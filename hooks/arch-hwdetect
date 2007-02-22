@@ -1,0 +1,39 @@
+# vim: set ft=sh:
+run_hook ()
+{
+    msg -n ":: Loading hwdetect..."
+	HWDETECT="/sbin/hwdetect --load-modules"
+	if grep -qw ide-legacy /proc/cmdline; then
+		HWDETECT="$HWDETECT --ide-legacy"
+	else
+		# generating blacklist modules which are not covered by new pata subsystem!
+		#for i in /lib/modules/$(uname -r)/kernel/drivers/ide/pci/*; do 
+		#	for alias in $(/sbin/modinfo $i|grep ^alias\:|cut -d' ' -f11); do 
+		#		[ -z "$(modprobe --show-depends $alias|grep '/ata/'|grep -v 'libata.ko')" ] && echo "$(basename ${i})" | sed -e 's/.ko//g' >> /tmp/.ide-blacklist
+		#	done
+		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/pci/*); do 
+			basename $i .ko >> /tmp/.ide-blacklist
+		done
+		#done
+		echo "Auto blacklisted IDE modules for udev:"
+		echo "--------------------------------------"
+		if [ -s /tmp/.ide-blacklist ]; then 
+			for i in $(sort -u /tmp/.ide-blacklist); do
+				echo -n "$i "
+			done
+			echo ""
+			echo "If you need them, please use 'ide-legacy' boot option or load them by hand!"
+		else
+			echo "No modules blacklisted."
+		fi
+		echo "--------------------------------------"
+
+	fi
+	if /usr/bin/vmware-detect; then
+		HWDETECT="$HWDETECT --vmware"
+		$HWDETECT
+	else
+		$HWDETECT
+	fi
+    msg "done."
+}

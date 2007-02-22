@@ -1,0 +1,78 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### setting up base structure
+    add_dir "/proc"
+    add_dir "/sys"
+    add_dir "/dev"
+    add_dir "/mnt"
+    add_dir "/tmp"
+    add_dir "/var/run"
+    add_dir "/var/log"
+    add_dir "/addons"
+    add_dir "/home"
+    add_device "/dev/null"    c 1 3
+    add_device "/dev/zero"    c 1 5
+    add_device "/dev/console" c 5 1
+
+    ### adding klibc lib files
+    for f in $(find /lib -name klibc-*.so); do
+        add_file $f
+    done
+
+    ### adding klibc binaries
+    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -type d); do
+        add_file $f /bin/$(basename $f)
+    done
+
+    ### adding needed programs from running system
+    add_file "${CONFIG}" "/config"
+    SCRIPT="arch-base"
+    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano nc printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su"
+    add_file "/usr/bin/reset"
+    add_file "/sbin/swapoff"
+    add_file "/sbin/halt"
+    add_file "/sbin/telinit"
+    add_file "/bin/awk"
+    add_file "/etc/archboot/etc/init" "/init"
+    add_file "/usr/bin/vi"
+    add_file "/bin/dir"
+    add_file "/usr/share/terminfo/l/linux"
+    add_file "/usr/share/vim/syntax/syntax.vim"
+    add_file "/usr/share/vim/syntax/conf.vim"
+    add_file "/usr/share/vim/syntax/sh.vim"
+    add_file "/usr/share/vim/syntax/grub.vim"
+    add_file "/usr/share/vim/syntax/lilo.vim"
+    add_file "/usr/share/vim/syntax/manual.vim"
+    add_file "/usr/share/vim/syntax/synload.vim"
+    add_file "/usr/share/vim/syntax/colortest.vim"
+    add_file "/usr/share/vim/syntax/syncolor.vim"
+    add_file "/usr/share/vim/syntax/hitest.vim"
+    add_file "/usr/share/vim/syntax/whitespace.vim"
+    add_file "/usr/share/vim/syntax/modconf.vim"
+    add_file "/usr/share/vim/syntax/resolv.vim"
+    add_file "/usr/share/vim/syntax/fstab.vim"
+    add_file "/usr/share/vim/filetype.vim"
+    add_file "/etc/rc.d/functions"
+    add_file "/etc/archboot/etc/rc.conf" "/etc/rc.conf"
+    add_file "/etc/rc.d/syslog-ng"
+
+    ### adding config files of installation system
+    for i in $(find /etc/archboot/etc/ -maxdepth 1 ! -type d ! -name 'init' ! -name "udev.rules" ! -name "menu.lst" ! -name "isolinux.cfg" ! -name "append-message*"); do
+        add_file "$i" "/etc/$(basename $i)"
+    done
+    
+    ### fixing network support
+    add_file "/lib/libnss_files.so.2"
+    add_file "/lib/libnss_dns.so.2"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up all initial directories and installs base
+  klibc utilities and libraries for a arch boot image. 
+  DO NOT remove this one unless you know what you're doing.
+HELPEOF
+}

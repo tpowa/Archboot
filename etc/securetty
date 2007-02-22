@@ -1,0 +1,11 @@
+#
+# /etc/securetty
+#
+
+console
+vc/1
+vc/2
+vc/3
+vc/4
+
+# End of file

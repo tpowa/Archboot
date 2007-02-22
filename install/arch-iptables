@@ -1,0 +1,22 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES="$(checked_modules "/net/ipv6") $(checked_modules "/net/ipv4") $(checked_modules "/net/netfilter")"
+    BINARIES="ip6tables ip6tables-restore ip6tables-save iptables iptables-restore iptables-save iptables-xml"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/rc.d/iptables"
+    add_file "/etc/rc.d/ip6tables"
+    add_file "/etc/archboot/etc/conf.d/iptables_conf.d" "/etc/conf.d/iptables"
+    add_file "/etc/archboot/etc/iptables/empty.rules" "/etc/iptables/empty.rules"
+    add_file "/etc/archboot/etc/iptables/simple_firewall.rules" "/etc/iptables/simple_firewall.rules"
+
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes iptables on an arch boot image.
+HELPEOF
+} 

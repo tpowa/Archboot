@@ -1,0 +1,28 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="pam_tally unix_chkpwd"
+    FILES=""
+    SCRIPT=""
+    for i in $(echo /etc/archboot/etc/pam/*/*); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/pam|/etc|g')"
+    done
+    for i in $(echo /lib/libpam*); do
+    	add_file "$i"
+    done
+    for i in $(echo /lib/security/pam_*.so); do
+    	add_file "$i"
+    done
+    for i in $(echo /lib/security/pam_filter/*); do
+    	add_file "$i"
+    done
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the pam on an arch boot image.
+HELPEOF
+} 

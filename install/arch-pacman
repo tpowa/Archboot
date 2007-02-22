@@ -1,0 +1,38 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="pacman"
+    FILES=""
+    SCRIPT=""
+
+DEPENDS="initscripts cvs wget bash coreutils cryptsetup dialog \
+e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm module-init-tools nano \
+ncurses net-tools netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
+syslog-ng sysvinit tar util-linux vim which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
+grub netkit-telnet openssh hwdetect portmap shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
+dosfstools udev initscripts filesystem kernel26 glibc kernel-headers xinetd naim links pacman screen kbd pam \
+dhcpcd bzip2 gcc mktemp openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
+rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils"
+
+for i in $DEPENDS; do
+	add_file "$(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*/depends)"
+	add_file "$(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*/files)"
+	add_file "$(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*/desc)"
+done
+add_dir "/var/log"
+add_file "/etc/archboot/etc/pacman/pacman.conf.pacman" "/etc/pacman.conf"
+add_file "/etc/archboot/etc/pacman/current.pacman" "/etc/pacman.d/current"
+add_file "/etc/archboot/etc/pacman/extra.pacman" "/etc/pacman.d/extra"
+add_file "/etc/archboot/etc/pacman/unstable.pacman" "/etc/pacman.d/unstable"
+add_file "/etc/archboot/etc/pacman/release.pacman" "/etc/pacman.d/release"
+add_file "/etc/archboot/etc/pacman/community.pacman" "/etc/pacman.d/community"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the pacman on an arch boot image.
+HELPEOF
+} 

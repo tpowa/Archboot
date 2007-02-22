@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="naim"
+    FILES=""
+    SCRIPT="arch-naim"
+    add_file "/etc/archboot/etc/naim/nircrc" "/root/.nircrc"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the naim on an arch boot image.
+HELPEOF
+} 

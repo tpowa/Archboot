@@ -1,0 +1,39 @@
+# vim:set ft=sh:
+
+install ()
+{
+    MODULES=""
+    BINARIES="udevd udevtrigger udevsettle"
+    FILES=" /etc/udev/udev.conf"
+    SCRIPT="arch-udev"
+    add_file /etc/archboot/etc/udev.rules /etc/udev/rules.d/udev.rules
+    add_file /etc/archboot/etc/start_udev /etc/start_udev
+    add_file /lib/initcpio/udev/firmware.sh /lib/udev/firmware.sh
+    add_file /lib/udev/cdrom_id /lib/udev/cdrom_id
+    add_file /etc/archboot/etc/load-modules.sh /lib/udev/load-modules.sh
+    add_file /lib/udev/cdsymlinks.sh /lib/udev/cdsymlinks.sh
+    add_file /lib/udev/ata_id /lib/udev/ata_id
+    add_file /lib/udev/dasd_id /lib/udev/dasd_id
+    add_file /lib/udev/edd_id /lib/udev/edd_id
+    add_file /lib/udev/path_id /lib/udev/path_id
+    add_file /lib/udev/scsi_id /lib/udev/scsi_id
+    add_file /lib/udev/usb_id /lib/udev/usb_id
+    add_file /lib/udev/vol_id /lib/udev/vol_id
+    # add persistent network and cd symlink support
+    # add_file /etc/udev/rules.d/75-cd-aliases-generator.rules
+    # add_file /etc/udev/rules.d/75-persistent-net-generator.rules
+    # add_file /etc/udev/rules.d/60-cdrom_id.rules
+    # add_file /lib/udev/write_cd_rules
+    # add_file /lib/udev/write_net_rules
+    # add_file /lib/udev/rule_generator.functions
+    # add_file /lib/udev/path_id
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will use udev to create your root device node
+  and detect the needed modules for your root device.
+  It is recommended to use this hook instead of modload.
+HELPEOF
+}

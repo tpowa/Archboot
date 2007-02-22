@@ -1,0 +1,21 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/pcmcia/" | grep -ve "sound" -e "net") $(checked_modules "/ide/legacy")"
+    MODULES=$(echo ${MODULES}) #trim whitespace
+    if [ "x${MODULES}" != "x" ]; then
+        MODULES="${MODULES} sd_mod sr_mod ide-disk ide-cd"
+    fi
+    BINARIES="pcmcia-socket-startup pcmcia-check-broken-cis"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/pcmcia/config.opts"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the pcmcia on an arch boot image.
+HELPEOF
+}

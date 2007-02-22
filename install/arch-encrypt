@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" dm-crypt $(all_modules "/crypto/" | grep -v "aes.ko" ) "
+    BINARIES="cryptsetup"
+    FILES=""
+    SCRIPT="arch-encrypt"
+    add_dir "/dev/mapper"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook allows for an encrypted root device on an arch boot image.
+HELPEOF
+}

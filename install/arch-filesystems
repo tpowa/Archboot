@@ -1,0 +1,16 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules '/kernel/fs' | grep -v "nls") $(checked_modules '/kernel/fs/nls/nls_cp437') "
+    BINARIES="mkswap mke2fs mkreiserfs reiserfsck reiserfstune resize_reiserfs mkfs.ext2 badblocks blkid dumpe2fs e2fsck e2image e2label findfs fsck logsave resize2fs tune2fs mkfs.ext3 mkfs.xfs mkntfs ntfscat ntfsclone ntfscluster ntfsfix ntfsinfo ntfslabel ntfsls ntfsresize ntfsundelete mkfs.jfs fsck.jfs jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune fsck.ext2 fsck.ext3 fsck.xfs xfs_repair xfs_check xfs_freeze xfs_io xfs_admin xfs_db mkdosfs dosfsck ntfs-3g"
+    FILES=""
+    SCRIPT="arch-filesystems"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook is responsible for including filesystems on an arch boot image.
+HELPEOF
+}

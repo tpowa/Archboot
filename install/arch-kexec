@@ -1,0 +1,18 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="kexec"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/rc.d/kexec"
+    add_file "/etc/archboot/etc/conf.d/kexec_conf.d" "/etc/conf.d/kexec"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes kexec on an arch boot image.
+HELPEOF
+} 

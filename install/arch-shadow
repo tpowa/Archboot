@@ -1,0 +1,24 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd adduser chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv logoutd newusers pwck pwconv pwunconv useradd userdel usermod"
+    FILES=""
+    SCRIPT=""
+    add_file "/usr/bin/sg"
+    add_file "/usr/sbin/vigr"
+    for i in $(echo /etc/archboot/etc/shadow-config/*/*); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/shadow-config|/etc|g')"
+    done
+    for i in $(echo /etc/archboot/etc/shadow-config/*.defs); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/shadow-config|/etc|g')"
+    done
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the shadow on an arch boot image.
+HELPEOF
+} 

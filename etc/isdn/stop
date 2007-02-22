@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# very simple reload-example for the new chargemax feature of isdnlog
+# this is called by isdnlog every time we get a AOCD and chargesum of
+# active device is greater then CHARGEMAX.
+# there are three parameter available:
+#
+#  first ($1) is chargesum-CHARGEMAX
+# second ($2) is ALIAS as defined in ISDNLOG.CONF
+#  third ($3) is total chargesum for active device
+
+case "$1" in
+5\.*)
+        echo "WARNING, charge-limit set by CHARGEMAX is reached!" >> /dev/console
+        echo "$2 is talking to much!" >> /dev/console
+#        /bin/aplay /usr/sounds/attention.au
+        ;;
+
+10\.* | 11\.* )
+        echo "WARNING, $2 got charge-overflow == $1, total chargesum == $3" >> /dev/console
+        echo "next chargeint will cause i4l to stop" >> /dev/console
+#        /bin/aplay /usr/sounds/earthdestruction.au
+        ;;
+
+20\.* | 21\.* )
+        echo "reload got charge-overflow == $1, now i4l will be stopped!" >> /dev/console
+        /sbin/init.d/i4l stop
+        ;;
+
+25\.* | 26\.* )
+        echo "aeh, still alive?! so we'll do a reboot!!" >> /dev/console
+#        /bin/aplay /usr/sounds/crash.au
+        /sbin/reboot
+        ;;
+esac
+
+echo "got charge_ov=$1 dev=$2 scharge=$3 " >> /dev/console

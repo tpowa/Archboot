@@ -1,0 +1,19 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "arch/i386/kernel/cpu/cpufreq")  $(checked_modules "drivers/cpufreq") "
+
+    BINARIES="cpufreq-info cpufreq-set"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/archboot/etc/conf.d/cpufreq_conf.d" "/etc/conf.d/cpufreq"
+    add_file "/etc/rc.d/cpufreq"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes cpufreq tools on an arch boot image.
+HELPEOF
+} 

@@ -1,0 +1,15 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    BINARIES=""
+    FILES=""
+    SCRIPT="arch-pxelinux"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook starts the network interface and mounts the NFSDIR on an arch boot image.
+HELPEOF
+}

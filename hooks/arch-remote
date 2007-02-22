@@ -1,0 +1,9 @@
+run_hook ()
+{
+    # fix telnet login
+    # ln -s /etc/login.sh /bin/login
+    # fix screen
+    ln -s $(find /usr/bin/screen-*) /usr/bin/screen
+    # fix daemons
+    sed -i -e 's|^DAEMONS=(@syslog-ng)|DAEMONS=(@syslog-ng @network @portmap @sshd @xinetd)|g' /etc/rc.conf
+}

@@ -1,0 +1,79 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### check for activated testing repository
+    if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
+	echo "WARNING: TESTING REPOSITORY ACTIVATED"
+	echo "-------------------------------------"
+	echo "POSSIBILITY OF BROKEN BINARY PACKAGES ON INSTALL MEDIA!"
+	echo "Use a chroot instead to avoid those problems."
+	echo "5 seconds time to cancel with CTRL+C"
+	sleep 5
+    fi
+    ### begin cvs part
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	CVSTREE=$(mktemp /tmp/archcvs.XXXX)
+    	rm ${CVSTREE}
+    	mkdir -p ${CVSTREE}
+    	# checkout actual CURRENT cvs
+    	export CVSROOT=${CVSSETUP}
+    else
+    	CVSTREE=${CVSTREE}
+    fi
+    SCRIPT=
+    BINARIES=
+    # always needed for every install
+    cd ${CVSTREE}
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	cvs -z3 co arch/scripts/{km,setup,quickinst}
+    	cvs -z3 co arch/doc/en/guide/install/arch-install-guide.txt
+    	cvs -z3 co arch/misc/bootdisk/2/mirrors.txt
+    fi
+    # fix km script
+    KM=$(mktemp /tmp/km.XXXX)
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	cp -f ${CVSTREE}/arch/scripts/km ${KM}
+    else
+    	cp -f ${KMSCRIPT} ${KM}
+    fi
+    sed -i -e 's#$BASEDIR/keymaps/##g' ${KM}
+    chmod 755 ${KM}
+    mkdir -p ${TEMPDIR}/arch
+    add_file "${KM}" "/bin/km"
+    # fix mirrors.txt
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	sed -i -e "s/i686/$(uname -m)/g" ${CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
+    	add_file "${CVSTREE}/arch/scripts/setup" "/arch/setup"
+    	add_file "${CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
+    	add_file "${CVSTREE}/arch/misc/bootdisk/2/mirrors.txt" "/arch/mirrors.txt"
+    else
+    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
+    	add_file "${SETUP}" "/arch/setup"
+    	add_file "${QUICKINST}" "/arch/quickinst"
+    	add_file "${MIRRORS}" "/arch/mirrors.txt"
+    fi
+    DOCS=$(mktemp /tmp/docs.XXXX)
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	cp -f ${CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${DOCS}
+    else
+    	cp -f ${DOCUMENTATION} ${DOCS}
+    fi
+    gzip -9 ${DOCS}
+    add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
+    add_dir "/src"
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	! [ "${TEMPDIR}" = "" ] && cp ${CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    else
+    	! [ "${TEMPDIR}" = "" ] && cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
+    fi
+    # generate iso title name
+    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux FTP $(uname -m)" >> ${ISONAME}
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up all you need for a arch ftp install image.
+HELPEOF
+}

@@ -1,0 +1,34 @@
+#! /bin/sh
+. /etc/rc.conf
+. /etc/rc.d/functions
+
+mkdir -p /dev/pts
+mkdir -p /dev/shm
+mount /dev/pts
+mount /dev/shm
+
+# anything more serious than KERN_WARNING goes to the console
+if grep -qw " verbose" /proc/cmdline; then
+	/bin/dmesg -n 8
+else
+	/bin/dmesg -n 3
+fi
+
+# Start daemons
+for daemon in "${DAEMONS[@]}"; do
+	if [ "$daemon" = "${daemon#!}" ]; then
+		if [ "$daemon" = "${daemon#@}" ]; then
+			/etc/rc.d/$daemon start
+		else
+			stat_bkgd "Starting ${daemon:1}"
+			(/etc/rc.d/${daemon:1} start) &>/dev/null &
+		fi
+	fi
+done
+
+if [ -x /etc/rc.local ]; then
+	/etc/rc.local
+fi
+
+# change to / for login shells
+cd /

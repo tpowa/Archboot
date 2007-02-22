@@ -1,0 +1,18 @@
+# vim:set ft=sh:
+
+install ()
+{
+    MODULES=""
+    BINARIES="vmware-detect"
+    FILES=""
+    SCRIPT="arch-hwdetect"
+    add_file /sbin/hwdetect /sbin/hwdetect
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will use hwdetect to load 
+  and detect the needed modules for your system.
+HELPEOF
+}

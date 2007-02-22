@@ -1,0 +1,158 @@
+# example for /etc/isdn/isdnlog.isdnctrl0.options
+# copy this file to /etc/isdn/isdnlog.isdnctrl0.options and edit
+#
+# if you have a second ISDN card, install this file as
+# /etc/isdn/isdnlog.isdnctrl2.options and increment the port-value
+#
+# More information: /usr/doc/packages/i4l/isdnlog/README
+
+[options]
+
+# command line            values:
+###################################################
+
+# -D                      daemon={yes|no}
+# isdnlog wird als Daemon gestartet. Wenn -mX nicht verwendet wurde, wird
+# die gesamte Ausgabe (normal stderr) auf den syslog geschrieben. Der
+# isdnlog wird automatisch im Hintergrund gestartet.
+
+daemon=yes
+
+# -l                      syslog="value"
+# Angabe der gewuenschten Meldungen, die in's syslog eingetragen
+# werden sollen
+
+syslog=1015
+
+# for debugging of d-kanal to /tmp/isdnctrl0
+
+# syslog=0xfffffff
+# log=3
+# flush=on
+
+# -x                      xisdn=XXX
+# Angabe der gewuenschten Meldungen, die dem X11-Client gemeldet
+# werden sollen. Gleichzeit mit -xX wird es erlaubt, dass ein X11-Client
+# sich beim isdnlog anmelden darf.
+
+xisdn=4087
+
+# -M                      monitor={yes|no}
+# imon/imontty/isdnmon Emulator
+# Hiermit erzeugt isdnlog eine den obigen Tools entsprechende Ausgabe
+# (Achtung: -m2048 muss dann zusaetzlich angegeben werden!)
+
+monitor=yes
+
+# -m                      stdout="value"
+# Angabe der gewuenschten Meldungen, die angezeigt werden sollen.
+# Normalerweise ist das stderr. Es kann aber mit -C X ein anderes
+# Device sein.
+
+stdout=2048
+
+# -n                      newline={yes|no}
+# Die Durchsatzmeldungen werden - soweit moeglich - immer in derselben
+# Bildschirmzeile angezeigt.
+
+newline=yes
+
+# -W                      width="value"
+# Alle Bildschirmausgabezeilen werden auf max. "x" Zeichen/Zeile
+# beschnitten
+
+width=80
+
+# -S                      start={yes|no}
+# isdnlog soll bei diversen Event's die in der 5. Spalte der isdn.conf
+# angegebenen externen Programme starten
+
+start=yes
+
+# -p                      port="value"
+# Angabe der TCP/IP Port-Nummer, ueber die isdnlog mit dem X11-Client
+# kommunizieren soll
+# wenn mehrere isdnlogs fuer mehrere Karten gestartet werden, muessen
+# unterschiedliche ports benutzt werden
+
+port=20011
+
+# -w                      thruput="value"
+# in welchen Abstaenden soll isdnlog die Uebertragungsrate neu
+# berechnen und anzeigen (Angabe in Sekunden)
+
+# thruput=60
+
+
+# -t                      time={0|1|2}
+# isdnlog soll bei einer Uhrzeit-Uebertragung durch die VSt die
+# Rechneruhr entsprechend stellen (-t 1 = ein mal, -t 2 = immer)
+
+time=1
+
+# -b                      bilingual={yes|no})
+# Wenn ein bilingualer NT verwendet wird, mit dem DSS1 gefahren wird,
+# dann muss dieses Flag gesetzt sein, da sonst die eigenen MSN's fehlerhaft
+# angezeigt werden.
+
+# bilingual=yes
+
+# -A                      amt="value"
+# Hiermit kann/koennen die Ziffer(n) angegeben werden, die
+# an einer Telefonanlage vorgewaehlt werden muessen, um ein Amt
+# zu bekommen. Hierbei koennen beliebig viele, jeweils durch ein ":"
+# getrennte Amtsholungen angegeben werden, also z.B.
+
+# amt=0:80:81:82:83:84:85:86:87:88:89
+# trim=0
+
+# -2                      dual="value"
+# Dual-Mode. isdnlog empfaengt die D-Kanal-Frames der anderen
+# Geraete auf dem S0-Bus ueber eine zweite, falsch angeschlossene
+# Teles-Karte.
+# Mit x = 2 zeigt isdnlog auch jede Kleinigkeit - wie z.b. jedes
+# einzelne gewaehlte Digit beim Telefonieren direkt an.
+
+# dual=1
+
+# -h                      hangup="value"
+# Zeitabhaengige Hangup-Timeout Steuerung
+# Wird dieses Flag angegeben, berechnet isdnlog bei jedem rausgehenden
+# Verbindungsaufbau die aktuelle Dauer einer Gebuehreneinheit
+# entsprechend der Tageszeit (nebst Wochentag/Feiertag etc.) sowie
+# der Gebuehrenzone des Gegners, und programmiert - falls erforderlich -
+# die neue Dauer in das entsprechende IP-Interface.
+
+hangup=5:3
+
+# -I			ciInterval="value[:value2]"
+# Print chargeint (CI) and AOC-D (EH) messages every value / value2 seconds.
+
+ciInterval=300:600
+
+# -d			abclcr="value"
+# Do active LCR for outgoing calls from your isdn card.
+#
+# Value is a bitmap:
+#	0 ... off
+#	1 ... calls to different area / country
+#	2 ... local calls too
+#	4 ... special numbers e.g. ISP
+# This needs a kernel patch to work. If the kernel patch is not found
+# a simulation is done.
+# Note: depending on your telefon provider local area calls may or may not
+# be routed to alternate providers.
+# For changing the ISP a script is called. s. next option 'providerchange'
+
+abclcr=0
+
+#			providerchange="path_top_script"
+# (There is no commandline option for this)
+# This script is called with 3 parameters, the new provider number
+# (fron rate-CC.dat) the number, which would be dialed, and the servicename.
+# The script should adjust routing, name resolution and so on to
+# connect to the ISP.
+# If the script returns non zero, LCR will not be done.
+
+# providerchange = /etc/isdn/provider
+

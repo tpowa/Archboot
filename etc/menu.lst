@@ -1,0 +1,32 @@
+color light-blue/black light-cyan/blue
+hiddenmenu
+timeout @@TIMEOUT@@
+default 0
+
+title Show Installation notes again
+cat (cd)/boot/boot.msg
+pause Press any key to continue
+
+title Arch Linux Installation / Rescue System
+root (cd)
+kernel /boot/vmlinuz @@KERNEL_BOOT_OPTIONS@@
+initrd /boot/initrd.img
+
+title Arch Linux Installation / Rescue System (ide-legacy)
+root (cd)
+kernel /boot/vmlinuz ide-legacy @@KERNEL_BOOT_OPTIONS@@
+initrd /boot/initrd.img
+
+title Memory Check
+root (cd)
+kernel /boot/memtest
+
+title Boot installed system (/boot on the same partition as /)
+root (hd0,0)
+kernel /boot/vmlinuz26 ro root=/dev/sda1
+initrd /boot/kernel26.img
+
+title Boot installed system (/boot on a separate partition)
+root (hd0,0)
+kernel /vmlinuz26 ro root=/dev/sda3
+initrd /kernel26.img

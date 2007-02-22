@@ -1,0 +1,23 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/drivers/isdn/") "
+
+    BINARIES="hisaxctrl icnctrl imon imontty ipppd ipppstats isdnctrl isdnlog mkzonedb pcbitctl isdnconf isdnrate isdnrep"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/archboot/etc/isdn/callerid.conf" "/etc/isdn/callerid.conf"
+    add_file "/etc/archboot/etc/isdn/isdn.conf" "/etc/isdn/isdn.conf"
+    add_file "/etc/archboot/etc/isdn/isdnlog.isdnctrl0.options" "/etc/isdn/isdnlog.isdnctrl0.options"
+    add_file "/etc/archboot/etc/isdn/isdnlog.users" "/etc/isdn/isdnlog.users"
+    add_file "/etc/archboot/etc/isdn/rate.conf" "/etc/isdn/rate.conf"
+    add_file "/etc/archboot/etc/isdn/stop" "/etc/isdn/stop"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the isdn subsystem on an arch boot image.
+HELPEOF
+}

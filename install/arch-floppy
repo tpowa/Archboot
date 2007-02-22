@@ -1,0 +1,16 @@
+# vim: set ft=sh:
+
+install ()
+{
+    MODULES="floppy"
+    BINARIES=""
+    FILES=""
+    SCRIPT="arch-floppy"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook loads the floppy module during boot.
+HELPEOF
+}

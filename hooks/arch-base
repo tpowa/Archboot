@@ -1,0 +1,10 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+run_hook ()
+{
+  # fixing some symlinks
+  ln -s /sbin/halt /sbin/poweroff
+  ln -s /sbin/halt /sbin/reboot
+  ln -s /bin/chroot /usr/bin/chroot
+  ln -s /sbin/killall5 /bin/pidof
+}

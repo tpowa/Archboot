@@ -1,0 +1,22 @@
+run_hook ()
+{
+    #TODO scan for these somehow...
+    /bin/modprobe -aq linear multipath raid0 raid1 raid456 raid10>/dev/null 2>&1
+    # md= can be specified multiple times.  The simplistic commandline
+    #  parsing does not handle this, so we will let mdassemble parse it
+    # create md devices  for installation
+    for i in $(seq 0 15); do
+	/sbin/mdadm --create /dev/md$i > /dev/null 2>&1
+        /sbin/mdadm --create -a mdp /dev/md_d$i > /dev/null 2>&1
+    done
+    for i in $(replace $(echo $md) ',' ' '); do 
+	case $i in d[0-9])
+    		mdadm --assemble --auto=mdp /dev/md_$(replace $(echo $md) ',' ' ')
+    		export USE_RAID_ARRAY=1
+		;;
+    	esac
+    done
+    if  ! [ "$USE_RAID_ARRAY" = "1" ] ; then
+      /bin/mdassemble ${CMDLINE}
+    fi
+}

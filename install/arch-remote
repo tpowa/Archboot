@@ -1,0 +1,33 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/drivers/net/") "
+
+    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd ssh scp ssh-keygen sshd pmap_set pmap_dump portmap xinetd in.telnetd"
+    FILES=""
+    SCRIPT="arch-remote"
+    add_file "/etc/archboot/etc/remote/hosts.allow" "/etc/hosts.allow"
+    add_file "/etc/archboot/etc/remote/hosts.deny" "/etc/hosts.deny"
+    add_file "/etc/archboot/etc/remote/screenrc" "/etc/screenrc"
+    add_file "/etc/archboot/etc/remote/xinetd.conf" "/etc/xinetd.conf"
+    add_file "/etc/archboot/etc/remote/servers_xinetd" "/etc/xinetd.d/servers"
+    add_file "/etc/archboot/etc/remote/services_xinetd" "/etc/xinetd.d/services"
+    add_file "/etc/archboot/etc/remote/telnet_xinetd" "/etc/xinetd.d/telnet"
+    add_file "/etc/archboot/etc/remote/ssh_config_ssh" "/etc/ssh/ssh_config"
+    add_file "/etc/archboot/etc/remote/sshd_config_ssh" "/etc/ssh/sshd_config"
+    add_file "/etc/archboot/etc/remote/moduli_ssh" "/etc/ssh/moduli"
+    add_file "/etc/archboot/etc/remote/sshd_pam" "/etc/pam.d/sshd"
+    add_file "/etc/archboot/etc/remote/screen_pam" "/etc/pam.d/screen"
+    add_file "/etc/rc.d/portmap"
+    add_file "/etc/rc.d/sshd"
+    add_file "/etc/rc.d/xinetd"
+    add_dir  "/var/empty"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes remote tools on an arch boot image.
+HELPEOF
+} 

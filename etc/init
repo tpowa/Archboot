@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# add sh symlink
+ln -s /bin/bash /bin/sh
+ln -s /sbin/modprobe /bin/modprobe
+
+msg () { [ "${quiet}" != "y" ] && echo "$@"; }
+err () { echo "ERROR: $@"; }
+
+msg ":: Loading Initramfs"
+
+/bin/mount -t sysfs none /sys
+/bin/mount -t proc  none /proc
+
+read CMDLINE </proc/cmdline
+export CMDLINE
+
+# Used so hooks can override params to kinit
+export kinit_params=""
+export root=""
+echo "/bin/modprobe" > /proc/sys/kernel/modprobe
+
+for cmd in $CMDLINE; do
+    case "$cmd" in
+        [0123456Ss]) export runlevel="$cmd" ;;
+        single) export runlevel="S" ;; #some people use 'single'
+        # replace can cause problems for the following entries
+        # These should only be applied to the lefthand side of the expression
+        # until we find a fix hardcode the stuff here.
+        root=*) export "${cmd}";;
+        md=*) export "${cmd}" ;;
+        crypto=*) export "${cmd}" ;;
+        resume2=*) export "${cmd}" ;;
+        ip=*) export "${cmd}" ;;
+        nfsaddrs=*) export "${cmd}" ;;
+        nfsroot=*) export "${cmd}" ;;
+        # only export stuff that does work with dash :)
+        *=*) cmd="$(replace "${cmd}" '.' '_')"
+             cmd="$(replace "${cmd}" '-' '_')"
+             export "${cmd}"
+             ;;
+        *)   cmd="$(replace "${cmd}" '.' '_')"
+             cmd="$(replace "${cmd}" '-' '_')"
+             export "${cmd}=y" 
+           ;;
+    esac
+done
+
+if [ "x${disablehooks}" != "x" ]; then
+    for d in $(replace "${disablehooks}" ','); do
+        export "hook_${d}=disabled"
+    done
+fi
+
+if [ "x${disablemodules}" != "x" ]; then
+    for d in $(replace "${disablemodules}" ','); do
+        export "mod_${d}=disabled"
+    done
+fi
+
+. /config
+
+for m in $MODULES; do
+    TST=""
+    eval "TST=\$mod_${m}"
+    if [ "${TST}" != "disabled" ]; then
+        /bin/modprobe -q $m > /dev/null 2>&1
+    fi
+done
+
+if [ -e "/hooks" ]; then
+    for h in $HOOKS; do
+        TST=""
+        eval "TST=\$hook_${h}"
+        if [ "${TST}" != "disabled" ]; then
+            run_hook () { msg "$h: no run function defined"; }
+            if [ -e "/hooks/$h" ]; then
+               . /hooks/$h
+               msg ":: Running Hook [${h}]"
+               run_hook
+            fi
+        fi
+    done
+fi
+
+if [ "${break}" = "y" ]; then
+    echo ":: Break requested, type 'exit' to resume operation"
+    echo "   NOTE: klibc contains no 'ls' binary, used 'echo *' instead"
+    PS1="ramfs$ " /bin/sh -i
+fi
+
+if [ "${root}" = "" -a "${ip}" = "" ]; then
+	# enter install environment
+	exec /sbin/init
+else
+	# boot into system
+	#Special handling is udev is running
+	udevpid=$(/bin/minips -C udevd -o pid=)
+	if [ "x${udevpid}" != "x" ]; then
+    		/bin/kill -9 $udevpid
+    		/bin/sleep 0.01
+	fi
+	# Optimize fs type loop for mounting rootfs
+	msg ":: Initramfs Completed - control passing to kinit"
+
+	echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
+	exec /bin/kinit -- "root=${root}" ${kinit_params} "${runlevel}" > /dev/null 2>&1
+fi
