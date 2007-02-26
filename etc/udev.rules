@@ -47,6 +47,9 @@ ACTION=="add", SUBSYSTEM=="mmc", RUN+="/lib/udev/load-modules.sh mmc_block"
 
 LABEL="hotplug_driver_loaded"
 
+# fix ide cdrom detection on old proliant servers
+ACTION=="add", SUBSYSTEM=="pci", ENV{MODALIAS}=="pci:v00000E11d00000001sv00000000sd00000000bc06sc02i00", RUN+="/lib/udev/load-modules.sh ide-generic"
+
 # FIRMWARE
 ACTION=="add", SUBSYSTEM=="firmware", ENV{FIRMWARE}=="?*", RUN+="/lib/udev/firmware.sh"
 #####################################
