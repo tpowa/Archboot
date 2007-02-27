@@ -29,7 +29,7 @@ install ()
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
     SCRIPT="arch-base"
-    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano nc printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su lspci"
+    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano nc printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su"
     add_file "/usr/bin/reset"
     add_file "/sbin/swapoff"
     add_file "/sbin/halt"
