@@ -23,6 +23,13 @@ if [ -s /tmp/.ide-blacklist ]; then
 		j="$j $l"
 	done
 fi
+# blacklist framebuffer modules
+for x in $(echo /lib/modules/$(uname -r)/kernel/drivers/video/*/*fb*); do
+	j="$j $(/usr/bin/basename $x .ko)"
+done
+for x in $(echo /lib/modules/$(uname -r)/kernel/drivers/video/*fb*); do
+	j="$j $(/usr/bin/basename $x .ko)"
+done
 
 if [ "${j}" != "" ] ; then
 	for n in ${i}; do

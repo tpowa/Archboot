@@ -7,4 +7,5 @@ run_hook ()
   ln -s /sbin/halt /sbin/reboot
   ln -s /bin/chroot /usr/bin/chroot
   ln -s /sbin/killall5 /bin/pidof
+  ln -s /usr/bin/netcat /usr/bin/nc
 }

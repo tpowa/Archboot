@@ -9,12 +9,12 @@ install ()
 
 DEPENDS="initscripts cvs wget bash coreutils cryptsetup dialog \
 e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm module-init-tools nano \
-ncurses net-tools netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
+ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
 syslog-ng sysvinit tar util-linux vim which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
 grub netkit-telnet openssh hwdetect portmap shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
 dosfstools udev initscripts filesystem kernel26 glibc kernel-headers xinetd naim links pacman screen kbd pam \
 dhcpcd bzip2 gcc mktemp openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
-rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils"
+rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn bcm43xx-fwcutter"
 
 for i in $DEPENDS; do
 	add_file "$(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*/depends)"

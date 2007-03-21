@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifconfig ping ping6 route nslookup telnet ssh netcfg"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifconfig ping ping6 route nslookup telnet ssh netcfg bcm43xx-fwcutter"
     FILES=""
     SCRIPT=""
     add_file "/sbin/dhcpcd"

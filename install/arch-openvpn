@@ -1,0 +1,20 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="openvpn"
+    FILES=""
+    SCRIPT=""
+    CONFIG_FILES="README client.conf firewall.sh home.up loopback-client loopback-server office.up openvpn-shutdown.sh openvpn-startup.sh server.conf static-home.conf static-office.conf tls-home.conf tls-office.conf xinetd-client-config xinetd-server-config"
+    for i in $CONFIG_FILES; do
+    	add_file "/etc/archboot/etc/openvpn/examples/$i" "/etc/openvpn/examples/$i"
+    done
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes openvpn on an arch boot image.
+HELPEOF
+} 
