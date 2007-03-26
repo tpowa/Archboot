@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifconfig ping ping6 route nslookup telnet ssh netcfg bcm43xx-fwcutter"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifconfig ping ping6 route nslookup telnet ssh netcfg bcm43xx-fwcutter wpa_cli wpa_passphrase wpa_supplicant"
     FILES=""
     SCRIPT=""
     add_file "/sbin/dhcpcd"
@@ -15,6 +15,7 @@ install ()
     add_file "/etc/archboot/etc/conf.d/dhcpcd_conf.d" "/etc/conf.d/dhcpcd"
     add_file "/etc/archboot/etc/conf.d/bonding_conf.d" "/etc/conf.d/bonding"
     add_file "/etc/archboot/etc/conf.d/bridges_conf.d" "/etc/conf.d/bridges"
+    add_file "/etc/archboot/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
 }
 
 help ()

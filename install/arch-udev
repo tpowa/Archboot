@@ -13,7 +13,6 @@ install ()
     add_file /etc/archboot/etc/load-modules.sh /lib/udev/load-modules.sh
     add_file /lib/udev/cdsymlinks.sh /lib/udev/cdsymlinks.sh
     add_file /lib/udev/ata_id /lib/udev/ata_id
-    add_file /lib/udev/dasd_id /lib/udev/dasd_id
     add_file /lib/udev/edd_id /lib/udev/edd_id
     add_file /lib/udev/path_id /lib/udev/path_id
     add_file /lib/udev/scsi_id /lib/udev/scsi_id
