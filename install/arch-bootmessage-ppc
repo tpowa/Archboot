@@ -1,0 +1,52 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### generate boot.msg
+    [ "${RUNPROGRAM}" = "mkbootcd" ] && TITLEMSG="ISOLINUX"
+    [ "${RUNPROGRAM}" = "mkbootcd-grub" ] && TITLEMSG="GRUB"
+    [ "${RUNPROGRAM}" = "mksyslinux" ] && TITLEMSG="SYSLINUX"
+    [ "${RUNPROGRAM}" = "mkpxelinux" ] && TITLEMSG="PXELINUX"
+
+    CONFIGMSG="INSTALLATION / RESCUEBOOT SYSTEM"
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	CVSMSG=$(mktemp /tmp/archmsg.XXXX)
+    	rm ${CVSMSG}
+    	mkdir -p ${CVSMSG}
+    	# checkout actual name from cvs rc.sysinit
+    	export CVSROOT=${CVSSETUP}
+    	cd ${CVSMSG}
+    	cvs -z3 co -r ${TAG} arch/build/base/initscripts/rc.sysinit
+    	NAME=$(grep 'Arch' arch/build/base/initscripts/rc.sysinit | sed -e 's/printhl "//g' -e 's/$C_OTHER(${C_H2}//g' -e 's/\\n"//g' -e 's/$C_OTHER)//g')
+    else
+    	NAME=$(grep 'Arch' ${RCSYSINIT} | sed -e 's/printhl "//g' -e 's/$C_OTHER(${C_H2}//g' -e 's/\\n"//g' -e 's/$C_OTHER)//g')
+    fi
+    echo "Arch Linux PPC" >> ${BOOTMESSAGE}
+    echo "http://www.archlinuxppc.org" >> ${BOOTMESSAGE}
+    echo "Arch Linux - Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>" >> ${BOOTMESSAGE}
+    echo "Distributed under the GNU General Public License (GPL)" >> ${BOOTMESSAGE}
+    echo "" >> ${BOOTMESSAGE}
+    echo "${TITLEMSG} BOOT" >> ${BOOTMESSAGE}
+    echo "Creation Tool: '$(echo ${RUNPROGRAM} | sed 's|-grub||')' written by Tobias Powalowski <tpowa@archlinux.org>" >> ${BOOTMESSAGE}
+    echo "Edited by Benoit Chesneau <benoitc@archlinuxppc> for Arch Linux PPC" >> ${BOOTMESSAGE}
+    echo "" >> ${BOOTMESSAGE}
+    echo "${CONFIGMSG}" >> ${BOOTMESSAGE} 
+    echo "${NAME}" >> ${BOOTMESSAGE}
+    echo "Kernel: ${USEKERNEL}" >> ${BOOTMESSAGE}
+    echo "Architecture: $(uname -m)" >> ${BOOTMESSAGE}
+    echo "Creation Date: $(date)" >> ${BOOTMESSAGE}
+    echo "" >> ${BOOTMESSAGE}
+    if [ "${RUNPROGRAM}" = "mkbootcd-grub" ]; then
+    	[ -s "${APPENDBOOTMESSAGE}" ] && cat ${APPENDBOOTMESSAGE} >> ${BOOTMESSAGE}
+    else
+    	[ -s "${APPENDBOOTMESSAGE_SYSLINUX}" ] && cat ${APPENDBOOTMESSAGE_SYSLINUX} >> ${BOOTMESSAGE}
+    fi
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up dynamically the boot message, depending on
+  your system.
+HELPEOF
+}
