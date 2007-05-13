@@ -1,4 +1,4 @@
 run_hook ()
 {
-    /bin/modprobe -aq floppy>/dev/null 2>&1
+    /sbin/modprobe -aq floppy>/dev/null 2>&1
 }

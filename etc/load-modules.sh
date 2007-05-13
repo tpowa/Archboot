@@ -40,6 +40,6 @@ if [ "${j}" != "" ] ; then
 		done
 	done
 fi
-/bin/modprobe $1 > /dev/null 2>&1
+/sbin/modprobe $1 > /dev/null 2>&1
 
 # vim: set et ts=4:

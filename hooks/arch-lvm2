@@ -1,6 +1,6 @@
 run_hook ()
 {
-    /bin/modprobe -q dm-mod >/dev/null 2>&1
+    /sbin/modprobe -q dm-mod >/dev/null 2>&1
     if [ -e "/sys/class/misc/device-mapper" ]; then
         read dev_t < /sys/class/misc/device-mapper/dev
         /bin/mknod "/dev/mapper/control" c $(/bin/replace "${dev_t}" ':')

@@ -39,7 +39,7 @@ echo "Deactivating Swap ..."
 /sbin/swapoff -a
 
 echo "Unmounting Filesystems ..."
-/bin/umount -a
+/bin/umount -a -t notmpfs,noramfs,nosysfs,noproc
 
 # Power off or reboot
 if [ "$RUNLEVEL" = "0" ]; then

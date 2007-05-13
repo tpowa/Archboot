@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="pacman"
+    BINARIES="pacman pacman.static"
     FILES=""
     SCRIPT=""
 
@@ -14,7 +14,7 @@ syslog-ng sysvinit tar util-linux vim which wireless_tools xfsprogs dnsutils hdp
 grub netkit-telnet openssh hwdetect portmap shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
 dosfstools udev initscripts filesystem kernel26 glibc kernel-headers xinetd naim links pacman screen kbd pam \
 dhcpcd bzip2 gcc mktemp openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
-rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn bcm43xx-fwcutter wpa_supplicant"
+rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn bcm43xx-fwcutter wpa_supplicant gzip rsync libarchive libdownload device-mapper"
 
 for i in $DEPENDS; do
 	add_file "$(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*/depends)"

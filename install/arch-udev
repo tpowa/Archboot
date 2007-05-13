@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="udevd udevtrigger udevsettle"
+    BINARIES="udevd udevtrigger udevsettle dmsetup"
     FILES=" /etc/udev/udev.conf"
     SCRIPT="arch-udev"
     add_file /etc/archboot/etc/udev.rules /etc/udev/rules.d/udev.rules
@@ -18,6 +18,8 @@ install ()
     add_file /lib/udev/scsi_id /lib/udev/scsi_id
     add_file /lib/udev/usb_id /lib/udev/usb_id
     add_file /lib/udev/vol_id /lib/udev/vol_id
+    add_file /lib/libvolume_id.so.0
+    add_file /etc/udev/rules.d/device-mapper.rules
     # add persistent network and cd symlink support
     # add_file /etc/udev/rules.d/75-cd-aliases-generator.rules
     # add_file /etc/udev/rules.d/75-persistent-net-generator.rules

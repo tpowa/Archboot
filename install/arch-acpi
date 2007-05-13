@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/acpi/")"
+
+    BINARIES=""
+    FILES=""
+    SCRIPT="arch-acpi"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the acpi subsystem on an arch boot image.
+HELPEOF
+}

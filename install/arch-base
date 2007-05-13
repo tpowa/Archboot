@@ -22,14 +22,16 @@ install ()
     done
 
     ### adding klibc binaries
-    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -type d); do
+    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -type d); do
         add_file $f /bin/$(basename $f)
     done
 
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
     SCRIPT="arch-base"
-    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su"
+    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su cat cpio dd gzip"
+    add_file "/bin/gunzip"
+    add_file "/bin/zcat"
     add_file "/usr/bin/reset"
     add_file "/sbin/swapoff"
     add_file "/sbin/halt"
