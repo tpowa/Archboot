@@ -17,7 +17,7 @@
 # list of available options, their meanings and defaults, please see the
 # ssh_config(5) man page.
 
-# Host *
+Host *
 #   ForwardAgent no
 #   ForwardX11 no
 #   RhostsRSAAuthentication no
@@ -42,3 +42,5 @@
 #   Tunnel no
 #   TunnelDevice any:any
 #   PermitLocalCommand no
+HashKnownHosts yes
+StrictHostKeyChecking ask

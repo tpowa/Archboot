@@ -21,6 +21,7 @@ install ()
     add_file "/etc/archboot/etc/remote/screen_pam" "/etc/pam.d/screen"
     add_file "/etc/archboot/etc/remote/rsyncd.conf" "/etc/rsyncd.conf"
     add_file "/etc/archboot/etc/remote/rsync_xinetd" "/etc/xinet.d/rsync"
+    add_file "/usr/share/terminfo/x/xterm"
     add_file "/etc/rc.d/portmap"
     add_file "/etc/rc.d/sshd"
     add_file "/etc/rc.d/xinetd"
