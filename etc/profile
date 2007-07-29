@@ -9,7 +9,7 @@ export INPUTRC="/etc/inputrc"
 export LESS="-R"
 
 # Locale settings (find your locale with 'locale -a')
-export LANG="en_EN"
+export LANG="C"
 export LC_COLLATE="C"
 
 export COLUMNS LINES

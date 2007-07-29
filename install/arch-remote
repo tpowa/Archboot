@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd ssh scp ssh-keygen sshd pmap_set pmap_dump portmap xinetd in.telnetd rsync"
+    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd findssl.sh scp sftp slogin ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd pmap_set pmap_dump portmap xinetd in.telnetd rsync"
     FILES=""
     SCRIPT="arch-remote"
     add_file "/etc/archboot/etc/remote/hosts.allow" "/etc/hosts.allow"
@@ -21,7 +21,11 @@ install ()
     add_file "/etc/archboot/etc/remote/screen_pam" "/etc/pam.d/screen"
     add_file "/etc/archboot/etc/remote/rsyncd.conf" "/etc/rsyncd.conf"
     add_file "/etc/archboot/etc/remote/rsync_xinetd" "/etc/xinet.d/rsync"
-    add_file "/usr/share/terminfo/x/xterm"
+    for i in $(find /usr/share/terminfo/ ! -type d); do
+    	add_file "$i"
+    done
+    add_file "/usr/lib/ssh/sftp-server"
+    add_file "/usr/lib/ssh/ssh-keysign"
     add_file "/etc/rc.d/portmap"
     add_file "/etc/rc.d/sshd"
     add_file "/etc/rc.d/xinetd"

@@ -1,5 +1,10 @@
 run_hook ()
 {
+    # fix ext2/ext3 symlinks
+    ln -s /sbin/e2fsck /sbin/fsck.ext3
+    ln -s /sbin/mkfs.ext2 /sbin/mke2fs
+    ln -s /sbin/findfs /sbin/tune2fs
+
     # fix vfat symlink
     ln -s /sbin/mkdosfs /sbin/mkfs.vfat
     ln -s /sbin/mkdosfs /sbin/mkfs.msdos

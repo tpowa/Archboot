@@ -310,27 +310,28 @@ SUBSYSTEM=="usb_device", ACTION=="add", PROGRAM="/bin/sh -c 'K=%k; K=$${K#usbdev
 # persistent storage links: /dev/{disk,tape}/{by-id,by-uuid,by-label,by-path,by-name}
 # scheme based on "Linux persistent device names", 2004, Hannes Reinecke <hare@suse.de>
 
-# do not change that !!!
+# needed like this!!!
 ACTION!="add|change", GOTO="persistent_storage_end"
 
-KERNEL=="nst[0-9]", SUBSYSTEMS=="scsi", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -s %p -d $tempnode"
-KERNEL=="nst[0-9]", SUBSYSTEMS=="scsi", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -a -s %p -d $tempnode"
+KERNEL=="nst[0-9]", SUBSYSTEMS=="scsi", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id --export --whitelisted --fallback-to-sysfs -s %p -d $tempnode"
 KERNEL=="nst[0-9]", SUBSYSTEMS=="scsi", ENV{ID_SERIAL}=="?*", SYMLINK+="tape/by-id/$env{ID_BUS}-$env{ID_SERIAL}-nst"
 
 # type 8 devices are "Medium Changers"
-KERNEL=="sg*", SUBSYSTEMS=="scsi", ATTRS{type}=="8", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -s %p -d $tempnode"
-KERNEL=="sg*", SUBSYSTEMS=="scsi", ATTRS{type}=="8", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -a -s %p -d $tempnode"
+KERNEL=="sg*", SUBSYSTEMS=="scsi", ATTRS{type}=="8", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id --export --whitelisted --fallback-to-sysfs -s %p -d $tempnode"
 KERNEL=="sg*", SUBSYSTEMS=="scsi", ATTRS{type}=="8", ENV{ID_SERIAL}=="?*", SYMLINK+="tape/by-id/$env{ID_BUS}-$env{ID_SERIAL}"
 
 SUBSYSTEM!="block", GOTO="persistent_storage_end"
 
 # skip rules for inappropriate block devices
-# do not add dm-* !!!
+# don't add dm-*!!!
 KERNEL=="ram*|loop*|fd*|nbd*|gnbd*|md*", GOTO="persistent_storage_end"
 
 # never access non-cdrom removable ide devices, the drivers are causing event loops on open()
 KERNEL=="hd*[!0-9]", ATTR{removable}=="1", DRIVERS=="ide-cs|ide-floppy", GOTO="persistent_storage_end"
 KERNEL=="hd*[0-9]", ATTRS{removable}=="1", GOTO="persistent_storage_end"
+
+# ignore partitions that span the entire disk
+ATTR{whole_disk}=="", GOTO="persistent_storage_end"
 
 # for partitions import parent information
 KERNEL=="*[0-9]", IMPORT{parent}="ID_*"
@@ -341,11 +342,11 @@ KERNEL=="hd*[!0-9]", ENV{ID_SERIAL}=="?*", SYMLINK+="disk/by-id/ata-$env{ID_MODE
 KERNEL=="hd*[0-9]", SYMLINK+="disk/by-id/ata-$env{ID_MODEL}_$env{ID_SERIAL}-part%n"
 
 KERNEL=="sd*[!0-9]|sr*|st*", ATTRS{ieee1394_id}=="?*", ENV{ID_SERIAL}="$attr{ieee1394_id}", ENV{ID_SUBSYSTEMS}="ieee1394"
-KERNEL=="sd*[!0-9]|sr*|st*", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/usb_id -x"
-KERNEL=="sd*[!0-9]|sr*|st*", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -s %p -d $tempnode"
-KERNEL=="sd*[!0-9]|sr*|st*", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id -g -x -a -s %p -d $tempnode"
-KERNEL=="sd*[!0-9]|sr*", ENV{ID_SERIAL}=="?*", SYMLINK+="disk/by-id/$env{ID_SUBSYSTEMS}-$env{ID_SERIAL}"
-KERNEL=="sd*[0-9]", ENV{ID_SERIAL}=="?*", SYMLINK+="disk/by-id/$env{ID_SUBSYSTEMS}-$env{ID_SERIAL}-part%n"
+KERNEL=="sd*[!0-9]|sr*|st*", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/usb_id --export"
+KERNEL=="sd*[!0-9]|sr*|st*", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id --export --whitelisted --fallback-to-sysfs -s %p -d $tempnode"
+KERNEL=="cciss?c[0-9]d[0-9]", ENV{ID_SERIAL}=="", IMPORT{program}="/lib/udev/scsi_id --export --whitelisted --ignore-sysfs -s %p -d $tempnode", ENV{ID_BUS}="cciss"
+KERNEL=="sd*[!0-9]|sr*|cciss?c[0-9]d[0-9]", ENV{ID_SERIAL}=="?*", SYMLINK+="disk/by-id/$env{ID_BUS}-$env{ID_SERIAL}"
+KERNEL=="sd*[0-9]|cciss*p[0-9]", ENV{ID_SERIAL}=="?*", SYMLINK+="disk/by-id/$env{ID_BUS}-$env{ID_SERIAL}-part%n"
 
 # libata compat (links like hd*)
 KERNEL=="sd*[!0-9]|sr*", ENV{ID_VENDOR}=="ATA", PROGRAM="/lib/udev/ata_id $tempnode", ENV{ID_ATA_COMPAT}="$result"
@@ -356,16 +357,16 @@ KERNEL=="mmcblk[0-9]", ATTR{name}=="?*", ATTR{serial}=="?*", ENV{ID_NAME}="$attr
 KERNEL=="mmcblk[0-9]p[0-9]", ATTR{name}=="?*", ATTR{serial}=="?*", ENV{ID_NAME}="$attr{name}", ENV{ID_SERIAL}="$attr{serial}", SYMLINK+="disk/by-id/mmc-$env{ID_NAME}_$env{ID_SERIAL}-part%n"
 
 # by-path (shortest physical path)
-KERNEL=="*[!0-9]|sr*", IMPORT{program}="/lib/udev/path_id %p", SYMLINK+="disk/by-path/$env{ID_PATH}"
+KERNEL=="*[!0-9]|sr*|cciss?c[0-9]d[0-9]", IMPORT{program}="path_id %p", SYMLINK+="disk/by-path/$env{ID_PATH}"
+KERNEL=="*[0-9]|cciss*p[0-9]", ENV{ID_PATH}=="?*", SYMLINK+="disk/by-path/$env{ID_PATH}-part%n"
 KERNEL=="st*", IMPORT{program}="/lib/udev/path_id %p", SYMLINK+="tape/by-path/$env{ID_PATH}"
 KERNEL=="sr*|st*", GOTO="persistent_storage_end"
-KERNEL=="*[0-9]", ENV{ID_PATH}=="?*", SYMLINK+="disk/by-path/$env{ID_PATH}-part%n"
 
 # by-label/by-uuid (filesystem properties)
 KERNEL=="*[!0-9]", ATTR{removable}=="1", GOTO="persistent_storage_end"
 IMPORT{program}="/lib/udev/vol_id --export $tempnode"
-ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID}"
-ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_SAFE}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_SAFE}"
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_ENC}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_ENC}"
 
 # BIOS Enhanced Disk Device
 KERNEL=="*[!0-9]", IMPORT{program}="/lib/udev/edd_id --export $tempnode"
@@ -381,9 +382,8 @@ ACTION!="add|change", GOTO="md_end"
 ATTR{md/array_state}=="|clear|inactive", GOTO="md_end"
 IMPORT{program}="/lib/udev/vol_id --export $tempnode"
 OPTIONS="link_priority=100"
-ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID}"
-ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_SAFE}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_SAFE}"
- 
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_ENC}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_ENC}"
 LABEL="md_end"
 # Persistant block device stuff - end
 #####################################

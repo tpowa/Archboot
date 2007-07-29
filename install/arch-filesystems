@@ -2,8 +2,8 @@
 
 install ()
 {
-    MODULES=" $(checked_modules '/kernel/fs' | grep -v "nls") $(checked_modules '/kernel/fs/nls/nls_cp437') "
-    BINARIES="mkswap mke2fs mkreiserfs reiserfsck reiserfstune resize_reiserfs mkfs.ext2 badblocks blkid dumpe2fs e2fsck e2image e2label findfs fsck logsave resize2fs tune2fs mkfs.ext3 mkfs.xfs mkntfs ntfscat ntfsclone ntfscluster ntfsfix ntfsinfo ntfslabel ntfsls ntfsresize ntfsundelete mkfs.jfs fsck.jfs jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune fsck.ext2 fsck.ext3 fsck.xfs xfs_repair xfs_check xfs_freeze xfs_io xfs_admin xfs_db mkdosfs dosfsck ntfs-3g"
+    MODULES=" $(checked_modules '/kernel/fs' "
+    BINARIES="mkswap debugreiserfs mkreiserfs fsck.reiserfs reiserfstune resize_reiserfs mke2fs badblocks blkid debugfs dumpe2fs fsck.ext2 e2image e2label fsck logsave resize2fs mkfs.ext3 mkfs.ntfs mount.ntfs-fuse ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls mkfs.jfs fsck.jfs jfs_debugfs jfs_fscklog jfs_logdump jfs_tune mkfs.xfs fsck.xfs xfs_repair xfs_admin xfs_bmap xfs_check xfs_copy xfs_db xfs_freeze xfs_growfs xfs_info xfs_io xfs_logprint xfs_mdrestore xfs_metadump xfs_mkfile xfs_ncheck xfs_quota xfs_rtcp mkdosfs dosfsck ntfs-3g"
     FILES=""
     SCRIPT="arch-filesystems"
 }
