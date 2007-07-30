@@ -2,8 +2,8 @@
 
 install ()
 {
-    MODULES=" $(checked_modules '/kernel/fs' "
-    BINARIES="mkswap debugreiserfs mkreiserfs fsck.reiserfs reiserfstune resize_reiserfs mke2fs badblocks blkid debugfs dumpe2fs fsck.ext2 e2image e2label fsck logsave resize2fs mkfs.ext3 mkfs.ntfs mount.ntfs-fuse ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls mkfs.jfs fsck.jfs jfs_debugfs jfs_fscklog jfs_logdump jfs_tune mkfs.xfs fsck.xfs xfs_repair xfs_admin xfs_bmap xfs_check xfs_copy xfs_db xfs_freeze xfs_growfs xfs_info xfs_io xfs_logprint xfs_mdrestore xfs_metadump xfs_mkfile xfs_ncheck xfs_quota xfs_rtcp mkdosfs dosfsck ntfs-3g"
+    MODULES=" $(checked_modules '/kernel/fs') "
+    BINARIES="mkswap debugfs.reiserfs mkfs.reiserfs reiserfsck tunefs.reiserfs resizefs.reiserfs mke2fs badblocks blkid debugfs dumpe2fs e2fsck e2image findfs fsck logsave mkfs.ext2 resize2fs mkntfs ntfsmount ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs fsck.xfs xfs_repair xfs_admin xfs_bmap xfs_check xfs_copy xfs_db xfs_freeze xfs_growfs xfs_info xfs_io xfs_logprint xfs_mdrestore xfs_metadump xfs_mkfile xfs_ncheck xfs_quota xfs_rtcp mkdosfs dosfsck ntfs-3g"
     FILES=""
     SCRIPT="arch-filesystems"
 }

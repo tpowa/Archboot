@@ -2,6 +2,8 @@ run_hook ()
 {
     # fix telnet login
     # ln -s /etc/login.sh /bin/login
+    # fix slogin
+    ln -s /usr/bin/ssh /usr/bin/slogin
     # fix screen
     ln -s $(find /usr/bin/screen-*) /usr/bin/screen
     # fix daemons

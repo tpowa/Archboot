@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd findssl.sh scp sftp slogin ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd pmap_set pmap_dump portmap xinetd in.telnetd rsync"
+    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd findssl.sh scp sftp ssh ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd pmap_set pmap_dump portmap xinetd in.telnetd rsync"
     FILES=""
     SCRIPT="arch-remote"
     add_file "/etc/archboot/etc/remote/hosts.allow" "/etc/hosts.allow"

@@ -1,15 +1,32 @@
 run_hook ()
 {
+    # fix reiserfs symlinks
+    ln -s /sbin/debugfs.reiserfs /sbin/debugreiserfs
+    ln -s /sbin/mkfs.reiserfs /sbin/mkreiserfs
+    ln -s /sbin/reiserfsck /sbin/fsck.reiserfs
+    ln -s /sbin/resizefs.reiserfs /sbin/resize_reiserfs
+    ln -s /sbin/tunefs.reiserfs /sbin/reiserfstune
+
     # fix ext2/ext3 symlinks
+    ln -s /sbin/e2fsck /sbin/fsck.ext2
     ln -s /sbin/e2fsck /sbin/fsck.ext3
-    ln -s /sbin/mkfs.ext2 /sbin/mke2fs
+    ln -s /sbin/findfs /sbin/e2label
     ln -s /sbin/findfs /sbin/tune2fs
+    ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext3
+    ln -s /sbin/mkfs.ext2 /sbin/mke2fs
+
+    # fix jfs symlinks
+    ln -s /sbin/jfs_fsck /sbin/fsck.jfs
+    ln -s /sbin/jfs_mkfs /sbin/mkfs.jfs
 
     # fix vfat symlink
     ln -s /sbin/mkdosfs /sbin/mkfs.vfat
     ln -s /sbin/mkdosfs /sbin/mkfs.msdos
     ln -s /sbin/dosfsck /sbin/fsck.msdos
     ln -s /sbin/dosfsck /sbin/fsck.vfat
+    # fix ntfs symlinks
+    ln -s /usr/sbin/mkntfs /sbin/mkfs.ntfs
+    ln -s /usr/sbin/ntfsmount /sbin/mount.ntfs-fuse
 
     # fix ntfs-3g symlink
     ln -s /usr/bin/ntfs-3g /sbin/mount.ntfs-3g
