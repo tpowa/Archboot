@@ -3,8 +3,8 @@ run_hook ()
      # fix depmod link
      ln -s /sbin/depmod /bin/depmod
      ARCH_ADDON="optical storage floppy disk"
-     echo " Waiting for usb/fw devices to come ready ..."
-     sleep 5
+     echo " Waiting 10 seconds for usb/fw devices to come ready ..."
+     sleep 10
      for i in $ARCH_ADDON; do
 	echo "Checking $i devices for addons ..."
 		for k in $(find /dev -maxdepth 1 -group "$i"); do
