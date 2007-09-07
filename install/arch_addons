@@ -5,7 +5,7 @@ install ()
     MODULES=""
     BINARIES=""
     FILES=""
-    SCRIPT="arch-addons"
+    SCRIPT="arch_addons"
 }
 
 help ()

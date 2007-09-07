@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/sound/")"
+
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the sound subsystem on an arch boot image.
+HELPEOF
+}

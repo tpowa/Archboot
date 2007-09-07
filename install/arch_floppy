@@ -5,7 +5,7 @@ install ()
     MODULES="floppy"
     BINARIES=""
     FILES=""
-    SCRIPT="arch-floppy"
+    SCRIPT="arch_floppy"
 }
 
 help ()

@@ -26,10 +26,10 @@ run_hook ()
     ln -s /sbin/dosfsck /sbin/fsck.vfat
     # fix ntfs symlinks
     ln -s /usr/sbin/mkntfs /sbin/mkfs.ntfs
-    ln -s /usr/sbin/ntfsmount /sbin/mount.ntfs-fuse
+    ln -s /usr/bin/ntfsmount /sbin/mount.ntfs-fuse
 
     # fix ntfs-3g symlink
-    ln -s /usr/bin/ntfs-3g /sbin/mount.ntfs-3g
+    ln -s /bin/ntfs-3g /sbin/mount.ntfs-3g
 
     #needed for switching
     if ! [ "${root}" = "" ]; then

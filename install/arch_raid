@@ -5,7 +5,7 @@ install ()
     MODULES=" $(checked_modules "drivers/md/*" | grep -v "dm-") "
     BINARIES="mdadm"
     FILES=""
-    SCRIPT="arch-raid"
+    SCRIPT="arch_raid"
     add_file "/usr/lib/klibc/bin/mdassemble" "/bin/mdassemble"
 }
 

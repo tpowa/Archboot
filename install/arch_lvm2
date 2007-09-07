@@ -5,7 +5,7 @@ install ()
     MODULES=" dm-mod "
     BINARIES="lvm"
     FILES=""
-    SCRIPT="arch-lvm2"
+    SCRIPT="arch_lvm2"
 
     add_dir "/dev/mapper"
 }

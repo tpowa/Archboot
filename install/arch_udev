@@ -5,7 +5,7 @@ install ()
     MODULES=""
     BINARIES="udevd udevtrigger udevsettle dmsetup"
     FILES=" /etc/udev/udev.conf"
-    SCRIPT="arch-udev"
+    SCRIPT="arch_udev"
     add_file /etc/archboot/etc/udev.rules /etc/udev/rules.d/udev.rules
     add_file /etc/archboot/etc/start_udev /etc/start_udev
     add_file /lib/initcpio/udev/firmware.sh /lib/udev/firmware.sh

@@ -5,6 +5,7 @@ run_hook ()
   # fixing some symlinks
   ln -s /sbin/halt /sbin/poweroff
   ln -s /sbin/halt /sbin/reboot
+  ln -s /usr/sbin/chroot /bin/chroot
   ln -s /bin/chroot /usr/bin/chroot
   ln -s /sbin/killall5 /bin/pidof
   ln -s /usr/bin/netcat /usr/bin/nc

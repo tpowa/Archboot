@@ -3,6 +3,9 @@ run_hook ()
      # fix depmod link
      ln -s /sbin/depmod /bin/depmod
      ARCH_ADDON="optical storage floppy disk"
+     ### exclude kernel ntfs it seems broken!
+     echo "Disabling kernel NTFS module for mounting, due to known issues!"
+     mv /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko.old
      echo " Waiting 10 seconds for usb/fw devices to come ready ..."
      sleep 10
      for i in $ARCH_ADDON; do
@@ -34,6 +37,7 @@ run_hook ()
 			fi
 		done
      done
+    mv /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko.old /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko
     if [ "$RETRIGGER_UDEV" = "1" ]; then
      	echo "Retrigger udev uevents ..."
      	/etc/start_udev uevents

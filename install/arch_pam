@@ -9,6 +9,7 @@ install ()
     for i in $(echo /etc/archboot/etc/pam/*/*); do
     	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/pam|/etc|g')"
     done
+    add_file "/etc/archboot/etc/pam/environment" "/etc/environment"
     for i in $(echo /lib/libpam*); do
     	add_file "$i"
     done
@@ -18,6 +19,8 @@ install ()
     for i in $(echo /lib/security/pam_filter/*); do
     	add_file "$i"
     done
+    #fix cracklib support!
+    add_file /usr/lib/libcrack.so.2
 }
 
 help ()

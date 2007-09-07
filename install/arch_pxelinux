@@ -2,16 +2,14 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "/acpi/")"
-
     BINARIES=""
     FILES=""
-    SCRIPT="arch-acpi"
+    SCRIPT="arch_pxelinux"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes the acpi subsystem on an arch boot image.
+  This hook starts the network interface and mounts the NFSDIR on an arch boot image.
 HELPEOF
 }

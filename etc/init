@@ -22,6 +22,7 @@ echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 
 for cmd in $CMDLINE; do
     case "$cmd" in
+	\#*) break ;; # ignore everything after a # in the commandline
         [0123456Ss]) export runlevel="$cmd" ;;
         single) export runlevel="S" ;; #some people use 'single'
         # replace can cause problems for the following entries
@@ -58,6 +59,12 @@ if [ "x${disablemodules}" != "x" ]; then
     done
 fi
 
+if [ "x${earlymodules}" != "x" ]; then
+    for m in $(replace "${earlymodules}" ','); do
+        /sbin/modprobe -q $m > /dev/null 2>&1
+    done
+fi
+
 . /config
 
 for m in $MODULES; do
@@ -83,6 +90,14 @@ if [ -e "/hooks" ]; then
     done
 fi
 
+if [ "${rootdelay}" != "0" ]; then
+    msg -n "Waiting for devices to settle..."
+    /bin/sleep "${rootdelay}"
+    export rootdelay=0
+    export kinit_params="$kinit_params rootdelay=0"
+    msg "done."
+fi
+
 if [ "${break}" = "y" ]; then
     echo ":: Break requested, type 'exit' to resume operation"
     echo "   NOTE: klibc contains no 'ls' binary, used 'echo *' instead"
@@ -94,15 +109,44 @@ if [ "${root}" = "" -a "${ip}" = "" ]; then
 	exec /sbin/init
 else
 	# boot into system
+	if [ ! -b "${root}" ]; then
+    		# This duplicates code from the filesystem hook
+    		# without this, mkinitcpio would fail for users who use
+    		# neither the udev hook, nor the filesystem hook
+    		msg "\nRoot device '${root}' doesn't exist, attempting to create it"
+
+    		eval $(/bin/parseblock "${root}")
+    		if [ "${BLOCKNAME}" = "unknown" ]; then
+        		echo "ERROR: Failed to parse block device name for '${root}'"
+    		elif [ "x${BLOCKDEVICE}" = "x" ]; then
+        		echo "ERROR: Failed to parse block device ids for '${root}'"
+    		else
+        		export root="${BLOCKNAME}"
+        		echo "/bin/mknod \"${BLOCKNAME}\" b ${BLOCKDEVICE}"
+        		/bin/mknod "${BLOCKNAME}" b ${BLOCKDEVICE} >/dev/null
+   		fi
+    		if [ ! -b "${root}" ]; then
+        		err "Unable to create/detect root device '${root}'"
+        		echo "Dropping to a recovery shell... type 'exit' to reboot"
+        		echo "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+        		echo ""
+        		echo "If the device '${root}' gets created while you are here,"
+        		echo "try adding 'rootdelay=8' or higher to the kernel command-line"
+        		PS1="ramfs$ " /bin/sh -i
+        		msg "Rebooting..."
+        		/bin/reboot
+        	fi
+	fi
+
+	msg ":: Initramfs Completed - control passing to kinit"
+	if [ -f "/message" ]; then
+    		msg "$(cat /message)"
+	fi
 	#Special handling is udev is running
 	udevpid=$(/bin/minips -C udevd -o pid=)
 	if [ "x${udevpid}" != "x" ]; then
     		/bin/kill -9 $udevpid
     		/bin/sleep 0.01
 	fi
-	# Optimize fs type loop for mounting rootfs
-	msg ":: Initramfs Completed - control passing to kinit"
-
-	echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 	exec /bin/kinit -- "root=${root}" ${kinit_params} "${runlevel}" > /dev/null 2>&1
 fi
