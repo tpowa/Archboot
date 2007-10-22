@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="pacman pacman.static"
+    BINARIES="pacman"
     FILES=""
     SCRIPT="arch_pacman"
 

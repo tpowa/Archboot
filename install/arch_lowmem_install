@@ -1,0 +1,55 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### check for activated testing repository
+    if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
+	echo "WARNING: TESTING REPOSITORY ACTIVATED"
+	echo "-------------------------------------"
+	echo "POSSIBILITY OF BROKEN BINARY PACKAGES ON INSTALL MEDIA!"
+	echo "Use a chroot instead to avoid those problems."
+	echo "5 seconds time to cancel with CTRL+C"
+	sleep 5
+    fi
+    ### begin cvs part
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
+	ARCH_CVSTREE=$(mktemp /tmp/archcvs.XXXX)
+    	rm ${CVSTREE}
+	rm ${ARCH_CVSTREE}
+    	mkdir -p ${CVSTREE}
+	mkdir -p ${ARCH_CVSTREE}
+    	# checkout actual CURRENT cvs
+    	export CVSROOT=${CVSSETUP}
+    else
+    	CVSTREE=${CVSTREE}
+	ARCH_CVSTREE=${ARCH_CVSTREE}
+    fi
+    SCRIPT=
+    BINARIES=
+    # always needed for every install
+    cd ${ARCH_CVSTREE}
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+	export CVSROOT=${ARCH_CVSSETUP}
+    	cvs -z3 co arch/scripts/{setup,quickinst}
+    fi
+    mkdir -p ${TEMPDIR}/arch
+    add_dir "/src"
+    if ! [ "${LOCALSETUP}" = "yes" ]; then 
+    	add_file "${ARCH_CVSTREE}/arch/scripts/setup" "/arch/setup"
+    	add_file "${ARCH_CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
+    else
+    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
+    	add_file "${SETUP}" "/arch/setup"
+    	add_file "${QUICKINST}" "/arch/quickinst"
+    fi
+    # generate iso title name
+    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux MINI $(uname -m)" >> ${ISONAME}
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up all you need for a lowmem arch install image.
+HELPEOF
+}

@@ -106,16 +106,20 @@ install ()
     mkdir -p ${TEMPDIR}/arch
     add_file "${KM}" "/bin/km"
     # fix mirrors.txt
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	sed -i -e "s/i686/$(uname -m)/g" ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
+    if ! [ "${LOCALSETUP}" = "yes" ]; then
+	sed -i -e "s/i686/$(uname -m)/g" ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
     	add_file "${ARCH_CVSTREE}/arch/scripts/setup" "/arch/setup"
     	add_file "${ARCH_CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
     	add_file "${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt" "/arch/mirrors.txt"
     else
-    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
+	MIRRORTREE=$(mktemp /tmp/mirror.XXXX)
+	rm ${MIRRORTREE}
+	mkdir -p ${MIRRORTREE}
+	cp ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt ${MIRRORTREE}/
+    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORTREE}/mirrors.txt
     	add_file "${SETUP}" "/arch/setup"
     	add_file "${QUICKINST}" "/arch/quickinst"
-    	add_file "${MIRRORS}" "/arch/mirrors.txt"
+    	add_file "${MIRRORTREE}/mirrors.txt" "/arch/mirrors.txt"
     fi
     DOCS=$(mktemp /tmp/docs.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
