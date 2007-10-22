@@ -67,7 +67,7 @@ rm $(echo tmp/*/)isolinux/*lowmem*
 # generate ftp iso
 ! [ -d $ARCH-iso ] && mkdir $ARCH-iso
 echo "Generating FTP ${ARCH} ISO ..."
-mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $ARCH-iso/Archlinux-${ARCH}-$(date +%Y.%m)-${VERSION}.ftp.iso $(echo tmp/*/) > /dev/null 2>&1
+mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${ARCH}/Archlinux-${ARCH}-$(date +%Y.%m)-${VERSION}.ftp.iso $(echo tmp/*/) > /dev/null 2>&1
 # generate base iso
 #echo "Generating BASE ${ARCH} ISO ..."
 #mkdir -p $(echo tmp/*/)arch/pkg/setup
