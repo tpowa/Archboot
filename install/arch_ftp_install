@@ -30,9 +30,9 @@ install ()
     # always needed for every install
     cd ${ARCH_CVSTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-	export CVSROOT={ARCH_CVSSETUP}
+	export CVSROOT=${ARCH_CVSSETUP}
     	cvs -z3 co arch/scripts/{km,setup,quickinst}
-    	cvs -z3 co arch/doc/en/guide/install/ARCH_install-guide.txt
+    	cvs -z3 co arch/doc/en/guide/install/arch-install-guide.txt
     	cvs -z3 co arch/misc/bootdisk/2/mirrors.txt
     fi
     # fix km script
@@ -60,7 +60,7 @@ install ()
     fi
     DOCS=$(mktemp /tmp/docs.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${ARCH_CVSTREE}/arch/doc/en/guide/install/ARCH_install-guide.txt ${DOCS}
+    	cp -f ${ARCH_CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${DOCS}
     else
     	cp -f ${DOCUMENTATION} ${DOCS}
     fi
@@ -68,7 +68,7 @@ install ()
     add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
     add_dir "/src"
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	! [ "${TEMPDIR}" = "" ] && cp ${ARCH_CVSTREE}/arch/doc/en/guide/install/ARCH_install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    	! [ "${TEMPDIR}" = "" ] && cp ${ARCH_CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
     else
     	! [ "${TEMPDIR}" = "" ] && cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
     fi
