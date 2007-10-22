@@ -9,8 +9,6 @@ install ()
     SCRIPT="arch_wireless"
     add_file "/etc/archboot/etc/conf.d/wireless_conf.d" "/etc/conf.d/wireless"
     add_file "/etc/archboot/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
-    # add madwifi support
-    add_file "/usr/bin/madwifi-unload"
     # add ralink firmware files
     add_file "/lib/firmware/rt2561.bin"
     add_file "/lib/firmware/rt2561s.bin"
