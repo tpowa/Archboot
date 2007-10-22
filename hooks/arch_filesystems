@@ -31,6 +31,16 @@ run_hook ()
     # fix ntfs-3g symlink
     ln -s /bin/ntfs-3g /sbin/mount.ntfs-3g
 
+    # fix nfs
+    ln -s /sbin/mount.nfs /sbin/mount.nfs4
+    ln -s /sbin/mount.nfs /sbin/umount.nfs
+    ln -s /sbin/mount.nfs /sbin/umount.nfs4
+
+    # fix cifs
+    ln -s /sbin/mount.cifs /sbin/mount.smbfs
+    ln -s /sbin/umount.cifs /sbin/umount.smbfs
+
+
     #needed for switching
     if ! [ "${root}" = "" ]; then
     msg -n ":: Loading root filesystem module..."
