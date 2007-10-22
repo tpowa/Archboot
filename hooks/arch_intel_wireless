@@ -6,6 +6,11 @@ run_hook ()
 	echo "You ACCEPTED the intel's licenses, intel wireless drivers are now available."
 	! [ -d /lib/firmware/ ] && mkdir -p /lib/firmware
 	mv /intel-firmware/* /lib/firmware/
+	echo "Unloading already loaded intel wireless modules ..."
+	modprobe -r ipw2100 > /dev/null 2>&1
+	modprobe -r ipw2200 > /dev/null 2>&1
+	modprobe -r iwl3945 > /dev/null 2>&1
+	modprobe -r iwl4965 > /dev/null 2>&1 
      	echo "Retrigger udev uevents ..."
      	/etc/start_udev uevents
     else
@@ -22,6 +27,7 @@ run_hook ()
 	echo "/lib/firmware/LICENSE.ipw2100-fw"
 	echo "By appending intel-wireless to boot prompt you accept those licenses!"
 	echo "--------------------"
+	echo "Message is displayed 15 seconds ..."
     	sleep 15
     fi
 }

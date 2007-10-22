@@ -50,6 +50,7 @@ run_hook ()
     	echo "Place external addon packages in /packages directory."
 	echo "Place external configs in /config directory."
 	echo "------------------"
+	echo "Message is displayed 10 seconds ..."
 	echo ""
     	sleep 10
     fi

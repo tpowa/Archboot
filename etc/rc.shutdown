@@ -11,15 +11,16 @@ echo "Shutting Down ..."
 
 # Shutdown daemons
 let i=${#DAEMONS[@]}
-while [[ i -ge 0 ]]; do
-	if [[ `echo ${DAEMONS[$i]} | grep '^[^\!]' | wc -l` -eq 1 ]]; then
-		/etc/rc.d/${DAEMONS[$i]#@} stop
+
+while [ $i -ge 0 ]; do
+	if [ "${DAEMONS[$i]:0:1}" != '!' ]; then
+		ck_daemon ${DAEMONS[$i]#@} || /etc/rc.d/${DAEMONS[$i]#@} stop
 	fi
 	let i=i-1
 done
 # find any leftover daemons and shut them down
 if [ -d /var/run/daemons ]; then
-	for daemon in `ls /var/run/daemons`; do
+	for daemon in $(ls  -1t /var/run/daemons); do
 		/etc/rc.d/$daemon stop
 	done
 fi

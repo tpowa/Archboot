@@ -10,18 +10,7 @@ install ()
     # change to english locale!
     export LANG=en_US
     CONFIGMSG="INSTALLATION / RESCUEBOOT SYSTEM"
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	CVSMSG=$(mktemp /tmp/archmsg.XXXX)
-    	rm ${CVSMSG}
-    	mkdir -p ${CVSMSG}
-    	# checkout actual name from cvs rc.sysinit
-    	export CVSROOT=${ARCH_CVSSETUP}
-    	cd ${CVSMSG}
-    	cvs -z3 co -r ${TAG} arch/build/base/initscripts/rc.sysinit
-    	NAME=$(grep 'Arch' arch/build/base/initscripts/rc.sysinit | sed -e 's/printhl "//g' -e 's/$C_OTHER(${C_H2}//g' -e 's/\\n"//g' -e 's/$C_OTHER)//g')
-    else
-    	NAME=$(grep 'Arch' ${RCSYSINIT} | sed -e 's/printhl "//g' -e 's/$C_OTHER(${C_H2}//g' -e 's/\\n"//g' -e 's/$C_OTHER)//g')
-    fi
+    NAME=${ARCHVERSION}
     echo "Arch Linux" >> ${BOOTMESSAGE}
     echo "http://www.archlinux.org" >> ${BOOTMESSAGE}
     echo "Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>" >> ${BOOTMESSAGE}
@@ -31,7 +20,7 @@ install ()
     echo "Creation Tool: '$(echo ${RUNPROGRAM} | sed 's|-grub||')' written by Tobias Powalowski <tpowa@archlinux.org>" >> ${BOOTMESSAGE}
     echo "" >> ${BOOTMESSAGE}
     echo "${CONFIGMSG}" >> ${BOOTMESSAGE} 
-    echo "${NAME}" >> ${BOOTMESSAGE}
+    echo "Arch Linux ${NAME}" >> ${BOOTMESSAGE}
     echo "Kernel: ${USEKERNEL}" >> ${BOOTMESSAGE}
     echo "Architecture: $(uname -m)" >> ${BOOTMESSAGE}
     echo "Creation Date: $(date)" >> ${BOOTMESSAGE}
