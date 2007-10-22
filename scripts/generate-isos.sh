@@ -65,7 +65,7 @@ fi
 tar xfj ${IMAGE}
 rm $(echo tmp/*/)isolinux/*lowmem*
 # generate ftp iso
-! [ -d $ARCH-iso ] && mkdir $ARCH-iso
+! [ -d ${ARCH} ] && mkdir ${ARCH}
 echo "Generating FTP ${ARCH} ISO ..."
 mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${ARCH}/Archlinux-${ARCH}-$(date +%Y.%m)-${VERSION}.ftp.iso $(echo tmp/*/) > /dev/null 2>&1
 # generate base iso
@@ -177,4 +177,5 @@ for i in *.iso; do md5sum $i >> md5sum.txt; done
 # generate torrents
 echo "Generating torrent files ..."
 maketorrent-console --comment www.archlinux.org http://linuxtracker.org/announce.php *
+rm md5sum.txt.torrent
 cd ..
