@@ -1,0 +1,6 @@
+run_hook ()
+{
+    # fix license symlinks
+	ln -s /usr/share/licenses/common/LGPL /usr/share/licenses/common/LGPL2
+	ln -s /usr/share/licenses/common/GPL /usr/share/licenses/common/GPL2
+}

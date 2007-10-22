@@ -13,7 +13,7 @@ id:2:initdefault:
 rc::sysinit:/etc/rc.sysinit
 rh:06:wait:/etc/rc.shutdown
 
-c0:2:respawn:/sbin/agetty -n -l /etc/login.sh 9600 ttyS0 linux
+#c0:2:respawn:/sbin/agetty -n -l /etc/login.sh 9600 ttyS0 linux
 c1:2:respawn:/sbin/agetty -n -l /etc/login.sh 38400 vc/1 linux
 c2:2:respawn:/sbin/agetty -n -l /etc/login.sh 38400 vc/2 linux
 c3:2:respawn:/sbin/agetty -n -l /etc/login.sh 38400 vc/3 linux

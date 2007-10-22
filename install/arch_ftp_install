@@ -13,27 +13,32 @@ install ()
     fi
     ### begin cvs part
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	CVSTREE=$(mktemp /tmp/archcvs.XXXX)
+    	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
+	ARCH_CVSTREE=$(mktemp /tmp/archcvs.XXXX)
     	rm ${CVSTREE}
+	rm ${ARCH_CVSTREE}
     	mkdir -p ${CVSTREE}
+	mkdir -p ${ARCH_CVSTREE}
     	# checkout actual CURRENT cvs
     	export CVSROOT=${CVSSETUP}
     else
     	CVSTREE=${CVSTREE}
+	ARCH_CVSTREE=${ARCH_CVSTREE}
     fi
     SCRIPT=
     BINARIES=
     # always needed for every install
-    cd ${CVSTREE}
+    cd ${ARCH_CVSTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
+	export CVSROOT={ARCH_CVSSETUP}
     	cvs -z3 co arch/scripts/{km,setup,quickinst}
-    	cvs -z3 co arch/doc/en/guide/install/arch-install-guide.txt
+    	cvs -z3 co arch/doc/en/guide/install/ARCH_install-guide.txt
     	cvs -z3 co arch/misc/bootdisk/2/mirrors.txt
     fi
     # fix km script
     KM=$(mktemp /tmp/km.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${CVSTREE}/arch/scripts/km ${KM}
+    	cp -f ${ARCH_CVSTREE}/arch/scripts/km ${KM}
     else
     	cp -f ${KMSCRIPT} ${KM}
     fi
@@ -43,10 +48,10 @@ install ()
     add_file "${KM}" "/bin/km"
     # fix mirrors.txt
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	sed -i -e "s/i686/$(uname -m)/g" ${CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
-    	add_file "${CVSTREE}/arch/scripts/setup" "/arch/setup"
-    	add_file "${CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
-    	add_file "${CVSTREE}/arch/misc/bootdisk/2/mirrors.txt" "/arch/mirrors.txt"
+    	sed -i -e "s/i686/$(uname -m)/g" ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
+    	add_file "${ARCH_CVSTREE}/arch/scripts/setup" "/arch/setup"
+    	add_file "${ARCH_CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
+    	add_file "${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt" "/arch/mirrors.txt"
     else
     	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
     	add_file "${SETUP}" "/arch/setup"
@@ -55,7 +60,7 @@ install ()
     fi
     DOCS=$(mktemp /tmp/docs.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${DOCS}
+    	cp -f ${ARCH_CVSTREE}/arch/doc/en/guide/install/ARCH_install-guide.txt ${DOCS}
     else
     	cp -f ${DOCUMENTATION} ${DOCS}
     fi
@@ -63,7 +68,7 @@ install ()
     add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
     add_dir "/src"
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	! [ "${TEMPDIR}" = "" ] && cp ${CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    	! [ "${TEMPDIR}" = "" ] && cp ${ARCH_CVSTREE}/arch/doc/en/guide/install/ARCH_install-guide.txt ${TEMPDIR}/arch/archdoc.txt
     else
     	! [ "${TEMPDIR}" = "" ] && cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
     fi

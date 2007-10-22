@@ -1,0 +1,27 @@
+run_hook ()
+{
+     if grep -qw intel-wireless /proc/cmdline; then
+	echo "ARCH_INTEL_WIRELESS:"
+	echo "--------------------"
+	echo "You ACCEPTED the intel's licenses, intel wireless drivers are now available."
+	! [ -d /lib/firmware/ ] && mkdir -p /lib/firmware
+	mv /intel-firmware/* /lib/firmware/
+     	echo "Retrigger udev uevents ..."
+     	/etc/start_udev uevents
+    else
+	echo "ARCH_INTEL_WIRELESS USAGE:"
+	echo "--------------------"
+	echo "By default intel wireless loading is disabled!"
+    	echo "In order to use those drivers you have to agree to intel's licenses" 
+	echo "and append intel-wireless to boot prompt."
+	echo ""
+	echo "License files for the drivers are located here:"
+	echo "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
+	echo "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
+	echo "/lib/firmware/LICENSE.ipw2200-fw"
+	echo "/lib/firmware/LICENSE.ipw2100-fw"
+	echo "By appending intel-wireless to boot prompt you accept those licenses!"
+	echo "--------------------"
+    	sleep 15
+    fi
+}

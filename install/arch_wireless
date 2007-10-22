@@ -1,0 +1,68 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/drivers/net/wirless/") "
+
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy bcm43xx-fwcutter wpa_cli wpa_passphrase wpa_supplicant 80211debug 80211stats athchans athctrl athdebug athkey athstats wlanconfig nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl"
+    FILES=""
+    SCRIPT="arch_wireless"
+    add_file "/etc/archboot/etc/conf.d/wireless_conf.d" "/etc/conf.d/wireless"
+    add_file "/etc/archboot/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
+    # add madwifi support
+    add_file "/usr/bin/madwifi-unload"
+    # add ralink firmware files
+    add_file "/lib/firmware/rt2561.bin"
+    add_file "/lib/firmware/rt2561s.bin"
+    add_file "/lib/firmware/rt2661.bin"
+    add_file "/lib/firmware/rt73.bin"
+    # add zd1211 firmware files
+    for i in /lib/firmware/zd1211/* ; do
+	add_file "$i"
+    done
+    # add wlan-ng26 support
+    add_file "/etc/rc.d/wlan"
+    for  i in /etc/archboot/etc/wlan/*; do
+	add_file "/etc/wlan/$(basename $i)"
+    done
+    for i in /etc/wlan/*.hex; do
+    	add_file "$i"
+    done
+    # add ndiswrapper support
+    add_file "/usr/lib/perl5/current/File/Path.pm"
+    add_file "/usr/lib/perl5/current/File/Spec/Unix.pm"
+    add_file "/usr/lib/perl5/current/File/Spec.pm"
+    add_file "/usr/lib/perl5/current/File/Copy.pm"
+    add_file "/usr/lib/perl5/current/File/Basename.pm"
+    add_file "/usr/lib/perl5/current/Exporter/Heavy.pm"
+    add_file "/usr/lib/perl5/current/AutoLoader.pm"
+    add_file "/usr/lib/perl5/current/Carp.pm"
+    add_file "/usr/lib/perl5/current/Carp/Heavy.pm"
+    add_file "/usr/lib/perl5/current/warnings.pm"
+    add_file "/usr/lib/perl5/current/warnings/register.pm"
+    add_file "/usr/lib/perl5/current/vars.pm"
+    add_file "/usr/lib/perl5/current/Exporter.pm"
+    add_file "/usr/lib/perl5/current/strict.pm"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/Cwd.pm"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/Cwd/Cwd.bs"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/Cwd/Cwd.so"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/Fcntl/Fcntl.bs"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/Fcntl/Fcntl.so"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/dl_find_symbol_anywhere.al"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/dl_expandspec.al"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/extralibs.ld"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/autosplit.ix"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/DynaLoader.a"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/auto/DynaLoader/dl_findfile.al"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/Config.pm"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/DynaLoader.pm"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/XSLoader.pm"
+    add_file "/usr/lib/perl5/current/$(uname -m)-linux-thread-multi/Fcntl.pm"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes wireless on an arch boot image.
+HELPEOF
+}

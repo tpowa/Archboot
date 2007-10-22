@@ -66,8 +66,12 @@ if [ ! -d $sysfs_dir/block ]; then
 	exit 1
 fi
 
-# mount ramfs, else autodetection will fail! # not needed on install media!
-# mount -t ramfs none $udev_root
+# mount ramfs, else autodetection will fail!
+mount -t ramfs none $udev_root
+#create missing nodes
+mknod /dev/null c 1 3
+mknod /dev/zero c 1 5
+mknod /dev/console c 5 1
 
 # propogate /udev from /sys
 #echo "Creating initial udev device nodes:"

@@ -9,4 +9,6 @@ run_hook ()
   ln -s /bin/chroot /usr/bin/chroot
   ln -s /sbin/killall5 /bin/pidof
   ln -s /usr/bin/netcat /usr/bin/nc
+  # fix depmod link
+  ln -s /sbin/depmod /bin/depmod
 }

@@ -1,0 +1,18 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="pptp"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/archboot/etc/ppp/options.pptp" "/etc/ppp/options.pptp"
+
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes pptpclient on an arch boot image.
+HELPEOF
+} 

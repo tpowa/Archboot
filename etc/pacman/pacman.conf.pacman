@@ -16,13 +16,8 @@
 #
 [options]
 LogFile     = /var/log/pacman.log
-NoUpgrade   = etc/passwd etc/group etc/shadow etc/sudoers
-NoUpgrade   = etc/fstab etc/raidtab etc/ld.so.conf
-NoUpgrade   = etc/rc.conf etc/rc.local
-NoUpgrade   = etc/modprobe.conf etc/modules.conf
-NoUpgrade   = etc/lilo.conf boot/grub/menu.lst
 HoldPkg     = pacman glibc
-#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
+XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
 
 #
 # REPOSITORIES
@@ -34,9 +29,9 @@ HoldPkg     = pacman glibc
 #[testing]
 #Server = ftp://ftp.archlinux.org/testing/os/i686
 
-[current]
+[core]
 # Add your preferred servers here, they will be used first
-Include = /etc/pacman.d/current
+Include = /etc/pacman.d/core
 
 [extra]
 # Add your preferred servers here, they will be used first
