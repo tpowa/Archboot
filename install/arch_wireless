@@ -29,6 +29,7 @@ install ()
     	add_file "$i"
     done
     # add ndiswrapper support
+    add_file "/usr/sbin/ndiswrapper"
     add_file "/usr/lib/perl5/current/File/Path.pm"
     add_file "/usr/lib/perl5/current/File/Spec/Unix.pm"
     add_file "/usr/lib/perl5/current/File/Spec.pm"
