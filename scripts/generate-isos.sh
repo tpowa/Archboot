@@ -9,7 +9,8 @@ ARCH=""
 PACMAN=""
 PACKAGES=""
 PACKAGEDIR=""
-KERNELDIR=""
+TESTINGDIR=""
+TESTINGLIST=""
 
 usage ()
 {
@@ -20,9 +21,10 @@ usage ()
     echo "  -a=ARCH          architecture name of ISO image"
     echo "  -P=PACKAGES      packages.txt file on ISO image"
     echo "  -PD=PACKAGEDIR   directory with packages included"
-    echo "  -KD=KERNELDIR    directory with alternate kernel included"
     echo "Optional:"
     echo "  -c=CONFIG        Use CONFIG file with included parameters."
+    echo "  -TD=TESTINGDIR   directory with testing packages included"
+    echo "  -TL=TESTINGLIST  list of testing packages to be included"
     echo "  -h               this message"
     exit 1
 }
@@ -39,7 +41,8 @@ while [ $# -gt 0 ]; do
 		-p|--p) PACMAN="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-P=*|--P=*) PACKAGES="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-PD=*|--PD=*) PACKAGEDIR="$(echo $1 | awk -F= '{print $2;}')" ;;
-		-KD=*|--KD=*) KERNELDIR="$(echo $1 | awk -F= '{print $2;}')" ;;
+		-TD=*|--TD=*) TESTINGDIR="$(echo $1 | awk -F= '{print $2;}')" ;;
+		-TL=*|--TL=*) TESTINGLIST="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -57,8 +60,8 @@ if [ "${VERSION}" = "" -o "${ARCH}" = "" -o "${PACKAGES}" = "" -o "${PACKAGEDIR}
 	exit 1
 fi
 
-if ! [ "$KERNELDIR" = "" ]; then
-	USE_RC_KERNEL=1
+if ! [ "$TESTINGDIR" = "" ]; then
+	USE_TESTING=1
 fi
 
 # unpack base of installation
@@ -78,7 +81,7 @@ mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/bo
 #	mkdir -p db/kernel
 #	grep -e base/ -e kernels/ ${PACKAGES} > fake-package/packages.txt
 #	tar  xfz ${PACKAGEDIR}/current.db.tar.gz -C db/current/
-#	tar  xfz ${KERNELDIR}/kernel.db.tar.gz -C db/kernel/
+#	tar  xfz ${TESTINGDIR}/kernel.db.tar.gz -C db/kernel/
 #	# replace kernel26 with wanted kernel
 #	sed -i -e "s#$(echo db/current/kernel26* | sed -e's#.*/##g')#$(echo db/kernel/kernel26* | sed -e's#.*/##g')#g" fake-package/packages.txt
 #	cp fake-package/packages.txt $(echo tmp/*/)arch/pkg/setup/packages.txt
@@ -97,7 +100,7 @@ mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/bo
 #		if ! (echo $i | grep "kernel26*"); then 
 #			cp ${PACKAGEDIR}/$i $(echo tmp/*/)arch/pkg/ || exit 1
 #		else
-#			cp ${KERNELDIR}/$i $(echo tmp/*/)arch/pkg/ || exit 1
+#			cp ${TESTINGDIR}/$i $(echo tmp/*/)arch/pkg/ || exit 1
 #		fi
 #	done
 #else
@@ -118,35 +121,42 @@ mkisofs -RlDJLV "Arch Linux FTP ${ARCH}" -b isolinux/isolinux.bin -c isolinux/bo
 # generate core
 echo "Generating CORE ${ARCH} ISO ..."
 mkdir -p $(echo tmp/*/)core/pkg
-if [ "$USE_RC_KERNEL" = "1" ] ; then
+if [ "$USE_TESTING" = "1" ] ; then
+	tar xfj ${IMAGE}
 	# make directories and extract db files
 	mkdir fake-package
 	mkdir -p db/core
-	mkdir -p db/kernel
+	mkdir -p db/testing
 	cp ${PACKAGES} fake-package/packages.txt
 	tar xfz ${PACKAGEDIR}/core.db.tar.gz -C db/core/
-	tar xfz ${KERNELDIR}/kernel.db.tar.gz -C db/kernel/
-	# replace kernel26 with wanted kernel
-	sed -i -e "s#$(echo db/core/kernel26* | sed -e's#.*/##g')#$(echo db/kernel/kernel26* | sed -e's#.*/##g')#g" fake-package/packages.txt
+	tar xfz ${TESTINGDIR}/testing.db.tar.gz -C db/testing/
+	# replace the packages from core with testing packages
+	for i in ${TESTINGLIST}; do
+		if [ $(grep $i fake-package/packages.txt | grep ${ARCH}) ]; then
+			sed -i -e "s#$(echo db/core/$i* | sed -e's#.*/##g')#$(echo db/testing/$i* | sed -e's#.*/##g')#g" fake-package/packages.txt
+		else
+			sed -i -e "s#$(echo db/core/$i* | sed -e's#.*/##g')#$(echo $(echo db/testing/$i*)-${ARCH} | sed -e's#.*/##g')#g" fake-package/packages.txt
+		fi
+		# change the packages in db file
+		rm -r db/core/$(echo $i*)
+		cp -r db/testing/$(echo $i*) db/core/
+	done
 	cp fake-package/packages.txt $(echo tmp/*/)core/pkg/packages.txt
-	# change kernel26 in db file
-	rm -r db/core/$(echo kernel26*)
-	cp -r db/kernel/$(echo kernel26*) db/core/
 	cd db/core
 	# regenerate db file
 	tar cvfz core.db.tar.gz *
 	cd ../../
-	cp db/current/core.db.tar.gz $(echo tmp/*/)core/pkg/
+	cp db/core/core.db.tar.gz $(echo tmp/*/)core/pkg/
 	#cleanup db files and packages
 	rm -r fake-package/ db/
 	# copy packages
 	for i in $(cat $(echo tmp/*/)core/pkg/packages.txt | sed -e 's#.*/##g'); do
-		if ! (echo $i | grep "kernel26*"); then 
-			cp ${PACKAGEDIR}/$i $(echo tmp/*/)core/pkg/ || exit 1
-		else
-			cp ${KERNELDIR}/$i $(echo tmp/*/)core/pkg/ || exit 1
-		fi
+		cp ${PACKAGEDIR}/$i $(echo tmp/*/)core/pkg/ >/dev/null 2>&1 || (echo "Inserting $i testing package ..."; cp ${TESTINGDIR}/$i $(echo tmp/*/)core/pkg/) || exit 1
 	done
+	cd $(echo tmp/*/)isolinux/
+	mv isolinux-lowmem.cfg isolinux.cfg
+	mv boot-lowmem.msg boot.msg
+	cd ../../../
 else
 	tar xfj ${IMAGE}
 	cp ${PACKAGES} $(echo tmp/*/)core/pkg/
