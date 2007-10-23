@@ -9,7 +9,7 @@ install ()
     [ "${RUNPROGRAM}" = "mkpxelinux" ] && TITLEMSG="PXELINUX"
     # change to english locale!
     export LANG=en_US
-    CONFIGMSG="INSTALLATION SYSTEM"
+    CONFIGMSG="INSTALLATION / RESCUEBOOT SYSTEM"
     NAME=${ARCHVERSION}
     echo "Arch Linux" >> ${BOOTMESSAGE}
     echo "http://www.archlinux.org" >> ${BOOTMESSAGE}
