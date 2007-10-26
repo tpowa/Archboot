@@ -27,6 +27,7 @@ run_hook ()
     # fix ntfs symlinks
     ln -s /usr/sbin/mkntfs /sbin/mkfs.ntfs
     ln -s /usr/bin/ntfsmount /sbin/mount.ntfs-fuse
+    ln -s /usr/bin/ntfsmount /sbin/mount.fuse.ntfs
 
     # fix ntfs-3g symlink
     ln -s /bin/ntfs-3g /sbin/mount.ntfs-3g
