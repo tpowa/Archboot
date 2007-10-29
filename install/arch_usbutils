@@ -6,7 +6,7 @@ install ()
     BINARIES="lsusb"
     FILES=""
     SCRIPT=""
-    add_file "/usr/share/usbutils/usb.ids.gz"
+    add_file "/usr/share/hwdata/usb.ids"
     add_file "/usr/sbin/update-usbids"
 }
 

@@ -6,7 +6,7 @@ install ()
     BINARIES="lspci setpci update-pciids"
     FILES=""
     SCRIPT=""
-    add_file "/usr/share/pciutils/pci.ids"
+    add_file "/usr/share/hwdata/pci.ids"
     add_file "/usr/sbin/update-pciids"
 }
 
