@@ -22,7 +22,7 @@ install ()
     done
 
     ### adding klibc binaries
-    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -type d); do
+    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -type d); do
         add_file $f /bin/$(basename $f)
     done
 
