@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "/drivers/net/wirless/") "
+    MODULES="$(checked_modules "/drivers/net/wirless/") $(checked_modules "/net/wirless/") $(checked_modules "/net/ieee80211/") $(checked_modules "/net/mac80211/")"
 
     BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy bcm43xx-fwcutter wpa_cli wpa_passphrase wpa_supplicant 80211debug 80211stats athchans athctrl athdebug athkey athstats wlanconfig nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl"
     FILES=""

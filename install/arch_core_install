@@ -19,16 +19,16 @@ install ()
     ### begin cvs part
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
     	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
-	ARCH_CVSTREE=$(mktemp /tmp/archcvs.XXXX)
+	GIT_INSTALLER_TREE=$(mktemp /tmp/installer.git.XXXX)
     	rm ${CVSTREE}
-	rm ${ARCH_CVSTREE}
+	rm ${GIT_INSTALLER_TREE}
     	mkdir -p ${CVSTREE}
-	mkdir -p ${ARCH_CVSTREE}
+	mkdir -p ${GIT_INSTALLER_TREE}
     	# checkout actual core cvs
     	export CVSROOT=${CVSSETUP}
     else
     	CVSTREE=${CVSTREE}
-	ARCH_CVSTREE=${ARCH_CVSTREE}
+	GIT_INSTALLER_TREE=${GIT_INSTALLER_TREE}
     fi
     cd ${CVSTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
@@ -87,17 +87,14 @@ install ()
     SCRIPT=
     BINARIES=
     # always needed for every install
-    cd ${ARCH_CVSTREE}
+    cd ${GIT_INSTALLER_TREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
-	export CVSROOT=${ARCH_CVSSETUP}
-    	cvs -z3 co arch/scripts/{km,setup,quickinst}
-    	cvs -z3 co arch/doc/en/guide/install/arch-install-guide.txt
-    	cvs -z3 co arch/misc/bootdisk/2/mirrors.txt
+	git-clone ${GIT_INSTALLER}
     fi
     # fix km script
     KM=$(mktemp /tmp/km.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${ARCH_CVSTREE}/arch/scripts/km ${KM}
+    	cp -f /etc/archboot/scripts/km ${KM}
     else
     	cp -f ${KMSCRIPT} ${KM}
     fi
@@ -107,15 +104,15 @@ install ()
     add_file "${KM}" "/bin/km"
     # fix mirrors.txt
     if ! [ "${LOCALSETUP}" = "yes" ]; then
-	sed -i -e "s/i686/$(uname -m)/g" ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt
-    	add_file "${ARCH_CVSTREE}/arch/scripts/setup" "/arch/setup"
-    	add_file "${ARCH_CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
-    	add_file "${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt" "/arch/mirrors.txt"
+	sed -i -e "s/i686/$(uname -m)/g" ${GIT_INSTALLER_TREE}/installer/mirrors.txt
+    	add_file "${GIT_INSTALLER_TREE}/installer/setup" "/arch/setup"
+    	add_file "${GIT_INSTALLER_TREE}/installer/quickinst" "/arch/quickinst"
+    	add_file "${GIT_INSTALLER_TREE}/installer/mirrors.txt" "/arch/mirrors.txt"
     else
 	MIRRORTREE=$(mktemp /tmp/mirror.XXXX)
 	rm ${MIRRORTREE}
 	mkdir -p ${MIRRORTREE}
-	cp ${ARCH_CVSTREE}/arch/misc/bootdisk/2/mirrors.txt ${MIRRORTREE}/
+	cp ${GIT_INSTALLER_TREE}/mirrors.txt ${MIRRORTREE}/
     	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORTREE}/mirrors.txt
     	add_file "${SETUP}" "/arch/setup"
     	add_file "${QUICKINST}" "/arch/quickinst"
@@ -123,7 +120,7 @@ install ()
     fi
     DOCS=$(mktemp /tmp/docs.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${ARCH_CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${DOCS}
+    	cp -f ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${DOCS}
     else
     	cp -f ${DOCUMENTATION} ${DOCS}
     fi
@@ -132,7 +129,7 @@ install ()
     add_dir "/src"
     if ! [ "${LOCALSETUP}" = "yes" ]; then
     	if ! [ "${TEMPDIR}" = "" ]; then
-    		cp ${ARCH_CVSTREE}/arch/doc/en/guide/install/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    		cp ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
     		cd ${TEMPDIR}/arch/pkg/setup/
     		#wget ${FTPSERVER}/$(uname -m)/setup/pacman.pkg.tar.gz 
     		cd ${TEMPDIR}/core/pkg/

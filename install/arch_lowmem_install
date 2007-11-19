@@ -14,30 +14,29 @@ install ()
     ### begin cvs part
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
     	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
-	ARCH_CVSTREE=$(mktemp /tmp/archcvs.XXXX)
+	GIT_INSTALLER_TREE=$(mktemp /tmp/installer.git.XXXX)
     	rm ${CVSTREE}
-	rm ${ARCH_CVSTREE}
+	rm ${GIT_INSTALLER_TREE}
     	mkdir -p ${CVSTREE}
-	mkdir -p ${ARCH_CVSTREE}
+	mkdir -p ${GIT_INSTALLER_TREE}
     	# checkout actual CURRENT cvs
     	export CVSROOT=${CVSSETUP}
     else
     	CVSTREE=${CVSTREE}
-	ARCH_CVSTREE=${ARCH_CVSTREE}
+	GIT_INSTALLER_TREE=${GIT_INSTALLER_TREE}
     fi
     SCRIPT=
     BINARIES=
     # always needed for every install
-    cd ${ARCH_CVSTREE}
+    cd ${GIT_INSTALLER_TREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-	export CVSROOT=${ARCH_CVSSETUP}
-    	cvs -z3 co arch/scripts/{setup,quickinst}
+	git-cone ${GIT_INSTALL}
     fi
     mkdir -p ${TEMPDIR}/arch
     add_dir "/src"
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	add_file "${ARCH_CVSTREE}/arch/scripts/setup" "/arch/setup"
-    	add_file "${ARCH_CVSTREE}/arch/scripts/quickinst" "/arch/quickinst"
+    	add_file "${GIT_INSTALLER_TREE}/installer/setup" "/arch/setup"
+    	add_file "${GIT_INSTALLER_TREE}/installer/quickinst" "/arch/quickinst"
     else
     	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
     	add_file "${SETUP}" "/arch/setup"

@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES="$(checked_modules "/net/ipv6") $(checked_modules "/net/ipv4") $(checked_modules "/net/netfilter")"
+    MODULES="$(checked_modules "/net/ipv6") $(checked_modules "/net/ipv4") $(checked_modules "/net/netfilter") $(checked_modules "/net/bridge/")"
     BINARIES="ip6tables ip6tables-restore ip6tables-save iptables iptables-restore iptables-save iptables-xml"
     FILES=""
     SCRIPT=""
