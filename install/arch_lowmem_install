@@ -30,7 +30,7 @@ install ()
     # always needed for every install
     cd ${GIT_INSTALLER_TREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-	git-cone ${GIT_INSTALL}
+	git-clone ${GIT_INSTALLER}
     fi
     mkdir -p ${TEMPDIR}/arch
     add_dir "/src"

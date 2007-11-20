@@ -33,7 +33,7 @@ install ()
     # fix km script
     KM=$(mktemp /tmp/km.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${GIT_INSTALLER_TREE}/arch/scripts/km ${KM}
+    	cp -f /etc/archboot/scripts/km ${KM}
     else
     	cp -f ${KMSCRIPT} ${KM}
     fi
@@ -59,7 +59,7 @@ install ()
     fi
     DOCS=$(mktemp /tmp/docs.XXXX)
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${GIT_INSTALLER_TREE}/arch-install-guide.txt ${DOCS}
+    	cp -f ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${DOCS}
     else
     	cp -f ${DOCUMENTATION} ${DOCS}
     fi
@@ -67,7 +67,7 @@ install ()
     add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
     add_dir "/src"
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	! [ "${TEMPDIR}" = "" ] && cp ${GIT_INSTALLER_TREE}/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    	! [ "${TEMPDIR}" = "" ] && cp ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
     else
     	! [ "${TEMPDIR}" = "" ] && cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
     fi

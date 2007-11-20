@@ -1,9 +1,9 @@
 Available boot options (no input will boot the install/rescue system):
 - 'arch <any_other_boot_option>' to boot the install/rescue system.
 - 'arch root=/dev/??? <any_other_boot_option>' to boot into an existing system.
-- 'lowmem <any_other_boot_option>' to boot the >=64MB RAM install system.
+- 'lowmem <any_other_boot_option>' to boot the 64MB RAM install system.
 - 'lowmem root=/dev/??? <any_other_boot_option>' to boot into an existing
-  >=64MB RAM system.
+  64MB RAM system.
 - If you have trouble with IDE drives, use the "ide-legacy" boot option.
 - If your system hangs during the boot process, any combinations of the
   boot options noapic acpi=off pci=routeirq nosmp may be useful.
