@@ -1,0 +1,26 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+
+    BINARIES=""
+    FILES=""
+    SCRIPT="arch_tiacx_wireless"
+    # add firmware files
+    for i in $(find /usr/share/tiacx/ ! -type d); do
+    	add_file $i
+    done
+    echo "- ARCH_TIACX_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
+    echo "  The firmware files for ACX100/111 devices are installed in" >> ${OPTIONSBOOTMESSAGE}
+    echo "  /usr/share/tiacx. Please identify the correct file(s) for your" >> ${OPTIONSBOOTMESSAGE}
+    echo "  device and copy them to /lib/firmware." >> ${OPTIONSBOOTMESSAGE}
+    echo "  See http://acx100.sourceforge.net/wiki/Firmware for details." >> ${OPTIONSBOOTMESSAGE}
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes tiacx wireless on an arch boot image.
+HELPEOF
+}

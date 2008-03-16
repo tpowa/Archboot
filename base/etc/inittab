@@ -1,0 +1,25 @@
+#
+# /etc/inittab
+#
+
+#  Runlevels:
+#  0 	Halt
+#  1(S)	Single-user
+#  2 	Multi-user
+#  3-5  Not used
+#  6	Reboot
+
+id:2:initdefault:
+rc::sysinit:/etc/rc.sysinit
+rh:06:wait:/etc/rc.shutdown
+
+# -8 options fixes umlauts problem on login
+#c0:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 9600 ttyS0 linux
+c1:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/1 linux
+c2:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/2 linux
+c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/3 linux
+c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/4 linux
+
+ca::ctrlaltdel:/sbin/shutdown -t3 -r now
+
+# End of file

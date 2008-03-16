@@ -1,6 +1,0 @@
-*filter
-:INPUT DROP [0:0]
-:FORWARD DROP [0:0]
-:OUTPUT ACCEPT [0:0]
--A INPUT -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT 
-COMMIT

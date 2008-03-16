@@ -6,7 +6,7 @@ install ()
     BINARIES="naim"
     FILES=""
     SCRIPT="arch_naim"
-    add_file "/etc/archboot/etc/naim/nircrc" "/root/.nircrc"
+    add_file "/etc/archboot/naim/root/nircrc" "/root/.nircrc"
 }
 
 help ()

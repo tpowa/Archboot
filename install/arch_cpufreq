@@ -7,7 +7,7 @@ install ()
     BINARIES="cpufreq-info cpufreq-set"
     FILES=""
     SCRIPT=""
-    add_file "/etc/archboot/etc/conf.d/cpufreq_conf.d" "/etc/conf.d/cpufreq"
+    add_file "/etc/archboot/cpufreq/etc/conf.d/cpufreq" "/etc/conf.d/cpufreq"
     add_file "/etc/rc.d/cpufreq"
 }
 

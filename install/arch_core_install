@@ -77,8 +77,8 @@ install ()
     	for COPY in ${SEARCHCVS};do
     		if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
     	 	source "${COPY}/PKGBUILD"
-    		cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}.pkg.tar.gz ${TEMPDIR}/core/pkg/
-    		echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}.pkg.tar.gz" >> ${TEMPDIR}/core/pkg/packages.txt
+    		cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core/pkg/
+    		echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core/pkg/packages.txt
     		fi
     	done
     	# generate packages.txt
@@ -130,10 +130,10 @@ install ()
     if ! [ "${LOCALSETUP}" = "yes" ]; then
     	if ! [ "${TEMPDIR}" = "" ]; then
     		cp ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
-    		cd ${TEMPDIR}/arch/pkg/setup/
+    		#cd ${TEMPDIR}/arch/pkg/setup/
     		#wget ${FTPSERVER}/$(uname -m)/setup/pacman.pkg.tar.gz 
     		cd ${TEMPDIR}/core/pkg/
-    		wget ${FTPSERVER}/$(uname -m)/core.db.tar.gz
+    		snarf ${FTPSERVER}/$(uname -m)/core.db.tar.gz
     	fi
     else
     	if ! [ "${TEMPDIR}" = "" ]; then

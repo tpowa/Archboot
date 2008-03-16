@@ -8,9 +8,9 @@ install ()
     SCRIPT=""
     add_file "/etc/rc.d/iptables"
     add_file "/etc/rc.d/ip6tables"
-    add_file "/etc/archboot/etc/conf.d/iptables_conf.d" "/etc/conf.d/iptables"
-    add_file "/etc/archboot/etc/iptables/empty.rules" "/etc/iptables/empty.rules"
-    add_file "/etc/archboot/etc/iptables/simple_firewall.rules" "/etc/iptables/simple_firewall.rules"
+    add_file "/etc/archboot/iptables/etc/conf.d/iptables" "/etc/conf.d/iptables"
+    add_file "/etc/archboot/iptables/etc/iptables/empty.rules" "/etc/iptables/empty.rules"
+    add_file "/etc/archboot/iptables/etc/iptables/simple_firewall.rules" "/etc/iptables/simple_firewall.rules"
 
 }
 

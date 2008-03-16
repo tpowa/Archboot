@@ -6,7 +6,7 @@ install ()
     BINARIES="grub grub-install grub-md5-crypt grub-set-default grub-terminfo install-grub"
     FILES=""
     SCRIPT=""
-    add_file "/etc/archboot/etc/grub/menu.lst" "/boot/grub/menu.lst"
+    add_file "/etc/archboot/grub/boot/grub/menu.lst" "/boot/grub/menu.lst"
     for i in $(find /usr/lib/grub ! -type d); do
     	add_file "$i"
     done

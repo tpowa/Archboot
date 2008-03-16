@@ -11,4 +11,6 @@ run_hook ()
   ln -s /usr/bin/netcat /usr/bin/nc
   # fix depmod link
   ln -s /sbin/depmod /bin/depmod
+  # fix permission on /var/lock
+  chmod 1777 /var/lock
 }

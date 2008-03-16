@@ -1,0 +1,10 @@
+run_hook ()
+{
+	echo "ARCH_TIACX_WIRELESS USAGE:"
+	echo "--------------------"
+        echo "  The firmware files for ACX100/111 devices are installed in"
+        echo "  /usr/share/tiacx. Please identify the correct file(s) for your"
+        echo "  device and copy them to /lib/firmware."
+        echo "  See http://acx100.sourceforge.net/wiki/Firmware for details."
+	echo "--------------------"
+}

@@ -27,7 +27,5 @@ run_hook ()
 	echo "/lib/firmware/LICENSE.ipw2100-fw"
 	echo "By appending intel-wireless to boot prompt you accept those licenses!"
 	echo "--------------------"
-	echo "Message is displayed 15 seconds ..."
-    	sleep 15
     fi
 }

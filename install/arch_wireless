@@ -4,11 +4,12 @@ install ()
 {
     MODULES="$(checked_modules "/drivers/net/wirless/") $(checked_modules "/net/wirless/") $(checked_modules "/net/ieee80211/") $(checked_modules "/net/mac80211/")"
 
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy bcm43xx-fwcutter wpa_cli wpa_passphrase wpa_supplicant 80211debug 80211stats athchans athctrl athdebug athkey athstats wlanconfig nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename bcm43xx-fwcutter wpa_cli wpa_passphrase wpa_supplicant 80211debug 80211stats ath_info athchans athctrl athdebug athkey athstats madwifi-unload wlanconfig nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl"
     FILES=""
+    ### remove with perl 5.10!
     SCRIPT="arch_wireless"
-    add_file "/etc/archboot/etc/conf.d/wireless_conf.d" "/etc/conf.d/wireless"
-    add_file "/etc/archboot/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
+    add_file "/etc/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
+    add_file "/etc/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
     # add ralink firmware files
     add_file "/lib/firmware/rt2561.bin"
     add_file "/lib/firmware/rt2561s.bin"
@@ -20,7 +21,7 @@ install ()
     done
     # add wlan-ng26 support
     add_file "/etc/rc.d/wlan"
-    for  i in /etc/archboot/etc/wlan/*; do
+    for  i in /etc/archboot/wireless/etc/wlan/*; do
 	add_file "/etc/wlan/$(basename $i)"
     done
     for i in /etc/wlan/*.hex; do
@@ -28,6 +29,35 @@ install ()
     done
     # add ndiswrapper support
     add_file "/usr/sbin/ndiswrapper"
+### new perl scheme! disabled until it moves in!
+#    add_file "/usr/share/perl5/core_perl/File/Path.pm"
+#    add_file "/usr/share/perl5/core_perl/File/Spec/Unix.pm"
+#    add_file "/usr/share/perl5/core_perl/File/Spec.pm"
+#    add_file "/usr/share/perl5/core_perl/File/Copy.pm"
+#    add_file "/usr/share/perl5/core_perl/File/Basename.pm"
+#    add_file "/usr/share/perl5/core_perl/Exporter/Heavy.pm"
+#    add_file "/usr/share/perl5/core_perl/AutoLoader.pm"
+#    add_file "/usr/share/perl5/core_perl/Carp.pm"
+#    add_file "/usr/share/perl5/core_perl/Carp/Heavy.pm"
+#    add_file "/usr/share/perl5/core_perl/warnings.pm"
+#    add_file "/usr/share/perl5/core_perl/warnings/register.pm"
+#    add_file "/usr/share/perl5/core_perl/vars.pm"
+#    add_file "/usr/share/perl5/core_perl/Exporter.pm"
+#    add_file "/usr/share/perl5/core_perl/strict.pm"
+#    add_file "/usr/lib/perl5/core_perl/Cwd.pm"
+#    add_file "/usr/lib/perl5/core_perl/auto/Cwd/Cwd.bs"
+#    add_file "/usr/lib/perl5/core_perl/auto/Cwd/Cwd.so"
+#    add_file "/usr/lib/perl5/core_perl/auto/Fcntl/Fcntl.bs"
+#    add_file "/usr/lib/perl5/core_perl/auto/Fcntl/Fcntl.so"
+#    add_file "/usr/lib/perl5/core_perl/auto/DynaLoader/dl_find_symbol_anywhere.al"
+#    add_file "/usr/lib/perl5/core_perl/auto/DynaLoader/dl_expandspec.al"
+#    add_file "/usr/lib/perl5/core_perl/auto/DynaLoader/autosplit.ix"
+#    add_file "/usr/lib/perl5/core_perl/auto/DynaLoader/dl_findfile.al"
+#    add_file "/usr/lib/perl5/core_perl/Config.pm"
+#    add_file "/usr/lib/perl5/core_perl/DynaLoader.pm"
+#    add_file "/usr/lib/perl5/core_perl/XSLoader.pm"
+#    add_file "/usr/lib/perl5/core_perl/Fcntl.pm"
+### old scheme can be removed when perl moves in!
     add_file "/usr/lib/perl5/current/File/Path.pm"
     add_file "/usr/lib/perl5/current/File/Spec/Unix.pm"
     add_file "/usr/lib/perl5/current/File/Spec.pm"

@@ -14,6 +14,7 @@ install ()
     echo "Arch Linux" >> ${BOOTMESSAGE}
     echo "http://www.archlinux.org" >> ${BOOTMESSAGE}
     echo "Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>" >> ${BOOTMESSAGE}
+    echo "Copyright 2007 - 2008 Aaron Griffin <aaron@archlinux.org.org>" >> ${BOOTMESSAGE}
     echo "Distributed under the GNU General Public License (GPL)" >> ${BOOTMESSAGE}
     echo "" >> ${BOOTMESSAGE}
     echo "${TITLEMSG} BOOT" >> ${BOOTMESSAGE}
@@ -29,6 +30,7 @@ install ()
     	[ -s "${APPENDBOOTMESSAGE}" ] && cat ${APPENDBOOTMESSAGE} >> ${BOOTMESSAGE}
     else
     	[ -s "${APPENDBOOTMESSAGE_SYSLINUX_LOWMEM}" ] && cat ${APPENDBOOTMESSAGE_SYSLINUX_LOWMEM} >> ${BOOTMESSAGE}
+    	[ -s "${APPENDOPTIONSBOOTMESSAGE}" ] && cat ${APPENDOPTIONSBOOTMESSAGE} >> ${OPTIONSBOOTMESSAGE}
     fi
 }
 

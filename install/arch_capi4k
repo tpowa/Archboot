@@ -10,7 +10,7 @@ install ()
 	add_file "$i"
     done
     add_file "/etc/rc.d/capiinit"
-    add_file "/etc/archboot/etc/capi4k/capi.conf" "/etc/capi.conf"
+    add_file "/etc/archboot/capi4k/etc/capi.conf" "/etc/capi.conf"
 }
 
 help ()

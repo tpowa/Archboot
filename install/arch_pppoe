@@ -7,10 +7,10 @@ install ()
     FILES=""
     SCRIPT=""
     add_dir "/etc/ppp/peers/plugins"
-    add_file "/etc/archboot/etc/ppp/firewall-masq" "/etc/ppp/firewall-masq"
-    add_file "/etc/archboot/etc/ppp/firewall-standalone" "/etc/ppp/firewall-standalone"
-    add_file "/etc/archboot/etc/ppp/pppoe-server-options" "/etc/ppp/pppoe-server-options"
-    add_file "/etc/archboot/etc/ppp/pppoe.conf" "/etc/ppp/pppoe.conf"
+    add_file "/etc/archboot/pppoe/etc/ppp/firewall-masq" "/etc/ppp/firewall-masq"
+    add_file "/etc/archboot/pppoe/etc/ppp/firewall-standalone" "/etc/ppp/firewall-standalone"
+    add_file "/etc/archboot/pppoe/etc/ppp/pppoe-server-options" "/etc/ppp/pppoe-server-options"
+    add_file "/etc/archboot/pppoe/etc/ppp/pppoe.conf" "/etc/ppp/pppoe.conf"
     add_file "/etc/rc.d/adsl"
 }
 

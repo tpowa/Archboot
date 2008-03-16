@@ -7,7 +7,7 @@ install ()
     FILES=""
     SCRIPT=""
     add_file "/etc/rc.d/kexec"
-    add_file "/etc/archboot/etc/conf.d/kexec_conf.d" "/etc/conf.d/kexec"
+    add_file "/etc/archboot/kexec/etc/conf.d/kexec" "/etc/conf.d/kexec"
 }
 
 help ()

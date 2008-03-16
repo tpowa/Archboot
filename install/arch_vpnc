@@ -7,8 +7,8 @@ install ()
     FILES=""
     SCRIPT=""
     add_file "/etc/rc.d/vpnc"
-    add_file "/etc/archboot/etc/vpnc/default.conf" "/etc/vpnc/default.conf"
-    add_file "/etc/archboot/etc/vpnc/vpnc-script" "/etc/vpnc/vpnc-script"
+    add_file "/etc/archboot/vpnc/etc/vpnc/default.conf" "/etc/vpnc/default.conf"
+    add_file "/etc/archboot/vpnc/etc/vpnc/vpnc-script" "/etc/vpnc/vpnc-script"
 
 }
 

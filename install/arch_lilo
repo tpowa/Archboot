@@ -6,7 +6,7 @@ install ()
     BINARIES="lilo"
     FILES=""
     SCRIPT=""
-    add_file "/etc/archboot/etc/lilo/lilo.conf" "/etc/lilo.conf"
+    add_file "/etc/archboot/lilo/etc/lilo.conf" "/etc/lilo.conf"
 }
 
 help ()

@@ -6,7 +6,7 @@ install ()
 
     BINARIES=""
     FILES=""
-    SCRIPT="arch_acpi"
+    SCRIPT=""
 }
 
 help ()

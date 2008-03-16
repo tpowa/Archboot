@@ -6,6 +6,11 @@ install ()
     BINARIES=""
     FILES=""
     SCRIPT="arch_addons"
+    echo "- ARCH_ADDONS USAGE:" >> ${OPTIONSBOOTMESSAGE}
+    echo "  In order to load external addon packages or configs" >> ${OPTIONSBOOTMESSAGE}
+    echo "  into install environment, please append arch-addons to boot prompt." >> ${OPTIONSBOOTMESSAGE}
+    echo "  Place external addon packages in /packages directory." >> ${OPTIONSBOOTMESSAGE}
+    echo "  Place external configs in /config directory." >> ${OPTIONSBOOTMESSAGE}
 }
 
 help ()

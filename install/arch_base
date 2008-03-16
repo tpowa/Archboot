@@ -7,7 +7,12 @@ install ()
     add_dir "/sys"
     add_dir "/dev"
     add_dir "/mnt"
+    add_dir "/media"
+    add_dir "/media/cdrom"
+    add_dir "/media/dvd"
+    add_dir "/media/floppy"
     add_dir "/tmp"
+    add_dir "/tmp/install"
     add_dir "/var/run"
     add_dir "/var/log"
     add_dir "/addons"
@@ -38,7 +43,7 @@ install ()
     add_file "/sbin/halt"
     add_file "/sbin/telinit"
     add_file "/bin/awk"
-    add_file "/etc/archboot/etc/init" "/init"
+    add_file "/etc/archboot/base/init" "/init"
     add_file "/usr/bin/vi"
     add_file "/bin/dir"
     add_file "/usr/share/terminfo/l/linux"
@@ -58,11 +63,11 @@ install ()
     add_file "/usr/share/vim/syntax/fstab.vim"
     add_file "/usr/share/vim/filetype.vim"
     add_file "/etc/rc.d/functions"
-    add_file "/etc/archboot/etc/rc.conf" "/etc/rc.conf"
+    add_file "/etc/archboot/base/etc/rc.conf" "/etc/rc.conf"
     add_file "/etc/rc.d/syslog-ng"
 
     ### adding config files of installation system
-    for i in $(find /etc/archboot/etc/ -maxdepth 1 ! -type d ! -name 'init' ! -name "udev.rules" ! -name "menu.lst" ! -name "isolinux.cfg" ! -name "append-message*"); do
+    for i in $(find /etc/archboot/base/etc/*); do
         add_file "$i" "/etc/$(basename $i)"
     done
     

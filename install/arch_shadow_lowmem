@@ -6,11 +6,11 @@ install ()
     BINARIES="login"
     FILES=""
     SCRIPT=""
-    for i in $(echo /etc/archboot/etc/shadow-config/*/*); do
-    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/shadow-config|/etc|g')"
+    for i in $(echo /etc/archboot/shadow/etc/*/*); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/shadow/etc|/etc|g')"
     done
-    for i in $(echo /etc/archboot/etc/shadow-config/*.defs); do
-    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/shadow-config|/etc|g')"
+    for i in $(echo /etc/archboot/shadow/etc/*.defs); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/shadow/etc|/etc|g')"
     done
 }
 

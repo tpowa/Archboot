@@ -6,7 +6,7 @@ install ()
     BINARIES="pptp"
     FILES=""
     SCRIPT=""
-    add_file "/etc/archboot/etc/ppp/options.pptp" "/etc/ppp/options.pptp"
+    add_file "/etc/archboot/pptpclient/etc/ppp/options.pptp" "/etc/ppp/options.pptp"
 
 }
 

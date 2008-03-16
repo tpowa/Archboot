@@ -1,0 +1,4 @@
+Arch Linux options and troubleshooting:
+- If you have trouble with IDE drives, use the "ide-legacy" boot option
+- If your system hangs during the boot process, any combinations of the
+  boot options noapic acpi=off pci=routeirq nosmp may be useful.

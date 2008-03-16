@@ -6,10 +6,10 @@ install ()
     BINARIES="pam_tally unix_chkpwd"
     FILES=""
     SCRIPT=""
-    for i in $(echo /etc/archboot/etc/pam/*/*); do
-    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/etc/pam|/etc|g')"
+    for i in $(echo /etc/archboot/pam/etc/*/*); do
+    	add_file "$i" "$(echo $i | sed -e 's|/etc/archboot/pam/etc|/etc|g')"
     done
-    add_file "/etc/archboot/etc/pam/environment" "/etc/environment"
+    add_file "/etc/archboot/pam/etc/environment" "/etc/environment"
     for i in $(echo /lib/libpam*); do
     	add_file "$i"
     done

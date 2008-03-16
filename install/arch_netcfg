@@ -1,0 +1,30 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+    for i in /usr/lib/network/*; do
+	add_file $i
+    done
+    add_dir "/var/run/network/interfaces"
+    add_dir "/var/run/network/profiles"
+    add_file "/usr/bin/netcfg-auto-wireless"
+    add_file "/usr/bin/netcfg-menu"
+    add_files "usr/bin/netcfg2"
+    for i in /etc/network.d/examples/*; do
+	add_file $i
+    done
+    add_file "/etc/rc.d/net-profiles"
+    add_file "/etc/rc.d/net-rename"
+    add_file "/etc/archboot/netcfg/etc/iftab" "/etc/iftab"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the netcfg on an arch boot image.
+HELPEOF
+}
