@@ -1,5 +1,0 @@
-run_hook ()
-{
-    #fix perl symlink
-    ln -s /usr/lib/perl5/current /usr/lib/perl5/5.8.8
-}
