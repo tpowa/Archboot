@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="ping ping6 route nslookup telnet ssh netcfg"
+    BINARIES="ping ping6 route nslookup telnet ssh"
     FILES=""
     SCRIPT=""
     add_file "/sbin/dhcpcd"
