@@ -7,7 +7,7 @@ install ()
     FILES=""
     SCRIPT=""
     KEYMAP_FILE="$(mktemp /tmp/keymap.XXXXXX)"
-    add_file /bin/loadkeys /bin/loadkeys
+    add_file /usr/bin/loadkeys /bin/loadkeys
     add_file /usr/bin/dumpkeys /bin/dumpkeys
     add_file /usr/bin/kbd_mode /bin/kdb_mode
     add_file /usr/bin/setfont /bin/setfont
