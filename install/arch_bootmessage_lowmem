@@ -14,7 +14,7 @@ install ()
     echo "Arch Linux" >> ${BOOTMESSAGE}
     echo "http://www.archlinux.org" >> ${BOOTMESSAGE}
     echo "Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>" >> ${BOOTMESSAGE}
-    echo "Copyright 2007 - 2008 Aaron Griffin <aaron@archlinux.org.org>" >> ${BOOTMESSAGE}
+    echo "Copyright 2007 - 2008 Aaron Griffin <aaron@archlinux.org>" >> ${BOOTMESSAGE}
     echo "Distributed under the GNU General Public License (GPL)" >> ${BOOTMESSAGE}
     echo "" >> ${BOOTMESSAGE}
     echo "${TITLEMSG} BOOT" >> ${BOOTMESSAGE}
