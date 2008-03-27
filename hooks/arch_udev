@@ -1,6 +1,9 @@
 # vim: set ft=sh:
 run_hook ()
 {
+    # fix udev symlinks
+    ln -s /sbin/udevadm /sbin/udevsettle
+    ln -s /sbin/udevadm /sbin/udevtrigger
     msg -n ":: Loading udev..."
     /etc/start_udev
     msg "done."
