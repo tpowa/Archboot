@@ -2,11 +2,18 @@
 
 install ()
 {
-    ###  check for root
+    ### check for root
     if ! [ $UID -eq 0 ]; then 
-	echo "ERROR: only works when run as root!"
+	echo "ERROR: Please run as root user!"
 	exit 1
     fi
+
+    ### check for TEMPDIR
+    if [ $TEMPDIR = "" ]; then
+	 echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
+	 exit 1
+    fi
+
     ### check for activated testing repository
     if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
 	echo "WARNING: TESTING REPOSITORY ACTIVATED"
@@ -16,141 +23,66 @@ install ()
 	echo "5 seconds time to cancel with CTRL+C"
 	sleep 5
     fi
-    ### begin cvs part
+    ### setting up directories
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
-	GIT_INSTALLER_TREE=$(mktemp /tmp/installer.git.XXXX)
-    	rm ${CVSTREE}
-	rm ${GIT_INSTALLER_TREE}
-    	mkdir -p ${CVSTREE}
-	mkdir -p ${GIT_INSTALLER_TREE}
-    	# checkout actual core cvs
-    	export CVSROOT=${CVSSETUP}
+    	SVNTREE=$(mktemp /tmp/svntree.XXXX)
+    	rm ${SVNTREE}
+    	mkdir -p ${SVNTREE}
     else
-    	CVSTREE=${CVSTREE}
-	GIT_INSTALLER_TREE=${GIT_INSTALLER_TREE}
+    	SVNTREE=${SVNTREE}
     fi
-    cd ${CVSTREE}
+    cd ${SVNTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
-    	cvs -z3 co -r ${TAG} core/
-    	MAINCVSDIR="${CVSTREE}/core"
-    	cd  ${MAINCVSDIR}
-    	SEARCHCVS=$(find ./ -type d ! -name "CVS")
+	# generate base
+	BASE=""
+	for i in $(pacman -Sg base | sed -e "s/base//g"); do 
+		BASE="$BASE $(echo $i)"
+	done
+	# generate base-devel
+	DEVEL=""
+	for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do 
+		DEVEL="$DEVEL $(echo $i)"
+	done
+	SUPPORT=""
+	SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g'))"
+	for i in base devel lib support; do
+	    mkdir $i
+	    svn co -N ${SVNSETUP} $i
+	done
+	cd base; svn up $BASE; cd ..
+	cd devel; svn up $DEVEL; cd ..
+	cd support; svn up $SUPPORT; cd ..
+	cd  ${SVNTREE}
+	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
     else
-    	cd ${MAINCVSDIR}
-    	SEARCHCVS=$(find ./ -type d ! -name "CVS")
+    	cd ${SVNTREE}
+	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
     fi
-
-    if ! [ "${TEMPDIR}" = "" ]; then 
-    	mkdir -p ${TEMPDIR}/core/pkg/
-    	# Download all packages
-    	PACKAGES=$(for i in ${SEARCHCVS};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && echo -n "core/$(echo $i|  awk -F/ '{print $3}') ";done)
-    	if ! [ "${LOCALSETUP}" = "yes" ]; then
-    		pacman -Sy
-    		if  ! [ "$(pacman -Sw --noconfirm ${PACKAGES})" ]; then 
-    			echo "ABORTING: Something went wrong in package retrieving or md5sum check."
-    			exit 1
-    		fi
-    	else
-    		DBGENERATE="$(mktemp /tmp/db-generate.XXX)"
-    		rm ${DBGENERATE}
-    		mkdir -p ${DBGENERATE}
-    		gensync ${MAINCVSDIR}/ ${DBGENERATE}/core.db.tar.gz ${PACKAGEDIR}
-    		PACMANREPO="$(mktemp /tmp/pacman-repo.XXX)"
-    		rm ${PACMANREPO}
-    		mkdir -p ${PACMANREPO}
-    		mount --bind ${PACKAGEDIR} ${PACMANREPO}
-    		mv ${DBGENERATE}/core.db.tar.gz ${PACMANREPO}/
-    		rm -r ${DBGENERATE}
-    		PACMANCONF="$(mktemp /tmp/pacman-conf.XXX)"
-    		echo "[core]" >> ${PACMANCONF}
-    		echo "Server = file://${PACMANREPO}" >> ${PACMANCONF}
-    		pacman -Sy --config ${PACMANCONF}
-    		if ! [ "$(pacman -Sw --noconfirm --config ${PACMANCONF} ${PACKAGES})" ]; then 
-    			echo "ABORTING: Something went wrong in package retrieving or md5sum check."
-    			umount ${PACMANREPO}
-    			exit 1
-    		fi
-    	fi
-    	# collect the packages
-    	cd ${MAINCVSDIR}
-    	for COPY in ${SEARCHCVS};do
-    		if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
-    	 	source "${COPY}/PKGBUILD"
-    		cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core/pkg/
-    		echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core/pkg/packages.txt
-    		fi
-    	done
-    	# generate packages.txt
-    	sort -u ${TEMPDIR}/core/pkg/packages.txt -o ${TEMPDIR}/core/pkg/packages.txt 
-    fi
+    # Download all packages
+    PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && echo -n "$(echo $i|  awk -F/ '{print $3}') ";done)
+    pacman -Sy
+    pacman -Sw --noconfirm ${PACKAGES}
+    # collect the packages
+    mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
+    for COPY in ${SEARCHSVN};do
+    	if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
+	    source "${COPY}/PKGBUILD"
+	    cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
+	    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+	    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
+	fi
+    done
+    # generate packages.txt
+    sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
     SCRIPT=
     BINARIES=
-    # always needed for every install
-    cd ${GIT_INSTALLER_TREE}
-    if ! [ "${LOCALSETUP}" = "yes" ]; then
-	git-clone ${GIT_INSTALLER}
-    fi
-    # fix km script
-    KM=$(mktemp /tmp/km.XXXX)
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f /etc/archboot/scripts/km ${KM}
-    else
-    	cp -f ${KMSCRIPT} ${KM}
-    fi
-    sed -i -e 's#$BASEDIR/keymaps/##g' ${KM}
-    chmod 755 ${KM}
-    mkdir -p ${TEMPDIR}/arch
-    add_file "${KM}" "/bin/km"
-    # fix mirrors.txt
-    if ! [ "${LOCALSETUP}" = "yes" ]; then
-	sed -i -e "s/i686/$(uname -m)/g" ${GIT_INSTALLER_TREE}/installer/mirrors.txt
-    	add_file "${GIT_INSTALLER_TREE}/installer/setup" "/arch/setup"
-    	add_file "${GIT_INSTALLER_TREE}/installer/quickinst" "/arch/quickinst"
-    	add_file "${GIT_INSTALLER_TREE}/installer/mirrors.txt" "/arch/mirrors.txt"
-    else
-	MIRRORTREE=$(mktemp /tmp/mirror.XXXX)
-	rm ${MIRRORTREE}
-	mkdir -p ${MIRRORTREE}
-	cp ${GIT_INSTALLER_TREE}/mirrors.txt ${MIRRORTREE}/
-    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORTREE}/mirrors.txt
-    	add_file "${SETUP}" "/arch/setup"
-    	add_file "${QUICKINST}" "/arch/quickinst"
-    	add_file "${MIRRORTREE}/mirrors.txt" "/arch/mirrors.txt"
-    fi
-    DOCS=$(mktemp /tmp/docs.XXXX)
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${DOCS}
-    else
-    	cp -f ${DOCUMENTATION} ${DOCS}
-    fi
-    gzip -9 ${DOCS}
-    add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
-    add_dir "/src"
-    if ! [ "${LOCALSETUP}" = "yes" ]; then
-    	if ! [ "${TEMPDIR}" = "" ]; then
-    		cp ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
-    		#cd ${TEMPDIR}/arch/pkg/setup/
-    		#wget ${FTPSERVER}/$(uname -m)/setup/pacman.pkg.tar.gz 
-    		cd ${TEMPDIR}/core/pkg/
-    		snarf ${FTPSERVER}/$(uname -m)/core.db.tar.gz
-    	fi
-    else
-    	if ! [ "${TEMPDIR}" = "" ]; then
-    		cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
-    		#cp -f ${PACMANBINARY} ${TEMPDIR}/arch/pkg/setup/
-    		mv ${PACMANREPO}/core.db.tar.gz ${TEMPDIR}/core/pkg/
-    		umount ${PACMANREPO}
-    	fi 
-    fi
-
     # generate iso title name
-    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux CORE $(uname -m)" >> ${ISONAME}
+    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux Archboot CORE $(uname -m)" >> ${ISONAME}
 }
 
 help ()
 {
 cat <<HELPEOF
-  This hook sets up all you need for a arch core install image.
+  This hook sets up all you need for a archboot install image.
 HELPEOF
 }

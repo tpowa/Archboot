@@ -1,0 +1,18 @@
+# vim: set ft=sh:
+run_hook ()
+{
+    /sbin/modprobe -q dm-mod >/dev/null 2>&1
+    #fix if udev initialises /dev/mapper/control
+    sleep 0.5
+    if [ -e "/sys/class/misc/device-mapper" ]; then
+        if [ ! -c "/dev/mapper/control" ]; then
+	    read dev_t < /sys/class/misc/device-mapper/dev
+	    /bin/mknod "/dev/mapper/control" c $(/bin/replace "${dev_t}" ':')
+	fi
+
+        [ "${quiet}" = "y" ] && DMRAIDQUIET=">/dev/null"
+
+        msg ":: Activating dmraid arrays..."
+        /usr/sbin/dmraid -ay $DMRAIDQUIET
+    fi
+}

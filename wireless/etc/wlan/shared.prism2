@@ -62,6 +62,7 @@ prism2_fwload ()
 	
 	# figure out firmware image and dump it over.
 
+	$WLANCTL $1 lnxreq_ifstate ifstate=disable
 	$WLANCTL $1 lnxreq_ifstate ifstate=fwload
 	HARDWARE=`$PRISM2DL -s $1 | grep 0x0008 | cut -c26-29`
 	case "$HARDWARE" in

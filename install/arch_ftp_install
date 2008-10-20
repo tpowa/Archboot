@@ -2,6 +2,18 @@
 
 install ()
 {
+    ### check for root
+    if ! [ $UID -eq 0 ]; then 
+	echo "ERROR: Please run as root user!"
+	exit 1
+    fi
+
+    ### check for TEMPDIR
+    if [ $TEMPDIR = "" ]; then
+	 echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
+	 exit 1
+    fi
+
     ### check for activated testing repository
     if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
 	echo "WARNING: TESTING REPOSITORY ACTIVATED"
@@ -11,68 +23,11 @@ install ()
 	echo "5 seconds time to cancel with CTRL+C"
 	sleep 5
     fi
-    ### begin cvs part
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
-	GIT_INSTALLER_TREE=$(mktemp /tmp/installer.git.XXXX)
-    	rm ${CVSTREE}
-	rm ${GIT_INSTALLER_TREE}
-    	mkdir -p ${CVSTREE}
-	mkdir -p ${GIT_INSTALLER_TREE}
-    else
-    	CVSTREE=${CVSTREE}
-	GIT_INSTALLER_TREE=${GIT_INSTALLER_TREE}
-    fi
+
     SCRIPT=
     BINARIES=
-    # always needed for every install
-    cd ${GIT_INSTALLER_TREE}
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-	git-clone ${GIT_INSTALLER}
-    fi
-    # fix km script
-    KM=$(mktemp /tmp/km.XXXX)
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f /etc/archboot/scripts/km ${KM}
-    else
-    	cp -f ${KMSCRIPT} ${KM}
-    fi
-    sed -i -e 's#$BASEDIR/keymaps/##g' ${KM}
-    chmod 755 ${KM}
-    mkdir -p ${TEMPDIR}/arch
-    add_file "${KM}" "/bin/km"
-    # fix mirrors.txt
-    if ! [ "${LOCALSETUP}" = "yes" ]; then
-	sed -i -e "s/i686/$(uname -m)/g" ${GIT_INSTALLER_TREE}/installer/mirrors.txt
-    	add_file "${GIT_INSTALLER_TREE}/installer/setup" "/arch/setup"
-    	add_file "${GIT_INSTALLER_TREE}/installer/quickinst" "/arch/quickinst"
-    	add_file "${GIT_INSTALLER_TREE}/installer/mirrors.txt" "/arch/mirrors.txt"
-    else
-	MIRRORTREE=$(mktemp /tmp/mirror.XXXX)
-	rm ${MIRRORTREE}
-	mkdir -p ${MIRRORTREE}
-	cp ${GIT_INSTALLER_TREE}/mirrors.txt ${MIRRORTREE}/
-    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORTREE}/mirrors.txt
-    	add_file "${SETUP}" "/arch/setup"
-    	add_file "${QUICKINST}" "/arch/quickinst"
-    	add_file "${MIRRORTREE}/mirrors.txt" "/arch/mirrors.txt"
-    fi
-    DOCS=$(mktemp /tmp/docs.XXXX)
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	cp -f ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${DOCS}
-    else
-    	cp -f ${DOCUMENTATION} ${DOCS}
-    fi
-    gzip -9 ${DOCS}
-    add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
-    add_dir "/src"
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	! [ "${TEMPDIR}" = "" ] && cp ${GIT_INSTALLER_TREE}/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
-    else
-    	! [ "${TEMPDIR}" = "" ] && cp -f ${DOCUMENTATION} ${TEMPDIR}/arch/archdoc.txt
-    fi
     # generate iso title name
-    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux FTP $(uname -m)" >> ${ISONAME}
+    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux Archboot FTP $(uname -m)" >> ${ISONAME}
 }
 
 help ()

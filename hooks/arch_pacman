@@ -4,6 +4,4 @@ run_hook ()
     for i in /etc/pacman.d/*; do
 	sed -i -e "s/i686/$(uname -m)/g" $i
     done
-    # add pacman.static symlink
-    ln -s /usr/bin/pacman /usr/bin/pacman.static
 }

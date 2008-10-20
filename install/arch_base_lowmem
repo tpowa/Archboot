@@ -27,14 +27,14 @@ install ()
     done
 
     ### adding klibc binaries
-    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -type d); do
+    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -name "mv" ! -name "kill" ! -name "ln" ! -name "losetup" ! -name "mkdir" ! -name "mkfifo" ! -name "mknod" ! -name "poweroff" ! -name "sync" ! -name "dmesg" ! -type d); do
         add_file $f /bin/$(basename $f)
     done
 
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
     SCRIPT="arch_base_lowmem"
-    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 hwclock depmod cat gzip tr sdparm expr tput ifconfig"
+    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod"
     add_file "/bin/echo"
     add_file "/bin/gunzip"
     add_file "/bin/zcat"

@@ -26,7 +26,7 @@ run_hook ()
 						echo "Copying new packages to /tmp/packages/ install environment ..."
 						cp /addons/packages/*.pkg.tar.gz /tmp/packages/
 						echo "Installing new packages to install environment ..."
-						pacman -A /tmp/packages/* || echo "Dependency resolution failed!"
+						pacman -U /tmp/packages/* || echo "Dependency resolution failed!"
 						RETRIGGER_UDEV="1"
 					else
 						echo "No new files found to copy and install in /packages directory on media $k."
@@ -44,9 +44,8 @@ run_hook ()
     else
 	echo "ARCH_ADDONS USAGE:"
 	echo "------------------"
-	echo "By default loading is disabled!"
     	echo "In order to load external addon packages or configs" 
-	echo "into install environment, please append arch-addons to boot prompt."
+	echo "into the install environment, please append arch-addons to boot prompt."
     	echo "Place external addon packages in /packages directory."
 	echo "Place external configs in /config directory."
 	echo "------------------"

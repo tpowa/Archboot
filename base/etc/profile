@@ -23,10 +23,9 @@ alias ls='ls --color=auto'
 alias dir='dir --color=auto'
 
 cd /
-echo " Waiting for usb/fw devices to come ready ..."
-sleep 5
-clear
-cat /etc/motd
 echo "Hit ENTER to enter the bash shell ..."
 read
+if ! [ -e /tmp/.setup ]; then
+	[ $(which /arch/setup 2> /dev/null) ] && /arch/setup
+fi
 # End of file

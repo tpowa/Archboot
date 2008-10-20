@@ -4,18 +4,20 @@ install ()
 {
     ### generate motd
     MOTD=$(mktemp /tmp/motd.XXXX)
-    echo "Virtual consoles 1-4 are active." >> ${MOTD}
+    echo "Virtual consoles 1-6 are active." >> ${MOTD}
     echo "--------------------------------" >> ${MOTD}
-    echo "To change virtual console use ALT + F(1-5 or 12)" >> ${MOTD}
+    echo "To change virtual console use ALT + F(1-7 or 12)" >> ${MOTD}
     echo "" >> ${MOTD}
     echo "Logging:" >> ${MOTD}
-    echo "  - vc5 is used for setup logging." >> ${MOTD}
+    echo "  - vc7 is used for setup logging." >> ${MOTD}
     echo "  - vc12 is used for kernel logging." >> ${MOTD}
     echo "Documentation:" >> ${MOTD}
     echo "  - Documentation can be read by executing:" >> ${MOTD}
     echo "    zcat /arch/archdoc.txt.gz | less" >> ${MOTD}
     echo "Keymap:" >> ${MOTD}
     echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
+    echo "Timesetting:" >> ${MOTD}
+    echo "  - To change your clock, type 'tz' at the console." >> ${MOTD}
     if [ "${RUNPROGRAM}" = "mksyslinux" ]; then
     	echo "Installation Hints:" >> ${MOTD}
     	echo "  - If you don't use 'FTP INSTALL', mount your install source under '/src/'"  >> ${MOTD}

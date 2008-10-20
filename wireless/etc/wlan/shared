@@ -73,14 +73,17 @@ fi
 #    exit 1
 #fi
 
-if [ ! -n "$WLAN_UDEV" ] ; then
-if [ -f /proc/sys/kernel/hotplug -a \
-	-x `cat /proc/sys/kernel/hotplug` -a \
-	-f /etc/hotplug/wlan.agent ] ; then
-	HAS_HOTPLUG=y
-else
+if [ -z "$WLAN_UDEV" ] ; then
 	HAS_HOTPLUG=n
-fi
+	if [ -f /proc/sys/kernel/hotplug -a \
+	     -f /etc/hotplug/wlan.agent ] ; then
+		HOTPLUGGER=$(</proc/sys/kernel/hotplug)
+		if [ -n "$HOTPLUGGER" ] ; then
+			if [ -x $HOTPLUGGER ] ; then
+				HAS_HOTPLUG=y
+			fi
+		fi
+	fi
 fi
 
 # Source the wlan configuration

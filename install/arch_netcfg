@@ -19,6 +19,7 @@ install ()
     done
     add_file "/etc/rc.d/net-profiles"
     add_file "/etc/rc.d/net-rename"
+    add_file "/etc/rc.d/net-auto"
     add_file "/etc/archboot/netcfg/etc/iftab" "/etc/iftab"
 }
 

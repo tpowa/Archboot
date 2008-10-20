@@ -1,7 +1,6 @@
 set autoindent
 set const
 set historylog
-set nowrap
 set smooth
 set regexp
 set fill 72

@@ -20,19 +20,14 @@ install ()
     # iwlwifi support
     add_file "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-3945-1.ucode" "/intel-firmware/iwlwifi-3945-1.ucode"
-    add_file "/lib/firmware/iwlwifi-3945.ucode" "/intel-firmware/iwlwifi-3945.ucode"
     add_file "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-4965-1.ucode" "/intel-firmware/iwlwifi-4965-1.ucode"
-    add_file "/lib/firmware/iwlwifi-4965.ucode" "/intel-firmware/iwlwifi-4965.ucode"
+    add_file "/lib/firmware/iwlwifi-4965-2.ucode" "/intel-firmware/iwlwifi-4965-2.ucode"
+    add_file "/usr/share/licenses/iwlwifi-5000-ucode/LICENSE"
+    add_file "/lib/firmware/iwlwifi-5000-1.ucode" "/intel-firmware/iwlwifi-5000-1.ucode"
     echo "- ARCH_INTEL_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
-    echo "  In order to use those drivers you have to agree to intel's licenses" >> ${OPTIONSBOOTMESSAGE}
-    echo "  and append intel-wireless to boot prompt." >> ${OPTIONSBOOTMESSAGE}
-    echo "  License files for the drivers are located here:" >> ${OPTIONSBOOTMESSAGE}
-    echo "  /usr/share/licenses/iwlwifi-4965-ucode/LICENSE" >> ${OPTIONSBOOTMESSAGE}
-    echo "  /usr/share/licenses/iwlwifi-3945-ucode/LICENSE" >> ${OPTIONSBOOTMESSAGE}
-    echo "  /lib/firmware/LICENSE.ipw2200-fw" >> ${OPTIONSBOOTMESSAGE}
-    echo "  /lib/firmware/LICENSE.ipw2100-fw" >> ${OPTIONSBOOTMESSAGE}
-    echo "  By appending intel-wireless to boot prompt you accept those licenses!" >> ${OPTIONSBOOTMESSAGE}
+    echo "  In order to use those drivers, you have to agree to the firmware licenses" >> ${OPTIONSBOOTMESSAGE}
+    echo "  by appending intel-wireless to boot prompt." >> ${OPTIONSBOOTMESSAGE}
 }
 
 help ()

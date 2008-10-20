@@ -1,0 +1,25 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+    ! [ -d "${TEMPDIR}/arch/" ] && mkdir -p ${TEMPDIR}/arch/
+    add_file "/etc/archboot/installer/setup" "/arch/setup"
+    add_file "/etc/archboot/installer/quickinst" "/arch/quickinst"
+    DOCS=$(mktemp /tmp/docs.XXXX)
+    cp -f /etc/archboot/installer/arch-install-guide.txt ${DOCS}
+    gzip -9 ${DOCS}
+    add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
+    add_dir "/src" 
+    cp /etc/archboot/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the archboot installer on an arch boot image.
+HELPEOF
+}

@@ -2,10 +2,11 @@
 
 install ()
 {
-    MODULES=""
+    MODULES="dm-mod"
     BINARIES="dmraid"
     FILES=""
-    SCRIPT=""
+    SCRIPT="arch_dmraid"
+    add_dir "/dev/mapper"
     add_dir "/var/lock/dmraid"
 
 }

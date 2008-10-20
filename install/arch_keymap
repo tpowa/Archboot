@@ -6,7 +6,6 @@ install ()
     BINARIES=""
     FILES=""
     SCRIPT=""
-    KEYMAP_FILE="$(mktemp /tmp/keymap.XXXXXX)"
     add_file /usr/bin/loadkeys /bin/loadkeys
     add_file /usr/bin/dumpkeys /bin/dumpkeys
     add_file /usr/bin/kbd_mode /bin/kdb_mode
@@ -14,6 +13,7 @@ install ()
         for i in $(find /usr/share/kbd/ ! -type d ! -name "mac*"  ! -name "ppc" ! -name "ppc" ! -name "atari*" ! -name "sun*" ! -name "README*" ! -name "amiga*"); do
             add_file $i
         done
+    add_file /etc/archboot/keymap/km /usr/bin/km
 }
 
 help ()

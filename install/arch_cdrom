@@ -1,0 +1,16 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES="sr_mod ide-cd_mod"
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the cdrom support on an arch boot image.
+HELPEOF
+}

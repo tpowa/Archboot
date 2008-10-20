@@ -14,6 +14,11 @@ install ()
     add_file "/etc/archboot/net/etc/conf.d/dhcpcd" "/etc/conf.d/dhcpcd"
     add_file "/etc/archboot/net/etc/conf.d/bonding" "/etc/conf.d/bonding"
     add_file "/etc/archboot/net/etc/conf.d/bridges" "/etc/conf.d/bridges"
+    for i in $(find /usr/lib/dhcpcd -type f); do
+        add_file "$i"
+    done
+    add_file "/etc/archboot/net/etc/dhcpcd.conf" "/etc/dhcpcd.conf"
+    add_dir "/var/lib/dhcpcd"
 }
 
 help ()

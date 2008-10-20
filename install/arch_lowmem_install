@@ -2,6 +2,18 @@
 
 install ()
 {
+### check for root
+    if ! [ $UID -eq 0 ]; then 
+	echo "ERROR: Please run as root user!"
+	exit 1
+    fi
+
+    ### check for TEMPDIR
+    if [ $TEMPDIR = "" ]; then
+	 echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
+	 exit 1
+    fi
+
     ### check for activated testing repository
     if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
 	echo "WARNING: TESTING REPOSITORY ACTIVATED"
@@ -11,39 +23,62 @@ install ()
 	echo "5 seconds time to cancel with CTRL+C"
 	sleep 5
     fi
-    ### begin cvs part
+    ### setting up directories
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	CVSTREE=$(mktemp /tmp/corecvs.XXXX)
-	GIT_INSTALLER_TREE=$(mktemp /tmp/installer.git.XXXX)
-    	rm ${CVSTREE}
-	rm ${GIT_INSTALLER_TREE}
-    	mkdir -p ${CVSTREE}
-	mkdir -p ${GIT_INSTALLER_TREE}
-    	# checkout actual CURRENT cvs
-    	export CVSROOT=${CVSSETUP}
+    	SVNTREE=$(mktemp /tmp/svntree.XXXX)
+    	rm ${SVNTREE}
+    	mkdir -p ${SVNTREE}
     else
-    	CVSTREE=${CVSTREE}
-	GIT_INSTALLER_TREE=${GIT_INSTALLER_TREE}
+    	SVNTREE=${SVNTREE}
     fi
+    cd ${SVNTREE}
+    if ! [ "${LOCALSETUP}" = "yes" ]; then
+	# generate base
+	BASE=""
+	for i in $(pacman -Sg base | sed -e "s/base//g"); do 
+		BASE="$BASE $(echo $i)"
+	done
+	# generate base-devel
+	DEVEL=""
+	for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do 
+		DEVEL="$DEVEL $(echo $i)"
+	done
+	SUPPORT=""
+	SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g'))"
+	for i in base devel lib support; do
+	    mkdir $i
+	    svn co -N ${SVNSETUP} $i
+	done
+	cd base; svn up $BASE; cd ..
+	cd devel; svn up $DEVEL; cd ..
+	cd support; svn up $SUPPORT; cd ..
+	cd  ${SVNTREE}
+	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+    else
+    	cd ${SVNTREE}
+	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+    fi
+    # Download all packages
+    PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && echo -n "$(echo $i|  awk -F/ '{print $3}') ";done)
+    pacman -Sy
+    pacman -Sw --noconfirm ${PACKAGES}
+    # collect the packages
+    mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
+    for COPY in ${SEARCHSVN};do
+    	if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
+	    source "${COPY}/PKGBUILD"
+	    cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
+	    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+	    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz
+	fi
+    done
+    # generate packages.txt
+    sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
     SCRIPT=
     BINARIES=
-    # always needed for every install
-    cd ${GIT_INSTALLER_TREE}
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-	git-clone ${GIT_INSTALLER}
-    fi
-    mkdir -p ${TEMPDIR}/arch
-    add_dir "/src"
-    if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	add_file "${GIT_INSTALLER_TREE}/installer/setup" "/arch/setup"
-    	add_file "${GIT_INSTALLER_TREE}/installer/quickinst" "/arch/quickinst"
-    else
-    	sed -i -e "s/i686/$(uname -m)/g" ${MIRRORS}
-    	add_file "${SETUP}" "/arch/setup"
-    	add_file "${QUICKINST}" "/arch/quickinst"
-    fi
+
     # generate iso title name
-    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux MINI $(uname -m)" >> ${ISONAME}
+    [ "${RUNPROGRAM}" = "mkbootcd" -o "${RUNPROGRAM}" = "mkbootcd-grub" ] && echo "Arch Linux Archboot CORE lowmem $(uname -m)" >> ${ISONAME}
 }
 
 help ()

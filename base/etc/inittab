@@ -19,6 +19,8 @@ c1:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/1 linux
 c2:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/2 linux
 c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/3 linux
 c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/4 linux
+c5:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/4 linux
+c6:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/4 linux
 
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
 

@@ -4,7 +4,7 @@ NAME="$(date +%Y%m%d)"
 mkdir iso-creator-$ARCH
 cd iso-creator-$ARCH
 mkbootcd -c=/etc/archboot/archbootcd.conf -t=$NAME-$ARCH.tar.bz2
-mkbootcd -c=/etc/archboot/archbootcd-lowmem.conf -t=$NAME-$ARCH-lowmem.tar.bz2
+mkbootcd -c=/etc/archboot/archbootcd-tarball.conf -t=$NAME-$ARCH-lowmem.tar.bz2
 mkdir normal
 mkdir lowmem
 tar xvfj $NAME-$ARCH.tar.bz2
