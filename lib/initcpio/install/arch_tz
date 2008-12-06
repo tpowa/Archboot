@@ -1,0 +1,20 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="hwclock date ntpdate"
+    FILES=""
+    SCRIPT=""
+	for i in $(find /usr/share/zoneinfo ! -type d); do
+		add_file $i
+	done
+	add_file /usr/share/archboot/tz/tz /usr/bin/tz
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the timezone data on an arch boot image.
+HELPEOF
+}

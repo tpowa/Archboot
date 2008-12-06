@@ -1,7 +1,0 @@
-run_hook ()
-{
-    # fix download source
-    for i in /etc/pacman.d/*; do
-	sed -i -e "s/i686/$(uname -m)/g" $i
-    done
-}

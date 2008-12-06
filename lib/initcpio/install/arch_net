@@ -1,0 +1,29 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/drivers/net/") "
+
+    BINARIES="ping ping6 route nslookup telnet ssh"
+    FILES=""
+    SCRIPT=""
+    add_file "/sbin/dhcpcd"
+    add_file "/sbin/ifenslave"
+    add_file "/usr/sbin/brctl"
+    add_file "/etc/rc.d/network"
+    add_file "/usr/share/archboot/net/etc/conf.d/dhcpcd" "/etc/conf.d/dhcpcd"
+    add_file "/usr/share/archboot/net/etc/conf.d/bonding" "/etc/conf.d/bonding"
+    add_file "/usr/share/archboot/net/etc/conf.d/bridges" "/etc/conf.d/bridges"
+    for i in $(find /usr/lib/dhcpcd -type f); do
+        add_file "$i"
+    done
+    add_file "/usr/share/archboot/net/etc/dhcpcd.conf" "/etc/dhcpcd.conf"
+    add_dir "/var/lib/dhcpcd"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the network on an arch boot image.
+HELPEOF
+}

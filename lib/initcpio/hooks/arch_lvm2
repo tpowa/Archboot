@@ -1,0 +1,22 @@
+run_hook ()
+{
+    # fix symlinks
+    LVMSYMLINKS="vgcfgbackup vgcfgrestore vgchange vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay lvextend lvmchange lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs lvscan"
+    for i in $LVMSYMLINKS; do
+        ln -sf /sbin/lvm /sbin/$i
+    done
+    /sbin/modprobe -q dm-mod >/dev/null 2>&1
+    # fix if udev initialises /dev/mapper/control
+    sleep 0.5
+    if [ -e "/sys/class/misc/device-mapper" ]; then
+        if [ ! -c "/dev/mapper/control" ]; then
+	    read dev_t < /sys/class/misc/device-mapper/dev
+	    /bin/mknod "/dev/mapper/control" c $(/bin/replace "${dev_t}" ':')
+	fi
+
+        msg "Scanning logical volumes..."
+        /sbin/lvm vgscan --ignorelockingfailure
+        msg "Activating logical volumes..."
+        /sbin/lvm vgchange --ignorelockingfailure -ay
+    fi
+}

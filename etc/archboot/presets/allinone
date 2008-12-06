@@ -1,0 +1,31 @@
+# vim:set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+# config file for mkisolinux
+
+# DEFAULT kernel boot options
+KERNEL_BOOT_OPTIONS="rootdelay=5"
+
+# mkinitcpio config file, defaulted to stock config file
+MKINITCPIO_CONFIG="/etc/archboot/allinone.conf"
+
+# kernel version, defaulted to build for runtime kernel
+VERSION="$(uname -r)"
+
+# kernel image, defaulted to stock arch kernel
+KERNEL="/boot/vmlinuz26"
+
+# boot message file
+# blank by default arch-bootmessage hook will create it by default
+APPENDBOOTMESSAGE="/usr/share/archboot/bootloader/messages/allinone"
+APPENDOPTIONSBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-options"
+
+# isolinux.cfg files to use
+ISOLINUXCFG="/usr/share/archboot/bootloader/allinone.cfg"
+
+# Prompt on boot, 1=yes 0=no
+PROMPT="1"
+
+# Timeout, 30 seconds to fix usb keyboard issues
+# 0 means wait for prompt
+TIMEOUT="300"
+

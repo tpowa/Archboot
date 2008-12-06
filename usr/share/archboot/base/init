@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# add sh symlink
+ln -s /bin/bash /bin/sh
+ln -s /sbin/modprobe /bin/modprobe
+
+msg () { [ "${quiet}" != "y" ] && echo "$@"; }
+err () { echo "ERROR: $@"; }
+
+msg ":: Loading Initramfs"
+
+/bin/mount -t sysfs none /sys
+/bin/mount -t proc  none /proc
+
+read CMDLINE </proc/cmdline
+export CMDLINE
+
+# Used so hooks can override params to kinit
+export kinit_params=""
+export root=""
+echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
+
+for cmd in ${CMDLINE}; do
+    case "${cmd}" in
+	\#*) break ;; # ignore everything after a # in the commandline
+        [0123456Ss]) export runlevel="${cmd}" ;;
+        single) export runlevel="S" ;; #some people use 'single'
+        #Allow "init=X" to pass-through
+        init=*) kinit_params="${kinit_params} ${cmd}" ;;
+        # only export stuff that does work with dash :)
+        *=*) cmd="$(replace -s= "${cmd}" '.' '_')"
+             cmd="$(replace -s= "${cmd}" '-' '_')"
+             export "${cmd}"
+             ;;
+        *)   cmd="$(replace "${cmd}" '.' '_')"
+             cmd="$(replace "${cmd}" '-' '_')"
+             export "${cmd}=y" 
+           ;;
+    esac
+done
+
+if [  -n  "${disablehooks}" ]; then
+    for d in $(replace "${disablehooks}" ','); do
+        export "hook_${d}=disabled"
+    done
+fi
+
+if [  -n "${disablemodules}" ]; then
+    for d in $(replace "${disablemodules}" ','); do
+        export "mod_${d}=disabled"
+    done
+fi
+
+if [ -n "${earlymodules}" ]; then
+    for m in $(replace "${earlymodules}" ','); do
+        /sbin/modprobe -q ${m} > /dev/null 2>&1
+    done
+fi
+
+. /config
+
+for m in ${MODULES}; do
+    TST=""
+    eval "TST=\$mod_${m}"
+    if [ "${TST}" != "disabled" ]; then
+        /bin/modprobe -q ${m} > /dev/null 2>&1
+    fi
+done
+
+if [ -e "/hooks" ]; then
+    for h in ${HOOKS}; do
+        TST=""
+        eval "TST=\$hook_${h}"
+        if [ "${TST}" != "disabled" ]; then
+            run_hook () { msg "${h}: no run function defined"; }
+            if [ -e "/hooks/${h}" ]; then
+               . /hooks/${h}
+               msg ":: Running Hook [${h}]"
+               run_hook
+            fi
+        fi
+    done
+fi
+
+if [ "${break}" = "y" ]; then
+    echo ":: Break requested, type 'exit' to resume operation"
+    echo "   NOTE: klibc contains no 'ls' binary, used 'echo *' instead"
+    PS1="ramfs$ " /bin/sh -i
+fi
+
+if [ "${root}" = "" -a "${ip}" = "" ]; then
+	# enter install environment
+	exec /sbin/init
+else
+	# boot into system
+	if [ ! -b "${root}" ]; then
+    		# This duplicates code from the filesystem hook
+    		# without this, mkinitcpio would fail for users who use
+    		# neither the udev hook, nor the filesystem hook
+    		msg "\nRoot device '${root}' doesn't exist, attempting to create it"
+
+    		eval $(/bin/parseblock "${root}")
+    		if [ "${BLOCKNAME}" = "unknown" ]; then
+        		echo "ERROR: Failed to parse block device name for '${root}'"
+    		elif [ -z "${BLOCKDEVICE}" ]; then
+        		echo "ERROR: Failed to parse block device ids for '${root}'"
+    		else
+        		export root="${BLOCKNAME}"
+        		echo "/bin/mknod \"${BLOCKNAME}\" b ${BLOCKDEVICE}"
+        		/bin/mknod "${BLOCKNAME}" b ${BLOCKDEVICE} >/dev/null
+   		fi
+    		if [ ! -b "${root}" ]; then
+        		err "Unable to create/detect root device '${root}'"
+        		echo "Dropping to a recovery shell... type 'exit' to reboot"
+        		echo "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+        		echo ""
+        		echo "If the device '${root}' gets created while you are here,"
+        		echo "try adding 'rootdelay=8' or higher to the kernel command-line"
+        		PS1="ramfs$ " /bin/sh -i
+        		msg "Rebooting..."
+        		/bin/reboot
+        	fi
+	fi
+
+	msg ":: Initramfs Completed - control passing to kinit"
+	if [ -f "/message" ]; then
+    		msg "$(cat /message)"
+	fi
+	#Special handling is udev is running
+	udevpid=$(/bin/minips -C udevd -o pid=)
+	if [  -n "${udevpid}" ]; then
+    		/bin/kill -9 ${udevpid}
+    		/bin/sleep 0.01
+	fi
+	exec /bin/kinit -- "root=${root}" ${kinit_params} "${runlevel}" > /dev/null 2>&1
+fi

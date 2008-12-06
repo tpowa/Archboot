@@ -1,0 +1,45 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### generate motd
+    MOTD=$(mktemp /tmp/motd.XXXX)
+    echo "Welcome to Arch Linux (archboot environment)" >> ${MOTD}
+    echo "--------------------------------------------" >> ${MOTD}
+    echo "Consoles:" >> ${MOTD}
+    echo "  - Virtual consoles 1-6 are active." >> ${MOTD}
+    echo "  - To change virtual console use ALT + F(1-7 or 12)" >> ${MOTD}
+    echo "Logging:" >> ${MOTD}
+    echo "  - vc7 is used for setup logging." >> ${MOTD}
+    echo "  - vc12 is used for kernel logging." >> ${MOTD}
+    echo "Device node problems (eg. usbsticks or external harddrives:" >> ${MOTD}
+    echo "  - Please unplug and replug your device to get the correct node in /dev/." >> ${MOTD}
+if [ "$(echo $HOOKS | grep arch_keymap)" ]; then
+    echo "Keymap:" >> ${MOTD}
+    echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
+fi
+if [ "$(echo $HOOKS | grep arch_tz)" ]; then
+    echo "Timesetting:" >> ${MOTD}
+    echo "  - To change your clock, type 'tz' at the console." >> ${MOTD}
+fi
+if [ "$(echo $HOOKS | grep arch_installer)" ]; then
+    echo "Normal Setup:" >> ${MOTD}
+    echo "  - On first login /arch/setup is launched automatically." >> ${MOTD}
+    echo "  - Please run '/arch/setup' again to install Arch Linux if you left setup." >> ${MOTD}
+    echo "For Experts:" >> ${MOTD}
+    echo "  - Use '/arch/quickinst' to install and bypass the setup routine." >> ${MOTD}
+    echo "Documentation:" >> ${MOTD}
+    echo "  - Documentation can be read by executing:" >> ${MOTD}
+    echo "    zcat /arch/archdoc.txt.gz | less" >> ${MOTD}
+fi
+    chmod 644 ${MOTD}
+    add_file "${MOTD}" "/etc/motd"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up dynamically the motd message, depending on
+  your system.
+HELPEOF
+}

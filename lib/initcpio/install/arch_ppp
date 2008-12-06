@@ -1,0 +1,26 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="poff pon chat plog pppd pppdump pppoe-discovery pppstats"
+    FILES=""
+    SCRIPT=""
+    for i in $(find /usr/lib/pppd ! -type d); do
+	add_file "$i"
+    done
+    add_dir "/etc/ppp/peers"
+    add_file "/usr/share/archboot/ppp/etc/ppp/chap-secrets" "/etc/ppp/chap-secrets"
+    add_file "/usr/share/archboot/ppp/etc/ppp/ip-down" "/etc/ppp/ip-down"
+    add_file "/usr/share/archboot/ppp/etc/ppp/ip-up" "/etc/ppp/ip-up"
+    add_file "/usr/share/archboot/ppp/etc/ppp/options" "/etc/ppp/options"
+    add_file "/usr/share/archboot/ppp/etc/ppp/pap-secrets" "/etc/ppp/pap-secrets"
+    add_file "/etc/rc.d/ppp"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes ppp on an arch boot image.
+HELPEOF
+} 

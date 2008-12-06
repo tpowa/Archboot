@@ -1,0 +1,16 @@
+run_hook ()
+{
+    # fix slogin
+    ln -s /usr/bin/ssh /usr/bin/slogin
+    # fix screen
+    ln -s $(find /usr/bin/screen-*) /usr/bin/screen
+    # fix nfs
+    touch /var/lib/nfs/xtab
+    touch /var/lib/nfs/state
+    touch /var/lib/nfs/rmtab
+    touch /var/lib/nfs/etab
+    # fix daemons
+    sed -i -e 's|^DAEMONS=(@syslog-ng)|DAEMONS=(@syslog-ng network portmap sshd xinetd)|g' /etc/rc.conf
+    # fix serial console
+    dmesg | grep ttyS0 >/dev/null && sed -i -e 's/^#c0/c0/g' /etc/inittab
+}

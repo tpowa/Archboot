@@ -1,0 +1,15 @@
+# vim:set ft=sh:
+
+install ()
+{
+    MODULES=""
+    BINARIES="udevadm"
+    SCRIPT="arch_udevtrigger"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will trigger your udev events.
+HELPEOF
+}

@@ -1,0 +1,22 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="login"
+    FILES=""
+    SCRIPT=""
+    for i in $(echo /usr/share/archboot/shadow/etc/*/*); do
+    	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"
+    done
+    for i in $(echo /usr/share/archboot/shadow/etc/*.defs); do
+    	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"
+    done
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the shadow on a lowmem arch boot image.
+HELPEOF
+} 

@@ -1,0 +1,39 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+
+    BINARIES=""
+    FILES=""
+    SCRIPT="arch_intel_wireless"
+    # ipw2100 support
+    add_file "/lib/firmware/ipw2100-1.3-i.fw" "/intel-firmware/ipw2100-1.3-i.fw"
+    add_file "/lib/firmware/ipw2100-1.3-p.fw" "/intel-firmware/ipw2100-1.3-p.fw"
+    add_file "/lib/firmware/LICENSE.ipw2100-fw"
+    add_file "/lib/firmware/LICENSE.ipw2100-fw"
+    # ipw2200 support
+    add_file "/lib/firmware/ipw2200-bss.fw" "/intel-firmware/ipw2200-bss.fw"
+    add_file "/lib/firmware/ipw2200-ibss.fw" "/intel-firmware/ipw2200-ibss.fw"
+    add_file "/lib/firmware/ipw2200-sniffer.fw" "/intel-firmware/ipw2200-sniffer.fw"
+    add_file "/lib/firmware/LICENSE.ipw2200-fw"
+    # iwlwifi support
+    add_file "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
+    add_file "/lib/firmware/iwlwifi-3945-1.ucode" "/intel-firmware/iwlwifi-3945-1.ucode"
+    add_file "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
+    add_file "/lib/firmware/iwlwifi-4965-1.ucode" "/intel-firmware/iwlwifi-4965-1.ucode"
+    add_file "/lib/firmware/iwlwifi-4965-2.ucode" "/intel-firmware/iwlwifi-4965-2.ucode"
+    add_file "/usr/share/licenses/iwlwifi-5000-ucode/LICENSE"
+    add_file "/lib/firmware/iwlwifi-5000-1.ucode" "/intel-firmware/iwlwifi-5000-1.ucode"
+    echo "- ARCH_INTEL_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
+    echo "  In order to use those drivers, you have to agree to the firmware licenses" >> ${OPTIONSBOOTMESSAGE}
+    echo "  by appending intel-wireless to boot prompt." >> ${OPTIONSBOOTMESSAGE}
+    echo "" >> ${OPTIONSBOOTMESSAGE}
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes intel wireless on an arch boot image.
+HELPEOF
+}

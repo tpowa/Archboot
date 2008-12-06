@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="lilo"
+    FILES=""
+    SCRIPT=""
+    add_file "/usr/share/archboot/lilo/etc/lilo.conf" "/etc/lilo.conf"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes lilo on an arch boot image.
+HELPEOF
+} 

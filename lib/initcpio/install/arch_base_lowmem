@@ -1,0 +1,70 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    ### setting up base structure
+    add_dir "/proc"
+    add_dir "/sys"
+    add_dir "/dev"
+    add_dir "/mnt"
+    add_dir "/media"
+    add_dir "/media/cdrom"
+    add_dir "/media/dvd"
+    add_dir "/media/floppy"
+    add_dir "/tmp"
+    add_dir "/tmp/install"
+    add_dir "/var/run"
+    add_dir "/var/log"
+    add_dir "/addons"
+    add_dir "/home"
+    add_device "/dev/null"    c 1 3
+    add_device "/dev/zero"    c 1 5
+    add_device "/dev/console" c 5 1
+
+    ### adding klibc lib files
+    for f in $(find /lib -name klibc-*.so); do
+        add_file $f
+    done
+
+    ### adding klibc binaries
+    for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -name "mv" ! -name "kill" ! -name "ln" ! -name "losetup" ! -name "mkdir" ! -name "mkfifo" ! -name "mknod" ! -name "poweroff" ! -name "readlink" ! -name "sync" ! -name "dmesg" ! -type d); do
+        add_file $f /bin/$(basename $f)
+    done
+
+    ### adding needed programs from running system
+    add_file "${CONFIG}" "/config"
+    SCRIPT="arch_base_lowmem"
+    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod readlink"
+    add_file "/bin/echo"
+    add_file "/bin/gunzip"
+    add_file "/bin/zcat"
+    add_file "/usr/bin/reset"
+    add_file "/sbin/swapoff"
+    add_file "/sbin/halt"
+    add_file "/sbin/telinit"
+    add_file "/bin/awk"
+    add_file "/usr/share/archboot/base/init" "/init"
+    add_file "/bin/dir"
+    add_file "/usr/share/terminfo/l/linux"
+    add_file "/etc/rc.d/functions"
+    add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"
+    add_file "/etc/rc.d/syslog-ng"
+
+    ### adding config files of installation system
+    for i in $(find /usr/share/archboot/base/etc/*); do
+        add_file "$i" "/etc/$(basename $i)"
+    done
+    
+    ### fixing network support
+    add_file "/lib/libnss_files.so.2"
+    add_file "/lib/libnss_dns.so.2"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook sets up all initial directories and installs base
+  klibc utilities and libraries for a lowmem arch boot image.
+  DO NOT remove this one unless you know what you're doing.
+HELPEOF
+}

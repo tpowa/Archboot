@@ -1,0 +1,49 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/drivers/net/") "
+
+    BINARIES="$(basename $(find /usr/bin/screen-*)) telnet tcpd findssl.sh scp sftp ssh ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd pmap_set pmap_dump portmap xinetd in.telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount sm-notify start-statd"
+    FILES=""
+    SCRIPT="arch_remote"
+    add_file "/usr/share/archboot/remote/etc/hosts.allow" "/etc/hosts.allow"
+    add_file "/usr/share/archboot/remote/etc/hosts.deny" "/etc/hosts.deny"
+    add_file "/usr/share/archboot/remote/etc/screenrc" "/etc/screenrc"
+    add_file "/usr/share/archboot/remote/etc/xinetd.conf" "/etc/xinetd.conf"
+    add_file "/usr/share/archboot/remote/etc/xinetd.d/servers" "/etc/xinetd.d/servers"
+    add_file "/usr/share/archboot/remote/etc/xinetd.d/services" "/etc/xinetd.d/services"
+    add_file "/usr/share/archboot/remote/etc/xinetd.d/telnet" "/etc/xinetd.d/telnet"
+    add_file "/usr/share/archboot/remote/etc/ssh/ssh_config" "/etc/ssh/ssh_config"
+    add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
+    add_file "/usr/share/archboot/remote/etc/conf.d/sshd" "/etc/conf.d/sshd"
+    add_file "/usr/share/archboot/remote/etc/ssh/moduli" "/etc/ssh/moduli"
+    add_file "/usr/share/archboot/remote/etc/pam.d/sshd" "/etc/pam.d/sshd"
+    add_file "/usr/share/archboot/remote/etc/pam.d/screen" "/etc/pam.d/screen"
+    add_file "/usr/share/archboot/remote/etc/rsyncd.conf" "/etc/rsyncd.conf"
+    add_file "/usr/share/archboot/remote/etc/xinetd.d/rsync" "/etc/xinetd.d/rsync"
+    add_file "/usr/share/archboot/remote/etc/exports" "/etc/exports"
+    for i in $(find /usr/share/terminfo/ ! -type d); do
+    	add_file "$i"
+    done
+    add_file "/usr/lib/ssh/sftp-server"
+    add_file "/usr/lib/ssh/ssh-keysign"
+    add_file "/etc/rc.d/portmap"
+    add_file "/etc/rc.d/sshd"
+    add_file "/etc/rc.d/xinetd"
+    add_file "/etc/rc.d/rsyncd"
+    add_dir  "/var/empty"
+    add_file "/etc/rc.d/nfsd"
+    add_file "/etc/rc.d/nfslock"
+    add_file "/usr/share/archboot/remote/etc/conf.d/nfs" "/etc/conf.d/nfs"
+    add_dir "/var/lib/nfs/sm"
+    add_dir "/var/lib/nfs/sm.bak"
+    add_dir "/var/lib/nfs/v4recovery"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes remote tools on an arch boot image.
+HELPEOF
+} 

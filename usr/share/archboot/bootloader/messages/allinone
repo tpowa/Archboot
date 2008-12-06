@@ -1,0 +1,24 @@
+Arch Linux
+http://www.archlinux.org
+Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>
+Copyright 2007 - 2008 Aaron Griffin <aaron@archlinux.org>
+Distributed under the GNU General Public License (GPL)
+
+@@BOOTLOADER@@ BOOT
+Creation Tool: 'archboot' written by Tobias Powalowski <tpowa@archlinux.org>
+
+INSTALLATION / RESCUEBOOT SYSTEM
+Arch Linux @@RELEASENAME@@
+Kernel: @@KERNEL@@
+Architecture: i686/x86_64
+Creation Date: @@DATE@@
+
+Available boot options (no input will boot the 32bit archboot system):
+- For 64bit environment, please use arch64 or lowmem64.
+- 'arch <any_other_boot_option>' to boot the archboot system.
+- 'arch root=/dev/??? <any_other_boot_option>' to boot into an existing system.
+- 'lowmem <any_other_boot_option>' to boot the 64MB RAM archboot system.
+- 'lowmem root=/dev/??? <any_other_boot_option>' to boot into an existing
+  64MB RAM system.
+- 'memtest' to start the memory test program memtest86+.
+- For troubleshooting and other options press the F2 key.

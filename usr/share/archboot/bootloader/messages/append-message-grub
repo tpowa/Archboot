@@ -1,0 +1,9 @@
+Select the appropriate option in the following menu.
+- If you have trouble with IDE drives, select the "ide-legacy" option.
+- If your system hangs during the boot process, any combinations of the
+  boot options noapic acpi=off pci=routeirq nosmp nomsi may be useful.
+- To edit boot options, follow the instructions in the following menu
+- Select "Memory Check" to run memtest86+
+- To boot an installed system, select one of the "Installed system" prototypes
+  and edit the "root" and "kernel" lines appropriately
+

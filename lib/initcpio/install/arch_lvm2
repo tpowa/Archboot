@@ -1,0 +1,19 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" dm-mod "
+    BINARIES="lvm fsadm lvmdump"
+    FILES=""
+    SCRIPT="arch_lvm2"
+
+    add_dir "/dev/mapper"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook loads the necessary modules for an LVM2 root device 
+  on an arch boot image.
+HELPEOF
+}

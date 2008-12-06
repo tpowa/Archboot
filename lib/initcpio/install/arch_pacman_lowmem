@@ -1,0 +1,35 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="pacman"
+    FILES=""
+    SCRIPT="arch_pacman_lowmem"
+
+DEPENDS="initscripts bash coreutils cryptsetup dialog \
+e2fsprogs findutils gawk grep jfsutils less lvm2 mdadm module-init-tools nano \
+ncurses procps psmisc reiserfsprogs sed \
+syslog-ng sysvinit tar util-linux-ng which xfsprogs hdparm memtest86+ \
+grub hwdetect shadow dosfstools udev initscripts filesystem kernel26 glibc kernel-headers pacman pam \
+bzip2 gcc-libs openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt libpcap lilo grub gzip libarchive \
+libdownload device-mapper cracklib readline acl attr archboot klibc libevent sdparm licenses dmraid parted"
+
+for i in $DEPENDS; do
+	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
+		add_file "$k/depends"
+		add_file "$k/files"
+		add_file "$k/desc"
+	done
+done
+add_dir "/var/log"
+add_file "/usr/share/archboot/pacman/etc/pacman.conf" "/etc/pacman.conf"
+add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the pacman on a lowmem arch boot image.
+HELPEOF
+} 
