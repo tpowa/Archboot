@@ -1502,7 +1502,6 @@ configure_system()
 			sed -i -e "s# 192.168.0.2 # $IPADDR #g" ${DESTDIR}/etc/rc.conf
 			sed -i -e "s# 255.255.255.0 # $SUBNET #g" ${DESTDIR}/etc/rc.conf
 			sed -i -e "s# 192.168.0.255\"# $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
-			sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf 
 				if [ "$GW" != "" ]; then 
 					sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf 
 					sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf 
@@ -1511,6 +1510,7 @@ configure_system()
 		else  
 			sed -i -e "s#eth0=\"eth0.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
 		fi
+			sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf 
 		if [ "$PROXY_HTTP" != "" ]; then
 			echo "export http_proxy=$PROXY_HTTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
 			chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
