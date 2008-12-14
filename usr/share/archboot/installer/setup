@@ -24,8 +24,6 @@ MIRRORLIST="/etc/pacman.d/mirrorlist"
 PART_ROOT=
 PART_SWAP=
 
-PATH=$PATH:/tmp/bin:/tmp/usr/bin:/tmp/sbin:/tmp/usr/sbin
-
 # default filesystem specs (the + is bootable flag)
 # <mountpoint>:<partsize>:<fstype>[:+]
 DEFAULTFS="/boot:32:ext2:+ swap:256:swap /:7500:ext3 /home:*:ext3"
@@ -1433,11 +1431,13 @@ prepare_harddrive()
 	NEXTITEM="3"
 }
 
-configure_system()
+dohwdetect
 {
 	HWDETECT=""
 	HWPARAMETER=""
-	DSDT_ENABLE=""
+	HWDETECTHOSTCONTROLLER=""
+	HWDETECTHOOKS=""
+	HWDETECTRC=""
 	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk controllers,\nnetwork and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
 	if [ "$HWDETECT" = "yes" ]; then
 		if /usr/bin/vmware-detect; then 
@@ -1457,25 +1457,8 @@ configure_system()
 		fi
 		DIALOG --defaultno --yesno "Do you need support for booting from lvm2 volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --lvm2"
 		DIALOG --defaultno --yesno "Do you need support for booting from encrypted volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --encrypt"
-		DIALOG --defaultno --yesno "Do you need support for booting the kernel with a custom DSDT file?" 0 0 && DSDT_ENABLE=1
-		if [ "$DSDT_ENABLE" = "1" ]; then
-			while [ "$DSDT" = "" ]; do
-				DIALOG --inputbox "Enter the custom DSDT file (with full path)" 8 65 "" 2>$ANSWER || return 1
-				DSDT=$(cat $ANSWER)
-				if [ -s "$DSDT" ]; then
-					cp $DSDT $DESTDIR/lib/initcpio/custom.dsdt
-					HWPARAMETER="$HWPARAMETER --dsdt"
-				else
-					DIALOG --msgbox "ERROR: You have entered a wrong file name, please enter again." 0 0
-					DSDT=""
-				fi
-			done
-		fi
 		# add always keymap
 		HWPARAMETER="$HWPARAMETER --keymap"
-		HWDETECTHOSTCONTROLLER=""
-		HWDETECTHOOKS=""
-		HWDETECTRC=""
 		HWDETECTHOSTCONTROLLER="$(hwdetect --hostcontroller $HWPARAMETER)"
 		HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
 		HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
@@ -1483,6 +1466,29 @@ configure_system()
 		[ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
 		[ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
 	fi
+}
+
+dodsdt
+{
+	DSDT_ENABLE=""
+	DIALOG --defaultno --yesno "Do you need support for booting the kernel with a custom DSDT file?" 0 0 && DSDT_ENABLE=1
+	if [ "$DSDT_ENABLE" = "1" ]; then
+		while [ "$DSDT" = "" ]; do
+			DIALOG --inputbox "Enter the custom DSDT file (with full path)" 8 65 "" 2>$ANSWER || return 1
+			DSDT=$(cat $ANSWER)
+			if [ -s "$DSDT" ]; then
+				cp $DSDT $DESTDIR/lib/initcpio/custom.dsdt
+				HWPARAMETER="$HWPARAMETER --dsdt"
+			else
+				DIALOG --msgbox "ERROR: You have entered a wrong file name, please enter again." 0 0
+				DSDT=""
+			fi
+		done
+	fi
+}
+
+doparameters
+{
 	if [ -s /tmp/.keymap ]; then
 		DIALOG --yesno "Do you want to use the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
 	fi
@@ -1520,6 +1526,13 @@ configure_system()
 			chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
 		fi)
 	fi
+}
+
+configure_system()
+{
+	dohwdetect
+	dodsdt
+	doparameters
 	[ "$EDITOR" ] || geteditor
 	DONE=0
 	FILE=""
@@ -1585,8 +1598,8 @@ configure_system()
 				else
 					SAMEMIRROR=""
 					mirrorlist="${DESTDIR}/etc/pacman.d/mirrorlist"
-					if [ "$MODE" = "ftp" -a "${SYNC_SERVER}" != "" ]; then
-						DIALOG --yesno "Would you like to use the same MIRROR you used for installation?" 0 0&& SAMEMIRROR="yes"
+					if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+						DIALOG --yesno "Would you like to use the same MIRROR you used for installation?" 0 0 && SAMEMIRROR="yes"
 					fi
 					if ! [ "$SAMEMIRROR" = "yes" ]; then
 						DIALOG --msgbox "WARNING:\n\n- Please keep in mind ftp.archlinux.org is throttled!\n- Please select another mirror to get full download speed." 18 70
