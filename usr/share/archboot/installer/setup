@@ -12,17 +12,17 @@ EDITOR=
 VMLINUZ="vmlinuz26"
 
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm"
+PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 # downloader
 DLPROG="wget"
 # sources
 SYNC_URL=
 FILE_URL="file:///src/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
+PACKAGES=
 
 # partitions
 PART_ROOT=
-PART_SWAP=
 
 # default filesystem specs (the + is bootable flag)
 # <mountpoint>:<partsize>:<fstype>[:+]
@@ -55,25 +55,44 @@ DIALOG() {
 	return $?
 }
 
+# chroot_mount()
+# prepares target system as a chroot
+#
+chroot_mount()
+{
+    [ -e "${DESTDIR}/sys" ] || mkdir "${DESTDIR}/sys"
+    [ -e "${DESTDIR}/proc" ] || mkdir "${DESTDIR}/proc"
+    [ -e "${DESTDIR}/dev" ] || mkdir "${DESTDIR}/dev"
+    mount -t sysfs sysfs "${DESTDIR}/sys"
+    mount -t proc proc "${DESTDIR}/proc"
+    mount -o bind /dev "${DESTDIR}/dev"
+}
+
+# chroot_umount()
+# tears down chroot in target system
+#
+chroot_umount()
+{
+    umount $DESTDIR/proc
+    umount $DESTDIR/sys
+    umount $DESTDIR/dev
+}
+
 finddisks() {
 	workdir="$PWD"
 	cd /sys/block
 	# ide devices
 	for dev in $(ls | egrep '^hd'); do
 		if [ "$(cat $dev/device/media)" = "disk" ]; then
-			if [ "$(dmesg | grep sectors | grep $dev)" ]; then
-				echo "/dev/$dev"
-				[ "$1" ] && echo $1
-			fi
+			echo "/dev/$dev"
+			[ "$1" ] && echo $1
 		fi
 	done
 	#scsi/sata devices
 	for dev in $(ls | egrep '^sd'); do
 		if ! [ "$(cat $dev/device/type)" = "5" ]; then
-			if [ "$(dmesg | grep sectors | grep $dev)" ]; then
-				echo "/dev/$dev"
-				[ "$1" ] && echo $1
-			fi
+			echo "/dev/$dev"
+			[ "$1" ] && echo $1
 		fi
 	done
 	# cciss controllers
@@ -234,6 +253,10 @@ getdest() {
 	DESTDIR=$(cat $ANSWER)
 }
 
+# geteditor()
+# prompts the user to choose an editor
+# sets EDITOR global variable
+#
 geteditor() {
 	if ! [ $(which vi) ]; then
 		DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
@@ -250,6 +273,17 @@ geteditor() {
 	esac 
 }
 
+# _mkfs()
+# Create and mount filesystems in our destination system directory.
+#
+# args:
+#  domk: Whether to make the filesystem or use what is already there
+#  device: Device filesystem is on
+#  fstype: type of filesystem located at the device (or what to create)
+#  dest: Mounting location for the destination system
+#  mountpoint: Mount point inside the destination system, e.g. '/boot'
+
+# returns: 1 on failure
 _mkfs() {
 	local _domk=$1
 	local _device=$2
@@ -257,8 +291,8 @@ _mkfs() {
 	local _dest=$4
 	local _mountpoint=$5
 
+	# we have two main cases: "swap" and everything else.
 	if [ "${_fstype}" = "swap" ]; then
-		_mountpoint="swap"
 		swapoff ${_device} >/dev/null 2>&1
 		if [ "${_domk}" = "yes" ]; then
 			mkswap ${_device} >$LOG 2>&1
@@ -272,99 +306,42 @@ _mkfs() {
 			DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
 			return 1
 		fi
-	elif [ "${_fstype}" = "xfs" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			mkfs.xfs -f ${_device} >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mkfs.xfs ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t xfs ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
-	elif [ "${_fstype}" = "jfs" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			yes | mkfs.jfs ${_device} >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mkfs.jfs ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t jfs ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
-	elif [ "${_fstype}" = "reiserfs" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			yes | mkreiserfs ${_device} >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mkreiserfs ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t reiserfs ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
-	elif [ "${_fstype}" = "ext2" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			mke2fs "${_device}" >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mke2fs ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t ext2 ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
-	elif [ "${_fstype}" = "ext3" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			mke2fs -j ${_device} >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mke2fs -j ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t ext3 ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
-	elif [ "${_fstype}" = "vfat" ]; then
-		if [ "${_domk}" = "yes" ]; then
-			mkfs.vfat ${_device} >$LOG 2>&1
-			if [ $? != 0 ]; then
-				DIALOG --msgbox "Error creating filesystem: mkfs.vfat ${_device}" 0 0
-				return 1
-			fi
-			sleep 2
-		fi
-		mkdir -p ${_dest}${_mountpoint}
-		mount -t vfat ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
-		if [ $? != 0 ]; then
-			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
-			return 1
-		fi
 	else
-		DIALOG --msgbox "unknown fstype for ${_device}" 0 0
-		return 1
+		# make sure the fstype is one we can handle
+		local knownfs=0
+		for fs in xfs jfs reiserfs ext2 ext3 vfat; do
+			[ "${_fstype}" = "${fs}" ] && knownfs=1 && break
+		done
+		if [ $knownfs -eq 0 ]; then
+			DIALOG --msgbox "unknown fstype ${_fstype} for ${_device}" 0 0
+			return 1
+		fi
+		# if we were tasked to create the filesystem, do so
+		if [ "${_domk}" = "yes" ]; then
+			local ret
+			case ${_fstype} in
+				xfs)      mkfs.xfs -f ${_device} >$LOG 2>&1; ret=$? ;;
+				jfs)      yes | mkfs.jfs ${_device} >$LOG 2>&1; ret=$? ;;
+				reiserfs) yes | mkreiserfs ${_device} >$LOG 2>&1; ret=$? ;;
+				ext2)     mke2fs "${_device}" >$LOG 2>&1; ret=$? ;;
+				ext3)     mke2fs -j ${_device} >$LOG 2>&1; ret=$? ;;
+				vfat)     mkfs.vfat ${_device} >$LOG 2>&1; ret=$? ;;
+				# don't handle anything else here, we will error later
+			esac
+			if [ $ret != 0 ]; then
+				DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
+				return 1
+			fi
+			sleep 2
+		fi
+		# create our mount directory
+		mkdir -p ${_dest}${_mountpoint}
+		# mount the bad boy
+		mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+		if [ $? != 0 ]; then
+			DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
+			return 1
+		fi
 	fi
 
 	# add to temp fstab
@@ -384,15 +361,107 @@ _mkfs() {
 	fi
 }
 
-mksimplefs() {
-	DEVICE=$1
-	FSSPECS=$2
+# Get a list of available disks for use in the "Available disks" dialogs. This
+# will print the disks as follows, getting size info from hdparm:
+#   /dev/sda: 640133 MBytes (640 GB)
+#   /dev/sdb: 640135 MBytes (640 GB)
+_getavaildisks()
+{
+	# NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
+	for i in $(finddisks); do echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"; done
+}
+
+# Disable swap and all mounted partitions for the destination system. Unmount
+# the destination root partition last!
+_umountall()
+{
+	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
+	swapoff -a >/dev/null 2>&1
+	umount $(mount | grep -v "${DESTDIR} " | grep "${DESTDIR}" | sed 's|\ .*||g') >/dev/null 2>&1
+	umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
+}
+
+autoprepare() {
+	DISCS=$(finddisks)
+	if [ $(echo $DISCS | wc -w) -gt 1 ]; then
+		DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+		DIALOG --menu "Select the hard drive to use" 14 55 7 $(finddisks _) 2>$ANSWER || return 1
+		DISC=$(cat $ANSWER)
+	else
+		DISC=$DISCS
+	fi
+	SET_DEFAULTFS=""
+	BOOT_PART_SET=""
+	SWAP_PART_SET=""
+	ROOT_PART_SET=""
+	CHOSEN_FS=""
+	# get just the disk size in 1000*1000 MB
+	DISC_SIZE=$(hdparm -I $DISC | grep -F '1000*1000' | sed "s/^.*:[ \t]*\([0-9]*\) MBytes.*$/\1/")
+	while [ "$SET_DEFAULTFS" = "" ]; do
+		FSOPTS=""
+		[ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
+		[ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+		[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
+		[ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
+		[ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
+		while [ "$BOOT_PART_SET" = "" ]; do
+			DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: $DISC_SIZE MB" 10 65 "32" 2>$ANSWER || return 1
+			BOOT_PART_SIZE="$(cat $ANSWER)"
+			if [ "$BOOT_PART_SIZE" = "" ]; then
+				DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+			else
+				if [ "$BOOT_PART_SIZE" -ge "$DISC_SIZE" -o "$BOOT_PART_SIZE" -lt "16" -o "$SBOOT_PART_SIZE" = "$DISC_SIZE" ]; then
+					DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+				else
+					BOOT_PART_SET=1
+				fi
+			fi
+		done
+		DISC_SIZE=$(($DISC_SIZE-$BOOT_PART_SIZE))
+		while [ "$SWAP_PART_SET" = "" ]; do
+			DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: $DISC_SIZE MB" 10 65 "256" 2>$ANSWER || return 1
+			SWAP_PART_SIZE=$(cat $ANSWER)
+			if [ "$SWAP_PART_SIZE" = "" -o  "$SWAP_PART_SIZE" = "0" ]; then
+				DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+			else
+				if [ "$SWAP_PART_SIZE" -ge "$DISC_SIZE" ]; then
+					DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+				else
+					SWAP_PART_SET=1
+				fi
+			fi
+		done
+		DISC_SIZE=$(($DISC_SIZE-$SWAP_PART_SIZE))
+		while [ "$ROOT_PART_SET" = "" ]; do
+		DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  $DISC_SIZE MB" 10 65 "7500" 2>$ANSWER || return 1
+		ROOT_PART_SIZE=$(cat $ANSWER)
+			if [ "$ROOT_PART_SIZE" = "" -o "$ROOT_PART_SIZE" = "0" ]; then
+				DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+			else
+				if [ "$ROOT_PART_SIZE" -ge "$DISC_SIZE" ]; then
+					DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+				else
+					DIALOG --yesno "$(($DISC_SIZE-$ROOT_PART_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+				fi
+			fi
+		done
+		while [ "$CHOSEN_FS" = "" ]; do
+			DIALOG --menu "Select a filesystem for / and /home:" 13 45 6 $FSOPTS 2>$ANSWER || return 1
+			FSTYPE=$(cat $ANSWER)
+			DIALOG --yesno "$FSTYPE will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
+		done
+		SET_DEFAULTFS=1
+	done
+	REAL_DEFAULTFS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
+	DIALOG --defaultno --yesno "$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
+	|| return 1
+	DEVICE=$DISC
+	FSSPECS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g") 
 	sfdisk_input=""
 
 	# we assume a /dev/hdX format (or /dev/sdX)
 	dev=$DEVICE
-	PART_SWAP="${dev}2"
-	PART_ROOT="${dev}3"
+	PART_ROOT="${DEVICE}3"
 
 	if [ "$S_MKFS" = "1" ]; then
 		DIALOG --msgbox "You have already prepared your filesystems manually" 0 0
@@ -411,26 +480,9 @@ mksimplefs() {
 		return 1
 	fi
 
-	# /boot required
-	if [ $(echo $FSSPECS | grep '/boot:' | wc -l) -ne 1 ]; then
-		DIALOG --msgbox "Need exactly one boot partition" 0 0
-		return 1
-	fi
-
-	# swap required
-	if [ $(echo $FSSPECS | grep 'swap:' | wc -l) -lt 1 ]; then
-		DIALOG --msgbox "Need at least one swap partition" 0 0
-		return 1
-	fi
-
 	# / required
 	if [ $(echo $FSSPECS | grep '/:' | wc -l) -ne 1 ]; then
 		DIALOG --msgbox "Need exactly one root partition" 0 0
-		return 1
-	fi
-
-	if [ $(echo $FSSPECS | grep '/home:' | wc -l) -ne 1 ]; then
-		DIALOG --msgbox "Need exactly one home partition" 0 0
 		return 1
 	fi
 
@@ -438,9 +490,7 @@ mksimplefs() {
 
 	# disable swap and all mounted partitions, umount / last!
 	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
-	swapoff -a >/dev/null 2>&1
-	umount $(mount | grep -v "${DESTDIR} " | grep "${DESTDIR}" | sed 's|\ .*||g') >/dev/null 2>&1
-	umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
+	_umountall
 
 	# setup input var for sfdisk
 	for fsspec in $FSSPECS; do
@@ -474,7 +524,7 @@ $sfdisk_input
 EOF
 	if [ $? -gt 0 ]; then
 		DIALOG --msgbox "Error partitioning $DEVICE (see $LOG for details)" 0 0
-		prink on
+		printk on
 		return 1
 	fi
 	printk on
@@ -485,7 +535,7 @@ EOF
 		mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
 		fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
 		if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 > /dev/null; then
-				_mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
+			_mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
 		fi
 		part=$(($part + 1))
 	done
@@ -512,34 +562,26 @@ partition() {
 	fi
 	# disable swap and all mounted partitions, umount / last!
 	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
-	swapoff -a >/dev/null 2>&1
-	umount $(mount | grep -v "${DESTDIR} " | grep "${DESTDIR}" | sed 's|\ .*||g') >/dev/null 2>&1
-	umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
-	#
-	# Select disk to partition
-	#
-	DISCS=$(finddisks _)
-	DISCS="$DISCS OTHER -"
-	DIALOG --msgbox "Available Disks:\n\n$(for i in $(finddisks); do echo -n $(echo $i | sed 's#/dev/##g'): '' ; dmesg | grep $(echo $i | sed 's#/dev/##g') | grep sectors | sort -u | cut -d'(' -f2 | cut -d')' -f1; echo "\n"; done)\n"
-	DIALOG --menu "Select the disk you want to partition" 14 55 7 $DISCS 2>$ANSWER || return 1
-	DISC=$(cat $ANSWER)
-	if [ "$DISC" = "OTHER" ]; then
-		DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>$ANSWER || return 1
-		DISC=$(cat $ANSWER)
-	fi
-	while [ "$DISC" != "DONE" ]; do
-		#
-		# Partition disc
-		#
-		DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
-		cfdisk $DISC
+	_umountall
 
-		DIALOG --menu "Select the disk you want to partition" 14 55 7 $DISCS DONE + 2>$ANSWER || return 1
+	# Select disk to partition
+	DISCS=$(finddisks _)
+	DISCS="$DISCS OTHER - DONE +"
+	DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+	DISC=""
+	while true; do
+		# Prompt the user with a list of known disks
+		DIALOG --menu "Select the disk you want to partition (select DONE when finished)" 14 55 7 $DISCS 2>$ANSWER || return 1
 		DISC=$(cat $ANSWER)
 		if [ "$DISC" = "OTHER" ]; then
 			DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>$ANSWER || return 1
 			DISC=$(cat $ANSWER)
 		fi
+		# Leave our loop if the user is done partitioning
+		[ "$DISC" = "DONE" ] && break
+		# Partition disc
+		DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
+		cfdisk $DISC
 	done
 	S_PART=1
 }
@@ -552,7 +594,7 @@ mountpoints() {
 	while [ "$PARTFINISH" != "DONE" ]; do
 	: >/tmp/.fstab
 	: >/tmp/.parts
-
+	FSOPTS=""
 	[ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
 	[ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
 	[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
@@ -563,13 +605,12 @@ mountpoints() {
 	#
 	# Select mountpoints
 	#
-	DIALOG --msgbox "Available Disks:\n\n$(for i in $(finddisks); do echo -n $(echo $i | sed 's#/dev/##g'): '' ; dmesg | grep $(echo $i | sed 's#/dev/##g') | grep sectors | sort -u | cut -d'(' -f2 | cut -d')' -f1; echo "\n"; done)\n" 0 0
+	DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
 	PARTS=$(findpartitions _)
 	DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
 	PART=$(cat $ANSWER)
 	PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-	PART_SWAP=$PART
-	if [ "$PART_SWAP" != "NONE" ]; then
+	if [ "$PART" != "NONE" ]; then
 		DOMKFS="no"
 		DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
 		echo "$PART:swap:swap:$DOMKFS" >>/tmp/.parts
@@ -615,9 +656,7 @@ mountpoints() {
 	done
 	# disable swap and all mounted partitions
 	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
-	swapoff -a >/dev/null 2>&1
-	umount $(mount | grep -v "${DESTDIR} " | grep "${DESTDIR}" | sed 's|\ .*||g') >/dev/null 2>&1
-	umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
+	_umountall
 	for line in $(cat /tmp/.parts); do
 		PART=$(echo $line | cut -d: -f 1)
 		FSTYPE=$(echo $line | cut -d: -f 2)
@@ -626,7 +665,7 @@ mountpoints() {
 		umount ${DESTDIR}${MP}
 		if [ "$DOMKFS" = "yes" ]; then
 			if [ "$FSTYPE" = "swap" ]; then
-				DIALOG --infobox "Creating swapspace on $PART, activating..." 0 0
+				DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
 			else
 				DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
 			fi
@@ -678,7 +717,7 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
-	DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 18 70
+	DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 10 65
 	# FIXME: this regex doesn't honor commenting
 	MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
 	DIALOG --menu "Select an FTP/HTTP mirror" 14 55 7 \
@@ -690,8 +729,13 @@ select_mirror() {
 			"ftp://ftp.archlinux.org/core/os/i686" 2>$ANSWER || return 1
 			SYNC_URL=$(cat $ANSWER)
 	else
-		SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | sed "s#\$repo/os/x86_64#core/os/$(uname -m)#g")
+		# Form the full URL for our mirror by grepping for the server name in
+		# our mirrorlist and pulling the full URL out. Substitute 'core' in
+		# for the repository name, and ensure that if it was listed twice we
+		# only return one line for the mirror.
+		SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | sed "s#\$repo/os/x86_64#core/os/$(uname -m)#g" | head -n1)
 	fi
+	echo "Using mirror: $SYNC_URL" >$LOG
 }
 
 select_cdrom () {
@@ -713,6 +757,11 @@ select_cdrom () {
 	fi
 }
 
+# prepare_pacman()
+# configures pacman and syncs for the first time on destination system
+#
+# params: none
+# returns: 1 on error
 prepare_pacman() {
 	cd /tmp
 	if [ "$MODE" = "cd" ]; then
@@ -735,11 +784,16 @@ EOF
 	[ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
 
 	DIALOG --infobox "Refreshing package database..." 6 45
-	# FIXME: if sync fails. this function needs to fail.
-	$PACMAN -Sy >$LOG 2>&1
+	$PACMAN -Sy >$LOG 2>&1 || return 1
+	return 0
 }
 
-selectpkg() {
+# select_packages()
+# prompts the user to select packages to install
+#
+# params: none
+# returns: 1 on error
+select_packages() {
 	if ! [ "$S_SRC" = "1" ]; then
 		DIALOG --msgbox "Error:\nYou must select Source first." 0 0
 		return 1
@@ -789,98 +843,62 @@ selectpkg() {
 	fi
 	# Use default ftp install routine from arch livecd
 	if [ "$MODE" = "ftp" ]; then
-		DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages with your categories already selected, allowing you to fine-tune.\n\nNOTE: The BASE category is always installed, and its packages will not appear in this menu." 18 70
+		# if selection has been done before, warn about loss of input
+		# and let the user exit gracefully
+		if [ $S_SELECT -ne 0 ]; then
+			DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
+		fi
+
+		DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 15 70
+
 		# set up our install location if necessary and sync up
 		# so we can get package lists
-		prepare_pacman 
-		# category selection hasn't been done before
-		if ! [ -f /tmp/.pkgcategory ]; then
-			CATLIST=""
-			for i in $($PACMAN -Sg | sed "s/^base$/ /g"); do
-				CATLIST="${CATLIST} ${i} - OFF"
-			done
-		else
-			# category selection was already run at least once
-			CATLIST=""
-			for i in $(cat /tmp/.pkgcategory | sed 's|\"||g'); do
-				CATLIST="$CATLIST $i ^ ON"
-			done
-			for i in $($PACMAN -Sg | sed "s/^base$/ /g"); do
-				grep $i /tmp/.pkgcategory > /dev/null 2>&1 || CATLIST="$CATLIST $i - OFF"
-			done
+		prepare_pacman
+		if [ $? -ne 0 ]; then
+			DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
+			return 1
 		fi
-		DIALOG --checklist "Select Package Categories" 19 55 12 $CATLIST 2>/tmp/.pkgcategory || return 1
 
-		# mash up the package lists
-		COREPKGS=$($PACMAN -Sl core | cut -d' ' -f2)
+		# show group listing for group selection
+		local _catlist="base ^ ON"
+		for i in $($PACMAN -Sg | sed "s/^base$/ /g"); do
+			_catlist="${_catlist} ${i} - OFF"
+		done
 
-		# remove base packages from the selectable list
-		for i in $($PACMAN -Sg base | tail +2); do
-			COREPKGS=$(echo ${COREPKGS} | sed "s/\(^${i} \| ${i} \| ${i}$\)/ /g")
-		done
-		# assemble a list of pre-selected packages
-		for i in $(cat /tmp/.pkgcategory | sed 's|"||g'); do
-			CATPKGS="$CATPKGS $($PACMAN -Sg ${i} | tail +2)"
-		done
-		# put together the menu list
-		PKGLIST=""
-		for i in ${COREPKGS}; do
-			# if the package was preselected, check it
-			if [ -n "$(echo $CATPKGS | grep "\(^${i} \| ${i} \| ${i}$\)")" ]; then
-				PKGLIST="$PKGLIST ${i} ^ ON"
+		DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 19 55 12 $_catlist 2>$ANSWER || return 1
+		_catlist="$(cat $ANSWER)"
+
+		# assemble a list of packages with groups, marking pre-selected ones
+		# <package> <group> <selected>
+		local _pkgtmp="$($PACMAN -Sl core | awk '{print $2}')"
+		local _pkglist=''
+
+		$PACMAN -Si $_pkgtmp | \
+		awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' > $ANSWER
+		while read pkgname pkgcat; do
+
+			# check if this package is in a selected group
+			# slightly ugly but sorting later requires newlines in the variable
+			if [ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]; then
+				_pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} ON")"
 			else
-				PKGLIST="$PKGLIST ${i} - OFF"
+				_pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} OFF")"
 			fi
-		done
-		DIALOG --checklist "Select Packages To Install." 19 60 12 $PKGLIST 2>/tmp/.pkglist || return 1
+		done < $ANSWER
+
+		# sort by category
+		_pkglist="$(echo "$_pkglist" | sort -f -k 2)"
+
+		DIALOG  --separate-output --checklist "Select Packages To Install." 19 60 12 $_pkglist 2>$ANSWER || return 1
+		PACKAGES="$(cat $ANSWER)"
 	fi
 	S_SELECT=1
 }
 
-doinstall()
-{
-	# begin install
-	rm -f /tmp/pacman.log
-	# all pacman output goes to /tmp/pacman.log, which we tail into a dialog
-	( \
-		echo "Installing Packages..." >/tmp/pacman.log ; echo >>/tmp/pacman.log ; \
-		touch /tmp/setup-pacman-running ; \
-		$PACMAN -S $(echo $* | sed 's|"||g') >>/tmp/pacman.log 2>&1 ; \
-		echo $? >/tmp/.pacman.retcode; \
-		echo >>/tmp/pacman.log; \
 
-		if [ "$(cat /tmp/.pacman.retcode)" -gt 0 ]; then
-			echo "Package Installation FAILED." >>/tmp/pacman.log
-		else
-			echo "Package Installation Complete." >>/tmp/pacman.log
-		fi
-		rm /tmp/setup-pacman-running
-	) &
-
-	sleep 2
-	dialog --backtitle "$TITLE" --title " Installing... Please Wait " \
-	--no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>/tmp/.pid
-	while [ -f /tmp/setup-pacman-running ]; do
-		sleep 1
-	done
-	kill $(cat /tmp/.pid)
-	if [ "$(cat /tmp/.pacman.retcode)" -gt 0 ]; then
-		result="Installation Failed (see errors below)"
-		retcode=1
-	else
-		result="Installation Complete"
-		retcode=0
-	fi
-	# disabled for now
-	#dialog --backtitle "$TITLE" --title " $result " \
-	#	--exit-label "Continue" --textbox "/tmp/pacman.log" 18 70
-	# fix the stair-stepping that --tailboxbg leaves us with
-	stty onlcr
-
-	rm -f /tmp/.pacman.retcode
-	return $retcode
-}
-
+# installpkg()
+# performs package installation to the target system
+#
 installpkg() {
 	if ! [ "$S_SRC" = "1" ]; then
 		DIALOG --msgbox "Error:\nYou must select Source first." 0 0
@@ -891,6 +909,11 @@ installpkg() {
 			DIALOG --msgbox "You must select packages first." 0 0
 			return 1
 		fi
+	else
+		if [ "$S_SELECT" != "1" ]; then
+			DIALOG --msgbox "You must select packages first." 0 0
+			return 1
+		fi
 	fi
 	if [ "$S_MKFS" != "1" -a "$S_MKFSAUTO" != "1" ]; then
 		getdest
@@ -898,48 +921,77 @@ installpkg() {
 
 	DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
 	if [ "$MODE" = "cd" ]; then
-	LIST=
-	# fix pacman list!
-	sed -i -e 's/-i686//g' -e 's/-x86_64//g' /tmp/.pkglist
-	for pkg in $(cat /tmp/.pkglist); do
-		pkgname=${pkg%-*-*}
-		LIST="$LIST $pkgname"
-	done
-	fi
-	if [ "$MODE" = "ftp" ]; then
-		LIST="base" # always install base
+		PACKAGES=
+		# fix pacman list!
+		sed -i -e 's/-i686//g' -e 's/-x86_64//g' /tmp/.pkglist
 		for pkg in $(cat /tmp/.pkglist); do
-			LIST="$LIST $pkg"
+			pkgname=${pkg%-*-*}
+			PACKAGES="$PACKAGES $pkgname"
 		done
 	fi
-	# for a CD install, we don't need to download packages first
-	if [ "$MODE" = "ftp" ]; then
-		DIALOG --infobox "Downloading packages.  See $LOG for output." 6 55
-		$PACMAN -Sw $(echo $LIST | sed 's|"||g') >$LOG 2>&1
-		if [ $? -gt 0 ]; then
-			DIALOG --msgbox "One or more packages failed to download.  You can try again by re-selecting Install Packages from the main menu." 12 65
-			return 1
+	# create chroot environment on target system
+	# code straight from mkarchroot
+	chroot_mount
+
+	# execute pacman in a subshell so we can follow its progress
+	# pacman output goes /tmp/pacman.log
+	# /tmp/setup-pacman-running acts as a lockfile
+	( \
+		echo "Installing Packages..." >/tmp/pacman.log ; \
+		echo >>/tmp/pacman.log ; \
+		touch /tmp/setup-pacman-running ; \
+		$PACMAN -S $PACKAGES 2>&1 >> /tmp/pacman.log ; \
+		echo $? > /tmp/.pacman-retcode ; \
+		if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
+			echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
+		else
+			echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
 		fi
+		rm /tmp/setup-pacman-running
+	) &
+
+	# display pacman output while it's running
+	sleep 2
+	dialog --backtitle "$TITLE" --title " Installing... Please Wait " \
+		--no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>$ANSWER
+	while [ -f /tmp/setup-pacman-running ]; do
+		sleep 1
+	done
+	kill $(cat $ANSWER)
+
+	# pacman finished, display scrollable output
+	local _result=''
+	if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
+		_result="Installation Failed (see errors below)"
+	else
+		_result="Installation Complete"
 	fi
-	# mount proc/sysfs first, so initcpio can use auto-detection if it wants
-	! [ -d $DESTDIR/proc ] && mkdir $DESTDIR/proc
-	! [ -d $DESTDIR/sys ] && mkdir $DESTDIR/sys
-	! [ -d $DESTDIR/dev ] && mkdir $DESTDIR/dev
-	mount -t proc none $DESTDIR/proc
-	mount -t sysfs none $DESTDIR/sys
-	mount -o bind /dev $DESTDIR/dev
-	doinstall $LIST
-	 if [ $? -gt 0 ]; then
-		DIALOG --msgbox "One or more packages failed to install.  You can try again by re-selecting Install Packages from the main menu." 12 65
-		return 1
-	fi
-	dialog --backtitle "$TITLE" --title " $result " \
-		--exit-label "Continue" --textbox "/tmp/pacman.log" 18 70
-	if [ $? -gt 0 ]; then
-		return 1
-	fi
+	rm /tmp/.pacman-retcode
+	DIALOG --title "$_result" --exit-label "Continue" \
+		--textbox "/tmp/pacman.log" 18 70 || return 1
+	# tear down the chroot environment
+	chroot_umount
+
+	# ensure the disk is synced
+	sync
+
 	S_INSTALL=1
-	# add archboot addons if activated
+
+	# automagic time!
+	# any automatic configuration should go here
+	DIALOG --infobox "Writing base configuration..." 6 40
+	auto_addons
+	auto_fstab
+	auto_locale
+	auto_network
+	auto_hwdetect
+	auto_dsdt
+	auto_parameters
+}
+
+# add archboot addons if activated
+auto_addons() 
+{
 	if [ -d /tmp/packages ]; then
 		DO_ADDON=""
 		DIALOG --yesno "Would you like to install your addons packages to installed system?" 0 0 && DO_ADDON="yes"
@@ -948,8 +1000,14 @@ installpkg() {
 			$PACMAN -U /tmp/packages/*
 		fi
 	fi
-	umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
-	sync
+}
+
+# auto_fstab()
+# preprocess fstab file
+# comments out old fields and inserts new ones
+# according to partitioning/formatting stage
+#
+auto_fstab(){
 	# Modify fstab
 	if [ "$S_MKFS" = "1" -o "$S_MKFSAUTO" = "1" ]; then
 		if [ -f /tmp/.fstab ]; then
@@ -980,6 +1038,55 @@ installpkg() {
 			done
 			sort /tmp/.fstab >>$DESTDIR/etc/fstab
 		fi
+	fi
+}
+
+# auto_locale()
+# enable glibc locales from rc.conf and build initial locale DB
+auto_locale()
+{
+	for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
+		sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
+	done
+	DIALOG --infobox "Generating glibc base locales..." 4 40
+	chroot ${DESTDIR} locale-gen >/dev/null
+}
+
+
+# auto_network()
+# configures network on host system according to installer
+# settings if user wishes to do so
+#
+auto_network()
+{
+	# exit if network wasn't configured in installer
+	if [ $S_NET -eq 0 ]; then
+		return 1
+	fi
+
+	DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
+
+	if [ "$S_DHCP" != "1" ]; then 
+		sed -i -e "s#eth0=\"eth0#$INTERFACE=\"$INTERFACE#g" ${DESTDIR}/etc/rc.conf
+		sed -i -e "s# 192.168.0.2 # $IPADDR #g" ${DESTDIR}/etc/rc.conf
+		sed -i -e "s# 255.255.255.0 # $SUBNET #g" ${DESTDIR}/etc/rc.conf
+		sed -i -e "s# 192.168.0.255\"# $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
+			if [ "$GW" != "" ]; then 
+				sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf 
+				sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf 
+			fi 
+		echo "nameserver $DNS" >> ${DESTDIR}/etc/resolv.conf 
+	else  
+		sed -i -e "s#eth0=\"eth0.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
+	fi
+		sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf 
+	if [ "$PROXY_HTTP" != "" ]; then
+		echo "export http_proxy=$PROXY_HTTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
+		chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
+	fi
+	if [ "$PROXY_FTP" != "" ]; then
+		echo "export ftp_proxy=$PROXY_FTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
+		chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
 	fi
 }
 
@@ -1015,9 +1122,12 @@ donetwork() {
 	done
 	DIALOG --yesno "Do you want to use DHCP?" 0 0
 	if [ $? -eq 0 ]; then
-		DIALOG --infobox "Please wait.  Polling for DHCP server on $INTERFACE..." 0 0
-		dhcpcd $INTERFACE >$LOG 2>&1 || DIALOG --msgbox "Failed to run dhcpcd." 0 0 || return 1
-		sleep 10
+		DIALOG --infobox "Please wait.  Polling for DHCP server on $INTERFACE..." 10 65
+		dhcpcd $INTERFACE >$LOG 2>&1
+		if [ $? -ne 0 ]; then
+			DIALOG --msgbox "Failed to run dhcpcd.  See $LOG for details." 0 0
+			return 1
+		fi
 		if [ ! $(ifconfig $INTERFACE | grep 'inet addr:') ]; then
 			DIALOG --msgbox "DHCP request failed." 0 0 || return 1
 		fi
@@ -1031,7 +1141,7 @@ donetwork() {
 			SUBNET=$(cat $ANSWER)
 			DIALOG --inputbox "Enter your broadcast" 8 65 "192.168.0.255" 2>$ANSWER || return 1
 			BROADCAST=$(cat $ANSWER)
-			DIALOG --inputbox "Enter your gateway (optional)" 8 65 "192.168.0.1" 8 65 2>$ANSWER || return 1
+			DIALOG --inputbox "Enter your gateway (optional)" 8 65 "192.168.0.1" 2>$ANSWER || return 1
 			GW=$(cat $ANSWER)
 			DIALOG --inputbox "Enter your DNS server IP" 8 65 "192.168.0.1" 2>$ANSWER || return 1
 			DNS=$(cat $ANSWER)
@@ -1045,6 +1155,7 @@ donetwork() {
 				0) NETPARAMETERS="1" ;;
 			esac
 		done
+		echo "running: ifconfig $INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST up" >$LOG
 		ifconfig $INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST up >$LOG 2>&1 || DIALOG --msgbox "Failed to setup $INTERFACE interface." 0 0 || return 1
 		if [ "$GW" != "" ]; then
 			route add default gw $GW >$LOG 2>&1 || DIALOG --msgbox "Failed to setup your gateway." 0 0 || return 1
@@ -1062,7 +1173,7 @@ donetwork() {
 		echo "nameserver $DNS" >/etc/resolv.conf
 	fi
 	### Missing Proxy Configuration
-	DIALOG --msgbox "The network is configured." 0 0
+	DIALOG --msgbox "The network is configured." 8 30
 	S_NET=1
 }
 
@@ -1107,15 +1218,14 @@ dolilo() {
 	[ "$EDITOR" ] || geteditor
 	$EDITOR ${DESTDIR}/etc/lilo.conf
 	DIALOG --infobox "Installing the LILO bootloader..." 0 0
-	mount -t proc none $DESTDIR/proc
-	mount -o bind /dev $DESTDIR/dev
+	chroot_mount
 	chroot $DESTDIR /sbin/lilo >$LOG 2>&1
 	if [ $? -gt 0 ]; then
-		umount $DESTDIR/dev $DESTDIR/proc
+		chroot_umount
 		DIALOG --msgbox "Error installing LILO. (see $LOG for output)" 0 0
 		return 1
 	fi
-	umount $DESTDIR/dev $DESTDIR/proc
+	chroot_umount
 	DIALOG --msgbox "LILO was successfully installed." 0 0
 	S_LILO=1
 }
@@ -1152,6 +1262,11 @@ dogrub() {
 			else
 				subdir="/boot"
 			fi
+			# keep the file from being completely bogus
+			if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
+				DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
+				grubdev="(hd0,0)"
+			fi
 			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 			if [ "$UUIDPARAMETER" = "yes" ]; then
 				echo "kernel $subdir/$VMLINUZ root=${_rootpart} ro" >>$DESTDIR/boot/grub/menu.lst
@@ -1175,7 +1290,7 @@ dogrub() {
 				echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
 			fi
 			echo "" >>$DESTDIR/boot/grub/menu.lst
-			echo "# (1) Windows" >>$DESTDIR/boot/grub/menu.lst
+			echo "# (2) Windows" >>$DESTDIR/boot/grub/menu.lst
 			echo "#title Windows" >>$DESTDIR/boot/grub/menu.lst
 			echo "#rootnoverify (hd0,0)" >>$DESTDIR/boot/grub/menu.lst
 			echo "#makeactive" >>$DESTDIR/boot/grub/menu.lst
@@ -1193,7 +1308,7 @@ dogrub() {
 		DIALOG --msgbox "No hard drives were found" 0 0
 		return 1
 	fi
-	DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
+	DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
 	ROOTDEV=$(cat $ANSWER)
 	DIALOG --infobox "Installing the GRUB bootloader..." 0 0
 	cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
@@ -1222,6 +1337,10 @@ dogrub() {
 	bootdev=$(mapdev $ROOTDEV)
 	if [ "$bootpart" = "" ]; then
 		DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
+		return 1
+	fi
+	if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
+		DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
 		return 1
 	fi
 	$DESTDIR/sbin/grub --no-floppy --batch >/tmp/grub.log 2>&1 <<EOF
@@ -1269,8 +1388,8 @@ select_source()
 		getsource
 	else
 		TITLE="Arch Linux FTP/HTTP Installation"
-		DIALOG --msgbox "If you wish to load your ethernet modules manually, please do so now (consoles 1 thru 6 are active)." 12 65
-		while $(/bin/true); do
+		DIALOG --msgbox "If you wish to load your ethernet modules manually, please do so now in an other terminal." 12 65
+		while true; do
 		    DIALOG --menu "FTP Installation" 10 35 3 \
 		    "0" "Setup Network" \
 		    "1" "Choose Mirror" \
@@ -1306,6 +1425,28 @@ set_keyboard()
 	fi
 }
 
+# run_mkinitcpio()
+# runs mkinitcpio on the target system, displays output
+#
+run_mkinitcpio()
+{
+	chroot_mount
+	# all mkinitcpio output goes to /tmp/mkinitcpio.log, which we tail into a dialog
+	( \
+	touch /tmp/setup-mkinitcpio-running
+	echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
+	chroot $DESTDIR /sbin/mkinitcpio -p kernel26 >>/tmp/mkinitcpio.log 2>&1
+	echo >> /tmp/mkinitcpio.log
+	rm -f /tmp/setup-mkinitcpio-running 
+	) &
+	sleep 2 
+	dialog --backtitle "$TITLE" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
+	while [ -f /tmp/setup-mkinitcpio-running ]; do
+		sleep 1
+	done
+	chroot_umount
+}
+
 prepare_harddrive()
 {
 	S_MKFSAUTO=0
@@ -1328,76 +1469,7 @@ prepare_harddrive()
 		NEXTITEM="$(cat $ANSWER)"
 		case $(cat $ANSWER) in
 			"1")
-				DISCS=$(finddisks)
-				if [ $(echo $DISCS | wc -w) -gt 1 ]; then
-					DIALOG --msgbox "Available Disks:\n\n$(for i in $(finddisks); do dmesg | grep $(echo $i | sed 's#/dev/##g') | grep sectors | sort -u | cut -d')' -f1 |sed -e 's/ /|/g' -e 's/SCSI|device|//g' -e 's/(//g'; done)\n" 0 0
-					DIALOG --menu "Select the hard drive to use" 14 55 7 $(finddisks _) 2>$ANSWER || return 1
-					DISC=$(cat $ANSWER)
-				else
-					DISC=$DISCS
-				fi
-					SET_DEFAULTFS=""
-					BOOT_PART_SET=""
-					SWAP_PART_SET=""
-					ROOT_PART_SET=""
-					CHOSEN_FS=""
-					DISC_SIZE=$(dmesg | grep $(echo $DISC | sed 's#/dev/##g') | grep sectors | sort -u | cut -d'(' -f2 | sed -e 's# .*##g')
-					while [ "$SET_DEFAULTFS" = "" ]; do
-						FSOPTS="ext2 Ext2 ext3 Ext3"
-						[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-						[ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
-						[ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
-						while [ "$BOOT_PART_SET" = "" ]; do
-							DIALOG --inputbox "Enter the size (MegaByte/MB) of your /boot partition,\n(minimum value is 16).\n\nDisk space left: $DISC_SIZE (MegaByte/MB)" 8 65 "32" 2>$ANSWER || return 1
-							BOOT_PART_SIZE="$(cat $ANSWER)"
-							if [ "$BOOT_PART_SIZE" = ""  ]; then
-								DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-							else
-								if [ "$BOOT_PART_SIZE" -ge "$DISC_SIZE" -o "$BOOT_PART_SIZE" -lt "16" -o "$SBOOT_PART_SIZE" = "$DISC_SIZE" ]; then
-									DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-								else
-									BOOT_PART_SET=1
-								fi
-							fi
-						done
-						DISC_SIZE=$(($DISC_SIZE-$BOOT_PART_SIZE))
-						while [ "$SWAP_PART_SET" = "" ]; do
-							DIALOG --inputbox "Enter the size (MegaByte/MB) of your swap partition,\n(minimum value is > 0).\n\nDisk space left: $DISC_SIZE (MegaByte/MB)" 8 65 "256" 2>$ANSWER || return 1
-							SWAP_PART_SIZE=$(cat $ANSWER)
-							if [ "$SWAP_PART_SIZE" = "" -o  "$SWAP_PART_SIZE" = "0" ]; then
-								DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-							else
-								if [ "$SWAP_PART_SIZE" -ge "$DISC_SIZE" ]; then
-									DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-								else
-									SWAP_PART_SET=1
-								fi
-							fi
-						done
-						DISC_SIZE=$(($DISC_SIZE-$SWAP_PART_SIZE))
-						while [ "$ROOT_PART_SET" = "" ]; do
-							DIALOG --inputbox "Enter the size (MegaByte/MB) of your / partition,\nthe /home partition will take all the left space.\n\nDisk space left:  $DISC_SIZE (MegaByte/MB)" 8 65 "7500" 2>$ANSWER || return 1
-							ROOT_PART_SIZE=$(cat $ANSWER)
-							if [ "$ROOT_PART_SIZE" = "" -o "$ROOT_PART_SIZE" = "0" ]; then
-								DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-							else
-								if [ "$ROOT_PART_SIZE" -ge "$DISC_SIZE" ]; then
-									DIALOG --msgbox "ERROR: You have entered a wrong size, please enter again." 0 0
-								else
-									DIALOG --yesno "$(($DISC_SIZE-$ROOT_PART_SIZE)) (MegaByte/MB) will be used for your /home partition?" 0 0 && ROOT_PART_SET=1
-								fi
-							fi
-						done
-						while [ "$CHOSEN_FS" = "" ]; do
-							DIALOG --menu "Select a filesystem for / and /home" 13 45 6 $FSOPTS 2>$ANSWER || return 1
-									FSTYPE=$(cat $ANSWER)
-							DIALOG --yesno "$FSTYPE will be used for / and /home?" 0 0 && CHOSEN_FS=1
-						done
-						SET_DEFAULTFS=1
-					done
-				REAL_DEFAULTFS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
-				DIALOG --defaultno --yesno "$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
-					&& mksimplefs $DISC "$REAL_DEFAULTFS" ;;
+				autoprepare ;;
 			"2")
 				partition ;;
 			"3")
@@ -1410,7 +1482,40 @@ prepare_harddrive()
 	NEXTITEM="3"
 }
 
-dohwdetect()
+do_pacmanmirror()
+{
+	SAMEMIRROR=""
+	mirrorlist="${DESTDIR}/etc/pacman.d/mirrorlist"
+	if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+		DIALOG --yesno "Would you like to use the same MIRROR you used for installation?" 0 0 && SAMEMIRROR="yes"
+	fi
+	if ! [ "$SAMEMIRROR" = "yes" ]; then
+		DIALOG --msgbox "WARNING:\n\n- Please keep in mind ftp.archlinux.org is throttled!\n- Please select another mirror to get full download speed." 18 70
+		# this will find all mirrors in the mirrorlist, commented out or not
+		PAC_MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "$mirrorlist" | sed 's|$| _|g')
+		DIALOG --menu "Select the primary Pacman mirror" 14 55 7 $PAC_MIRRORS "Custom" "_" 2>$ANSWER || return 1
+		PAC_SYNC_SERVER="$(cat $ANSWER)"
+		if [ "$PAC_SYNC_SERVER" = "Custom" ]; then
+			DIALOG --inputbox "Enter the full URL to packages, for example:\nhttp://server.org/archlinux/\$repo/os/$(uname -m)" 8 65 "http://" 2>$ANSWER || return 1
+			PAC_SYNC_SERVER="$(cat $ANSWER)"
+		else
+			# Form the full URL for our mirror by grepping for the
+			# server name in our mirrorlist and pulling the full URL
+			# out. Ensure that if it was listed twice we only return
+			# one line for the mirror.
+			PAC_SYNC_SERVER=$(egrep -o "${PAC_SYNC_SERVER}.*" "$mirrorlist" | head -n1)
+		fi
+	else
+		PAC_SYNC_SERVER="$(echo ${SYNC_URL} | sed 's/core/\$repo/g')"
+	fi
+	# comment out all existing mirrors
+	sed -i -e 's/^Server/#Server/g' "$mirrorlist"
+	# add our new entry at the end of the file
+	echo "# Setup-configured entry" >> "$mirrorlist"
+	echo Server = $(egrep -o "$PAC_SYNC_SERVER.*" "$mirrorlist") >> "$mirrorlist"
+}
+
+auto_hwdetect()
 {
 	HWDETECT=""
 	HWPARAMETER=""
@@ -1447,7 +1552,7 @@ dohwdetect()
 	fi
 }
 
-dodsdt()
+auto_dsdt()
 {
 	DSDT_ENABLE=""
 	DIALOG --defaultno --yesno "Do you need support for booting the kernel with a custom DSDT file?" 0 0 && DSDT_ENABLE=1
@@ -1466,7 +1571,7 @@ dodsdt()
 	fi
 }
 
-doparameters()
+auto_parameters()
 {
 	if [ -s /tmp/.keymap ]; then
 		DIALOG --yesno "Do you want to use the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
@@ -1480,38 +1585,10 @@ doparameters()
 	if [ -s  /tmp/.timezone ]; then
 		DIALOG --yesno "Do you want to use the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
 	fi
-	if [ "$S_NET" = "1" ]; then
-		DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 && (
-		if [ "$S_DHCP" != "1" ]; then 
-			sed -i -e "s#eth0=\"eth0#$INTERFACE=\"$INTERFACE#g" ${DESTDIR}/etc/rc.conf
-			sed -i -e "s# 192.168.0.2 # $IPADDR #g" ${DESTDIR}/etc/rc.conf
-			sed -i -e "s# 255.255.255.0 # $SUBNET #g" ${DESTDIR}/etc/rc.conf
-			sed -i -e "s# 192.168.0.255\"# $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
-				if [ "$GW" != "" ]; then 
-					sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf 
-					sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf 
-				fi 
-			echo "nameserver $DNS" >> ${DESTDIR}/etc/resolv.conf 
-		else  
-			sed -i -e "s#eth0=\"eth0.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
-		fi
-			sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf 
-		if [ "$PROXY_HTTP" != "" ]; then
-			echo "export http_proxy=$PROXY_HTTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
-			chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
-		fi
-		if [ "$PROXY_FTP" != "" ]; then
-			echo "export ftp_proxy=$PROXY_FTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
-			chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
-		fi)
-	fi
 }
 
 configure_system()
 {
-	dohwdetect
-	dodsdt
-	doparameters
 	[ "$EDITOR" ] || geteditor
 	DONE=0
 	FILE=""
@@ -1533,85 +1610,51 @@ configure_system()
 			"/etc/locale.gen" "Glibc Locales" \
 			"Root-Password" "Set the root password" \
 			"Pacman-Mirror" "Set the primary pacman mirror" \
-			"_" "Return to Main Menu" 2>$ANSWER
+			"Return" "Return to Main Menu" 2>$ANSWER
 		FILE=$(cat $ANSWER)
 
-		if [ "$FILE" = "_" -o "$FILE" = "" ]; then
-			mount -t proc none $DESTDIR/proc
-			mount -t sysfs none $DESTDIR/sys
-			mount -o bind /dev $DESTDIR/dev
-			# all pacman output goes to /tmp/pacman.log, which we tail into a dialog
-			( \
-			touch /tmp/setup-mkinitcpio-running
-			echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/initramfs.log
-			chroot $DESTDIR /sbin/mkinitcpio -p kernel26 >>/tmp/initramfs.log 2>&1
-			echo >> /tmp/initramfs.log
-			rm -f /tmp/setup-mkinitcpio-running 
-			) &
-			sleep 2 
-			dialog --backtitle "$TITLE" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/initramfs.log" 18 70
-			while [ -f /tmp/setup-mkinitcpio-running ]; do
-				sleep 1
-			done
-			umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
+		if [ "$FILE" = "Return" -o "$FILE" = "" ]; then
+			run_mkinitcpio
 			DONE=1 
 		else
+			# A file was selected, take the appropriate action
 			if [ "$FILE" = "/etc/mkinitcpio.conf" ]; then
 				DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
 				HOOK_ERROR=""
-			fi
-			if ! [ "$FILE" = "Root-Password" -o "$FILE" = "Pacman-Mirror" ]; then
-				if [ "$FILE" = "/etc/locale.gen" ]; then
+				$EDITOR ${DESTDIR}${FILE}
+			elif [ "$FILE" = "/etc/locale.gen" ]; then
 				# enable glibc locales from rc.conf
 					for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
 						sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
 					done
-				fi
-					$EDITOR ${DESTDIR}${FILE}
+				$EDITOR ${DESTDIR}${FILE}
+			elif [ "$FILE" = "Root-Password" ]; then
+				ROOTPW=""
+				while [ "$ROOTPW" = "" ]; do
+					chroot ${DESTDIR} passwd root && ROOTPW=1
+				done
+				# NOTE: no call to ${EDITOR} for this 'file'
+			elif [ "$FILE" = "Pacman-Mirror" ]; then
+				do_pacmanmirror
+				# NOTE: no call to ${EDITOR} for this 'file'
 			else
-				if [ "$FILE" = "Root-Password" ]; then
-					ROOTPW=""
-					while [ "$ROOTPW" = "" ]; do
-						chroot ${DESTDIR} passwd root && ROOTPW=1
-					done
-				else
-					SAMEMIRROR=""
-					mirrorlist="${DESTDIR}/etc/pacman.d/mirrorlist"
-					if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
-						DIALOG --yesno "Would you like to use the same MIRROR you used for installation?" 0 0 && SAMEMIRROR="yes"
-					fi
-					if ! [ "$SAMEMIRROR" = "yes" ]; then
-						DIALOG --msgbox "WARNING:\n\n- Please keep in mind ftp.archlinux.org is throttled!\n- Please select another mirror to get full download speed." 18 70
-						# this will find all mirrors in the mirrorlist, commented out or not
-						PAC_MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "${DESTDIR}/etc/pacman.d/mirrorlist" | sed 's|$| _|g')
-						DIALOG --menu "Select the primary Pacman mirror" 14 55 7 $PAC_MIRRORS "Custom" "_" 2>$ANSWER || return 1
-						PAC_SYNC_SERVER="$(cat $ANSWER)"
-						if [ "$PAC_SYNC_SERVER" = "Custom" ]; then
-							DIALOG --inputbox "Enter the full URL to packages, for example:\nhttp://server.org/archlinux/\$repo/os/$(uname -m)" 8 65 "http://" 2>$ANSWER || return 1
-							PAC_SYNC_SERVER="$(cat $ANSWER)"
-						fi
-					else
-						PAC_SYNC_SERVER="$(echo ${SYNC_URL} | sed 's/core/\$repo/g')"
-					fi
-					# comment out all existing mirrors
-					sed -i -e 's/^Server/#Server/g' "$mirrorlist"
-					# add our new entry at the end of the file
-					echo "# Setup-configured entry" >> "$mirrorlist"
-					echo Server = $(egrep -o "$PAC_SYNC_SERVER.*" "$mirrorlist") >> "$mirrorlist"
-				fi
+				# All other files need no special pre-processing, so just go ahead and edit them
+				# TODO: rc.conf should be pre-processed a bit to insert selected
+				#       timezone and utc info
+				$EDITOR ${DESTDIR}${FILE}
 			fi
+
+			# All of the below steps are post-processing on files that were edited by the user
 			if [ "$FILE" = "/etc/locale.gen" ]; then
 				chroot ${DESTDIR} locale-gen
-			fi
-			if [ "$FILE" = "/etc/mkinitcpio.conf" ]; then
+			elif [ "$FILE" = "/etc/mkinitcpio.conf" ]; then
 				for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do 
 					[ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1 
 				done
 				if [ "$HOOK_ERROR" = "1" ]; then
 					DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
 				fi
-			fi
-			if [ "$FILE" = "/etc/rc.conf" ]; then
+			elif [ "$FILE" = "/etc/rc.conf" ]; then
 				TIMEZONE=""
 				eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
 				if [ "$TIMEZONE" != "" -a -e ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ]; then
@@ -1621,30 +1664,6 @@ configure_system()
 				if [ ! -f ${DESTDIR}/var/lib/hwclock/adjtime ]; then
 						echo "0.0 0 0.0" > ${DESTDIR}/var/lib/hwclock/adjtime
 				fi
-				eval $(grep "^HARDWARECLOCK" ${DESTDIR}/etc/rc.conf)
-				if [ "$HARDWARECLOCK" = "UTC" ]; then
-					chroot ${DESTDIR} /sbin/hwclock --directisa --utc --hctosys
-				else
-					chroot ${DESTDIR} /sbin/hwclock --directisa --localtime --hctosys
-				fi
-				# ugly hack:
-				for line in $(sort --reverse -t: -k3 /tmp/.parts); do
-					PART=$(echo $line | cut -d: -f 1)
-					FSTYPE=$(echo $line | cut -d: -f 2)
-					MP=$(echo $line | cut -d: -f 3)
-					if [ "$MP" != "swap" ]; then
-						umount ${DESTDIR}${MP}
-					fi
-				done
-				for line in $(sort -t: -k3 /tmp/.parts); do
-					PART=$(echo $line | cut -d: -f 1)
-					FSTYPE=$(echo $line | cut -d: -f 2)
-					MP=$(echo $line | cut -d: -f 3)
-					if [ "$MP" != "swap" ]; then
-					mount -t ${FSTYPE} ${PART} ${DESTDIR}${MP}
-					fi
-				done
-				# end of hack
 			fi
 		fi
 	done
@@ -1690,7 +1709,7 @@ mainmenu() {
 		"3")
 			select_source ;;
 		"4")
-			selectpkg ;;
+			select_packages ;;
 		"5")
 			installpkg ;;
 		"6")
@@ -1727,7 +1746,7 @@ fi
 
 DIALOG --msgbox "Welcome to the Arch Linux Installation program.  The install process is fairly straightforward, and you should run through the options in the order they are presented.  If you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.  You can view all output from commands by viewing your VC7 console (ALT-F7).  ALT-F1 will bring you back here." 14 65
 
-while $(/bin/true); do
+while true; do
 	mainmenu
 done
 
