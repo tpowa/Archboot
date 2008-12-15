@@ -983,10 +983,6 @@ installpkg() {
 	auto_addons
 	auto_fstab
 	auto_locale
-	auto_network
-	auto_hwdetect
-	auto_dsdt
-	auto_parameters
 }
 
 # add archboot addons if activated
@@ -1587,86 +1583,109 @@ auto_parameters()
 	fi
 }
 
+auto_timesetting()
+{
+	TIMEZONE=""
+	eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
+	if [ "$TIMEZONE" != "" -a -e ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ]; then
+		cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ${DESTDIR}/etc/localtime
+		cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE /etc/localtime
+	fi
+	if [ ! -f ${DESTDIR}/var/lib/hwclock/adjtime ]; then
+		echo "0.0 0 0.0" > ${DESTDIR}/var/lib/hwclock/adjtime
+	fi
+}
+
 configure_system()
 {
+
+	## PREPROCESSING ##
+	# only done on first invocation of configure_system
+	if [ $S_CONFIG -eq 0 ]; then
+		# /etc/pacman.d/mirrorlist
+		# add installer-selected mirror to the top of the mirrorlist
+		if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+			awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
+			mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
+		fi
+		auto_network
+		auto_hwdetect
+		auto_dsdt
+		auto_parameters
+	fi
+
+	## END PREPROCESS ##
 	[ "$EDITOR" ] || geteditor
-	DONE=0
 	FILE=""
-	while [ "$EDITOR" != "" -a "$DONE" = "0" ]; do
+
+	# main menu loop
+	while true; do
 		if [ -n "$FILE" ]; then
 			DEFAULT="--default-item $FILE"
 		else
 			DEFAULT=""
 		fi
-		dialog $DEFAULT --backtitle "$TITLE" --menu "Configuration" 19 80 16 \
-			"/etc/rc.conf" "System Config" \
-			"/etc/fstab" "Filesystem Mountpoints" \
-			"/etc/mkinitcpio.conf" "Initramfs Config" \
-			"/etc/modprobe.conf" "Kernel Modules (for 2.6.x)" \
-			"/etc/resolv.conf" "DNS Servers" \
-			"/etc/hosts" "Network Hosts" \
-			"/etc/hosts.deny" "Denied Network Services" \
-			"/etc/hosts.allow" "Allowed Network Services" \
-			"/etc/locale.gen" "Glibc Locales" \
-			"Root-Password" "Set the root password" \
-			"Pacman-Mirror" "Set the primary pacman mirror" \
-			"Return" "Return to Main Menu" 2>$ANSWER
-		FILE=$(cat $ANSWER)
+		DIALOG $DEFAULT --menu "Configuration" 19 80 16 \
+			"/etc/rc.conf"              "System Config" \
+			"/etc/fstab"                "Filesystem Mountpoints" \
+			"/etc/mkinitcpio.conf"      "Initramfs Config" \
+			"/etc/modprobe.conf"        "Kernel Modules" \
+			"/etc/resolv.conf"          "DNS Servers" \
+			"/etc/hosts"                "Network Hosts" \
+			"/etc/hosts.deny"           "Denied Network Services" \
+			"/etc/hosts.allow"          "Allowed Network Services" \
+			"/etc/locale.gen"           "Glibc Locales" \
+			"Pacman-Mirror"             "Set the primary pacman mirror" \
+			"/etc/pacman.d/mirrorlist"  "Pacman Mirror List" \
+			"Root-Password"             "Set the root password" \
+			"Return"                    "Return to Main Menu" 2>$ANSWER || FILE="Return"
+		FILE="$(cat $ANSWER)"
 
-		if [ "$FILE" = "Return" -o "$FILE" = "" ]; then
-			run_mkinitcpio
-			DONE=1 
-		else
-			# A file was selected, take the appropriate action
-			if [ "$FILE" = "/etc/mkinitcpio.conf" ]; then
-				DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
-				HOOK_ERROR=""
-				$EDITOR ${DESTDIR}${FILE}
-			elif [ "$FILE" = "/etc/locale.gen" ]; then
-				# enable glibc locales from rc.conf
-					for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
-						sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
-					done
-				$EDITOR ${DESTDIR}${FILE}
-			elif [ "$FILE" = "Root-Password" ]; then
-				ROOTPW=""
-				while [ "$ROOTPW" = "" ]; do
-					chroot ${DESTDIR} passwd root && ROOTPW=1
-				done
-				# NOTE: no call to ${EDITOR} for this 'file'
-			elif [ "$FILE" = "Pacman-Mirror" ]; then
-				do_pacmanmirror
-				# NOTE: no call to ${EDITOR} for this 'file'
-			else
-				# All other files need no special pre-processing, so just go ahead and edit them
-				# TODO: rc.conf should be pre-processed a bit to insert selected
-				#       timezone and utc info
-				$EDITOR ${DESTDIR}${FILE}
+		if [ "$FILE" = "Return" -o -z "$FILE" ]; then       # exit
+			break
+		elif [ "$FILE" = "/etc/mkinitcpio.conf" ]; then    # non-file
+			DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
+			HOOK_ERROR=""
+			$EDITOR ${DESTDIR}${FILE}
+			for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do 
+				[ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1 
+			done
+			if [ "$HOOK_ERROR" = "1" ]; then
+				DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
 			fi
-
-			# All of the below steps are post-processing on files that were edited by the user
-			if [ "$FILE" = "/etc/locale.gen" ]; then
-				chroot ${DESTDIR} locale-gen
-			elif [ "$FILE" = "/etc/mkinitcpio.conf" ]; then
-				for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do 
-					[ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1 
+		elif [ "$FILE" = "/etc/locale.gen" ]; then          # non-file
+			# enable glibc locales from rc.conf
+				for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
+					sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
 				done
-				if [ "$HOOK_ERROR" = "1" ]; then
-					DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
-				fi
-			elif [ "$FILE" = "/etc/rc.conf" ]; then
-				TIMEZONE=""
-				eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
-				if [ "$TIMEZONE" != "" -a -e ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ]; then
-					cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ${DESTDIR}/etc/localtime
-					cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE /etc/localtime
-				fi
-				if [ ! -f ${DESTDIR}/var/lib/hwclock/adjtime ]; then
-						echo "0.0 0 0.0" > ${DESTDIR}/var/lib/hwclock/adjtime
-				fi
-			fi
-		fi
+			$EDITOR ${DESTDIR}${FILE}
+		elif [ "$FILE" = "Root-Password" ]; then            # non-file
+			while true; do
+				chroot ${DESTDIR} passwd root && break
+			done
+		elif [ "$FILE" = "Pacman-Mirror" ]; then            # non-file
+			do_pacmanmirror
+		else                                                #regular file
+			$EDITOR ${DESTDIR}${FILE}
+		fi 
 	done
+	## POSTPROCESSING ##
+
+	# adjust time
+	#
+	auto_timesetting
+
+	# /etc/initcpio.conf
+	#
+	run_mkinitcpio
+
+	# /etc/locale.gen
+	#
+	chroot ${DESTDIR} locale-gen
+
+	## END POSTPROCESSING ##
+
+	S_CONFIG=1
 }
 
 install_bootloader()
