@@ -34,38 +34,13 @@ INSTMODE=$1
 DESTDIR=$2
 PKGARG=$3
 
+PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
+
 if [ "$PKGARG" = "" ]; then
 	usage
 fi
 
 ! [ -d /tmp ] && mkdir /tmp
-
-# sometimes this gets mounted RO, dunno why
-/bin/mount -o remount,rw / >/dev/null 2>&1
-
-PACMAN=
-[ -f /tmp/usr/bin/pacman ] && PACMAN=/tmp/usr/bin/pacman
-[ -f /usr/bin/pacman ] && PACMAN=/usr/bin/pacman
-if [ "$PACMAN" = "" ]; then
-	cd /tmp
-	if [ "$INSTMODE" = "ftp" ]; then
-		echo "Downloading pacman..."
-		wget $PKGARG/pacman*.pkg.tar.gz
-		if [ $? -gt 0 ]; then
-			echo "error: Download failed"
-			exit 1
-		fi
-		tar -xzf pacman*.pkg.tar.gz
-	elif [ "$INSTMODE" = "cd" ]; then
-		echo "Unpacking pacman..."
-		tar -xzf $PKGARG/pacman*.pkg.tar.gz
-	fi
-fi
-[ -f /tmp/usr/bin/pacman ] && PACMAN=/tmp/usr/bin/pacman
-if [ "$PACMAN" = "" ]; then
-	echo "error: Cannot find the pacman binary!"
-	exit 1
-fi
 
 if [ "$INSTMODE" = "ftp" ]; then
 	echo "[core]" >/tmp/pacman.conf
@@ -105,10 +80,10 @@ mount -t proc none $DESTDIR/proc
 mount -t sysfs none $DESTDIR/sys
 mount -o bind /dev $DESTDIR/dev	
 if [ "$INSTMODE" = "cd" ]; then
-  $PACMAN -r $DESTDIR --config /tmp/pacman.conf -Sy $PKGLIST
+  $PACMAN -Sy $PKGLIST
 fi
 if [ "$INSTMODE" = "ftp" ]; then
-  $PACMAN -r $DESTDIR --config /tmp/pacman.conf -Sy base
+  $PACMAN -Sy base
 fi
 if [ $? -gt 0 ]; then
 	echo
