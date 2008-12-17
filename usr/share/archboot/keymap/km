@@ -2,12 +2,12 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 
 ANSWER="/tmp/.km"
-TITLE="Arch Linux Keymap And Font Setting"
+TITLE="Arch Linux Keymap And Console Font Setting"
 BASEDIR="/usr/share/kbd"
 
 abort()
 {
-	dodialog yesno "Abort Keymap And Font Setting?" 6 40 || return 0
+	DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 40 || return 0
 	[ -e /tmp/.km ] && rm -f /tmp/.km
 	[ -e /tmp/.keymap ] && rm -f /tmp/.keymap
 	[ -e /tmp/.font ] && rm -f /tmp/.font
@@ -16,41 +16,25 @@ abort()
 	exit 0
 }
 
-dodialog()
-{
-	# use this for msgbox, inputbox, yesno, infobox
-	#
-	# dodialog <boxtype> <text> [height] [width] [other]
-	# 26/3/06: added an option so that if [other] is default=no 
-	#	   the dialog will default to no
-	# the new dialog's auto-sizing is pretty dumb, we can't trust it
-	height=12
-	width=65
-	if [ "$3" != "" ]; then
-		height=$3
-	fi
-	if [ "$4" != "" ]; then
-		width=$4
-	fi
-	if [ "$5" == "default=no"  ]; then
-		dialog --defaultno --backtitle "$TITLE" --aspect 15 --$1 "$2" $height $width 
-		
-	else
-		dialog --backtitle "$TITLE" --aspect 15 --$1 "$2" $height $width $5
-	fi
+# DIALOG()
+# an el-cheapo dialog wrapper
+#
+# parameters: see dialog(1)
+# returns: whatever dialog did
+DIALOG() {
+	dialog --backtitle "$TITLE" --aspect 15 "$@"
+	return $?
 }
 
-domenu()
+error_kmset()
 {
-	menutype=$1 ; shift
-	text=$1     ; shift
-	height=$1   ; shift
-	width=$1    ; shift
-	mheight=$1  ; shift
-	
-	dialog --cancel-label "Skip" --$menutype "$text" $height $width $mheight $*
+	DIALOG --msgbox "An error occured, your current keymap was not changed." 0 0
 }
 
+error_consoleset()
+{
+	DIALOG --msgbox "An error occured, your current consolefont was not changed." 0 0
+}
 
 dokeymap() {
 	echo "Scanning for keymaps..."
@@ -58,14 +42,15 @@ dokeymap() {
 	for i in $(find $BASEDIR/keymaps -follow -name "*.gz" | sed 's|^.*/||g' | sort); do
 		KEYMAPS="$KEYMAPS $i -"
 	done
-	domenu menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER
+	DIALOG --menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER || DIALOG --msgbox "Aborting, your current keymap was not changed." 0 0
 	keymap=$(cat $ANSWER)
 	echo $keymap > /tmp/.keymap
 	if [ "$keymap" ]; then
 		echo "Loading keymap: $keymap"
 		#loadkeys -q $BASEDIR/keymaps/$keymap
-		loadkeys -q $keymap
+		loadkeys -q $keymap || error_kmset 
 	fi
+S_NEXTITEM=2
 }
 
 doconsolefont() {
@@ -75,7 +60,7 @@ doconsolefont() {
 	for i in $(find $BASEDIR/consolefonts -maxdepth 1 ! -name '*.cp.gz' -name "*.gz"  | sed 's|^.*/||g' | sort); do
 		FONTS="$FONTS $i -"
 	done
-	domenu menu "Select A Console Font" 22 60 16 $FONTS 2>$ANSWER
+	DIALOG --menu "Select A Console Font" 22 60 16 $FONTS 2>$ANSWER || DIALOG --msgbox "Aborting, your current consolefont was not changed." 0 0
 	font=$(cat $ANSWER)
 	echo $font > /tmp/.font
 	if [ "$font" ]; then
@@ -88,7 +73,11 @@ doconsolefont() {
 			fi
 		done
 		[ -e /dev/ttys0 ] &&  setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0
+		if [ $? -gt 0 ]; then
+			error_consoleset
+		fi
 	fi
+S_NEXTITEM=3
 }
 
 mainmenu() {
@@ -97,7 +86,7 @@ mainmenu() {
 	else
 		DEFAULT=""
 	fi
-	dialog $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
+	DIALOG $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
 		--menu "Use the UP and DOWN arrows to navigate menus. Use TAB to switch between buttons and ENTER to select." 15 55 8 \
 		"1" "Set Keymap" \
 		"2" "Set Consolefont" \
@@ -149,7 +138,7 @@ if [ -e /tmp/.km-running ]; then
 fi 
 : >/tmp/.km-running
 
-while $(/bin/true); do
+while true; do
 	mainmenu
 done
 
