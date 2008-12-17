@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "/drivers/net/") "
+    MODULES=" $(checked_modules "/drivers/net/" | grep -ve "wireless") "
 
     BINARIES="ping ping6 route nslookup telnet ssh"
     FILES=""

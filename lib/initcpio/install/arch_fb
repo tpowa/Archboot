@@ -4,9 +4,10 @@ install ()
 {
     MODULES=" $(checked_modules "/video/" | grep 'fb')"
 
-    BINARIES=""
+    BINARIES="v86d"
     FILES=""
     SCRIPT=""
+    add_file /usr/share/archboot/fb/etc/modprobe.d/uvesafb
 }
 
 help ()

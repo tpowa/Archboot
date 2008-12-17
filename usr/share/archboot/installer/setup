@@ -1518,7 +1518,7 @@ auto_hwdetect()
 	HWDETECTHOSTCONTROLLER=""
 	HWDETECTHOOKS=""
 	HWDETECTRC=""
-	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk controllers,\nnetwork and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers,\nnetwork and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
 	if [ "$HWDETECT" = "yes" ]; then
 		if /usr/bin/vmware-detect; then 
 			HWPARAMETER="$HWPARAMETER --vmware"
@@ -1537,11 +1537,9 @@ auto_hwdetect()
 		fi
 		DIALOG --defaultno --yesno "Do you need support for booting from lvm2 volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --lvm2"
 		DIALOG --defaultno --yesno "Do you need support for booting from encrypted volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --encrypt"
-		# add always keymap
-		HWPARAMETER="$HWPARAMETER --keymap"
 		HWDETECTHOSTCONTROLLER="$(hwdetect --hostcontroller $HWPARAMETER)"
 		HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
-		HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
+		HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
 		[ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
 		[ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
 		[ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
@@ -1560,7 +1558,7 @@ auto_dsdt()
 				cp $DSDT $DESTDIR/lib/initcpio/custom.dsdt
 				HWPARAMETER="$HWPARAMETER --dsdt"
 			else
-				DIALOG --msgbox "ERROR: You have entered a wrong file name, please enter again." 0 0
+				DIALOG --msgbox "ERROR: You have entered a invalid file name, please enter again." 0 0
 				DSDT=""
 			fi
 		done
@@ -1570,16 +1568,20 @@ auto_dsdt()
 auto_parameters()
 {
 	if [ -s /tmp/.keymap ]; then
-		DIALOG --yesno "Do you want to use the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+		DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0 
+		sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
 	fi
 	if [ -s /tmp/.font ]; then
-		DIALOG --yesno "Do you want to use the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s/^CONSOLEFONT=.*/CONSOLEFONT=\"$(cat /tmp/.font | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+		DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in rc.conf ..." 0 0
+		sed -i -e "s/^CONSOLEFONT=.*/CONSOLEFONT=\"$(cat /tmp/.font | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
 	fi
 	if [ -s  /tmp/.hardwareclock ]; then
-		DIALOG --yesno "Do you want to use the hardwareclock: $(cat /tmp/.hardwareclock | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s/^HARDWARECLOCK=.*/HARDWARECLOCK=\"$(cat /tmp/.hardwareclock | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+		DIALOG --infobox "Setting the hardwareclock: $(cat /tmp/.hardwareclock | sed -e 's/\..*//g') in rc.conf ..." 0 0
+		sed -i -e "s/^HARDWARECLOCK=.*/HARDWARECLOCK=\"$(cat /tmp/.hardwareclock | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
 	fi
 	if [ -s  /tmp/.timezone ]; then
-		DIALOG --yesno "Do you want to use the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf?" 0 0 && sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
+		DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf ..." 0 0
+		sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
 	fi
 }
 
@@ -1596,18 +1598,23 @@ auto_timesetting()
 	fi
 }
 
+auto_ftpmirror()
+{
+	# /etc/pacman.d/mirrorlist
+	# add installer-selected mirror to the top of the mirrorlist
+	if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+		awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
+		mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
+	fi
+}
+
 configure_system()
 {
 
 	## PREPROCESSING ##
 	# only done on first invocation of configure_system
 	if [ $S_CONFIG -eq 0 ]; then
-		# /etc/pacman.d/mirrorlist
-		# add installer-selected mirror to the top of the mirrorlist
-		if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
-			awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
-			mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
-		fi
+		auto_ftpmirror
 		auto_network
 		auto_hwdetect
 		auto_dsdt
@@ -1708,8 +1715,8 @@ mainmenu() {
 	fi
 	dialog $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
 	--menu "Use the UP and DOWN arrows to navigate menus.  Use TAB to switch between buttons and ENTER to select." 17 55 13 \
-	"0" "Keyboard And Console Setting" \
-	"1" "Set Clock" \
+	"0" "Set Keyboard And Console Font" \
+	"1" "Set Time and Date" \
 	"2" "Prepare Hard Drive" \
 	"3" "Select Source" \
 	"4" "Select Packages" \
@@ -1747,7 +1754,7 @@ mainmenu() {
 			echo ""
 			exit 0 ;;
 		*)
-			DIALOG --yesno "Abort Installation?" 6 40 &&[ -e /tmp/.setup-running ] && rm /tmp/.setup-running && clear && exit 0
+			DIALOG --yesno "Abort Installation?" 6 40 && [ -e /tmp/.setup-running ] && rm /tmp/.setup-running && clear && exit 0
 			;;
 	esac
 }
