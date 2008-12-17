@@ -130,23 +130,22 @@ getuuid()
 
 
 findcdroms() {
-	workdir="$PWD"
-	cd /sys/block
+	block=/sys/block
 	# ide devices
-	for dev in $(ls | egrep '^hd'); do
-		if [ "$(cat $dev/device/media)" = "cdrom" ]; then
-			echo "/dev/$dev"
+	for dev in $(ls $block | egrep '^hd'); do
+		if [ "$(cat $block/$dev/device/media)" = "cdrom" ]; then
+			echo "/dev/$dev $(hdparm -I /dev/$dev | grep Model | sed -e 's/.*Model Number://g' -e 's/ //g')"
 			[ "$1" ] && echo $1
 		fi
 	done
 	# scsi/sata and other devices
-	for dev in $(ls | egrep '^sd|^sr|^scd|^sg'); do
-		if [ "$(cat $dev/device/type)" = "5" ]; then
-			echo "/dev/$dev"
+	for dev in $(ls $block | egrep '^sd|^sr|^scd|^sg'); do
+		if [ "$(cat $block/$dev/device/type)" = "5" ]; then
+			#echo "/dev/$dev"
+			echo "/dev/$dev $(hdparm -I /dev/$dev | grep Model | sed -e 's/.*Model Number://g' -e 's/ //g')"
 			[ "$1" ] && echo $1
 		fi
 	done
-	cd "$workdir"
 }
 
 findpartitions() {
@@ -741,12 +740,11 @@ select_mirror() {
 select_cdrom () {
 	# we may have leftover mounts...
 	umount /src >/dev/null 2>&1
-	CDROMS=$(findcdroms _)
+	CDROMS=$(findcdroms)
 	if [ "$CDROMS" = "" ]; then
 		DIALOG --msgbox "No CD drives were found" 0 0
 		return 1
 	fi
-	DIALOG --msgbox "Available CD drives:\n\n$(for i in $(findcdroms); do k=$(echo $i: | sed 's#/dev/##g'); dmesg | grep $k | grep "CD/"| cut -d, -f1 | sed 's/ /|/g';l=$(echo "$k"$(dmesg | grep $(dmesg | grep $(echo $k | sed 's#:##g') |grep CD- |cut -d\  -f2) | grep ^scsi | sed -e 's/ /|/g' | sed -e 's#.*CD-ROM##g' | sed -e 's#|||##g' | sed -e 's#||#|#g')); ! [ "$l" = "$k" ] && echo $l; done)\n" 0 0
 	DIALOG --menu "Select the CD drive that contains Arch packages" 14 55 7 $CDROMS 2>$ANSWER || return 1
 	CDROM=$(cat $ANSWER)
 	DIALOG --infobox "Mounting $CDROM" 0 0
