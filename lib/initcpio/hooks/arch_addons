@@ -39,7 +39,8 @@ run_hook ()
     	mv /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko.old /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko
     	if [ "$RETRIGGER_UDEV" = "1" ]; then
      		echo "Retrigger udev uevents ..."
-     		/etc/start_udev uevents
+     		udevadm trigger
+		udevadm settle
     	fi
     else
 	echo "ARCH_ADDONS USAGE:"

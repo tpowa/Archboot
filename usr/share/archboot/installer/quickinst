@@ -7,13 +7,13 @@ usage() {
 	echo "media manually than go through the routines in the setup script."
 	echo
 	echo "First make sure you have all your filesystems mounted under <destdir>."
-	echo "e.g. mount -t iso9660 /dev/sdc or /dev/sr0 (for new naming sheme) /src "
+	echo "e.g. mount -t iso9660 /dev/hdc or /dev/sr0 (for new naming sheme) /src "
 	echo "Then run this script to install all base packages to <destdir>."
 	echo
 	if [ -e /usr/bin/wget ]; then
-		echo "<install_mode> must be either 'ftp' or 'cd'"
+		echo "<install_mode> must be either 'ftp' or 'media'"
 	else
-		echo "<install_mode> must be 'cd'"
+		echo "<install_mode> must be 'media'"
 	fi
 	echo
 	echo "Examples:"
@@ -25,7 +25,7 @@ usage() {
 		fi
 	fi
 
-	echo "  quickinst cd  /mnt /src/core-$(uname -m)/pkg"
+	echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
 	echo ""
 	exit 0
 }
@@ -50,7 +50,7 @@ if [ "$INSTMODE" = "ftp" ]; then
 	ln -sf $DESTDIR/var/cache/pacman/pkg /var/cache/pacman/pkg >/dev/null 2>&1
 fi
 
-if [ "$INSTMODE" = "cd" ]; then
+if [ "$INSTMODE" = "media" ]; then
 	PKGFILE=/tmp/packages.txt
 	cp $PKGARG/packages.txt /tmp/packages.txt
 	if [ ! -f $PKGFILE ]; then

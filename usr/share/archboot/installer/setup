@@ -78,18 +78,72 @@ chroot_umount()
     umount $DESTDIR/dev
 }
 
-finddisks() {
-	workdir="$PWD"
-	cd /sys/block
+# Check media on install packages
+check_media() {
+	! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media > /dev/null 2>&1
+	if [ -d $media/core-$(uname -m)/pkg ]; then
+		SET_MEDIA=1
+		break
+	else
+		umount $media > /dev/null 2>&1
+	fi
+}
+
+# Get cdroms and removable devices
+get_media() {
+	block=/sys/block
+	media=/src
+	SET_MEDIA=0
+	#unmount media first, we may have leftovers ...
+	umount $media  > /dev/null 2>&1
 	# ide devices
-	for dev in $(ls | egrep '^hd'); do
+	if [ "$SET_MEDIA" = "0" ]; then
+		for dev in $(ls $block | egrep '^hd'); do
+			if [ "$(cat $block/$dev/device/media)" = "cdrom" ]; then
+				check_media
+			fi
+		done
+	fi
+	if [ "$SET_MEDIA" = "0" ]; then
+		# scsi/sata and other devices
+		for dev in $(ls $block | egrep '^sd|^sr|^scd|^sg'); do
+			if [ "$(cat $block/$dev/device/type)" = "5" ]; then
+				check_media
+			fi
+		done
+	fi
+	if [ "$SET_MEDIA" = "0" ]; then
+		# usb devices with raw partition
+		for dev in $(ls $block | egrep '^sd'); do
+			if [ "$(cat $block/$dev/device/type)" = "0" -a "$(cat $block/$dev/removable)" = "1" -a ! "$(cat $block/$dev/size)" = "0" ]; then
+				check_media
+			fi
+		done
+	fi
+}
+
+#check on manual mounted source
+manual_media() {
+	if [ "$SET_MEDIA" = "0" ]; then
+		DIALOG --msgbox "No source media was autodetected, please switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages are available under /src/core-$(uname -m)/pkg.\n\n" 15 55
+	fi
+	if [ ! -d /src/core-$(uname -m)/pkg ]; then
+		DIALOG --msgbox "Package directory /src/core-$(uname -m)/pkg is missing!" 0 0
+		return 1
+	fi
+}
+
+finddisks() {
+	block=/sys/block
+	# ide devices
+	for dev in $(ls $block | egrep '^hd'); do
 		if [ "$(cat $dev/device/media)" = "disk" ]; then
 			echo "/dev/$dev"
 			[ "$1" ] && echo $1
 		fi
 	done
 	#scsi/sata devices
-	for dev in $(ls | egrep '^sd'); do
+	for dev in $(ls $block | egrep '^sd'); do
 		if ! [ "$(cat $dev/device/type)" = "5" ]; then
 			echo "/dev/$dev"
 			[ "$1" ] && echo $1
@@ -97,21 +151,18 @@ finddisks() {
 	done
 	# cciss controllers
 	if [ -d /dev/cciss ] ; then
-		cd /dev/cciss
-		for dev in $(ls | egrep -v 'p'); do
+		for dev in $(ls /dev/cciss | egrep -v 'p'); do
 			echo "/dev/cciss/$dev"
 			[ "$1" ] && echo $1
 		done
 	fi
 	# Smart 2 controllers
         if [ -d /dev/ida ] ; then
-                cd /dev/ida
-                for dev in $(ls | egrep -v 'p'); do
+                for dev in $(ls /dev/ida | egrep -v 'p'); do
                         echo "/dev/ida/$dev"
                         [ "$1" ] && echo $1
                 done
         fi
-	cd "$workdir"
 }
 
 # getuuid()
@@ -128,32 +179,11 @@ getuuid()
     fi
 }
 
-
-findcdroms() {
-	block=/sys/block
-	# ide devices
-	for dev in $(ls $block | egrep '^hd'); do
-		if [ "$(cat $block/$dev/device/media)" = "cdrom" ]; then
-			echo "/dev/$dev $(hdparm -I /dev/$dev | grep Model | sed -e 's/.*Model Number://g' -e 's/ //g')"
-			[ "$1" ] && echo $1
-		fi
-	done
-	# scsi/sata and other devices
-	for dev in $(ls $block | egrep '^sd|^sr|^scd|^sg'); do
-		if [ "$(cat $block/$dev/device/type)" = "5" ]; then
-			#echo "/dev/$dev"
-			echo "/dev/$dev $(hdparm -I /dev/$dev | grep Model | sed -e 's/.*Model Number://g' -e 's/ //g')"
-			[ "$1" ] && echo $1
-		fi
-	done
-}
-
 findpartitions() {
-	workdir="$PWD"
+	block=/sys/block
 	for devpath in $(finddisks); do
 		disk=$(echo $devpath | sed 's|.*/||')
-		cd /sys/block/$disk
-		for part in $disk*; do
+		for part in $(ls $block/$disk*); do
 			# check if not already assembled to a raid device
 			if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" ]; then
 				if [ -d $part ]; then
@@ -177,21 +207,18 @@ findpartitions() {
 	done
 	# inlcude cciss controllers
 	if [ -d /dev/cciss ] ; then
-		cd /dev/cciss
-		for dev in $(ls | egrep 'p'); do
+		for dev in $(ls /dev/cciss | egrep 'p'); do
 			echo "/dev/cciss/$dev"
 			[ "$1" ] && echo $1
 		done
 	fi
 	# inlcude Smart 2 controllers
 	if [ -d /dev/ida ] ; then
-		cd /dev/ida
-		for dev in $(ls | egrep 'p'); do
+		for dev in $(ls /dev/ida | egrep 'p'); do
 			echo "/dev/ida/$dev"
 			[ "$1" ] && echo $1
 		done
 	fi
-	cd "$workdir"
 }
 
 get_grub_map() {
@@ -686,22 +713,10 @@ mountpoints() {
 
 getsource() {
 	S_SRC=0
-	if [ "$MODE" = "cd" ]; then
-		DIALOG --menu "You can either install packages from an Arch Linux CD, or you can switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages are available under /src/core-$(uname -m)/pkg.\n\n" \
-			15 55 2 \
-			"CD" "Mount the CD-ROM and install from there" \
-			"SRC" "I have manually mounted the source media" 2>$ANSWER || return 1
-		case $(cat $ANSWER) in
-			"CD")
-				select_cdrom
-				;;
-			"SRC")
-				;;
-		esac
-		if [ ! -d /src/core-$(uname -m)/pkg ]; then
-			DIALOG --msgbox "Package directory /src/core-$(uname -m)/pkg is missing!" 0 0
-			return 1
-		fi
+	if [ "$MODE" = "media" ]; then
+		get_media
+		#last fallback, if autodetection fails!
+		manual_media
 	fi
 
 	if [ "$MODE" = "ftp" ]; then
@@ -737,32 +752,13 @@ select_mirror() {
 	echo "Using mirror: $SYNC_URL" >$LOG
 }
 
-select_cdrom () {
-	# we may have leftover mounts...
-	umount /src >/dev/null 2>&1
-	CDROMS=$(findcdroms)
-	if [ "$CDROMS" = "" ]; then
-		DIALOG --msgbox "No CD drives were found" 0 0
-		return 1
-	fi
-	DIALOG --menu "Select the CD drive that contains Arch packages" 14 55 7 $CDROMS 2>$ANSWER || return 1
-	CDROM=$(cat $ANSWER)
-	DIALOG --infobox "Mounting $CDROM" 0 0
-	mount -t iso9660 $CDROM /src >/dev/null 2>&1
-	if [ $? -gt 0 ]; then
-		DIALOG --msgbox "Failed to mount $CDROM" 0 0
-		return 1
-	fi
-}
-
 # prepare_pacman()
 # configures pacman and syncs for the first time on destination system
 #
 # params: none
 # returns: 1 on error
 prepare_pacman() {
-	cd /tmp
-	if [ "$MODE" = "cd" ]; then
+	if [ "$MODE" = "media" ]; then
 		local serverurl="${FILE_URL}"
 	elif [ "$MODE" = "ftp" ]; then
 		local serverurl="${SYNC_URL}"
@@ -796,8 +792,8 @@ select_packages() {
 		DIALOG --msgbox "Error:\nYou must select Source first." 0 0
 		return 1
 	fi
-	# Archboot setup CD Mode uses packages.txt!
-	if [ "$MODE" = "cd" ]; then
+	# Archboot setup media Mode uses packages.txt!
+	if [ "$MODE" = "media" ]; then
 		DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
 		# set up our install location if necessary and sync up
 		# so we can get package lists
@@ -902,7 +898,7 @@ installpkg() {
 		DIALOG --msgbox "Error:\nYou must select Source first." 0 0
 		return 1
 	fi
-	if [ "$MODE" = "cd" ]; then
+	if [ "$MODE" = "media" ]; then
 		if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
 			DIALOG --msgbox "You must select packages first." 0 0
 			return 1
@@ -918,7 +914,7 @@ installpkg() {
 	fi
 
 	DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
-	if [ "$MODE" = "cd" ]; then
+	if [ "$MODE" = "media" ]; then
 		PACKAGES=
 		# fix pacman list!
 		sed -i -e 's/-i686//g' -e 's/-x86_64//g' /tmp/.pkglist
@@ -1361,24 +1357,24 @@ select_source()
 {
 	if ! [ $(which $DLPROG) ]; then
 		DIALOG --menu "Please select an installation source" 10 35 3 \
-		"1" "CD-ROM or OTHER SOURCE" 2>$ANSWER || return 1
+		"1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>$ANSWER || return 1
 	else
 		DIALOG --menu "Please select an installation source" 10 35 3 \
-		"1" "CD-ROM or OTHER SOURCE" \
+		"1" "CD-ROM, USBSTICK or OTHER SOURCE" \
 		"2" "FTP/HTTP" 2>$ANSWER || return 1
 	fi
 
 	case $(cat $ANSWER) in
 		"1")
-			MODE="cd"
+			MODE="media"
 			;;
 		"2")
 			MODE="ftp"
 			;;
 	esac 
 
-	if [ "$MODE" = "cd" ]; then
-		TITLE="Arch Linux CDROM or OTHER SOURCE Installation"
+	if [ "$MODE" = "media" ]; then
+		TITLE="Arch Linux CDROM, USBSTICK or OTHER SOURCE Installation"
 		getsource
 	else
 		TITLE="Arch Linux FTP/HTTP Installation"
@@ -1741,7 +1737,7 @@ mainmenu() {
 		"7")
 			install_bootloader ;;
 		"8")
-			if [ "$S_SRC" = "1" -a "$MODE" = "cd" ]; then
+			if [ "$S_SRC" = "1" -a "$MODE" = "media" ]; then
 				umount /src >/dev/null 2>&1
 			fi
 			[ -e /tmp/.setup-running ] && rm /tmp/.setup-running
