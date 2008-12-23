@@ -1638,6 +1638,7 @@ configure_system()
 			"/etc/locale.gen"           "Glibc Locales" \
 			"Pacman-Mirror"             "Set the primary pacman mirror" \
 			"/etc/pacman.d/mirrorlist"  "Pacman Mirror List" \
+			"/etc/pacman.conf"          "Pacman Config File" \
 			"Root-Password"             "Set the root password" \
 			"Return"                    "Return to Main Menu" 2>$ANSWER || FILE="Return"
 		FILE="$(cat $ANSWER)"
