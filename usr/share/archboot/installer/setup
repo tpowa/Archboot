@@ -1514,24 +1514,26 @@ auto_hwdetect()
 	HWDETECTRC=""
 	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers,\nnetwork and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
 	if [ "$HWDETECT" = "yes" ]; then
-		if /usr/bin/vmware-detect; then 
-			HWPARAMETER="$HWPARAMETER --vmware"
-		fi
-		grep -qw ide-legacy /proc/cmdline && HWPARAMETER="$HWPARAMETER --ide-legacy"
+		[ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
+		[ "$(grep -qw ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
 		DIALOG --defaultno --yesno "Do you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
 		DIALOG --defaultno --yesno "Do you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
 		DIALOG --defaultno --yesno "Do you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
 		DIALOG --defaultno --yesno "Do you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
-		DIALOG --defaultno --yesno "Do you need support for booting from software raid arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid"
-		if [ -e $DESTDIR/lib/initcpio/hooks/raid-partitions ]; then
-			DIALOG --defaultno --yesno "Do you need support for booting from software raid mdp/partition arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid-partitions"
+		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
+			DIALOG --defaultno --yesno "Do you need support for booting from software raid arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid"
+			if [ -e $DESTDIR/lib/initcpio/hooks/raid-partitions ]; then
+				DIALOG --defaultno --yesno "Do you need support for booting from software raid mdp/partition arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid-partitions"
+			fi
 		fi
 		if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
-			DIALOG --defaultno --yesno "Do you need support for booting from hardware dmraid arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --dmraid"
+			for i in $(dmraid -l | sed -e 's/ .*//g'); do
+				ls /dev/mapper/$i > /dev/null 2>&1 && HWPARAMETER="$HWPARAMETER --dmraid"
+			done
 		fi
-		DIALOG --defaultno --yesno "Do you need support for booting from lvm2 volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --lvm2"
-		DIALOG --defaultno --yesno "Do you need support for booting from encrypted volumes?" 0 0 && HWPARAMETER="$HWPARAMETER --encrypt"
-		HWDETECTHOSTCONTROLLER="$(hwdetect --hostcontroller $HWPARAMETER)"
+		[ "$(blkid -c /dev/null | grep TYPE=\"lvm2pv\")" ] && HWPARAMETER="$HWPARAMETER --lvm2"
+		[ "$(blkid -c /dev/null | grep TYPE=\"crypt_LUKS\")" ] && HWPARAMETER="$HWPARAMETER --encrypt"
+		HWDETECTHOSTCONTROLLER="$(hwdetect --filesystem --hostcontroller $HWPARAMETER)"
 		HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
 		HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
 		[ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
