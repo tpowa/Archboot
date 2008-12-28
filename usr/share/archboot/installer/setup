@@ -335,7 +335,7 @@ _mkfs() {
 	else
 		# make sure the fstype is one we can handle
 		local knownfs=0
-		for fs in xfs jfs reiserfs ext2 ext3 vfat; do
+		for fs in xfs jfs reiserfs ext2 ext3 ext4 vfat; do
 			[ "${_fstype}" = "${fs}" ] && knownfs=1 && break
 		done
 		if [ $knownfs -eq 0 ]; then
@@ -351,6 +351,7 @@ _mkfs() {
 				reiserfs) yes | mkreiserfs ${_device} >$LOG 2>&1; ret=$? ;;
 				ext2)     mke2fs "${_device}" >$LOG 2>&1; ret=$? ;;
 				ext3)     mke2fs -j ${_device} >$LOG 2>&1; ret=$? ;;
+				ext4)     mkfs.ext4 ${_device} >$LOG 2>&1; ret=$? ;;
 				vfat)     mkfs.vfat ${_device} >$LOG 2>&1; ret=$? ;;
 				# don't handle anything else here, we will error later
 			esac
@@ -427,6 +428,7 @@ autoprepare() {
 		FSOPTS=""
 		[ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
 		[ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+		[ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
 		[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
 		[ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
 		[ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
@@ -623,6 +625,7 @@ mountpoints() {
 	FSOPTS=""
 	[ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
 	[ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+	[ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
 	[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
 	[ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
 	[ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
@@ -1516,6 +1519,8 @@ auto_hwdetect()
 	if [ "$HWDETECT" = "yes" ]; then
 		[ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
 		[ "$(grep -qw ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
+		! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
+		[ "$(cat /proc/modules | grep usbhid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
 		DIALOG --defaultno --yesno "Do you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
 		DIALOG --defaultno --yesno "Do you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
 		DIALOG --defaultno --yesno "Do you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
@@ -1535,7 +1540,7 @@ auto_hwdetect()
 		[ "$(blkid -c /dev/null | grep TYPE=\"crypt_LUKS\")" ] && HWPARAMETER="$HWPARAMETER --encrypt"
 		HWDETECTHOSTCONTROLLER="$(hwdetect --filesystem --hostcontroller $HWPARAMETER)"
 		HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
-		HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
+		HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
 		[ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
 		[ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
 		[ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
@@ -1612,9 +1617,9 @@ configure_system()
 	if [ $S_CONFIG -eq 0 ]; then
 		auto_ftpmirror
 		auto_network
-		auto_hwdetect
-		auto_dsdt
 		auto_parameters
+		auto_dsdt
+		auto_hwdetect
 	fi
 
 	## END PREPROCESS ##
