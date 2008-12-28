@@ -5,6 +5,7 @@ run_hook ()
 
     # fix ext2/ext3 symlinks
     ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext3
+    ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext4
     ln -s /sbin/mkfs.ext2 /sbin/mke2fs
 
     # fix jfs symlinks

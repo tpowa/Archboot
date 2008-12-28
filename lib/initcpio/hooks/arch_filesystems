@@ -7,12 +7,13 @@ run_hook ()
     ln -s /sbin/resizefs.reiserfs /sbin/resize_reiserfs
     ln -s /sbin/tunefs.reiserfs /sbin/reiserfstune
 
-    # fix ext2/ext3 symlinks
+    # fix ext2/ext3/ext4 symlinks
     ln -s /sbin/e2fsck /sbin/fsck.ext2
     ln -s /sbin/e2fsck /sbin/fsck.ext3
     ln -s /sbin/findfs /sbin/e2label
     ln -s /sbin/findfs /sbin/tune2fs
     ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext3
+    ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext4
     ln -s /sbin/mkfs.ext2 /sbin/mke2fs
 
     # fix jfs symlinks

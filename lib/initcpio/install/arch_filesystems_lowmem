@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules '/kernel/fs/reiserfs') $(checked_modules '/kernel/fs/ext2') $(checked_modules '/kernel/fs/ext3') $(checked_modules '/kernel/fs/jfs') $(checked_modules '/kernel/fs/xfs') $(checked_modules '/kernel/fs/vfat') $(checked_modules '/kernel/fs/fat') $(checked_modules '/kernel/fs/isofs') $(checked_modules '/kernel/fs/nls/nls_cp437')"
+    MODULES=" $(checked_modules '/kernel/fs/reiserfs') $(checked_modules '/kernel/fs/ext2') $(checked_modules '/kernel/fs/ext3') $(checked_modules '/kernel/fs/ext4') $(checked_modules '/kernel/fs/jfs') $(checked_modules '/kernel/fs/xfs') $(checked_modules '/kernel/fs/vfat') $(checked_modules '/kernel/fs/fat') $(checked_modules '/kernel/fs/isofs') $(checked_modules '/kernel/fs/nls/nls_cp437')"
     BINARIES="mkswap mkfs.reiserfs mkfs.ext2 jfs_fsck jfs_mkfs mkfs.xfs xfs_freeze xfs_io mkdosfs blkid"
     FILES=""
     SCRIPT="arch_filesystems_lowmem"
