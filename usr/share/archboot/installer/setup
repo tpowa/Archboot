@@ -1199,9 +1199,9 @@ dolilo() {
 			if [ -n "${_uuid}" ]; then
 				_rootpart="/dev/disk/by-uuid/${_uuid}"
 			fi
-			sed -i "s|root=.*$|append=\"root=${_rootpart} rootfs=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
 		else
-			sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfs=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
 		fi
 	fi
 	DEVS=$(finddisks _)
@@ -1269,9 +1269,9 @@ dogrub() {
 			fi
 			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			fi
 			if [ "$VMLINUZ" = "vmlinuz26" ]; then
 				echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
@@ -1282,9 +1282,9 @@ dogrub() {
 			echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
 			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			fi
 			if [ "$VMLINUZ" = "vmlinuz26" ]; then
 				echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
