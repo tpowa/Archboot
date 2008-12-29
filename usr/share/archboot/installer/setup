@@ -23,6 +23,7 @@ PACKAGES=
 
 # partitions
 PART_ROOT=
+ROOTFS=""
 
 # default filesystem specs (the + is bootable flag)
 # <mountpoint>:<partsize>:<fstype>[:+]
@@ -1178,7 +1179,12 @@ net_notdetectable() {
 	done
 }
 
+getrootfs() {
+ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
+}
+
 dolilo() {
+	getrootfs
 	if [ ! -f $DESTDIR/etc/lilo.conf ]; then
 		DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf.  Is LILO installed?" 0 0
 		return 1
@@ -1193,9 +1199,9 @@ dolilo() {
 			if [ -n "${_uuid}" ]; then
 				_rootpart="/dev/disk/by-uuid/${_uuid}"
 			fi
-			sed -i "s|root=.*$|append=\"root=${_rootpart}\"|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${_rootpart} rootfs=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
 		else
-			sed -i "s|root=.*$|root=${PART_ROOT}|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfs=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
 		fi
 	fi
 	DEVS=$(finddisks _)
@@ -1224,6 +1230,7 @@ dolilo() {
 }
 
 dogrub() {
+	getrootfs
 	get_grub_map	
 	if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
 		DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
@@ -1262,9 +1269,9 @@ dogrub() {
 			fi
 			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			fi
 			if [ "$VMLINUZ" = "vmlinuz26" ]; then
 				echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
@@ -1275,9 +1282,9 @@ dogrub() {
 			echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
 			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT ro" >>$DESTDIR/boot/grub/menu.lst
+				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfs=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
 			fi
 			if [ "$VMLINUZ" = "vmlinuz26" ]; then
 				echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
