@@ -20,7 +20,7 @@ pcre cpio archboot fuse klibc libusb vi lzo2 libsasl libldap libevent gpm sdparm
 madwifi madwifi-utils rt2x00-rt61-fw rt2x00-rt71w-fw rt2500 ndiswrapper ndiswrapper-utils \
 zd1211-firmware ipw2100-fw ipw2200-fw iwlwifi-3945-ucode iwlwifi-4965-ucode iwlwifi-5000-ucode \
 smbclient tdb tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware parted tzdata ntp \
-v86d wlan-ng26-utils iw crda>=0.9.5-1 libnl"
+v86d wlan-ng26-utils iw crda libnl"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
