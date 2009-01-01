@@ -7,14 +7,13 @@ run_hook ()
 		HWDETECT="$HWDETECT --ide-legacy"
 	else
 		# generating blacklist modules which are not covered by new pata subsystem!
-		#for i in /lib/modules/$(uname -r)/kernel/drivers/ide/pci/*; do 
+		#for i in /lib/modules/$(uname -r)/kernel/drivers/ide/*; do 
 		#	for alias in $(/sbin/modinfo $i|grep ^alias\:|cut -d' ' -f11); do 
 		#		[ -z "$(modprobe --show-depends $alias|grep '/ata/'|grep -v 'libata.ko')" ] && echo "$(basename ${i})" | sed -e 's/.ko//g' >> /tmp/.ide-blacklist
 		#	done
-		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/pci/*); do 
-			basename $i .ko >> /tmp/.ide-blacklist
+		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
+			basename $i .ko | grep -v ^ide >> /tmp/.ide-blacklist
 		done
-		#done
 		echo "Auto blacklisted IDE modules for udev:"
 		echo "--------------------------------------"
 		if [ -s /tmp/.ide-blacklist ]; then 
