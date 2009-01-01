@@ -138,14 +138,14 @@ finddisks() {
 	block=/sys/block
 	# ide devices
 	for dev in $(ls $block | egrep '^hd'); do
-		if [ "$(cat $dev/device/media)" = "disk" ]; then
+		if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
 			echo "/dev/$dev"
 			[ "$1" ] && echo $1
 		fi
 	done
 	#scsi/sata devices
 	for dev in $(ls $block | egrep '^sd'); do
-		if ! [ "$(cat $dev/device/type)" = "5" ]; then
+		if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
 			echo "/dev/$dev"
 			[ "$1" ] && echo $1
 		fi
@@ -184,10 +184,10 @@ findpartitions() {
 	block=/sys/block
 	for devpath in $(finddisks); do
 		disk=$(echo $devpath | sed 's|.*/||')
-		for part in $(ls $block/$disk*); do
+		for part in $(ls $block/$disk | egrep ^$disk); do
 			# check if not already assembled to a raid device
 			if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" ]; then
-				if [ -d $part ]; then
+				if [ -d $block/$disk/$part ]; then
 					echo "/dev/$part"
 					[ "$1" ] && echo $1
 				fi
@@ -1530,7 +1530,7 @@ do_pacmanmirror()
 	sed -i -e 's/^Server/#Server/g' "$mirrorlist"
 	# add our new entry at the end of the file
 	echo "# Setup-configured entry" >> "$mirrorlist"
-	echo Server = $(egrep -o "$PAC_SYNC_SERVER.*" "$mirrorlist") >> "$mirrorlist"
+	echo "Server = $PAC_SYNC_SERVER" >> "$mirrorlist"
 }
 
 auto_hwdetect()
@@ -1658,7 +1658,7 @@ configure_system()
 		else
 			DEFAULT=""
 		fi
-		DIALOG $DEFAULT --menu "Configuration" 19 80 16 \
+		DIALOG $DEFAULT --menu "Configuration" 20 80 16 \
 			"/etc/rc.conf"              "System Config" \
 			"/etc/fstab"                "Filesystem Mountpoints" \
 			"/etc/mkinitcpio.conf"      "Initramfs Config" \
@@ -1715,7 +1715,7 @@ configure_system()
 
 	# /etc/locale.gen
 	#
-	chroot ${DESTDIR} locale-gen
+	chroot ${DESTDIR} locale-gen > /dev/null 2>&1
 
 	## END POSTPROCESSING ##
 
