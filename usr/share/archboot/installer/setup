@@ -1395,14 +1395,13 @@ select_source()
 	else
 		DEFAULT=
 		TITLE="Arch Linux FTP/HTTP Installation"
-		DIALOG $DEFAULT --msgbox "If you wish to load your ethernet modules manually, please do so now in an other terminal." 12 65
 		while true; do
 			if [ -n "$NEXTITEM" ]; then
 			DEFAULT="--default-item $NEXTITEM"
 			else
 			DEFAULT=""
 			fi
-		    DIALOG --$DEFAULT --menu "FTP Installation" 10 35 3 \
+		    DIALOG $DEFAULT --menu "FTP Installation" 10 35 3 \
 		    "0" "Setup Network" \
 		    "1" "Choose Mirror" \
 		    "2" "Return to Main Menu" 2>$ANSWER
