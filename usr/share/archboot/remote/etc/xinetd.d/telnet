@@ -4,7 +4,7 @@ service telnet
 	socket_type		= stream
 	wait			= no
 	user			= root
-	server			= /usr/sbin/in.telnetd
+	server			= /usr/sbin/telnetd
 	log_on_failure		+= USERID
 	disable			= no
 }
