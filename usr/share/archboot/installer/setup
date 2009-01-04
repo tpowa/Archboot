@@ -549,7 +549,7 @@ autoprepare() {
 	printk off
 	DIALOG --infobox "Partitioning $DEVICE" 0 0
 	# clean partitiontable to avoid issues!
-	dd if=/dev/zero of=$DEVICE bs=512 count=1
+	dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
 	sfdisk $DEVICE -uM >$LOG 2>&1 <<EOF
 $sfdisk_input
 EOF
@@ -1111,7 +1111,7 @@ donetwork() {
 		fi
 	fi
 	while [ "$INTERFACE" = "" ]; do
-		DIALOG --msgbox "Available Ethernet Interfaces:\n$(ifconfig -a | egrep "Ethernet" | sed 's# #_#g')\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
+		DIALOG --msgbox "Available Ethernet Interfaces:\n$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
 		ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
 		DIALOG --extra-button --extra-label "Probe" --ok-label "Select" --menu "Select a network interface" 14 55 7 $ifaces 2>$ANSWER
 		case $? in

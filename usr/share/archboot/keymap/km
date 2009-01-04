@@ -31,11 +31,6 @@ error_kmset()
 	DIALOG --msgbox "An error occured, your current keymap was not changed." 0 0
 }
 
-error_consoleset()
-{
-	DIALOG --msgbox "An error occured, your current consolefont was not changed." 0 0
-}
-
 dokeymap() {
 	echo "Scanning for keymaps..."
 	KEYMAPS=
@@ -72,12 +67,7 @@ doconsolefont() {
 				setfont $BASEDIR/consolefonts/$font -C /dev/tty${i}
 			fi
 		done
-		if [ $? -gt 0 ]; then
-			error_consoleset
-		fi
-		if [ -e /dev/ttyS0 ]; then 
-			setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0 || error_consoleset
-		fi
+		[ -e /dev/ttyS0 ] && setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0
 	fi
 S_NEXTITEM=3
 }
