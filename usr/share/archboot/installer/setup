@@ -728,6 +728,8 @@ getsource() {
 	fi
 
 	if [ "$MODE" = "ftp" ]; then
+		#in order to cache packages from media check on it first!
+		get_media
 		select_mirror
 		NEXTITEM="2"
 	fi
@@ -1123,7 +1125,7 @@ donetwork() {
 	DIALOG --yesno "Do you want to use DHCP?" 0 0
 	if [ $? -eq 0 ]; then
 		DIALOG --infobox "Please wait.  Polling for DHCP server on $INTERFACE..." 10 65
-		[ -e /var/run/dhcpcd-$INTERFACE.pid ] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid)
+		[ -e /var/run/dhcpcd-$INTERFACE.pid ] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid) && sleep 1
 		dhcpcd $INTERFACE >$LOG 2>&1
 		if [ $? -ne 0 ]; then
 			DIALOG --msgbox "Failed to run dhcpcd.  See $LOG for details." 0 0
@@ -1316,59 +1318,66 @@ dogrub() {
 		DIALOG --msgbox "No hard drives were found" 0 0
 		return 1
 	fi
-	DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
-	ROOTDEV=$(cat $ANSWER)
-	DIALOG --infobox "Installing the GRUB bootloader..." 0 0
-	cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
-	sync
-	# freeze xfs filesystems to enable grub installation on xfs filesystems
-	if [ -x /usr/sbin/xfs_freeze ]; then
-		/usr/sbin/xfs_freeze -f $DESTDIR/boot > /dev/null 2>&1
-		/usr/sbin/xfs_freeze -f $DESTDIR/ > /dev/null 2>&1
-	fi
-	# look for a separately-mounted /boot partition
-	bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-	if [ "$bootpart" = "" ]; then
-		if [ "$PART_ROOT" = "" ]; then
-			DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
-			bootpart=$(cat $ANSWER)
-		else
-			bootpart=$PART_ROOT
+	S_GRUB=""
+	while [ "$S_GRUB" = "" ]; do
+		DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
+		ROOTDEV=$(cat $ANSWER)
+		DIALOG --infobox "Installing the GRUB bootloader..." 0 0
+		cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
+		sync
+		# freeze xfs filesystems to enable grub installation on xfs filesystems
+		if [ -x /usr/sbin/xfs_freeze ]; then
+			/usr/sbin/xfs_freeze -f $DESTDIR/boot > /dev/null 2>&1
+			/usr/sbin/xfs_freeze -f $DESTDIR/ > /dev/null 2>&1
 		fi
-	fi
-	DIALOG --defaultno --yesno "Do you have your system installed on software raid?\nAnswer 'YES' to install grub to another hard disk."  0 0
-	if [ $? -eq 0 ]; then
-		DIALOG --menu "Please select the boot partition device, this cannot be autodetected!\nPlease redo grub installation for all partitions you need it!" 14 55 7 $DEVS 2>$ANSWER || return 1
-		bootpart=$(cat $ANSWER)
-	fi	
-	bootpart=$(mapdev $bootpart)
-	bootdev=$(mapdev $ROOTDEV)
-	if [ "$bootpart" = "" ]; then
-		DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
-		return 1
-	fi
-	if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
-		DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
-		return 1
-	fi
-	$DESTDIR/sbin/grub --no-floppy --batch >/tmp/grub.log 2>&1 <<EOF
+		# look for a separately-mounted /boot partition
+		bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+		if [ "$bootpart" = "" ]; then
+			if [ "$PART_ROOT" = "" ]; then
+				DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
+				bootpart=$(cat $ANSWER)
+			else
+				bootpart=$PART_ROOT
+			fi
+		fi
+		bootpart=$(mapdev $bootpart)
+		bootdev=$(mapdev $ROOTDEV)
+		if [ "$bootpart" = "" ]; then
+			DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
+			return 1
+		fi
+		if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
+			DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
+			return 1
+		fi
+		$DESTDIR/sbin/grub --no-floppy --batch >/tmp/grub.log 2>&1 <<EOF
 root $bootpart
 setup $bootdev
 quit
 EOF
-	cat /tmp/grub.log >$LOG
-	# unfreeze xfs filesystems
-	if [ -x /usr/sbin/xfs_freeze ]; then
-		/usr/sbin/xfs_freeze -u $DESTDIR/boot > /dev/null 2>&1
-		/usr/sbin/xfs_freeze -u $DESTDIR/ > /dev/null 2>&1
-	fi
+		cat /tmp/grub.log >$LOG
+		# unfreeze xfs filesystems
+		if [ -x /usr/sbin/xfs_freeze ]; then
+			/usr/sbin/xfs_freeze -u $DESTDIR/boot > /dev/null 2>&1
+			/usr/sbin/xfs_freeze -u $DESTDIR/ > /dev/null 2>&1
+		fi
 
-	if grep "Error [0-9]*: " /tmp/grub.log >/dev/null; then
-		DIALOG --msgbox "Error installing GRUB. (see $LOG for output)" 0 0
-		return 1
-	fi
-	DIALOG --msgbox "GRUB was successfully installed." 0 0
-	S_GRUB=1
+		if grep "Error [0-9]*: " /tmp/grub.log >/dev/null; then
+			DIALOG --msgbox "Error installing GRUB. (see $LOG for output)" 0 0
+			return 1
+		fi
+		DIALOG --msgbox "GRUB was successfully installed." 0 0
+		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
+			DIALOG --defaultno --yesno "You have your system installed on software raid?\nAnswer 'YES' to install grub to another hard disk."  0 0
+			if [ $? -eq 0 ]; then
+				S_GRUB=""
+			else
+				S_GRUB=1
+			fi
+		else
+			S_GRUB=1
+		fi
+	done
 }
 
 select_source()
