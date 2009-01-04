@@ -548,6 +548,8 @@ autoprepare() {
 	# invoke sfdisk
 	printk off
 	DIALOG --infobox "Partitioning $DEVICE" 0 0
+	# clean partitiontable to avoid issues!
+	dd if=/dev/zero of=$DEVICE bs=512 count=1
 	sfdisk $DEVICE -uM >$LOG 2>&1 <<EOF
 $sfdisk_input
 EOF

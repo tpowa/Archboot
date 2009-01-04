@@ -72,9 +72,11 @@ doconsolefont() {
 				setfont $BASEDIR/consolefonts/$font -C /dev/tty${i}
 			fi
 		done
-		[ -e /dev/ttys0 ] &&  setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0
 		if [ $? -gt 0 ]; then
 			error_consoleset
+		fi
+		if [ -e /dev/ttyS0 ]; then 
+			setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0 || error_consoleset
 		fi
 	fi
 S_NEXTITEM=3
