@@ -1,0 +1,8 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+run_hook ()
+{
+  # fixing some symlinks
+  ln -s /usr/sbin/lnstat /usr/sbin/ctstat
+  ln -s /usr/sbin/lnstat /usr/bin/rtstat
+}
