@@ -4,9 +4,9 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/" | grep -ve "wireless") "
 
-    BINARIES="ping ping6 route nslookup telnet ssh"
+    BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr ss tc"
     FILES=""
-    SCRIPT=""
+    SCRIPT="arch_net"
     add_file "/sbin/dhcpcd"
     add_file "/sbin/ifenslave"
     add_file "/usr/sbin/brctl"
@@ -19,6 +19,16 @@ install ()
     done
     add_file "/usr/share/archboot/net/etc/dhcpcd.conf" "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
+    add_file "/lib/tc/experimental.dist"
+    add_file "/lib/tc/normal.dist"
+    add_file "/lib/tc/pareto.dist"
+    add_file "/lib/tc/paretonormal.dist"
+    add_file "/usr/share/archboot/net/etc/iproute2/ematch_map /etc/iproute2/ematch_map"
+    add_file "/usr/share/archboot/net/etc/iproute2/rt_dsfield /etc/iproute2/rt_dsfield"
+    add_file "/usr/share/archboot/net/etc/iproute2/etc/iproute2/rt_protos /etc/iproute2/rt_protos"
+    add_file "/usr/share/archboot/net/etc/iproute2/etc/iproute2/rt_realms /etc/iproute2/rt_realms"
+    add_file "/usr/share/archboot/net/etc/iproute2/etc/iproute2/rt_scopes /etc/iproute2/rt_scopes"
+    add_file "/usr/share/archboot/net/etc/iproute2/etc/iproute2/rt_tables /etc/iproute2/rt_tables"
 }
 
 help ()
