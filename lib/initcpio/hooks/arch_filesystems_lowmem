@@ -11,6 +11,14 @@ run_hook ()
     # fix jfs symlinks
     ln -s /sbin/jfs_mkfs /sbin/mkfs.jfs
 
+    # fix ntfs symlinks
+    ln -s /usr/sbin/mkntfs /sbin/mkfs.ntfs
+    ln -s /usr/bin/ntfsmount /sbin/mount.ntfs-fuse
+    ln -s /usr/bin/ntfsmount /sbin/mount.fuse.ntfs
+
+    # fix ntfs-3g symlink
+    ln -s /bin/ntfs-3g /sbin/mount.ntfs-3g
+
     # fix vfat symlink
     ln -s /sbin/mkdosfs /sbin/mkfs.vfat
     ln -s /sbin/mkdosfs /sbin/mkfs.msdos
