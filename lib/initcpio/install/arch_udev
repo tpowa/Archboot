@@ -7,6 +7,7 @@ install ()
     FILES="/etc/udev/udev.conf"
     SCRIPT="arch_udev"
     add_file /etc/modprobe.d/framebuffer_blacklist
+    add_file /etc/modprobe.d/usb-load-ehci-first 
     add_file /usr/share/archboot/udev/etc/load-modules.sh /lib/udev/load-modules.sh
     add_file /lib/udev/ata_id
     add_file /lib/udev/cdrom_id

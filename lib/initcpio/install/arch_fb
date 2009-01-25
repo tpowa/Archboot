@@ -7,7 +7,7 @@ install ()
     BINARIES="v86d"
     FILES=""
     SCRIPT=""
-    add_file /usr/share/archboot/fb/etc/modprobe.d/uvesafb
+    add_file "/usr/share/archboot/fb/etc/modprobe.d/uvesafb" "/etc/modprobe.d/uvesafb"
 }
 
 help ()

@@ -1,7 +1,0 @@
-run_hook ()
-{
-    # fix symlinks for naim
-    ln -s /usr/bin/naim /usr/bin/nirc
-    ln -s /usr/bin/naim /usr/bin/nicq
-    ln -s /usr/bin/naim /usr/bin/nlily
-}
