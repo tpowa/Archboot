@@ -1371,12 +1371,7 @@ EOF
 		DIALOG --msgbox "GRUB was successfully installed." 0 0
 		S_GRUB=1
 		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
-			DIALOG --defaultno --yesno "You have your system installed on software raid?\nAnswer 'YES' to install grub to another hard disk."  0 0
-			if [ $? -eq 0 ]; then
-				S_GRUB=""
-			fi
-		else
-
+			DIALOG --defaultno --yesno "You have your system installed on software raid.\nAnswer 'YES' to install grub to another hard disk." 0 0 && S_GRUB=""
 		fi
 	done
 }
