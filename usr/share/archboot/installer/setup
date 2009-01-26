@@ -1552,10 +1552,18 @@ auto_hwdetect()
 		[ "$(grep -qw ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
 		! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
 		[ "$(cat /proc/modules | grep usbhid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
-		DIALOG --defaultno --yesno "Do you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
-		DIALOG --defaultno --yesno "Do you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
-		DIALOG --defaultno --yesno "Do you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
-		DIALOG --defaultno --yesno "Do you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
+		if [ "$(cat /proc/modules | grep usb_storage)" ]; then
+			DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
+		fi
+		if [ "$(cat /proc/modules | grep sbp2)" ]; then
+			DIALOG --defaultno --yesno "Setup detected firewire storage driver...\nDo you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
+		fi
+		if [ "$(cat /proc/modules | grep pcmcia)" ]; then
+			DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
+		fi
+		if [ "$(cat /proc/modules | grep nfs)" ]; then
+			DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
+		fi
 		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
 			DIALOG --defaultno --yesno "Do you need support for booting from software raid arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid"
 			if [ -e $DESTDIR/lib/initcpio/hooks/raid-partitions ]; then
