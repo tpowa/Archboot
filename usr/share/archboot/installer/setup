@@ -336,7 +336,7 @@ _mkfs() {
 	else
 		# make sure the fstype is one we can handle
 		local knownfs=0
-		for fs in xfs jfs reiserfs ext2 ext3 ext4 ntfs vfat; do
+		for fs in xfs jfs reiserfs ext2 ext3 ext4 ntfs-3g vfat; do
 			[ "${_fstype}" = "${fs}" ] && knownfs=1 && break
 		done
 		if [ $knownfs -eq 0 ]; then
@@ -353,7 +353,7 @@ _mkfs() {
 				ext2)     mkfs.ext2 ${_device} >$LOG 2>&1; ret=$? ;;
 				ext3)     mkfs.ext3 ${_device} >$LOG 2>&1; ret=$? ;;
 				ext4)     mkfs.ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-				ntfs)     mkfs.ntfs ${_device} >$LOG 2>&1; ret=$? ;;
+				ntfs-3g)  mkfs.ntfs ${_device} >$LOG 2>&1; ret=$? ;;
 				vfat)     mkfs.vfat ${_device} >$LOG 2>&1; ret=$? ;;
 				# don't handle anything else here, we will error later
 			esac
@@ -634,7 +634,7 @@ mountpoints() {
 	[ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
 	[ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
 	[ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
-	[ "$(which mkfs.ntfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS ntfs NTFS"
+	[ "$(which mkfs.ntfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS ntfs-3g NTFS"
 	[ "$(which mkfs.vfat 2>/dev/null)" ]   && FSOPTS="$FSOPTS vfat VFAT"
 
 	#
