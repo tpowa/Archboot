@@ -656,7 +656,7 @@ mountpoints() {
 	PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
 	PART_ROOT=$PART
 	# Select root filesystem type
-	DIALOG --menu "Select a filesystem for $PART" 13 45 6 $FSOPTS 2>$ANSWER || return 1
+	DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
 	FSTYPE=$(cat $ANSWER)
 	DOMKFS="no"
 	DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
@@ -670,7 +670,7 @@ mountpoints() {
 	while [ "$PART" != "DONE" ]; do
 		PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
 		# Select a filesystem type
-		DIALOG --menu "Select a filesystem for $PART" 13 45 6 $FSOPTS 2>$ANSWER || return 1
+		DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
 		FSTYPE=$(cat $ANSWER)
 		MP=""
 		while [ "${MP}" = "" ]; do
@@ -1123,10 +1123,14 @@ donetwork() {
 			*) net_notdetectable ;;
 		esac
 	done
+	# bring down everything, which could grab and affect the interface!
+	[ -e /var/run/dhcpcd-$INTERFACE.pid ] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid) && sleep 1
+	[ "$(ifconfig | grep $INTERFACE)" ] && ifconfig $INTERFACE down >$LOG 2>&1
+	[ "$(route | grep default)" ] && route del default >$LOG 2>&1
+	[ -e /etc/resolv.conf ] && rm /etc/resolv.conf >$LOG 2>&1
 	DIALOG --yesno "Do you want to use DHCP?" 0 0
 	if [ $? -eq 0 ]; then
 		DIALOG --infobox "Please wait.  Polling for DHCP server on $INTERFACE..." 10 65
-		[ -e /var/run/dhcpcd-$INTERFACE.pid ] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid) && sleep 1
 		dhcpcd $INTERFACE >$LOG 2>&1
 		if [ $? -ne 0 ]; then
 			DIALOG --msgbox "Failed to run dhcpcd.  See $LOG for details." 0 0
