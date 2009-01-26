@@ -13,7 +13,7 @@ run_hook ()
         if [ "${quiet}" = "y" ]; then
 	    /usr/sbin/dmraid -ay >/dev/null
 	else
-	     /usr/sbin/dmraid
+	     /usr/sbin/dmraid -ay
 	fi
     fi
 }
