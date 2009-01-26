@@ -1,17 +1,19 @@
 #!/bin/sh
 ### general setup stuff
 SVNSETUP="svn://archlinux.org/srv/svn-packages/"
-# generate base
 BASE=""
+DEVEL=""
+SUPPORT=""
+# generate base
 for i in $(pacman -Sg base | sed -e "s/base//g"); do 
 	BASE="$BASE $(echo $i)"
 done
 # generate base-devel
-DEVEL=""
 for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do 
 	DEVEL="$DEVEL $(echo $i)"
 done
-SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g'))"
+# generate support, ntfs-3g is added additionally!
+SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g"
 for i in base devel support; do
     mkdir $i
     svn co -N ${SVNSETUP} $i
