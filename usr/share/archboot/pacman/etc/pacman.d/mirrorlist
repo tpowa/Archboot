@@ -11,19 +11,24 @@ Server = ftp://ftp.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/x
 Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/x86_64
 Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/x86_64
 Server = ftp://ftp.ibiblio.org/pub/linux/distributions/archlinux/$repo/os/x86_64
-Server = http://holmes.umflint.edu/archlinux/$repo/os/x86_64
+Server = http://archlinux.umflint.edu/mirrors/archlinux/$repo/os/x86_64
 Server = http://mirror.neotuli.net/arch/$repo/os/x86_64
 Server = http://mirror.rit.edu/archlinux/$repo/os/x86_64
 Server = http://mirror.umoss.org/archlinux/$repo/os/x86_64
 Server = http://schlunix.org/archlinux/$repo/os/x86_64
+Server = http://mirror.archlinux.com.ve/$repo/os/x86_64
+Server = http://mirrors.gigenet.com/archlinux/$repo/os/x86_64
 # - Canada
-Server = ftp://mirror.csclub.uwaterloo.ca/archlinux/$repo/os/@carch 
+Server = ftp://mirror.csclub.uwaterloo.ca/archlinux/$repo/os/x86_64
+Server = ftp://mirrors.portafixe.com/archlinux/$repo/os/x86_64
 
 # South America
 # - Brazil
 Server = http://archlinux.c3sl.ufpr.br/$repo/os/x86_64
 Server = ftp://archlinux.c3sl.ufpr.br/archlinux/$repo/os/x86_64
 Server = ftp://ftp.las.ic.unicamp.br/pub/archlinux/$repo/os/x86_64
+# - Venezuela
+Server = http://mirror2.archlinux.com.ve/$repo/os/x86_64
 
 # Europe
 # - Austria
@@ -32,6 +37,8 @@ Server = ftp://gd.tuwien.ac.at/opsys/linux/archlinux/$repo/os/x86_64
 Server = ftp://ftp.belnet.be/mirror/archlinux.org/$repo/os/x86_64
 # - Czech Republic
 Server = ftp://ftp.sh.cvut.cz/MIRRORS/arch/$repo/os/x86_64
+# - Denmark
+Server = ftp://ftp.klid.dk/archlinux/$repo/os/x86_64
 # - Estonia
 Server = ftp://ftp.estpak.ee/pub/archlinux/$repo/os/x86_64
 # - France
@@ -48,10 +55,13 @@ Server = ftp://ftp.uni-bayreuth.de/pub/linux/archlinux/$repo/os/x86_64
 Server = ftp://ftp.archlinuxppc.org/x86_64/$repo/os/x86_64
 Server = ftp://ftp.tu-chemnitz.de/pub/linux/archlinux/$repo/os/x86_64
 Server = http://ftp.uni-kl.de/pub/linux/archlinux/$repo/os/x86_64
+Server = ftp://mirrors.igprolin-online.org/archlinux/$repo/os/x86_64
+Server = ftp://ftp-stud.hs-esslingen.de/pub/Mirrors/archlinux/$repo/os/x86_64
 # - Great Britain
 Server = http://www.mirrorservice.org/sites/ftp.archlinux.org/$repo/os/x86_64
 Server = ftp://mirrors.uk2.net/pub/archlinux/$repo/os/x86_64
 Server = http://archlinux.mirrors.uk2.net/$repo/os/x86_64
+Server = ftp://mirror.lividpenguin.com/pub/archlinux/$repo/os/x86_64
 # - Greece
 Server = ftp://ftp.ntua.gr/pub/linux/archlinux/$repo/os/x86_64
 # - Hungary
@@ -64,7 +74,7 @@ Server = ftp://mi.mirror.garr.it/mirrors/archlinux/$repo/os/x86_64
 Server = ftp://ftp.nluug.nl/pub/metalab/distributions/archlinux/$repo/os/x86_64
 Server = ftp://ftp.surfnet.nl/pub/os/Linux/distr/archlinux/$repo/os/x86_64
 # - Norway
-Server = http://arch.likbilen.com/$repo/os/@carch
+Server = http://mirror.archlinux.no/$repo/os/x86_64
 # - Poland
 Server = ftp://mirror.icis.pcz.pl/archlinux/$repo/os/x86_64
 Server = http://piotrkosoft.net/pub/mirrors/ftp.archlinux.org/$repo/os/x86_64
@@ -83,12 +93,15 @@ Server = ftp://ftp.gigabit.nu/$repo/os/x86_64
 # - Switzerland
 Server = http://archlinux.puzzle.ch/$repo/os/x86_64
 # - Turkey
-Server = http://server.elsistech.com/archlinux/$repo/os/x86_64
+Server = ftp://ftp.linux.org.tr/pub/mirrors/archlinux/$repo/os/x86_64
 # - Ukraine
-Server = ftp://hell.org.ua/archlinux/$repo/os/x86_64
+Server = ftp://archlinux.hell.org.ua/archlinux/$repo/os/x86_64
 Server = ftp://ftp.linux.kiev.ua/pub/Linux/ArchLinux/$repo/os/x86_64
 
 # Asia
+# - Indonesia
+Server = http://archlinux.cbn.net.id/$repo/os/x86_64
+Server = ftp://archlinux.cbn.net.id/pub/archlinux/$repo/os/x86_64
 # - Israel
 Server = http://mirror.isoc.org.il/pub/archlinux/$repo/os/x86_64
 # - Vietnam
@@ -98,4 +111,6 @@ Server = ftp://202.78.230.5/archlinux/$repo/os/x86_64
 # Australia
 Server = ftp://mirror.pacific.net.au/linux/archlinux/$repo/os/x86_64
 Server = ftp://mirror.aarnet.edu.au/pub/archlinux/$repo/os/x86_64
+Server = ftp://ftp.iinet.net.au/pub/archlinux/$repo/os/x86_64
+Server = http://mirror.internode.on.net/pub/archlinux/$repo/os/x86_64
 
