@@ -1,7 +1,7 @@
 run_hook ()
 {
     # fix reiserfs symlinks
-    ln -s /sbin/mkfs.reiserfs /sbin/mkreiserfs
+    ln -s /sbin/mkreiserfs /sbin/mkfs.reiserfs 
 
     # fix ext2/ext3 symlinks
     ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext3
