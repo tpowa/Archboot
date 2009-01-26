@@ -697,7 +697,6 @@ mountpoints() {
 		FSTYPE=$(echo $line | cut -d: -f 2)
 		MP=$(echo $line | cut -d: -f 3)
 		DOMKFS=$(echo $line | cut -d: -f 4)
-		umount ${DESTDIR}${MP}
 		if [ "$DOMKFS" = "yes" ]; then
 			if [ "$FSTYPE" = "swap" ]; then
 				DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
@@ -709,7 +708,7 @@ mountpoints() {
 			if [ "$FSTYPE" = "swap" ]; then
 				DIALOG --infobox "Activating swapspace on $PART" 0 0
 			else
-				DIALOG --infobox "Mounting $PART to ${DESTDIR}${MP}"
+				DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
 			fi
 			_mkfs no $PART $FSTYPE $DESTDIR $MP || return 1
 		fi
