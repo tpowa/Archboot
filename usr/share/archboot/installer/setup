@@ -955,8 +955,8 @@ installpkg() {
 			echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
 		fi
 		### HACK to fix infofiles in bash and texinfo!
-		[ $(echo $PACKAGES | grep texinfo) ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
-		[ $(echo $PACKAGES | grep bash) ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
+		[ "$(echo $PACKAGES | grep texinfo)" ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
+		[ "$(echo $PACKAGES | grep bash)" ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
 		rm /tmp/setup-pacman-running
 	) &
 
@@ -1692,7 +1692,7 @@ configure_system()
 			"/etc/pacman.d/mirrorlist"  "Pacman Mirror List" \
 			"/etc/pacman.conf"          "Pacman Config File" \
 			"Root-Password"             "Set the root password" \
-			"Return"                    "Return to Main Menu" 2>$ANSWER || FILE="Return"
+			"Return"                    "Return to Main Menu" 2>$ANSWER || break
 		FILE="$(cat $ANSWER)"
 
 		if [ "$FILE" = "Return" -o -z "$FILE" ]; then       # exit
