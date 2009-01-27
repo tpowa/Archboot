@@ -954,6 +954,9 @@ installpkg() {
 		else
 			echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
 		fi
+		### HACK to fix infofiles in bash and texinfo!
+		[ $(echo $PACKAGES | grep texinfo) ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
+		[ $(echo $PACKAGES | grep bash) ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
 		rm /tmp/setup-pacman-running
 	) &
 
@@ -1549,12 +1552,12 @@ auto_hwdetect()
 	HWDETECTHOSTCONTROLLER=""
 	HWDETECTHOOKS=""
 	HWDETECTRC=""
-	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers,\nnetwork and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+	DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
 	if [ "$HWDETECT" = "yes" ]; then
 		[ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
 		[ "$(grep -qw ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
 		! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
-		[ "$(cat /proc/modules | grep usbhid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
+		[ "$(cat /proc/modules | grep hid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
 		if [ "$(cat /proc/modules | grep usb_storage)" ]; then
 			DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
 		fi
@@ -1655,7 +1658,7 @@ configure_system()
 {
 
 	## PREPROCESSING ##
-	# only done on first invocation of configure_system
+	# only done on first invocation of configure_system and redone on canceled configure system
 	if [ $S_CONFIG -eq 0 ]; then
 		auto_ftpmirror
 		auto_network
@@ -1663,13 +1666,13 @@ configure_system()
 		auto_dsdt
 		auto_hwdetect
 	fi
-
 	## END PREPROCESS ##
 	[ "$EDITOR" ] || geteditor
 	FILE=""
 
 	# main menu loop
 	while true; do
+		S_CONFIG=0
 		if [ -n "$FILE" ]; then
 			DEFAULT="--default-item $FILE"
 		else
@@ -1693,6 +1696,7 @@ configure_system()
 		FILE="$(cat $ANSWER)"
 
 		if [ "$FILE" = "Return" -o -z "$FILE" ]; then       # exit
+			S_CONFIG=1
 			break
 		elif [ "$FILE" = "/etc/mkinitcpio.conf" ]; then    # non-file
 			DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
@@ -1720,24 +1724,18 @@ configure_system()
 			$EDITOR ${DESTDIR}${FILE}
 		fi 
 	done
-	## POSTPROCESSING ##
-
-	# adjust time
-	#
-	auto_timesetting
-
-	# /etc/initcpio.conf
-	#
-	run_mkinitcpio
-
-	# /etc/locale.gen
-	#
-	chroot ${DESTDIR} locale-gen > /dev/null 2>&1
-
-	## END POSTPROCESSING ##
-
-	S_CONFIG=1
-	NEXTITEM="7"
+	if [ $S_CONFIG -eq 1 ]; then
+		# only done on normal exit of configure menu
+		## POSTPROCESSING ##
+		# adjust time
+		auto_timesetting
+		# /etc/initcpio.conf
+		run_mkinitcpio
+		# /etc/locale.gen
+		chroot ${DESTDIR} locale-gen > /dev/null 2>&1
+		## END POSTPROCESSING ##
+		NEXTITEM="7"
+	fi
 }
 
 install_bootloader()
