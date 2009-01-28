@@ -222,6 +222,36 @@ findpartitions() {
 	fi
 }
 
+findgrubpartitions() {
+	block=/sys/block
+	for devpath in $(finddisks); do
+		disk=$(echo $devpath | sed 's|.*/||')
+		for part in $(ls $block/$disk | egrep ^$disk); do
+			# check if not already assembled to a raid device
+			if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" ]; then
+				if [ -d $block/$disk/$part ]; then
+					echo "/dev/$part"
+					[ "$1" ] && echo $1
+				fi
+			fi
+		done
+	done
+	# inlcude cciss controllers
+	if [ -d /dev/cciss ] ; then
+		for dev in $(ls /dev/cciss | egrep 'p'); do
+			echo "/dev/cciss/$dev"
+			[ "$1" ] && echo $1
+		done
+	fi
+	# inlcude Smart 2 controllers
+	if [ -d /dev/ida ] ; then
+		for dev in $(ls /dev/ida | egrep 'p'); do
+			echo "/dev/ida/$dev"
+			[ "$1" ] && echo $1
+		done
+	fi
+}
+
 get_grub_map() {
 	rm /tmp/dev.map
 	DIALOG --infobox "Generating GRUB device map...\nThis could take a while.\n\n Please be patient." 0 0
@@ -262,7 +292,7 @@ mapdev() {
 			echo "$grubdevice,$pnum)"
 		fi
 	else
-		echo " DEVICE NOT FOUND"
+		echo "DEVICE NOT FOUND"
 	fi
 }
 
@@ -603,17 +633,19 @@ partition() {
 	DISC=""
 	while true; do
 		# Prompt the user with a list of known disks
-		DIALOG --menu "Select the disk you want to partition (select DONE when finished)" 14 55 7 $DISCS 2>$ANSWER || return 1
+		DIALOG --menu "Select the disk you want to partition\n(select DONE when finished)" 14 55 7 $DISCS 2>$ANSWER || return 1
 		DISC=$(cat $ANSWER)
 		if [ "$DISC" = "OTHER" ]; then
-			DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>$ANSWER || return 1
+			DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>$ANSWER || DISC=""
 			DISC=$(cat $ANSWER)
 		fi
 		# Leave our loop if the user is done partitioning
 		[ "$DISC" = "DONE" ] && break
-		# Partition disc
-		DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
-		cfdisk $DISC
+		if ! [ "$DISC" = "" ]; then 
+			# Partition disc
+			DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
+			cfdisk $DISC
+		fi
 	done
 	NEXTITEM="3"
 	S_PART=1
@@ -1248,6 +1280,10 @@ dolilo() {
 }
 
 dogrub() {
+	_bootdev=""
+	_grubdev=""
+	bootdev=""
+	grubdev=""
 	getrootfs
 	get_grub_map	
 	if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
@@ -1256,7 +1292,22 @@ dogrub() {
 	fi
 	# try to auto-configure GRUB...
 	if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
-		grubdev=$(mapdev $PART_ROOT)
+		if [ "$(echo $PART_ROOT | grep md)" ]; then
+			for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+				_grubdev="$_grubdev $(mapdev $i)"
+			done
+		else
+			_grubdev=$(mapdev $PART_ROOT)
+		fi
+		# look for a separately-mounted /boot partition
+		bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+		if [ "$(echo $bootdev | grep md)" ]; then
+			for i in $(mdadm --detail $_bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+				_bootdev="$_bootdev $i"
+			done
+		else
+			_bootdev=$bootdev
+		fi
 		if [ "$UUIDPARAMETER" = "yes" ]; then
 			local _rootpart="${PART_ROOT}"
 			local _uuid="$(getuuid ${PART_ROOT})"
@@ -1264,19 +1315,16 @@ dogrub() {
 				_rootpart="/dev/disk/by-uuid/${_uuid}"
 			fi
 		fi
-		# look for a separately-mounted /boot partition
-		bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-		if [ "$grubdev" != "" -o "$bootdev" != "" ]; then
+		if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
 			cp $DESTDIR/boot/grub/menu.lst /tmp/.menu.lst
 			# remove the default entries by truncating the file at our little tag (#-*)
 			head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >$DESTDIR/boot/grub/menu.lst
 			rm -f /tmp/.menu.lst
-			echo "" >>$DESTDIR/boot/grub/menu.lst
-			echo "# (0) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
-			echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
 			subdir=
-			if [ "$bootdev" != "" ]; then
-				grubdev=$(mapdev $bootdev)
+			if [ "$_bootdev" != "" ]; then
+				for bootdev in $_bootdev; do 
+				_grubdev="$_grubdev $(mapdev $bootdev)"
+				done
 			else
 				subdir="/boot"
 			fi
@@ -1285,30 +1333,38 @@ dogrub() {
 				DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
 				grubdev="(hd0,0)"
 			fi
-			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
-			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
-			fi
-			if [ "$VMLINUZ" = "vmlinuz26" ]; then
-				echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
-			fi
+			NUMBER=0
+			for grubdev in $_grubdev; do
+				echo "" >>$DESTDIR/boot/grub/menu.lst
+				echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
+				echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
+				echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
+				if [ "$UUIDPARAMETER" = "yes" ]; then
+					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				else
+					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				fi
+				if [ "$VMLINUZ" = "vmlinuz26" ]; then
+					echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
+				fi
+				echo "" >>$DESTDIR/boot/grub/menu.lst
+				# adding fallback/full image
+				NUMBER=$(($NUMBER+1))
+				echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
+				echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
+				echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
+				if [ "$UUIDPARAMETER" = "yes" ]; then
+					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				else
+					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+				fi
+				if [ "$VMLINUZ" = "vmlinuz26" ]; then
+					echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
+				fi
+				NUMBER=$(($NUMBER+1))
+			done
 			echo "" >>$DESTDIR/boot/grub/menu.lst
-			# adding fallback/full image
-			echo "# (1) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
-			echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
-			echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-			if [ "$UUIDPARAMETER" = "yes" ]; then
-				echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
-			else
-				echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
-			fi
-			if [ "$VMLINUZ" = "vmlinuz26" ]; then
-				echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
-			fi
-			echo "" >>$DESTDIR/boot/grub/menu.lst
-			echo "# (2) Windows" >>$DESTDIR/boot/grub/menu.lst
+			echo "# ($NUMBER) Windows" >>$DESTDIR/boot/grub/menu.lst
 			echo "#title Windows" >>$DESTDIR/boot/grub/menu.lst
 			echo "#rootnoverify (hd0,0)" >>$DESTDIR/boot/grub/menu.lst
 			echo "#makeactive" >>$DESTDIR/boot/grub/menu.lst
@@ -1321,7 +1377,7 @@ dogrub() {
 	$EDITOR ${DESTDIR}/boot/grub/menu.lst
 
 	DEVS=$(finddisks _)
-	DEVS="$DEVS $(findpartitions _)"
+	DEVS="$DEVS $(findgrubpartitions _)"
 	if [ "$DEVS" = "" ]; then
 		DIALOG --msgbox "No hard drives were found" 0 0
 		return 1
@@ -1340,12 +1396,18 @@ dogrub() {
 		fi
 		# look for a separately-mounted /boot partition
 		bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+		if [ "$(echo $bootpart | grep md)" ]; then
+			bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
+		fi
 		if [ "$bootpart" = "" ]; then
 			if [ "$PART_ROOT" = "" ]; then
 				DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
 				bootpart=$(cat $ANSWER)
 			else
 				bootpart=$PART_ROOT
+				if [ "$(echo $bootpart | grep md)" ]; then
+					bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
+				fi
 			fi
 		fi
 		bootpart=$(mapdev $bootpart)
@@ -1377,7 +1439,7 @@ EOF
 		DIALOG --msgbox "GRUB was successfully installed." 0 0
 		S_GRUB=1
 		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
-			DIALOG --defaultno --yesno "You have your system installed on software raid.\nAnswer 'YES' to install grub to another hard disk." 0 0 && S_GRUB=""
+			DIALOG --defaultno --yesno "Setup detected a software raid partition.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
 		fi
 	done
 }
