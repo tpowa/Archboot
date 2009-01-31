@@ -5,6 +5,12 @@ ANSWER="/tmp/.tz"
 TITLE="Arch Linux Time And Date Setting"
 BASEDIR="/usr/share/zoneinfo"
 
+if [ "$1" = "--setup" ]; then
+	EXIT="Return to Main Menu"
+else
+	EXIT="Exit"
+fi
+
 abort()
 {
 	DIALOG --yesno "Abort Time And Date Setting?" 6 40 || return 0
@@ -46,32 +52,35 @@ hwclock $HWCLOCK_PARAMS
 
 dotimezone () {
 REGIONS=""
-SET_REGION=""
 SET_ZONE=""
 for i in $(grep ^[A-Z] $BASEDIR/zone.tab | cut -f 3 | sed -e 's#/.*##g'| sort -u); do
 	REGIONS="$REGIONS $i -"
 done
-DIALOG --menu "Please Select A Region:" 22 60 16 $REGIONS 2>$ANSWER && SET_REGION="1"
-region=$(cat $ANSWER)
-if [ "${SET_REGION}" = "1" ]; then
-	for i in $(grep ^[A-Z] $BASEDIR/zone.tab | grep $region/ | cut -f 3 | sed -e "s#$region/##g"| sort -u); do
-		ZONES="$ZONES $i -"
-	done
-	DIALOG --menu "Please Select A Timezone:" 22 60 16 $ZONES 2>$ANSWER && SET_ZONE="1"
-	zone=$(cat $ANSWER)
-	if [ "${SET_ZONE}" = "1" ]; then
-		DIALOG --infobox "Setting Timezone to $region/$zone ..." 0 0
-		echo $region/$zone > /tmp/.timezone
-		[ -e /etc/localtime ] && rm -f /etc/localtime
-		cp $BASEDIR/$region/$zone /etc/localtime
-		dohwclock
+while ! [ "$SET_ZONE" = "1" ]; do
+	SET_REGION=""
+	DIALOG --menu "Please Select A Region:" 22 60 16 $REGIONS 2>$ANSWER && SET_REGION="1"
+	region=$(cat $ANSWER)
+	if [ "${SET_REGION}" = "1" ]; then
+		ZONES=""
+		for i in $(grep ^[A-Z] $BASEDIR/zone.tab | grep $region/ | cut -f 3 | sed -e "s#$region/##g"| sort -u); do
+			ZONES="$ZONES $i -"
+		done
+		DIALOG --menu "Please Select A Timezone:" 22 60 16 $ZONES 2>$ANSWER && SET_ZONE="1"
+		zone=$(cat $ANSWER)
+		if [ "${SET_ZONE}" = "1" ]; then
+			DIALOG --infobox "Setting Timezone to $region/$zone ..." 0 0
+			echo $region/$zone > /tmp/.timezone
+			[ -e /etc/localtime ] && rm -f /etc/localtime
+			cp $BASEDIR/$region/$zone /etc/localtime
+			dohwclock
+			S_NEXTITEM="2"
+		fi
 	else
-		DIALOG --msgbox "Skipping region and timezone, please select a timezone." 0 0
+		DIALOG --msgbox "Skipping region and timezone." 0 0
+		S_NEXTITEM="1"
+		break
 	fi
-else
-	DIALOG --msgbox "Skipping region and timezone, please select a region first." 0 0
-fi
-S_NEXTITEM="2"
+done
 }
 
 error_timeset()
@@ -84,7 +93,7 @@ SET_TIME=""
 USE_NTPDATE=""
 HARDWARECLOCK=""
 if [ ! -s /tmp/.timezone ]; then
-	DIALOG --msgbox "You have to select a region and timezone." 0 0
+	DIALOG --msgbox "You have to select a region and timezone first." 0 0
 	S_NEXTITEM="1"
 	return 1
 fi
@@ -104,9 +113,20 @@ if [ "${SET_TIME}" = "1" ]; then
 		DIALOG --msgbox "Synced clock with internet pool successfully.\n\nYour current time is now:\n$(date)" 0 0
 	else
 		# display and ask to set date/time
-		dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> $ANSWER || (error_timeset; return 1)
+		CANCEL=""
+		dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> $ANSWER || CANCEL="1"
+		if [ "$CANCEL" = "1" ]; then
+			error_timeset
+			S_NEXTITEM="2"
+			return 1
+		fi
 		local _date="$(cat $ANSWER)"
-		dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> $ANSWER || (error_timeset; return 1)
+		dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> $ANSWER || CANCEL="1"
+		if [ "$CANCEL" = "1" ]; then
+			error_timeset
+			S_NEXTITEM="2"
+			return 1
+		fi
 		local _time="$(cat $ANSWER)"
 		# save the time
 		# DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
@@ -117,8 +137,6 @@ if [ "${SET_TIME}" = "1" ]; then
 		dohwclock
 		DIALOG --msgbox "Your current time is now:\n$(date)" 0 0
 	fi
-else
-	DIALOG --msgbox "Current time was not changed!" 0 0
 fi
 S_NEXTITEM="3"
 }

@@ -5,6 +5,12 @@ ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 BASEDIR="/usr/share/kbd"
 
+if [ "$1" = "--setup" ]; then
+	EXIT="Return to Main Menu"
+else
+	EXIT="Exit"
+fi
+
 abort()
 {
 	DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 40 || return 0
@@ -37,13 +43,18 @@ dokeymap() {
 	for i in $(find $BASEDIR/keymaps -follow -name "*.gz" | sed 's|^.*/||g' | sort); do
 		KEYMAPS="$KEYMAPS $i -"
 	done
-	DIALOG --menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER || DIALOG --msgbox "Aborting, your current keymap was not changed." 0 0
+	DIALOG --menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER || CANCEL="1"
+	if [ "$CANCEL" = "1" ]; then
+		DIALOG --msgbox "Aborting, your current keymap was not changed." 0 0
+		S_NEXTITEM="1"
+		return 1
+	fi
 	keymap=$(cat $ANSWER)
 	echo $keymap > /tmp/.keymap
 	if [ "$keymap" ]; then
-		echo "Loading keymap: $keymap"
+		DIALOG --infobox "Loading keymap: $keymap" 0 0
 		#loadkeys -q $BASEDIR/keymaps/$keymap
-		loadkeys -q $keymap || error_kmset 
+		loadkeys -q $keymap > /dev/null 2>&1 || error_kmset 
 	fi
 S_NEXTITEM=2
 }
@@ -55,19 +66,25 @@ doconsolefont() {
 	for i in $(find $BASEDIR/consolefonts -maxdepth 1 ! -name '*.cp.gz' -name "*.gz"  | sed 's|^.*/||g' | sort); do
 		FONTS="$FONTS $i -"
 	done
-	DIALOG --menu "Select A Console Font" 22 60 16 $FONTS 2>$ANSWER || DIALOG --msgbox "Aborting, your current consolefont was not changed." 0 0
+	CANCEL=""
+	DIALOG --menu "Select A Console Font" 22 60 16 $FONTS 2>$ANSWER || CANCEL=1
+	if [ "$CANCEL" = "1" ]; then
+		DIALOG --msgbox "Aborting, your current consolefont was not changed." 0 0
+		S_NEXTITEM="2"
+		return 1
+	fi
 	font=$(cat $ANSWER)
 	echo $font > /tmp/.font
 	if [ "$font" ]; then
-		echo "Loading font: $font"
+		DIALOG --infobox "Loading font: $font" 0 0
 		for i in $(seq 1 6); do
 			if [ -d /dev/vc ]; then
-				setfont $BASEDIR/consolefonts/$font -C /dev/vc/${i}
+				setfont $BASEDIR/consolefonts/$font -C /dev/vc/${i} > /dev/null 2>&1
 			else
-				setfont $BASEDIR/consolefonts/$font -C /dev/tty${i}
+				setfont $BASEDIR/consolefonts/$font -C /dev/tty${i} > /dev/null 2>&1
 			fi
 		done
-		[ -e /dev/ttyS0 ] && setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0
+		[ -e /dev/ttyS0 ] && setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0 > /dev/null 2>&1
 	fi
 S_NEXTITEM=3
 }
@@ -82,7 +99,7 @@ mainmenu() {
 		--menu "Use the UP and DOWN arrows to navigate menus. Use TAB to switch between buttons and ENTER to select." 15 55 8 \
 		"1" "Set Keymap" \
 		"2" "Set Consolefont" \
-		"3" "Exit" 2>$ANSWER
+		"3" "$EXIT" 2>$ANSWER
 	case $(cat $ANSWER) in
 		"1")
 			dokeymap

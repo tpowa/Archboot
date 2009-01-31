@@ -1497,7 +1497,7 @@ select_source()
 set_clock()
 {
 	if [ -e /usr/bin/tz ]; then 
-		tz
+		tz --setup
 	else
 		DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
 	fi
@@ -1507,7 +1507,7 @@ set_clock()
 set_keyboard()
 {
 	if [ -e /usr/bin/km ]; then 
-		km
+		km --setup
 	else
 		DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
 	fi
