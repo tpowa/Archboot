@@ -175,7 +175,7 @@ finddisks() {
 # returns:    nothing
 getuuid()
 {
-    if [ "${1%%/[hs]d?[0-9]}" != "${1}" ]; then
+    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" ]; then
         echo "$(blkid -s UUID -o value ${1})"
     fi
 }
@@ -222,7 +222,7 @@ findpartitions() {
 	fi
 }
 
-findgrubpartitions() {
+findbootloaderpartitions() {
 	block=/sys/block
 	for devpath in $(finddisks); do
 		disk=$(echo $devpath | sed 's|.*/||')
@@ -1233,8 +1233,13 @@ getrootfs() {
 ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
+getraidarrays() {
+RAIDARRAYS="$(echo -n $(cat /proc/mdstat | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g'))"
+}
+
 dolilo() {
 	getrootfs
+	getraidarray
 	if [ ! -f $DESTDIR/etc/lilo.conf ]; then
 		DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf.  Is LILO installed?" 0 0
 		return 1
@@ -1249,13 +1254,13 @@ dolilo() {
 			if [ -n "${_uuid}" ]; then
 				_rootpart="/dev/disk/by-uuid/${_uuid}"
 			fi
-			sed -i "s|root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
 		else
-			sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS\"|g" $DESTDIR/etc/lilo.conf
+			sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
 		fi
 	fi
 	DEVS=$(finddisks _)
-	DEVS="$DEVS $(findpartitions _)"
+	DEVS="$DEVS $(findbootloaderpartitions _)"
 	if [ "$DEVS" = "" ]; then
 		DIALOG --msgbox "No hard drives were found" 0 0
 		return 1
@@ -1285,6 +1290,7 @@ dogrub() {
 	bootdev=""
 	grubdev=""
 	getrootfs
+	getraidarrays
 	get_grub_map	
 	if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
 		DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
@@ -1340,9 +1346,9 @@ dogrub() {
 				echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
 				echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 				if [ "$UUIDPARAMETER" = "yes" ]; then
-					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
 				else
-					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
 				fi
 				if [ "$VMLINUZ" = "vmlinuz26" ]; then
 					echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
@@ -1354,9 +1360,9 @@ dogrub() {
 				echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
 				echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
 				if [ "$UUIDPARAMETER" = "yes" ]; then
-					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+					echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
 				else
-					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS ro" >>$DESTDIR/boot/grub/menu.lst
+					echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
 				fi
 				if [ "$VMLINUZ" = "vmlinuz26" ]; then
 					echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
@@ -1377,7 +1383,7 @@ dogrub() {
 	$EDITOR ${DESTDIR}/boot/grub/menu.lst
 
 	DEVS=$(finddisks _)
-	DEVS="$DEVS $(findgrubpartitions _)"
+	DEVS="$DEVS $(findbootloaderpartitions _)"
 	if [ "$DEVS" = "" ]; then
 		DIALOG --msgbox "No hard drives were found" 0 0
 		return 1
