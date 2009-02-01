@@ -427,7 +427,24 @@ _mkfs() {
 _getavaildisks()
 {
 	# NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
-	for i in $(finddisks); do echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"; done
+	for i in $(finddisks); do
+		echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+	done
+}
+
+# Get a list of available partitions for use in the "Available Mountpoints" dialogs. This
+# will print the mountpoints as follows, getting size info from /sys:
+#   /dev/sda: 640 MB
+#   /dev/sdb: 640 MB
+_getavailpartitions()
+{
+	for i in $(findpartitions); do
+		if [ $(echo "$i" | grep 'md') ]; then
+			echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+		else
+			echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+		fi
+	done
 }
 
 # Disable swap and all mounted partitions for the destination system. Unmount
@@ -440,7 +457,20 @@ _umountall()
 	umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
 }
 
+# Disable all software raid devices
+_stopmd()
+{
+	if [ "$(cat /proc/mdstat | grep ^md)" ]; then
+		DIALOG --infobox "Disabling all software raid devices..." 0 0
+		for i in $(cat /proc/mdstat | grep ^md | sed -e 's# :.*##g'); do
+			mdadm --manage --stop /dev/$i
+		done
+	fi
+}
+
 autoprepare() {
+	# disable all raid devices, else weird things can happen during partitioning!
+	_stopmd
 	DISCS=$(finddisks)
 	if [ $(echo $DISCS | wc -w) -gt 1 ]; then
 		DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
@@ -549,7 +579,6 @@ autoprepare() {
 	rm -f /tmp/.fstab
 
 	# disable swap and all mounted partitions, umount / last!
-	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
 	_umountall
 
 	# setup input var for sfdisk
@@ -623,9 +652,9 @@ partition() {
 		return 0
 	fi
 	# disable swap and all mounted partitions, umount / last!
-	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
 	_umountall
-
+	# disable all raid devices, else weird things can happen during partitioning!
+	_stopmd
 	# Select disk to partition
 	DISCS=$(finddisks _)
 	DISCS="$DISCS OTHER - DONE +"
@@ -672,7 +701,7 @@ mountpoints() {
 	#
 	# Select mountpoints
 	#
-	DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+	DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
 	PARTS=$(findpartitions _)
 	DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
 	PART=$(cat $ANSWER)
@@ -722,7 +751,6 @@ mountpoints() {
 	DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
 	done
 	# disable swap and all mounted partitions
-	DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
 	_umountall
 	for line in $(cat /tmp/.parts); do
 		PART=$(echo $line | cut -d: -f 1)
