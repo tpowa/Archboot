@@ -987,8 +987,8 @@ installpkg() {
 			echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
 		fi
 		### HACK to fix infofiles in bash and texinfo!
-		[ "$(echo $PACKAGES | grep texinfo)" ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
-		[ "$(echo $PACKAGES | grep bash)" ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
+		#[ "$(echo $PACKAGES | grep texinfo)" ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
+		#[ "$(echo $PACKAGES | grep bash)" ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
 		rm /tmp/setup-pacman-running
 	) &
 
@@ -1289,6 +1289,7 @@ dogrub() {
 	_grubdev=""
 	bootdev=""
 	grubdev=""
+	redundant=""
 	getrootfs
 	getraidarrays
 	get_grub_map	
@@ -1298,20 +1299,40 @@ dogrub() {
 	fi
 	# try to auto-configure GRUB...
 	if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
+		# check if raid device is used
 		if [ "$(echo $PART_ROOT | grep md)" ]; then
-			for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-				_grubdev="$_grubdev $(mapdev $i)"
-			done
+			if ! [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid0" -o "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "linear" ]; then
+				# redundant devices
+				for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+					_grubdev="$_grubdev $(mapdev $i)"
+				done
+				redundant="1"
+			else
+				# in raid0,linear devices are not redundant, only one device needed!
+				_grubdev=$(mapdev $(mdadm --detail $PART_ROOT | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g'))
+				redundant=""
+			fi
 		else
+			# use normal device
 			_grubdev=$(mapdev $PART_ROOT)
 		fi
 		# look for a separately-mounted /boot partition
 		bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+		# check if raid device is used  on /boot partition
 		if [ "$(echo $bootdev | grep md)" ]; then
-			for i in $(mdadm --detail $_bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-				_bootdev="$_bootdev $i"
-			done
+			if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid0" -o "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "linear" ]; then
+				# redundant devices
+				for i in $(mdadm --detail $_bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+					_bootdev="$_bootdev $i"
+				done
+				redundant="1"
+			else
+				# in raid0,linear devices are not redundant, only one device needed!
+				_bootdev=$(mdadm --detail $_bootdev | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g')
+				redundant=""
+			fi
 		else
+			# use normal device
 			_bootdev=$bootdev
 		fi
 		if [ "$UUIDPARAMETER" = "yes" ]; then
@@ -1327,6 +1348,7 @@ dogrub() {
 			head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >$DESTDIR/boot/grub/menu.lst
 			rm -f /tmp/.menu.lst
 			subdir=
+			# create correct entry array
 			if [ "$_bootdev" != "" ]; then
 				for bootdev in $_bootdev; do 
 				_grubdev="$_grubdev $(mapdev $bootdev)"
@@ -1340,6 +1362,7 @@ dogrub() {
 				grubdev="(hd0,0)"
 			fi
 			NUMBER=0
+			# create default grub entries
 			for grubdev in $_grubdev; do
 				echo "" >>$DESTDIR/boot/grub/menu.lst
 				echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
@@ -1445,7 +1468,9 @@ EOF
 		DIALOG --msgbox "GRUB was successfully installed." 0 0
 		S_GRUB=1
 		if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
-			DIALOG --defaultno --yesno "Setup detected a software raid partition.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
+			if ! [ "$redundant" = "1" ]; then
+				DIALOG --defaultno --yesno "Setup detected a redundant software raid partition.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
+			fi
 		fi
 	done
 }
