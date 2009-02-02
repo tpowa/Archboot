@@ -19,7 +19,7 @@ abort()
 	[ -e /tmp/.font ] && rm -f /tmp/.font
         [ -e /tmp/.km-running ] && rm /tmp/.km-running
 	clear
-	exit 0
+	exit 1
 }
 
 # DIALOG()

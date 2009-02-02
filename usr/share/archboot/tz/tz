@@ -21,7 +21,7 @@ abort()
 	[ -e /var/lib/hwclock/adjtime ] && rm -f /var/lib/hwclock/adjtime
 	[ -e /tmp/.tz-running ] && rm /tmp/.tz-running
 	clear
-	exit 0
+	exit 1
 }
 
 # DIALOG()
