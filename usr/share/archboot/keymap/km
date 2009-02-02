@@ -43,6 +43,7 @@ dokeymap() {
 	for i in $(find $BASEDIR/keymaps -follow -name "*.gz" | sed 's|^.*/||g' | sort); do
 		KEYMAPS="$KEYMAPS $i -"
 	done
+	CANCEL=""
 	DIALOG --menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER || CANCEL="1"
 	if [ "$CANCEL" = "1" ]; then
 		DIALOG --msgbox "Aborting, your current keymap was not changed." 0 0
