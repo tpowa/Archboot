@@ -151,7 +151,7 @@ mainmenu() {
 		--menu "Use the UP and DOWN arrows to navigate menus. Use TAB to switch between buttons and ENTER to select." 15 55 8 \
 		"1" "Select Region and Timezone" \
 		"2" "Set Time and Date" \
-		"3" "Exit" 2>$ANSWER
+		"3" "$EXIT" 2>$ANSWER
 	case $(cat $ANSWER) in
 		"1")
 			dotimezone
