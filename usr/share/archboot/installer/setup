@@ -1535,10 +1535,11 @@ select_source()
 			else
 			DEFAULT=""
 			fi
+		    CANCEL=""
 		    DIALOG $DEFAULT --menu "FTP Installation" 10 35 3 \
 		    "0" "Setup Network" \
 		    "1" "Choose Mirror" \
-		    "2" "Return to Main Menu" 2>$ANSWER
+		    "2" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
 
 		    case "$(cat $ANSWER)" in
 			"0")
@@ -1550,7 +1551,11 @@ select_source()
 		    esac
 		done
 	fi
-	NEXTITEM="4"
+	if [ "$CANCEL" = "1" ]; then 
+		NEXTITEM="3"
+	else
+		NEXTITEM="4"
+	fi
 }
 
 set_clock()
@@ -1607,11 +1612,12 @@ prepare_harddrive()
 		else
 			DEFAULT=""
 		fi
+		CANCEL=""
 		dialog $DEFAULT --backtitle "$TITLE" --menu "Prepare Hard Drive" 12 60 5 \
 			"1" "Auto-Prepare (erases the ENTIRE hard drive)" \
 			"2" "Partition Hard Drives" \
 			"3" "Set Filesystem Mountpoints" \
-			"4" "Return to Main Menu" 2>$ANSWER
+			"4" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
 		NEXTITEM="$(cat $ANSWER)"
 		[ "$S_MKFSAUTO" = "1" ] && DONE=1
 		case $(cat $ANSWER) in
@@ -1628,7 +1634,11 @@ prepare_harddrive()
 				DONE=1 ;;
 		esac
 	done
-	NEXTITEM="3"
+	if [ "$CANCEL" = "1" ]; then 
+		NEXTITEM="2"
+	else
+		NEXTITEM="3"
+	fi
 }
 
 do_pacmanmirror()
@@ -1859,15 +1869,20 @@ configure_system()
 
 install_bootloader()
 {
+	CANCEL=""
 	DIALOG --menu "Which bootloader would you like to use?  Grub is the Arch default.\n\n" \
 		10 55 2 \
 		"GRUB" "Use the GRUB bootloader (default)" \
-		"LILO" "Use the LILO bootloader" 2>$ANSWER
+		"LILO" "Use the LILO bootloader" 2>$ANSWER || CANCEL=1
 	case $(cat $ANSWER) in
 		"GRUB") dogrub ;;
 		"LILO") dolilo ;;
 	esac
-	NEXTITEM="8"
+	if [ "$CANCEL" = "1" ]; then 
+		NEXTITEM="7"
+	else
+		NEXTITEM="8"
+	fi
 }
 
 mainmenu() {
