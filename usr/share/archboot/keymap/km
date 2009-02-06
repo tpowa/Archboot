@@ -46,7 +46,6 @@ dokeymap() {
 	CANCEL=""
 	DIALOG --menu "Select A Keymap" 22 60 16 $KEYMAPS 2>$ANSWER || CANCEL="1"
 	if [ "$CANCEL" = "1" ]; then
-		DIALOG --msgbox "Aborting, your current keymap was not changed." 0 0
 		S_NEXTITEM="1"
 		return 1
 	fi
@@ -70,7 +69,6 @@ doconsolefont() {
 	CANCEL=""
 	DIALOG --menu "Select A Console Font" 22 60 16 $FONTS 2>$ANSWER || CANCEL=1
 	if [ "$CANCEL" = "1" ]; then
-		DIALOG --msgbox "Aborting, your current consolefont was not changed." 0 0
 		S_NEXTITEM="2"
 		return 1
 	fi

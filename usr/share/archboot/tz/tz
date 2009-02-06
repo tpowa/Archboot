@@ -76,16 +76,10 @@ while ! [ "$SET_ZONE" = "1" ]; do
 			S_NEXTITEM="2"
 		fi
 	else
-		DIALOG --msgbox "Skipping region and timezone." 0 0
 		S_NEXTITEM="1"
 		break
 	fi
 done
-}
-
-error_timeset()
-{
-	DIALOG --msgbox "Aborting, your current time was not changed." 0 0
 }
 
 dotimeset() {
@@ -116,14 +110,12 @@ if [ "${SET_TIME}" = "1" ]; then
 		CANCEL=""
 		dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> $ANSWER || CANCEL="1"
 		if [ "$CANCEL" = "1" ]; then
-			error_timeset
 			S_NEXTITEM="2"
 			return 1
 		fi
 		local _date="$(cat $ANSWER)"
 		dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> $ANSWER || CANCEL="1"
 		if [ "$CANCEL" = "1" ]; then
-			error_timeset
 			S_NEXTITEM="2"
 			return 1
 		fi
