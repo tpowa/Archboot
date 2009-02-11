@@ -1,33 +1,33 @@
 #! /bin/sh
 
 usage() {
-	echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
-	echo
-	echo "This script is for users who would rather partition/mkfs/mount their target"
-	echo "media manually than go through the routines in the setup script."
-	echo
-	echo "First make sure you have all your filesystems mounted under <destdir>."
-	echo "e.g. mount -t iso9660 /dev/hdc or /dev/sr0 (for new naming sheme) /src "
-	echo "Then run this script to install all base packages to <destdir>."
-	echo
-	if [ -e /usr/bin/wget ]; then
-		echo "<install_mode> must be either 'ftp' or 'media'"
-	else
-		echo "<install_mode> must be 'media'"
-	fi
-	echo
-	echo "Examples:"
-	if [ -e /usr/bin/wget ]; then
-		if [ "$(uname -m)" = "x86_64" ]; then
-    			echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/x86_64"
-		else 	
-			echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/i686"
-		fi
-	fi
+    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
+    echo
+    echo "This script is for users who would rather partition/mkfs/mount their target"
+    echo "media manually than go through the routines in the setup script."
+    echo
+    echo "First make sure you have all your filesystems mounted under <destdir>."
+    echo "e.g. mount -t iso9660 /dev/hdc or /dev/sr0 (for new naming sheme) /src "
+    echo "Then run this script to install all base packages to <destdir>."
+    echo
+    if [ -e /usr/bin/wget ]; then
+        echo "<install_mode> must be either 'ftp' or 'media'"
+    else
+        echo "<install_mode> must be 'media'"
+    fi
+    echo
+    echo "Examples:"
+    if [ -e /usr/bin/wget ]; then
+        if [ "$(uname -m)" = "x86_64" ]; then
+                echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/x86_64"
+        else
+                echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/i686"
+        fi
+    fi
 
-	echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
-	echo ""
-	exit 0
+    echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
+    echo ""
+    exit 0
 }
 
 INSTMODE=$1
@@ -37,38 +37,38 @@ PKGARG=$3
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
 if [ "$PKGARG" = "" ]; then
-	usage
+    usage
 fi
 
 ! [ -d /tmp ] && mkdir /tmp
 
 if [ "$INSTMODE" = "ftp" ]; then
-	echo "[core]" >/tmp/pacman.conf
-	echo "Server = $PKGARG" >>/tmp/pacman.conf
-	mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
-	rm -f /var/cache/pacman/pkg >/dev/null 2>&1
-	ln -sf $DESTDIR/var/cache/pacman/pkg /var/cache/pacman/pkg >/dev/null 2>&1
+    echo "[core]" >/tmp/pacman.conf
+    echo "Server = $PKGARG" >>/tmp/pacman.conf
+    mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
+    rm -f /var/cache/pacman/pkg >/dev/null 2>&1
+    ln -sf $DESTDIR/var/cache/pacman/pkg /var/cache/pacman/pkg >/dev/null 2>&1
 fi
 
 if [ "$INSTMODE" = "media" ]; then
-	PKGFILE=/tmp/packages.txt
-	cp $PKGARG/packages.txt /tmp/packages.txt
-	if [ ! -f $PKGFILE ]; then
-		echo "error: Could not find package list: $PKGFILE"
-		exit 1
-	fi
-	echo "[core]" >/tmp/pacman.conf
-	echo "Server = file://$PKGARG" >>/tmp/pacman.conf
-	mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
-	rm -f /var/cache/pacman/pkg >/dev/null 2>&1
-	ln -sf $PKGARG /var/cache/pacman/pkg >/dev/null 2>&1
-	PKGLIST=
-	# fix pacman list!
-	sed -i -e 's/-i686//g' -e 's/-x86_64//g' $PKGFILE
-	for i in $(cat $PKGFILE | grep 'base/' | cut -d/ -f2); do
-	  nm=${i%-*-*}
-	  PKGLIST="$PKGLIST $nm"
-	done
+    PKGFILE=/tmp/packages.txt
+    cp $PKGARG/packages.txt /tmp/packages.txt
+    if [ ! -f $PKGFILE ]; then
+        echo "error: Could not find package list: $PKGFILE"
+        exit 1
+    fi
+    echo "[core]" >/tmp/pacman.conf
+    echo "Server = file://$PKGARG" >>/tmp/pacman.conf
+    mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
+    rm -f /var/cache/pacman/pkg >/dev/null 2>&1
+    ln -sf $PKGARG /var/cache/pacman/pkg >/dev/null 2>&1
+    PKGLIST=
+    # fix pacman list!
+    sed -i -e 's/-i686//g' -e 's/-x86_64//g' $PKGFILE
+    for i in $(cat $PKGFILE | grep 'base/' | cut -d/ -f2); do
+      nm=${i%-*-*}
+      PKGLIST="$PKGLIST $nm"
+    done
 fi
 ! [ -d $DESTDIR/var/lib/pacman ] && mkdir -p $DESTDIR/var/lib/pacman
 ! [ -d /var/lib/pacman ] && mkdir -p /var/lib/pacman
@@ -78,7 +78,7 @@ fi
 ! [ -d $DESTDIR/dev ] && mkdir $DESTDIR/dev
 mount -t proc none $DESTDIR/proc
 mount -t sysfs none $DESTDIR/sys
-mount -o bind /dev $DESTDIR/dev	
+mount -o bind /dev $DESTDIR/dev
 if [ "$INSTMODE" = "cd" ]; then
   $PACMAN -Sy $PKGLIST
 fi
@@ -86,11 +86,11 @@ if [ "$INSTMODE" = "ftp" ]; then
   $PACMAN -Sy base
 fi
 if [ $? -gt 0 ]; then
-	echo
-	echo "Package installation FAILED."
-	echo
-	umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
-	exit 1
+    echo
+    echo "Package installation FAILED."
+    echo
+    umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
+    exit 1
 fi
 ### HACK to fix infofiles in bash and texinfo!
 #echo "Workaround for fixing bash and texinfo infofiles..."
@@ -99,9 +99,9 @@ fi
 
 umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
 
-echo 
+echo
 echo "Package installation complete."
-echo 
+echo
 echo "Please install a bootloader.  Edit the appropriate config file for"
 echo "your loader, and chroot into your system to install it into the"
 echo "boot sector:"
@@ -109,11 +109,11 @@ echo "  # mount -o bind /dev $DESTDIR/dev"
 echo "  # mount -t proc none $DESTDIR/proc"
 echo "  # mount -t sysfs none $DESTDIR/sys"
 echo "  # chroot $DESTDIR /bin/bash"
-echo 
+echo
 echo "For GRUB:"
 echo "  # install-grub /dev/sda /dev/sdaX (replace with your boot partition)"
 echo "  (or install manually by invoking the GRUB shell)"
-echo "HINT XFS FILESYSTEM:" 
+echo "HINT XFS FILESYSTEM:"
 echo "If you have created xfs filesystems, freeze them before and unfreeze them after"
 echo "installing grub (outside the chroot):"
 echo "- freeze:"
@@ -122,16 +122,18 @@ echo "  # xfs_freeze -f $DESTDIR/"
 echo "- unfreeze:"
 echo "  # xfs_freeze -u $DESTDIR/boot"
 echo "  # xfs_freeze -u $DESTDIR/"
-echo 
+echo
 echo "For LILO:"
 echo "  # lilo"
 echo
 echo "Next step, initramfs setup:"
 echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/kernel26-fallback.conf"
-echo "to fit your needs. After that run:" 
+echo "to fit your needs. After that run:"
 echo "# mkinitcpio -p kernel26"
-echo 
+echo
 echo "Then exit your chroot shell, edit $DESTDIR/etc/fstab and"
 echo "$DESTDIR/etc/rc.conf, and reboot!"
-echo 
+echo
 exit 0
+
+# vim: set ts=4 sw=4 et:
