@@ -20,7 +20,7 @@ SYNC_URL=
 FILE_URL="file:///src/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 PACKAGES=
-
+^
 # partitions
 PART_ROOT=
 ROOTFS=""
@@ -39,7 +39,7 @@ S_MKFSAUTO=0    # auto fs part/formatting TODO: kill this
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_LILO=0        # TODO: kill this - if using lilo 
+S_LILO=0        # TODO: kill this - if using lilo
 S_GRUB=0        # TODO: kill this - if using grub
 S_BOOT=""       # bootloader installed (set to loader name instead of 1)
 
@@ -278,10 +278,10 @@ mapdev() {
         else
         if [ "$dev" = "$linuxdevice" ]; then
             device_found=1
-            break   
+            break
         fi
        fi
-    done    
+    done
     if [ "$device_found" = "1" ]; then
         if [ "$partition_flag" = "0" ]; then
             echo "$grubdevice"
@@ -327,7 +327,7 @@ geteditor() {
         "1") EDITOR="nano" ;;
         "2") EDITOR="vi" ;;
         *)   EDITOR="nano" ;;
-    esac 
+    esac
 }
 
 # _mkfs()
@@ -524,10 +524,10 @@ _createmd()
         sfdisk --change-id $k  $l fd
     done
     # create raid device
-    for DEVICES in $(cat /tmp/.raid); do 
+    for DEVICES in $(cat /tmp/.raid); do
         DEVICES=$(echo -n "$DEVICES ")
     done
-    for SPARES in $(cat /tmp/.raid-spare); do 
+    for SPARES in $(cat /tmp/.raid-spare); do
         SPARES=$(echo -n "$SPARES ")
     done
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
@@ -667,7 +667,7 @@ autoprepare() {
     DIALOG --defaultno --yesno "$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
     || return 1
     DEVICE=$DISC
-    FSSPECS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g") 
+    FSSPECS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
     sfdisk_input=""
 
     # we assume a /dev/hdX format (or /dev/sdX)
@@ -791,7 +791,7 @@ partition() {
         fi
         # Leave our loop if the user is done partitioning
         [ "$DISC" = "DONE" ] && break
-        if ! [ "$DISC" = "" ]; then 
+        if ! [ "$DISC" = "" ]; then
             # Partition disc
             DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
             cfdisk $DISC
@@ -832,7 +832,6 @@ mountpoints() {
         DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
         echo "$PART:swap:swap:$DOMKFS" >>/tmp/.parts
     fi
-    
     DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
     PART=$(cat $ANSWER)
     PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
@@ -990,7 +989,7 @@ select_packages() {
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
         # set up our install location if necessary and sync up
         # so we can get package lists
-        prepare_pacman 
+        prepare_pacman
         PKGS="/src/core-$(uname -m)/pkg/packages.txt"
         if ! [ -f /tmp/.pkgcategory ]; then
             CHKLIST="base ^ ON"
@@ -1177,7 +1176,7 @@ installpkg() {
 }
 
 # add archboot addons if activated
-auto_addons() 
+auto_addons()
 {
     if [ -d /tmp/packages ]; then
         DO_ADDON=""
@@ -1253,20 +1252,20 @@ auto_network()
 
     DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
 
-    if [ "$S_DHCP" != "1" ]; then 
+    if [ "$S_DHCP" != "1" ]; then
         sed -i -e "s#eth0=\"eth0#$INTERFACE=\"$INTERFACE#g" ${DESTDIR}/etc/rc.conf
         sed -i -e "s# 192.168.0.2 # $IPADDR #g" ${DESTDIR}/etc/rc.conf
         sed -i -e "s# 255.255.255.0 # $SUBNET #g" ${DESTDIR}/etc/rc.conf
         sed -i -e "s# 192.168.0.255\"# $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
-            if [ "$GW" != "" ]; then 
-                sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf 
-                sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf 
-            fi 
-        echo "nameserver $DNS" >> ${DESTDIR}/etc/resolv.conf 
-    else  
+            if [ "$GW" != "" ]; then
+                sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf
+                sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf
+            fi
+        echo "nameserver $DNS" >> ${DESTDIR}/etc/resolv.conf
+    else
         sed -i -e "s#eth0=\"eth0.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
     fi
-        sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf 
+        sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf
     if [ "$PROXY_HTTP" != "" ]; then
         echo "export http_proxy=$PROXY_HTTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
@@ -1441,7 +1440,7 @@ dogrub() {
     redundant=""
     getrootfs
     getraidarrays
-    get_grub_map    
+    get_grub_map
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
         return 1
@@ -1499,7 +1498,7 @@ dogrub() {
             subdir=
             # create correct entry array
             if [ "$_bootdev" != "" ]; then
-                for bootdev in $_bootdev; do 
+                for bootdev in $_bootdev; do
                 _grubdev="$_grubdev $(mapdev $bootdev)"
                 done
             else
@@ -1642,7 +1641,7 @@ select_source()
         "2")
             MODE="ftp"
             ;;
-    esac 
+    esac
 
     if [ "$MODE" = "media" ]; then
         TITLE="Arch Linux CDROM, USBSTICK or OTHER SOURCE Installation"
@@ -1672,7 +1671,7 @@ select_source()
             esac
         done
     fi
-    if [ "$CANCEL" = "1" ]; then 
+    if [ "$CANCEL" = "1" ]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -1681,7 +1680,7 @@ select_source()
 
 set_clock()
 {
-    if [ -e /usr/bin/tz ]; then 
+    if [ -e /usr/bin/tz ]; then
         tz --setup && NEXTITEM="2"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
@@ -1690,7 +1689,7 @@ set_clock()
 
 set_keyboard()
 {
-    if [ -e /usr/bin/km ]; then 
+    if [ -e /usr/bin/km ]; then
         km --setup && NEXTITEM="1"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
@@ -1709,9 +1708,9 @@ run_mkinitcpio()
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
     chroot $DESTDIR /sbin/mkinitcpio -p kernel26 >>/tmp/mkinitcpio.log 2>&1
     echo >> /tmp/mkinitcpio.log
-    rm -f /tmp/setup-mkinitcpio-running 
+    rm -f /tmp/setup-mkinitcpio-running
     ) &
-    sleep 2 
+    sleep 2
     dialog --backtitle "$TITLE" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
     while [ -f /tmp/setup-mkinitcpio-running ]; do
         sleep 1
@@ -1744,7 +1743,7 @@ prepare_harddrive()
         [ "$S_MKFSAUTO" = "1" ] && DONE=1
         case $(cat $ANSWER) in
             "1")
-                autoprepare 
+                autoprepare
                 [ "$S_MKFSAUTO" = "1" ] && DONE=1
                 ;;
             "2")
@@ -1758,7 +1757,7 @@ prepare_harddrive()
                 DONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then 
+    if [ "$CANCEL" = "1" ]; then
         NEXTITEM="2"
     else
         NEXTITEM="3"
@@ -1790,7 +1789,7 @@ prepare_special()
                 _createmd
                 ;;
             "2")
-                _createlvm 
+                _createlvm
                 ;;
             "3")
                 _encrypt
@@ -1799,7 +1798,7 @@ prepare_special()
                 DONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then 
+    if [ "$CANCEL" = "1" ]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -1908,7 +1907,7 @@ auto_dsdt()
 auto_parameters()
 {
     if [ -s /tmp/.keymap ]; then
-        DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0 
+        DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
     fi
     if [ -s /tmp/.font ]; then
@@ -1996,8 +1995,8 @@ configure_system()
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
             $EDITOR ${DESTDIR}${FILE}
-            for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do 
-                [ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1 
+            for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do
+                [ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1
             done
             if [ "$HOOK_ERROR" = "1" ]; then
                 DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
@@ -2016,7 +2015,7 @@ configure_system()
             do_pacmanmirror
         else                                                #regular file
             $EDITOR ${DESTDIR}${FILE}
-        fi 
+        fi
     done
     if [ $S_CONFIG -eq 1 ]; then
         # only done on normal exit of configure menu
@@ -2043,7 +2042,7 @@ install_bootloader()
         "GRUB") dogrub ;;
         "LILO") dolilo ;;
     esac
-    if [ "$CANCEL" = "1" ]; then 
+    if [ "$CANCEL" = "1" ]; then
         NEXTITEM="7"
     else
         NEXTITEM="8"
@@ -2109,7 +2108,7 @@ if [ -e /tmp/.setup-running ]; then
     echo "setup already runs on a different console!"
     echo "Please remove /tmp/.setup-running first to launch setup!"
     exit 1
-fi 
+fi
 : >/tmp/.setup-running
 : >/tmp/.setup
 
