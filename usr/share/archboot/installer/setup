@@ -20,7 +20,7 @@ SYNC_URL=
 FILE_URL="file:///src/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 PACKAGES=
-^
+
 # partitions
 PART_ROOT=
 ROOTFS=""
@@ -482,12 +482,21 @@ _stoplvm()
 # Creates software raid devices
 _createmd()
 {
+    MDFINISH=""
     while [ "$MDFINISH" != "DONE" ]; do
         : >/tmp/.raid
         : >/tmp/.raid-spare
         #
         # Select raid devices
         #
+        while [ "${RAIDDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the node name for the raiddevice, eg:\n/dev/md0\n/dev/md1\n" 8 65 "/dev/md0" 2>$ANSWER || return 1
+            RAIDDEVICE=$(cat $ANSWER)
+            if [ "$(cat /proc/mdstat | grep "^$RAIDDEVICE")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
+                RAIDDEVICE=""
+            fi
+        done
         DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
         DIALOG --menu "Select the partition to use as first device" 21 50 13 $PARTS 2>$ANSWER || return 1
@@ -495,9 +504,10 @@ _createmd()
         echo "$PART" >>/tmp/.raid
         while [ "$PART" != "DONE" ]; do
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            DIALOG --menu "Select the partition to use as additional device" 21 50 13 $PARTS SPARE - NONE - DONE _ 2>$ANSWER || return 1
+            DIALOG --menu "Select the partition to use as additional device" 21 50 13 $PARTS SPARE - MISSING - DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
-            if [ "$PART" = "NONE" ]; then
+	    [ "$PART" = "DONE" ] && break
+            if [ "$PART" = "MISSING" ]; then
                 DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
                 echo "$DEGRADED" >>/tmp/.raid
             else
@@ -515,7 +525,7 @@ _createmd()
             DIALOG --menu "Only raid1 level available, too many missing devices." 21 50 13 raid1 - 2>$ANSWER || return 1
             LEVEL=$(cat $ANSWER)
         fi
-        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:$LEVEL\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
     # writing correct raid information to partition table
     for i in $(cat /tmp/.raid | grep -v missing); do
@@ -534,59 +544,18 @@ _createmd()
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     ### TODO parity in raid5 mode
     mdadm --create $RAIDDEVICE --force --run --level=$LEVEL --raid-devices=$RAID_DEVICES --spare-devices=$SPARE_DEVICES $DEVICES
-
-    PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-    PART_ROOT=$PART
-    # Select root filesystem type
-    DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-    FSTYPE=$(cat $ANSWER)
-    DOMKFS="no"
-    DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-    echo "$PART:$FSTYPE:/:$DOMKFS" >>/tmp/.parts
-
-    #
-    # Additional partitions
-    #
-    DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
-    PART=$(cat $ANSWER)
-    while [ "$PART" != "DONE" ]; do
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        # Select a filesystem type
-        DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-        FSTYPE=$(cat $ANSWER)
-        MP=""
-        while [ "${MP}" = "" ]; do
-            DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
-            MP=$(cat $ANSWER)
-            if grep ":$MP:" /tmp/.parts; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
-                MP=""
-            fi
-        done
-        DOMKFS="no"
-        DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-        echo "$PART:$FSTYPE:$MP:$DOMKFS" >>/tmp/.parts
-        DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
-    done
-    DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
-    done
-
-    DIALOG --msgbox "Partitions were successfully mounted." 0 0
-    NEXTITEM="4"
-    S_MKFS=1
 }
 
 # Creates software lvm devices
 _createlvm()
 {
-
+    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
 }
 
 # Encrypt devices
 _encrypt()
 {
-
+    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
 }
 
 autoprepare() {
@@ -806,7 +775,7 @@ mountpoints() {
         DIALOG --msgbox "You have already prepared your filesystems with Auto-prepare" 0 0
         return 0
     fi
-    while [ "$MDFINISH" != "DONE" ]; do
+    while [ "$PARTFINISH" != "DONE" ]; do
     : >/tmp/.fstab
     : >/tmp/.parts
     FSOPTS=""
@@ -868,7 +837,7 @@ mountpoints() {
         DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
     done
-    DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+    DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
@@ -1736,7 +1705,7 @@ prepare_harddrive()
         dialog $DEFAULT --backtitle "$TITLE" --menu "Prepare Hard Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE hard drive)" \
             "2" "Partition Hard Drives" \
-            "3" "Create Raid,Lvm and Encrypt" \
+            "3" "Create Raid, Lvm and Encrypt" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
@@ -1751,7 +1720,7 @@ prepare_harddrive()
             "3")
                 create_special ;;
             "4")
-                MDFINISH=""
+                PARTFINISH=""
                 mountpoints ;;
             *)
                 DONE=1 ;;
@@ -1765,7 +1734,7 @@ prepare_harddrive()
 }
 
 # menu for raid, lvm and encrypt
-prepare_special()
+create_special()
 {
     NEXTITEM=""
     DONE=0
@@ -1777,7 +1746,7 @@ prepare_special()
             DEFAULT=""
         fi
         CANCEL=""
-        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Raid,Lvm and Encrypt" 12 60 5 \
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Raid, Lvm and Encrypt" 12 60 5 \
             "1" "Create Software Raid" \
             "2" "Create LVM" \
             "3" "Encrypt" \
@@ -1786,14 +1755,11 @@ prepare_special()
         [ "$S_MKFSAUTO" = "1" ] && DONE=1
         case $(cat $ANSWER) in
             "1")
-                _createmd
-                ;;
+                _createmd ;;
             "2")
-                _createlvm
-                ;;
+                _createlvm ;;
             "3")
-                _encrypt
-                ;;
+                _encrypt ;;
             *)
                 DONE=1 ;;
         esac
