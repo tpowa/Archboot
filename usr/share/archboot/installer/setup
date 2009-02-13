@@ -482,13 +482,45 @@ _stoplvm()
 # Creates software raid devices
 _createmd()
 {
+    ### TODO:
+    ### - add raid partitions too!
     MDFINISH=""
+DIALOG --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
+-------------------\n\n
+Linear mode:\n
+You have two or more partitions which are not necessarily the same size\n
+(but of course can be), which you want to append to each other.\n
+Spare-disks are not supported here. If a disk dies, the array dies with\n
+it.\n\n
+RAID-0:\n
+You have two or more devices, of approximately the same size, and you want\n
+to combine their storage capacity and also combine their performance by\n
+accessing them in parallel. Like in Linear mode, spare disks are not\n
+supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
+array goes with it.\n\n
+RAID-1:\n
+You have two devices of approximately same size, and you want the two to\n
+be mirrors of each other. Eventually you have more devices, which you\n
+want to keep as stand-by spare-disks, that will automatically become a\n
+part of the mirror if one of the active devices break.\n\n
+RAID-5:\n
+You have three or more devices of roughly the same size, you want to\n
+combine them into a larger device, but still to maintain a degree of\n
+redundancy fordata safety. Eventually you have a number of devices to use\n
+as spare-disks, that will not take part in the array before another device\n
+fails. If you use N devices where the smallest has size S, the size of the\n
+entire array will be (N-1)*S. This \"missing\" space is used for parity\n
+(redundancy) information. Thus, if any disk fails, all data stay intact.\n
+But if two disks fail, all data is lost.\n\n
+RAID-10:\n
+Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
+two disks. It provides superior data security and can survive multiple\n
+disk failures. The main disadvantage is cost, because 50% of your\n
+storage is duplication." 0 0
     while [ "$MDFINISH" != "DONE" ]; do
         : >/tmp/.raid
         : >/tmp/.raid-spare
-        #
-        # Select raid devices
-        #
+        # enter raid device name
         while [ "${RAIDDEVICE}" = "" ]; do
             DIALOG --inputbox "Enter the node name for the raiddevice, eg:\n/dev/md0\n/dev/md1\n" 8 65 "/dev/md0" 2>$ANSWER || return 1
             RAIDDEVICE=$(cat $ANSWER)
@@ -497,53 +529,81 @@ _createmd()
                 RAIDDEVICE=""
             fi
         done
+        # select raid mode
+        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
+        DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
+        LEVEL=$(cat $ANSWER)
+        # raid5 and raid10 support parity parameter
+        PARITY=""
+        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
+            PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
+            PARTIY=$(cat $ANSWER)
+        fi
+        # show available partitions with sizes
         DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
+        # select the first device to use, no missing option available!
         DIALOG --menu "Select the partition to use as first device" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         echo "$PART" >>/tmp/.raid
         while [ "$PART" != "DONE" ]; do
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            DIALOG --menu "Select the partition to use as additional device" 21 50 13 $PARTS SPARE - MISSING - DONE _ 2>$ANSWER || return 1
+            # clean loop from used partition and options
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            # raid0 doesn't support missing devices
+            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
+            # add more devices
+            DIALOG --menu "Select the partition to use as additional device" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
+            SPARE=""
+            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
 	    [ "$PART" = "DONE" ] && break
             if [ "$PART" = "MISSING" ]; then
                 DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
                 echo "$DEGRADED" >>/tmp/.raid
             else
-                if [ "$PART" = "SPARE" ]; then
+                if [ "$SPARE" = "1" ]; then
                     echo "$PART" >>/tmp/.raid-spare
                 else
                     echo "$PART" >>/tmp/.raid
                 fi
             fi
         done
-        if [ "$(cat /tmp/.raid | grep -v missing | wc -l)" -gt 1 ]; then
-            DIALOG --menu "Select the raid level you want to use" 21 50 13 raid0 - raid1 - raid5 - 2>$ANSWER || return 1
-            LEVEL=$(cat $ANSWER)
-        else
-            DIALOG --menu "Only raid1 level available, too many missing devices." 21 50 13 raid1 - 2>$ANSWER || return 1
-            LEVEL=$(cat $ANSWER)
-        fi
-        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
-    # writing correct raid information to partition table
+    # writing raid information to partition table
     for i in $(cat /tmp/.raid | grep -v missing); do
+        # get device name
         k=$(echo $i | sed -e 's#[0-9]##g')
+        # get partition number of device
         l=$(echo $i | sed -e 's#.*[a-z]##g')
-        sfdisk --change-id $k  $l fd
+        DIALOG --infobox "Changing partition $k$l to raid..." 0 0
+        sfdisk --change-id $k  $l fd >$LOG 2>&1
+        if [ $? -gt 0 ]; then
+            DIALOG --msgbox "Error changing partition $k$l to raid (see $LOG for details)." 0 0
+            return 1
+        fi
     done
     # create raid device
-    for DEVICES in $(cat /tmp/.raid); do
-        DEVICES=$(echo -n "$DEVICES ")
-    done
-    for SPARES in $(cat /tmp/.raid-spare); do
-        SPARES=$(echo -n "$SPARES ")
-    done
+    DEVICES="$(echo -n $(cat /tmp/.raid))"
+    SPARES="$(echo -n $(cat /tmp/.raid-spare))"
+    # combine both if spares are available, spares at the end!
+    [ -n $SPARES ] && DEVICES="$DEVICES $SPARES"
+    # get number of devices
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
-    ### TODO parity in raid5 mode
-    mdadm --create $RAIDDEVICE --force --run --level=$LEVEL --raid-devices=$RAID_DEVICES --spare-devices=$SPARE_DEVICES $DEVICES
+    # generate options for mdadm
+    RAIDOPTIONS="--force --run --level=$LEVEL"
+    ! [ "$RAID_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
+    ! [ "$SPARE_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
+    ! [ "$PARITY" = "" ] && RAIDOPTIONS="$RAIDOPTIONS --layout=$PARITY"
+    DIALOG --infobox "Creating $RAIDDEVICE..." 0 0
+    mdadm --create $RAIDDEVICE $RAIDOPTIONS $DEVICES >$LOG 2>&1
+    if [ $? -gt 0 ]; then
+        DIALOG --msgbox "Error creating $RAIDDEVICE (see $LOG for details)." 0 0
+        return 1
+    fi
 }
 
 # Creates software lvm devices
