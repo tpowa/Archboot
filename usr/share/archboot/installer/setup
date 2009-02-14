@@ -139,15 +139,19 @@ finddisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            echo "/dev/$dev"
-            [ "$1" ] && echo $1
+            if ! [ "$(cat /proc/mdstat | grep $dev)" ]; then
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+            fi
         fi
     done
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            echo "/dev/$dev"
-            [ "$1" ] && echo $1
+            if ! [ "$(cat /proc/mdstat | grep $dev)" ]; then
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+            fi
         fi
     done
     # cciss controllers
@@ -199,9 +203,16 @@ findpartitions() {
         echo "/dev/mapper/$devpath"
         [ "$1" ] && echo $1
     done
-    # include any raid md devices
-    for devpath in $(ls -d /dev/md* | grep '[0-9]' 2>/dev/null); do
+    # include non partitionable raid md devices, exclude partitionable base devices
+    for devpath in $(ls -d /dev/md* | grep '[0-9]' | grep -v '_d' 2>/dev/null); do
         if cat /proc/mdstat | grep -qw $(echo $devpath | sed -e 's|/dev/||g'); then
+        echo "$devpath"
+        [ "$1" ] && echo $1
+        fi
+    done
+    # include partitionable raid md devices
+    for devpath in $(ls -d /dev/md* | grep '_d[0-9]p' 2>/dev/null); do
+        if cat /proc/partitions | grep -qw $(echo $devpath | sed -e 's|/dev/||g'); then
         echo "$devpath"
         [ "$1" ] && echo $1
         fi
@@ -482,11 +493,9 @@ _stoplvm()
 # Creates software raid devices
 _createmd()
 {
-    ### TODO:
-    ### - add raid partitions too!
     MDFINISH=""
 DIALOG --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
--------------------\n\n
+-----------------------------\n\n
 Linear mode:\n
 You have two or more partitions which are not necessarily the same size\n
 (but of course can be), which you want to append to each other.\n
@@ -521,10 +530,11 @@ storage is duplication." 0 0
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # enter raid device name
+        RAIDDEVICE=""
         while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice, eg:\n/dev/md0\n/dev/md1\n" 8 65 "/dev/md0" 2>$ANSWER || return 1
+            DIALOG --inputbox "Enter the node name for the raiddevice, eg. for none partitionable raiddevice:\n/dev/md0\n/dev/md1\n\n\neg. for partitionable raiddevice:\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md0" 2>$ANSWER || return 1
             RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat | grep "^$RAIDDEVICE")" ]; then
+            if [ "$(cat /proc/mdstat | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
@@ -540,11 +550,21 @@ storage is duplication." 0 0
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
         fi
-        # show available partitions with sizes
-        DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-        PARTS=$(findpartitions _)
+        # show available devices with sizes
+        if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
+            DIALOG --msgbox "Available disks:\n\n$(_getavaildisks)\n" 0 0
+            PARTS=$(finddisks _)
+        else
+            DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+            PARTS=$(findpartitions _)
+        fi
+        # break if all devices are in use
+        if [ "$PARTS" = "" ]; then
+            DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
+            return 1
+        fi
         # select the first device to use, no missing option available!
-        DIALOG --menu "Select the partition to use as first device" 21 50 13 $PARTS 2>$ANSWER || return 1
+        DIALOG --menu "Select the first device" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         echo "$PART" >>/tmp/.raid
         while [ "$PART" != "DONE" ]; do
@@ -553,7 +573,7 @@ storage is duplication." 0 0
             # raid0 doesn't support missing devices
             ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
             # add more devices
-            DIALOG --menu "Select the partition to use as additional device" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
+            DIALOG --menu "Select additional device" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             SPARE=""
             ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
@@ -572,19 +592,6 @@ storage is duplication." 0 0
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
-    # writing raid information to partition table
-    for i in $(cat /tmp/.raid | grep -v missing); do
-        # get device name
-        k=$(echo $i | sed -e 's#[0-9]##g')
-        # get partition number of device
-        l=$(echo $i | sed -e 's#.*[a-z]##g')
-        DIALOG --infobox "Changing partition $k$l to raid..." 0 0
-        sfdisk --change-id $k  $l fd >$LOG 2>&1
-        if [ $? -gt 0 ]; then
-            DIALOG --msgbox "Error changing partition $k$l to raid (see $LOG for details)." 0 0
-            return 1
-        fi
-    done
     # create raid device
     DEVICES="$(echo -n $(cat /tmp/.raid))"
     SPARES="$(echo -n $(cat /tmp/.raid-spare))"
@@ -595,6 +602,7 @@ storage is duplication." 0 0
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=$LEVEL"
+    [ "$(echo $RAIDDEVICE | grep _d)" ] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
     ! [ "$RAID_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
     ! [ "$SPARE_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
     ! [ "$PARITY" = "" ] && RAIDOPTIONS="$RAIDOPTIONS --layout=$PARITY"
@@ -602,6 +610,34 @@ storage is duplication." 0 0
     mdadm --create $RAIDDEVICE $RAIDOPTIONS $DEVICES >$LOG 2>&1
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error creating $RAIDDEVICE (see $LOG for details)." 0 0
+        return 1
+    fi
+    if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
+        DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
+        cfdisk $RAIDDEVICE
+    fi
+    # writing raid information to partition table
+    if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
+        for i in $(sfdisk -l $RAIDDEVICE | grep ^/dev | grep -v Empty | sed -e 's# .*##g'); do
+            # get device name
+            k=$(echo $i | sed -e 's#p[0-9]##g')
+            # get partition number of device
+            l=$(echo $i | sed -e 's#.*p##g')
+            DIALOG --infobox "Changing device $k$l to raid..." 0 0
+            sfdisk --change-id $k $l fd >$LOG 2>&1
+        done
+    else
+        for i in $(cat /tmp/.raid | grep -v missing); do
+            # get device name
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            # get partition number of device
+            l=$(echo $i | sed -e 's#.*[a-z]##g')
+            DIALOG --infobox "Changing device $k$l to raid..." 0 0
+            sfdisk --change-id $k $l fd >$LOG 2>&1
+        done
+    fi
+    if [ $? -gt 0 ]; then
+        DIALOG --msgbox "Error changing partition $k$l to raid (see $LOG for details)." 0 0
         return 1
     fi
 }
@@ -1797,9 +1833,9 @@ prepare_harddrive()
 create_special()
 {
     NEXTITEM=""
-    DONE=0
+    SPECIALDONE=0
     #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
-    while [ "$DONE" = "0" ]; do
+    while [ "$SPECIALDONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
         else
@@ -1821,7 +1857,7 @@ create_special()
             "3")
                 _encrypt ;;
             *)
-                DONE=1 ;;
+                SPECIALDONE=1 ;;
         esac
     done
     if [ "$CANCEL" = "1" ]; then
