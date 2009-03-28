@@ -880,7 +880,7 @@ EOF
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         if [ $(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l) -eq 0 ]; then
-            _mkfs yes ${DEVICE}p${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
+            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
         fi
         part=$(($part + 1))
     done
