@@ -153,7 +153,7 @@ finddisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -162,7 +162,7 @@ finddisks() {
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -183,7 +183,7 @@ finddisks() {
         done
     fi
     # partitionable raid
-    for dev in $(cat /proc/mdstat | grep ^md_d[0-9] | sed 's#:.*##g'); do
+    for dev in $(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9] | sed 's#:.*##g'); do
         echo "/dev/$dev"
         [ "$1" ] && echo $1
     done
@@ -195,7 +195,7 @@ findbootloaderdisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -204,7 +204,7 @@ findbootloaderdisks() {
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -247,7 +247,7 @@ findpartitions() {
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* | grep md[0-9]); do
-        if [ "$(cat /proc/mdstat | grep -qw $(echo $devpath | sed -e 's|/dev/||g'))" ]; then
+        if [ "$(cat /proc/mdstat 2>/dev/null | grep -qw $(echo $devpath | sed -e 's|/dev/||g'))" ]; then
             echo "$devpath"
             [ "$1" ] && echo $1
         fi
@@ -513,12 +513,12 @@ _umountall()
 # Disable all none partitionable software raid devices
 _stopmd()
 {
-    if [ "$(cat /proc/mdstat | grep ^md)" ]; then
+    if [ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]; then
         DISABLEMD=""
         DIALOG --yesno "Setup detected already running raid devices, do you want to disable them before partitioning?" 0 0 && DISABLEMD="1"
         if [ "$DISABLEMD" = "1" ]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
-            for i in $(cat /proc/mdstat | grep ^md | sed -e 's# :.*##g'); do
+            for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
                 mdadm --manage --stop /dev/$i
             done
         fi
@@ -528,9 +528,9 @@ _stopmd()
 # Disable all software lvm devices
 _stoplvm()
 {
-    if [ "$(cat /proc/mdstat | grep ^md)" ]; then
+    if [ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]; then
         DIALOG --infobox "Disabling all software raid devices..." 0 0
-        for i in $(cat /proc/mdstat | grep ^md | sed -e 's# :.*##g'); do
+        for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
             mdadm --manage --stop /dev/$i
         done
     fi
@@ -580,7 +580,7 @@ storage is duplication." 0 0
         while [ "${RAIDDEVICE}" = "" ]; do
             DIALOG --inputbox "Enter the node name for the raiddevice, eg. for none partitionable raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n\neg. for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md0" 2>$ANSWER || return 1
             RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
+            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
@@ -601,7 +601,7 @@ storage is duplication." 0 0
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
         #hell yeah, this is complicated! kill devices already in use.
-        ALREADYINUSE=$(cat /proc/mdstat | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
+        ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
             k=$(echo /dev/$i | sed -e 's#[0-9]##g')
@@ -1504,7 +1504,7 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
 getraidarrays() {
-RAIDARRAYS="$(echo -n $(cat /proc/mdstat | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
+RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
 }
 
 dolilo() {
@@ -1516,8 +1516,6 @@ dolilo() {
     fi
     # Try to auto-configure LILO...
     if [ "$PART_ROOT" != "" -a "$S_LILO" != "1" ]; then
-        sed -i "s|vmlinuz26|vmlinuz|g" $DESTDIR/etc/lilo.conf
-        sed -i "s|vmlinuz|$VMLINUZ|g" $DESTDIR/etc/lilo.conf
         if [ "$UUIDPARAMETER" = "yes" ]; then
             local _rootpart="${PART_ROOT}"
             local _uuid="$(getuuid ${PART_ROOT})"
@@ -1621,7 +1619,7 @@ dogrub() {
             # create correct entry array
             if [ "$_bootdev" != "" ]; then
                 for bootdev in $_bootdev; do
-                _grubdev="$_grubdev $(mapdev $bootdev)"
+                    _grubdev="$(mapdev $bootdev)"
                 done
             else
                 subdir="/boot"
@@ -1643,9 +1641,7 @@ dogrub() {
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
                 fi
-                if [ "$VMLINUZ" = "vmlinuz26" ]; then
-                    echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
-                fi
+                echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
                 echo "" >>$DESTDIR/boot/grub/menu.lst
                 # adding fallback/full image
                 NUMBER=$(($NUMBER+1))
@@ -1657,9 +1653,7 @@ dogrub() {
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
                 fi
-                if [ "$VMLINUZ" = "vmlinuz26" ]; then
-                    echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
-                fi
+                echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
             done
             echo "" >>$DESTDIR/boot/grub/menu.lst
@@ -1988,7 +1982,7 @@ auto_hwdetect()
             done
         fi
         if [ -e $DESTDIR/lib/initcpio/hooks/mdadm ]; then
-            [ "$(cat /proc/mdstat | grep ^md[0-9])" -o "$(cat /proc/mdstat | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --mdadm"
+            [ "$(cat /proc/mdstat 2>/dev/null | grep ^md[0-9])" -o "$(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --mdadm"
         fi
         [ "$(blkid -c /dev/null | grep TYPE=\"lvm2pv\")" ] && HWPARAMETER="$HWPARAMETER --lvm2"
         [ "$(blkid -c /dev/null | grep TYPE=\"crypt_LUKS\")" ] && HWPARAMETER="$HWPARAMETER --encrypt"
