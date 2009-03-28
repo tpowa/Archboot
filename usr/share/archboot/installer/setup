@@ -247,7 +247,7 @@ findpartitions() {
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* | grep md[0-9]); do
-        if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath)" ]; then
+        if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" ]; then
             echo "$devpath"
             [ "$1" ] && echo $1
         fi
@@ -1578,9 +1578,8 @@ dogrub() {
                 done
                 redundant="1"
             else
-                # none raid1 devices are not redundant, only one device needed!
-                _grubdev=$(mapdev $(mdadm --detail $PART_ROOT | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g'))
-                redundant=""
+                # none raid1 devices are not bootable with grub, let it fail!
+                FAIL_RAID=1
             fi
         else
             # use normal device
@@ -1596,14 +1595,21 @@ dogrub() {
                     _bootdev="$_bootdev $i"
                 done
                 redundant="1"
+                # remove fail if /boot is raid1!
+                FAIL_RAID=""
             else
-                # none raid1 devices are not redundant, only one device needed!
-                _bootdev=$(mdadm --detail $bootdev | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g')
-                redundant=""
+                # none raid1 devices are not bootable with grub, let it fail!
+                FAIL_RAID="1"
             fi
         else
+            # remove fail if /boot is on other device!
+            ! [ "$bootdev" = "" ] && FAIL_RAID=""
             # use normal device
             _bootdev=$bootdev
+        fi
+        if [ "$FAIL_RAID" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices!" 0 0
+                return 1
         fi
         if [ "$UUIDPARAMETER" = "yes" ]; then
             local _rootpart="${PART_ROOT}"
