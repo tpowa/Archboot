@@ -1569,14 +1569,14 @@ dogrub() {
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
         # check if raid device is used
         if [ "$(echo $PART_ROOT | grep md)" ]; then
-            if ! [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid0" -o "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "linear" ]; then
-                # redundant devices
+            if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+                # get redundant devices
                 for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
                     _grubdev="$_grubdev $(mapdev $i)"
                 done
                 redundant="1"
             else
-                # in raid0,linear devices are not redundant, only one device needed!
+                # none raid1 devices are not redundant, only one device needed!
                 _grubdev=$(mapdev $(mdadm --detail $PART_ROOT | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g'))
                 redundant=""
             fi
@@ -1588,14 +1588,14 @@ dogrub() {
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
         # check if raid device is used  on /boot partition
         if [ "$(echo $bootdev | grep md)" ]; then
-            if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid0" -o "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "linear" ]; then
-                # redundant devices
+            if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+                # get redundant devices
                 for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
                     _bootdev="$_bootdev $i"
                 done
                 redundant="1"
             else
-                # in raid0,linear devices are not redundant, only one device needed!
+                # none raid1 devices are not redundant, only one device needed!
                 _bootdev=$(mdadm --detail $bootdev | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g')
                 redundant=""
             fi
