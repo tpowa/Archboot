@@ -12,7 +12,7 @@ e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm module-init-tools
 ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
 syslog-ng sysvinit tar util-linux-ng which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
 grub inetutils openssh hwdetect portmap shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
-dosfstools udev initscripts filesystem kernel26 glibc kernel-headers xinetd links pacman pacman-mirrorlist screen kbd pam \
+dosfstools udev initscripts filesystem kernel26 kernel26-firmware glibc kernel-headers xinetd links pacman pacman-mirrorlist screen kbd pam \
 dhcpcd bzip2 gcc-libs openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
 rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
 wpa_supplicant gzip rsync libarchive libdownload device-mapper cracklib nfs-utils nfsidmap readline acl attr \

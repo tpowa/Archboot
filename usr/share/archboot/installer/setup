@@ -79,6 +79,20 @@ chroot_umount()
     umount $DESTDIR/dev
 }
 
+# getuuid()
+# converts /dev/[hs]d?[0-9] devices to UUIDs
+#
+# parameters: device file
+# outputs:    UUID on success
+#             nothing on failure
+# returns:    nothing
+getuuid()
+{
+    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" ]; then
+        echo "$(blkid -s UUID -o value ${1})"
+    fi
+}
+
 # Check media on install packages
 check_media() {
     ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media > /dev/null 2>&1
@@ -139,7 +153,7 @@ finddisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat | grep $dev)" ]; then
+            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -148,7 +162,49 @@ finddisks() {
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat | grep $dev)" ]; then
+            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+            fi
+        fi
+    done
+    # cciss controllers
+    if [ -d /dev/cciss ] ; then
+        for dev in $(ls /dev/cciss | egrep -v 'p'); do
+            echo "/dev/cciss/$dev"
+            [ "$1" ] && echo $1
+        done
+    fi
+    # Smart 2 controllers
+    if [ -d /dev/ida ] ; then
+        for dev in $(ls /dev/ida | egrep -v 'p'); do
+                echo "/dev/ida/$dev"
+                [ "$1" ] && echo $1
+        done
+    fi
+    # partitionable raid
+    for dev in $(cat /proc/mdstat | grep ^md_d[0-9] | sed 's#:.*##g'); do
+        echo "/dev/$dev"
+        [ "$1" ] && echo $1
+    done
+}
+
+# don't check on raid devices!
+findbootloaderdisks() {
+    block=/sys/block
+    # ide devices
+    for dev in $(ls $block | egrep '^hd'); do
+        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
+            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+            fi
+        fi
+    done
+    #scsi/sata devices
+    for dev in $(ls $block | egrep '^sd'); do
+        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
+            if ! [ "$(cat /proc/mdstat | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -170,26 +226,12 @@ finddisks() {
     fi
 }
 
-# getuuid()
-# converts /dev/[hs]d?[0-9] devices to UUIDs
-#
-# parameters: device file
-# outputs:    UUID on success
-#             nothing on failure
-# returns:    nothing
-getuuid()
-{
-    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" ]; then
-        echo "$(blkid -s UUID -o value ${1})"
-    fi
-}
-
 findpartitions() {
     block=/sys/block
     for devpath in $(finddisks); do
         disk=$(echo $devpath | sed 's|.*/||')
         for part in $(ls $block/$disk | egrep ^$disk); do
-            # check if not already assembled to a raid device
+            # check if not already assembled to a none partitionable raid device, includes also partitionable raid partitions
             if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
@@ -203,18 +245,11 @@ findpartitions() {
         echo "/dev/mapper/$devpath"
         [ "$1" ] && echo $1
     done
-    # include non partitionable raid md devices, exclude partitionable base devices
-    for devpath in $(ls -d /dev/md* | grep '[0-9]' | grep -v '_d' 2>/dev/null); do
-        if cat /proc/mdstat | grep -qw $(echo $devpath | sed -e 's|/dev/||g'); then
-        echo "$devpath"
-        [ "$1" ] && echo $1
-        fi
-    done
-    # include partitionable raid md devices
-    for devpath in $(ls -d /dev/md* | grep '_d[0-9]p' 2>/dev/null); do
-        if cat /proc/partitions | grep -qw $(echo $devpath | sed -e 's|/dev/||g'); then
-        echo "$devpath"
-        [ "$1" ] && echo $1
+    # include none partitionable raid md devices
+    for devpath in $(ls -d /dev/md* | grep md[0-9]); do
+        if [ "$(cat /proc/mdstat | grep -qw $(echo $devpath | sed -e 's|/dev/||g'))" ]; then
+            echo "$devpath"
+            [ "$1" ] && echo $1
         fi
     done
     # inlcude cciss controllers
@@ -233,13 +268,14 @@ findpartitions() {
     fi
 }
 
+# don't list raid devices!
 findbootloaderpartitions() {
     block=/sys/block
     for devpath in $(finddisks); do
         disk=$(echo $devpath | sed 's|.*/||')
         for part in $(ls $block/$disk | egrep ^$disk); do
             # check if not already assembled to a raid device
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep md_d[0-9])" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -439,7 +475,11 @@ _getavaildisks()
 {
     # NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
     for i in $(finddisks); do
-        echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+        if [ $(echo "$i" | grep 'md_d[0-9]') ]; then
+            echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+        else
+            echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+        fi
     done
 }
 
@@ -450,7 +490,9 @@ _getavaildisks()
 _getavailpartitions()
 {
     for i in $(findpartitions); do
-        if [ $(echo "$i" | grep 'md') ]; then
+        if [ $(echo "$i" | grep '/md_d[0-9]') ]; then
+            echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+        elif [ $(echo "$i" | grep 'md') ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
         else
             echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
@@ -468,14 +510,18 @@ _umountall()
     umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
 }
 
-# Disable all software raid devices
+# Disable all none partitionable software raid devices
 _stopmd()
 {
     if [ "$(cat /proc/mdstat | grep ^md)" ]; then
-        DIALOG --infobox "Disabling all software raid devices..." 0 0
-        for i in $(cat /proc/mdstat | grep ^md | sed -e 's# :.*##g'); do
-            mdadm --manage --stop /dev/$i
-        done
+        DISABLEMD=""
+        DIALOG --yesno "Setup detected already running raid devices, do you want to disable them before partitioning?" 0 0 && DISABLEMD="1"
+        if [ "$DISABLEMD" = "1" ]; then
+            DIALOG --infobox "Disabling all software raid devices..." 0 0
+            for i in $(cat /proc/mdstat | grep ^md | sed -e 's# :.*##g'); do
+                mdadm --manage --stop /dev/$i
+            done
+        fi
     fi
 }
 
@@ -532,7 +578,7 @@ storage is duplication." 0 0
         # enter raid device name
         RAIDDEVICE=""
         while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice, eg. for none partitionable raiddevice:\n/dev/md0\n/dev/md1\n\n\neg. for partitionable raiddevice:\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md0" 2>$ANSWER || return 1
+            DIALOG --inputbox "Enter the node name for the raiddevice, eg. for none partitionable raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n\neg. for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md0" 2>$ANSWER || return 1
             RAIDDEVICE=$(cat $ANSWER)
             if [ "$(cat /proc/mdstat | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
@@ -550,30 +596,37 @@ storage is duplication." 0 0
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
         fi
-        # show available devices with sizes
-        if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
-            DIALOG --msgbox "Available disks:\n\n$(_getavaildisks)\n" 0 0
-            PARTS=$(finddisks _)
-        else
-            DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-            PARTS=$(findpartitions _)
-        fi
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+        PARTS=$(finddisks _)
+        PARTS="$PARTS $(findpartitions _)"
+        #hell yeah, this is complicated! kill devices already in use.
+        ALREADYINUSE=$(cat /proc/mdstat | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
+            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+            if ! [ $(echo $k | grep ^md) ]; then
+                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+            fi
+        done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
             return 1
         fi
         # select the first device to use, no missing option available!
-        DIALOG --menu "Select the first device" 21 50 13 $PARTS 2>$ANSWER || return 1
+        RAIDNUMBER=1
+        DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         echo "$PART" >>/tmp/.raid
         while [ "$PART" != "DONE" ]; do
+            RAIDNUMBER=$(($RAIDNUMBER + 1))
             # clean loop from used partition and options
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e "s#${PART}[0-9]\ _##g" -e "s#$(echo ${PART} | sed -e 's#[0-9]##g')\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
             ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
             # add more devices
-            DIALOG --menu "Select additional device" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
+            DIALOG --menu "Select additional device $RAIDNUMBER" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             SPARE=""
             ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
@@ -602,7 +655,7 @@ storage is duplication." 0 0
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=$LEVEL"
-    [ "$(echo $RAIDDEVICE | grep _d)" ] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
+    [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
     ! [ "$RAID_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
     ! [ "$SPARE_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
     ! [ "$PARITY" = "" ] && RAIDOPTIONS="$RAIDOPTIONS --layout=$PARITY"
@@ -612,12 +665,12 @@ storage is duplication." 0 0
         DIALOG --msgbox "Error creating $RAIDDEVICE (see $LOG for details)." 0 0
         return 1
     fi
-    if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
+    if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
         DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
         cfdisk $RAIDDEVICE
     fi
     # writing raid information to partition table
-    if [ "$(echo $RAIDDEVICE | grep _d)" ]; then
+    if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
         for i in $(sfdisk -l $RAIDDEVICE | grep ^/dev | grep -v Empty | sed -e 's# .*##g'); do
             # get device name
             k=$(echo $i | sed -e 's#p[0-9]##g')
@@ -655,7 +708,7 @@ _encrypt()
 }
 
 autoprepare() {
-    # disable all raid devices, else weird things can happen during partitioning!
+    # check on raid devices, else weird things can happen during partitioning!
     _stopmd
     DISCS=$(finddisks)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
@@ -664,6 +717,10 @@ autoprepare() {
         DISC=$(cat $ANSWER)
     else
         DISC=$DISCS
+    fi
+    if [ "$(echo $DISC | grep md_d[0-9])" ]; then
+        DIALOG --msgbox "Error: You cannot use partitionable raid device for autoprepare, please use an other device." 0 0
+        return 1
     fi
     SET_DEFAULTFS=""
     BOOT_PART_SET=""
@@ -735,10 +792,6 @@ autoprepare() {
     FSSPECS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
     sfdisk_input=""
 
-    # we assume a /dev/hdX format (or /dev/sdX)
-    dev=$DEVICE
-    PART_ROOT="${DEVICE}3"
-
     if [ "$S_MKFS" = "1" ]; then
         DIALOG --msgbox "You have already prepared your filesystems manually" 0 0
         return 0
@@ -761,6 +814,10 @@ autoprepare() {
         DIALOG --msgbox "Need exactly one root partition" 0 0
         return 1
     fi
+
+    dev=$DEVICE
+    # we assume a /dev/hdX format (or /dev/sdX)
+    PART_ROOT="${DEVICE}3"
 
     rm -f /tmp/.fstab
 
@@ -823,7 +880,7 @@ EOF
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         if [ $(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l) -eq 0 ]; then
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
+            _mkfs yes ${DEVICE}p${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
         fi
         part=$(($part + 1))
     done
@@ -839,11 +896,11 @@ partition() {
     fi
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    # disable all raid devices, else weird things can happen during partitioning!
+    # check on raid devices, else weird things can happen during partitioning!
     _stopmd
     # Select disk to partition
     DISCS=$(finddisks _)
-    DISCS="$DISCS OTHER - DONE +"
+    DISCS="$DISCS OTHER _ DONE +"
     DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
     DISC=""
     while true; do
@@ -1447,7 +1504,7 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
 getraidarrays() {
-RAIDARRAYS="$(echo -n $(cat /proc/mdstat | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g'))"
+RAIDARRAYS="$(echo -n $(cat /proc/mdstat | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
 }
 
 dolilo() {
@@ -1535,13 +1592,13 @@ dogrub() {
         if [ "$(echo $bootdev | grep md)" ]; then
             if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid0" -o "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "linear" ]; then
                 # redundant devices
-                for i in $(mdadm --detail $_bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+                for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
                     _bootdev="$_bootdev $i"
                 done
                 redundant="1"
             else
                 # in raid0,linear devices are not redundant, only one device needed!
-                _bootdev=$(mdadm --detail $_bootdev | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g')
+                _bootdev=$(mdadm --detail $bootdev | grep "\ /dev/" -m 1| sed -e 's#.* /#/#g')
                 redundant=""
             fi
         else
@@ -1618,7 +1675,7 @@ dogrub() {
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/boot/grub/menu.lst
 
-    DEVS=$(finddisks _)
+    DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
         DIALOG --msgbox "No hard drives were found" 0 0
@@ -1681,8 +1738,8 @@ EOF
         DIALOG --msgbox "GRUB was successfully installed." 0 0
         S_GRUB=1
         if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
-            if ! [ "$redundant" = "1" ]; then
-                DIALOG --defaultno --yesno "Setup detected a redundant software raid partition.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
+            if [ "$redundant" = "1" ]; then
+                DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
             fi
         fi
     done
@@ -1925,12 +1982,8 @@ auto_hwdetect()
         if [ "$(cat /proc/modules | grep nfs)" ]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
-        if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
-            DIALOG --defaultno --yesno "Do you need support for booting from software raid arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid"
-            if [ -e $DESTDIR/lib/initcpio/hooks/raid-partitions ]; then
-                DIALOG --defaultno --yesno "Do you need support for booting from software raid mdp/partition arrays?" 0 0 && HWPARAMETER="$HWPARAMETER --raid-partitions"
-            fi
-        fi
+        [ "$(cat /proc/mdstat | grep ^md[0-9])" ] && HWPARAMETER="$HWPARAMETER --raid"
+        [ "$(cat /proc/mdstat | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --raid-partitions"
         if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
             for i in $(dmraid -l | sed -e 's/ .*//g'); do
                 ls /dev/mapper/$i > /dev/null 2>&1 && HWPARAMETER="$HWPARAMETER --dmraid"
