@@ -1982,12 +1982,13 @@ auto_hwdetect()
         if [ "$(cat /proc/modules | grep nfs)" ]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
-        [ "$(cat /proc/mdstat | grep ^md[0-9])" ] && HWPARAMETER="$HWPARAMETER --raid"
-        [ "$(cat /proc/mdstat | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --raid-partitions"
         if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
             for i in $(dmraid -l | sed -e 's/ .*//g'); do
                 ls /dev/mapper/$i > /dev/null 2>&1 && HWPARAMETER="$HWPARAMETER --dmraid"
             done
+        fi
+        if [ -e $DESTDIR/lib/initcpio/hooks/mdadm ]; then
+            [ "$(cat /proc/mdstat | grep ^md[0-9])" -o "$(cat /proc/mdstat | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --mdadm"
         fi
         [ "$(blkid -c /dev/null | grep TYPE=\"lvm2pv\")" ] && HWPARAMETER="$HWPARAMETER --lvm2"
         [ "$(blkid -c /dev/null | grep TYPE=\"crypt_LUKS\")" ] && HWPARAMETER="$HWPARAMETER --encrypt"
