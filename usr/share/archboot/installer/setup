@@ -1294,6 +1294,7 @@ installpkg() {
     DIALOG --infobox "Writing base configuration..." 6 40
     auto_addons
     auto_fstab
+    auto_mdadm
     auto_locale
 }
 
@@ -1360,6 +1361,17 @@ auto_locale()
     chroot ${DESTDIR} locale-gen >/dev/null
 }
 
+# auto_mdadm()
+# add mdadm setup to existing /etc/mdadm.conf
+auto_mdadm()
+{
+    if [ -e $DESTDIR/etc/mdadm.conf ];then
+        if [ "$(cat /proc/mdstat | grep ^md)" ]; then
+            DIALOG --infobox "Adding raid setup to $DESTDIR/etc/mdadm.conf ..." 4 40
+            chroot ${DESTDIR} mdadm -Ds >> $DESTDIR/etc/mdadm.conf
+        fi
+    fi
+}
 
 # auto_network()
 # configures network on host system according to installer
