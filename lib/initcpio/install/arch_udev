@@ -32,7 +32,7 @@ install ()
     for i in 75-cd-aliases-generator.rules.optional 75-persistent-net-generator.rules.optional; do
         add_file /etc/udev/rules.d/$i
     done
-    for i in 40-alsa 40-ia64 40-isdn 40-pilot-links 40-ppc 40-s390 40-zaptel 50-udev-default  60-cdrom_id 60-persistent-input \
+    for i in 40-alsa 40-isdn 40-pilot-links 40-zaptel 50-udev-default  60-cdrom_id 60-persistent-input \
           60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l 61-persistent-storage-edd 64-device-mapper \
           64-md-raid 79-fstab_import 80-drivers 95-udev-late; do
     	  add_file /lib/udev/rules.d/$i.rules
