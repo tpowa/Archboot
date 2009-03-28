@@ -247,7 +247,7 @@ findpartitions() {
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* | grep md[0-9]); do
-        if [ "$(cat /proc/mdstat 2>/dev/null | grep -qw $(echo $devpath | sed -e 's|/dev/||g'))" ]; then
+        if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath)" ]; then
             echo "$devpath"
             [ "$1" ] && echo $1
         fi
@@ -1961,7 +1961,7 @@ auto_hwdetect()
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [ "$HWDETECT" = "yes" ]; then
         [ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
-        [ "$(grep -qw ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
+        [ "$(grep -w ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
         ! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
         [ "$(cat /proc/modules | grep hid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
         if [ "$(cat /proc/modules | grep usb_storage)" ]; then
