@@ -1368,7 +1368,7 @@ auto_mdadm()
     if [ -e $DESTDIR/etc/mdadm.conf ];then
         if [ "$(cat /proc/mdstat | grep ^md)" ]; then
             DIALOG --infobox "Adding raid setup to $DESTDIR/etc/mdadm.conf ..." 4 40
-            chroot ${DESTDIR} mdadm -Ds >> $DESTDIR/etc/mdadm.conf
+            mdadm -Ds >> $DESTDIR/etc/mdadm.conf
         fi
     fi
 }
