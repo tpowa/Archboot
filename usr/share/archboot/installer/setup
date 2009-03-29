@@ -1384,6 +1384,19 @@ auto_mdadm()
             DIALOG --infobox "Adding raid setup to $DESTDIR/etc/mdadm.conf ..." 4 40
             mdadm -Ds >> $DESTDIR/etc/mdadm.conf
         fi
+        # create correct entry on raid partitions!
+        if [ "$(grep /dev/block $DESTDIR/etc/mdadm.conf)" ]; then
+            # get uuid
+            for i in $(grep /dev/block $DESTDIR/etc/mdadm.conf | sed -e 's#.*UUID=##g'); do
+                for k in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# .*##g'); do
+                    if [ "$(mdadm --detail /dev/$k | grep $i)" ]; then
+                        replace_string="$(grep $i $DESTDIR/etc/mdadm.conf)"
+                        corrected_string="$(echo $replace_string | sed -e "s#/dev/block/.*\ l#/dev/$k\ l#g")"
+                        sed -i -e "s#$replace_string#$corrected_string#g" $DESTDIR/etc/mdadm.conf
+                    fi
+                done
+            done
+        fi
     fi
 }
 
@@ -1532,21 +1545,6 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 getraidarrays() {
     if ! [ "$(grep ^ARRAY $DESTDIR/etc/mdadm.conf)" ]; then
         RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
-    else
-        # create correct entry on raid partitions!
-        if [ "$(grep /dev/block $DESTDIR/etc/mdadm.conf)" ]; then
-            for i in $(grep /dev/block $DESTDIR/etc/mdadm.conf); do
-                #get uuid
-                k=$(sed -e 's#.*UUID=##g')
-                for l in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# .*##g'); do
-                    if [ $(mdadm --detail $l | grep $k) ]; then
-                        replace_string="$(grep $k $DESTDIR/etc/mdadm.conf)"
-                        corrected_string="$(echo $replace_string | sed -e "s#/dev/block/.*\ #/dev/$l\ ##g")"
-                        sed -i -e "s#$replace_string#$corrected_string##g" $DESTDIR/etc/mdadm.conf
-                    fi
-                done
-            done
-        fi
     fi
 }
 
@@ -1558,7 +1556,7 @@ dolilo() {
         return 1
     fi
     # Try to auto-configure LILO...
-    if [ "$PART_ROOT" != "" -a "$S_LILO" != "1" ]; then
+    if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
             local _rootpart="${PART_ROOT}"
             local _uuid="$(getuuid ${PART_ROOT})"
@@ -1570,7 +1568,7 @@ dolilo() {
             sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
         fi
     fi
-    DEVS=$(finddisks _)
+    DEVS=$(findbootloaderdisks _)
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
         DIALOG --msgbox "No hard drives were found" 0 0
@@ -1622,6 +1620,10 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID=1
             fi
+            if [ "$(echo $PART_ROOT | grep md_d)" ]; then
+                # partitionable raid is not supported by grub!
+                FAIL_RAID=1
+            fi
         else
             # use normal device
             _grubdev=$(mapdev $PART_ROOT)
@@ -1645,11 +1647,15 @@ dogrub() {
         else
             # remove fail if /boot is on other device!
             ! [ "$bootdev" = "" ] && FAIL_RAID=""
+            if [ "$(echo $bootdev | grep md_d)" ]; then
+                # partitionable raid is not supported by grub!
+                FAIL_RAID=1
+            fi
             # use normal device
             _bootdev=$bootdev
         fi
         if [ "$FAIL_RAID" = "1" ]; then
-                DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices!" 0 0
+                DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
                 return 1
         fi
         if [ "$UUIDPARAMETER" = "yes" ]; then
