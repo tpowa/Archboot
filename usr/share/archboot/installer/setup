@@ -1550,7 +1550,7 @@ getraidarrays() {
 
 dolilo() {
     getrootfs
-    getraidarray
+    getraidarrays
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf.  Is LILO installed?" 0 0
         return 1
@@ -1563,12 +1563,12 @@ dolilo() {
             if [ -n "${_uuid}" ]; then
                 _rootpart="/dev/disk/by-uuid/${_uuid}"
             fi
-            sed -i "s|root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
         else
-            sed -i "s|root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
         fi
     fi
-    DEVS=$(findbootloaderdisks _)
+    DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
         DIALOG --msgbox "No hard drives were found" 0 0
