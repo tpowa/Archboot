@@ -1032,7 +1032,7 @@ mountpoints() {
     done
 
     DIALOG --msgbox "Partitions were successfully mounted." 0 0
-    NEXTITEM="4"
+    NEXTITEM="5"
     S_MKFS=1
 }
 
