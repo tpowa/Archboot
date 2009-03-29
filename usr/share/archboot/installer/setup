@@ -1532,6 +1532,21 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 getraidarrays() {
     if ! [ "$(grep ^ARRAY $DESTDIR/etc/mdadm.conf)" ]; then
         RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
+    else
+        # create correct entry on raid partitions!
+        if [ "$(grep /dev/block $DESTDIR/etc/mdadm.conf)" ]; then
+            for i in $(grep /dev/block $DESTDIR/etc/mdadm.conf); do
+                #get uuid
+                k=$(sed -e 's#.*UUID=##g')
+                for l in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# .*##g'); do
+                    if [ $(mdadm --detail $l | grep $k) ]; then
+                        replace_string="$(grep $k $DESTDIR/etc/mdadm.conf)"
+                        corrected_string="$(echo $replace_string | sed -e "s#/dev/block/.*\ #/dev/$l\ ##g")"
+                        sed -i -e "s#$replace_string#$corrected_string##g" $DESTDIR/etc/mdadm.conf
+                    fi
+                done
+            done
+        fi
     fi
 }
 
