@@ -788,8 +788,8 @@ _createpv()
 {
     PVFINISH=""
     while [ "$PVFINISH" != "DONE" ]; do
-        # enter raid device name
         PVDEVICE=""
+        #hell yeah, this is complicated! kill devices already in use.
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
         ALREADYINUSE="$(pvs -o pv_name --noheading)"
@@ -805,7 +805,7 @@ _createpv()
         fi
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
-        #hell yeah, this is complicated! kill devices already in use.
+        # select device
         DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         # final step ask if everything is ok?
@@ -823,6 +823,37 @@ _createpv()
 _createvg()
 {
     DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
+    VGFINISH=""
+    while [ "$VGFINISH" != "DONE" ]; do
+        VGDEVICE=""
+        #hell yeah, this is complicated! kill devices already in use.
+        PARTS=$(finddisks _)
+        PARTS="$PARTS $(findpartitions _)"
+        ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # break if all devices are in use
+        if [ "$PARTS" = "" ]; then
+            DIALOG --msgbox "All devices in use. No more devices left for physical volume creation." 0 0
+            return 1
+        fi
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+        # select device
+        DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to create physical volume on $PART?" 0 0 && VGFINISH="DONE"
+    done
+    DIALOG --infobox "Creating physical volume on $PART..." 0 0
+    pvcreate $PART >$LOG 2>&1
+    if [ $? -gt 0 ]; then
+        DIALOG --msgbox "Error creating physical volume on $PART (see $LOG for details)." 0 0
+        return 1
+    fi
 }
 
 # Creates logical volume
