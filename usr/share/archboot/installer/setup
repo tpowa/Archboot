@@ -152,7 +152,7 @@ manual_media() {
 
 finddisks() {
     # ide devices
-    for dev in $(ls $block | egrep '^hd'); do
+    for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
             if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
@@ -161,7 +161,7 @@ finddisks() {
         fi
     done
     #scsi/sata devices
-    for dev in $(ls $block | egrep '^sd'); do
+    for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
             if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
                 echo "/dev/$dev"
@@ -229,7 +229,7 @@ findbootloaderdisks() {
 findpartitions() {
     for devpath in $(finddisks); do
         disk=$(basename $devpath)
-        for part in $(ls $block/$disk | egrep ^$disk); do
+        for part in $(ls $block/$disk 2>/dev/null | egrep ^$disk); do
             # exclude checks:
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
@@ -253,7 +253,7 @@ findpartitions() {
         [ "$1" ] && echo $1
     done
     # include none partitionable raid md devices
-    for devpath in $(ls -d /dev/md* | grep md[0-9]); do
+    for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
         if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" ]; then
             echo "$devpath"
             [ "$1" ] && echo $1
@@ -489,10 +489,12 @@ _getavaildisks()
 {
     # NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
     for i in $(finddisks); do
-        if [ $(echo "$i" | grep 'md_d[0-9]') ]; then
-            echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
-        else
-            echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+        if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
+            if [ $(echo "$i" | grep 'md_d[0-9]') ]; then
+                echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+            else
+                echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+            fi
         fi
     done
 }
@@ -524,12 +526,12 @@ _umountall()
     umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
 }
 
-# Disable all none partitionable software raid devices
+# Disable all software raid devices
 _stopmd()
 {
     if [ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]; then
         DISABLEMD=""
-        DIALOG --yesno "Setup detected already running raid devices, do you want to disable them before partitioning?" 0 0 && DISABLEMD="1"
+        DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [ "$DISABLEMD" = "1" ]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
@@ -539,21 +541,39 @@ _stopmd()
     fi
 }
 
-# Disable all software lvm devices
+# Disable all lvm devices
 _stoplvm()
 {
-    if [ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]; then
-        DIALOG --infobox "Disabling all software raid devices..." 0 0
-        for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
-            mdadm --manage --stop /dev/$i
+    DISABLELVM=""
+    DETECTED_LVM=""
+    LV_VOLUMES="$(ls /dev/mapper/ | grep -v control)"
+    LV_GROUPS="$(vgs -o vg_name --noheading)"
+    LV_PHYSICAL="$(pvs -o pv_name --noheading)"
+    ! [ "$LV_VOLUMES" = "" ] && DETECTED_LVM=1
+    ! [ "$LV_GROUPS" = "" ] && DETECTED_LVM=1
+    ! [ "$LV_PHYSICAL" = "" ] && DETECTED_LVM=1
+    if [ "$DETECTED_LVM" = "1" ]; then
+        DIALOG --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && DISABLELVM="1"
+    fi
+    if [ "$DISABLELVM" = "1" ]; then
+        DIALOG --infobox "Removing logical volumes ..." 0 0
+        for i in $LV_VOLUMES; do
+            lvremove -f /dev/mapper/$i 
+        done
+        DIALOG --infobox "Removing logical groups ..." 0 0
+        for i in $LV_GROUPS; do
+            vgremove -f $i
+        done
+        DIALOG --infobox "Removing physical volumes ..." 0 0
+        for i in $LV_PHYSICAL; do
+            pvremove -f $i
         done
     fi
 }
 
-# Creates software raid devices
-_createmd()
+#helpbox for raid
+_helpraid()
 {
-    MDFINISH=""
 DIALOG --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
 -----------------------------\n\n
 Linear mode:\n
@@ -586,32 +606,11 @@ Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
 two disks. It provides superior data security and can survive multiple\n
 disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
-    while [ "$MDFINISH" != "DONE" ]; do
-        : >/tmp/.raid
-        : >/tmp/.raid-spare
-        # enter raid device name
-        RAIDDEVICE=""
-        while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice, eg. for none partitionable raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n\neg. for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md0" 2>$ANSWER || return 1
-            RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
-                RAIDDEVICE=""
-            fi
-        done
-        # select raid mode
-        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
-        DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
-        LEVEL=$(cat $ANSWER)
-        # raid5 and raid10 support parity parameter
-        PARITY=""
-        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
-            PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
-            PARTIY=$(cat $ANSWER)
-        fi
-        # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+}
+
+# check on raid
+_checkraid(){
+        # check for devices
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
         #hell yeah, this is complicated! kill devices already in use.
@@ -628,6 +627,28 @@ storage is duplication." 0 0
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
             return 1
         fi
+}
+
+# select raid mode
+_raidmode()
+{
+        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
+        DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
+        LEVEL=$(cat $ANSWER)
+        # raid5 and raid10 support parity parameter
+        PARITY=""
+        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
+            PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
+            PARTIY=$(cat $ANSWER)
+        fi
+}
+
+#select the devices for raid device
+_selectraiddevice()
+{
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
         DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
@@ -644,7 +665,7 @@ storage is duplication." 0 0
             PART=$(cat $ANSWER)
             SPARE=""
             ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
-	    [ "$PART" = "DONE" ] && break
+            [ "$PART" = "DONE" ] && break
             if [ "$PART" = "MISSING" ]; then
                 DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
                 echo "$DEGRADED" >>/tmp/.raid
@@ -656,10 +677,63 @@ storage is duplication." 0 0
                 fi
             fi
         done
+}
+
+# Create raid
+_raid()
+{
+    MDFINISH=""
+    while [ "$MDFINISH" != "DONE" ]; do
+        : >/tmp/.raid
+        : >/tmp/.raid-spare
+        _checkraid
+        # enter raid device name
+        RAIDDEVICE=""
+        while [ "${RAIDDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
+            RAIDDEVICE=$(cat $ANSWER)
+            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
+                RAIDDEVICE=""
+            fi
+        done
+        _raidmode
+        _selectraiddevice
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
-    # create raid device
+    _createraid
+}
+
+# Create raid partitions
+_raidpartitions()
+{
+    MDFINISH=""
+    while [ "$MDFINISH" != "DONE" ]; do
+        : >/tmp/.raid
+        : >/tmp/.raid-spare
+        _checkraid
+        # enter raid device name
+        RAIDDEVICE=""
+        while [ "${RAIDDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
+            RAIDDEVICE=$(cat $ANSWER)
+            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
+                RAIDDEVICE=""
+            fi
+        done
+        _raidmode
+        _selectraiddevice
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+    done
+    _createraid
+}
+
+# create raid device
+_createraid()
+{
     DEVICES="$(echo -n $(cat /tmp/.raid))"
     SPARES="$(echo -n $(cat /tmp/.raid-spare))"
     # combine both if spares are available, spares at the end!
@@ -709,8 +783,50 @@ storage is duplication." 0 0
     fi
 }
 
-# Creates software lvm devices
-_createlvm()
+# Creates physical volume
+_createpv()
+{
+    PVFINISH=""
+    while [ "$PVFINISH" != "DONE" ]; do
+        # enter raid device name
+        PVDEVICE=""
+        PARTS=$(finddisks _)
+        PARTS="$PARTS $(findpartitions _)"
+        ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # break if all devices are in use
+        if [ "$PARTS" = "" ]; then
+            DIALOG --msgbox "All devices in use. No more devices left for physical volume creation." 0 0
+            return 1
+        fi
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+        #hell yeah, this is complicated! kill devices already in use.
+        DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to create physical volume on $PART?" 0 0 && PVFINISH="DONE"
+    done
+    DIALOG --infobox "Creating physical volume on $PART..." 0 0
+    pvcreate $PART >$LOG 2>&1
+    if [ $? -gt 0 ]; then
+        DIALOG --msgbox "Error creating physical volume on $PART (see $LOG for details)." 0 0
+        return 1
+    fi
+}
+
+# Creates volume group
+_createvg()
+{
+    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
+}
+
+# Creates logical volume
+_createlv()
 {
     DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
 }
@@ -724,6 +840,8 @@ _encrypt()
 autoprepare() {
     # check on raid devices, else weird things can happen during partitioning!
     _stopmd
+    # check on lvm devices, else weird things can happen during partitioning!
+    _stoplvm
     DISCS=$(finddisks)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
@@ -912,6 +1030,8 @@ partition() {
     _umountall
     # check on raid devices, else weird things can happen during partitioning!
     _stopmd
+    # check on lvm devices, else weird things can happen during partitioning!
+    _stoplvm
     # Select disk to partition
     DISCS=$(finddisks _)
     DISCS="$DISCS OTHER _ DONE +"
@@ -1907,7 +2027,7 @@ prepare_harddrive()
         dialog $DEFAULT --backtitle "$TITLE" --menu "Prepare Hard Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE hard drive)" \
             "2" "Partition Hard Drives" \
-            "3" "Create Raid, Lvm and Encrypt" \
+            "3" "Create Software Raid, Lvm and Encrypt" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
@@ -1954,7 +2074,6 @@ create_special()
             "3" "Encrypt" \
             "4" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
-        [ "$S_MKFSAUTO" = "1" ] && DONE=1
         case $(cat $ANSWER) in
             "1")
                 _createmd ;;
@@ -1968,6 +2087,86 @@ create_special()
     done
     if [ "$CANCEL" = "1" ]; then
         NEXTITEM="3"
+    else
+        NEXTITEM="4"
+    fi
+}
+
+# menu for lvm creation
+_createlvm()
+{
+    NEXTITEM=""
+    LVMDONE=0
+    #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
+    while [ "$LVMDONE" = "0" ]; do
+        if [ -n "$NEXTITEM" ]; then
+            DEFAULT="--default-item $NEXTITEM"
+        else
+            DEFAULT=""
+        fi
+        CANCEL=""
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create physical volume, volume group or logical volume" 12 60 5 \
+            "1" "Reset Logical Volume completely" \
+            "2" "Create Physical Volume" \
+            "3" "Create Volume Group" \
+            "4" "Create Logical Volume" \
+            "5" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+        NEXTITEM="$(cat $ANSWER)"
+        case $(cat $ANSWER) in
+            "1")
+                _stoplvm ;;
+            "2")
+                _createpv ;;
+            "3")
+                _createvg ;;
+            "4")
+                _createlv ;;
+              *)
+                LVMDONE=1 ;;
+        esac
+    done
+    if [ "$CANCEL" = "1" ]; then
+        NEXTITEM="2"
+    else
+        NEXTITEM="4"
+    fi
+}
+
+# menu for md creation
+_createmd()
+{
+    NEXTITEM=""
+    MDDONE=0
+    #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
+    while [ "$MDDONE" = "0" ]; do
+        if [ -n "$NEXTITEM" ]; then
+            DEFAULT="--default-item $NEXTITEM"
+        else
+            DEFAULT=""
+        fi
+        CANCEL=""
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Software Raid" 12 60 5 \
+            "1" "Raid Help" \
+            "2" "Reset Software Raid completely" \
+            "3" "Create Software Raid" \
+            "4" "Create Partitionable Software Raid" \
+            "5" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+        NEXTITEM="$(cat $ANSWER)"
+        case $(cat $ANSWER) in
+            "1")
+                _helpraid ;;
+            "2")
+                _stopmd ;;
+            "3")
+                _raid ;;
+            "4")
+                _raidpartitions ;;
+              *)
+                MDDONE=1 ;;
+        esac
+    done
+    if [ "$CANCEL" = "1" ]; then
+        NEXTITEM="1"
     else
         NEXTITEM="4"
     fi
