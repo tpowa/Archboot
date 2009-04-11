@@ -800,11 +800,11 @@ _createpv()
         done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
-            DIALOG --msgbox "All devices in use. No more devices left for physical volume creation." 0 0
+            DIALOG --msgbox "No more devices left for physical volume creation." 0 0
             return 1
         fi
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select device
         DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
@@ -819,39 +819,70 @@ _createpv()
     fi
 }
 
+#find physical volumes that are not in use
+findpv()
+{
+    for dev in $(pvs -o pv_name --noheading);do
+        if [ "$(pvs -o vg_name --noheading $dev)" = "      " ]; then
+            echo "$dev"
+            [ "$1" ] && echo $1
+        fi
+    done
+}
+
+getavailablepv()
+{
+    pvs -o pv_name,pv_size --noheading | sed -e 's#$#\\n#'
+}
+
 # Creates volume group
 _createvg()
 {
-    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
     VGFINISH=""
     while [ "$VGFINISH" != "DONE" ]; do
+        : >/tmp/.pvs
         VGDEVICE=""
-        #hell yeah, this is complicated! kill devices already in use.
-        PARTS=$(finddisks _)
-        PARTS="$PARTS $(findpartitions _)"
-        ALREADYINUSE="$(pvs -o pv_name --noheading)"
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-            k=$(echo $i | sed -e 's#[0-9]##g')
-            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        done
+        PVS=$(findpv _)
         # break if all devices are in use
-        if [ "$PARTS" = "" ]; then
-            DIALOG --msgbox "All devices in use. No more devices left for physical volume creation." 0 0
+        if [ "$PVS" = "" ]; then
+            DIALOG --msgbox "No more devices left for Volume Group creation." 0 0
             return 1
         fi
+        # enter volume group name
+        VGDEVICE=""
+        while [ "${VGDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 15 65 "foogroup" 2>$ANSWER || return 1
+            VGDEVICE=$(cat $ANSWER)
+            if [ "$(vgs -o vg_name --noheading 2>/dev/null | grep "^  $(echo $VGDEVICE)")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
+                VGDEVICE=""
+            fi
+        done
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
-        # select device
-        DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
+        DIALOG --msgbox "Physical Volumes:\n$(getavailablepv)\n\nPhysical Volumes that are not shown in next dialog, are already in use!" 0 0
+        # select the first device to use, no missing option available!
+        PVNUMBER=1
+        DIALOG --menu "Select Physical Volume $PVNUMBER for $VGDEVICE" 21 50 13 $PVS 2>$ANSWER || return 1
+        PV=$(cat $ANSWER)
+        echo "$PV" >>/tmp/.pvs
+        while [ "$PVS" != "DONE" ]; do
+            PVNUMBER=$(($PVNUMBER + 1))
+            # clean loop from used partition and options
+            PVS="$(echo $PVS | sed -e "s#${PV}\ _##g")"
+            # add more devices
+            DIALOG --menu "Select additional Physical Volume $PVNUMBER for $VGDEVICE" 21 50 13 $PVS DONE _ 2>$ANSWER || return 1
+            PV=$(cat $ANSWER)
+            [ "$PV" = "DONE" ] && break
+            echo "$PV" >>/tmp/.pvs
+        done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create physical volume on $PART?" 0 0 && VGFINISH="DONE"
+        DIALOG --yesno "Would you like to create Volume Group:\n$VGDEVICE\n\nPhysical Volumes:\n$(cat /tmp/.pvs | sed -e 's#$#\\n#g')like this?" 0 0 && VGFINISH="DONE"
     done
-    DIALOG --infobox "Creating physical volume on $PART..." 0 0
-    pvcreate $PART >$LOG 2>&1
+    DIALOG --infobox "Creating Volume Group $VGDEVICE..." 0 0
+    PV="$(echo -n $(cat /tmp/.pvs))"
+    vgcreate $VGDEVICE $PV >$LOG 2>&1
     if [ $? -gt 0 ]; then
-        DIALOG --msgbox "Error creating physical volume on $PART (see $LOG for details)." 0 0
+        DIALOG --msgbox "Error creating Volume Group $VGDEVICE (see $LOG for details)." 0 0
         return 1
     fi
 }
