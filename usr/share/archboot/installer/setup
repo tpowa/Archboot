@@ -510,6 +510,8 @@ _getavailpartitions()
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         elif [ $(echo "$i" | grep 'md') ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+        elif [ $(echo "$i" | grep 'mapper') ]; then
+             echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
         else
             echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
@@ -783,11 +785,33 @@ _createraid()
     fi
 }
 
+# help for lvm
+_helplvm()
+{
+DIALOG --msgbox "LOGICAL VOLUME SUMMARY:\n
+-----------------------------\n\n
+LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
+abstract your storage space and have \"virtual partitions\" which are easier\n
+to modify. The basic building block of LVM are:\n
+Physical volume (PV):\n
+Partition on hard disk (or even hard disk itself or loopback file) on which you\n
+can have virtual groups. It has a special header and is divided into physical\n
+extents. Think of physical volumes as big building blocks which can be used to\n
+build your hard drive. 
+Volume group (VG):\n 
+Group of physical volumes that are used as storage volume (as one disk).\n
+They contain logical volumes. Think of volume groups as hard drives.\n 
+Logical volume(LV): A \"virtual/logical partition\" that resides in a volume\n
+group and is composed of physical extents. Think of logical volumes as\n
+normal partitions." 0 0
+}
+
 # Creates physical volume
 _createpv()
 {
     PVFINISH=""
     while [ "$PVFINISH" != "DONE" ]; do
+        : >/tmp/.pvs-create
         PVDEVICE=""
         #hell yeah, this is complicated! kill devices already in use.
         PARTS=$(finddisks _)
@@ -800,18 +824,31 @@ _createpv()
         done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
-            DIALOG --msgbox "No more devices left for physical volume creation." 0 0
+            DIALOG --msgbox "No devices left for physical volume creation." 0 0
             return 1
         fi
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
-        # select device
-        DIALOG --menu "Select device for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
+        # select the first device to use
+        DEVNUMBER=1
+        DIALOG --menu "Select device number $DEVNUMBER for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
+        echo "$PART" >>/tmp/.pvs-create
+        while [ "$PART" != "DONE" ]; do
+            DEVNUMBER=$(($DEVNUMBER + 1))
+            # clean loop from used partition and options
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e "s#${PART}[0-9]\ _##g" -e "s#$(echo ${PART} | sed -e 's#[0-9]##g')\ _##g")"
+            # add more devices
+            DIALOG --menu "Select additional device number $DEVNUMBER for physical volume" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            [ "$PART" = "DONE" ] && break
+            echo "$PART" >>/tmp/.pvs-create
+        done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create physical volume on $PART?" 0 0 && PVFINISH="DONE"
+        DIALOG --yesno "Would you like to create physical volume on devices below?\n$(cat /tmp/.pvs-create | sed -e 's#$#\\n#g')" 0 0 && PVFINISH="DONE"
     done
     DIALOG --infobox "Creating physical volume on $PART..." 0 0
+    PART="$(echo -n $(cat /tmp/.pvs-create))"
     pvcreate $PART >$LOG 2>&1
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error creating physical volume on $PART (see $LOG for details)." 0 0
@@ -835,6 +872,22 @@ getavailablepv()
     pvs -o pv_name,pv_size --noheading | sed -e 's#$#\\n#'
 }
 
+#find volume groups that are not already full in use
+findvg()
+{
+    for dev in $(vgs -o vg_name --noheading);do
+        if ! [ "$(vgs -o vg_free --noheading --units m $dev | sed -e 's#M##g')" = "     0" ]; then
+            echo "$dev"
+            [ "$1" ] && echo $1
+        fi
+    done
+}
+
+getavailablevg()
+{
+    vgs -o vg_name,vg_free --noheading --units m| sed -e 's#$#\\n#'
+}
+
 # Creates volume group
 _createvg()
 {
@@ -845,7 +898,7 @@ _createvg()
         PVS=$(findpv _)
         # break if all devices are in use
         if [ "$PVS" = "" ]; then
-            DIALOG --msgbox "No more devices left for Volume Group creation." 0 0
+            DIALOG --msgbox "No devices left for Volume Group creation." 0 0
             return 1
         fi
         # enter volume group name
@@ -876,7 +929,7 @@ _createvg()
             echo "$PV" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create Volume Group:\n$VGDEVICE\n\nPhysical Volumes:\n$(cat /tmp/.pvs | sed -e 's#$#\\n#g')like this?" 0 0 && VGFINISH="DONE"
+        DIALOG --yesno "Would you like to create Volume Group like this?\n\n$VGDEVICE\n\nPhysical Volumes:\n$(cat /tmp/.pvs | sed -e 's#$#\\n#g')" 0 0 && VGFINISH="DONE"
     done
     DIALOG --infobox "Creating Volume Group $VGDEVICE..." 0 0
     PV="$(echo -n $(cat /tmp/.pvs))"
@@ -890,13 +943,121 @@ _createvg()
 # Creates logical volume
 _createlv()
 {
-    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
+    LVFINISH=""
+    while [ "$LVFINISH" != "DONE" ]; do
+        LVDEVICE=""
+        LV_SIZE_SET=""
+        LVS=$(findvg _)
+        # break if all devices are in use
+        if [ "$LVS" = "" ]; then
+            DIALOG --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
+            return 1
+        fi
+        # enter logical volume name
+        LVDEVICE=""
+        while [ "${LVDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
+            LVDEVICE=$(cat $ANSWER)
+            if [ "$(lvs -o lv_name --noheading 2>/dev/null | grep "^  $(echo $LVDEVICE)")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
+                LVDEVICE=""
+            fi
+        done
+        # show all devices with sizes
+        DIALOG --msgbox "Volume Groups:\n$(getavailablevg)\n\nVolume Groups that are not shown in next dialog, are already 100% in use!" 0 0
+        # select the first device to use, no missing option available!
+        LVNUMBER=1
+        DIALOG --menu "Select Volume Group $LVNUMBER for $LVDEVICE" 21 50 13 $LVS 2>$ANSWER || return 1
+        LV=$(cat $ANSWER)
+        while [ "$LV_SIZE_SET" = "" ]; do
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
+                LV_SIZE=$(cat $ANSWER)
+                if [ "$LV_SIZE" = "" ]; then
+                    LV_ALL=""
+                    DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
+                fi
+                if [ "$LV_SIZE" = "0" ]; then
+                    DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                else
+                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#M##g')" ]; then
+                        DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+                    else
+                        LV_SIZE_SET=1
+                    fi
+                fi
+        done
+        #Contiguous doesn't work with +100%FREE
+        LV_CONTIGUOUS=""
+        [ "$LV_ALL" = "" ] && DIALOG --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && LV_CONTIGUOUS="1"
+        if [ "$LV_CONTIGUOUS" = "1" ]; then
+            CONTIGUOUS=yes
+            LV_EXTRA="-C y"
+        else
+            CONTIGUOUS=no
+            LV_EXTRA=""
+        fi
+        [ "$LV_SIZE" = "" ] && LV_SIZE="All free space left"
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to create Logical Volume $LVDEVICE like this?\nVolume Group:\n$LV\nVolume Size:\n$LV_SIZE\nContiguous Volume:\n$CONTIGUOUS" 0 0 && LVFINISH="DONE"
+    done
+    DIALOG --infobox "Creating Logical Volume $LVDEVICE..." 0 0
+    if [ "$LV_ALL" = "1" ]; then
+        lvcreate $LV_EXTRA -l +100%FREE $LV -n $LVDEVICE >$LOG 2>&1
+    else
+        lvcreate $LV_EXTRA -L $LV_SIZE\M $LV -n $LVDEVICE >$LOG 2>&1
+    fi
+    if [ $? -gt 0 ]; then
+        DIALOG --msgbox "Error creating Logical Volume $LVDEVICE (see $LOG for details)." 0 0
+        return 1
+    fi
 }
 
 # Encrypt devices
 _encrypt()
 {
-    DIALOG --msgbox "ERROR: Not yet implemented." 8 65 || return 1
+    ENCRYPTFINISH=""
+    while [ "$ENCRYPTFINISH" != "DONE" ]; do
+        PARTS=$(finddisks _)
+        PARTS="$PARTS $(findpartitions _)"
+        ALREADYINUSE=""
+        for i in $PARTS; do
+            [ "$(cryptsetup isLuks $i)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # break if all devices are in use
+        if [ "$PARTS" = "" ]; then
+            DIALOG --msgbox "No devices left for encryption." 0 0
+            return 1
+        fi
+        # enter logical volume name
+        ENCRYPTDEVICE=""
+        while [ "${ENCRYPTDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the name for encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
+            ENCRYPTDEVICE=$(cat $ANSWER)
+            if ! [ "$(cryptsetup status $ENCRYPTDEVICE | grep inactive)" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
+                ENCRYPTDEVICE=""
+            fi
+        done
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        DIALOG --menu "Select device for encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        # final step ask if everything is ok?
+        DIALOG --yesno "Would you like to encrypt device below?\nName:$ENCRYPTDEVICE\nDevice:$PART\n" 0 0 && ENCRYPTFINISH="DONE"
+    done
+    DIALOG --infobox "Encrypting $PART..." 0 0
+    while true; do
+        cryptsetup -q -c aes-xts-plain -y -s 512 luksFormat $PART && break
+    done
+    DIALOG --infobox "Opening encrypted $PART..." 0 0
+    while true; do
+        cryptsetup luksOpen $PART $ENCRYPTDEVICE && break
+    done
 }
 
 autoprepare() {
@@ -1784,13 +1945,15 @@ dogrub() {
     getrootfs
     getraidarrays
     get_grub_map
+    FAIL_RAID=""
+    FAIL_LVM=""
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
         return 1
     fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
-        # check if raid device is used
+        # check if raid device is used or devicemapper is used
         if [ "$(echo $PART_ROOT | grep md)" ]; then
             if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
                 # get redundant devices
@@ -1806,13 +1969,15 @@ dogrub() {
                 # partitionable raid is not supported by grub!
                 FAIL_RAID=1
             fi
+        elif [ "$(echo $PART_ROOT | grep mapper)" ]; then
+            FAIL_LVM=1
         else
             # use normal device
             _grubdev=$(mapdev $PART_ROOT)
         fi
         # look for a separately-mounted /boot partition
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        # check if raid device is used  on /boot partition
+        # check if raid device or lvm is used  on /boot partition
         if [ "$(echo $bootdev | grep md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
                 # get redundant devices
@@ -1826,9 +1991,12 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
+        elif  [ "$(echo $bootdev | grep mapper)" ]; then
+                FAIL_LVM="1"
         else
             # remove fail if /boot is on other device!
             ! [ "$bootdev" = "" ] && FAIL_RAID=""
+            ! [ "$bootdev" = "" ] && FAIL_LVM=""
             if [ "$(echo $bootdev | grep md_d)" ]; then
                 # partitionable raid is not supported by grub!
                 FAIL_RAID=1
@@ -1838,6 +2006,10 @@ dogrub() {
         fi
         if [ "$FAIL_RAID" = "1" ]; then
                 DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
+                return 1
+        fi
+        if [ "$FAIL_LVM" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from lvm devices!" 0 0
                 return 1
         fi
         if [ "$UUIDPARAMETER" = "yes" ]; then
@@ -2134,7 +2306,7 @@ create_special()
             "1" "Create Software Raid" \
             "2" "Create LVM" \
             "3" "Encrypt" \
-            "4" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
+            "4" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
         case $(cat $ANSWER) in
             "1")
@@ -2167,21 +2339,24 @@ _createlvm()
             DEFAULT=""
         fi
         CANCEL=""
-        dialog $DEFAULT --backtitle "$TITLE" --menu "Create physical volume, volume group or logical volume" 12 60 5 \
-            "1" "Reset Logical Volume completely" \
-            "2" "Create Physical Volume" \
-            "3" "Create Volume Group" \
-            "4" "Create Logical Volume" \
-            "5" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create physical volume, volume group or logical volume" 13 60 5 \
+            "1" "LVM Help" \
+            "2" "Reset Logical Volume completely" \
+            "3" "Create Physical Volume" \
+            "4" "Create Volume Group" \
+            "5" "Create Logical Volume" \
+            "6" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
         case $(cat $ANSWER) in
             "1")
-                _stoplvm ;;
+                _helplvm ;;
             "2")
-                _createpv ;;
+                _stoplvm ;;
             "3")
-                _createvg ;;
+                _createpv ;;
             "4")
+                _createvg ;;
+            "5")
                 _createlv ;;
               *)
                 LVMDONE=1 ;;
