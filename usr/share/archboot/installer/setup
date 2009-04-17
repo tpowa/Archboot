@@ -235,11 +235,13 @@ findpartitions() {
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
             #- part of lvm2 device
             #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
+            # part of luks device
+            #  $(fstype 2>/dev/null </dev/$part | grep "luks")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -511,7 +513,11 @@ _getavailpartitions()
         elif [ $(echo "$i" | grep 'md') ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
         elif [ $(echo "$i" | grep 'mapper') ]; then
-             echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
+            if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
+            else
+                echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
+            fi
         else
             echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
@@ -569,6 +575,31 @@ _stoplvm()
         DIALOG --infobox "Removing physical volumes ..." 0 0
         for i in $LV_PHYSICAL; do
             pvremove -f $i
+        done
+    fi
+}
+
+# Disable all luks encrypted devices
+_stopluks()
+{
+    DISABLELUKS=""
+    DETECTED_LUKS=""
+    LUKSDEVICE=""
+    LUKS_DEVICES="$(ls /dev/mapper/ | grep -v control)"
+    for i in $LUKS_DEVICES; do
+        cryptsetup status $i 2>/dev/null && LUKSDEVICE="$LUKSDEVICE $i"
+    done
+    ! [ "$LUKSDEVICE" = "" ] && DETECTED_LUKS=1
+    if [ "$DETECTED_LUKS" = "1" ]; then
+        DIALOG --defaultno --yesno "Setup detected luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
+    fi
+    if [ "$DISABLELUKS" = "1" ]; then
+        DIALOG --infobox "Removing luks encrypted devices ..." 0 0
+        for i in $LUKSDEVICE; do
+            LUKS_REAL_DEVICE="$(cryptsetup status $i | grep device: | sed -e 's#device:##g')"
+            cryptsetup remove $i
+            # delete header from device
+            dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10
         done
     fi
 }
@@ -785,6 +816,27 @@ _createraid()
     fi
 }
 
+#remove devices which are claimed by lvm or luks
+_useddevices()
+{
+    PARTS=$(finddisks _)
+    PARTS="$PARTS $(findpartitions _)"
+    ALREADYINUSE=""
+    # skip physical volume devices
+    ALREADYINUSE="$(pvs -o pv_name --noheading)"
+    for i in $PARTS; do
+        # skip harddisks which contain already encrypted partitions! 
+        for k in $(ls /dev/mapper/* | grep -v control); do
+           cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+    done
+    for i in $ALREADYINUSE; do
+        PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        k=$(echo $i | sed -e 's#[0-9]##g')
+        PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+    done
+}
+
 # help for lvm
 _helplvm()
 {
@@ -792,18 +844,19 @@ DIALOG --msgbox "LOGICAL VOLUME SUMMARY:\n
 -----------------------------\n\n
 LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
 abstract your storage space and have \"virtual partitions\" which are easier\n
-to modify. The basic building block of LVM are:\n
-Physical volume (PV):\n
-Partition on hard disk (or even hard disk itself or loopback file) on which you\n
-can have virtual groups. It has a special header and is divided into physical\n
-extents. Think of physical volumes as big building blocks which can be used to\n
-build your hard drive. 
-Volume group (VG):\n 
-Group of physical volumes that are used as storage volume (as one disk).\n
-They contain logical volumes. Think of volume groups as hard drives.\n 
-Logical volume(LV): A \"virtual/logical partition\" that resides in a volume\n
-group and is composed of physical extents. Think of logical volumes as\n
-normal partitions." 0 0
+to modify.\n\nThe basic building block of LVM are:\n
+- Physical volume (PV):\n
+  Partition on hard disk (or even hard disk itself or loopback file) on\n
+  which you can have virtual groups. It has a special header and is\n
+  divided into physical extents. Think of physical volumes as big building\n
+  blocks which can be used to build your hard drive.\n
+- Volume group (VG):\n 
+  Group of physical volumes that are used as storage volume (as one disk).\n
+  They contain logical volumes. Think of volume groups as hard drives.\n 
+- Logical volume(LV):\n
+  A \"virtual/logical partition\" that resides in a volume group and is\n 
+  composed of physical extents. Think of logical volumes as normal\n
+  partitions." 0 0
 }
 
 # Creates physical volume
@@ -813,10 +866,15 @@ _createpv()
     while [ "$PVFINISH" != "DONE" ]; do
         : >/tmp/.pvs-create
         PVDEVICE=""
-        #hell yeah, this is complicated! kill devices already in use.
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
+        ALREADYINUSE=""
+        # skip physical volume devices
         ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        # skip harddisks which contain lvm! 
+        for i in $(ls /dev/mapper/* | grep -v control); do
+                lvs $i --noheading 2>/dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+        done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
             k=$(echo $i | sed -e 's#[0-9]##g')
@@ -1012,16 +1070,21 @@ _createlv()
     fi
 }
 
-# Encrypt devices
-_encrypt()
+# create luks deviclu
+_luks()
 {
-    ENCRYPTFINISH=""
-    while [ "$ENCRYPTFINISH" != "DONE" ]; do
+    LUKSFINISH=""
+    while [ "$LUKSFINISH" != "DONE" ]; do
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
         ALREADYINUSE=""
+        # skip physical volume devices
+        ALREADYINUSE="$(pvs -o pv_name --noheading)"
         for i in $PARTS; do
-            [ "$(cryptsetup isLuks $i)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+            # skip harddisks which contain already encrypted partitions! 
+            for k in $(ls /dev/mapper/* | grep -v control); do
+                cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
+            done
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -1030,25 +1093,25 @@ _encrypt()
         done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
-            DIALOG --msgbox "No devices left for encryption." 0 0
+            DIALOG --msgbox "No devices left for luks encryption." 0 0
             return 1
         fi
         # enter logical volume name
-        ENCRYPTDEVICE=""
-        while [ "${ENCRYPTDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the name for encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
-            ENCRYPTDEVICE=$(cat $ANSWER)
-            if ! [ "$(cryptsetup status $ENCRYPTDEVICE | grep inactive)" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
-                ENCRYPTDEVICE=""
+        LUKSDEVICE=""
+        while [ "${LUKSDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the name for luks encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
+            LUKSDEVICE=$(cat $ANSWER)
+            if ! [ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
+                LUKSDEVICE=""
             fi
         done
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
-        DIALOG --menu "Select device for encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
+        DIALOG --menu "Select device for luks encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to encrypt device below?\nName:$ENCRYPTDEVICE\nDevice:$PART\n" 0 0 && ENCRYPTFINISH="DONE"
+        DIALOG --yesno "Would you like to encrypt luks device below?\nName:$LUKSDEVICE\nDevice:$PART\n" 0 0 && LUKSFINISH="DONE"
     done
     DIALOG --infobox "Encrypting $PART..." 0 0
     while true; do
@@ -1056,11 +1119,13 @@ _encrypt()
     done
     DIALOG --infobox "Opening encrypted $PART..." 0 0
     while true; do
-        cryptsetup luksOpen $PART $ENCRYPTDEVICE && break
+        cryptsetup luksOpen $PART $LUKSDEVICE && break
     done
 }
 
 autoprepare() {
+    # check on encrypted devices, else weird things can happen!
+    _stopluks
     # check on raid devices, else weird things can happen during partitioning!
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
@@ -1251,6 +1316,8 @@ partition() {
     fi
     # disable swap and all mounted partitions, umount / last!
     _umountall
+    # check on encrypted devices, else weird things can happen!
+    _stopluks
     # check on raid devices, else weird things can happen during partitioning!
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
@@ -2261,7 +2328,7 @@ prepare_harddrive()
         dialog $DEFAULT --backtitle "$TITLE" --menu "Prepare Hard Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE hard drive)" \
             "2" "Partition Hard Drives" \
-            "3" "Create Software Raid, Lvm and Encrypt" \
+            "3" "Create Software Raid, Lvm2 and Luks encryption" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
@@ -2294,7 +2361,6 @@ create_special()
 {
     NEXTITEM=""
     SPECIALDONE=0
-    #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
     while [ "$SPECIALDONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
@@ -2302,10 +2368,10 @@ create_special()
             DEFAULT=""
         fi
         CANCEL=""
-        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Raid, Lvm and Encrypt" 12 60 5 \
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Software Raid, LVM2 and Luks encryption" 14 60 5 \
             "1" "Create Software Raid" \
-            "2" "Create LVM" \
-            "3" "Encrypt" \
+            "2" "Create LVM2" \
+            "3" "Create Luks encryption" \
             "4" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
         case $(cat $ANSWER) in
@@ -2314,7 +2380,7 @@ create_special()
             "2")
                 _createlvm ;;
             "3")
-                _encrypt ;;
+                _createluks ;;
             *)
                 SPECIALDONE=1 ;;
         esac
@@ -2326,55 +2392,11 @@ create_special()
     fi
 }
 
-# menu for lvm creation
-_createlvm()
-{
-    NEXTITEM=""
-    LVMDONE=0
-    #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
-    while [ "$LVMDONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
-            DEFAULT="--default-item $NEXTITEM"
-        else
-            DEFAULT=""
-        fi
-        CANCEL=""
-        dialog $DEFAULT --backtitle "$TITLE" --menu "Create physical volume, volume group or logical volume" 13 60 5 \
-            "1" "LVM Help" \
-            "2" "Reset Logical Volume completely" \
-            "3" "Create Physical Volume" \
-            "4" "Create Volume Group" \
-            "5" "Create Logical Volume" \
-            "6" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
-        NEXTITEM="$(cat $ANSWER)"
-        case $(cat $ANSWER) in
-            "1")
-                _helplvm ;;
-            "2")
-                _stoplvm ;;
-            "3")
-                _createpv ;;
-            "4")
-                _createvg ;;
-            "5")
-                _createlv ;;
-              *)
-                LVMDONE=1 ;;
-        esac
-    done
-    if [ "$CANCEL" = "1" ]; then
-        NEXTITEM="2"
-    else
-        NEXTITEM="4"
-    fi
-}
-
 # menu for md creation
 _createmd()
 {
     NEXTITEM=""
     MDDONE=0
-    #DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
     while [ "$MDDONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
@@ -2404,6 +2426,87 @@ _createmd()
     done
     if [ "$CANCEL" = "1" ]; then
         NEXTITEM="1"
+    else
+        NEXTITEM="4"
+    fi
+}
+
+# menu for lvm creation
+_createlvm()
+{
+    NEXTITEM=""
+    LVMDONE=0
+    while [ "$LVMDONE" = "0" ]; do
+        if [ -n "$NEXTITEM" ]; then
+            DEFAULT="--default-item $NEXTITEM"
+        else
+            DEFAULT=""
+        fi
+        CANCEL=""
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create physical volume, volume group or logical volume" 13 60 7 \
+            "1" "LVM Help" \
+            "2" "Reset Logical Volume completely" \
+            "3" "Create Physical Volume" \
+            "4" "Create Volume Group" \
+            "5" "Create Logical Volume" \
+            "6" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+        NEXTITEM="$(cat $ANSWER)"
+        case $(cat $ANSWER) in
+            "1")
+                _helplvm ;;
+            "2")
+                _stoplvm ;;
+            "3")
+                _createpv ;;
+            "4")
+                _createvg ;;
+            "5")
+                _createlv ;;
+              *)
+                LVMDONE=1 ;;
+        esac
+    done
+    if [ "$CANCEL" = "1" ]; then
+        NEXTITEM="2"
+    else
+        NEXTITEM="4"
+    fi
+}
+
+# menu for luks creation
+_createluks()
+{
+    NEXTITEM=""
+    LUKSDONE=0
+    while [ "$LUKSDONE" = "0" ]; do
+        if [ -n "$NEXTITEM" ]; then
+            DEFAULT="--default-item $NEXTITEM"
+        else
+            DEFAULT=""
+        fi
+        CANCEL=""
+        dialog $DEFAULT --backtitle "$TITLE" --menu "Create Luks Encryption" 12 60 5 \
+            "1" "Luks Help" \
+            "2" "Reset Luks Encryption completely" \
+            "3" "Create Luks" \
+            "4" "Create Luks Swap" \
+            "5" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+        NEXTITEM="$(cat $ANSWER)"
+        case $(cat $ANSWER) in
+            "1")
+                _helpluks ;;
+            "2")
+                _stopluks ;;
+            "3")
+                _luks ;;
+            "4")
+                _luksswap ;;
+              *)
+                LUKSDONE=1 ;;
+        esac
+    done
+    if [ "$CANCEL" = "1" ]; then
+        NEXTITEM="3"
     else
         NEXTITEM="4"
     fi
