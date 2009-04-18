@@ -596,7 +596,7 @@ _stopluks()
     if [ "$DISABLELUKS" = "1" ]; then
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in $LUKSDEVICE; do
-            LUKS_REAL_DEVICE="$(cryptsetup status $i | grep device: | sed -e 's#device:##g')"
+            LUKS_REAL_DEVICE="$(echo $(cryptsetup status $i | grep device: | sed -e 's#device:##g'))"
             cryptsetup remove $i
             # delete header from device
             dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10
@@ -1113,14 +1113,25 @@ _luks()
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to encrypt luks device below?\nName:$LUKSDEVICE\nDevice:$PART\n" 0 0 && LUKSFINISH="DONE"
     done
+    LUKSPASSPHRASE=""
+    while [ "${LUKSPASSPHRASE}" = "" ]; do
+        DIALOG --insecure --passwordbox "Enter passphrase below:" 0 0 2>$ANSWER || return 1
+        LUKSPASS=$(cat $ANSWER)
+        DIALOG --insecure --passwordbox "Retype passphrase below:" 0 0 2>$ANSWER || return 1
+        LUKSPASS2=$(cat $ANSWER)
+        if [ "$LUKSPASS" = "$LUKSPASS2" ]; then
+            LUKSPASSPHRASE=$LUKSPASS
+            echo $LUKSPASSPHRASE > /tmp/.passphrase
+            LUKSPASSPHRASE=/tmp/.passphrase
+        else
+             DIALOG --msgbox "Passphrases didn't match, please enter again." 0 0
+        fi
+    done
     DIALOG --infobox "Encrypting $PART..." 0 0
-    while true; do
-        cryptsetup -q -c aes-xts-plain -y -s 512 luksFormat $PART && break
-    done
+    cryptsetup -c aes-xts-plain -s 512 luksFormat $PART >$LOG <$LUKSPASSPHRASE
     DIALOG --infobox "Opening encrypted $PART..." 0 0
-    while true; do
-        cryptsetup luksOpen $PART $LUKSDEVICE && break
-    done
+    cryptsetup luksOpen $PART $LUKSDEVICE >$LOG <$LUKSPASSPHRASE  
+    rm /tmp/.passphrase
 }
 
 autoprepare() {
