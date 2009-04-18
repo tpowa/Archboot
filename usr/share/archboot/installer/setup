@@ -1115,9 +1115,9 @@ _luks()
     done
     LUKSPASSPHRASE=""
     while [ "${LUKSPASSPHRASE}" = "" ]; do
-        DIALOG --insecure --passwordbox "Enter passphrase below:" 0 0 2>$ANSWER || return 1
+        DIALOG --insecure --passwordbox "Enter passphrase:" 0 0 2>$ANSWER || return 1
         LUKSPASS=$(cat $ANSWER)
-        DIALOG --insecure --passwordbox "Retype passphrase below:" 0 0 2>$ANSWER || return 1
+        DIALOG --insecure --passwordbox "Retype passphrase:" 0 0 2>$ANSWER || return 1
         LUKSPASS2=$(cat $ANSWER)
         if [ "$LUKSPASS" = "$LUKSPASS2" ]; then
             LUKSPASSPHRASE=$LUKSPASS
@@ -2723,9 +2723,23 @@ configure_system()
                 done
             $EDITOR ${DESTDIR}${FILE}
         elif [ "$FILE" = "Root-Password" ]; then            # non-file
-            while true; do
-                chroot ${DESTDIR} passwd root && break
+            PASSWORD=""
+            while [ "${PASSWORD}" = "" ]; do
+                DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>$ANSWER || return 1
+                PASS=$(cat $ANSWER)
+                DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>$ANSWER || return 1
+                PASS2=$(cat $ANSWER)
+                if [ "$PASS" = "$PASS2" ]; then
+                    PASSWORD=$PASS
+                    echo $PASSWORD > /tmp/.password
+                    echo $PASSWORD > /tmp/.password
+                    PASSWORD=/tmp/.password
+                else
+                    DIALOG --msgbox "Password didn't match, please enter again." 0 0
+                fi
             done
+            chroot ${DESTDIR} passwd root < /tmp/.password
+            rm /tmp/.password
         elif [ "$FILE" = "Pacman-Mirror" ]; then            # non-file
             do_pacmanmirror
         else                                                #regular file
