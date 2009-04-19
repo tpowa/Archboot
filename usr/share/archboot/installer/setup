@@ -287,11 +287,13 @@ findbootloaderpartitions() {
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
             #- part of lvm2 device
             #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
+            # part of luks device
+            #  $(fstype 2>/dev/null </dev/$part | grep "luks")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
-            #- partitionable raid partition
-            #  $(echo $part | grep md_d[0-9])
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep md_d[0-9])" ]; then
+            #- extended partition on raid partition device
+            #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -602,6 +604,7 @@ _stopluks()
             dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10
         done
     fi
+    [ -e /tmp/.crypttab ] && rm /tmp/.crypttab
 }
 
 #helpbox for raid
@@ -1070,7 +1073,30 @@ _createlv()
     fi
 }
 
-# create luks deviclu
+# help for luks
+_helpluks()
+{
+DIALOG --msgbox "LUKS ENCRYPTION SUMMARY:\n
+-----------------------------\n\n
+Encryption is useful for two (related) reasons.\n
+Firstly, it prevents anyone with physical access to your computer,\n
+and your hard drive in particular, from getting the data from it\n
+(unless they have your passphrase/key).\n
+Secondly, it allows you to wipe the data on your hard drive with\n
+far more confidence in the event of you selling or discarding\n
+your drive.\n
+Basically, it supplements the access control mechanisms of the operating\n
+system (like file permissions) by making it harder to bypass the operating\n
+system by inserting a boot CD, for example. Encrypting the root partition\n
+prevents anyone from using this method to insert viruses or trojans onto\n
+your computer.\n\n
+ATTENTION:\n
+Having encrypted partitions does not protect you from all possible\n
+attacks. The encryption is only as good as your key management, and there\n
+are other ways to break into computers, while they are running." 0 0
+}
+
+# create luks device
 _luks()
 {
     LUKSFINISH=""
@@ -1131,6 +1157,8 @@ _luks()
     cryptsetup -c aes-xts-plain -s 512 luksFormat $PART >$LOG <$LUKSPASSPHRASE
     DIALOG --infobox "Opening encrypted $PART..." 0 0
     cryptsetup luksOpen $PART $LUKSDEVICE >$LOG <$LUKSPASSPHRASE  
+    LUKSPASSPHRASE="$(cat $LUKSPASSPHRASE)"
+    echo $LUKSDEVICE $PART $LUKSPASSPHRASE >> /tmp/.crypttab
     rm /tmp/.passphrase
 }
 
@@ -1730,6 +1758,7 @@ installpkg() {
     auto_addons
     auto_fstab
     auto_mdadm
+    auto_luks
     auto_locale
 }
 
@@ -1964,14 +1993,25 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
 getraidarrays() {
+    RAIDARRAYS=""
     if ! [ "$(grep ^ARRAY $DESTDIR/etc/mdadm.conf)" ]; then
         RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
+    fi
+}
+
+getcryptsetup() {
+    CRYPTSETUP=""
+    if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
+        CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"
+        CRYPTNAME="$(basename $PART_ROOT)"
+        CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
     fi
 }
 
 dolilo() {
     getrootfs
     getraidarrays
+    getcryptsetup
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf.  Is LILO installed?" 0 0
         return 1
@@ -1984,9 +2024,9 @@ dolilo() {
             if [ -n "${_uuid}" ]; then
                 _rootpart="/dev/disk/by-uuid/${_uuid}"
             fi
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         fi
     fi
     DEVS="$(findbootloaderdisks _)"
@@ -2022,6 +2062,7 @@ dogrub() {
     redundant=""
     getrootfs
     getraidarrays
+    getcryptsetup
     get_grub_map
     FAIL_RAID=""
     FAIL_LVM=""
@@ -2124,9 +2165,9 @@ dogrub() {
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
                 fi
                 echo "initrd $subdir/kernel26.img" >>$DESTDIR/boot/grub/menu.lst
                 echo "" >>$DESTDIR/boot/grub/menu.lst
@@ -2500,8 +2541,7 @@ _createluks()
             "1" "Luks Help" \
             "2" "Reset Luks Encryption completely" \
             "3" "Create Luks" \
-            "4" "Create Luks Swap" \
-            "5" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
+            "4" "Return to Previous Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
         case $(cat $ANSWER) in
             "1")
@@ -2510,8 +2550,6 @@ _createluks()
                 _stopluks ;;
             "3")
                 _luks ;;
-            "4")
-                _luksswap ;;
               *)
                 LUKSDONE=1 ;;
         esac
@@ -2636,6 +2674,14 @@ auto_parameters()
     if [ -s  /tmp/.timezone ]; then
         DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
+    fi
+}
+
+auto_luks()
+{
+    if [ -e /tmp/.crypttab -a "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]; then
+        sed -i -e "/$(basename ${PART_ROOT})/d" /tmp/.crypttab
+        cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
 }
 
