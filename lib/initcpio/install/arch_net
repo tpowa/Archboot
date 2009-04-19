@@ -6,7 +6,7 @@ install ()
     # add staging modules
     STAGING="et131x"
     for i in $STAGING; do
-        MODULES="$MODULES $(checked_modules "/drivers/staging/$i)"
+        MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
     BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr ss tc"
     FILES=""

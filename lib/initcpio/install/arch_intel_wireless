@@ -16,7 +16,7 @@ install ()
     add_file "/lib/firmware/ipw2200-bss.fw" "/intel-firmware/ipw2200-bss.fw"
     add_file "/lib/firmware/ipw2200-ibss.fw" "/intel-firmware/ipw2200-ibss.fw"
     add_file "/lib/firmware/ipw2200-sniffer.fw" "/intel-firmware/ipw2200-sniffer.fw"
-    add_file "/lib/firmware/LICENSE.ipw2200-fw"
+    add_file "/usr/share/licenses/ipw2200-fw/LICENSE"
     # iwlwifi support
     add_file "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-3945-1.ucode" "/intel-firmware/iwlwifi-3945-1.ucode"
