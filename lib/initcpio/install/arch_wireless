@@ -6,7 +6,7 @@ install ()
     # add staging wireless here
     STAGING="agnx at76_usb otus rt2860 rt2870 rtl8187se winbond wlan-ng"
     for i in $STAGING; do
-        MODULES="$MODULES $(checked_modules "/drivers/staging/$i)"
+        MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
     BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl iw crda regdbdump"
     FILES=""
