@@ -110,6 +110,11 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME
 echo "Generating ALLINONE ISO ..."
 mkisofs -RlDJLV "Arch Linux ALLINONE" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
 
+# generate hybrid file
+echo "Generating ALLINONE hybrid ..."
+cp ${IMAGENAME}.iso ${IMAGENAME}-hybrid.iso
+isohybrid ${IMAGENAME}-hybrid.iso
+
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."
 rm ${ALLINONE}/isolinux/isolinux.bin
@@ -124,7 +129,7 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME
 
 #create md5sums.txt
 [ -e md5sum.txt ] && rm -f md5sum.txt
-for i in ${IMAGENAME}.iso ${IMAGENAME}.img; do
+for i in ${IMAGENAME}.iso ${IMAGENAME}.img ${IMAGENAME}-hybrid.iso; do
 	md5sum $i >> md5sum.txt
 done
 # cleanup
