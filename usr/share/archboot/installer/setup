@@ -644,12 +644,18 @@ disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
 }
 
-# check on raid
-_checkraid(){
+# Create raid
+_raid()
+{
+    MDFINISH=""
+    while [ "$MDFINISH" != "DONE" ]; do
+        : >/tmp/.raid
+        : >/tmp/.raid-spare
         # check for devices
         PARTS=$(finddisks _)
         PARTS="$PARTS $(findpartitions _)"
-        #hell yeah, this is complicated! kill devices already in use.
+        ALREADYINUSE=""
+        #hell yeah, this is complicated! kill software raid devices already in use.
         ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
@@ -658,16 +664,28 @@ _checkraid(){
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
+        # skip physical volume devices
+        ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
             return 1
         fi
-}
-
-# select raid mode
-_raidmode()
-{
+        # enter raid device name
+        RAIDDEVICE=""
+        while [ "${RAIDDEVICE}" = "" ]; do
+            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
+            RAIDDEVICE=$(cat $ANSWER)
+            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
+                RAIDDEVICE=""
+            fi
+        done
         RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
         DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
         LEVEL=$(cat $ANSWER)
@@ -678,13 +696,8 @@ _raidmode()
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
         fi
-}
-
-#select the devices for raid device
-_selectraiddevice()
-{
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\nDevices that are not shown in next dialog, are already in use!" 0 0
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
         DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
@@ -713,28 +726,6 @@ _selectraiddevice()
                 fi
             fi
         done
-}
-
-# Create raid
-_raid()
-{
-    MDFINISH=""
-    while [ "$MDFINISH" != "DONE" ]; do
-        : >/tmp/.raid
-        : >/tmp/.raid-spare
-        _checkraid
-        # enter raid device name
-        RAIDDEVICE=""
-        while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
-            RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
-                RAIDDEVICE=""
-            fi
-        done
-        _raidmode
-        _selectraiddevice
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
@@ -748,7 +739,31 @@ _raidpartitions()
     while [ "$MDFINISH" != "DONE" ]; do
         : >/tmp/.raid
         : >/tmp/.raid-spare
-        _checkraid
+        # check for devices
+        PARTS=$(finddisks _)
+        PARTS="$PARTS $(findpartitions _)"
+        ALREADYINUSE=""
+        #hell yeah, this is complicated! kill software raid devices already in use.
+        ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
+            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+            if ! [ $(echo $k | grep ^md) ]; then
+                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+            fi
+        done
+        # skip physical volume devices
+        ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+            k=$(echo $i | sed -e 's#[0-9]##g')
+            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # break if all devices are in use
+        if [ "$PARTS" = "" ]; then
+            DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
+            return 1
+        fi
         # enter raid device name
         RAIDDEVICE=""
         while [ "${RAIDDEVICE}" = "" ]; do
@@ -759,8 +774,46 @@ _raidpartitions()
                 RAIDDEVICE=""
             fi
         done
-        _raidmode
-        _selectraiddevice
+        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
+        DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
+        LEVEL=$(cat $ANSWER)
+        # raid5 and raid10 support parity parameter
+        PARITY=""
+        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
+            PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
+            PARTIY=$(cat $ANSWER)
+        fi
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
+        # select the first device to use, no missing option available!
+        RAIDNUMBER=1
+        DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        echo "$PART" >>/tmp/.raid
+        while [ "$PART" != "DONE" ]; do
+            RAIDNUMBER=$(($RAIDNUMBER + 1))
+            # clean loop from used partition and options
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e "s#${PART}[0-9]\ _##g" -e "s#$(echo ${PART} | sed -e 's#[0-9]##g')\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            # raid0 doesn't support missing devices
+            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
+            # add more devices
+            DIALOG --menu "Select additional device $RAIDNUMBER" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            SPARE=""
+            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
+            [ "$PART" = "DONE" ] && break
+            if [ "$PART" = "MISSING" ]; then
+                DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
+                echo "$DEGRADED" >>/tmp/.raid
+            else
+                if [ "$SPARE" = "1" ]; then
+                    echo "$PART" >>/tmp/.raid-spare
+                else
+                    echo "$PART" >>/tmp/.raid
+                fi
+            fi
+        done
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
     done
@@ -819,27 +872,6 @@ _createraid()
     fi
 }
 
-#remove devices which are claimed by lvm or luks
-_useddevices()
-{
-    PARTS=$(finddisks _)
-    PARTS="$PARTS $(findpartitions _)"
-    ALREADYINUSE=""
-    # skip physical volume devices
-    ALREADYINUSE="$(pvs -o pv_name --noheading)"
-    for i in $PARTS; do
-        # skip harddisks which contain already encrypted partitions! 
-        for k in $(ls /dev/mapper/* | grep -v control); do
-           cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
-        done
-    done
-    for i in $ALREADYINUSE; do
-        PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        k=$(echo $i | sed -e 's#[0-9]##g')
-        PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-    done
-}
-
 # help for lvm
 _helplvm()
 {
@@ -874,14 +906,32 @@ _createpv()
         ALREADYINUSE=""
         # skip physical volume devices
         ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        # skip raidpartions on physical volumes!
+        if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
+            ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
+        fi
         # skip harddisks which contain lvm! 
         for i in $(ls /dev/mapper/* | grep -v control); do
                 lvs $i --noheading 2>/dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        for i in $PARTS; do
+            # skip harddisks which contain already encrypted partitions! 
+            for k in $(ls /dev/mapper/* | grep -v control); do
+                cryptsetup status $k 2>/dev/null | grep -v /dev/mapper | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
+            done
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
             k=$(echo $i | sed -e 's#[0-9]##g')
             PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # skip harddisks which contain software raid!
+        ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
+        for i in $ALREADYINUSE; do
+            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+            if ! [ $(echo $k | grep ^md) ]; then
+                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+            fi
         done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
@@ -1031,10 +1081,10 @@ _createlv()
         DIALOG --menu "Select Volume Group $LVNUMBER for $LVDEVICE" 21 50 13 $LVS 2>$ANSWER || return 1
         LV=$(cat $ANSWER)
         while [ "$LV_SIZE_SET" = "" ]; do
+            LV_ALL=""
             DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
                 LV_SIZE=$(cat $ANSWER)
                 if [ "$LV_SIZE" = "" ]; then
-                    LV_ALL=""
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
                 fi
                 if [ "$LV_SIZE" = "0" ]; then
@@ -1106,6 +1156,10 @@ _luks()
         ALREADYINUSE=""
         # skip physical volume devices
         ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        # skip raidpartitions on physical volumes!
+        if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
+            ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
+        fi
         for i in $PARTS; do
             # skip harddisks which contain already encrypted partitions! 
             for k in $(ls /dev/mapper/* | grep -v control); do
@@ -1116,6 +1170,14 @@ _luks()
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
             k=$(echo $i | sed -e 's#[0-9]##g')
             PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        done
+        # skip harddisks which contain already software raid!
+        ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
+        for i in $ALREADYINUSE; do
+            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+            if ! [ $(echo $k | grep ^md) ]; then
+                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+            fi
         done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
