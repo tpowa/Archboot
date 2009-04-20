@@ -2001,7 +2001,7 @@ getraidarrays() {
 
 getcryptsetup() {
     CRYPTSETUP=""
-    if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
+    if ! [ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive) " ]; then
         CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"
         CRYPTNAME="$(basename $PART_ROOT)"
         CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
