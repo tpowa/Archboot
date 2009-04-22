@@ -234,7 +234,7 @@ Installing Arch Linux
    consider using a normal CD-R instead. Some older drives [two of mine,
    for example] don't manage to read CD-RWs properly.
    An other option would be, that your system doesn't have enough RAM installed.
-   (You need at least 160 MB RAM! or use the lowmem boot image.)
+   (You need at least 256 MB RAM! or use the lowmem boot image.)
 
    At the end of the boot procedure, you should be dropped into a root
    shell with a handful of instructions filling the upper half of your
