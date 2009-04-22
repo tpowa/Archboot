@@ -2,7 +2,7 @@ Available boot options (no input will boot the archboot system):
 - 'arch <any_other_boot_option>' to boot the 64MB RAM archboot system.
 
 - 'arch root=/dev/??? <any_other_boot_option>' to boot into an existing
-  64MB RAM system.
+  96MB RAM system.
 
 - 'memtest' to start the memory test program memtest86+.
 
