@@ -2840,7 +2840,7 @@ configure_system()
                 if [ "$PASS" = "$PASS2" ]; then
                     PASSWORD=$PASS
                     echo $PASSWORD > /tmp/.password
-                    echo $PASSWORD > /tmp/.password
+                    echo $PASSWORD >> /tmp/.password
                     PASSWORD=/tmp/.password
                 else
                     DIALOG --msgbox "Password didn't match, please enter again." 0 0
