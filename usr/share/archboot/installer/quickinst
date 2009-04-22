@@ -79,7 +79,7 @@ fi
 mount -t proc none $DESTDIR/proc
 mount -t sysfs none $DESTDIR/sys
 mount -o bind /dev $DESTDIR/dev
-if [ "$INSTMODE" = "cd" ]; then
+if [ "$INSTMODE" = "media" ]; then
   $PACMAN -Sy $PKGLIST
 fi
 if [ "$INSTMODE" = "ftp" ]; then
@@ -92,10 +92,6 @@ if [ $? -gt 0 ]; then
     umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
     exit 1
 fi
-### HACK to fix infofiles in bash and texinfo!
-#echo "Workaround for fixing bash and texinfo infofiles..."
-#$PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
-#$PACMAN -S bash 2>&1 >> /tmp/pacman.log
 
 umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
 
