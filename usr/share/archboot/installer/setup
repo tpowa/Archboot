@@ -2064,9 +2064,15 @@ getraidarrays() {
 getcryptsetup() {
     CRYPTSETUP=""
     if ! [ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive)" ]; then
-        CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"
-        CRYPTNAME="$(basename $PART_ROOT)"
-        CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
+            if [ "$UUIDPARAMETER" = "yes" ]; then
+                CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(blkid -s UUID -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
+                CRYPTNAME="$(basename $PART_ROOT)"
+                CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
+            else
+                CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"
+                CRYPTNAME="$(basename $PART_ROOT)"
+                CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
+            fi
     fi
 }
 
