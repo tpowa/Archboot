@@ -20,6 +20,7 @@ install ()
     # iwlwifi support
     add_file "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-3945-1.ucode" "/intel-firmware/iwlwifi-3945-1.ucode"
+    add_file "/lib/firmware/iwlwifi-3945-2.ucode" "/intel-firmware/iwlwifi-3945-2.ucode"
     add_file "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-4965-1.ucode" "/intel-firmware/iwlwifi-4965-1.ucode"
     add_file "/lib/firmware/iwlwifi-4965-2.ucode" "/intel-firmware/iwlwifi-4965-2.ucode"
