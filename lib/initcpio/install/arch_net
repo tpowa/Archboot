@@ -8,7 +8,7 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr ss tc"
+    BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr ss tc dhclient"
     FILES=""
     SCRIPT="arch_net"
     add_file "/sbin/dhcpcd"
@@ -33,6 +33,10 @@ install ()
     add_file "/usr/share/archboot/net/etc/iproute2/rt_realms" "/etc/iproute2/rt_realms"
     add_file "/usr/share/archboot/net/etc/iproute2/rt_scopes" "/etc/iproute2/rt_scopes"
     add_file "/usr/share/archboot/net/etc/iproute2/rt_tables" "/etc/iproute2/rt_tables"
+    # add dhclient support
+    add_file "/sbin/dhclient-script"
+    add_dir "/var/lib/dhclient"
+    add_dir "/var/state/dhcp"
 }
 
 help ()
