@@ -12,15 +12,15 @@ install ()
     echo "Logging:" >> ${MOTD}
     echo "  - vc7 is used for setup logging." >> ${MOTD}
     echo "  - vc12 is used for kernel logging." >> ${MOTD}
-    echo "Device node problems (eg. usbsticks or external harddrives:" >> ${MOTD}
+    echo "Device node problems (eg. usbsticks or external harddrives):" >> ${MOTD}
     echo "  - Please unplug and replug your device to get the correct node in /dev/." >> ${MOTD}
 if [ "$(echo $HOOKS | grep arch_keymap)" ]; then
-    echo "Keymap:" >> ${MOTD}
+    echo "Change keymap:" >> ${MOTD}
     echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
 fi
 if [ "$(echo $HOOKS | grep arch_tz)" ]; then
-    echo "Timesetting:" >> ${MOTD}
-    echo "  - To change your clock, type 'tz' at the console." >> ${MOTD}
+    echo "Change time and date:" >> ${MOTD}
+    echo "  - To change your time and date, type 'tz' at the console." >> ${MOTD}
 fi
 if [ "$(echo $HOOKS | grep arch_installer)" ]; then
     echo "Normal Setup:" >> ${MOTD}
