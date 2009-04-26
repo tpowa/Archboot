@@ -2129,7 +2129,7 @@ dosyslinux() {
     cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
     cat ${MBR} > ${ROOTDEV}
     chroot_mount
-    chroot /usr/bin/syslinux -o offset $bootdev >$LOG 2>&1
+    chroot $DESTDIR /usr/bin/syslinux -o offset $bootdev >$LOG 2>&1
     if [ $? -gt 0 ]; then
         chroot_umount
         DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
