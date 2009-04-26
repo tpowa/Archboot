@@ -65,7 +65,6 @@ install ()
     add_file "/etc/rc.d/functions"
     add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"
     add_file "/etc/rc.d/syslog-ng"
-
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/*); do
         add_file "$i" "/etc/$(basename $i)"
@@ -74,6 +73,8 @@ install ()
     ### fixing network support
     add_file "/lib/libnss_files.so.2"
     add_file "/lib/libnss_dns.so.2"
+    ### add copy-mountpoint.sh
+    add_file "/usr/bin/copy-mountpoint.sh"
 }
 
 help ()
