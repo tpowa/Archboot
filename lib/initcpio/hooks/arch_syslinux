@@ -1,0 +1,5 @@
+run_hook ()
+{
+    # fix mcopy
+    ln -s /usr/bin/mtools /usr/bin/mcopy
+}

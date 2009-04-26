@@ -3,9 +3,9 @@
 install ()
 {
     MODULES=""
-    BINARIES="syslinux mcopy"
+    BINARIES="syslinux mtools"
     FILES=""
-    SCRIPT=""
+    SCRIPT="arch_syslinux"
     add_file "/usr/lib/syslinux/mbr.bin"
 }
 
