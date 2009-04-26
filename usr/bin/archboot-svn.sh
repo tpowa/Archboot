@@ -13,7 +13,7 @@ for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do
 	DEVEL="$DEVEL $(echo $i)"
 done
 # generate support, ntfs-3g is added additionally!
-SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g syslinux"
+SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g syslinux dhclient"
 for i in base devel support; do
     mkdir $i
     svn co -N ${SVNSETUP} $i
