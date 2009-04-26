@@ -2076,6 +2076,69 @@ getcryptsetup() {
     fi
 }
 
+dosyslinux() {
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
+        DIALOG --msgbox "Error: Couldn't find syslinux binary.  Is SYSLINUX installed?" 0 0
+        return 1
+    fi
+    # look for a separately-mounted /boot partition
+    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+    if [ "$bootdev" = "" ]; then
+        DIALOG --msgbox "Error: Couldn't find separate /boot partition." 0 0
+        return 1
+    fi
+    FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+    if ! [ "$FSTYPE" = "vfat" ]; then
+        DIALOG --msgbox "Error: Couldn't find vfat boot partition." 0 0
+        return 1
+    fi
+    DEVS="$(findbootloaderdisks _)"
+    DEVS="$DEVS $(findbootloaderpartitions _)"
+    if [ "$DEVS" = "" ]; then
+        DIALOG --msgbox "No hard drives were found" 0 0
+        return 1
+    fi
+    DIALOG --menu "Select the boot device where the SYSLINUX bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
+    ROOTDEV=$(cat $ANSWER)
+    # generate syslinux.cfg
+    TEMPDIR=/tmp
+    MBR=${DESTDIR}/usr/lib/syslinux/mbr.bin
+    [ -e ${TEMPDIR}/syslinux.cfg ] && rm ${TEMPDIR}/syslinux.cfg
+    echo "prompt 1" >> ${TEMPDIR}/syslinux.cfg
+    echo "timeout 300" >> ${TEMPDIR}/syslinux.cfg
+    echo "default arch"  >> ${TEMPDIR}/syslinux.cfg
+    echo "label arch" >> ${TEMPDIR}/syslinux.cfg
+    echo "kernel vmlinuz26" >> ${TEMPDIR}/syslinux.cfg
+    if [ "$UUIDPARAMETER" = "yes" ]; then
+        local _rootpart="${PART_ROOT}"
+        local _uuid="$(getuuid ${PART_ROOT})"
+        if [ -n "${_uuid}" ]; then
+            _rootpart="/dev/disk/by-uuid/${_uuid}"
+        fi
+        echo "append initrd=kernel26.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+    else
+        echo "append initrd=kernel26.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+    fi
+    DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
+    [ "$EDITOR" ] || geteditor
+    $EDITOR ${TEMPDIR}/syslinux.cfg
+    DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
+    cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
+    cat ${MBR} > ${ROOTDEV}
+    chroot_mount
+    chroot /usr/bin/syslinux -o offset $bootdev >$LOG 2>&1
+    if [ $? -gt 0 ]; then
+        chroot_umount
+        DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
+        return 1
+    fi
+    chroot_umount
+    DIALOG --msgbox "SYSLINUX was successfully installed." 0 0
+}
+
 dolilo() {
     getrootfs
     getraidarrays
@@ -2880,10 +2943,12 @@ install_bootloader()
     DIALOG --menu "Which bootloader would you like to use?  Grub is the Arch default.\n\n" \
         10 55 2 \
         "GRUB" "Use the GRUB bootloader (default)" \
-        "LILO" "Use the LILO bootloader" 2>$ANSWER || CANCEL=1
+        "LILO" "Use the LILO bootloader" \
+        "SYSLINUX" "Use the SYSLINUX bootloader" 2>$ANSWER || CANCEL=1
     case $(cat $ANSWER) in
         "GRUB") dogrub ;;
         "LILO") dolilo ;;
+        "SYSLINUX") dosyslinux ;;
     esac
     if [ "$CANCEL" = "1" ]; then
         NEXTITEM="7"
