@@ -1,5 +1,6 @@
 run_hook ()
 {
-    # fix mcopy
+    # fix syslinux
     ln -s /usr/bin/mtools /usr/bin/mcopy
+    ln -s /usr/bin/mtools /usr/bin/mattrib
 }
