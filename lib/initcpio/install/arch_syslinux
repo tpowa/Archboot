@@ -7,6 +7,8 @@ install ()
     FILES=""
     SCRIPT="arch_syslinux"
     add_file "/usr/lib/syslinux/mbr.bin"
+    add_file "/usr/lib/gconv/gconv-modules"
+    add_file "/usr/lib/gconv/IBM850.so"
 }
 
 help ()
