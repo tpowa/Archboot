@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" dm-mod "
+    MODULES="checked_modules "drivers/md/dm-*""
     BINARIES="lvm fsadm lvmdump"
     FILES=""
     SCRIPT="arch_lvm2"
