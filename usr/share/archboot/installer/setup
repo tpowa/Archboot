@@ -2077,6 +2077,8 @@ getcryptsetup() {
 }
 
 dosyslinux() {
+    bootdev=""
+    bootprefix=""
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2084,12 +2086,14 @@ dosyslinux() {
         DIALOG --msgbox "Error: Couldn't find syslinux binary.  Is SYSLINUX installed?" 0 0
         return 1
     fi
+    DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
-        DIALOG --msgbox "Error: Couldn't find separate /boot partition." 0 0
-        return 1
+        bootdev=${PART_ROOT}
+        bootprefix=/boot
     fi
+    # syslinux only can boot from vfat partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
     if ! [ "$FSTYPE" = "vfat" ]; then
         DIALOG --msgbox "Error: Couldn't find vfat boot partition." 0 0
@@ -2122,13 +2126,20 @@ dosyslinux() {
     else
         echo "append initrd=kernel26.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
     fi
+    echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
+    echo "kernel vmlinuz26" >> ${TEMPDIR}/syslinux.cfg
+    if [ "$UUIDPARAMETER" = "yes" ]; then
+        echo "append initrd=kernel26-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+    else
+        echo "append initrd=kernel26-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+    fi
     DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${TEMPDIR}/syslinux.cfg
     DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
     cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
     cat ${MBR} > ${ROOTDEV}
-    syslinux -o offset $bootdev >$LOG 2>&1
+    syslinux $bootdev >$LOG 2>&1
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
         return 1
