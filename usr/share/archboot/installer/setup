@@ -2077,8 +2077,6 @@ getcryptsetup() {
 }
 
 dosyslinux() {
-    bootdev=""
-    bootprefix=""
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2090,8 +2088,8 @@ dosyslinux() {
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
-        bootdev=${PART_ROOT}
-        bootprefix=/boot
+        DIALOG --msgbox "Error: Couldn't find separate /boot partition." 0 0
+        return 1
     fi
     # syslinux only can boot from vfat partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
@@ -2113,6 +2111,7 @@ dosyslinux() {
     [ -e ${TEMPDIR}/syslinux.cfg ] && rm ${TEMPDIR}/syslinux.cfg
     echo "prompt 1" >> ${TEMPDIR}/syslinux.cfg
     echo "timeout 300" >> ${TEMPDIR}/syslinux.cfg
+    echo "display boot.msg" >> ${TEMPDIR}/syslinux.cfg
     echo "default arch"  >> ${TEMPDIR}/syslinux.cfg
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel vmlinuz26" >> ${TEMPDIR}/syslinux.cfg
@@ -2133,12 +2132,24 @@ dosyslinux() {
     else
         echo "append initrd=kernel26-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
     fi
+    # create boot message
+    [ -e ${TEMPDIR}/boot.msg ] && rm ${TEMPDIR}/boot.msg
+    echo "Arch Linux" >> ${TEMPDIR}/boot.msg
+    echo "SYSLINUX BOOT" >> ${TEMPDIR}/boot.msg
+    echo "" >> ${TEMPDIR}/boot.msg
+    echo "Available labels:"  >> ${TEMPDIR}/boot.msg
+    echo "- 'arch' for normal boot" >> ${TEMPDIR}/boot.msg
+    echo "- 'fallback' for fallback boot" >> ${TEMPDIR}/boot.msg
+    # edit syslinux.cfg
     DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${TEMPDIR}/syslinux.cfg
+    # install syslinux
     DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
     cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
+    cp  ${TEMPDIR}/boot.msg ${DESTDIR}/boot/boot.msg
     cat ${MBR} > ${ROOTDEV}
+    [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
     syslinux $bootdev >$LOG 2>&1
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
