@@ -13,7 +13,8 @@ ncurses procps psmisc reiserfsprogs sed \
 syslog-ng sysvinit tar util-linux-ng which xfsprogs hdparm memtest86+ \
 grub hwdetect shadow dosfstools udev initscripts filesystem kernel26 glibc kernel-headers pacman pacman-mirrorlist pam \
 bzip2 gcc-libs openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt libpcap lilo grub gzip libarchive \
-libdownload device-mapper cracklib readline acl attr archboot klibc libevent sdparm licenses dmraid parted syslinux"
+libdownload device-mapper cracklib readline acl attr archboot klibc libevent sdparm licenses dmraid parted syslinux \
+gmp ntfsprogs pcre fuse libcap"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
