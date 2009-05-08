@@ -12,4 +12,6 @@ run_hook ()
   ln -s /sbin/depmod /bin/depmod
   # fix permission on /var/lock
   chmod 1777 /var/lock
+  # fix vi symlink
+  ln -s /usr/bin/vim /usr/bin/vi
 }
