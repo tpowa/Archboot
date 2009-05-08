@@ -6,6 +6,9 @@ install ()
     BINARIES="mkswap mkreiserfs mkfs.ext2 jfs_fsck jfs_mkfs mkfs.xfs xfs_freeze xfs_io mkdosfs blkid mkntfs ntfsmount ntfs-3g"
     FILES=""
     SCRIPT="arch_filesystems_lowmem"
+    # fix licenses
+    add_file "/usr/share/licenses/e2fsprogs/BSD-LICENSE"
+    add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
 
 help ()

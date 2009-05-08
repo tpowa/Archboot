@@ -37,6 +37,16 @@ install ()
     add_file "/sbin/dhclient-script"
     add_dir "/var/lib/dhclient"
     add_dir "/var/state/dhcp"
+    # fixing licenses
+    add_file "/usr/share/licenses/db/LICENSE"
+    add_file "/usr/share/licenses/dhcpcd/LICENSE"
+    add_file "/usr/share/licenses/dhclient/LICENSE"
+    add_file "/usr/share/licenses/dnsutils/LICENSE"
+    add_file "/usr/share/licenses/heimdal/LICENSE"
+    add_file "/usr/share/licenses/openssh/LICENSE"
+    add_file "/usr/share/licenses/openssl/LICENSE"
+    add_file "/usr/share/licenses/sqlite3/license.txt"
+    add_file "/usr/share/licenses/tcp_wrappers/license.txt"
 }
 
 help ()

@@ -60,6 +60,14 @@ install ()
     add_file "/lib/libnss_dns.so.2"
     ### add copy-mountpoint.sh
     add_file "/usr/bin/copy-mountpoint.sh"
+    # fix licenses
+    add_file "/usr/share/licenses/bzip2/LICENSE"
+    add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
+    add_file "/usr/share/licenses/ncurses/license.txt"
+    add_file "/usr/share/licenses/pcre/LICENSE"
+    add_file "/usr/share/licenses/shadow/LICENSE
+    add_file "/usr/share/licenses/sdparm/COPYING"
+    add_file "/usr/share/licenses/zlib/license.txt"
 }
 
 help ()

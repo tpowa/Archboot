@@ -21,6 +21,8 @@ install ()
     add_file "/etc/rc.d/net-rename"
     add_file "/etc/rc.d/net-auto"
     add_file "/usr/share/archboot/netcfg/etc/iftab" "/etc/iftab"
+    # fix licenses
+    add_file "/usr/share/licenses/netcfg/LICENSE"
 }
 
 help ()

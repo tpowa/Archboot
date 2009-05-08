@@ -16,6 +16,8 @@ install ()
     add_file "/usr/share/archboot/ppp/etc/ppp/options" "/etc/ppp/options"
     add_file "/usr/share/archboot/ppp/etc/ppp/pap-secrets" "/etc/ppp/pap-secrets"
     add_file "/etc/rc.d/ppp"
+    # fix license files
+    add_file "/usr/share/licenses/libpcap/LICENSE"
 }
 
 help ()

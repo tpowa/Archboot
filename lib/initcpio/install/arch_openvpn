@@ -8,8 +8,10 @@ install ()
     SCRIPT=""
     CONFIG_FILES="README client.conf firewall.sh home.up loopback-client loopback-server office.up openvpn-shutdown.sh openvpn-startup.sh server.conf static-home.conf static-office.conf tls-home.conf tls-office.conf xinetd-client-config xinetd-server-config"
     for i in $CONFIG_FILES; do
-    	add_file "/usr/share/archboot/openvpn/etc/openvpn/examples/$i" "/etc/openvpn/examples/$i"
+        add_file "/usr/share/archboot/openvpn/etc/openvpn/examples/$i" "/etc/openvpn/examples/$i"
     done
+    # fix licenses
+    add_file "/usr/share/licenses/openvpn/COPYING"
 }
 
 help ()
