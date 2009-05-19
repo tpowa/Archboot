@@ -7,7 +7,10 @@ install ()
     FILES=""
     SCRIPT=""
     for i in /usr/lib/network/*; do
-	add_file $i
+        add_file $i
+    done
+    for i in /usr/lib/network/connections/*; do
+        add_file $i
     done
     add_dir "/var/run/network/interfaces"
     add_dir "/var/run/network/profiles"
