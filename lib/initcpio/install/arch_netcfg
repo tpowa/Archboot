@@ -7,7 +7,7 @@ install ()
     FILES=""
     SCRIPT=""
     for i in /usr/lib/network/*; do
-        add_file $i
+        [ -f $i ] && add_file $i
     done
     for i in /usr/lib/network/connections/*; do
         add_file $i
