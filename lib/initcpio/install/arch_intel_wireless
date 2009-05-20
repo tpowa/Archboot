@@ -25,6 +25,7 @@ install ()
     add_file "/lib/firmware/iwlwifi-4965-2.ucode" "/intel-firmware/iwlwifi-4965-2.ucode"
     add_file "/usr/share/licenses/iwlwifi-5000-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-5000-1.ucode" "/intel-firmware/iwlwifi-5000-1.ucode"
+    add_file "/lib/firmware/iwlwifi-5000-2.ucode" "/intel-firmware/iwlwifi-5000-2.ucode"
     add_file "/lib/firmware/iwlwifi-5150-2.ucode" "/intel-firmware/iwlwifi-5150-2.ucode"
     add_file "/usr/share/licenses/iwlwifi-5150-ucode/LICENSE"
     echo "- ARCH_INTEL_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
