@@ -1,21 +1,25 @@
 run_hook ()
 {
-     if grep -qw intel-wireless /proc/cmdline; then
-	echo "ARCH_INTEL_WIRELESS:"
-	echo "--------------------"
-	echo "You have ACCEPTED the firmware licenses:"
-	echo "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
-	echo "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
-	echo "/lib/firmware/LICENSE.ipw2200-fw"
-	echo "/lib/firmware/LICENSE.ipw2100-fw"
-	echo "Intel wireless drivers are now available."
-	! [ -d /lib/firmware/ ] && mkdir -p /lib/firmware
-	mv /intel-firmware/* /lib/firmware/
+    ### remove firmware took in by generation!
+    rm /lib/firmware/ipw2100* >/dev/null 2>&1
+    rm /lib/firmware/ipw2200* >/dev/null 2>&1
+    rm /lib/firmware/iwlwifi* >/dev/null 2>&1
+    if grep -qw intel-wireless /proc/cmdline; then
+        echo "ARCH_INTEL_WIRELESS:"
+        echo "--------------------"
+        echo "You have ACCEPTED the firmware licenses:"
+        echo "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
+        echo "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
+        echo "/lib/firmware/LICENSE.ipw2200-fw"
+        echo "/lib/firmware/LICENSE.ipw2100-fw"
+        echo "Intel wireless drivers are now available."
+        ! [ -d /lib/firmware/ ] && mkdir -p /lib/firmware
+        mv /intel-firmware/* /lib/firmware/
     else
-	echo "ARCH_INTEL_WIRELESS USAGE:"
-	echo "--------------------"
-	echo "In order to use those drivers, you have to agree to the firmware licenses"
-	echo "by appending intel-wireless to boot prompt." 
-	echo "--------------------"
+        echo "ARCH_INTEL_WIRELESS USAGE:"
+        echo "--------------------"
+        echo "In order to use those drivers, you have to agree to the firmware licenses"
+        echo "by appending intel-wireless to boot prompt." 
+        echo "--------------------"
     fi
 }

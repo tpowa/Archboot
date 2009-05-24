@@ -1,45 +1,5 @@
 run_hook ()
 {
-    # fix reiserfs symlinks
-    ln -s /sbin/mkreiserfs /sbin/mkfs.reiserfs 
-    ln -s /sbin/reiserfsck /sbin/fsck.reiserfs
-
-    # fix ext2/ext3/ext4 symlinks
-    ln -s /sbin/e2fsck /sbin/fsck.ext2
-    ln -s /sbin/e2fsck /sbin/fsck.ext3
-    ln -s /sbin/findfs /sbin/e2label
-    ln -s /sbin/findfs /sbin/tune2fs
-    ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext3
-    ln -s /sbin/mkfs.ext2 /sbin/mkfs.ext4
-    ln -s /sbin/mkfs.ext2 /sbin/mke2fs
-
-    # fix jfs symlinks
-    ln -s /sbin/jfs_fsck /sbin/fsck.jfs
-    ln -s /sbin/jfs_mkfs /sbin/mkfs.jfs
-
-    # fix vfat symlink
-    ln -s /sbin/mkdosfs /sbin/mkfs.vfat
-    ln -s /sbin/mkdosfs /sbin/mkfs.msdos
-    ln -s /sbin/dosfsck /sbin/fsck.msdos
-    ln -s /sbin/dosfsck /sbin/fsck.vfat
-    # fix ntfs symlinks
-    ln -s /usr/sbin/mkntfs /sbin/mkfs.ntfs
-    ln -s /usr/bin/ntfsmount /sbin/mount.ntfs-fuse
-    ln -s /usr/bin/ntfsmount /sbin/mount.fuse.ntfs
-
-    # fix ntfs-3g symlink
-    ln -s /bin/ntfs-3g /sbin/mount.ntfs-3g
-
-    # fix nfs
-    ln -s /sbin/mount.nfs /sbin/mount.nfs4
-    ln -s /sbin/mount.nfs /sbin/umount.nfs
-    ln -s /sbin/mount.nfs /sbin/umount.nfs4
-
-    # fix cifs
-    ln -s /sbin/mount.cifs /sbin/mount.smbfs
-    ln -s /sbin/umount.cifs /sbin/umount.smbfs
-
-
     #needed for switching
     if ! [ "${root}" = "" ]; then
     msg -n ":: Loading root filesystem module..."

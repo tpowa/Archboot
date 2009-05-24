@@ -2,6 +2,9 @@
 
 install ()
 {
+    SCRIPT="arch_base_lowmem"
+    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir poweroff reboot pidof nc"
+
     ### setting up base structure
     add_dir "/proc"
     add_dir "/sys"
@@ -26,25 +29,15 @@ install ()
         add_file $f
     done
 
-    ### adding klibc binaries
+    ### adding klibc binaries, stripping out all programs we use real version!
     for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -name "mv" ! -name "kill" ! -name "ln" ! -name "losetup" ! -name "mkdir" ! -name "mkfifo" ! -name "mknod" ! -name "poweroff" ! -name "readlink" ! -name "sync" ! -name "dmesg" ! -type d); do
         add_file $f /bin/$(basename $f)
     done
 
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
-    SCRIPT="arch_base_lowmem"
-    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod readlink"
-    add_file "/bin/echo"
-    add_file "/bin/gunzip"
-    add_file "/bin/zcat"
-    add_file "/usr/bin/reset"
-    add_file "/sbin/swapoff"
-    add_file "/sbin/halt"
-    add_file "/sbin/telinit"
-    add_file "/bin/awk"
+
     add_file "/usr/share/archboot/base/init" "/init"
-    add_file "/bin/dir"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/etc/rc.d/functions"
     add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"
@@ -58,9 +51,11 @@ install ()
     ### fixing network support
     add_file "/lib/libnss_files.so.2"
     add_file "/lib/libnss_dns.so.2"
+
     ### add copy-mountpoint.sh
     add_file "/usr/bin/copy-mountpoint.sh"
-    # fix licenses
+
+    ### fix licenses
     add_file "/usr/share/licenses/bzip2/LICENSE"
     add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
     add_file "/usr/share/licenses/ncurses/license.txt"

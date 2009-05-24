@@ -2,61 +2,63 @@
 
 install ()
 {
+    SCRIPT=
+    BINARIES=
     ### check for root
     if ! [ $UID -eq 0 ]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+        echo "ERROR: Please run as root user!"
+        exit 1
     fi
 
     ### check for TEMPDIR
     if [ $TEMPDIR = "" ]; then
-	 echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
-	 exit 1
+        echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
+        exit 1
     fi
 
     ### check for activated testing repository
     if ! [ "$(grep '^\[testing\]' /etc/pacman.conf)" = "" ]; then 
-	echo "WARNING: TESTING REPOSITORY ACTIVATED"
-	echo "-------------------------------------"
-	echo "POSSIBILITY OF BROKEN BINARY PACKAGES ON INSTALL MEDIA!"
-	echo "Use a chroot instead to avoid those problems."
-	echo "5 seconds time to cancel with CTRL+C"
-	sleep 5
+        echo "WARNING: TESTING REPOSITORY ACTIVATED"
+        echo "-------------------------------------"
+        echo "POSSIBILITY OF BROKEN BINARY PACKAGES ON INSTALL MEDIA!"
+        echo "Use a chroot instead to avoid those problems."
+        echo "5 seconds time to cancel with CTRL+C"
+        sleep 5
     fi
     ### setting up directories
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-    	SVNTREE=$(mktemp /tmp/svntree.XXXX)
-    	rm ${SVNTREE}
-    	mkdir -p ${SVNTREE}
+        SVNTREE=$(mktemp /tmp/svntree.XXXX)
+        rm ${SVNTREE}
+        mkdir -p ${SVNTREE}
     else
-    	SVNTREE=${SVNTREE}
+        SVNTREE=${SVNTREE}
     fi
     cd ${SVNTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
-	# generate base
-	BASE=""
-	for i in $(pacman -Sg base | sed -e "s/base//g"); do 
-		BASE="$BASE $(echo $i)"
-	done
-	# generate base-devel
-	DEVEL=""
-	for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do 
-		DEVEL="$DEVEL $(echo $i)"
-	done
-	SUPPORT=""
-	SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g dhclient"
-	for i in base devel lib support; do
-	    mkdir $i
-	    svn co -N ${SVNSETUP} $i
-	done
-	cd base; svn up $BASE; cd ..
-	cd devel; svn up $DEVEL; cd ..
-	cd support; svn up $SUPPORT; cd ..
-	cd  ${SVNTREE}
-	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+        # generate base
+        BASE=""
+        for i in $(pacman -Sg base | sed -e "s/base//g"); do 
+            BASE="$BASE $(echo $i)"
+        done
+        # generate base-devel
+        DEVEL=""
+        for i in $(pacman -Sg base-devel | sed -e "s/base-devel//g"); do 
+            DEVEL="$DEVEL $(echo $i)"
+        done
+        SUPPORT=""
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g dhclient"
+        for i in base devel lib support; do
+            mkdir $i
+            svn co -N ${SVNSETUP} $i
+        done
+        cd base; svn up $BASE; cd ..
+        cd devel; svn up $DEVEL; cd ..
+        cd support; svn up $SUPPORT; cd ..
+        cd  ${SVNTREE}
+        SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
     else
-    	cd ${SVNTREE}
-	SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+        cd ${SVNTREE}
+        SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
     fi
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && echo -n "$(echo $i|  awk -F/ '{print $3}') ";done)
@@ -65,17 +67,16 @@ install ()
     # collect the packages
     mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
     for COPY in ${SEARCHSVN};do
-    	if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
-	    source "${COPY}/PKGBUILD"
-	    cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
-	    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-	    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
-	fi
+        if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
+            source "${COPY}/PKGBUILD"
+            cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
+            echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
+        fi
     done
+    rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz~
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
-    SCRIPT=
-    BINARIES=
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }

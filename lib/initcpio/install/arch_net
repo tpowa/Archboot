@@ -8,30 +8,9 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr ss tc dhclient"
+    BINARIES="ping ping6 route nslookup telnet ssh arpd genl ifcfg ifstat ip lnstat ctstat rtstat nstat routef routel rtacct rtmon rtpr ss tc dhclient"
     FILES=""
-    SCRIPT="arch_net"
-    # add e100 firmware files
-    add_file "/lib/firmware/e100/d101m_ucode.bin"     
-    add_file "/lib/firmware/e100/d101s_ucode.bin"     
-    add_file "/lib/firmware/e100/d102e_ucode.bin"
-    # add acenic firmware files
-    add_file "/lib/firmware/acenic/tg1.bin"
-    add_file "/lib/firmware/acenic/tg2.bin"
-    # add  cassini firmware files
-    add_file "/lib/firmware/sun/cassini.bin"
-    # add kaweth firmware files
-    add_file "/lib/firmware/kaweth/new_code.bin"
-    add_file "/lib/firmware/kaweth/new_code_fix.bin"
-    add_file "/lib/firmware/kaweth/trigger_code.bin"
-    add_file "/lib/firmware/kaweth/trigger_code_fix.bin"
-    # add starfire firmware files
-    add_file "/lib/firmware/adaptec/starfire_rx.bin"
-    add_file "/lib/firmware/adaptec/starfire_tx.bin"
-    # add tg3 firmware files
-    add_file "/lib/firmware/tigon/tg3.bin"
-    add_file "/lib/firmware/tigon/tg3_tso.bin"
-    add_file "/lib/firmware/tigon/tg3_tso5.bin"
+    SCRIPT=""
     add_file "/sbin/dhcpcd"
     add_file "/sbin/ifenslave"
     add_file "/usr/sbin/brctl"

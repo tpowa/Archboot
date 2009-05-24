@@ -3,9 +3,9 @@
 install ()
 {
     MODULES=""
-    BINARIES="syslinux mtools"
+    BINARIES="syslinux mtools mcopy mattrib"
     FILES=""
-    SCRIPT="arch_syslinux"
+    SCRIPT=""
     add_file "/usr/lib/syslinux/mbr.bin"
     add_file "/usr/lib/gconv/gconv-modules"
     add_file "/usr/lib/gconv/IBM850.so"

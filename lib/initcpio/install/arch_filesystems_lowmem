@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=" $(checked_modules '/kernel/fs/reiserfs') $(checked_modules '/kernel/fs/ext2') $(checked_modules '/kernel/fs/ext3') $(checked_modules '/kernel/fs/ext4') $(checked_modules '/kernel/fs/jfs') $(checked_modules '/kernel/fs/xfs') $(checked_modules '/kernel/fs/vfat') $(checked_modules '/kernel/fs/fat') $(checked_modules '/kernel/fs/isofs') $(checked_modules '/kernel/fs/nls/nls_cp437') $(checked_modules '/kernel/fs/fuse')"
-    BINARIES="mkswap mkreiserfs mkfs.ext2 jfs_fsck jfs_mkfs mkfs.xfs xfs_freeze xfs_io mkdosfs blkid mkntfs ntfsmount ntfs-3g"
+    BINARIES="mkswap mkreiserfs mkfs.ext2 jfs_fsck jfs_mkfs mkfs.xfs xfs_freeze xfs_io mkdosfs blkid mkntfs ntfsmount ntfs-3g mkfs.reiserfs mkfs.ext3 mkfs.ext4 mke2fs mkfs.jfs mkfs.ntfs mount.ntfs-fuse mount.fuse.ntfs mount.ntfs-3g mkfs.vfat mkfs.msdos"
     FILES=""
     SCRIPT="arch_filesystems_lowmem"
     # fix licenses

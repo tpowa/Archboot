@@ -3,11 +3,9 @@
 install ()
 {
     MODULES=""
-    BINARIES="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd adduser chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv logoutd newusers pwck pwconv pwunconv useradd userdel usermod"
+    BINARIES="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd adduser chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv logoutd newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
     FILES=""
     SCRIPT=""
-    add_file "/usr/bin/sg"
-    add_file "/usr/sbin/vigr"
     for i in $(echo /usr/share/archboot/shadow/etc/*/*); do
     	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"
     done

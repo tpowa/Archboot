@@ -2,6 +2,9 @@
 
 install ()
 {
+    SCRIPT="arch_base"
+    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim-normal lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su cat cpio dd gzip wget top sdparm tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir reboot poweroff pidof nc"
+
     ### setting up base structure
     add_dir "/proc"
     add_dir "/sys"
@@ -26,56 +29,33 @@ install ()
         add_file $f
     done
 
-    ### adding klibc binaries
+    ### adding klibc binaries, stripping out all programs we use real version!
     for f in $(find /usr/lib/klibc/bin/ ! -name "mount" ! -name "umount" ! -name "reboot" ! -name "halt" ! -name "chroot" ! -name "sh" ! -name "modprobe" ! -name "cat" ! -name "cpio" ! -name "dd" ! -name "gunzip" ! -name "gzip" ! -name "insmod" ! -name "zcat" ! -name "lsmod" ! -name "mv" ! -name "kill" ! -name "ln" ! -name "losetup" ! -name "mkdir" ! -name "mkfifo" ! -name "mknod" ! -name "poweroff" ! -name "readlink" ! -name "dmesg" ! -name "sync" ! -type d); do
         add_file $f /bin/$(basename $f)
     done
 
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
-    SCRIPT="arch_base"
-    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim-normal lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su cat cpio dd gzip wget top sdparm tput ifconfig ln losetup mkdir mkfifo mknod readlink"
-    add_file "/bin/echo"
-    add_file "/bin/gunzip"
-    add_file "/bin/zcat"
-    add_file "/usr/bin/reset"
-    add_file "/sbin/swapoff"
-    add_file "/sbin/halt"
-    add_file "/sbin/telinit"
-    add_file "/bin/awk"
-    add_file "/usr/share/archboot/base/init" "/init"
-    add_file "/usr/bin/vim"
-    add_file "/bin/dir"
+
     add_file "/usr/share/terminfo/l/linux"
-    add_file "/usr/share/vim/vim72/syntax/syntax.vim"
-    add_file "/usr/share/vim/vim72/syntax/conf.vim"
-    add_file "/usr/share/vim/vim72/syntax/sh.vim"
-    add_file "/usr/share/vim/vim72/syntax/grub.vim"
-    add_file "/usr/share/vim/vim72/syntax/lilo.vim"
-    add_file "/usr/share/vim/vim72/syntax/manual.vim"
-    add_file "/usr/share/vim/vim72/syntax/synload.vim"
-    add_file "/usr/share/vim/vim72/syntax/colortest.vim"
-    add_file "/usr/share/vim/vim72/syntax/syncolor.vim"
-    add_file "/usr/share/vim/vim72/syntax/hitest.vim"
-    add_file "/usr/share/vim/vim72/syntax/whitespace.vim"
-    add_file "/usr/share/vim/vim72/syntax/modconf.vim"
-    add_file "/usr/share/vim/vim72/syntax/resolv.vim"
-    add_file "/usr/share/vim/vim72/syntax/fstab.vim"
-    add_file "/usr/share/vim/vim72/filetype.vim"
+    add_file "/usr/share/archboot/base/init" "/init"
     add_file "/etc/rc.d/functions"
     add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"
     add_file "/etc/rc.d/syslog-ng"
+
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/*); do
         add_file "$i" "/etc/$(basename $i)"
     done
-    
+
     ### fixing network support
     add_file "/lib/libnss_files.so.2"
     add_file "/lib/libnss_dns.so.2"
+
     ### add copy-mountpoint.sh
     add_file "/usr/bin/copy-mountpoint.sh"
-    # fix licenses
+
+    ### fix licenses
     add_file "/usr/share/licenses/bzip2/LICENSE"
     add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
     add_file "/usr/share/licenses/ncurses/license.txt"

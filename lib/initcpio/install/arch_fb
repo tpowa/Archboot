@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "/video/" | grep 'fb')"
+    MODULES=" $(checked_modules "drivers/video/" | grep 'fb')"
 
     BINARIES="v86d"
     FILES=""

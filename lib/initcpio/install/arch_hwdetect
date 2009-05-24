@@ -3,10 +3,9 @@
 install ()
 {
     MODULES=""
-    BINARIES="vmware-detect"
+    BINARIES="vmware-detect hwdetect"
     FILES=""
     SCRIPT="arch_hwdetect"
-    add_file /sbin/hwdetect /sbin/hwdetect
 }
 
 help ()

@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "/firewire/") $(checked_modules "/ieee1394/") "
+    MODULES=" $(checked_modules "/ieee1394/") "
 
     MODULES=$(echo ${MODULES}) #trim whitespace
     if [ -n "${MODULES}" ]; then

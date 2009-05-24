@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES=""
+    BINARIES="netcfg-auto-wireless netcfg-menu netcfg2 netcfg"
     FILES=""
     SCRIPT=""
     for i in /usr/lib/network/*; do
@@ -14,9 +14,6 @@ install ()
     done
     add_dir "/var/run/network/interfaces"
     add_dir "/var/run/network/profiles"
-    add_file "/usr/bin/netcfg-auto-wireless"
-    add_file "/usr/bin/netcfg-menu"
-    add_file "/usr/bin/netcfg2"
     for i in /etc/network.d/examples/*; do
 	add_file $i
     done

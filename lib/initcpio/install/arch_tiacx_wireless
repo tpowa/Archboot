@@ -3,13 +3,12 @@
 install ()
 {
     MODULES=""
-
     BINARIES=""
     FILES=""
     SCRIPT="arch_tiacx_wireless"
     # add firmware files
     for i in $(find /usr/share/tiacx/ ! -type d); do
-    	add_file $i
+        add_file $i
     done
     echo "- ARCH_TIACX_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
     echo "  Please identify the correct file(s) for your device in /usr/share/tiacx" >> ${OPTIONSBOOTMESSAGE}
