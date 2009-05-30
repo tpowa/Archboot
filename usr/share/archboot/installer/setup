@@ -2365,8 +2365,8 @@ dogrub() {
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
                 /usr/sbin/xfs_freeze -f $DESTDIR/boot > /dev/null 2>&1
             fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/ " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR/ > /dev/null 2>&1
+            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -f $DESTDIR > /dev/null 2>&1
             fi
         fi
         # look for a separately-mounted /boot partition
@@ -2406,8 +2406,8 @@ EOF
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
                 /usr/sbin/xfs_freeze -u $DESTDIR/boot > /dev/null 2>&1
             fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/ " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR/ > /dev/null 2>&1
+            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -u $DESTDIR > /dev/null 2>&1
             fi
         fi
 
