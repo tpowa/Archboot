@@ -74,7 +74,7 @@ install ()
             repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
         fi
     done
-    rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz~
+    rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
     # generate iso title name
