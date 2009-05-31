@@ -3,7 +3,7 @@
 install ()
 {
     SCRIPT="arch_base_lowmem"
-    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir poweroff reboot pidof nc"
+    BINARIES="init agetty mount modprobe umount head basename clear nano printf tail test tty wc which xargs yes syslog-ng bash swapon uniq cut seq find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown ls rm sed less chgrp chmod chown df dialog dmesg egrep fgrep grep kill killall killall5 more ps pwd rmdir stty sync tar touch uname hdparm true mktemp chroot dirname bzip2 date hwclock depmod cat gzip tr sdparm expr tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir poweroff reboot pidof nc lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzless lzma lzmadec lzmore unlzma unxz xz xzcat xzdec"
 
     ### setting up base structure
     add_dir "/proc"
