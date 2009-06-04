@@ -10,6 +10,14 @@ install ()
     for i in $CONFIG_FILES; do
         add_file "/usr/share/archboot/openvpn/etc/openvpn/examples/$i" "/etc/openvpn/examples/$i"
     done
+    # add easy rsa
+    for i in /usr/share/openvpn/easy-rsa/*; do
+        add_file "$i"
+    done
+    # add plugins
+    for i in /usr/share/openvpn/plugin/lib/*
+        add_file "$i"
+    done
     # fix licenses
     add_file "/usr/share/licenses/openvpn/COPYING"
 }
