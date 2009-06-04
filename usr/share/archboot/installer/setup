@@ -2861,6 +2861,7 @@ auto_ftpmirror()
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+        SYNC_URL="$(echo ${SYNC_URL} | sed 's/core/\$repo/g')"
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
     fi
