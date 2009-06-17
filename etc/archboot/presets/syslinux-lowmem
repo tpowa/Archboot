@@ -4,7 +4,7 @@
 # DEFAULT kernel boot options like root=/dev/hda3 etc.
 # add your root= option, if you boot from a disk device
 # and don't want to add it by hand on each boot
-KERNEL_BOOT_OPTIONS="rootdelay=5"
+KERNEL_BOOT_OPTIONS="rootdelay=10"
 
 # mkinitcpio config file, defaulted to stock config file
 MKINITCPIO_CONFIG="/etc/archboot/lowmem.conf"
