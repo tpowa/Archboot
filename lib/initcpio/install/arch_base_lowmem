@@ -38,6 +38,7 @@ install ()
     add_file "${CONFIG}" "/config"
 
     add_file "/usr/share/archboot/base/init" "/init"
+    add_file "/lib/initcpio/init_functions" "/init_functions"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/etc/rc.d/functions"
     add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"

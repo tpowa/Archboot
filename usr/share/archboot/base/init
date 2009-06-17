@@ -1,11 +1,8 @@
 #!/bin/bash
-
+. /init_functions
 # add sh symlink
 ln -s /bin/bash /bin/sh
 ln -s /sbin/modprobe /bin/modprobe
-
-msg () { [ "${quiet}" != "y" ] && echo "$@"; }
-err () { echo "ERROR: $@"; }
 
 msg ":: Loading Initramfs"
 
