@@ -1,6 +1,6 @@
 #
 # Arch Linux repository mirrorlist
-# Generated on 2009-05-09
+# Generated on 2009-06-16
 #
 
 # Australia
@@ -22,10 +22,11 @@
 #Server = http://ftp.belnet.be/mirror/archlinux.org/$repo/os/x86_64
 
 # Brazil
-#Server = http://archlinux.c3sl.ufpr.br/$repo/os/x86_64
 #Server = ftp://archlinux.c3sl.ufpr.br/archlinux/$repo/os/x86_64
+#Server = http://archlinux.c3sl.ufpr.br/$repo/os/x86_64
 #Server = ftp://ftp.las.ic.unicamp.br/pub/archlinux/$repo/os/x86_64
 #Server = http://www.las.ic.unicamp.br/pub/archlinux/$repo/os/x86_64
+#Server = http://pet.inf.ufsc.br/mirrors/archlinux/$repo/os/x86_64
 
 # Bulgaria
 #Server = http://archlinux.igor.onlinedirect.bg/$repo/os/x86_64
@@ -47,17 +48,21 @@
 #Server = ftp://ftp.klid.dk/archlinux/$repo/os/x86_64
 
 # Estonia
-#Server = http://ftp.estpak.ee/pub/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.estpak.ee/pub/archlinux/$repo/os/x86_64
+#Server = http://ftp.estpak.ee/pub/archlinux/$repo/os/x86_64
+
+# Finland
+#Server = ftp://mirror.archlinux.fi/$repo/os/x86_64
+#Server = http://mirror.archlinux.fi/$repo/os/x86_64
 
 # France
 #Server = http://mir.archlinux.fr/$repo/os/x86_64
 #Server = ftp://mir1.archlinuxfr.org/archlinux/$repo/os/x86_64
-#Server = http://mir1.archlinuxfr.org/archlinux/$repo/os/x86_64
 #Server = ftp://mir2.archlinuxfr.org/archlinux/$repo/os/x86_64
+#Server = http://mir1.archlinuxfr.org/archlinux/$repo/os/x86_64
 #Server = http://mir2.archlinuxfr.org/archlinux/$repo/os/x86_64
-#Server = http://distrib-coffee.ipsl.jussieu.fr/pub/linux/archlinux/$repo/os/x86_64
 #Server = ftp://distrib-coffee.ipsl.jussieu.fr/pub/linux/archlinux/$repo/os/x86_64
+#Server = http://distrib-coffee.ipsl.jussieu.fr/pub/linux/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.free.fr/mirrors/ftp.archlinux.org/$repo/os/x86_64
 #Server = ftp://ftp.rez-gif.supelec.fr/Linux/archlinux/$repo/os/x86_64
 
@@ -69,7 +74,6 @@
 #Server = http://ftp.hosteurope.de/mirror/ftp.archlinux.org/$repo/os/x86_64
 #Server = ftp://ftp-stud.hs-esslingen.de/pub/Mirrors/archlinux/$repo/os/x86_64
 #Server = http://ftp-stud.hs-esslingen.de/pub/Mirrors/archlinux/$repo/os/x86_64
-#Server = ftp://mirrors.igprolin-online.org/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/x86_64
 #Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.tu-chemnitz.de/pub/linux/archlinux/$repo/os/x86_64
@@ -90,6 +94,8 @@
 # Greece
 #Server = ftp://ftp.ntua.gr/pub/linux/archlinux/$repo/os/x86_64
 #Server = http://ftp.ntua.gr/pub/linux/archlinux/$repo/os/x86_64
+#Server = ftp://ftp.otenet.gr/pub/linux/archlinux/$repo/os/x86_64
+#Server = http://ftp.otenet.gr/linux/archlinux/$repo/os/x86_64
 
 # Hungary
 #Server = ftp://ftp.mfa.kfki.hu/pub/mirrors/ftp.archlinux.org/$repo/os/x86_64
@@ -115,21 +121,28 @@
 #Server = ftp://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/x86_64
 #Server = http://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/x86_64
 
+# Latvia
+#Server = http://archlinux.goodsoft.lv/$repo/os/x86_64
+
 # Lithuania
 #Server = ftp://atviras.lt/archmirror/$repo/os/x86_64
 #Server = http://atviras.lt/archmirror/$repo/os/x86_64
 
 # Netherlands
+#Server = ftp://mirror.leaseweb.com/archlinux/$repo/os/x86_64
+#Server = http://mirror.leaseweb.com/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.nluug.nl/pub/metalab/distributions/archlinux/$repo/os/x86_64
 #Server = http://ftp.nluug.nl/pub/metalab/distributions/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.surfnet.nl/pub/os/Linux/distr/archlinux/$repo/os/x86_64
 #Server = http://ftp.surfnet.nl/pub/os/Linux/distr/archlinux/$repo/os/x86_64
 
+# New Caledonia
+#Server = ftp://archlinux.nautile.nc/archlinux/$repo/os/x86_64
+#Server = http://archlinux.nautile.nc/archlinux/$repo/os/x86_64
+
 # Norway
 #Server = ftp://mirror.archlinux.no/$repo/os/x86_64
 #Server = http://mirror.archlinux.no/$repo/os/x86_64
-#Server = ftp://jane.tihlde.org/pub/archlinux/$repo/os/x86_64
-#Server = http://jane.tihlde.org/pub/archlinux/$repo/os/x86_64
 
 # Poland
 #Server = ftp://mirror.icis.pcz.pl/archlinux/$repo/os/x86_64
@@ -140,8 +153,8 @@
 #Server = http://unix.net.pl/archlinux.org/$repo/os/x86_64
 
 # Portugal
-#Server = http://cesium.di.uminho.pt/pub/archlinux/$repo/os/x86_64
 #Server = ftp://cesium.di.uminho.pt/pub/archlinux/$repo/os/x86_64
+#Server = http://cesium.di.uminho.pt/pub/archlinux/$repo/os/x86_64
 #Server = http://darkstar.ist.utl.pt/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.nux.ipb.pt/pub/dists/archlinux/$repo/os/x86_64
 #Server = http://ftp.nux.ipb.pt/pub/dists/archlinux/$repo/os/x86_64
@@ -152,14 +165,16 @@
 
 # Russia
 #Server = http://archlinux.freeside.ru/$repo/os/x86_64
-#Server = http://mirror.yandex.ru/archlinux/$repo/os/x86_64
+#Server = ftp://mirror.svk.su/archlinux/$repo/os/x86_64
+#Server = http://mirror.svk.su/archlinux/$repo/os/x86_64
 #Server = ftp://mirror.yandex.ru/archlinux/$repo/os/x86_64
+#Server = http://mirror.yandex.ru/archlinux/$repo/os/x86_64
 
 # Sweden
-#Server = http://ftp.ds.hj.se/pub/os/linux/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.ds.hj.se/pub/os/linux/archlinux/$repo/os/x86_64
-#Server = http://ftp.gigabit.nu/$repo/os/x86_64
+#Server = http://ftp.ds.hj.se/pub/os/linux/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.gigabit.nu/$repo/os/x86_64
+#Server = http://ftp.gigabit.nu/$repo/os/x86_64
 
 # Switzerland
 #Server = ftp://archlinux.puzzle.ch/$repo/os/x86_64
@@ -171,23 +186,24 @@
 # Ukraine
 #Server = ftp://archlinux.hell.org.ua/archlinux/$repo/os/x86_64
 #Server = http://archlinux.hell.org.ua/archlinux/$repo/os/x86_64
-#Server = http://ftp.linux.kiev.ua/pub/Linux/ArchLinux/$repo/os/x86_64
 #Server = ftp://ftp.linux.kiev.ua/pub/Linux/ArchLinux/$repo/os/x86_64
+#Server = http://ftp.linux.kiev.ua/pub/Linux/ArchLinux/$repo/os/x86_64
 
 # United States
 #Server = http://mirror.archlinux.com.ve/$repo/os/x86_64
 #Server = http://archlinux.unixheads.org/$repo/os/x86_64
-#Server = http://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/x86_64
 #Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/x86_64
-#Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/x86_64
+#Server = http://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/x86_64
 #Server = ftp://mirrors.easynews.com/linux/archlinux/$repo/os/x86_64
+#Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/x86_64
+#Server = ftp://ftp.archlinux.org/$repo/os/x86_64
 #Server = http://mirrors.gigenet.com/archlinux/$repo/os/x86_64
-#Server = http://www.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/x86_64
 #Server = ftp://ftp.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/x86_64
+#Server = http://www.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/x86_64
 #Server = ftp://mirrors.hosef.org/archlinux/$repo/os/x86_64
 #Server = http://mirrors.hosef.org/archlinux/$repo/os/x86_64
-#Server = http://distro.ibiblio.org/pub/linux/distributions/archlinux/$repo/os/x86_64
 #Server = ftp://ibiblio.org/pub/linux/distributions/archlinux/$repo/os/x86_64
+#Server = http://distro.ibiblio.org/pub/linux/distributions/archlinux/$repo/os/x86_64
 #Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/x86_64
 #Server = ftp://mirror.rit.edu/archlinux/$repo/os/x86_64
 #Server = http://mirror.rit.edu/archlinux/$repo/os/x86_64
@@ -200,8 +216,8 @@
 #Server = http://mirror2.archlinux.com.ve/$repo/os/x86_64
 
 # Vietnam
-#Server = ftp://ftp.indochinalinux.com/archlinux/$repo/os/x86_64
 #Server = ftp://202.78.230.5/archlinux/$repo/os/x86_64
+#Server = ftp://ftp.indochinalinux.com/archlinux/$repo/os/x86_64
 #Server = ftp://mirror-fpt-telecom.fpt.net/archlinux/$repo/os/x86_64
 #Server = http://mirror-fpt-telecom.fpt.net/archlinux/$repo/os/x86_64
 
