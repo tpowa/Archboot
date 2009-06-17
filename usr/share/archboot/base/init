@@ -65,6 +65,13 @@ for m in ${MODULES}; do
     fi
 done
 
+# If rootdelay is empty or not a non-negative integer, set it to 10
+if [ -z "${rootdelay}" -o ! "${rootdelay}" -ge 0 ]; then
+    export rootdelay=10
+# We'll wait for the root device, so make sure klibc doesn't
+    export kinit_params="$kinit_params rootdelay=0"
+fi
+
 if [ -e "/hooks" ]; then
     for h in ${HOOKS}; do
         TST=""
@@ -90,13 +97,6 @@ if [ "${root}" = "" -a "${ip}" = "" ]; then
 	# enter install environment
 	exec /sbin/init
 else
-	# If rootdelay is empty or not a non-negative integer, set it to 10
-	if [ -z "${rootdelay}" -o ! "${rootdelay}" -ge 0 ]; then
-		export rootdelay=10
-	# We'll wait for the root device, so make sure klibc doesn't
-		export kinit_params="$kinit_params rootdelay=0"
-	fi
-
 	# If we boot from NFS, don't check for a block device in /dev
 	# Let kinit do it all
 	if [ -z "${nfsroot}" -a "${root}" != "/dev/nfs" ]; then
