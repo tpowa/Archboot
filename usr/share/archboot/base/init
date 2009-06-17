@@ -101,37 +101,39 @@ else
 	# Let kinit do it all
 	if [ -z "${nfsroot}" -a "${root}" != "/dev/nfs" ]; then
 		if ! poll_device "${root}" ${rootdelay}; then
-		msg "\nRoot device '${root}' doesn't exist, attempting to create it"
+			msg "\nRoot device '${root}' doesn't exist, attempting to create it"
 
-		eval $(/bin/parseblock "${root}")
-        if [ -z "${BLOCKDEVICE}" ]; then
-		echo "ERROR: Failed to parse block device ids for '${root}'"
-        else
-		echo "/bin/mknod /dev/root b ${BLOCKDEVICE}"
-		/bin/mknod /dev/root b ${BLOCKDEVICE} >/dev/null
-		export root="/dev/root"
-        fi
-        if [ ! -b "${root}" -a ! -L "${root}" ]; then
-		err "Unable to detect or create root device '${root}'"
-		echo "You are being dropped to a recovery shell"
-		echo "    Type 'reboot' to reboot"
-		echo "    Type 'exit' to try and continue booting"
-		echo "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
-		echo ""
-		echo "If the device '${root}' gets created while you are here,"
-		echo "try adding 'rootdelay=10' or higher to the kernel command-line"
-		PS1="ramfs$ " /bin/sh -i
-		msg "Trying to continue (this will most likely fail)..."
+			eval $(/bin/parseblock "${root}")
+			if [ -z "${BLOCKDEVICE}" ]; then
+				echo "ERROR: Failed to parse block device ids for '${root}'"
+			else
+				echo "/bin/mknod /dev/root b ${BLOCKDEVICE}"
+				/bin/mknod /dev/root b ${BLOCKDEVICE} >/dev/null
+				export root="/dev/root"
+			fi
+			if [ ! -b "${root}" -a ! -L "${root}" ]; then
+				err "Unable to detect or create root device '${root}'"
+				echo "You are being dropped to a recovery shell"
+				echo "    Type 'reboot' to reboot"
+				echo "    Type 'exit' to try and continue booting"
+				echo "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+				echo ""
+				echo "If the device '${root}' gets created while you are here,"
+				echo "try adding 'rootdelay=10' or higher to the kernel command-line"
+				PS1="ramfs$ " /bin/sh -i
+				msg "Trying to continue (this will most likely fail)..."
+			fi
+		fi
 	fi
 	if [ -f "/message" ]; then
-    		msg "$(cat /message)"
+		msg "$(cat /message)"
 	fi
 	msg ":: Initramfs Completed - control passing to kinit"
 	#Special handling is udev is running
 	udevpid=$(/bin/minips -C udevd -o pid=)
 	if [  -n "${udevpid}" ]; then
-    		/bin/kill -9 ${udevpid}
-    		/bin/sleep 0.01
+		/bin/kill -9 ${udevpid}
+		/bin/sleep 0.01
 	fi
 	exec /bin/kinit "$@" -- "root=${root}" ${kinit_params} > /dev/null 2>&1
 fi
