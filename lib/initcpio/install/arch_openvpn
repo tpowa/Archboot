@@ -15,7 +15,7 @@ install ()
         add_file "$i"
     done
     # add plugins
-    for i in /usr/share/openvpn/plugin/lib/*
+    for i in /usr/share/openvpn/plugin/lib/*; do
         add_file "$i"
     done
     # fix licenses

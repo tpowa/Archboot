@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="tcpd findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd pmap_set pmap_dump xinetd telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount sm-notify start-statd slogin screen rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd"
+    BINARIES="tcpd findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd xinetd telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount sm-notify start-statd slogin screen rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd"
     FILES=""
     SCRIPT="arch_remote"
     add_file "/usr/share/archboot/remote/etc/hosts.allow" "/etc/hosts.allow"
@@ -35,8 +35,8 @@ install ()
     add_dir  "/var/empty"
     add_file "/etc/rc.d/nfs-server"
     add_file "/etc/rc.d/nfs-common"
-    add_file "/usr/share/archboot/remote/etc/conf.d/nfs-common" "/etc/conf.d/nfs-common"
-    add_file "/usr/share/archboot/remote/etc/conf.d/nfs-server" "/etc/conf.d/nfs-server"
+    add_file "/usr/share/archboot/remote/etc/conf.d/nfs-common.conf" "/etc/conf.d/nfs-common.conf"
+    add_file "/usr/share/archboot/remote/etc/conf.d/nfs-server.conf" "/etc/conf.d/nfs-server.conf"
     add_file "/usr/share/archboot/remote/etc/gssapi_mech.conf" "/etc/gssapi_mech.conf"
     add_file "/usr/share/archboot/remote/etc/idmapd.conf" "/etc/idmapd.conf"
     add_file  "/usr/share/archboot/remote/etc/netconfig" "/etc/netconfig"
