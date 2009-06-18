@@ -1953,6 +1953,7 @@ auto_network()
 # change mkinitcpio.conf to use lzma compression by default!
 mkinitcpio_lzma()
 {
+  sed -i -e 's:^#COMPRESSION=\"lzma\":COMPRESSION=\"lzma\"#g' $DESTDIR/etc/mkinitcpio.conf
   sed -i -e 's#^COMPRESSION=.*#COMPRESSION=\"lzma\"#g' $DESTDIR/etc/mkinitcpio.conf
 }
 
