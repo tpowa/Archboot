@@ -1949,9 +1949,9 @@ auto_network()
     fi
 }
 
-# mkinitcpio_lzma()
+# auto_lzma()
 # change mkinitcpio.conf to use lzma compression by default!
-mkinitcpio_lzma()
+auto_lzma()
 {
   sed -i -e 's:^#COMPRESSION=\"lzma\":COMPRESSION=\"lzma\"#g' $DESTDIR/etc/mkinitcpio.conf
   sed -i -e 's#^COMPRESSION=.*#COMPRESSION=\"lzma\"#g' $DESTDIR/etc/mkinitcpio.conf
@@ -2804,25 +2804,6 @@ auto_hwdetect()
     fi
 }
 
-auto_dsdt()
-{
-    DSDT_ENABLE=""
-    DIALOG --defaultno --yesno "Do you need support for booting the kernel with a custom DSDT file?" 0 0 && DSDT_ENABLE=1
-    if [ "$DSDT_ENABLE" = "1" ]; then
-        while [ "$DSDT" = "" ]; do
-            DIALOG --inputbox "Enter the custom DSDT file (with full path)" 8 65 "" 2>$ANSWER || return 1
-            DSDT=$(cat $ANSWER)
-            if [ -s "$DSDT" ]; then
-                cp $DSDT $DESTDIR/lib/initcpio/custom.dsdt
-                HWPARAMETER="$HWPARAMETER --dsdt"
-            else
-                DIALOG --msgbox "ERROR: You have entered a invalid file name, please enter again." 0 0
-                DSDT=""
-            fi
-        done
-    fi
-}
-
 auto_parameters()
 {
     if [ -s /tmp/.keymap ]; then
@@ -2884,8 +2865,7 @@ configure_system()
         auto_ftpmirror
         auto_network
         auto_parameters
-        auto_dsdt
-	mkinitcpio_lzma
+	auto_lzma
         auto_hwdetect
     fi
     ## END PREPROCESS ##
