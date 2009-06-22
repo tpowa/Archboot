@@ -1949,14 +1949,6 @@ auto_network()
     fi
 }
 
-# auto_lzma()
-# change mkinitcpio.conf to use lzma compression by default!
-auto_lzma()
-{
-  sed -i -e 's:^#COMPRESSION=\"lzma\":COMPRESSION=\"lzma\":g' $DESTDIR/etc/mkinitcpio.conf
-  sed -i -e 's:^COMPRESSION=.*:COMPRESSION=\"lzma\":g' $DESTDIR/etc/mkinitcpio.conf
-}
-
 # donetwork()
 # Hand-hold through setting up networking
 #
@@ -2865,7 +2857,6 @@ configure_system()
         auto_ftpmirror
         auto_network
         auto_parameters
-	auto_lzma
         auto_hwdetect
     fi
     ## END PREPROCESS ##
