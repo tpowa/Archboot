@@ -183,6 +183,17 @@ finddisks() {
                 [ "$1" ] && echo $1
         done
     fi
+    # dmraid devices
+    if [ -d /dev/mapper ] ; then
+        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v [0-9]$); do
+            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
+                if [ $(echo $dev | grep ^$fakeraid) ]; then
+                    echo "/dev/mapper/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            done
+        done
+    fi
     # partitionable raid
     for dev in $(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9] | sed 's#:.*##g'); do
         echo "/dev/$dev"
@@ -222,6 +233,17 @@ findbootloaderdisks() {
         for dev in $(ls /dev/ida | egrep -v 'p'); do
                 echo "/dev/ida/$dev"
                 [ "$1" ] && echo $1
+        done
+    fi
+    # dmraid devices
+    if [ -d /dev/mapper ] ; then
+        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v [0-9]$); do
+            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
+                if [ $(echo $dev | grep ^$fakeraid) ]; then
+                    echo "/dev/mapper/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            done
         done
     fi
 }
@@ -275,6 +297,17 @@ findpartitions() {
             [ "$1" ] && echo $1
         done
     fi
+    # dmraid devices
+    if [ -d /dev/mapper ] ; then
+        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep [0-9]$); do
+            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
+                if [ $(echo $dev | grep ^$fakeraid) ]; then
+                    echo "/dev/mapper/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            done
+        done
+    fi
 }
 
 # don't list raid devices, lvm2 and devicemapper!
@@ -313,6 +346,17 @@ findbootloaderpartitions() {
         for dev in $(ls /dev/ida | egrep 'p'); do
             echo "/dev/ida/$dev"
             [ "$1" ] && echo $1
+        done
+    fi
+    # dmraid devices
+    if [ -d /dev/mapper ] ; then
+        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep [0-9]$); do
+            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
+                if [ $(echo $dev | grep ^$fakeraid) ]; then
+                    echo "/dev/mapper/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            done
         done
     fi
 }
