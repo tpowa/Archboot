@@ -1949,6 +1949,14 @@ auto_network()
     fi
 }
 
+# auto_lzma()
+# change mkinitcpio.conf to use lzma compression by default!
+auto_lzma()
+{
+  sed -i -e 's:^#COMPRESSION=\"lzma\":COMPRESSION=\"lzma\":g' $DESTDIR/etc/mkinitcpio.conf
+  sed -i -e 's:^COMPRESSION=.*:COMPRESSION=\"lzma\":g' $DESTDIR/etc/mkinitcpio.conf
+}
+
 # donetwork()
 # Hand-hold through setting up networking
 #
@@ -2857,6 +2865,7 @@ configure_system()
         auto_ftpmirror
         auto_network
         auto_parameters
+	auto_lzma
         auto_hwdetect
     fi
     ## END PREPROCESS ##
@@ -2872,20 +2881,20 @@ configure_system()
             DEFAULT=""
         fi
         DIALOG $DEFAULT --menu "Configuration" 20 80 16 \
-            "/etc/rc.conf"              "System Config" \
-            "/etc/fstab"                "Filesystem Mountpoints" \
-            "/etc/mkinitcpio.conf"      "Initramfs Config" \
-            "/etc/modprobe.conf"        "Kernel Modules" \
-            "/etc/resolv.conf"          "DNS Servers" \
-            "/etc/hosts"                "Network Hosts" \
-            "/etc/hosts.deny"           "Denied Network Services" \
-            "/etc/hosts.allow"          "Allowed Network Services" \
-            "/etc/locale.gen"           "Glibc Locales" \
-            "Pacman-Mirror"             "Set the primary pacman mirror" \
-            "/etc/pacman.d/mirrorlist"  "Pacman Mirror List" \
-            "/etc/pacman.conf"          "Pacman Config File" \
-            "Root-Password"             "Set the root password" \
-            "Return"                    "Return to Main Menu" 2>$ANSWER || break
+            "/etc/rc.conf"                  "System Config" \
+            "/etc/fstab"                    "Filesystem Mountpoints" \
+            "/etc/mkinitcpio.conf"          "Initramfs Config" \
+            "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+            "/etc/resolv.conf"              "DNS Servers" \
+            "/etc/hosts"                    "Network Hosts" \
+            "/etc/hosts.deny"               "Denied Network Services" \
+            "/etc/hosts.allow"              "Allowed Network Services" \
+            "/etc/locale.gen"               "Glibc Locales" \
+            "Pacman-Mirror"                 "Set the primary pacman mirror" \
+            "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
+            "/etc/pacman.conf"              "Pacman Config File" \
+            "Root-Password"                 "Set the root password" \
+            "Return"                        "Return to Main Menu" 2>$ANSWER || break
         FILE="$(cat $ANSWER)"
 
         if [ "$FILE" = "Return" -o -z "$FILE" ]; then       # exit
