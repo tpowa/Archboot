@@ -2822,9 +2822,9 @@ auto_hwdetect()
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
         if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
-            for i in $(dmraid -l | sed -e 's/ .*//g'); do
-                ls /dev/mapper/$i > /dev/null 2>&1 && HWPARAMETER="$HWPARAMETER --dmraid"
-            done
+            if ! [ $(dmraid -r | grep ^no ) ]; then
+                HWPARAMETER="$HWPARAMETER --dmraid"
+            fi
         fi
         if [ -e $DESTDIR/lib/initcpio/hooks/mdadm ]; then
             [ "$(cat /proc/mdstat 2>/dev/null | grep ^md[0-9])" -o "$(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --mdadm"
