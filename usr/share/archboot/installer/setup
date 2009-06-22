@@ -257,13 +257,17 @@ findpartitions() {
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
             #- part of lvm2 device
             #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
-            # part of luks device
+            #- part of luks device
             #  $(fstype 2>/dev/null </dev/$part | grep "luks")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+            #- part of dmraid device
+            #  $(dmraid -r | grep /dev/$part)
+            ### TODO - extended partition on dmraid
+            #  $(dmraid -r | grep /dev/$part)
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(dmraid -r | grep /dev/$part)" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -297,17 +301,6 @@ findpartitions() {
             [ "$1" ] && echo $1
         done
     fi
-    # dmraid devices
-    if [ -d /dev/mapper ] ; then
-        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep [0-9]$); do
-            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
-                if [ $(echo $dev | grep ^$fakeraid) ]; then
-                    echo "/dev/mapper/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            done
-        done
-    fi
 }
 
 # don't list raid devices, lvm2 and devicemapper!
@@ -326,7 +319,11 @@ findbootloaderpartitions() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+            #- part of dmraid device
+            #  $(dmraid -r | grep /dev/$part)
+            ### TODO - extended partition on dmraid
+            #  $(dmraid -r | grep /dev/$part)
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(dmraid -r | grep /dev/$part)" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -600,7 +597,7 @@ _stoplvm()
 {
     DISABLELVM=""
     DETECTED_LVM=""
-    LV_VOLUMES="$(ls /dev/mapper/ | grep -v control)"
+    LV_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator -)"
     LV_GROUPS="$(vgs -o vg_name --noheading)"
     LV_PHYSICAL="$(pvs -o pv_name --noheading)"
     ! [ "$LV_VOLUMES" = "" ] && DETECTED_LVM=1
@@ -1285,6 +1282,10 @@ autoprepare() {
     fi
     if [ "$(echo $DISC | grep md_d[0-9])" ]; then
         DIALOG --msgbox "Error: You cannot use partitionable raid device for autoprepare, please use an other device." 0 0
+        return 1
+    fi
+    if [ "$(echo $DISC | grep /dev/mapper)" ]; then
+        DIALOG --msgbox "Error: You cannot use dmraid device for autoprepare, please use an other device." 0 0
         return 1
     fi
     SET_DEFAULTFS=""
