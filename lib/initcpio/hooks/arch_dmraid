@@ -12,9 +12,9 @@ run_hook ()
 	fi
 	msg ":: Activating dmraid arrays..."
         if [ "${quiet}" = "y" ]; then
-	    /usr/sbin/dmraid -ay >/dev/null
+	    /usr/sbin/dmraid -ay -Z >/dev/null
 	else
-	     /usr/sbin/dmraid -ay
+	     /usr/sbin/dmraid -ay -Z
 	fi
     fi
 }
