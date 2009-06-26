@@ -946,13 +946,17 @@ _createpv()
         ALREADYINUSE=""
         # skip physical volume devices
         ALREADYINUSE="$(pvs -o pv_name --noheading)"
-        # skip raidpartions on physical volumes!
+        # skip raidpartitions on physical volumes!
         if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
             ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
         fi
         # skip harddisks which contain lvm! 
         for i in $(ls /dev/mapper/* | grep -v control); do
                 lvs $i --noheading 2>/dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        # skip dmraid main volume
+        for i in $(dmraid -s -c); do
+            ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
         done
         for i in $PARTS; do
             # skip harddisks which contain already encrypted partitions! 
@@ -1200,6 +1204,10 @@ _luks()
         if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
             ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
         fi
+        # skip dmraid main volume
+        for i in $(dmraid -s -c); do
+            ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
+        done
         for i in $PARTS; do
             # skip harddisks which contain already encrypted partitions! 
             for k in $(ls /dev/mapper/* | grep -v control); do
