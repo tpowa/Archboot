@@ -154,7 +154,7 @@ finddisks() {
     # ide devices
     for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -163,7 +163,7 @@ finddisks() {
     #scsi/sata devices
     for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -185,13 +185,9 @@ finddisks() {
     fi
     # dmraid devices
     if [ -d /dev/mapper ] ; then
-        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v [0-9]$); do
-            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
-                if [ $(echo $dev | grep ^$fakeraid) ]; then
-                    echo "/dev/mapper/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            done
+        for fakeraid in $(dmraid -s -c); do
+                echo "/dev/mapper/$fakeraid"
+                [ "$1" ] && echo $1
         done
     fi
     # partitionable raid
@@ -206,7 +202,7 @@ findbootloaderdisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -215,7 +211,7 @@ findbootloaderdisks() {
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
             fi
@@ -237,13 +233,9 @@ findbootloaderdisks() {
     fi
     # dmraid devices
     if [ -d /dev/mapper ] ; then
-        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v [0-9]$); do
-            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
-                if [ $(echo $dev | grep ^$fakeraid) ]; then
-                    echo "/dev/mapper/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            done
+        for fakeraid in $(dmraid -s -c); do
+                echo "/dev/mapper/$fakeraid"
+                [ "$1" ] && echo $1
         done
     fi
 }
@@ -263,11 +255,7 @@ findpartitions() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            #- part of dmraid device
-            #  $(dmraid -r | grep /dev/$part)
-            ### TODO - extended partition on dmraid
-            #  $(dmraid -r | grep /dev/$part)
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(dmraid -r | grep /dev/$part)" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -275,8 +263,8 @@ findpartitions() {
             fi
         done
     done
-    # include any mapped devices
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+    # include any mapped devices, only show dmraid partitions!
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v $(dmraid -s -c)$); do
         echo "/dev/mapper/$devpath"
         [ "$1" ] && echo $1
     done
@@ -319,11 +307,7 @@ findbootloaderpartitions() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            #- part of dmraid device
-            #  $(dmraid -r | grep /dev/$part)
-            ### TODO - extended partition on dmraid
-            #  $(dmraid -r | grep /dev/$part)
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(dmraid -r | grep /dev/$part)" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -347,13 +331,9 @@ findbootloaderpartitions() {
     fi
     # dmraid devices
     if [ -d /dev/mapper ] ; then
-        for dev in $(ls /dev/mapper 2>/dev/null | grep -v control | grep [0-9]$); do
-            for fakeraid in $(dmraid -l | sed -e 's/ .*//g'); do
-                if [ $(echo $dev | grep ^$fakeraid) ]; then
-                    echo "/dev/mapper/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            done
+        for fakeraid in $(dmraid -s -c)p*; do
+                echo "/dev/mapper/$fakeraid"
+                [ "$1" ] && echo $1
         done
     fi
 }
@@ -646,6 +626,25 @@ _stopluks()
         done
     fi
     [ -e /tmp/.crypttab ] && rm /tmp/.crypttab
+}
+
+#_dmraid_update
+_dmraid_update()
+{
+    DIALOG --infobox "Deactivating dmraid devices ..." 0 0
+    dmraid -an > /dev/null 2>&1
+    if [ "$DETECTED_LVM" = "1" -o "$DETECTED_LUKS" = "1" ]; then
+	DIALOG --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && RESETDM="1"
+	if [ "$RESETDM" = "1" ]; then
+            DIALOG --infobox "Resetting devicemapper devices ..." 0 0
+	    dmsetup remove_all > /dev/null 2>&1
+	fi
+    else
+        DIALOG --infobox "Resetting devicemapper devices ..." 0 0
+	dmsetup remove_all > /dev/null 2>&1
+    fi
+    DIALOG --infobox "Reactivating dmraid devices ..." 0 0
+    dmraid -ay -Z > /dev/null 2>&1
 }
 
 #helpbox for raid
@@ -1468,6 +1467,8 @@ partition() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
+    # update dmraid
+    _dmraid_update
     # Select disk to partition
     DISCS=$(finddisks _)
     DISCS="$DISCS OTHER _ DONE +"
@@ -1489,6 +1490,8 @@ partition() {
             cfdisk $DISC
         fi
     done
+    # update dmraid
+    _dmraid_update
     NEXTITEM="3"
     S_PART=1
 }
@@ -1510,7 +1513,6 @@ mountpoints() {
     [ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
     [ "$(which mkfs.ntfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS ntfs-3g NTFS"
     [ "$(which mkfs.vfat 2>/dev/null)" ]   && FSOPTS="$FSOPTS vfat VFAT"
-
     #
     # Select mountpoints
     #
