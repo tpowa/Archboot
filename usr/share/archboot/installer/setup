@@ -154,18 +154,22 @@ finddisks() {
     # ide devices
     for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                echo "/dev/$dev"
-                [ "$1" ] && echo $1
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
             fi
         fi
     done
     #scsi/sata devices
     for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                echo "/dev/$dev"
-                [ "$1" ] && echo $1
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
             fi
         fi
     done
@@ -202,18 +206,22 @@ findbootloaderdisks() {
     # ide devices
     for dev in $(ls $block | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                echo "/dev/$dev"
-                [ "$1" ] && echo $1
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
             fi
         fi
     done
     #scsi/sata devices
     for dev in $(ls $block | egrep '^sd'); do
         if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                echo "/dev/$dev"
-                [ "$1" ] && echo $1
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
             fi
         fi
     done
@@ -515,10 +523,10 @@ _getavaildisks()
     # NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
     for i in $(finddisks); do
         if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
-            if [ $(echo "$i" | grep 'md_d[0-9]') ]; then
-                echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+            if [ $(echo "$i" | grep 'mapper') ]; then
+                echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
-                echo -n "$i: "; hdparm -I $i | grep -F '1000*1000' | sed "s/.*1000:[ \t]*\(.*\)/\1/"; echo "\n"
+                echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
         fi
     done
@@ -538,6 +546,8 @@ _getavailpartitions()
         elif [ $(echo "$i" | grep 'mapper') ]; then
             if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
+            elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
+                [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
             fi
