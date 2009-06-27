@@ -201,6 +201,45 @@ finddisks() {
     done
 }
 
+findautoprepare() {
+    # ide devices
+    for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
+        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            fi
+        fi
+    done
+    #scsi/sata devices
+    for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
+        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            fi
+        fi
+    done
+    # cciss controllers
+    if [ -d /dev/cciss ] ; then
+        for dev in $(ls /dev/cciss | egrep -v 'p'); do
+            echo "/dev/cciss/$dev"
+            [ "$1" ] && echo $1
+        done
+    fi
+    # Smart 2 controllers
+    if [ -d /dev/ida ] ; then
+        for dev in $(ls /dev/ida | egrep -v 'p'); do
+                echo "/dev/ida/$dev"
+                [ "$1" ] && echo $1
+        done
+    fi
+}
+
 # don't check on raid devices!
 findbootloaderdisks() {
     # ide devices
@@ -1303,21 +1342,13 @@ autoprepare() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    DISCS=$(finddisks)
+    DISCS=$(findautoprepare)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the hard drive to use" 14 55 7 $(finddisks _) 2>$ANSWER || return 1
+        DIALOG --menu "Select the hard drive to use" 14 55 7 $(findautoprepare _) 2>$ANSWER || return 1
         DISC=$(cat $ANSWER)
     else
         DISC=$DISCS
-    fi
-    if [ "$(echo $DISC | grep md_d[0-9])" ]; then
-        DIALOG --msgbox "Error: You cannot use partitionable raid device for autoprepare, please use an other device." 0 0
-        return 1
-    fi
-    if [ "$(echo $DISC | grep /dev/mapper)" ]; then
-        DIALOG --msgbox "Error: You cannot use dmraid device for autoprepare, please use an other device." 0 0
-        return 1
     fi
     SET_DEFAULTFS=""
     BOOT_PART_SET=""
