@@ -150,6 +150,45 @@ manual_media() {
     fi
 }
 
+findautoprepare() {
+    # ide devices
+    for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
+        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            fi
+        fi
+    done
+    #scsi/sata devices
+    for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
+        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
+            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                    echo "/dev/$dev"
+                    [ "$1" ] && echo $1
+                fi
+            fi
+        fi
+    done
+    # cciss controllers
+    if [ -d /dev/cciss ] ; then
+        for dev in $(ls /dev/cciss | egrep -v 'p'); do
+            echo "/dev/cciss/$dev"
+            [ "$1" ] && echo $1
+        done
+    fi
+    # Smart 2 controllers
+    if [ -d /dev/ida ] ; then
+        for dev in $(ls /dev/ida | egrep -v 'p'); do
+                echo "/dev/ida/$dev"
+                [ "$1" ] && echo $1
+        done
+    fi
+}
+
 finddisks() {
     # ide devices
     for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
@@ -199,92 +238,6 @@ finddisks() {
         echo "/dev/$dev"
         [ "$1" ] && echo $1
     done
-}
-
-findautoprepare() {
-    # ide devices
-    for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
-        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
-    done
-    #scsi/sata devices
-    for dev in $(ls $block 2>/dev/null | egrep '^sd'); do
-        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
-    done
-    # cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep -v 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep -v 'p'); do
-                echo "/dev/ida/$dev"
-                [ "$1" ] && echo $1
-        done
-    fi
-}
-
-# don't check on raid devices!
-findbootloaderdisks() {
-    # ide devices
-    for dev in $(ls $block | egrep '^hd'); do
-        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
-    done
-    #scsi/sata devices
-    for dev in $(ls $block | egrep '^sd'); do
-        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
-    done
-    # cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep -v 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep -v 'p'); do
-                echo "/dev/ida/$dev"
-                [ "$1" ] && echo $1
-        done
-    fi
-    # dmraid devices
-    if [ -d /dev/mapper ] ; then
-        for fakeraid in $(dmraid -s -c); do
-                echo "/dev/mapper/$fakeraid"
-                [ "$1" ] && echo $1
-        done
-    fi
 }
 
 findpartitions() {
@@ -338,49 +291,100 @@ findpartitions() {
     fi
 }
 
-# don't list raid devices, lvm2 and devicemapper!
-findbootloaderpartitions() {
-    for devpath in $(finddisks); do
-        disk=$(basename $devpath)
-        for part in $(ls $block/$disk | egrep ^$disk); do
-            # exclude checks:
-            #- part of raid device
-            #  $(cat /proc/mdstat 2>/dev/null | grep $part)
-            #- part of lvm2 device
-            #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
-            # part of luks device
-            #  $(fstype 2>/dev/null </dev/$part | grep "luks")
-            #- extended partition
-            #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
-            #- extended partition on raid partition device
-            #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
-                if [ -d $block/$disk/$part ]; then
-                    echo "/dev/$part"
-                    [ "$1" ] && echo $1
+# don't check on raid devices!
+findbootloaderdisks() {
+    if ! [ "$USE_DMRAID" = "1" ]; then
+        # ide devices
+        for dev in $(ls $block | egrep '^hd'); do
+            if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
+                if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                        echo "/dev/$dev"
+                        [ "$1" ] && echo $1
+                    fi
                 fi
             fi
         done
-    done
-    # inlcude cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
+        #scsi/sata devices
+        for dev in $(ls $block | egrep '^sd'); do
+            if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
+                if ! [ "$(cat $block/$dev/size)" = "0" ]; then
+                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+                        echo "/dev/$dev"
+                        [ "$1" ] && echo $1
+                    fi
+                fi
+            fi
         done
-    fi
-    # inlcude Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep 'p'); do
-            echo "/dev/ida/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # dmraid devices
-    if [ -d /dev/mapper ] ; then
-        for fakeraid in $(dmraid -s -c)p*; do
-                echo "/dev/mapper/$fakeraid"
+        # cciss controllers
+        if [ -d /dev/cciss ] ; then
+            for dev in $(ls /dev/cciss | egrep -v 'p'); do
+                echo "/dev/cciss/$dev"
                 [ "$1" ] && echo $1
+            done
+        fi
+        # Smart 2 controllers
+        if [ -d /dev/ida ] ; then
+            for dev in $(ls /dev/ida | egrep -v 'p'); do
+                    echo "/dev/ida/$dev"
+                    [ "$1" ] && echo $1
+            done
+        fi
+    else
+        # dmraid devices
+        if [ -d /dev/mapper ] ; then
+            for fakeraid in $(dmraid -s -c); do
+                    echo "/dev/mapper/$fakeraid"
+                    [ "$1" ] && echo $1
+            done
+        fi
+    fi
+}
+
+# don't list raid devices, lvm2 and devicemapper!
+findbootloaderpartitions() {
+    if ! [ "$USE_DMRAID" = "1" ]; then
+        for devpath in $(findbootloaderdisks); do
+            disk=$(basename $devpath)
+            for part in $(ls $block/$disk | egrep ^$disk); do
+                # exclude checks:
+                #- part of raid device
+                #  $(cat /proc/mdstat 2>/dev/null | grep $part)
+                #- part of lvm2 device
+                #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
+                # part of luks device
+                #  $(fstype 2>/dev/null </dev/$part | grep "luks")
+                #- extended partition
+                #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
+                #- extended partition on raid partition device
+                #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+                    if [ -d $block/$disk/$part ]; then
+                        echo "/dev/$part"
+                        [ "$1" ] && echo $1
+                    fi
+                fi
+            done
+        done
+        # inlcude cciss controllers
+        if [ -d /dev/cciss ] ; then
+            for dev in $(ls /dev/cciss | egrep 'p'); do
+                echo "/dev/cciss/$dev"
+                [ "$1" ] && echo $1
+            done
+        fi
+        # inlcude Smart 2 controllers
+        if [ -d /dev/ida ] ; then
+            for dev in $(ls /dev/ida | egrep 'p'); do
+                echo "/dev/ida/$dev"
+                [ "$1" ] && echo $1
+            done
+        fi
+    else
+        # dmraid devices
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
+            echo "/dev/mapper/$devpath"
+            [ "$1" ] && echo $1
         done
     fi
 }
@@ -393,27 +397,77 @@ quit
 EOF
 }
 
+get_grub_dmraid_map() {
+    USE_DMRAID="1"
+    rm /tmp/dev.map
+    DIALOG --infobox "Generating GRUB dmraid device map...\nThis could take a while.\n\n Please be patient." 0 0
+    for i in $(dmraid -s -c); do
+        majorhd=0
+        echo "(hd$majorhd) /dev/mapper/$i" >> /tmp/dev.map
+        majorhd="$(($majorhd+1))"
+    done
+}
+
+#get geometry of device for grub installation
+get_chs() {
+    realdev=""
+    checkdev=""
+    # we need the real device for geometry check!
+    realdev="$(echo $bootdev | sed -e 's#,.*)#)#g')"
+    checkdev=$(grep $realdev /tmp/dev.map | sed -e 's#.*\ ##g')
+    CYLINDERS=$(sfdisk -G $checkdev | cut -d " " -f2)
+    HEADS=$(sfdisk -G $checkdev | cut -d " " -f4)
+    SECTORS=$(sfdisk -G $checkdev | cut -d " " -f6)
+}
+
+# we need symlinks for grub installation!
+grub_dmraid_hack() {
+    for i in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
+        rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+        ln -s /dev/mapper/$i  /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+    done
+}
+
+# remove created symlinks
+remove_grub_dmraid_hack(){
+    for i in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
+        rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+    done
+}
+
 mapdev() {
     partition_flag=0
     device_found=0
     devs=$(cat /tmp/dev.map | grep -v fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
-    linuxdevice=$(echo $1 | cut -b1-8)
-    if [ "$(echo $1 | egrep '[0-9]$')" ]; then
-        # /dev/hdXY
-        pnum=$(echo $1 | cut -b9-)
-        pnum=$(($pnum-1))
-        partition_flag=1
+    # check if we use hd or sd device
+    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+        linuxdevice=$(echo $1 | sed -e 's#p[0-9].*$##')
+    else
+        linuxdevice=$(echo $1 | sed -e 's#[0-9].*$##g')
     fi
-    for  dev in $devs
-    do
-        if [ "(" = $(echo $dev | cut -b1) ]; then
-        grubdevice="$dev"
-        else
-        if [ "$dev" = "$linuxdevice" ]; then
-            device_found=1
-            break
+    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+        if [ "$(echo $1 | egrep 'p[0-9].*$')" ]; then
+            pnum=$(echo $1 | sed -e 's#.*p##g')
+            pnum=$(($pnum-1))
+            partition_flag=1
         fi
-       fi
+    else
+        if [ "$(echo $1 | egrep '[0-9]$')" ]; then
+            # /dev/hdXY
+            pnum=$(echo $1 | cut -b9-)
+            pnum=$(($pnum-1))
+            partition_flag=1
+        fi
+    fi
+    for  dev in $devs; do
+        if [ "(" = $(echo $dev | cut -b1) ]; then
+            grubdevice="$dev"
+        else
+            if [ "$dev" = "$linuxdevice" ]; then
+                device_found=1
+                break
+            fi
+        fi
     done
     if [ "$device_found" = "1" ]; then
         if [ "$partition_flag" = "0" ]; then
@@ -2174,6 +2228,8 @@ getraidarrays() {
 getcryptsetup() {
     CRYPTSETUP=""
     if ! [ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive)" ]; then
+        #avoid clash with dmraid here
+        if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
             if [ "$UUIDPARAMETER" = "yes" ]; then
                 CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(blkid -s UUID -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
                 CRYPTNAME="$(basename $PART_ROOT)"
@@ -2183,6 +2239,7 @@ getcryptsetup() {
                 CRYPTNAME="$(basename $PART_ROOT)"
                 CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
             fi
+        fi
     fi
 }
 
@@ -2330,10 +2387,14 @@ dogrub() {
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
         return 1
     fi
+    if ! [ $(dmraid -r | grep ^no ) ]; then
+        USE_DMRAID=""
+        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
+    fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
-        # check if raid device is used or devicemapper is used
-        if [ "$(echo $PART_ROOT | grep md)" ]; then
+        # check if raid device, devicemapper or dmraid is used
+        if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
                 # get redundant devices
                 for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
@@ -2342,22 +2403,27 @@ dogrub() {
                 redundant="1"
             else
                 # none raid1 devices are not bootable with grub, let it fail!
-                FAIL_RAID=1
+                FAIL_RAID="1"
             fi
-            if [ "$(echo $PART_ROOT | grep md_d)" ]; then
+            if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub!
-                FAIL_RAID=1
+                FAIL_RAID="1"
             fi
-        elif [ "$(echo $PART_ROOT | grep mapper)" ]; then
-            FAIL_LVM=1
+        elif [ "$(echo $PART_ROOT | grep /dev/mapper)" ]; then
+            # dmraid check
+            if ! [ "$(dmsetup info $PART_ROOT | grep 'DMRAID')" ]; then
+                FAIL_LVM="1"
+            else
+                _grubdev=$(mapdev $PART_ROOT)
+            fi
         else
             # use normal device
             _grubdev=$(mapdev $PART_ROOT)
         fi
         # look for a separately-mounted /boot partition
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        # check if raid device or lvm is used  on /boot partition
-        if [ "$(echo $bootdev | grep md)" ]; then
+        # check if raid device, devicemapper or dmraid is used  on /boot partition
+        if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
                 # get redundant devices
                 for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
@@ -2370,15 +2436,19 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
-        elif  [ "$(echo $bootdev | grep mapper)" ]; then
-                FAIL_LVM="1"
+        elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
+                if ! [ "$(dmsetup info $bootdev | grep 'DMRAID')" ]; then
+                    FAIL_LVM="1"
+                else
+                    _bootdev=$bootdev
+                fi
         else
             # remove fail if /boot is on other device!
             ! [ "$bootdev" = "" ] && FAIL_RAID=""
             ! [ "$bootdev" = "" ] && FAIL_LVM=""
-            if [ "$(echo $bootdev | grep md_d)" ]; then
+            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub!
-                FAIL_RAID=1
+                FAIL_RAID="1"
             fi
             # use normal device
             _bootdev=$bootdev
@@ -2437,9 +2507,9 @@ dogrub() {
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
                 fi
                 echo "initrd $subdir/kernel26-fallback.img" >>$DESTDIR/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
@@ -2481,7 +2551,7 @@ dogrub() {
         fi
         # look for a separately-mounted /boot partition
         bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        if [ "$(echo $bootpart | grep md)" ]; then
+        if [ "$(echo $bootpart | grep /dev/md)" ]; then
             bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
         fi
         if [ "$bootpart" = "" ]; then
@@ -2490,7 +2560,7 @@ dogrub() {
                 bootpart=$(cat $ANSWER)
             else
                 bootpart=$PART_ROOT
-                if [ "$(echo $bootpart | grep md)" ]; then
+                if [ "$(echo $bootpart | grep /dev/md)" ]; then
                     bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
                 fi
             fi
@@ -2505,11 +2575,17 @@ dogrub() {
             DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
             return 1
         fi
-        $DESTDIR/sbin/grub --no-floppy --batch >/tmp/grub.log 2>&1 <<EOF
+	get_chs
+        ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
+        grub_dmraid_hack
+        $DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub.log 2>&1 <<EOF
+geometry $realdev $CYLINDERS $HEADS $SECTORS
 root $bootpart
 setup $bootdev
 quit
 EOF
+        ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
+        remove_grub_dmraid_hack
         cat /tmp/grub.log >$LOG
         # unfreeze xfs filesystems
         if [ -x /usr/sbin/xfs_freeze ]; then
@@ -2525,6 +2601,8 @@ EOF
             DIALOG --msgbox "Error installing GRUB. (see $LOG for output)" 0 0
             return 1
         fi
+        # copy device map file
+        cp -f /tmp/dev.map $DESTDIR/boot/grub/device.map
         DIALOG --msgbox "GRUB was successfully installed." 0 0
         S_GRUB=1
         if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
