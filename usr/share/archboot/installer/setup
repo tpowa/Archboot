@@ -263,10 +263,20 @@ findpartitions() {
             fi
         done
     done
-    # include any mapped devices, only show dmraid partitions!
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control | grep -v $(dmraid -s -c)$); do
-        echo "/dev/mapper/$devpath"
-        [ "$1" ] && echo $1
+    # include any mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm!
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        k="$(cryptsetup status $devpath 2>/dev/null | grep device: | sed -e 's#.*\ ##g')"
+        partofcrypt="$partofcrypt $k"
+    done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"lvm2pv\"" | sed -e 's#:.*##g')"
+        partoflvm="$partoflvm $k"
+    done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(echo $partofcrypt | grep $devpath)" -o "$(echo $partoflvm | grep $devpath)" ]; then
+            echo "/dev/mapper/$devpath"
+            [ "$1" ] && echo $1
+        fi
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
@@ -381,10 +391,12 @@ findbootloaderpartitions() {
             done
         fi
     else
-        # dmraid devices
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
-            echo "/dev/mapper/$devpath"
-            [ "$1" ] && echo $1
+        # only show dmraid partitions!
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+            if ! [ "$(dmraid -s -c | grep $devpath$)" -a "$(dmraid -s -c | grep $devpath)" ]; then
+                echo "/dev/mapper/$devpath"
+                [ "$1" ] && echo $1
+            fi
         done
     fi
 }
@@ -401,8 +413,8 @@ get_grub_dmraid_map() {
     USE_DMRAID="1"
     rm /tmp/dev.map
     DIALOG --infobox "Generating GRUB dmraid device map...\nThis could take a while.\n\n Please be patient." 0 0
+    majorhd=0
     for i in $(dmraid -s -c); do
-        majorhd=0
         echo "(hd$majorhd) /dev/mapper/$i" >> /tmp/dev.map
         majorhd="$(($majorhd+1))"
     done
@@ -422,16 +434,20 @@ get_chs() {
 
 # we need symlinks for grub installation!
 grub_dmraid_hack() {
-    for i in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
-        rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
-        ln -s /dev/mapper/$i  /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+    for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        if ! [ "$(dmraid -s -c | grep $i$)" ]; then
+            rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+            ln -s /dev/mapper/$i  /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+        fi
     done
 }
 
 # remove created symlinks
 remove_grub_dmraid_hack(){
-    for i in $(ls /dev/mapper 2>/dev/null | grep -v control | grep $(dmraid -s -c) | grep -v $(dmraid -s -c)$); do
-        rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+    for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        if ! [ "$(dmraid -s -c | grep $i$)" ]; then
+            rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
+        fi
     done
 }
 
@@ -568,8 +584,8 @@ _mkfs() {
                 jfs)      yes | mkfs.jfs ${_device} >$LOG 2>&1; ret=$? ;;
                 reiserfs) yes | mkreiserfs ${_device} >$LOG 2>&1; ret=$? ;;
                 ext2)     mkfs.ext2 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext3)     mkfs.ext3 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext4)     mkfs.ext4 ${_device} >$LOG 2>&1; ret=$? ;;
+                ext3)     mke2fs -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
+                ext4)     mke2fs -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
                 ntfs-3g)  mkfs.ntfs ${_device} >$LOG 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat ${_device} >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
@@ -815,8 +831,8 @@ _raid()
             PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
         done
         # skip dmraid devices
-        for i in $(ls /dev/mapper/$(dmraid -s -c)*); do
-            ALREADYINUSE="$ALREADYINUSE $i"
+        for i in $(dmraid -s -c); do
+                ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -910,8 +926,8 @@ _raidpartitions()
             PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
         done
         # skip dmraid devices
-        for i in $(ls /dev/mapper/$(dmraid -s -c)*); do
-            ALREADYINUSE="$ALREADYINUSE $i"
+        for i in $(dmraid -s -c); do
+                ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -1006,6 +1022,7 @@ _createraid()
     # writing raid information to partition table
     if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
         for i in $(sfdisk -l $RAIDDEVICE | grep ^/dev | grep -v Empty | grep -v Extended | sed -e 's# .*##g'); do
+            # output will be /dev/md_d0*
             # get device name
             k=$(echo $i | sed -e 's#p[0-9]##g')
             # get partition number of device
@@ -1016,9 +1033,22 @@ _createraid()
     else
         for i in $(cat /tmp/.raid | grep -v missing); do
             # get device name
-            k=$(echo $i | sed -e 's#[0-9]##g')
+            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+                k=$(echo $i | sed -e 's#p[0-9].*$##')
+            else
+                k=$(echo $i | sed -e 's#[0-9].*$##g')
+            fi
             # get partition number of device
-            l=$(echo $i | sed -e 's#.*[a-z]##g')
+            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+                if [ "$(echo $i | egrep 'p[0-9].*$')" ]; then
+                    l=$(echo $i | sed -e 's#.*p##g')
+                fi
+            else
+                if [ "$(echo $1 | egrep '[0-9]$')" ]; then
+                    # /dev/hdXY
+                    l=$(echo $1 | cut -b9-)
+                fi
+            fi
             DIALOG --infobox "Changing device $k$l to raid..." 0 0
             sfdisk --change-id $k $l fd >$LOG 2>&1
         done
@@ -1133,15 +1163,30 @@ findpv()
 {
     for dev in $(pvs -o pv_name --noheading);do
         if [ "$(pvs -o vg_name --noheading $dev)" = "      " ]; then
-            echo "$dev"
-            [ "$1" ] && echo $1
+            if [ "$(echo "$dev" | grep "block/254")" ]; then
+                getsymlink="$(readlink $dev)"
+                correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
+                echo "$correctdevice"
+                [ "$1" ] && echo $1
+            else
+                echo "$dev"
+                [ "$1" ] && echo $1
+            fi
         fi
     done
 }
 
 getavailablepv()
 {
-    pvs -o pv_name,pv_size --noheading | sed -e 's#$#\\n#'
+    for i in "$(pvs -o pv_name,pv_size --noheading)"; do
+        if [ "$(echo $i | grep block/254)" ]; then
+            getsymlink="$(readlink $(echo $i | sed -e 's#\ .*$##g'))"
+            correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
+            echo "$i" | sed -e "s#.*\ #$correctdevice\ \\n#g"
+        else
+            echo "$i" | sed -e 's#$#\\n#'
+        fi
+    done
 }
 
 #find volume groups that are not already full in use
