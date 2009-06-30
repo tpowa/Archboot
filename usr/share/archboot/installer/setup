@@ -1097,20 +1097,16 @@ _createpv()
         if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
             ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
         fi
-        # skip harddisks which contain lvm! 
-        for i in $(ls /dev/mapper/* | grep -v control); do
-                lvs $i --noheading 2>/dev/null && ALREADYINUSE="$ALREADYINUSE $i"
-        done
         # skip dmraid main volume
         for i in $(dmraid -s -c); do
             ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
         done
-        for i in $PARTS; do
-            # skip harddisks which contain already encrypted partitions! 
-            for k in $(ls /dev/mapper/* | grep -v control); do
-                cryptsetup status $k 2>/dev/null | grep -v /dev/mapper | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
-            done
-        done
+        #for i in $PARTS; do
+        #    # skip harddisks which contain already encrypted partitions! 
+        #    for k in $(ls /dev/mapper/* | grep -v control); do
+        #        cryptsetup status $k 2>/dev/null | grep -v /dev/mapper | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
+        #    done
+        #done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
             k=$(echo $i | sed -e 's#[0-9]##g')
