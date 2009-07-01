@@ -265,7 +265,7 @@ findpartitions() {
             fi
         done
     done
-    # include any mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm!
+    # mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
         k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
         partofcrypt="$partofcrypt $k"
@@ -282,9 +282,12 @@ findpartitions() {
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
-        if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" ]; then
-            echo "$devpath"
-            [ "$1" ] && echo $1
+    # exlude md partitions which are part of lvm
+        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"lvm2pv\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypt_LUKS\"")" ]; then
+            if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" -a ! "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath) | grep "dm-")" ]; then
+                echo "$devpath"
+                [ "$1" ] && echo $1
+            fi
         fi
     done
     # inlcude cciss controllers
