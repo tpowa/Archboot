@@ -228,9 +228,11 @@ finddisks() {
     fi
     # dmraid devices
     if [ -d /dev/mapper ] ; then
-        for fakeraid in $(dmraid -s -c); do
-                echo "/dev/mapper/$fakeraid"
-                [ "$1" ] && echo $1
+        for fakeraid in "$(dmraid -s -c)"; do
+                if ! [ "$(echo $fakeraid | grep '^no')" ]; then
+                    echo "/dev/mapper/$fakeraid"
+                    [ "$1" ] && echo $1
+                fi
         done
     fi
     # partitionable raid
@@ -265,7 +267,7 @@ findpartitions() {
     done
     # include any mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(cryptsetup status $devpath 2>/dev/null | grep device: | sed -e 's#.*\ ##g')"
+        k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
         partofcrypt="$partofcrypt $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -273,7 +275,7 @@ findpartitions() {
         partoflvm="$partoflvm $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(echo $partofcrypt | grep $devpath)" -o "$(echo $partoflvm | grep $devpath)" ]; then
+        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
             echo "/dev/mapper/$devpath"
             [ "$1" ] && echo $1
         fi
@@ -631,13 +633,13 @@ _getavaildisks()
 {
     # NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
     for i in $(finddisks); do
-        if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
+        #if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
             if [ $(echo "$i" | grep 'mapper') ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
-        fi
+        #fi
     done
 }
 
@@ -685,7 +687,7 @@ _stopmd()
         if [ "$DISABLEMD" = "1" ]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
-                mdadm --manage --stop /dev/$i
+                mdadm --manage --stop /dev/$i > $LOG
             done
         fi
     fi
@@ -708,15 +710,15 @@ _stoplvm()
     if [ "$DISABLELVM" = "1" ]; then
         DIALOG --infobox "Removing logical volumes ..." 0 0
         for i in $LV_VOLUMES; do
-            lvremove -f /dev/mapper/$i 
+            lvremove -f /dev/mapper/$i 2>/dev/null> $LOG
         done
         DIALOG --infobox "Removing logical groups ..." 0 0
         for i in $LV_GROUPS; do
-            vgremove -f $i
+            vgremove -f $i 2>/dev/null > $LOG
         done
         DIALOG --infobox "Removing physical volumes ..." 0 0
         for i in $LV_PHYSICAL; do
-            pvremove -f $i
+            pvremove -f $i 2>/dev/null > $LOG
         done
     fi
 }
@@ -739,9 +741,9 @@ _stopluks()
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in $LUKSDEVICE; do
             LUKS_REAL_DEVICE="$(echo $(cryptsetup status $i | grep device: | sed -e 's#device:##g'))"
-            cryptsetup remove $i
+            cryptsetup remove $i > $LOG
             # delete header from device
-            dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10
+            dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10 > $LOG
         done
     fi
     [ -e /tmp/.crypttab ] && rm /tmp/.crypttab
@@ -811,8 +813,8 @@ _raid()
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
-        PARTS=$(finddisks _)
-        PARTS="$PARTS $(findpartitions _)"
+        #PARTS=$(finddisks _)
+        PARTS="$(findpartitions _)"
         ALREADYINUSE=""
         #hell yeah, this is complicated! kill software raid devices already in use.
         ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
@@ -824,19 +826,19 @@ _raid()
             fi
         done
         # skip physical volume devices
-        ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-            k=$(echo $i | sed -e 's#[0-9]##g')
-            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        done
+        #ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
+        #for i in $ALREADYINUSE; do
+        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        #    k=$(echo $i | sed -e 's#[0-9]##g')
+        #    PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        #done
         # skip dmraid devices
-        for i in $(dmraid -s -c); do
-                ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
-        done
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        done
+        #for i in $(dmraid -s -c); do
+        #        ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
+        #done
+        #for i in $ALREADYINUSE; do
+        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
@@ -919,19 +921,19 @@ _raidpartitions()
             fi
         done
         # skip physical volume devices
-        ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-            k=$(echo $i | sed -e 's#[0-9]##g')
-            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        done
+        #ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
+        #for i in $ALREADYINUSE; do
+        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        #    k=$(echo $i | sed -e 's#[0-9]##g')
+        #    PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        #done
         # skip dmraid devices
-        for i in $(dmraid -s -c); do
-                ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
-        done
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        done
+        #for i in $(dmraid -s -c); do
+        #        ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
+        #done
+        #for i in $ALREADYINUSE; do
+        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
@@ -1033,20 +1035,20 @@ _createraid()
     else
         for i in $(cat /tmp/.raid | grep -v missing); do
             # get device name
-            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" ]; then
                 k=$(echo $i | sed -e 's#p[0-9].*$##')
             else
                 k=$(echo $i | sed -e 's#[0-9].*$##g')
             fi
             # get partition number of device
-            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" ]; then
                 if [ "$(echo $i | egrep 'p[0-9].*$')" ]; then
                     l=$(echo $i | sed -e 's#.*p##g')
                 fi
             else
-                if [ "$(echo $1 | egrep '[0-9]$')" ]; then
+                if [ "$(echo $i | egrep '[0-9]$')" ]; then
                     # /dev/hdXY
-                    l=$(echo $1 | cut -b9-)
+                    l=$(echo $i | cut -b9-)
                 fi
             fi
             DIALOG --infobox "Changing device $k$l to raid..." 0 0
@@ -1088,38 +1090,37 @@ _createpv()
     while [ "$PVFINISH" != "DONE" ]; do
         : >/tmp/.pvs-create
         PVDEVICE=""
-        PARTS=$(finddisks _)
-        PARTS="$PARTS $(findpartitions _)"
+        #PARTS=$(finddisks _)
+        PARTS="$(findpartitions _)"
         ALREADYINUSE=""
-        # skip physical volume devices
-        ALREADYINUSE="$(pvs -o pv_name --noheading)"
-        # skip raidpartitions on physical volumes!
-        if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
-            ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
-        fi
-        # skip dmraid main volume
-        for i in $(dmraid -s -c); do
-            ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
+        # skip volume devices
+        for i in $(ls /dev/mapper/* | grep -v control); do
+            for k in $(vgs -o vg_name --noheading); do
+                echo $i | grep -q "/dev/mapper/$k-" && ALREADYINUSE="$ALREADYINUSE $i"
+            done
         done
-        #for i in $PARTS; do
-        #    # skip harddisks which contain already encrypted partitions! 
-        #    for k in $(ls /dev/mapper/* | grep -v control); do
-        #        cryptsetup status $k 2>/dev/null | grep -v /dev/mapper | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
-        #    done
-        #done
+        # skip already encrypted volume devices
+        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
+            k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+            ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+        done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-            k=$(echo $i | sed -e 's#[0-9]##g')
-            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
         done
+        # skip physical volume devices
+        # ALREADYINUSE="$(pvs -o pv_name --noheading)"
+        # skip raidpartitions on physical volumes!
+        #if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
+        #    ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
+        #fi
         # skip harddisks which contain software raid!
-        ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
-        for i in $ALREADYINUSE; do
-            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-            if ! [ $(echo $k | grep ^md) ]; then
-                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-            fi
-        done
+        #ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
+        #for i in $ALREADYINUSE; do
+        #    k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+         #   if ! [ $(echo $k | grep ^md) ]; then
+         #       PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+         #   fi
+        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "No devices left for physical volume creation." 0 0
@@ -1189,7 +1190,7 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [ "$(vgs -o vg_free --noheading --units m $dev | sed -e 's#M##g')" = "     0" ]; then
+        if ! [ "$(vgs -o vg_free --noheading --units m $dev | grep " 0M$")" ]; then
             echo "$dev"
             [ "$1" ] && echo $1
         fi
@@ -1198,7 +1199,11 @@ findvg()
 
 getavailablevg()
 {
-    vgs -o vg_name,vg_free --noheading --units m| sed -e 's#$#\\n#'
+    for i in $(vgs -o vg_name,vg_free --noheading --units m); do
+        if ! [ $(echo $i | grep " 0M$") ]; then
+            echo $i | sed -e 's#$#\\n#'
+        fi
+    done
 }
 
 # Creates volume group
@@ -1266,25 +1271,23 @@ _createlv()
             DIALOG --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
             return 1
         fi
+        # show all devices with sizes
+        DIALOG --msgbox "Volume Groups:\n$(getavailablevg)\n\nVolume Groups that are not shown, are already 100% in use!" 0 0
+        DIALOG --menu "Select Volume Group" 21 50 13 $LVS 2>$ANSWER || return 1
+        LV=$(cat $ANSWER)
         # enter logical volume name
         LVDEVICE=""
         while [ "${LVDEVICE}" = "" ]; do
             DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
             LVDEVICE=$(cat $ANSWER)
-            if [ "$(lvs -o lv_name --noheading 2>/dev/null | grep "^  $(echo $LVDEVICE)")" ]; then
+            if [ "$(lvs -o lv_name,vg_name --noheading 2>/dev/null | grep " $(echo $LVDEVICE) $(echo $LV)"$)" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 LVDEVICE=""
             fi
         done
-        # show all devices with sizes
-        DIALOG --msgbox "Volume Groups:\n$(getavailablevg)\n\nVolume Groups that are not shown in next dialog, are already 100% in use!" 0 0
-        # select the first device to use, no missing option available!
-        LVNUMBER=1
-        DIALOG --menu "Select Volume Group $LVNUMBER for $LVDEVICE" 21 50 13 $LVS 2>$ANSWER || return 1
-        LV=$(cat $ANSWER)
         while [ "$LV_SIZE_SET" = "" ]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m $LV)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
                 LV_SIZE=$(cat $ANSWER)
                 if [ "$LV_SIZE" = "" ]; then
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
@@ -1353,44 +1356,55 @@ _luks()
 {
     LUKSFINISH=""
     while [ "$LUKSFINISH" != "DONE" ]; do
-        PARTS=$(finddisks _)
-        PARTS="$PARTS $(findpartitions _)"
+        #PARTS=$(finddisks _)
+        PARTS="$(findpartitions _)"
         ALREADYINUSE=""
-        # skip physical volume devices
-        ALREADYINUSE="$(pvs -o pv_name --noheading)"
-        # skip raidpartitions on physical volumes!
-        if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
-            ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
-        fi
-        # skip dmraid main volume
-        for i in $(dmraid -s -c); do
-            ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
+        # skip already encrypted devices, device mapper!
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+            cryptsetup status $devpath > /dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
         done
-        for i in $PARTS; do
-            # skip harddisks which contain already encrypted partitions! 
-            for k in $(ls /dev/mapper/* | grep -v control); do
-                cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
-            done
+        # skip already encrypted devices, device mapper with encrypted parts!
+        for devpath in $(pvs -o pv_name --noheading); do
+	     if [ "$(echo $devpath | grep block/254)" ]; then
+                getsymlink="$(readlink $devpath)"
+                correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
+                if [ "$(cryptsetup status $(basename $correctdevice))" ]; then
+                   killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                   ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+                fi
+             fi
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-            k=$(echo $i | sed -e 's#[0-9]##g')
-            PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
         done
+        # skip raidpartitions on physical volumes!
+        #if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
+        #    ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
+        #fi
+        #for i in $PARTS; do
+            # skip harddisks which contain already encrypted partitions! 
+        #    for k in $(ls /dev/mapper/* | grep -v control); do
+        #        cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
+        #    done
+        #done
         # skip harddisks which contain already software raid!
-        ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
-        for i in $ALREADYINUSE; do
-            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-            if ! [ $(echo $k | grep ^md) ]; then
-                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-            fi
-        done
+        #ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
+        #for i in $ALREADYINUSE; do
+        #    k=$(echo /dev/$i | sed -e 's#[0-9]##g')
+        #    if ! [ $(echo $k | grep ^md) ]; then
+        #        PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
+        #    fi
+        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "No devices left for luks encryption." 0 0
             return 1
         fi
-        # enter logical volume name
+        # show all devices with sizes
+        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        DIALOG --menu "Select device for luks encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        # enter luks name
         LUKSDEVICE=""
         while [ "${LUKSDEVICE}" = "" ]; do
             DIALOG --inputbox "Enter the name for luks encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
@@ -1400,10 +1414,6 @@ _luks()
                 LUKSDEVICE=""
             fi
         done
-        # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
-        DIALOG --menu "Select device for luks encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to encrypt luks device below?\nName:$LUKSDEVICE\nDevice:$PART\n" 0 0 && LUKSFINISH="DONE"
     done
