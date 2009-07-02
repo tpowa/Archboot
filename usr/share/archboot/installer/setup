@@ -228,7 +228,7 @@ finddisks() {
     fi
     # dmraid devices
     if [ -d /dev/mapper ] ; then
-        for fakeraid in "$(dmraid -s -c)"; do
+        for fakeraid in $(dmraid -s -c); do
                 if ! [ "$(echo $fakeraid | grep '^no')" ]; then
                     echo "/dev/mapper/$fakeraid"
                     [ "$1" ] && echo $1
@@ -265,7 +265,7 @@ findpartitions() {
             fi
         done
     done
-    # mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm!
+    # mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
         k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
         partofcrypt="$partofcrypt $k"
@@ -275,7 +275,11 @@ findpartitions() {
         partoflvm="$partoflvm $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g')"
+        partofraid="$partofraid $k"
+    done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
             echo "/dev/mapper/$devpath"
             [ "$1" ] && echo $1
         fi
@@ -284,10 +288,10 @@ findpartitions() {
     for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
     # exlude md partitions which are part of lvm
         if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"lvm2pv\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypt_LUKS\"")" ]; then
-            if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" -a ! "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath) | grep "dm-")" ]; then
+            #if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" -a ! "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath) | grep "dm-")" ]; then
                 echo "$devpath"
                 [ "$1" ] && echo $1
-            fi
+            #fi
         fi
     done
     # inlcude cciss controllers
@@ -692,6 +696,10 @@ _stopmd()
             for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
                 mdadm --manage --stop /dev/$i > $LOG
             done
+            DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
+            for i in $(blkid -c=/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g'); do
+                mdadm --zero-superblock $i > $LOG
+            done
         fi
     fi
 }
@@ -816,7 +824,6 @@ _raid()
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
-        #PARTS=$(finddisks _)
         PARTS="$(findpartitions _)"
         ALREADYINUSE=""
         #hell yeah, this is complicated! kill software raid devices already in use.
@@ -828,20 +835,15 @@ _raid()
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
-        # skip physical volume devices
-        #ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
-        #for i in $ALREADYINUSE; do
-        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        #    k=$(echo $i | sed -e 's#[0-9]##g')
-        #    PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        #done
-        # skip dmraid devices
-        #for i in $(dmraid -s -c); do
-        #        ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
-        #done
-        #for i in $ALREADYINUSE; do
-        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        #done
+        # skip mapper devices which contain raid devices
+        ALREADYINUSE=""
+        for i in $(ls /dev/mapper/* 2>/dev/null | grep -v control); do
+            cryptsetup status $i | grep "device:.*/dev/md" && ALREADYINUSE="$ALREADYINUSE $i"
+            blkid -c=/dev/null $i | grep "TYPE=\"mdraid\"" && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
@@ -911,8 +913,7 @@ _raidpartitions()
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
-        PARTS=$(finddisks _)
-        PARTS="$PARTS $(findpartitions _)"
+        PARTS="$(findpartitions _)"
         ALREADYINUSE=""
         #hell yeah, this is complicated! kill software raid devices already in use.
         ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
@@ -923,20 +924,15 @@ _raidpartitions()
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
-        # skip physical volume devices
-        #ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading)"
-        #for i in $ALREADYINUSE; do
-        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        #    k=$(echo $i | sed -e 's#[0-9]##g')
-        #    PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        #done
-        # skip dmraid devices
-        #for i in $(dmraid -s -c); do
-        #        ALREADYINUSE="$ALREADYINUSE /dev/mapper/$i"
-        #done
-        #for i in $ALREADYINUSE; do
-        #    PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        #done
+        # skip mapper devices which contain raid devices or are part of lvm!
+        ALREADYINUSE=""
+        for i in $(ls /dev/mapper/*); do
+            cryptsetup status $i | grep "device:.*/dev/md*" && ALREADYINUSE="$ALREADYINUSE $i"
+            blkid -c=/dev/null $i | grep "TYPE=\"mdraid\"" && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        for i in $ALREADYINUSE; do
+            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
+        done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
@@ -1055,7 +1051,10 @@ _createraid()
                 fi
             fi
             DIALOG --infobox "Changing device $k$l to raid..." 0 0
-            sfdisk --change-id $k $l fd >$LOG 2>&1
+            # only change id where it is possible!
+            if [ "$(echo /dev/mapper/$(dmraid -s -c) | grep $i)" -o "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" -o "$(echo $i | grep /dev/ida/)" -o "$(echo $i | grep /dev/cciss/)" ]; then
+                sfdisk --change-id $k $l fd >$LOG 2>&1
+            fi
         done
     fi
     if [ $? -gt 0 ]; then
@@ -1105,25 +1104,18 @@ _createpv()
         # skip already encrypted volume devices
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            ### TODO! show fakeraid encrypted devices!
+            #for fakeraid in $(dmraid -s -c); do
+            #    if [ "$(echo $k | grep $fakeraid)" ]; then
+            #        ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$k"
+            #    else
+                    ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            #    fi
+            #done
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
-        # skip physical volume devices
-        # ALREADYINUSE="$(pvs -o pv_name --noheading)"
-        # skip raidpartitions on physical volumes!
-        #if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
-        #    ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
-        #fi
-        # skip harddisks which contain software raid!
-        #ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
-        #for i in $ALREADYINUSE; do
-        #    k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-         #   if ! [ $(echo $k | grep ^md) ]; then
-         #       PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-         #   fi
-        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "No devices left for physical volume creation." 0 0
@@ -1380,24 +1372,6 @@ _luks()
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
-        # skip raidpartitions on physical volumes!
-        #if [ "$(pvs -o pv_name --noheading | grep /dev/md_)" ]; then
-        #    ALREADYINUSE="$ALREADYINUSE $(pvs -o pv_name --noheading | sed -e 's#p[0-9]$##g')"
-        #fi
-        #for i in $PARTS; do
-            # skip harddisks which contain already encrypted partitions! 
-        #    for k in $(ls /dev/mapper/* | grep -v control); do
-        #        cryptsetup status $k 2>/dev/null | grep -q $i && ALREADYINUSE="$ALREADYINUSE $i"
-        #    done
-        #done
-        # skip harddisks which contain already software raid!
-        #ALREADYINUSE="$ALREADYINUSE $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')"
-        #for i in $ALREADYINUSE; do
-        #    k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-        #    if ! [ $(echo $k | grep ^md) ]; then
-        #        PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-        #    fi
-        #done
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "No devices left for luks encryption." 0 0
