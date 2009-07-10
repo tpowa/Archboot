@@ -229,7 +229,7 @@ finddisks() {
     # dmraid devices
     if [ -d /dev/mapper ] ; then
         for fakeraid in $(dmraid -s -c); do
-                if ! [ "$(echo $fakeraid | grep '^no')" ]; then
+                if [ "$(echo $fakeraid | grep '_')" ]; then
                     echo "/dev/mapper/$fakeraid"
                     [ "$1" ] && echo $1
                 fi
@@ -265,9 +265,9 @@ findpartitions() {
             fi
         done
     done
-    # mapped devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
+    # device mapper devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypt_LUKS\"" | sed -e 's#:.*##g')"
         partofcrypt="$partofcrypt $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -286,12 +286,10 @@ findpartitions() {
     done
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
-    # exlude md partitions which are part of lvm
+        # exlude md partitions which are part of lvm
         if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"lvm2pv\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypt_LUKS\"")" ]; then
-            #if [ "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath))" -a ! "$(cat /proc/mdstat 2>/dev/null | grep -w $(basename $devpath) | grep "dm-")" ]; then
                 echo "$devpath"
                 [ "$1" ] && echo $1
-            #fi
         fi
     done
     # inlcude cciss controllers
@@ -839,7 +837,6 @@ _raid()
         ALREADYINUSE=""
         for i in $(ls /dev/mapper/* 2>/dev/null | grep -v control); do
             cryptsetup status $i | grep "device:.*/dev/md" && ALREADYINUSE="$ALREADYINUSE $i"
-            blkid -c=/dev/null $i | grep "TYPE=\"mdraid\"" && ALREADYINUSE="$ALREADYINUSE $i"
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -928,7 +925,6 @@ _raidpartitions()
         ALREADYINUSE=""
         for i in $(ls /dev/mapper/*); do
             cryptsetup status $i | grep "device:.*/dev/md*" && ALREADYINUSE="$ALREADYINUSE $i"
-            blkid -c=/dev/null $i | grep "TYPE=\"mdraid\"" && ALREADYINUSE="$ALREADYINUSE $i"
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -1097,21 +1093,25 @@ _createpv()
         ALREADYINUSE=""
         # skip volume devices
         for i in $(ls /dev/mapper/* | grep -v control); do
-            for k in $(vgs -o vg_name --noheading); do
-                echo $i | grep -q "/dev/mapper/$k-" && ALREADYINUSE="$ALREADYINUSE $i"
-            done
+            [ "$(lvs /dev/mapper/$i 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
         done
         # skip already encrypted volume devices
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
-            k="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            ### TODO! show fakeraid encrypted devices!
-            #for fakeraid in $(dmraid -s -c); do
-            #    if [ "$(echo $k | grep $fakeraid)" ]; then
-            #        ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$k"
-            #    else
-                    ! [ "$k" = "" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
-            #    fi
-            #done
+            realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+            [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+        done
+        # skip md devices, which already have lvm devices!
+        for i in $PARTS; do
+            mdcheck="$(echo $i | sed -e 's#/dev/##g')"
+            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                for k in $(find /sys/block/$mdcheck/ -name 'dm*'); do
+                    # check encrypted volume
+                    realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+                    [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    # check on normal lvs
+                    [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                done
+            fi
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
@@ -1368,6 +1368,16 @@ _luks()
                    ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                 fi
              fi
+        done
+        # skip md devices, which already has encrypted devices!
+        ### TODO check on volume devices
+        for i in $PARTS; do
+            mdcheck="$(echo $i | sed -e 's#/dev/##g')"
+            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*')" = "" ]; then
+                for k in $(find /sys/block/$mdcheck/ -name 'dm*'); do
+                    cryptsetup status $(cat $k/dm/name) > /dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+                done
+            fi
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
