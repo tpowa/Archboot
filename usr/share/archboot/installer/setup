@@ -1368,14 +1368,31 @@ _luks()
                    ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                 fi
              fi
+             # remove hidden crypt by md device
+             if [ "$(echo $devpath | grep /dev/md)" ]; then
+                 mdcheck="$(echo $devpath | sed -e 's#/dev/##g')"
+                 if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                     for k in $(find /sys/block/$mdcheck/ -name 'dm*'); do
+                         if [ "$(cryptsetup status $(cat $k/dm/name) 2> /dev/null)" ]; then
+                             killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                             ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+                         fi
+                     done
+                 fi
+             fi
         done
         # skip md devices, which already has encrypted devices!
-        ### TODO check on volume devices
         for i in $PARTS; do
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
-            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*')" = "" ]; then
+            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*'); do
-                    cryptsetup status $(cat $k/dm/name) > /dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+                    cryptsetup status $(cat $k/dm/name) 2> /dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+                    # check lvm devices if encryption was used!
+                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2> /dev/null)" ]; then
+                        for devpath in $ALREADYINUSE; do
+                            [ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                        done
+                    fi
                 done
             fi
         done
