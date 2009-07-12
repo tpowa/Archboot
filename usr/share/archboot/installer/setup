@@ -98,12 +98,12 @@ getuuid()
 
 # Check media on install packages
 check_media() {
-    ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media > /dev/null 2>&1
+    ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media >/dev/null 2>&1
     if [ -d $media/core-$(uname -m)/pkg ]; then
         SET_MEDIA=1
         break
     else
-        umount $media > /dev/null 2>&1
+        umount $media >/dev/null 2>&1
     fi
 }
 
@@ -112,7 +112,7 @@ get_media() {
     media=/src
     SET_MEDIA=0
     #unmount media first, we may have leftovers ...
-    umount $media  > /dev/null 2>&1
+    umount $media  >/dev/null 2>&1
     # ide devices
     if [ "$SET_MEDIA" = "0" ]; then
         for dev in $(ls $block | egrep '^hd'); do
@@ -762,19 +762,19 @@ _stopluks()
 _dmraid_update()
 {
     DIALOG --infobox "Deactivating dmraid devices ..." 0 0
-    dmraid -an > /dev/null 2>&1
+    dmraid -an >/dev/null 2>&1
     if [ "$DETECTED_LVM" = "1" -o "$DETECTED_LUKS" = "1" ]; then
 	DIALOG --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && RESETDM="1"
 	if [ "$RESETDM" = "1" ]; then
             DIALOG --infobox "Resetting devicemapper devices ..." 0 0
-	    dmsetup remove_all > /dev/null 2>&1
+	    dmsetup remove_all >/dev/null 2>&1
 	fi
     else
         DIALOG --infobox "Resetting devicemapper devices ..." 0 0
-	dmsetup remove_all > /dev/null 2>&1
+	dmsetup remove_all >/dev/null 2>&1
     fi
     DIALOG --infobox "Reactivating dmraid devices ..." 0 0
-    dmraid -ay -Z > /dev/null 2>&1
+    dmraid -ay -Z >/dev/null 2>&1
 }
 
 #helpbox for raid
@@ -1455,7 +1455,7 @@ _luks()
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null); do
                     cryptsetup status $(cat $k/dm/name) >/dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
-                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2> /dev/null)" ]; then
+                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
                         for devpath in $ALREADYINUSE; do
                             [ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ] && ALREADYINUSE="$ALREADYINUSE $i"
                         done
@@ -1687,7 +1687,7 @@ EOF
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
-        if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 > /dev/null; then
+        if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" || return 1
         fi
         part=$(($part + 1))
@@ -1950,7 +1950,7 @@ select_packages() {
                 CHKLIST="$CHKLIST $i ^ ON"
             done
             for category in $(cat $PKGS | sed 's|/.*$||g' | uniq | grep -v kernels); do
-                grep $category /tmp/.pkgcategory > /dev/null 2>&1 || CHKLIST="$CHKLIST $category - OFF"
+                grep $category /tmp/.pkgcategory >/dev/null 2>&1 || CHKLIST="$CHKLIST $category - OFF"
             done
         fi
         DIALOG --checklist "Select Package Categories" 19 55 12 $CHKLIST 2>/tmp/.pkgcategory || return 1
@@ -2680,10 +2680,10 @@ dogrub() {
         # freeze xfs filesystems to enable grub installation on xfs filesystems
         if [ -x /usr/sbin/xfs_freeze ]; then
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR/boot > /dev/null 2>&1
+                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
             fi
             if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR > /dev/null 2>&1
+                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
             fi
         fi
         # look for a separately-mounted /boot partition
@@ -2727,10 +2727,10 @@ EOF
         # unfreeze xfs filesystems
         if [ -x /usr/sbin/xfs_freeze ]; then
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR/boot > /dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
             fi
             if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR > /dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
             fi
         fi
 
@@ -3264,7 +3264,7 @@ configure_system()
         # /etc/initcpio.conf
         run_mkinitcpio
         # /etc/locale.gen
-        chroot ${DESTDIR} locale-gen > /dev/null 2>&1
+        chroot ${DESTDIR} locale-gen >/dev/null 2>&1
         ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
