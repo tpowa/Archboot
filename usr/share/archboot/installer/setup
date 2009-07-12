@@ -833,12 +833,38 @@ _raid()
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
-        # skip mapper devices which contain raid devices
+        # skip encrypted mapper devices which contain raid devices
         ALREADYINUSE=""
         for i in $(ls /dev/mapper/* 2>/dev/null | grep -v control); do
-            cryptsetup status $i | grep "device:.*/dev/md" && ALREADYINUSE="$ALREADYINUSE $i"
+            cryptsetup status $i 2>/dev/null | grep -q "device:.*/dev/md" && ALREADYINUSE="$ALREADYINUSE $i"
         done
-        ### TODO check layers of encrypt and lvm!
+        # skip lvm with raid devices
+        for devpath in $(pvs -o pv_name --noheading); do
+            # skip simple lvm device with raid device
+            if [ "$(echo $devpath | grep /dev/md)" ]; then
+                killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+            fi
+            # skip encrypted raid device
+            if [ "$(echo $devpath | grep block/254)" ]; then
+                getsymlink="$(readlink $devpath)"
+                correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
+                if [ "$(cryptsetup status $(basename $correctdevice) | grep "device:.*/dev/md")" ]; then
+                   killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                   ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+                fi
+            fi
+        done
+        # skip already encrypted volume devices with raid device
+        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
+            realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+            if [ "$(lvs $realdevice 2>/dev/null)" ]; then
+                vg="$(lvs -o vg_name --noheading $realdevice)"
+                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg" | grep "/dev/md")" ]; then
+                   ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+                fi
+            fi
+        done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
@@ -922,15 +948,41 @@ _raidpartitions()
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
-        # skip mapper devices which contain raid devices or are part of lvm!
+        # skip encrypted mapper devices which contain raid devices!
         ALREADYINUSE=""
         for i in $(ls /dev/mapper/*); do
-            cryptsetup status $i | grep "device:.*/dev/md*" && ALREADYINUSE="$ALREADYINUSE $i"
+            cryptsetup status $i 2>/dev/null | grep -q "device:.*/dev/md.*" && ALREADYINUSE="$ALREADYINUSE $i"
+        done
+        # skip lvm with raid devices
+        for devpath in $(pvs -o pv_name --noheading); do
+            # skip simple lvm with raid device
+            if [ "$(echo $devpath | grep /dev/md)" ]; then
+                killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+            fi
+            # skip encrypted raid device
+            if [ "$(echo $devpath | grep block/254)" ]; then
+                getsymlink="$(readlink $devpath)"
+                correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
+                if [ "$(cryptsetup status $(basename $correctdevice) | grep "device:.*/dev/md")" ]; then
+                   killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                   ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
+                fi
+            fi
+        done
+        # skip already encrypted volume devices with raid device
+        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
+            realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
+            if [ "$(lvs $realdevice 2>/dev/null)" ]; then
+                vg="$(lvs -o vg_name --noheading $realdevice)"
+                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg" | grep "/dev/md")" ]; then
+                   ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+                fi
+            fi
         done
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
-        ### TODO check layers of encrypt and lvm!
         # break if all devices are in use
         if [ "$PARTS" = "" ]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
@@ -1371,14 +1423,14 @@ _luks()
         ALREADYINUSE=""
         # skip already encrypted devices, device mapper!
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            cryptsetup status $devpath > /dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            cryptsetup status $devpath >/dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
         done
         # skip already encrypted devices, device mapper with encrypted parts!
         for devpath in $(pvs -o pv_name --noheading); do
 	     if [ "$(echo $devpath | grep block/254)" ]; then
                 getsymlink="$(readlink $devpath)"
                 correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
-                if [ "$(cryptsetup status $(basename $correctdevice))" ]; then
+                if [ "$(cryptsetup status $(basename $correctdevice) >/dev/null 2>&1)" ]; then
                    killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                    ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                 fi
@@ -1388,7 +1440,7 @@ _luks()
                  mdcheck="$(echo $devpath | sed -e 's#/dev/##g')"
                  if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
                      for k in $(find /sys/block/$mdcheck/ -name 'dm*'); do
-                         if [ "$(cryptsetup status $(cat $k/dm/name) 2> /dev/null)" ]; then
+                         if [ "$(cryptsetup status $(cat $k/dm/name) >/dev/null 2>&1)" ]; then
                              killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                              ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                          fi
@@ -1401,7 +1453,7 @@ _luks()
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
             if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null); do
-                    cryptsetup status $(cat $k/dm/name) 2> /dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+                    cryptsetup status $(cat $k/dm/name) >/dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
                     if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2> /dev/null)" ]; then
                         for devpath in $ALREADYINUSE; do
@@ -1416,9 +1468,9 @@ _luks()
             mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
             if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null); do
-                    cryptsetup status $(cat $k/dm/name) 2> /dev/null && ALREADYINUSE="$ALREADYINUSE $i"
+                    cryptsetup status $(cat $k/dm/name) >/dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
-                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2> /dev/null)" ]; then
+                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
                         for devpath in $ALREADYINUSE; do
                             [ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ] && ALREADYINUSE="$ALREADYINUSE $i"
                         done
@@ -1619,7 +1671,7 @@ autoprepare() {
     printk off
     DIALOG --infobox "Partitioning $DEVICE" 0 0
     # clean partitiontable to avoid issues!
-    dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+    dd if=/dev/zero of=$DEVICE bs=512 count=1 2>&1 >/dev/null 
     sfdisk $DEVICE -uM >$LOG 2>&1 <<EOF
 $sfdisk_input
 EOF
