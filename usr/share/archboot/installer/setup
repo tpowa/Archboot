@@ -38,12 +38,12 @@ S_NET=0         # network configuration
 S_CLOCK=0       # clock and timezone
 S_PART=0        # partitioning
 S_MKFS=0        # formatting
-S_MKFSAUTO=0    # auto fs part/formatting TODO: kill this
+S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
 S_LILO=0        # TODO: kill this - if using lilo
-S_GRUB=0        # TODO: kill this - if using grub
+S_GRUB=0        # using grub
 S_BOOT=""       # bootloader installed (set to loader name instead of 1)
 
 # menu item tracker- autoselect the next item
