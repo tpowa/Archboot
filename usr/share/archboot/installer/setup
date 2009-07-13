@@ -860,7 +860,7 @@ _raid()
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
             if [ "$(lvs $realdevice 2>/dev/null)" ]; then
                 vg="$(lvs -o vg_name --noheading $realdevice)"
-                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg" | grep "/dev/md")" ]; then
+                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
                    ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
                 fi
             fi
@@ -975,7 +975,7 @@ _raidpartitions()
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
             if [ "$(lvs $realdevice 2>/dev/null)" ]; then
                 vg="$(lvs -o vg_name --noheading $realdevice)"
-                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg" | grep "/dev/md")" ]; then
+                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
                    ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
                 fi
             fi
