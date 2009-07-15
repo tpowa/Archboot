@@ -2524,7 +2524,7 @@ dogrub() {
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
         return 1
     fi
-    if ! [ $(dmraid -r | grep ^no ) ]; then
+    if ! [ "$(dmraid -r | grep ^no )" ]; then
         USE_DMRAID=""
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
@@ -3103,7 +3103,7 @@ auto_hwdetect()
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
         if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
-            if ! [ $(dmraid -r | grep ^no ) ]; then
+            if ! [ "$(dmraid -r | grep ^no )" ]; then
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
