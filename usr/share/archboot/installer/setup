@@ -3107,13 +3107,8 @@ auto_hwdetect()
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
-        if [ -e $DESTDIR/lib/initcpio/hooks/mdadm ]; then
-            [ "$(cat /proc/mdstat 2>/dev/null | grep ^md[0-9])" -o "$(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9])" ] && HWPARAMETER="$HWPARAMETER --mdadm"
-        fi
-        [ "$(blkid -c /dev/null | grep TYPE=\"lvm2pv\")" ] && HWPARAMETER="$HWPARAMETER --lvm2"
-        [ "$(blkid -c /dev/null | grep TYPE=\"crypt_LUKS\")" ] && HWPARAMETER="$HWPARAMETER --encrypt"
         HWDETECTHOSTCONTROLLER="$(hwdetect --filesystem --hostcontroller $HWPARAMETER)"
-        HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
+        HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER --rootdevice=$PART_ROOT)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
         [ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
