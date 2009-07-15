@@ -859,7 +859,7 @@ _raid()
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
             if [ "$(lvs $realdevice 2>/dev/null)" ]; then
-                vg="$(lvs -o vg_name --noheading $realdevice)"
+                vg="$(echo $(lvs -o vg_name --noheading $realdevice))"
                 if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
                    ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
                 fi
@@ -974,7 +974,7 @@ _raidpartitions()
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
             if [ "$(lvs $realdevice 2>/dev/null)" ]; then
-                vg="$(lvs -o vg_name --noheading $realdevice)"
+                vg="$(echo $(lvs -o vg_name --noheading $realdevice))"
                 if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
                    ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
                 fi
@@ -3108,7 +3108,7 @@ auto_hwdetect()
             fi
         fi
         HWDETECTHOSTCONTROLLER="$(hwdetect --filesystem --hostcontroller $HWPARAMETER)"
-        HWDETECTHOOKS="$(hwdetect --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER --rootdevice=$PART_ROOT)"
+        HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
         [ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
