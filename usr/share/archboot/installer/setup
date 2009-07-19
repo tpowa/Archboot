@@ -2227,17 +2227,14 @@ auto_network()
     DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
 
     if [ "$S_DHCP" != "1" ]; then
-        sed -i -e "s#eth0=\"eth0#$INTERFACE=\"$INTERFACE#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s# 192.168.0.2 # $IPADDR #g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s# 255.255.255.0 # $SUBNET #g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s# 192.168.0.255\"# $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^eth.*#$INTERFACE=\"$INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
             if [ "$GW" != "" ]; then
                 sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf
                 sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf
             fi
         echo "nameserver $DNS" >> ${DESTDIR}/etc/resolv.conf
     else
-        sed -i -e "s#eth0=\"eth0.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^eth.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
     fi
         sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf
     if [ "$PROXY_HTTP" != "" ]; then
