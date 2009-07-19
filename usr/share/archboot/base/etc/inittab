@@ -13,14 +13,13 @@ id:2:initdefault:
 rc::sysinit:/etc/rc.sysinit
 rh:06:wait:/etc/rc.shutdown
 
-# -8 options fixes umlauts problem on login
 #c0:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 9600 ttyS0 linux
-c1:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/1 linux
-c2:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/2 linux
-c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/3 linux
-c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/4 linux
-c5:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/5 linux
-c6:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 vc/6 linux
+c1:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty1 linux
+c2:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty2 linux
+c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty3 linux
+c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty4 linux
+c5:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty5 linux
+c6:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty6 linux
 
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
 
