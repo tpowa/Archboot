@@ -461,7 +461,7 @@ remove_grub_dmraid_hack(){
 mapdev() {
     partition_flag=0
     device_found=0
-    devs=$(cat /tmp/dev.map | grep -v fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
+    devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     # check if we use hd or sd device
     if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
         linuxdevice=$(echo $1 | sed -e 's#p[0-9].*$##')
@@ -694,6 +694,16 @@ _stopmd()
             for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
                 mdadm --manage --stop /dev/$i > $LOG
             done
+            DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
+            for i in $(blkid -c=/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g'); do
+                mdadm --zero-superblock $i > $LOG
+            done
+        fi
+    fi
+    DISABLEMDSB=""
+    if [ "$(blkid -c=/dev/null | grep "TYPE=\"mdraid\"")" ]; then
+        DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
+        if [ "$DISABLEMDSB" = "1" ]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(blkid -c=/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g'); do
                 mdadm --zero-superblock $i > $LOG
@@ -2617,9 +2627,9 @@ dogrub() {
                 subdir="/boot"
             fi
             # keep the file from being completely bogus
-            if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
+            if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
                 DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
-                grubdev="(hd0,0)"
+                _grubdev="(hd0,0)"
             fi
             NUMBER=0
             # create default grub entries
