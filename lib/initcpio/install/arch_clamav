@@ -1,0 +1,28 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="clamav-config clamconf clamdscan clamdtop clamscan freshclam sigtool clamd"
+    FILES=""
+    SCRIPT=""
+    add_file "/etc/rc.d/clamav"
+    add_file "/usr/sbin/clamdwatch.pl"
+    # add /var directories
+    add_dir "/var/run/clamav"
+    add_dir "/var/lib/clamav"
+    add_dir "/var/log/clamav"
+    ### TODO add perl modules
+    ### add config files
+clamav /etc/clamav/clamd.conf           
+clamav /etc/clamav/freshclam.conf       
+clamav /etc/conf.d/                     
+clamav /etc/conf.d/clamav       
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes clamav on an arch boot image.
+HELPEOF
+} 
