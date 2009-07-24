@@ -1918,6 +1918,7 @@ prepare_pacman() {
 [options]
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /src/core-$(uname -m)/pkg
+CacheDir = /src/core-any/pkg
 
 [core]
 Server = ${serverurl}
