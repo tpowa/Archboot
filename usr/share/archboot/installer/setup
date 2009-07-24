@@ -1180,7 +1180,7 @@ _createpv()
         # skip md partition devices, which already have lvm devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
+            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" -a "$mdcheck" = "" ]; then
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
                     realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
@@ -1476,7 +1476,7 @@ _luks()
         # skip md partition devices, which already has encrypted devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" ]; then
+            if ! [ "$(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null)" = "" -a "$mdcheck" = "" ]; then
                 for k in $(find /sys/block/$mdcheck/ -name 'dm*' 2>/dev/null); do
                     cryptsetup status $(cat $k/dm/name) >/dev/null 2>&1 && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
