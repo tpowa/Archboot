@@ -66,13 +66,14 @@ install ()
     pacman -Sw --noconfirm ${PACKAGES}
     # collect the packages
     mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
+    mkdir -p ${TEMPDIR}/core-any/pkg/
     for COPY in ${SEARCHSVN};do
         if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
             source "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
-                cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
+                cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz ${TEMPDIR}/core-any/pkg/
                 echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz || return 1
+                repo-add ${TEMPDIR}/core-any/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz || return 1
             else
                 cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
                 echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt

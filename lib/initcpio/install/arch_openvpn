@@ -6,16 +6,20 @@ install ()
     BINARIES="openvpn"
     FILES=""
     SCRIPT=""
-    CONFIG_FILES="README client.conf firewall.sh home.up loopback-client loopback-server office.up openvpn-shutdown.sh openvpn-startup.sh server.conf static-home.conf static-office.conf tls-home.conf tls-office.conf xinetd-client-config xinetd-server-config"
-    for i in $CONFIG_FILES; do
-        add_file "/usr/share/archboot/openvpn/etc/openvpn/examples/$i" "/etc/openvpn/examples/$i"
+    add_dir "/etc/openvpn"
+    add_files "/etc/rc.d/openvpn"
+    add_files "/etc/rc.d/openvpn-tapdev"
+    add_file "/usr/share/archboot/openvpn/etc/conf.d/openvpn-tapdev" "/etc/conf.d/openvpn-tapdev"
+    # add examples
+    for i in /usr/share/openvpn/examples/*; do
+        add_file "$i"
     done
     # add easy rsa
     for i in /usr/share/openvpn/easy-rsa/*; do
         add_file "$i"
     done
     # add plugins
-    for i in /usr/share/openvpn/plugin/lib/*; do
+    for i in /usr/lib/openvpn/*; do
         add_file "$i"
     done
     # fix licenses
