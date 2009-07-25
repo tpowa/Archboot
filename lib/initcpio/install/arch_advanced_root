@@ -1,0 +1,17 @@
+# vim:set ft=sh:
+
+install ()
+{
+    MODULES=""
+    BINARIES="hwdetect"
+    FILES=""
+    SCRIPT="arch_advanced_root"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will use hwdetect to detect the needed 
+  advanced hooks for your system.
+HELPEOF
+}

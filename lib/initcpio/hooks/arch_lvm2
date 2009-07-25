@@ -1,18 +1,20 @@
 run_hook ()
 {
-    /sbin/modprobe -q dm-mod >/dev/null 2>&1
-    # fix if udev initialises /dev/mapper/control
-    sleep 0.5
-    if [ -e "/sys/class/misc/device-mapper" ]; then
-        if [ ! -c "/dev/mapper/control" ]; then
-            read dev_t < /sys/class/misc/device-mapper/dev
-            if [ ! -e "/dev/mapper/control" ]; then
-                /bin/mknod "/dev/mapper/control" c $(/bin/replace "${dev_t}" ':')
+    if ! [ "$LVMRUN" = "1" ]; then
+        /sbin/modprobe -q dm-mod >/dev/null 2>&1
+        # fix if udev initialises /dev/mapper/control
+        sleep 0.5
+        if [ -e "/sys/class/misc/device-mapper" ]; then
+            if [ ! -c "/dev/mapper/control" ]; then
+                read dev_t < /sys/class/misc/device-mapper/dev
+                if [ ! -e "/dev/mapper/control" ]; then
+                    /bin/mknod "/dev/mapper/control" c $(/bin/replace "${dev_t}" ':')
+                fi
             fi
+            msg "Scanning logical volumes..."
+            /sbin/lvm vgscan --ignorelockingfailure
+            msg "Activating logical volumes..."
+            /sbin/lvm vgchange --ignorelockingfailure -ay
         fi
-        msg "Scanning logical volumes..."
-        /sbin/lvm vgscan --ignorelockingfailure
-        msg "Activating logical volumes..."
-        /sbin/lvm vgchange --ignorelockingfailure -ay
     fi
 }
