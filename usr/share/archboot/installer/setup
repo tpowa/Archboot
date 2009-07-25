@@ -2069,7 +2069,7 @@ installpkg() {
     if [ "$MODE" = "media" ]; then
         PACKAGES=
         # fix pacman list!
-        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/"//g' /tmp/.pkglist
+        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' /tmp/.pkglist
         for pkg in $(cat /tmp/.pkglist); do
             pkgname=${pkg%-*-*}
             PACKAGES="$PACKAGES $pkgname"
