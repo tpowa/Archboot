@@ -13,6 +13,7 @@ install ()
     add_file "/usr/share/archboot/clamav/etc/clamav/freshclam.conf" "/etc/clamav/freshclam.conf"
     # get latest virus definitions
     CLAMAV=$(mktemp -d /tmp/clamav.XXXX)
+    chmod 777 $CLAMAV
     freshclam --config-file=/usr/share/archboot/clamav/etc/clamav/freshclam.conf --datadir=$CLAMAV
     add_file "$CLAMAV/mirrors.dat" "/var/lib/clamav/mirrors.dat"
     add_file "$CLAMAV/main.cvd" "/var/lib/clamav/main.cvd"
