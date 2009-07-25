@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="hwdetect"
+    BINARIES=""
     FILES=""
     SCRIPT="arch_advanced_root"
 }
@@ -11,7 +11,8 @@ install ()
 help ()
 {
 cat <<HELPEOF
-  This hook will use hwdetect to detect the needed 
-  advanced hooks for your system.
+  This hook will override advanced hooks for your system.
+  Use advanced="your hooks hooks" eg. advanced="encrypt mdadm"
+  to override the defaults.
 HELPEOF
 }

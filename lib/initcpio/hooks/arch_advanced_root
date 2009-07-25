@@ -2,7 +2,7 @@
 run_hook ()
 {
 if ! [ "${root}" = "" -a "${ip}" = "" ]; then
-    HOOKS="$(hwdetect --rootdevice=${root} --advanced)"
+    HOOKS="$advanced"
     echo $HOOKS | grep -q lvm && export LVMRUN=1
     echo $HOOKS | grep -q mdadm && export MDADMRUN=1
     echo $HOOKS | grep -q encrypt && export ENCRYPTRUN=1
