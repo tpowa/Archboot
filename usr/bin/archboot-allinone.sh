@@ -83,6 +83,7 @@ tar xvf core-x86_64.tar -C ${CORE64} || exit 1
 # move in packages
 mv ${LOWMEM}/tmp/*/core-i686 ${ALLINONE}/
 mv ${LOWMEM64}/tmp/*/core-x86_64 ${ALLINONE}/
+mv ${LOWMEM}/tmp/*/core-any ${ALLINONE}/
 
 # move in doc
 mv ${CORE}/tmp/*/arch/archdoc.txt ${ALLINONE}/arch/
