@@ -5,10 +5,10 @@ install ()
     MODULES=""
     BINARIES="clamscan freshclam"
     FILES=""
-    SCRIPT=""
+    SCRIPT="arch_clamav"
     # add /var directories
     add_dir "/var/run/clamav"
-    add_dir "/var/lib/clamav"
+    add_dir "/var/lib/"
     add_dir "/var/log/clamav"
     add_file "/usr/share/archboot/clamav/etc/clamav/freshclam.conf" "/etc/clamav/freshclam.conf"
     # add unrar support

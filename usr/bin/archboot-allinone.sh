@@ -73,6 +73,7 @@ ALLINONE=$(mktemp -d /tmp/allinone.XXX)
 # create directories
 mkdir ${ALLINONE}/arch
 mkdir ${ALLINONE}/isolinux
+mkdir ${ALLINONE}/clamav
 
 # extract tarballs
 tar xvf lowmem-i686.tar -C ${LOWMEM} || exit 1
@@ -87,6 +88,13 @@ mv ${LOWMEM}/tmp/*/core-any ${ALLINONE}/
 
 # move in doc
 mv ${CORE}/tmp/*/arch/archdoc.txt ${ALLINONE}/arch/
+
+# copy in clamav db files
+if [ -d /var/lib/clamav ]; then
+    cp /var/lib/clamav/daily.cvd ${ALLINONE}/clamav/
+    cp /var/lib/clamav/main.cvd ${ALLINONE}/clamav/
+    cp /var/lib/clamav/mirrors.dat ${ALLINONE}/clamav/
+fi
 
 # place kernels and memtest
 mv ${LOWMEM}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/
