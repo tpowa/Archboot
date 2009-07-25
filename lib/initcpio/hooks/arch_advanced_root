@@ -1,8 +1,8 @@
 # vim: set ft=sh:
 run_hook ()
 {
-if ! [ "${root}" = "" -a "${ip}" = "" ]; then
-    HOOKS="$advanced"
+if ! [ "${root}" = "" -a "${ip}" = "" -a "${advanced}" = "" ]; then
+    HOOKS="$(echo ${advanced})"
     echo $HOOKS | grep -q lvm && export LVMRUN=1
     echo $HOOKS | grep -q mdadm && export MDADMRUN=1
     echo $HOOKS | grep -q encrypt && export ENCRYPTRUN=1
