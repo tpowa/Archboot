@@ -3,7 +3,7 @@
 #       encryption schemes
 run_hook ()
 {
-    if [ "$ENCRYPTRUN" = "1" ]; then
+    if ! [ "$ENCRYPTRUN" = "1" ]; then
         /sbin/modprobe -a -q dm-crypt >/dev/null 2>&1
         if [ -e "/sys/class/misc/device-mapper" ]; then
             if [ ! -c "/dev/mapper/control" ]; then
