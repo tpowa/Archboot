@@ -11,6 +11,13 @@ install ()
     add_dir "/var/lib/clamav"
     add_dir "/var/log/clamav"
     add_file "/usr/share/archboot/clamav/etc/clamav/freshclam.conf" "/etc/clamav/freshclam.conf"
+    # add unrar support
+    add_file "/usr/lib/libclamunrar.so"
+    add_file "/usr/lib/libclamunrar.so.6"
+    add_file "/usr/lib/libclamunrar.so.6.0.4"
+    add_file "/usr/lib/libclamunrar_iface.so"
+    add_file "/usr/lib/libclamunrar_iface.so.6"
+    add_file "/usr/lib/libclamunrar_iface.so.6.0.4"
     # get latest virus definitions
     CLAMAV=$(mktemp -d /tmp/clamav.XXXX)
     chmod 777 $CLAMAV
