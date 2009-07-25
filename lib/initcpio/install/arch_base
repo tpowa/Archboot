@@ -3,7 +3,7 @@
 install ()
 {
     SCRIPT="arch_base"
-    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim-normal lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su cat cpio dd gzip wget top sdparm tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir reboot poweroff pidof nc lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzless lzma lzmadec lzmore unlzma unxz xz xzcat xzdec"
+    BINARIES="init agetty mount modprobe modinfo umount basename du clear env head id md5sum nano netcat printf tail tee test tr tty uptime w who wc which whoami xargs yes syslog-ng bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted gawk cp mv shutdown free ls rm sed test less chgrp chmod chown date df dialog dmesg egrep fgrep grep hostname kill killall killall5 more ps pwd rmdir stty sync tar touch uname vim-normal lsmod modinfo rmmod hdparm true mktemp chroot dirname expr bzip2 hwclock depmod su cat cpio dd gzip wget top sdparm tput ifconfig ln losetup mkdir mkfifo mknod readlink echo gunzip zcat reset swapoff halt telinit awk dir reboot poweroff pidof nc lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzless lzma lzmadec lzmore unlzma unxz xz xzcat xzdec"
 
     ### setting up base structure
     add_dir "/proc"
