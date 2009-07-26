@@ -128,6 +128,6 @@ run_hook ()
             nuke ${ckeyfile}
         fi
     else
-        msg ":: SKipping already run by arch_root_advanced hook..."
+        msg ":: Skipping already run by arch_root_advanced hook..."
     fi
 }
