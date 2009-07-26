@@ -3,9 +3,6 @@ run_hook ()
 {
 if ! [ "${root}" = "" -a "${ip}" = "" -a "${advanced}" = "" ]; then
     HOOKS="$(echo ${advanced} | sed -e 's#,# #g')"
-    echo $HOOKS | grep -q lvm && export LVMRUN=1
-    echo $HOOKS | grep -q mdadm && export MDADMRUN=1
-    echo $HOOKS | grep -q encrypt && export ENCRYPTRUN=1
         for h in ${HOOKS}; do
                 run_hook () { msg "${h}: no run function defined"; }
                 if [ -e "/hooks/${h}" ]; then
@@ -14,5 +11,8 @@ if ! [ "${root}" = "" -a "${ip}" = "" -a "${advanced}" = "" ]; then
                    run_hook
                 fi
         done
+    echo $HOOKS | grep -q lvm && export LVMRUN=1
+    echo $HOOKS | grep -q mdadm && export MDADMRUN=1
+    echo $HOOKS | grep -q encrypt && export ENCRYPTRUN=1
 fi
 }
