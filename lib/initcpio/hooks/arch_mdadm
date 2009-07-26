@@ -50,5 +50,7 @@ run_hook ()
             # assemble everything
             /sbin/mdassemble.static
         fi
+    else
+        msg ":: SKipping already run by arch_root_advanced hook..."
     fi
 }

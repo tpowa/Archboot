@@ -12,7 +12,7 @@ help ()
 {
 cat <<HELPEOF
   This hook will override advanced hooks for your system.
-  Use advanced="your hooks hooks" eg. advanced="encrypt mdadm"
+  Use advanced=hook1,hook2,hook3 eg. advanced=arch_encrypt,arch_mdadm
   to override the defaults.
 HELPEOF
 }

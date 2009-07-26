@@ -16,5 +16,7 @@ run_hook ()
             msg "Activating logical volumes..."
             /sbin/lvm vgchange --ignorelockingfailure -ay
         fi
+    else
+        msg ":: SKipping already run by arch_root_advanced hook..."
     fi
 }
