@@ -415,7 +415,7 @@ findbootloaderpartitions() {
         done
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
             if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
-                [ "$(dmraid -s -c | grep $devpath)" ] && echo "/dev/mapper/$devpath"
+                echo "/dev/mapper/$devpath"
                 [ "$1" ] && echo $1
             fi
         done
