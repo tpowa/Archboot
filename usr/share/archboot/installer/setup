@@ -348,11 +348,13 @@ findbootloaderdisks() {
             done
         fi
     else
-        # dmraid devices
+    # dmraid devices
         if [ -d /dev/mapper ] ; then
             for fakeraid in $(dmraid -s -c); do
+                if [ "$(echo $fakeraid | grep '_')" ]; then
                     echo "/dev/mapper/$fakeraid"
                     [ "$1" ] && echo $1
+                fi
             done
         fi
     fi
@@ -400,7 +402,19 @@ findbootloaderpartitions() {
     else
         # only show dmraid partitions!
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            if ! [ "$(dmraid -s -c | grep $devpath$)" -a "$(dmraid -s -c | grep $devpath)" ]; then
+            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypt_LUKS\"" | sed -e 's#:.*##g')"
+            partofcrypt="$partofcrypt $k"
+        done
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"lvm2pv\"" | sed -e 's#:.*##g')"
+            partoflvm="$partoflvm $k"
+        done
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g')"
+            partofraid="$partofraid $k"
+        done
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+            if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" -a "$(dmraid -s -c | grep $devpath)" ]; then
                 echo "/dev/mapper/$devpath"
                 [ "$1" ] && echo $1
             fi
