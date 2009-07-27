@@ -2527,7 +2527,7 @@ dogrub() {
     getcryptsetup
     get_grub_map
     FAIL_RAID=""
-    FAIL_LVM=""
+    FAIL_DM=""
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
         return 1
@@ -2557,7 +2557,7 @@ dogrub() {
         elif [ "$(echo $PART_ROOT | grep /dev/mapper)" ]; then
             # dmraid check
             if ! [ "$(dmsetup info $PART_ROOT | grep 'DMRAID')" ]; then
-                FAIL_LVM="1"
+                FAIL_DM="1"
             else
                 _grubdev=$(mapdev $PART_ROOT)
             fi
@@ -2583,14 +2583,14 @@ dogrub() {
             fi
         elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
                 if ! [ "$(dmsetup info $bootdev | grep 'DMRAID')" ]; then
-                    FAIL_LVM="1"
+                    FAIL_DM="1"
                 else
+                    FAIL_DM=""
                     _bootdev=$bootdev
                 fi
         else
             # remove fail if /boot is on other device!
             ! [ "$bootdev" = "" ] && FAIL_RAID=""
-            ! [ "$bootdev" = "" ] && FAIL_LVM=""
             if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub!
                 FAIL_RAID="1"
@@ -2602,8 +2602,8 @@ dogrub() {
                 DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
                 return 1
         fi
-        if [ "$FAIL_LVM" = "1" ]; then
-                DIALOG --msgbox "Error: Grub cannot boot from lvm devices!" 0 0
+        if [ "$FAIL_DM" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
                 return 1
         fi
         if [ "$UUIDPARAMETER" = "yes" ]; then
