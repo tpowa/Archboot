@@ -2591,6 +2591,7 @@ dogrub() {
         else
             # remove fail if /boot is on other device!
             ! [ "$bootdev" = "" ] && FAIL_RAID=""
+            ! [ "$bootdev" = "" ] && FAIL_DM=""
             if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub!
                 FAIL_RAID="1"
