@@ -413,11 +413,13 @@ findbootloaderpartitions() {
             k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g')"
             partofraid="$partofraid $k"
         done
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
-                echo "/dev/mapper/$devpath"
+        for i in $(dmraid -s -c); do
+            for devpath in $(echo /dev/mapper/$i*); do 
+            if ! [ "$(dmraid -s -c | grep $(basename $devpath)$)" -o "$(ls $partofcrypt 2>/dev/null | grep $devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep $devpath$)" -o "$(ls $partofraid 2>/dev/null | grep $devpath$)" ]; then
+                echo "$devpath"
                 [ "$1" ] && echo $1
             fi
+        done
         done
     fi
 }
