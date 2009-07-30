@@ -1178,7 +1178,9 @@ _createpv()
         # skip already encrypted volume devices
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            if ! [ "$realdevice" = "" ]; then
+                [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            fi
         done
         # skip md devices, which already have lvm devices!
         for i in $PARTS; do
