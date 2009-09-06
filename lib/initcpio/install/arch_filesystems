@@ -7,7 +7,6 @@ install ()
     FILES=""
     SCRIPT=""
     # fix licenses
-    add_file "/usr/share/licenses/e2fsprogs/BSD-LICENSE"
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
 
