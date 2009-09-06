@@ -1,6 +1,6 @@
 #!/bin/sh
 ### general setup stuff
-SVNSETUP="svn://archlinux.org/srv/svn-packages/"
+SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE=""
 DEVEL=""
 SUPPORT=""
