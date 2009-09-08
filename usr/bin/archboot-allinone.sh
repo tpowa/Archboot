@@ -60,7 +60,7 @@ fi
 
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
-[ "${RELEASENAME}" = "" ] && RELEASENAME="Schmollie"
+[ "${RELEASENAME}" = "" ] && RELEASENAME="Schepperle"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 # generate temp directories
