@@ -68,9 +68,9 @@ done
 # If rootdelay is empty or not a non-negative integer, set it to 10
 if [ -z "${rootdelay}" -o ! "${rootdelay}" -ge 0 ]; then
     export rootdelay=10
-# We'll wait for the root device, so make sure klibc doesn't
-    export kinit_params="$kinit_params rootdelay=0"
 fi
+# We'll wait for the root device, so make sure klibc doesn't
+export kinit_params="$kinit_params rootdelay=0"
 
 if [ -e "/hooks" ]; then
     for h in ${HOOKS}; do
