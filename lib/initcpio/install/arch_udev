@@ -50,10 +50,6 @@ install ()
     for i in /lib/udev/keymaps/*; do
         add_file "$i"
     done
-    # add device nodes
-    for i in $(find /lib/udev/devices/*); do
-        add_file "$i"
-    done
 }
 
 help ()
