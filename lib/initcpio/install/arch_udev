@@ -46,7 +46,12 @@ install ()
              79-fstab_import 80-drivers 81-arch 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
+    # add keymap files
     for i in /lib/udev/keymaps/*; do
+        add_file "$i"
+    done
+    # add device nodes
+    for i in $(find /lib/udev/devices/*); do
         add_file "$i"
     done
 }

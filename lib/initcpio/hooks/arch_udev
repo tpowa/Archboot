@@ -2,29 +2,9 @@
 run_hook ()
 {
     # mount tmpfs, else autodetection will fail!
-    mount -n -t tmpfs udev /dev -o mode=0755,size=10M,noexec
-    #create missing nodes
-    mknod -m 0666 /dev/null c 1 3
-    mknod -m 0660 /dev/zero c 1 5
-    mknod -m 0600 /dev/console c 5 1
-    mknod -m 0666 /dev/kmsg c 1 11
-    # make extra nodes
-    ln -sf /proc/self/fd /dev/fd
-    ln -sf /proc/self/fd/0 /dev/stdin
-    ln -sf /proc/self/fd/1 /dev/stdout
-    ln -sf /proc/self/fd/2 /dev/stderr
-    ln -sf /proc/kcore /dev/core
-    # these static devices are created for convenience, to autoload the modules if necessary
-    # /dev/loop0
-    mknod -m 0660 /dev/loop0 b 7 0
-    chgrp disk /dev/loop0
-    # /dev/net/tun
-    mkdir /dev/net
-    mknod -m 0666 /dev/net/tun c 10 200
-    # /dev/fuse
-    mknod -m 0666 /dev/fuse c 10 229
-    # /dev/ppp
-    mknod -m 0600 /dev/ppp c 108 0
+    mount -n -t tmpfs udev /dev -o mode=0755,size=10M,nosuid
+    # Copy static device nodes to /dev
+    cp -a /lib/udev/devices/* /dev/
     echo > /proc/sys/kernel/hotplug
     msg -n ":: Starting udevd..."
     /sbin/udevd --daemon
