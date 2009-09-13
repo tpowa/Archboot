@@ -55,10 +55,10 @@ install ()
         cd devel; svn up $DEVEL; cd ..
         cd support; svn up $SUPPORT; cd ..
         cd  ${SVNTREE}
-        SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any")"
     else
         cd ${SVNTREE}
-        SEARCHSVN=$(find ./ -type d -name *"$(uname -m)" ! -name "testing*")
+        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any")"
     fi
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && echo -n "$(echo $i|  awk -F/ '{print $3}') ";done)
