@@ -4,7 +4,7 @@ install ()
 {
     MODULES=" $(checked_modules "/drivers/net/" | grep -ve "wireless") "
     # add staging modules
-    STAGING="et131x"
+    STAGING="et131x sxg"
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
