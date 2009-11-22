@@ -8,7 +8,7 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant nwepgen prism2dl wlancfg wlanctl-ng loadndisdriver perl iw crda regdbdump"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant loadndisdriver perl iw crda regdbdump"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
@@ -21,14 +21,6 @@ install ()
     # add zd1211 firmware files
     for i in /lib/firmware/zd1211/* ; do
 	add_file "$i"
-    done
-    # add wlan-ng26 support
-    add_file "/etc/rc.d/wlan"
-    for  i in /usr/share/archboot/wireless/etc/wlan/*; do
-	add_file "/etc/wlan/$(basename $i)"
-    done
-    for i in /etc/wlan/*.hex; do
-    	add_file "$i"
     done
     # add ndiswrapper support
     add_file "/usr/sbin/ndiswrapper"
