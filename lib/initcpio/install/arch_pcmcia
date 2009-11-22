@@ -4,10 +4,11 @@ install ()
 {
     MODULES=" $(checked_modules "/pcmcia/" | grep -ve "sound" -e "net") $(checked_modules "/ide/legacy")"
     MODULES=$(echo ${MODULES}) #trim whitespace
-    BINARIES="pcmcia-socket-startup pcmcia-check-broken-cis"
+    BINARIES="lspcmcia pccardctl pcmcia-socket-startup pcmcia-check-broken-cis"
     FILES=""
     SCRIPT=""
     add_file "/etc/pcmcia/config.opts"
+    add_file "/lib/udev/rules.d/60-pcmcia.rules"
 }
 
 help ()
