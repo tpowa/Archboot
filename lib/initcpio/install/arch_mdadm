@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=" $(checked_modules "drivers/md/*" | grep -v "dm-") "
-    BINARIES="mdassemble.static mdadm"
+    BINARIES="mdassemble.static mdadm mdmon"
     FILES=""
     SCRIPT="arch_mdadm"
     # check if a custom mdadm.conf exists
