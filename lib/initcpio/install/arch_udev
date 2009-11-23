@@ -32,9 +32,6 @@ install ()
     add_file /lib/udev/write_cd_rules
     add_file /lib/udev/write_net_rules
     # add rule files
-    for i in device-mapper; do
-        add_file /etc/udev/rules.d/$i.rules
-    done
     for i in 75-cd-aliases-generator.rules.optional 75-persistent-net-generator.rules.optional; do
         add_file /etc/udev/rules.d/$i
     done
