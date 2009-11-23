@@ -8,7 +8,7 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant loadndisdriver perl iw crda regdbdump"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant loadndisdriver perl iw crda regdbdump wpa_actiond"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"

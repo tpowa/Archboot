@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="netcfg-auto-wireless netcfg-menu netcfg2 netcfg"
+    BINARIES="net-auto-wired netcfg-wpa_actiond netcfg-wpa_actiond-action netcfg-menu netcfg2 netcfg"
     FILES=""
     SCRIPT=""
     for i in /usr/lib/network/*; do
@@ -12,15 +12,21 @@ install ()
     for i in /usr/lib/network/connections/*; do
         add_file $i
     done
+    for i in /usr/lib/network/hooks/*; do
+        add_file $i
+    done
     add_dir "/var/run/network/interfaces"
     add_dir "/var/run/network/profiles"
     for i in /etc/network.d/examples/*; do
 	add_file $i
     done
+    add_dir "/etc/network.d/hooks"
     add_file "/etc/rc.d/net-profiles"
     add_file "/etc/rc.d/net-rename"
-    add_file "/etc/rc.d/net-auto"
+    add_file "/etc/rc.d/net-auto-wired"
+    add_file "/etc/rc.d/net-auto-wireless"
     add_file "/usr/share/archboot/netcfg/etc/iftab" "/etc/iftab"
+    add_file "/usr/share/archboot/netcfg/etc/ifplugd/netcfg.action" "/etc/ifplugd/netcfg.action"
     # fix licenses
     add_file "/usr/share/licenses/netcfg/LICENSE"
 }
