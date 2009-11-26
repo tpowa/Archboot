@@ -13,6 +13,10 @@ install ()
     SCRIPT=""
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
     add_file "/usr/share/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
+    # add ar9170-fw
+    add_file "/lib/firmware/ar9170.fw"
+    # add rt2870usb-fw
+    add_file "/lib/firmware/rt2870.bin"
     # add ralink firmware files
     add_file "/lib/firmware/rt2561.bin"
     add_file "/lib/firmware/rt2561s.bin"
@@ -56,6 +60,8 @@ install ()
     add_file "/lib/udev/rules.d/85-regulatory.rules"
     add_file "/usr/lib/crda/regulatory.bin"
     # fixing licenses
+    add_file "/usr/share/licenses/ar9170-fw/LICENSE"
+    add_file "/usr/share/licenses/rt2870usb-fw/LICENSE"
     add_file "/usr/share/licenses/expat/COPYING"
     add_file "/usr/share/licenses/dbus-core/COPYING"
     add_file "/usr/share/licenses/crda/LICENSE"

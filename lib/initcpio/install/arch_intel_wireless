@@ -18,6 +18,8 @@ install ()
     add_file "/lib/firmware/ipw2200-sniffer.fw" "/intel-firmware/ipw2200-sniffer.fw"
     add_file "/usr/share/licenses/ipw2200-fw/LICENSE"
     # iwlwifi support
+    add_file "/lib/firmware/iwlwifi-1000-3.ucode"
+    add_file "/usr/share/licenses/iwlwifi-1000-ucode/LICENSE"
     add_file "/usr/share/licenses/iwlwifi-3945-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-3945-2.ucode" "/intel-firmware/iwlwifi-3945-2.ucode"
     add_file "/usr/share/licenses/iwlwifi-4965-ucode/LICENSE"
@@ -27,6 +29,8 @@ install ()
     add_file "/lib/firmware/iwlwifi-5000-2.ucode" "/intel-firmware/iwlwifi-5000-2.ucode"
     add_file "/lib/firmware/iwlwifi-5150-2.ucode" "/intel-firmware/iwlwifi-5150-2.ucode"
     add_file "/usr/share/licenses/iwlwifi-5150-ucode/LICENSE"
+    add_file "/lib/firmware/iwlwifi-6000-4.ucode"
+    add_file "/usr/share/licenses/iwlwifi-6000-ucode/LICENSE"
     echo "- ARCH_INTEL_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
     echo "  In order to use those drivers, you have to agree to the firmware licenses" >> ${OPTIONSBOOTMESSAGE}
     echo "  by appending intel-wireless to boot prompt." >> ${OPTIONSBOOTMESSAGE}
