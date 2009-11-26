@@ -26,7 +26,7 @@ install ()
     add_file "/etc/rc.d/net-auto-wired"
     add_file "/etc/rc.d/net-auto-wireless"
     add_file "/usr/share/archboot/netcfg/etc/iftab" "/etc/iftab"
-    add_file "/usr/share/archboot/netcfg/etc/ifplugd/netcfg.action" "/etc/ifplugd/netcfg.action"
+    add_file "/etc/ifplugd/netcfg.action"
     # fix licenses
     add_file "/usr/share/licenses/netcfg/LICENSE"
 }

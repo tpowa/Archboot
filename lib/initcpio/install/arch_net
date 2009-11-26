@@ -39,8 +39,8 @@ install ()
     add_dir "/var/state/dhcp"
     # add ifplugd support
     add_file "/etc/rc.d/ifplugd"
-    add_file ""/usr/share/archboot/net/etc/ifplugd/ifplugd.action" "/etc/ifplugd/ifplugd.action"
-    add_file ""/usr/share/archboot/net/etc/ifplugd/ifplugd.conf" "/etc/ifplugd/ifplugd.conf"
+    add_file "/etc/ifplugd/ifplugd.action"
+    add_file "/usr/share/archboot/net/etc/ifplugd/ifplugd.conf" "/etc/ifplugd/ifplugd.conf"
     # fixing licenses
     add_file "/usr/share/licenses/db/LICENSE"
     add_file "/usr/share/licenses/dhcpcd/LICENSE"
