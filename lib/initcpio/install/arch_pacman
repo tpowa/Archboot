@@ -22,7 +22,7 @@ zd1211-firmware ipw2100-fw ipw2200-fw iwlwifi-3945-ucode iwlwifi-4965-ucode iwlw
 smbclient tdb tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware parted tzdata ntp \
 v86d wlan-ng26-utils iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl \
 gmp heimdal sqlite3 db dbus-core libcap fsarchiver iwlwifi-5150-ucode xz-utils librpcsecgss libtirpc \
-wipe ddrescue testdisk clamav"
+wipe ddrescue testdisk clamav iwlwifi-1000-ucode iwlwifi-6000-ucode ar9170-fw rt2870usb-fw ifplugd wpa_actiond"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
