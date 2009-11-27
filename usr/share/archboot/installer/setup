@@ -275,7 +275,7 @@ findpartitions() {
         partoflvm="$partoflvm $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g')"
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
         partofraid="$partofraid $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -410,7 +410,7 @@ findbootloaderpartitions() {
             partoflvm="$partoflvm $k"
         done
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g')"
+            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
             partofraid="$partofraid $k"
         done
         for i in $(dmraid -s -c); do
@@ -711,17 +711,17 @@ _stopmd()
                 mdadm --manage --stop /dev/$i > $LOG
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(blkid -c=/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g'); do
+            for i in $(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g'); do
                 mdadm --zero-superblock $i > $LOG
             done
         fi
     fi
     DISABLEMDSB=""
-    if [ "$(blkid -c=/dev/null | grep "TYPE=\"mdraid\"")" ]; then
+    if [ "$(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"")" ]; then
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
         if [ "$DISABLEMDSB" = "1" ]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(blkid -c=/dev/null | grep "TYPE=\"mdraid\"" | sed -e 's#:.*##g'); do
+            for i in $(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g'); do
                 mdadm --zero-superblock $i > $LOG
             done
         fi
@@ -2769,7 +2769,7 @@ EOF
         cp -f /tmp/dev.map $DESTDIR/boot/grub/device.map
         DIALOG --msgbox "GRUB was successfully installed." 0 0
         S_GRUB=1
-        if [ "$(blkid -c /dev/null | grep TYPE=\"mdraid\")" ]; then
+        if [ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]; then
             if [ "$redundant" = "1" ]; then
                 DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
             fi
