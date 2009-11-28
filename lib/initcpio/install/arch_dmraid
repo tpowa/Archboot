@@ -2,11 +2,10 @@
 
 install ()
 {
-    MODULES="dm-mod dm-mirror"
+    MODULES=""
     BINARIES="dmraid"
     FILES=""
     SCRIPT="arch_dmraid"
-    add_dir "/dev/mapper"
     add_dir "/var/lock/dmraid"
 
 }
@@ -15,5 +14,6 @@ help ()
 {
 cat<<HELPEOF
   This hook includes dmraid on an arch boot image.
+  It depends on arch_devicemapper hook.
 HELPEOF
 } 

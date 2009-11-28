@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES="$(checked_modules "/drivers/virtio")"
+    MODULES=" *virtio* "
     BINARIES=""
     FILES=""
     SCRIPT=""

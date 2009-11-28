@@ -34,6 +34,6 @@ install ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the netcfg on an arch boot image.
+  This hook includes the netcfg package on an arch boot image.
 HELPEOF
 }

@@ -2,11 +2,10 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "drivers/md/dm-*") "
+    MODULES=""
     BINARIES="lvm fsadm lvmdump vgcfgbackup vgcfgrestore vgchange vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay lvextend lvmchange lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs lvscan"
     FILES=""
     SCRIPT="arch_lvm2"
-    add_dir "/dev/mapper"
 }
 
 help ()
@@ -14,5 +13,6 @@ help ()
 cat<<HELPEOF
   This hook loads the necessary modules for an LVM2 root device 
   on an arch boot image.
+  It depends on arch_devicemapper hook.
 HELPEOF
 }

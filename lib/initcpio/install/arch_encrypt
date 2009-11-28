@@ -2,11 +2,10 @@
 
 install ()
 {
-    MODULES=" dm-crypt $(all_modules "/crypto/" | grep -v "aes.ko" ) "
+    MODULES=" $(all_modules "/crypto/" | grep -v "aes.ko" ) "
     BINARIES="cryptsetup"
     FILES=""
     SCRIPT="arch_encrypt"
-    add_dir "/dev/mapper"
     # fix licenses
     add_file "/usr/share/licenses/popt/COPYING"
 }
@@ -15,5 +14,6 @@ help ()
 {
 cat<<HELPEOF
   This hook allows for an encrypted root device on an arch boot image.
+  It depends on arch_devicemapper hook.
 HELPEOF
 }
