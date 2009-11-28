@@ -15,6 +15,8 @@ install ()
     add_file "/usr/share/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
     # add ar9170-fw
     add_file "/lib/firmware/ar9170.fw"
+    add_file "/lib/firmware/ar9170-1.fw"
+    add_file "/lib/firmware/ar9170-2.fw"
     # add rt2870usb-fw
     add_file "/lib/firmware/rt2870.bin"
     # add ralink firmware files
