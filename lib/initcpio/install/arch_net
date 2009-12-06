@@ -23,7 +23,7 @@ install ()
     done
     add_file "/usr/share/archboot/net/etc/dhcpcd.conf" "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
-    add_file "/lib/tc/q_atm.so"
+    add_file "/usr/lib/tc/q_atm.so"
     add_file "/usr/share/tc/experimental.dist"
     add_file "/usr/share/tc/normal.dist"
     add_file "/usr/share/tc/pareto.dist"
