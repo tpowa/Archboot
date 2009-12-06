@@ -10,5 +10,6 @@ tty4
 tty5
 tty6
 ttyS0
+hvc0
 
 # End of file

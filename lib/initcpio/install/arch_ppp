@@ -15,6 +15,8 @@ install ()
     add_file "/usr/share/archboot/ppp/etc/ppp/ip-up" "/etc/ppp/ip-up"
     add_file "/usr/share/archboot/ppp/etc/ppp/options" "/etc/ppp/options"
     add_file "/usr/share/archboot/ppp/etc/ppp/pap-secrets" "/etc/ppp/pap-secrets"
+    add_file "/usr/share/archboot/ppp/etc/ppp/ip-down.d/00-dns.sh" "/etc/ppp/ip-down.d/00-dns.sh"
+    add_file "/usr/share/archboot/ppp/etc/ppp/ip-up.d/00-dns.sh" "/etc/ppp/ip-up.d/00-dns.sh"
     add_file "/etc/rc.d/ppp"
     # fix license files
     add_file "/usr/share/licenses/libpcap/LICENSE"

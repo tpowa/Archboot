@@ -20,6 +20,8 @@ c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty3 linux
 c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty4 linux
 c5:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty5 linux
 c6:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty6 linux
+# Hypervisor Virtual Console for Xen and KVM
+#h0:2345:respawn:/sbin/agetty -8 38400 hvc0 linux
 
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
 

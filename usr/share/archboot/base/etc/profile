@@ -2,22 +2,23 @@
 # /etc/profile
 #
 
-export PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+export PATH
 
-export LESSCHARSET="latin1"
-export INPUTRC="/etc/inputrc"
-export LESS="-R"
+INPUTRC="/etc/inputrc"
+LESS="-R"
 
-# Locale settings (find your locale with 'locale -a')
-export LANG="C"
-export LC_COLLATE="C"
+# Some readline stuff that is fairly common
+HISTSIZE=1000
+HISTCONTROL="erasedups"
 
-export COLUMNS LINES
+export HISTSIZE HISTCONTROL INPUTRC LESS
+
+#Set our umask
+umask 022
 
 export PS1='[Arch Linux: \W]\$ '
 export PS2='> '
-
-umask 022
 
 alias ls='ls --color=auto'
 alias dir='dir --color=auto'

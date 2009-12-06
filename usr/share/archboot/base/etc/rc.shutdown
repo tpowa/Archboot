@@ -1,54 +1,85 @@
 #!/bin/bash
 #
 # /etc/rc.shutdown
+#
+
 . /etc/rc.conf
 . /etc/rc.d/functions
+
+run_hook shutdown_start
 
 # avoid staircase effect
 /bin/stty onlcr
 
-echo "Shutting Down ..."
+echo " "
+printhl "Initiating Shutdown..."
+echo " "
 
-# Shutdown daemons
+# avoid NIS hanging syslog-ng on shutdown by unsetting the domainname
+if [ -x /bin/domainname ]; then
+	/bin/domainname ""
+fi
+
+if [ -x /etc/rc.local.shutdown ]; then
+	/etc/rc.local.shutdown
+fi
+
+# Find daemons NOT in the DAEMONS array. Shut these down first
+if [ -d /var/run/daemons ]; then
+	for daemon in $(/bin/ls -1t /var/run/daemons); do
+		if ! in_array $daemon ${DAEMONS[@]}; then
+			stop_daemon $daemon
+		fi
+	done
+fi
+# Shutdown daemons in reverse order
 let i=${#DAEMONS[@]}-1
-
 while [ $i -ge 0 ]; do
 	if [ "${DAEMONS[$i]:0:1}" != '!' ]; then
-		ck_daemon ${DAEMONS[$i]#@} || /etc/rc.d/${DAEMONS[$i]#@} stop
+		ck_daemon ${DAEMONS[$i]#@} || stop_daemon ${DAEMONS[$i]#@}
 	fi
 	let i=i-1
 done
-# find any leftover daemons and shut them down
-if [ -d /var/run/daemons ]; then
-	for daemon in $(ls  -1t /var/run/daemons); do
-		/etc/rc.d/$daemon stop
-	done
-fi
+
+run_hook shutdown_prekillall
+
+# Terminate all processes
+stat_busy "Sending SIGTERM To Processes"
+/sbin/killall5 -15 &> /dev/null
+/bin/sleep 5
+stat_done
+
+stat_busy "Sending SIGKILL To Processes"
+/sbin/killall5 -9 &> /dev/null
+/bin/sleep 1
+stat_done
+
+run_hook shutdown_postkillall
 
 # removing psmouse module to fix some reboot issues on newer laptops
 modprobe -r psmouse >/dev/null 2>&1
 
-# Terminate all processes
-echo "Sending SIGTERM To Processes ..."
-/sbin/killall5 -15 &> /dev/null
-/bin/sleep 5
-
-echo "Sending SIGKILL To Processes ..."
-/sbin/killall5 -9 &> /dev/null
-
-echo "Deactivating Swap ..."
+stat_busy "Deactivating Swap"
 /sbin/swapoff -a
+stat_done
 
-echo "Unmounting Filesystems ..."
-/bin/umount -a -t notmpfs,noramfs,nosysfs,noproc
+stat_busy "Unmounting Filesystems"
+/bin/umount -a -r -t noramfs,notmpfs,nosysfs,noproc -O no_netdev
+stat_done
+
+run_hook shutdown_poweroff
 
 # Power off or reboot
 if [ "$RUNLEVEL" = "0" ]; then
-  echo "[ POWER OFF ]"
-  /sbin/poweroff -d -f -i
+	printsep
+	printhl "${C_H2}POWER OFF"
+	/sbin/poweroff -d -f -h -i
 else
-  echo " [ REBOOTING ]"
-  /sbin/reboot -d -f -i
+	printsep
+	printhl "${C_H2}REBOOTING"
+	# if kexec is installed and a kernel is loaded, use it
+	[ -x /sbin/kexec ] && /sbin/kexec -e > /dev/null 2>&1
+	/sbin/reboot -d -f -i
 fi
 
 # End of file
