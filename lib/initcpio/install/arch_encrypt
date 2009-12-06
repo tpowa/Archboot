@@ -7,7 +7,7 @@ install ()
     FILES=""
     SCRIPT="arch_encrypt"
     # fix licenses
-    add_file "/usr/share/licenses/popt/COPYING"
+    add_file "/usr/share/licenses/popt/LICENSE"
 }
 
 help ()
