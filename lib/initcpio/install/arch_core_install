@@ -46,7 +46,7 @@ install ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g dhclient"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g dhclient v86d nouveau-drm"
         for i in base devel lib support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
@@ -71,13 +71,17 @@ install ()
         if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
             source "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
-                cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz ${TEMPDIR}/core-any/pkg/
-                echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz || return 1
+                for i in ${pkgname[@]}; do
+                    cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz ${TEMPDIR}/core-any/pkg/
+                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.gz || return 1
+                done
             else
-                cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
-                echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
+                for i in ${pkgname[@]}; do
+                    cp /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
+                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${pkgname}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
+                done
             fi
         fi
     done

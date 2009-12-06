@@ -15,7 +15,7 @@ grub inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links
 dosfstools udev initscripts filesystem kernel26 kernel26-firmware glibc kernel-headers xinetd links pacman pacman-mirrorlist screen kbd pam \
 dhcpcd bzip2 gcc-libs openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
 rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
-wpa_supplicant gzip rsync libarchive libdownload device-mapper cracklib nfs-utils nfsidmap readline acl attr \
+wpa_supplicant gzip rsync libarchive device-mapper cracklib nfs-utils nfsidmap readline acl attr \
 pcre cpio archboot fuse klibc libusb vim lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
 rt2x00-rt61-fw rt2x00-rt71w-fw ndiswrapper ndiswrapper-utils \
 zd1211-firmware ipw2100-fw ipw2200-fw iwlwifi-3945-ucode iwlwifi-4965-ucode iwlwifi-5000-ucode \
