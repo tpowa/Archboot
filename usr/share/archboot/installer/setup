@@ -1915,7 +1915,7 @@ select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | sed "s#\$repo/#core/#g" | head -n1)
+        SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     echo "Using mirror: $SYNC_URL" >$LOG
 }
@@ -1940,6 +1940,39 @@ CacheDir = /src/core-any/pkg
 
 [core]
 Server = ${serverurl}
+EOF
+
+    # Set up the necessary directories for pacman use
+    [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
+    [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+
+    DIALOG --infobox "Refreshing package database..." 6 45
+    $PACMAN -Sy >$LOG 2>&1 || return 1
+    return 0
+}
+
+# prepare_pacman()
+# configures pacman and syncs for the first time on destination system
+#
+# params: none
+# returns: 1 on error
+prepare_pacman_extra() {
+    if [ "$MODE" = "media" ]; then
+        local serverurl="${FILE_URL}"
+    elif [ "$MODE" = "ftp" ]; then
+        local serverurl="${SYNC_URL}"
+    fi
+    # Setup a pacman.conf in /tmp
+    cat << EOF > /tmp/pacman.conf
+[options]
+CacheDir = ${DESTDIR}/var/cache/pacman/pkg
+CacheDir = /src/core-$(uname -m)/pkg
+CacheDir = /src/core-any/pkg
+
+[core]
+Server = ${serverurl}
+[extra]
+Server =  ${serverurl}
 EOF
 
     # Set up the necessary directories for pacman use
@@ -2085,14 +2118,21 @@ installpkg() {
 
     DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
     if [ "$MODE" = "media" ]; then
-        PACKAGES=
         # fix pacman list!
         sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' /tmp/.pkglist
         for pkg in $(cat /tmp/.pkglist); do
             pkgname=${pkg%-*-*}
             PACKAGES="$PACKAGES $pkgname"
         done
+    else
+        # add extra repository for packages not in core!
+        prepare_pacman_extra
     fi
+        # Add packages which are not in core repository
+        [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm"
+        [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+        [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+        [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
@@ -3095,7 +3135,7 @@ do_pacmanmirror()
             PAC_SYNC_SERVER=$(egrep -o "${PAC_SYNC_SERVER}.*" "$mirrorlist" | head -n1)
         fi
     else
-        PAC_SYNC_SERVER="$(echo ${SYNC_URL} | sed 's/core/\$repo/g')"
+        PAC_SYNC_SERVER="${SYNC_URL}"
     fi
     # comment out all existing mirrors
     sed -i -e 's/^Server/#Server/g' "$mirrorlist"
@@ -3107,26 +3147,41 @@ do_pacmanmirror()
 auto_hwdetect()
 {
     HWDETECT=""
+    FBPARAMETER=""
     HWPARAMETER=""
-    HWDETECTHOSTCONTROLLER=""
+    HWDETECTMODULES=""
     HWDETECTHOOKS=""
+    HWDETECTFILES=""
     HWDETECTRC=""
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [ "$HWDETECT" = "yes" ]; then
+        # check if running in vmware
         [ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
+        # check on ide-legacy boot parameter
         [ "$(grep -w ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
+        # check on used keymap
         ! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
-        [ "$(cat /proc/modules | grep hid)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
-        if [ "$(cat /proc/modules | grep usb_storage)" ]; then
+        # check on usb input
+        [ "$(grep hid /proc/modules)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
+        # check on framebuffer modules and kms
+        if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+             FBPARAMETER="--uvesafb"
+             HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
+        fi
+        [ "$(grep -w ati-kms /proc/cmdline)" ] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [ "$(grep -w intel-kms /proc/cmdline)" ] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [ "$(grep -w nvidia-kms /proc/cmdline)" ]&& (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [ "$(grep -w fbmodule /proc/cmdline)" ]&& FBPARAMETER="--fbmodule"
+        if [ "$(grep usb_storage /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
         fi
-        if [ "$(cat /proc/modules | grep sbp2)" ]; then
+        if [ "$(grep sbp2 /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected firewire storage driver...\nDo you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
         fi
-        if [ "$(cat /proc/modules | grep pcmcia)" ]; then
+        if [ "$(grep pcmcia /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
         fi
-        if [ "$(cat /proc/modules | grep nfs)" ]; then
+        if [ "$(grep nfs /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
         if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
@@ -3134,12 +3189,27 @@ auto_hwdetect()
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
-        HWDETECTHOSTCONTROLLER="$(hwdetect --filesystem --hostcontroller $HWPARAMETER)"
-        HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $HWPARAMETER)"
+        HWDETECTMODULES="$(hwdetect --fbmodule $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER)"
+        HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $FBPARAMETER $HWPARAMETER)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
-        [ -n "$HWDETECTHOSTCONTROLLER" ] && sed -i -e "s/^MODULES=.*/$HWDETECTHOSTCONTROLLER/g" ${DESTDIR}/etc/mkinitcpio.conf
+        [ -n "$HWDETECTMODULES" ] && sed -i -e "s/^MODULES=.*/$HWDETECTMODULES/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
+        [ -n "$HWDETECTFILES" ] && sed -i -e "s/^FILES=.*/FILES=\"$HWDETECTFILES\"/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
+    fi
+}
+
+auto_fb()
+{
+    UVESAFB=""
+    if [ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]; then
+        ! [ "$(grep nouveau $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep i915 $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+    fi
+    if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+        UVESAFB="$(grep [a-z] /etc/modprobe.d/uvesafb.conf)" 
+        sed -i -e "s#options.*#$UVESAFB#g" $DESTDIR/etc/modprobe.d/uvesafb.conf
     fi
 }
 
@@ -3189,7 +3259,7 @@ auto_ftpmirror()
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
-        SYNC_URL="$(echo ${SYNC_URL} | sed 's/core/\$repo/g')"
+        SYNC_URL="${SYNC_URL}"
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
     fi

@@ -4,7 +4,7 @@ SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE=""
 DEVEL=""
 SUPPORT=""
-SUPPORT_ADDITION="ntfs-3g dhclient nouveau-drm"
+SUPPORT_ADDITION="ntfs-3g dhclient nouveau-drm v86d"
 # generate base
 for i in $(pacman -Sg base | sed -e "s/base//g"); do 
 	BASE="$BASE $(echo $i)"
