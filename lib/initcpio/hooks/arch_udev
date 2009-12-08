@@ -27,7 +27,7 @@ run_hook ()
     # /dev/ppp
     mknod -m 0600 /dev/ppp c 108 0
     echo > /proc/sys/kernel/hotplug
-    msg -n ":: Starting udevd:"
+    msg ":: Starting udevd:"
     /sbin/udevd --daemon
     msg "done."
 }
