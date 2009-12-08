@@ -89,7 +89,7 @@ mv ${LOWMEM}/tmp/*/core-any ${ALLINONE}/
 mv ${CORE}/tmp/*/arch/archdoc.txt ${ALLINONE}/arch/
 
 # copy in clamav db files
-if [ -d /var/lib/clamav -a -x /us/bin/freshclam ]; then
+if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
     mkdir ${ALLINONE}/clamav
     rm -f /var/lib/clamav/*
     freshclam
