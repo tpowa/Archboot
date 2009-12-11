@@ -1,4 +1,4 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
 
 install ()
 {
