@@ -4,9 +4,4 @@ run_hook ()
 {
     # add symlink for db files
     ln -sf /src/clamav /var/lib/clamav
-    echo "ARCH_CLAMAV USAGE:"
-    echo "--------------------"
-    echo "  Mount your boot media to /src to use ondisk clamav db files." 
-    echo "  If you want up to date db files use the freshclam program."
-    echo "--------------------"
 }

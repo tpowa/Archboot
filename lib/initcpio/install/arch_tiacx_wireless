@@ -5,7 +5,7 @@ install ()
     MODULES=""
     BINARIES=""
     FILES=""
-    SCRIPT="arch_tiacx_wireless"
+    SCRIPT=""
     # add firmware files
     for i in $(find /usr/share/tiacx/ ! -type d); do
         add_file $i

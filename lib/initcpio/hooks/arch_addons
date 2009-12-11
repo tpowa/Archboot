@@ -5,33 +5,33 @@ run_hook ()
      if grep -qw arch-addons /proc/cmdline; then
      	ARCH_ADDON="optical storage floppy disk"
      	### exclude kernel ntfs it seems broken!
-     	echo "Disabling kernel NTFS module for mounting, due to known issues!"
+     	msg "Disabling kernel NTFS module for mounting, due to known issues!"
      	mv /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko.old
-     	echo " Waiting 10 seconds for usb/fw devices to come ready ..."
+     	msg " Waiting 10 seconds for usb/fw devices to come ready..."
      	sleep 10
      	for i in $ARCH_ADDON; do
-		echo "Checking $i devices for addons ..."
+		msg "Checking $i devices for addons..."
 			for k in $(find /dev -maxdepth 1 -group "$i"); do
      				if mount $k /addons > /dev/null 2>&1; then
-					echo "Looking for new config files on $k, checking /config directory ..."
+					msg "Looking for new config files on $k, checking /config directory..."
 					if [ -d "/addons/config" ]; then
-						echo "Copying new config files to /etc install environment ..."
+						msg "Copying new config files to /etc install environment..."
 						cp -r /addons/config/* /etc/
-						echo "Finished."
+						msg "Finished."
 						RETRIGGER_UDEV="1"
 					else
-						echo "No files found to copy in /config directory on media $i."
+						msg "No files found to copy in /config directory on media $i."
 					fi
-					echo "Looking for new packages to install on $k, checking /packages directory ..."
+					msg "Looking for new packages to install on $k, checking /packages directory..."
 					if [ -d "/addons/packages" ]; then
 						mkdir /tmp/packages/
-						echo "Copying new packages to /tmp/packages/ install environment ..."
+						msg "Copying new packages to /tmp/packages/ install environment..."
 						cp /addons/packages/*.pkg.tar.gz /tmp/packages/
-						echo "Installing new packages to install environment ..."
-						pacman -U /tmp/packages/* || echo "Dependency resolution failed!"
+						msg "Installing new packages to install environment..."
+						pacman -U /tmp/packages/* || msg "Dependency resolution failed!"
 						RETRIGGER_UDEV="1"
 					else
-						echo "No new files found to copy and install in /packages directory on media $k."
+						msg "No new files found to copy and install in /packages directory on media $k."
 					fi
 					umount /addons
 					sleep 2
@@ -40,17 +40,9 @@ run_hook ()
      	done
     	mv /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko.old /lib/modules/$(uname -r)/kernel/fs/ntfs/ntfs.ko
     	if [ "$RETRIGGER_UDEV" = "1" ]; then
-     		echo "Retrigger udev uevents ..."
+     		msg "Retrigger udev uevents..."
      		udevadm trigger
 		udevadm settle
     	fi
-    else
-	echo "ARCH_ADDONS USAGE:"
-	echo "------------------"
-    	echo "In order to load external addon packages or configs" 
-	echo "into the install environment, please append arch-addons to boot prompt."
-    	echo "Place external addon packages in /packages directory."
-	echo "Place external configs in /config directory."
-	echo "------------------"
     fi
 }
