@@ -2,7 +2,7 @@ run_hook ()
 {
   # check for kms
   if [ "$intel_kms" = "y" ]; then
-    msg ":: Switching to intel kms mode ..."
+    msg ":: Switching to intel kms mode..."
     # writing module options
     echo "options i915 modeset=1" >> /etc/modprobe.d/modprobe.conf
     fbmodule="i915"
@@ -10,7 +10,7 @@ run_hook ()
     echo "blacklist i915" >> /etc/modprobe.d/framebuffer_blacklist.conf
   fi
   if [ "$nvidia_kms" = "y" ]; then
-    msg ":: Switching to nvidia kms mode ..."
+    msg ":: Switching to nvidia kms mode..."
     # writing module options
     echo "options nouveau modeset=1" >> /etc/modprobe.d/modprobe.conf
     fbmodule="nouveau"
@@ -20,7 +20,7 @@ run_hook ()
     depmod -a
   fi
   if [ "$ati_kms" = "y" ]; then
-    msg ":: Switching to ati kms mode ..."
+    msg ":: Switching to ati kms mode..."
     # writing module options
     echo "options radeon modeset=1" >> /etc/modprobe.d/modprobe.conf
     fbmodule="radeon"
@@ -29,12 +29,13 @@ run_hook ()
   fi
   # check for uvesafb
   if [ "$(echo $uvesafb | grep "[0-9]*x[0-9]*-[0-9]*")" ]; then
-    msg ":: Switching to uvesafb mode ..."
+    msg ":: Switching to uvesafb mode..."
     sed -i -e "s#options.*#options uvesafb mode_option=$uvesafb scroll=ywrap#g" /etc/modprobe.d/uvesafb.conf
     fbmodule="uvesafb"
   fi
   # load correct module
   if ! [ "$fbmodule" = "" -a "$fbmodule" = "y" ]; then
+    msg ":: Loading ${fbmodule}..."
     modprobe -aq $fbmodule >/dev/null 2>&1
   fi
 }

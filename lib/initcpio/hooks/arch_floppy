@@ -1,4 +1,5 @@
 run_hook ()
 {
+    msg ":: Loading floppy module..."
     /sbin/modprobe -aq floppy>/dev/null 2>&1
 }

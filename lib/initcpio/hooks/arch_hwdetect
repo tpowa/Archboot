@@ -1,7 +1,7 @@
 # vim: set ft=sh:
 run_hook ()
 {
-    msg -n ":: Loading hwdetect..."
+    msg ":: Loading hwdetect..."
 	HWDETECT="/sbin/hwdetect --load-modules"
 	if grep -qw ide-legacy /proc/cmdline; then
 		HWDETECT="$HWDETECT --ide-legacy"
