@@ -14,18 +14,18 @@ run_hook ()
 		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
 			basename $i .ko | grep -v ^ide >> /tmp/.ide-blacklist
 		done
-		echo "Auto blacklisted IDE modules for udev:"
-		echo "--------------------------------------"
+		msg "Blacklisted IDE modules (old subsystem) for udev:"
+		msg "--------------------------------------"
 		if [ -s /tmp/.ide-blacklist ]; then 
 			for i in $(sort -u /tmp/.ide-blacklist); do
-				echo -n "$i "
+				msg -n "$i "
 			done
-			echo ""
-			echo "If you need them, please use 'ide-legacy' boot option or load them by hand!"
+			msg ""
+			msg "If you need them, please use 'ide-legacy' boot option or load them by hand!"
 		else
-			echo "No modules blacklisted."
+			msg "No modules blacklisted."
 		fi
-		echo "--------------------------------------"
+		msg "--------------------------------------"
 
 	fi
 	if /usr/bin/vmware-detect; then
