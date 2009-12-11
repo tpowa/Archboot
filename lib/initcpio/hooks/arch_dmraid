@@ -1,4 +1,5 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
 run_hook ()
 {
     /sbin/modprobe -q dm-mod >/dev/null 2>&1

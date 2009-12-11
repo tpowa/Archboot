@@ -1,4 +1,5 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+#
 # TODO this one needs some work to work with lots of different
 #       encryption schemes
 run_hook ()

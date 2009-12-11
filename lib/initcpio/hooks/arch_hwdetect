@@ -1,7 +1,8 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
 run_hook ()
 {
-    msg ":: Loading hwdetect..."
+    msg ":: Running hwdetect..."
 	HWDETECT="/sbin/hwdetect --load-modules"
 	if grep -qw ide-legacy /proc/cmdline; then
 		HWDETECT="$HWDETECT --ide-legacy"
@@ -30,9 +31,8 @@ run_hook ()
 	fi
 	if /usr/bin/vmware-detect; then
 		HWDETECT="$HWDETECT --vmware"
-		$HWDETECT
-	else
-		$HWDETECT
 	fi
+	msg ":: Loading detected kernel modules..."
+	$HWDETECT
     msg "done."
 }

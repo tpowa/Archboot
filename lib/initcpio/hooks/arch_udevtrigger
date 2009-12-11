@@ -1,7 +1,8 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
 run_hook ()
 {
-    msg -n ":: Loading UDev uevents ..."
+    msg ":: Loading UDev uevents ..."
     /sbin/udevadm trigger
     /sbin/udevadm settle
     msg "done."

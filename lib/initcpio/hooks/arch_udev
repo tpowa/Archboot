@@ -1,4 +1,5 @@
-# vim: set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
 run_hook ()
 {
     # mount tmpfs, else autodetection will fail!

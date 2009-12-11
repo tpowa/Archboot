@@ -1,3 +1,5 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
 run_hook ()
 {
     # fix license symlinks
