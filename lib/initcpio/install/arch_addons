@@ -6,12 +6,6 @@ install ()
     BINARIES=""
     FILES=""
     SCRIPT="arch_addons"
-    echo "- ARCH_ADDONS USAGE:" >> ${OPTIONSBOOTMESSAGE}
-    echo "  In order to load external addon packages or configs" >> ${OPTIONSBOOTMESSAGE}
-    echo "  into the install environment, please append arch-addons to boot prompt." >> ${OPTIONSBOOTMESSAGE}
-    echo "  Place external addon packages in /packages directory." >> ${OPTIONSBOOTMESSAGE}
-    echo "  Place external configs in /config directory." >> ${OPTIONSBOOTMESSAGE}
-    echo "" >> ${OPTIONSBOOTMESSAGE}
     ! [ -d ${TEMPDIR}/packages ] && mkdir ${TEMPDIR}/packages
     ! [ -d ${TEMPDIR}/config ] && mkdir ${TEMPDIR}/config
     cp -r /etc/archboot/packages/* ${TEMPDIR}/packages

@@ -30,7 +30,7 @@ if [ "$(echo $HOOKS | grep arch_installer)" ]; then
     echo "  - Use '/arch/quickinst' to install and bypass the setup routine." >> ${MOTD}
     echo "Documentation:" >> ${MOTD}
     echo "  - Documentation can be read by executing:" >> ${MOTD}
-    echo "    zcat /arch/archdoc.txt.gz | less" >> ${MOTD}
+    echo "    zcat /arch/archboot.txt.gz | less" >> ${MOTD}
 fi
     chmod 644 ${MOTD}
     add_file "${MOTD}" "/etc/motd"

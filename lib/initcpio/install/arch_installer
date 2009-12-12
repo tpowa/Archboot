@@ -10,11 +10,11 @@ install ()
     add_file "/usr/share/archboot/installer/setup" "/arch/setup"
     add_file "/usr/share/archboot/installer/quickinst" "/arch/quickinst"
     DOCS=$(mktemp /tmp/docs.XXXX)
-    cp -f /usr/share/archboot/installer/arch-install-guide.txt ${DOCS}
+    cp -f /usr/share/archboot/installer/archboot.txt ${DOCS}
     gzip -9 ${DOCS}
-    add_file "${DOCS}.gz" "/arch/archdoc.txt.gz" 
+    add_file "${DOCS}.gz" "/arch/archboot.txt.gz" 
     add_dir "/src" 
-    cp /usr/share/archboot/installer/arch-install-guide.txt ${TEMPDIR}/arch/archdoc.txt
+    cp /usr/share/archboot/installer/archboot.txt ${TEMPDIR}/arch/archboot.txt
 }
 
 help ()

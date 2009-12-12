@@ -31,10 +31,6 @@ install ()
     add_file "/usr/share/licenses/iwlwifi-5150-ucode/LICENSE"
     add_file "/lib/firmware/iwlwifi-6000-4.ucode"
     add_file "/usr/share/licenses/iwlwifi-6000-ucode/LICENSE"
-    echo "- ARCH_INTEL_WIRELESS USAGE:" >> ${OPTIONSBOOTMESSAGE}
-    echo "  In order to use those drivers, you have to agree to the firmware licenses" >> ${OPTIONSBOOTMESSAGE}
-    echo "  by appending intel-wireless to boot prompt." >> ${OPTIONSBOOTMESSAGE}
-    echo "" >> ${OPTIONSBOOTMESSAGE}
 }
 
 help ()
