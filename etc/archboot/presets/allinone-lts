@@ -6,13 +6,13 @@
 KERNEL_BOOT_OPTIONS="rootdelay=10"
 
 # mkinitcpio config file, defaulted to stock config file
-MKINITCPIO_CONFIG="/etc/archboot/allinone-lowmem.conf"
+MKINITCPIO_CONFIG="/etc/archboot/allinone-lts.conf"
 
 # kernel version, defaulted to build for runtime kernel
-VERSION="$(uname -r)"
+VERSION="2.6.27-lts"
 
 # kernel image, defaulted to stock arch kernel
-KERNEL="/boot/vmlinuz26"
+KERNEL="/boot/vmlinuz26-lts"
 
 # boot message file
 # blank by default arch-bootmessage hook will create it by default

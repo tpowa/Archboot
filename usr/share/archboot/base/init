@@ -17,6 +17,14 @@ export kinit_params=""
 export root=""
 echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 
+# if available, start udevd at this stage
+if [ -x /sbin/udevd ]; then
+    msg ":: Starting udevd..."
+    echo > /proc/sys/kernel/hotplug
+    /sbin/udevd --daemon
+    msg "done."
+fi
+
 for cmd in ${CMDLINE}; do
     case "${cmd}" in
 	\#*) break ;; # ignore everything after a # in the commandline

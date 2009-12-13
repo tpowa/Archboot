@@ -6,6 +6,7 @@ Distributed under the GNU General Public License (GPL)
 
 @@BOOTLOADER@@ BOOT
 Creation Tool: 'archboot' written by Tobias Powalowski <tpowa@archlinux.org>
+Latest version: ftp://ftp.archlinux.org/iso/archboot or your favourite mirror.
 
 INSTALLATION / RESCUEBOOT SYSTEM
 Arch Linux @@RELEASENAME@@
@@ -13,12 +14,11 @@ Kernel: @@KERNEL@@ / @@KERNEL_LTS@@
 Architecture: i686/x86_64
 Creation Date: @@DATE@@
 
-Available boot options (no input will boot the 32bit archboot system after 30):
+Available boot options (no input will boot the 32bit archboot system):
 - 'arch <any_other_boot_option>' to boot the archboot system.
 - 'arch64 <any_other_boot_option>' to boot the 64bit archboot system.
-- 'lowmem <any_other_boot_option>' to boot the 96MB RAM archboot system.
-- 'lowmem64 <any_other_boot_option>' to boot the 64bit 96MB RAM archboot system.
-- For booting the LTS kernel, add -lts to each kernel image e.g. arch-lts.
+- 'arch-lts <any_other_boot_option>' to boot the LTS archboot system.
+- 'arch-lts64 <any_other_boot_option>' to boot the 64bit LTS archboot system.
 - 'memtest' to start the memory test program memtest86+.
 
 - For troubleshooting and other options press the F2 key.

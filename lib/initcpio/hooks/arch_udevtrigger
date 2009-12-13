@@ -2,7 +2,7 @@
 
 run_hook ()
 {
-    msg ":: Loading UDev uevents ..."
+    msg ":: Loading UDev uevents..."
     /sbin/udevadm trigger
     /sbin/udevadm settle
     msg "done."

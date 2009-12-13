@@ -14,18 +14,19 @@ usage ()
     echo "${APPNAME} -g <any other option>"
     echo ""
     echo "PARAMETERS:"
-    echo "  -g               Start generation of images."
-    echo "  -i=IMAGENAME     Your IMAGENAME."
-    echo "  -r=RELEASENAME   Use RELEASENAME in boot message."
-    echo "  -k=KERNELNAME    Use KERNELNAME in boot message."
-    echo "  -h               This message."
+    echo "  -g                  Start generation of images."
+    echo "  -i=IMAGENAME        Your IMAGENAME."
+    echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
+    echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
+    echo "  -lts=LTSKERNELNAME  Use LTSKERNELNAME in boot message."
+    echo "  -h                  This message."
     exit 1
 }
 
 [ "$1" == "" ] && usage && exit 1
 
 ALLINONE="/etc/archboot/presets/allinone"
-ALLINONE_LOWMEM="/etc/archboot/presets/allinone-lowmem"
+ALLINONE_LTS="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 USBIMAGE_HELPER="/usr/bin/archboot-tarball-helper.sh"
 
@@ -36,6 +37,7 @@ while [ $# -gt 0 ]; do
 		-i=*|--i=*) IMAGENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo $1 | awk -F= '{print $2;}')" ;;
+		-lts=*|--lts=*) KERNEL_LTS="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -50,7 +52,7 @@ fi
 
 if [ ${TARBALL} = "1" ]; then
 	${TARBALL_HELPER} -c=${ALLINONE} -t=core-$(uname -m).tar
-	${TARBALL_HELPER} -c=${ALLINONE_LOWMEM} -t=lowmem-$(uname -m).tar
+	${TARBALL_HELPER} -c=${ALLINONE_LTS} -t=core-lts-$(uname -m).tar
 	exit 0
 fi
 
@@ -60,14 +62,15 @@ fi
 
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
+[ "${KERNEL_LTS}" = "" ] && KERNEL_LTS="2.6.27-lts"
 [ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R1"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 # generate temp directories
-LOWMEM=$(mktemp -d /tmp/lowmem.XXX)
-LOWMEM64=$(mktemp -d /tmp/lowmem64.XXX)
 CORE=$(mktemp -d /tmp/core.XXX)
 CORE64=$(mktemp -d /tmp/core64.XXX)
+CORE_LTS=$(mktemp -d /tmp/core-lts.XXX)
+CORE64_LTS=$(mktemp -d /tmp/core64-lts.XXX)
 ALLINONE=$(mktemp -d /tmp/allinone.XXX)
 
 # create directories
@@ -75,18 +78,18 @@ mkdir ${ALLINONE}/arch
 mkdir ${ALLINONE}/isolinux
 
 # extract tarballs
-tar xvf lowmem-i686.tar -C ${LOWMEM} || exit 1
 tar xvf core-i686.tar -C ${CORE} || exit 1
-tar xvf lowmem-x86_64.tar -C ${LOWMEM64} || exit 1
 tar xvf core-x86_64.tar -C ${CORE64} || exit 1
+tar xvf core-lts-x86_64.tar -C ${CORE64_LTS} || exit 1
+tar xvf core-lts-i686.tar -C ${CORE_LTS} || exit 1
 
 # move in packages
-mv ${LOWMEM}/tmp/*/core-i686 ${ALLINONE}/
-mv ${LOWMEM64}/tmp/*/core-x86_64 ${ALLINONE}/
-mv ${LOWMEM}/tmp/*/core-any ${ALLINONE}/
+mv ${CORE_LTS}/tmp/*/core-i686 ${ALLINONE}/
+mv ${CORE64_LTS}/tmp/*/core-x86_64 ${ALLINONE}/
+mv ${CORE_LTS}/tmp/*/core-any ${ALLINONE}/
 
 # move in doc
-mv ${CORE}/tmp/*/arch/archdoc.txt ${ALLINONE}/arch/
+mv ${CORE}/tmp/*/arch/archboot.txt ${ALLINONE}/arch/
 
 # copy in clamav db files
 if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
@@ -99,15 +102,17 @@ if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
 fi
 
 # place kernels and memtest
-mv ${LOWMEM}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/
-mv ${LOWMEM64}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64
+mv ${CORE}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/
+mv ${CORE64}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64
+mv ${CORE_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm-lts
+mv ${CORE64_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64-lts
 mv ${CORE}/tmp/*/isolinux/memtest ${ALLINONE}/isolinux/
 
 # place initrd files
-mv ${LOWMEM}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/lowmem.img
-mv ${LOWMEM64}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/lowmem64.img
 mv ${CORE}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd.img
+mv ${CORE_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd-lts.img
 mv ${CORE64}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64.img
+mv ${CORE64_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64-lts.img
 
 # place config files
 mv ${CORE}/tmp/*/isolinux/isolinux.cfg ${ALLINONE}/isolinux/
@@ -115,7 +120,7 @@ mv ${CORE}/tmp/*/isolinux/boot.msg ${ALLINONE}/isolinux/
 mv ${CORE}/tmp/*/isolinux/options.msg ${ALLINONE}/isolinux/
 mv ${CORE}/tmp/*/isolinux/isolinux.bin ${ALLINONE}/isolinux/
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/isolinux/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/isolinux/boot.msg
 
 # generate iso file
 echo "Generating ALLINONE ISO ..."
@@ -134,7 +139,7 @@ mv ${ALLINONE}/isolinux/* ${ALLINONE}/
 rm -r ${ALLINONE}/isolinux
 mv ${CORE64}/tmp/*/isolinux/boot.msg ${ALLINONE}/
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot.msg
 
 /usr/bin/archboot-usbimage-helper.sh ${ALLINONE} ${IMAGENAME}.img > /dev/null 2>&1
 
@@ -144,8 +149,8 @@ for i in ${IMAGENAME}.iso ${IMAGENAME}.img ${IMAGENAME}-hybrid.iso; do
 	md5sum $i >> md5sum.txt
 done
 # cleanup
-rm -r ${LOWMEM}
-rm -r ${LOWMEM64}
 rm -r ${CORE}
 rm -r ${CORE64}
+rm -r ${CORE_LTS}
+rm -r ${CORE64_LTS}
 rm -r ${ALLINONE}

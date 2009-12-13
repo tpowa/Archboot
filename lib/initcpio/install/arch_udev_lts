@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+    add_file  /lib/udev/rules.d/30-kernel-compat.rules
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook includes udev compat rule files.
+HELPEOF
+}
