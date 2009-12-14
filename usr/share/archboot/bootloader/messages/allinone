@@ -6,13 +6,13 @@ Distributed under the GNU General Public License (GPL)
 
 @@BOOTLOADER@@ BOOT
 Creation Tool: 'archboot' written by Tobias Powalowski <tpowa@archlinux.org>
-Latest version: ftp://ftp.archlinux.org/iso/archboot or your favourite mirror.
 
-INSTALLATION / RESCUEBOOT SYSTEM
-Arch Linux @@RELEASENAME@@
-Kernel: @@KERNEL@@ / @@KERNEL_LTS@@
-Architecture: i686/x86_64
+ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM
+Release: @@RELEASENAME@@
 Creation Date: @@DATE@@
+RAM requirements: >= 288 MB 
+Standard kernel: @@KERNEL@@ / Long Term Support kernel: @@KERNEL_LTS@@
+Architecture: i686 / x86_64
 
 Available boot options (no input will boot the 32bit archboot system):
 - 'arch <any_other_boot_option>' to boot the archboot system.
