@@ -104,15 +104,15 @@ fi
 # place kernels and memtest
 mv ${CORE}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/
 mv ${CORE64}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64
-mv ${CORE_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm-lts
-mv ${CORE64_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64-lts
+mv ${CORE_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vmlts
+mv ${CORE64_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64lts
 mv ${CORE}/tmp/*/isolinux/memtest ${ALLINONE}/isolinux/
 
 # place initrd files
 mv ${CORE}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd.img
-mv ${CORE_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd-lts.img
+mv ${CORE_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrdlts.img
 mv ${CORE64}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64.img
-mv ${CORE64_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64-lts.img
+mv ${CORE64_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64lts.img
 
 # place config files
 mv ${CORE}/tmp/*/isolinux/isolinux.cfg ${ALLINONE}/isolinux/

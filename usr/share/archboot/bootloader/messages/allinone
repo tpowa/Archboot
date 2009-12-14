@@ -11,7 +11,7 @@ ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM
 Release: @@RELEASENAME@@
 Creation Date: @@DATE@@
 RAM requirements: >= 288 MB 
-Standard kernel: @@KERNEL@@ / Long Term Support kernel: @@KERNEL_LTS@@
+Standard kernel: @@KERNEL@@ / Long Term Support kernel: @@LTS_KERNEL@@
 Architecture: i686 / x86_64
 
 Available boot options (no input will boot the 32bit archboot system):
