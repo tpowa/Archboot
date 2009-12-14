@@ -40,6 +40,6 @@ add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mir
 help ()
 {
 cat<<HELPEOF
-  This hook includes the pacman on an arch boot image.
+  This hook includes the pacman on an arch lts boot image.
 HELPEOF
 } 

@@ -16,7 +16,8 @@ install ()
 help ()
 {
 cat<<HELPEOF
-  This hook loads the necessary modules for a firewire root device.
+  This hook loads the necessary modules for a firewire root device, on
+  lts kernel image.
   Detection will take place at runtime. To minimize the modules
   in the image, add the autodetect hook too.
 HELPEOF

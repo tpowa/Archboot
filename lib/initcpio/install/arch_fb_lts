@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "drivers/video/" | grep 'fb')  $(checked_modules "drivers/char/agp") "
+    BINARIES="v86d"
+    FILES=""
+    SCRIPT="arch_fb_lts"
+    add_file "/usr/share/archboot/fb/etc/modprobe.d/uvesafb.conf" "/etc/modprobe.d/uvesafb.conf"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the framebuffer and kms subsystem on an arch boot lts image.
+HELPEOF
+}
