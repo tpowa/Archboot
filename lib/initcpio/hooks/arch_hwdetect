@@ -19,7 +19,7 @@ run_hook ()
 		msg "--------------------------------------"
 		if [ -s /tmp/.ide-blacklist ]; then 
 			for i in $(sort -u /tmp/.ide-blacklist); do
-				msg -n "$i\"
+				echo -n "$i "
 			done
 			msg ""
 			msg "If you need them, please use 'ide-legacy' boot option or load them by hand!"

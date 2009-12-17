@@ -62,7 +62,7 @@ fi
 
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
-[ "${KERNEL_LTS}" = "" ] && KERNEL_LTS="2.6.27-lts"
+[ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.27-lts"
 [ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R1"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
