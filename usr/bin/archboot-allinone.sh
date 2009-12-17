@@ -30,6 +30,9 @@ ALLINONE_LTS="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 USBIMAGE_HELPER="/usr/bin/archboot-tarball-helper.sh"
 
+# change to english locale!
+export LANG=en_US
+
 while [ $# -gt 0 ]; do
 	case $1 in
 		-g|--g) GENERATE="1" ;;
