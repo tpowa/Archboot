@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="vmware-detect hwdetect"
+    FILES=""
+    SCRIPT="arch_hwdetect_lts"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will use hwdetect to load 
+  and detect the needed modules for your system.
+HELPEOF
+}

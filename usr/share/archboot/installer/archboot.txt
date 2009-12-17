@@ -1,227 +1,214 @@
 
-                  Arch Linux (Archboot) Installation Guide
+   Archboot Guide
 
-   September, 14 2008
+   December, 17 2009
 
-   Dennis Herbrich <dennis@archlinux.org>
    Tobias Powalowski <tpowa@archlinux.org>
+
+   Contributors (Parts from old Arch Linux Installation Guide):
+   Dennis Herbrich <dennis@archlinux.org>
    Judd Vinet <judd@archlinux.org>
-
-Summary
-
-   This is the general user documentation for the Arch Linux distribution.
-   It covers obtaining the necessary files, installing the distribution and
-   setting up a basic, bootable system. Additionally a short reference for
-   the system layout and Arch-specific tools is supplied.
 
 Table Of Contents
 
     1. Introduction
          1. What is Arch Linux?
          2. License
-         3. Credits and Feedback
-    2. Installing Arch Linux
-         1. Pre-Installation
-         2. Using CD-ROMs
-         3. Common Installation Procedure
-    3. System Configuration
-         1. Configuration Files
-         2. Boot Scripts
-         3. User Management
-         4. Internet Access
-    4. Package Management
-         1. Pacman
-         2. Accessing Repositories
-    5. Arch Build System (ABS)
-         1. Binary vs. Source
-         2. Synchronizing Your ABS Tree
-         3. How To Build Packages
-         4. Package Guidelines
-    6. Frequently Asked Questions
-         1. During package installation, pacman fails to resolve
-            dependencies for package A because package B is not in the
-            package set
-         2. How can I install packages from the install CD with pacman
-            --sync (so it resolves dependencies for me)?
-         3. How can I create multiple swap partitions during the install?
-         4. How do I reconfigure LILO from the rescue system?
-	 5. How do i reconfigure GRUB from the rescue system?
-         6. I can't ssh into my machine!
-         7. How should I load modules during boot now?
-         8. Kernel refuses to boot because of "lost interrupt"
-         9. I get "access denied" errors trying to play sound or read
-            DVDs
+         3. What is Archboot
+         4. What is the difference to the official install media?
+         5. What are the Archboot Setup features?
+    2. Archboot bootparameters
+         1. What are general boot parameters?
+         2. What are the video and framebuffer options?
+         3. What are other features of environment?
+    3. Installing Arch Linux with Archboot
+         1. What you will need?
+         2. Acquiring Archboot images
+         3. Preparing Installation Media
+         4. Booting the Install Media
+    4. Common Installation Procedure
+         1. Running Setup
+         2. Set Keyboard And Console Font
+         3. Set Time And Date
+         4. Prepare Hard Drive
+             1. Auto-Prepare
+             2. Partition Hard Drives
+             3. Create Software Raid, Lvm2 or Luks encryption
+             4. Set Filesystem Mountpoints
+         5. Select Source
+         6. Select Packages
+         7. Install Packages
+         8. Configure System
+         9. Install Bootloader
+         10. Exit Install
+    5. System Configuration
+    6. Useful links
 
 Introduction
 
   What is Arch Linux?
 
-   Arch Linux is an i686-optimized Linux distribution that was originally
-   based on ideas from CRUX, a great distribution developed by Per Lid�n.
+   http://www.archlinux.org
 
-   Arch is fast, lightweight, flexible and simple. Those aren't very
-   fancy buzzwords but they're all true. Arch is optimized for the i686
-   processor, so you get more for your CPU cycle. It's lightweight
-   compared to RedHat et al., and its simple design makes it easy to
-   extend and mold into whatever kind of system you're building.
-
-   This is backed by an easy-to-use binary package system that allows you
-   to upgrade your entire system with one command. Arch also uses a
-   ports-like package build system (the Arch Build System - ABS) to make
-   it easy to build packages, which can also be synchronized with one
-   command. Oh yeah, and you can rebuild your entire system with one
-   command, too. Everything is done quite simply and transparently.
-
-   Arch Linux strives to maintain the latest stable version of its
-   software. We currently support a fairly streamlined core package set
-   with a growing collection of extra packages maintained by AL
-   developers, as well as literally thousands of additional packages
-   submitted by trusted members of the community to our AUR for everyone
-   to use as they see fit.
-
-   In it's goal to be simple and lightweight, the relatively useless
-   portions of a Linux system have been left out, things like /usr/doc
-   and the info pages. In my own personal experience these are rarely
-   used, and equivalent information can be obtained from the net if need
-   be. Manpages all the way!
-
-   Arch Linux also strives to use some of the newer features that are
-   available to Linux users. All the typical filesystems, raid, lvm, and
-   encrypted partitions are supported.
-
-  License
+  License Arch Linux
 
    2002-2007 Judd Vinet
-   2007-2008 Aaron Griffin
+   2007-2009 Aaron Griffin
    and are licensed under the GNU General Public License (GPL).
 
-  Credits and Feedback
+  What is Archboot?
 
-   This document is heavily based on the works of Judd Vinet. Minor
-   corrections and a good bunch of modifications and additions have
-   been made by Dennis Herbrich and Tobias Powalowski. Corrections and
-   feedback should be fed into the bug tracker. An uncountable lot of
-   people have contributed and will contribute to the evolution of the
-   official Arch Linux Documentation by submitting corrections and
-   suggesting improvement, it's way too unpractical to list them all.
-   However, you know who you are, and without your help this would be
-   near impossible to maintain and improve. Thank you!
+   * Archboot is a set of scripts to generate bootable media for CD/USB/PXE.
+   * It is designed for installation or rescue operation.
+   * It only runs in RAM, without any special filesystems like squashfs,
+     thus it is limited to the RAM which is installed in your system.
+   * Git repository: 
+     http://projects.archlinux.org/?p=archboot.git;a=summary
+   * It is developed by tpowa.
 
-Installing Arch Linux
+  What is the difference to the official install media?
 
-  Pre-Installation
+   * It uses syslinux as initial bootloader.
+   * It provides x86_64/i686 architecture in one image.
+   * It provides the long time support kernel as installation option. 
+   * It uses hybrid iso format.
+   * It runs a modified Arch Linux system in initramfs.
+   * It is restricted to RAM usage, everything which is not necessary like
+     man or info pages etc. is not provided.
+   * Initial module loading and hardware detection is done
+     by the hwdetect script.
+   * It doesn't mount anything during boot process.
+   * It uses a different setup script and not the aif installer.
 
-   Arch Linux is optimized for the i686 processor and therefore will not
-   run on any lower or incompatible generations of x86 CPUs (i386,i486,i586).
-   A Pentium II or AMD K6-2 processor or higher is required. x86-64
-   architectures are also officially supported.
+  What are the Archboot Setup features?
 
-   Before installing Arch Linux, you should decide which installation
-   method and medium you would like to use. You should also read through this
-   installation guide in its entirety, so you have some idea of what to
-   expect.
+   * Media and Network installation mode
+   * Changing keymap and consolefont
+   * Changing time and date
+   * Preparing harddisk, like auto-prepare, partitioning etc.
+   * Creation of software raid/raid partitions, lvm2 devices and 
+     luks encrypted devices
+   * Supports standard linux,raid/raid_partitions,dmraid,lvm2
+     and encrypted devices
+   * Filesystem support: ext2/3/4,reiserfs,xfs,jfs,ntfs-3g,vfat
+   * Package selection support
+   * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
+     mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
+   * Configuration of basic system files
+   * Setting root password
+   * grub,lilo and syslinux bootloader support
 
-   Arch Linux provides bootable ISO and USB disk images. The ISO images will
-   work on almost any machine with a CD-ROM drive, and the USB images will
-   work on any system capable of booting from a USB drive.
+Archboot bootparameters
 
-   There are two variants of each installation medium which only differ in
-   terms of supplied packages. You can instruct the installer to obtain the
-   packages via FTP using either of these images, and all images can also be
-   used as fully functioning recovery environments.
-     * The "core" images contain a snapshot of the core packages. These
-       images are best suited for people who have an Internet connection
-       which is slow or difficult to set up.
-     * The "ftp" images contain no packages at all, and will use the network
-       to install packages. These images are preferred since you will end
-       up with an up-to-date system, but they are best suited for people
-       with fast, cheap connections.
+  What are general boot parameters?
 
-   Furthermore you should not worry about using an old ISO for
-   installation, as upgrading the system to the current branch is a
-   breeze once you've got your basic system set up. At least if you've
-   got a broadband connection!
+   * disablemodules
+      - disable a module which is loaded during bootup
+      - Usage:
+        disablemodules=<comma-separated-array>
+        disablemodules=pcspkr,usblp
 
-   Using a dialup PPP connection to gain access to the Internet during
-   the install process is supported. ppp utilities, rp-pppoe and the ISDN
-   userspace utilities are included on the installation media.
+   * disablehooks
+      - disable a hook which is run during bootup
+      - Usage:
+        disablehooks=<comma-separated-array>
+        disablehooks=arch_floppy,arch_cdrom
 
-   The ISOs run like any regular installed Arch system. In fact, they're
-   exactly the same, just installed to a CD or USB image instead of a hard
-   disk. They include the entire "base" package set, as well as various
-   networking utilities and drivers. If there's something else you happen
-   to need at runtime, just get your Internet connection up and install it
-   using pacman.
+   * root
+      - Using this option will boot you into your specified existing system.
+      - Usage:
+        root=/dev/<your-root-of-installed-system>
+        root=/dev/sda3
 
-   The most common (and recommended) installation procedure is to use the
-   install media to initially install only the base package set and whatever
-   utilities and drivers you need to get online. Then once you've successfully
-   booted the installed system, run a full system upgrade and install any
-   other packages you want.
+   * advanced
+      - This will override advanced hooks running order for your system.
+      - Default order is arch_mdadm,arch_lvm2,arch_encrypt
+      - Advanced hooks are: arch_mdadm,arch_lvm2,arch_encrypt
+      - Usage:
+        advanced=hook1,hook2,hook3
+        advanced=arch_encrypt,arch_mdadm
 
-   Another thing you should know before trying to install Arch Linux is
-   that during the install you're asked a few questions about which hard
-   drive to prepare, what modules to load, and what changes to make to
-   certain system-critical files like lilo.conf and rc.conf. The
-   installer will not hold your hand here and guide you through any
-   potential setup known and unknown to mankind, you are expected to know
-   what to put in and leave out. This is quite a requirement for a
-   newbie, so if this intimidates you already, make sure you read through
-   this whole document to get at least a vague idea what is going to be
-   asked, and check back on IRC, the forums or a Linux guru in your
-   neighborhood if anything is not clear to you before you totally mess
-   up your system. You may of course boldly step into the fight and
-   tinker and try around until it works, but don't tell anyone afterwards
-   you haven't been warned. That being said, it's not that bad. ;)
+   * ide-legacy
+      - This will turn on the old IDE subsystem. This is only needed,
+        if your system doesn't support the new PATA subsystem.
 
-    What You Will Need
+   * intel-wireless
+      - You agree to the intel wireless drivers licenses.
+      - Enables ipwXXXX and iwlXXXX module funtionality.
 
-     * a working knowledge of Linux and your system, especially your
-       hardware
-     * Arch Linux installation media (see the mirror list)
-          + Arch Linux Install CD
-     * Arch Linux installation media
-     * an i686-based or x86-64 computer (PPro, Pentium 2 or higher,
-       Athlon/Duron, etc. Note that AMD K6, Transmeta Crusoe, CyrixIII, and
-       VIA-C3 are NOT supported.)
-      * some time to kill
+   * arch-addons
+      - You want to load external addon packages or configs 
+        into the install environment.
+      - Place external addon packages in /packages directory of your external 
+        device.
+      - Place external configs in /config directory of your external device.
 
-     Acquiring Arch Linux
+  What are the video and framebuffer options?
 
-     * You can download Arch Linux from any of the sources listed on the
-       download page, http://archlinux.org/download/
-     * You may also purchase an installation CD from OSDisc and have it
-       shipped anywhere in the world.
+   * ati-kms (not available on lts image boot!)
+     - enables ati/amd chipset kms mode during boot and activates setup routine
+       to use it later on installed system.
 
-    Preparing Installation Media
+   * intel-kms (not available on lts image boot!)
+     - enables intel chipset kms mode during boot and activates setup routine
+       to use it later on installed system.
 
-     CD-ROM
+   * nvidia-kms (not available on lts image boot!)
+     - enables nvidia chipset kms mode during boot and activates setup routine
+       to use it later on installed system.
 
-      1. Download iso/<release>/<your_architecture>/Archlinux-XXX.iso
-      2. Download iso/<release>/<your_architecture>/md5sum.txt
-      3. Verify the integrity of the .iso image using md5sum:
-         md5sum --check md5sum.txt
-         Archlinux-XXX.iso: OK
-      4. Burn the ISO image to a CD-R or CD-RW using any software of your
-         choice.
+   * uvesafb
+     - enables uvesafb mode during boot and activates setup routine 
+       to use it later on installed system.
+     - you need to specify your supported resolution eg.:
+       uvesafb=<resolution>-<depth>
+       uvesafb=1024x768-16
 
-     USB
+   * fbmodule
+     - Loads the fb module you specify durin boot process 
+       and activates setup routine to use it later on installed system.
+     - Use it like this fbmodule=<yourmodule>, e.g. fbmodule=cirrusfb
 
-      1. Download iso/<release>/<your_architecture>/Archlinux-XXX.img
-      2. Download iso/<release>/<your_architecture>/md5sum.txt
-      3. Verify the integrity of the .img image using md5sum:
-         md5sum --check md5sum.txt
-         Archlinux-XXX.img: OK
-      4. Write the disk image to a USB mass storage device, such as a thumb
-         drive, using dd or similar raw-write software:
-         dd if=Archlinux-XXX.img of=/dev/your_usb_device
+  What are other features of environment?
+
+   * ARCH_TIACX_WIRELESS:
+     - Please identify the correct file(s) for your device in /usr/share/tiacx
+       and copy them to /lib/firmware and reload your kernel module.
+     - See http://acx100.sourceforge.net/wiki/Firmware for details.
+
+   * ARCH_CLAMAV:
+     - Mount your boot media to /src to use the ondisk clamav db files. 
+     - If you want up to date db files use the freshclam program
+       (you will need a working network connection)
+
+Installing Arch Linux with Archboot 
+
+  What you will need?
+
+   * a working knowledge of Linux and your system, especially your
+     hardware
+   * Archboot installation media
+   * an i686-based or x86-64 computer (PPro, Pentium 2 or higher,
+     Athlon/Duron, etc. Note that AMD K6, Transmeta Crusoe, CyrixIII, and
+     VIA-C3 are NOT supported.)
+   * some time to kill
+
+  Acquiring Archboot images
+
+   You can download Archboot images from any Arch Linux mirror:
+   eg. ftp://ftp.archlinux.org/iso/archboot/
+
+  Preparing Installation Media
+
+   * Hybrid image file is provided, which includes
+     i686 and x86_64 core repository. Please check md5sum before using it.
+   * Can be burned to CD(RW) media using most CD-burning utilities.
+   * Can be raw-written to a drive using 'dd' or similar utilities.
+     This method is intended for use with USB thumb drives.
 
   Booting the Install Media
-   If you're already familiar with the boot process, you may skip all this
-   babble as well, and jump to the Common Install Procedure, which outlines 
-   the actual process of installing Arch Linux.
 
-   Reboot your computer with the Arch Linux Installation CD in the drive.
+   Reboot your computer with the Arch Linux Archboot CD in the drive.
    Make sure your BIOS is set in a way to allow booting from your CD-ROM or 
    USB device. Refer to your motherboard manual or your system manufacturer
    for details if you have no clue how to do that.
@@ -229,95 +216,23 @@ Installing Arch Linux
    you pressing a key or wait 30 seconds, explaining what your options are at
    this point. Most users can just hit Enter.
 
-   If your CD-ROM fails to boot for no obvious reason, and you're using a
-   rather old CD-ROM drive in conjunction with a copy burned to a CD-RW,
-   consider using a normal CD-R instead. Some older drives [two of mine,
-   for example] don't manage to read CD-RWs properly.
-   An other option would be, that your system doesn't have enough RAM installed.
-   (You need at least 256 MB RAM! or use the lowmem boot image.)
-
    At the end of the boot procedure, you should be dropped into a root
    shell with a handful of instructions filling the upper half of your
    screen. At this point you are ready to commence the actual
    installation, or do any manual preparation you consider necessary.
 
-  Common Installation Procedure
+Common Installation Procedure
 
-   At this point your system should be booted, and the hard drive to
-   which you'd like to install, as well as your installation source, must
-   be accessible.
+  Running Setup
 
-   Installation Steps:
-
-    1. Loading a non-US Keymap
-    2. Running Setup
-    3. Configure Network (FTP Install only)
-    4. Prepare Hard Drive
-         1. Auto-Prepare
-         2. Partition Hard Drives
-         3. Set Filesystem Mountpoints
-    5. Select Packages
-    6. Install Packages
-    7. Configure System
-    8. Install Kernel
-    9. Install Bootloader
-   10. Exit Install
-
-   Using the available shell tools, experienced users are also able to
-   prepare the hard drive or any devices needed for the installation
-   before starting the installer. You may simply skip this paragraph if
-   you don't see any immediate need for further manual interaction. Note
-   that the Arch Linux installation media also contains a /arch/quickinst
-   script for experienced users. This script installs the "base" set of
-   packages to a user-specified destination directory. If you are doing
-   an exotic install with fun things like RAID and LVM, or don't want to
-   use the installer at all, you'll probably want to use the quickinst
-   script. All the cool kids do it, but you'll need to configure the
-   system afterwards since no form of auto-configuration takes place.
-
-   Loading a non-US Keymap
-
-   If you require a non-US keymap, you can use the km utility to load a
-   new keymap. Just type km at the prompt, then use the arrow keys to
-   navigate to the correct keymap and/or console font. 
-   (this is not available on a lowmem boot image.)
-
-    Running Setup
-
-   Now you can run /arch/setup to invoke the installer program. After an
-   informational message you will be prompted for the installation method
-   of your choice. If you have a fast Internet connection, you might
-   prefer the FTP installation to ensure you get the latest packages
-   instead of using the potentially outdated CD contents. Please note
-   that you will probably run into trouble if you have a complex proxy
-   setup with authentication when using the FTP installation. If you
-   can't use a CD-ROM, or any other medium you could mount at this stage,
-   this is the only viable method of installing Arch Linux.
-
+   On first login /arch/setup is launched automatically. After an
+   informational message you will be prompted to the main menu.
+   
    When navigating the setup script, make sure that you select DONE from
    the submenus after performing each step. This saves any settings you
    make in preparation for the next step. Further, avoid arbitrary steps
    through the installation process as this can also confuse the
    installer.
-
-   It's actually rather easy to set up your own FTP package mirror or
-   create your own bootable installation CD with the packages you need,
-   making the task of installing several instances of Arch Linux across
-   multiple machines rather simple, while at the same time saving a lot
-   of mirror bandwidth. Make your life and ours easier, and look into
-   these alternatives!
-
-   When choosing a CD-ROM or OTHER SOURCE install you will only be able
-   to install packages contained on the CD, which may be quite old, or
-   packages stored on a medium you were able to mount (DVD, USB stick or
-   similar) somewhere in the filesystem tree manually. Of course it has
-   the merit that you won't need an Internet connection, and is therefore
-   the recommended choice for dialup users or anyone else who does not
-   feel like downloading about at least 100 MB of packages.
-
-   After choosing one of the two alternatives, you will be presented with
-   the installer menu, listing the necessary steps in the order in which
-   they should be completed.
 
    At any point in the install process, you can switch to your 5th
    virtual console (ALT-F5) to view the output from the commands the
@@ -325,45 +240,20 @@ Installing Arch Linux
    the installer is running, and any F-key in between if you need to open
    another console to intervene manually for any reason.
 
-    Configure Network (FTP Install only)
+  Set Keyboard And Console Font
 
-   Configure Network will allow you to install and configure your network
-   device.
-   Note:
-   Wireless drivers are available in install environment, but you have to
-   configure those devices with the standard Linux tools by hand.
-   For intel wireless drivers you need to boot with intel-wireless boot
-   parameter, this includes that you accept the according intel licenses.
-   You can skip configure network then and go straight ahead to preparing
-   harddrive.
+   Use this menu to change your keyboard to your desired keymap 
+   and console font.
 
-   A list of all currently available network devices is presented to you.
-   If no ethernet device is available yet, or the one you wish to use is
-   missing, either hit OK and go on to probe for it, or switch to another
-   console and load the module manually.
+  Set Time And Date
+ 
+   Use this menu to change time and date of your running system.
 
-   If you still can't configure your network card, make sure it's physically
-   been properly installed, and that it is supported by the Linux kernel.
+  Prepare Hard Drive
 
-   When the correct module is loaded, and your desired network card is
-   listed, you should Select the ethernet device you want to configure
-   and you will be given the option to configure your network with DHCP.
-   If your network uses DHCP, hit YES and let the installer do the rest.
-   If you select NO, you will be asked to enter the networking information
-   manually. Either way, your network should be successfully configured,
-   and if you're of the skeptical kind, you may check connectivity using
-   standard tools like ping on another console.
-
-   As automatisms are not perfect, you may not be able to successfully
-   use the installer to set up your network. In these rare cases, don't
-   bother, and set up you network device manually in one of the consoles.
-   All the installer needs is a transparent connection to the FTP server
-   you are going to select later during the installation.
-
-   This menu entry is only available when choosing FTP Installation, for
-   rather obvious reasons.
-
-    Prepare Hard Drive
+   First you will be asked if you want to use UUID for device name scheme.
+   It is recommended to use UUID, in order to avoid name collisions or 
+   name switching of devices.
 
    Prepare Hard Drive will lead you into a submenu offering two
    alternatives of preparing your target drive for installation.
@@ -373,43 +263,23 @@ Installing Arch Linux
    create filesystems on all three. These partitions will also be
    automatically mounted in the proper place. To be exact, this option
    will create:
-     * 32 MB ext2 /boot partition
-     * 256 MB swap partition
-     * root and /home partition with the remaining space
-
-   Actual sizes may vary slightly due to different hard disk geometries.
-   You can choose this option if you don't know much about hard drive
-   partitions, but be warned:
+     * a /boot ext2 partition
+     * a swap partition
+     * a root partition 
+     * a /home partition with the remaining space
 
    AUTO-PREPARE WILL ERASE ALL DATA ON THE CHOSEN HARD DRIVE!
    Read the warning presented by the installer very carefully, and make
    sure the correct device is about to be partitioned!
-
-   A way to verify your choice for a device to partition would be to open
-   another terminal (ALT-F2, Enter) and enter
-      # cfdisk -P s <name of device>
-
-   there to display the current partition table of the selected device,
-   which should suffice to identify the hard disk.
-
-   If no device name is shown ("[nothing] will be COMPLETELY ERASED!
-   ..."), and the installer produces an "Device not valid" error after
-   hitting YES, make sure you loaded all needed modules if it's a SCSI,
-   RAID, etc. device. You can still load any modules now by changing to
-   another terminal and issuing the commands there, then return to the
-   installer process on terminal one (ALT-F1).
 
    If you prefer to do the partitioning manually, use the other two
    options, Partition Hard Drives and Set Filesystem Mountpoints to
    prepare the target media according to your specifications as outlined
    below. Then Return to Main Menu after a successful preparation.
 
-    Partition Hard Drives
+  Partition Hard Drives
 
-   Partition Hard Drives should be skipped if you chose Auto-Prepare
-   already!
-
-   Otherwise you should select the disk(s) you want to partition, and
+   You should select the disk(s) you want to partition, and
    you'll be dropped into the cfdisk program where you can freely modify
    the partitioning information until you [Write] and [Quit].
 
@@ -417,12 +287,16 @@ Installing Arch Linux
    and it's helpful to note somewhere which partition you're going to
    mount where, as you'll be asked exactly that in the next step.
 
-    Set Filesystem Mountpoints
+  Create Software Raid, Lvm2 or Luks encryption
 
-   Set Filesystem Mountpoints should also be skipped if you chose to
-   Auto-Prepare your hard drive. You should select this choice once the
-   partition information is edited to your liking with the previous menu
-   selection, or already existent through whatever other means.
+   Use this menu for the mentioned above special devices. 
+   Help is provided in each submenu.
+
+  Set Filesystem Mountpoints
+
+   You should select this choice once the partition information is edited 
+   to your liking with the previous menu selection, or already existent through
+   whatever other means.
 
    The first question to answer is what partition to use as swap. Select
    the previously created swap partition from the list, or NONE, if you
@@ -442,7 +316,7 @@ Installing Arch Linux
    Every time you specify a partition to mount, you will be asked if you
    want to create a filesystem on the respective partition. If you select
    YES, you will be asked what filesystem to create (a matter of taste,
-   really. Choose ext3 if you have no clue), and the partition will be
+   really. Choose ext4 if you have no clue), and the partition will be
    formatted with the chosen filesystem, destroying all data in the
    process. It should be no problem, however, to say NO at this point to
    preserve any existing files on the partition.
@@ -468,38 +342,65 @@ Installing Arch Linux
    of all of your choices for review. After formatting and mounting all
    partitions, you may return to the Main Menu and proceed with the next step.
 
-    Select Packages
+  Select Source
+
+   If you have a fast Internet connection, you might  prefer the FTP/HTTP
+   installation to ensure you get the latest packages, instead of using the
+   potentially outdated media contents. Please note that you will probably
+   run into trouble if you have a complex proxy setup with authentication
+   when using the FTP/HTTP installation. If you  can't use a CD-ROM, USB device
+   or any other medium you could mount at this stage, this is the only viable
+   method of installing Arch Linux.
+
+  Setup Network (FTP/HTTP method)
+
+   Setup Network will allow you to install and configure your network device.
+   Wireless drivers are available in install environment, but you have to
+   configure those devices with the standard Linux tools by hand, 
+   or the Arch Linux way by using the netcfg scripts.
+   You can skip setup network then and go straight ahead to selecting mirror.
+   Note:
+   For intel wireless drivers you need to boot with intel-wireless boot
+   parameter, this includes that you accept the according intel licenses.
+   
+   A list of all currently available network devices is presented to you.
+   If no ethernet device is available yet, or the one you wish to use is
+   missing, either hit OK and go on to probe for it, or switch to another
+   console and load the module manually.
+
+   If you still can't configure your network card, make sure it's physically
+   been properly installed, and that it is supported by the Linux kernel.
+
+   When the correct module is loaded, and your desired network card is
+   listed, you should Select the ethernet device you want to configure
+   and you will be given the option to configure your network with DHCP.
+   If your network uses DHCP, hit YES and let the installer do the rest.
+   If you select NO, you will be asked to enter the networking information
+   manually. Either way, your network should be successfully configured,
+   and if you're of the skeptical kind, you may check connectivity using
+   standard tools like ping on another console.
+
+   As automatisms are not perfect, you may not be able to successfully
+   use the installer to set up your network. In these rare cases, don't
+   bother, and set up you network device manually in one of the consoles.
+   All the installer needs is a transparent connection to the FTP/HTTP server
+   you are going to select later during the installation.
+
+  Choose Mirror (FTP/HTTP method)
+
+   You need to select a mirror for installing the packages, else the FTP/HTTP 
+   installation will not work.
+
+  Select Packages
 
    Select Packages will let you select the packages you wish to install
-   from the CD or your FTP mirror.
-
-   If you chose CD-ROM installation, you have to tell the installer
-   whether it should try to mount the CD itself, or whether you already
-   mounted the source media on the /src directory. Select the option
-   according to what you need; Normally you will want to choose CD, after
-   which you will be given the possibility to choose a CD-ROM drive from
-   the list of all detected devices.
-
-   If your CD-ROM drive is not displayed in the list, make sure you
-   loaded any modules that may be needed, like SCSI or USB storage
-   support, and load them in another terminal if necessary.
-
-   If you chose FTP Installation, you will be asked to choose a mirror
-   close to you from a list, or select Custom to enter your own fully
-   qualified domain name (or IP address) to an FTP server containing the
-   installation source packages, ie. a prepared server in your LAN, or a
-   mirror that's not listed for whatever reason, and afterwards the full
-   path to the directory on the server that contains the packages and
-   specifically the file core.db.tar.gz. The installer will check your
-   input for validity, and allow you to make corrections until you enter
-   an address and path that are reachable and allow downloading of the
-   package list.
+   from the media or your FTP/HTTP mirror.
 
    Whatever source you chose, after fetching the package list you'll be
    dropped into the package category selection screen.
 
    If you are presented an error while fetching the package database, you
-   should either choose another FTP mirror, make sure your network is
+   should either choose another mirror, make sure your network is
    working at all, and you didn't slip any typos into your custom server
    address. You might also have goofed mounting of your source media in
    the /src directory, if you chose that option. Read the messages
@@ -543,24 +444,22 @@ Installing Arch Linux
    any packages you need for setting up Internet connectivity. These
    packages usually are:
 
-   dhcpcd (base)
+   dhcpcd or dhclient
           Add if your machine is a DHCP client.
 
-   isdn4k-utils (support)
+   isdn4k-utils
           Add if you use ISDN for dialup.
 
-   ppp (support)
+   ppp
           Add if you use an analog modem for dialup.
 
-   rp-pppoe (support)
+   rp-pppoe
           Add if you use DSL for pseudo-dialup.
-
-   Other packages from support category.
 
    Once you're done selecting the packages you need, leave the selection
    screen and continue to the next step, Install Packages.
 
-    Install Packages
+  Install Packages
 
    Install Packages will now install pacman and any other packages you
    selected with resolved dependencies onto your hard disk. Don't be
@@ -569,31 +468,18 @@ Installing Arch Linux
    not explicitly ask for permission to install these extra packages, as
    it assumes you know what you're doing.
 
-   After the package selection, the installer will not check for free
-   space on the target! This seemingly trivial task would eat up
-   considerable time, and therefore the installer simply assumes to have
-   enough free space on the target partition(s). In case it doesn't, the
-   installation will fail in various funny ways. A df -h in another
-   terminal might show that one or more of the targets mounted below 
-   /tmp/install have been filled up, causing mischief. Consider repartitioning
-   or selecting a smaller set of packages.
-
    Error messages and debugging output is echoed as usual to terminal
    five (ALT-F5). During normal, successful operation, you shouldn't find
    much to read there, though. After the packages have been installed,
    proceed to the next step, Configure System.
 
-   Please note that this release of Arch Linux only offers one kernel to
-   install, as flexibility has now been put into the initramfs created by
-   the mkinitcpio tool.
-
-   The CD-ROM includes the latest kernel at the time the image was made.
-   If you are using the FTP Installation method, the kernel about to be
-   installed will be the current version waiting on your FTP source,
+   The media includes the latest kernel at the time the image was made.
+   If you are using the FTP/HTTP Installation method, the kernel about to be
+   installed will be the current version waiting on your FTP/HTTP source,
    and might therefore introduce changes and/or incompatibilities unknown
    at the present time. This is unlikely, but keep this in mind.
 
-    Configure System
+  Configure System
 
    Configure System allows you to edit the configuration files crucial
    for your newly installed system. Initially you will be asked whether
@@ -601,14 +487,6 @@ Installing Arch Linux
    produce some (even more) sensible defaults for your configuration
    files. Unless you're having problems/crashes, you should let it have
    it's way, and work from what it generates.
-
-   Answer the following questions about RAID, LVM and encrypted volumes
-   with Yes, if your root partition resides on a RAID, LVM or encrypted
-   volume, respectively, to automatically add the necessary HOOKS to the
-   mkinitcpio.conf. Otherwise you will get a kernel panic during boot, as
-   your root partition will not be accessible at the time of boot. Most
-   people will answer these questions with No, though, and not waste a
-   second thought about it.
 
    After this automatic preconfiguration you'll be asked for your
    favorite editor to use for manually fine-tuning the generated
@@ -618,47 +496,16 @@ Installing Arch Linux
    reviewing the configuration entirely and hope the defaults will work
    for you, but it's strongly recommended to iterate through the list of
    configuration files presented here and review the settings carefully.
-   Please refer to the System Configuration section for detailed
-   descriptions of the various files.
 
-    Install Bootloader
+  Install Bootloader
 
-   Install Bootloader will install a bootloader on your hard drive,
-   either GRUB (recommended) or LILO, depending on your personal
-   preference.
+   Choose the bootloader you want to use, if you are unsure which one to use
+   choose grub bootloader.
 
-   Before installing the bootloader, the setup script will want you to
-   examine the appropriate configuration file to confirm the proper
-   settings. Make sure you know what your root (and /boot, if you have
-   it) partitions are.
+  Exit Install
 
-   If you choose to install LILO, the bootloader will be automatically
-   installed according to your settings in the configuration file, whilst
-   GRUB demands the selection of a partition to install the bootloader
-   to. Here you should choose what you would enter as the boot option of
-   LILO, which is usually the entry named /dev/sda, as it refers the
-   master boot record of the first hard disk. Detailed error messages can
-   be found as usual on VC5 (virtual console 5), if anything goes wrong.
-
-   If you plan on setting up a multiboot system, it might be a better
-   option to install the bootloader in your root or /boot partition, and
-   refer to that boot sector from whatever other boot loader you want to
-   reside in the master boot record.
-
-   Installing a boot loader in the MBR will relentlessly overwrite any
-   existing bootloader! Make sure you understand the implications of that
-   if you're running a multiboot system, or want to preserve an installed
-   bootloader from another OS!
-
-    Exit Install
-
-   Exit Install now, remove the CD from the drive, type reboot at the
+   Remove the media from your computer, type reboot at the
    command line and cross your fingers!
-
-   If your system boots up, you can log in as root without any password,
-   so your first things to do are setting a password for root with the
-   passwd command once you're logged in, add a user as outlined in the
-   User Management section, and set up your Internet Connection.
 
    Congratulations! Now you can proceed to getting into the nitty-gritty of
    configuring the interesting parts of your system, and adapt it to your
@@ -666,13 +513,10 @@ Installing Arch Linux
 
 System Configuration
 
-   These are the core configuration files for Arch Linux. You should be
-   comfortable hand-editing these files with a text-editor, because there
-   aren't any GUI apps to help you out. Only the most basic configuration
-   files are listed here. If you need help configuring a specific
-   service, please read the appropriate manpage or refer to any online
-   documentation you need. In many cases, the Archlinux Wiki and forums
-   are a rich source for help as well.
+   If you need help configuring a specific service, please read the 
+   appropriate manpage or refer to any online documentation you need. 
+   In many cases, the Archlinux Wiki and forums are a rich source for
+   help as well.
 
    Arch Linux does not use any abstraction layers to administrate your
    system. As a result, you can usually stick to any instructions
@@ -680,1258 +524,19 @@ System Configuration
    search engine of your choice, and it'll work out without confusing
    your system, because your system just does not care.
 
-  Configuration Files
-
-   Before attempting to boot your newly installed system, you should at
-   least glance over these files and make sure they are not too far off
-   the mark.
-
-   List of Configuration Files
-
-    1. /etc/rc.conf
-    2. /etc/fstab
-    3. /etc/mkinitcpio.conf
-    4. /etc/modprobe.conf
-    5. /etc/resolv.conf
-    6. /etc/hosts
-    7. /etc/hosts.deny
-    8. /etc/hosts.allow
-    9. /etc/locale.gen
-   10. /boot/grub/menu.lst
-   11. /etc/lilo.conf
-   12. Additional configuration files:
-   13. /etc/conf.d/*
-   14. /etc/profile
-
-    /etc/rc.conf
-
-   This is the main configuration file for Arch Linux. It allows you to
-   set your keyboard, timezone, hostname, network, daemons to run and
-   modules to load at bootup, profiles, and more. You should read through
-   all the settings in this file and make sure you understand them, and
-   change them where appropriate:
-
-   LOCALE
-          This sets your system language, which will be used by all
-          i18n-friendly applications and utilities. See locale.gen below
-          for available options. This setting's default is fine for US
-          English users.
-
-   HARDWARECLOCK
-          Either UTC if your BIOS clock is set to UTC, or localtime if
-          your BIOS clock is set to your local time. If you have an OS
-          installed which cannot handle UTC BIOS times correctly, like
-          Windows, choose localtime here, otherwise you should prefer
-          UTC, which makes daylight savings time a non-issue and has a
-          few other positive aspects.
-
-   TIMEZONE
-          Specifies your time zone. Possible time zones are the relative
-          path to a zoneinfo file starting from the directory
-          /usr/share/zoneinfo. For example, a German timezone would be
-          Europe/Berlin, which refers to the file
-          /usr/share/zoneinfo/Europe/Berlin. If you don't know the exact
-          name of your timezone file, worry about it later.
-
-   KEYMAP
-          Defines the keymap to load with the loadkeys program on bootup.
-          Possible keymaps are found in /usr/share/kbd/keymaps. Please
-          note that this setting is only valid for your TTYs, not any
-          graphical window managers or X! Again, the default is fine for
-          US users.
-
-   CONSOLEFONT
-          Defines the console font to load with the setfont program on
-          bootup. Possible fonts are found in
-          /usr/share/kbd/consolefonts.
-
-   CONSOLEMAP
-          Defines the console map to load with the setfont program on
-          bootup. Possible maps are found in /usr/share/kbd/consoletrans.
-          You will want to set this to a map suitable for your locale
-          (8859-1 for Latin1, for example) if you're using an utf8 locale
-          above, and use programs that generate 8-bit output. If you're
-          using X11 for everyday work, don't bother, as it only affects
-          the output of Linux console applications.
-
-   USECOLOR
-          Enable (or disable) colorized status messages during boot-up.
-
-   MOD_AUTOLOAD
-          If set to "yes", udev will be allowed to load modules as necessary
-          upon bootup. If set to "no", it will not.
-
-   MODULES
-          In this array you can list the names of modules you want to
-          load during bootup without the need to bind them to a hardware
-          device as in the modprobe.conf. Simply add the name of the
-          module here, and put any options into modprobe.conf if need
-          be.
-          Prepending a module with a bang ('!') will blacklist the module,
-          and not allow it to be loaded. For example, if you don't want that
-          annoying PC speaker, you could blacklist the pcspkr module.
-          A benefit of specifying networking modules here is that ethernet
-          cards covered by the listed modules will always be detected in
-          the order the modules are listed. This prevents the dreaded
-          interface confusion where your ethernet hardware is assigned to
-          seemingly random interfaces after each boot. An even better way
-          to handle this is using static interface labels by configuring
-          udev appropriately, though.
-
-   USELVM
-          Set to "YES" to run a vgchange during sysinit, thus activating
-          any LVM groups. If you have no idea what this means, don't
-          bother.
-
-   HOSTNAME
-          Set this to the hostname of the machine, without the domain
-          part. This is totally your choice, as long as you stick to
-          letters, digits and a few common special characters like the
-          dash. Don't be too creative here, though, and when in doubt,
-          use the default.
-
-   INTERFACES
-          Here you define the settings for your networking interfaces.
-          The default lines and the included comments explain the setup
-          well enough. If you do not use DHCP to configure a device, just
-          keep in mind that the value of the variable (whose name must be
-          equal to the name of the device which is supposed to be
-          configured) equals the line which would be appended to the
-          ifconfig command if you were to configure the device manually
-          in the shell.
-
-   ROUTES
-          You can define your own static network routes with arbitrary
-          names here. Look at the example for a default gateway to get
-          the idea. Basically the quoted part is identical to what you'd
-          pass to a manual route add command, therefore reading man route
-          is recommended if you don't know what to write here, or simply
-          leave this alone.
-
-   NETWORKS
-          Enables certain network profiles at bootup. Network profiles
-          provide a convenient way of managing multiple network
-          configurations, and are intended to replace the standard
-          INTERFACES/ROUTES setup that is still recommended for systems
-          with only one network configuration. If your computer will be
-          participating in various networks at various times (eg, a
-          laptop) then you should take a look at the
-          /etc/network-profiles/ directory to set up some profiles. There
-          is a template file included there that can be used to create
-          new profiles.
-
-   DAEMONS
-          This array simply lists the names of those scripts contained in
-          /etc/rc.d/ which are supposed to be started during the boot
-          process. If a script name is prefixed with a bang (!), it is
-          not executed. If a script is prefixed with an "at" symbol (@),
-          then it will be executed in the background, ie. the startup
-          sequence will not wait for successful completion before
-          continuing. Usually you do not need to change the defaults to
-          get a running system, but you are going to edit this array
-          whenever you install system services like sshd, and want to
-          start these automatically during bootup. This is basically
-          Arch's way of handling what others handle with various symlinks
-          to an init.d directory.
-
-    /etc/fstab
-
-   Your filesystem settings and mountpoints are configured here. The
-   installer should have created the necessary entries for you, but you
-   should look over it and make sure it's right. If you are using an
-   encrypted root device, LVM or RAID, you will likely need to change
-   them to device names, rather than the UUIDs the installer will have
-   inserted for you.
-
-   With the current kernel, an important change has been introduced
-   pertaining to the ATA/IDE subsystem. The new pata (Parallel ATA)
-   drivers replace the legacy IDE subsystem, and one important change is
-   that the naming scheme for IDE disks has changed from the old hda,
-   hdb, etc. to also use device names of the type sda, sdb, etc, just
-   like SCSI and SATA devices do. Because of this, the installer will have
-   used UUID entries by default, since they offer a consistent way to refer
-   to partitions regardless of the underlying driver.
-
-   If for some reason you are unable to use UUIDs, make sure you are
-   using the right device names, or you will end up with an unbootable
-   system in no time. Here's the rundown: if you're using the 'ide' hook
-   in your initcpio.conf, you should be using the hd? device names, and if
-   you're using the 'pata' hook, you should be using the sd? names.
-
-    /etc/mkinitcpio.conf
-
-   This file allows you to fine-tune the initial ramdisk for your system.
-   The ramdisk is a gzipped image that is read by the kernel during bootup.
-   Its purpose is to bootstrap the system to the point where it can access
-   the root filesystem. This means it has to load any modules that are
-   required to "see" things like IDE, SCSI, or SATA drives (or USB/FW, if
-   you are booting off a USB/FW drive). Once the ramdisk loads the proper
-   modules, either manually or through udev, it passes control to the
-   Arch system and your bootup continues. For this reason, the ramdisk
-   only needs to contain the modules necessary to access the root
-   filesystem. It does not need to contain every module you would ever
-   want to use. The majority of your everyday modules will be loaded
-   later on by udev, during the init process.
-
-   By default, mkinitcpio.conf is configured to autodetect all needed modules
-   for IDE, SCSI, or SATA systems through so-called HOOKS. This means the
-   default initrd should work for almost everybody.You can edit
-   mkinitcpio.conf and remove the subsystem HOOKS (ie, IDE, SCSI, RAID,
-   USB, etc) that you don't need.
-
-   You can customize even further by specifying the exact modules you
-   need in the MODULES array and remove even more of the hooks, but take
-   heed to the comments in the file, as this is a touchy place to go
-   crazy with removing entries!
-
-   If you're using RAID or encryption on your root filesystem, then
-   you'll have to tweak the RAID/CRYPT settings near the bottom. See the
-   wiki pages for RAID/LVM, filesystem encryption, and mkinitcpio for
-   more info.
-
-   When you're finished tweaking mkinitcpio.conf, you must run mkinitcpio
-   -p kernel26 as root to regenerate the images, unless you're still
-   installing the system; In that case this step will be done
-   automatically.
-
-   WARNING: If you fail to set up your mkinitcpio.conf correctly, your
-   system will not boot! For this reason, you should be especially
-   careful when tweaking this file.
-
-   If you do manage to render your system unbootable, you can try using
-   the fallback image that is installed alongside the stock kernel. A
-   boot option for this is included in the default GRUB and LILO
-   configuration.
-
-   Read the warning about the pata transition problems elaborated in the
-   fstab section carefully!
-
-    /etc/modprobe.conf
-
-   This tells the kernel which modules it needs to load for system
-   devices, and what options to set. For example, to have the kernel load
-   your Realtek 8139 ethernet module when it starts the network (ie.
-   tries to setup eth0), use this line:
-     alias eth0 8139too
-
-   The syntax of this file is nearly identical to the old modules.conf
-   scheme, unless you use some of the more exotic options like
-   post-install. Then you should invest a little time into reading man
-   modprobe.conf.
-
-   Most people will not need to edit this file.
-
-    /etc/resolv.conf
-
-   Use this file to manually setup your nameserver(s) that you want to
-   use. It should basically look like this:
-     search domain.tld
-     nameserver 192.168.0.1
-     nameserver 192.168.0.2
-
-   Replace domain.tld and the ip addresses with your settings. The
-   so-called search domain specifies the default domain that is appended
-   to unqualified hostnames automatically. By setting this, a ping myhost
-   will effectively become a ping myhost.domain.tld with the above
-   values. These settings usually aren't mighty important, though, and
-   most people should leave them alone for now. If you use DHCP, this
-   file will be replaced with the correct values automatically when
-   networking is started, meaning you can and should happily ignore this
-   file.
-
-    /etc/hosts
-
-   This is where you stick hostname/ip associations of computers on your
-   network. If a hostname isn't known to your DNS, you can add it here to
-   allow proper resolving, or override DNS replies. You usually don't
-   need to change anything here, but you might want to add the hostname
-   and hostname + domain of the local machine to this file, resolving to
-   the IP of your network interface. Some services, postfix for example,
-   will bomb otherwise. If you don't know what you're doing, leave this
-   file alone until you read man hosts.
-
-    /etc/hosts.deny
-   This file denies network services access. By default all network services
-   are denied.
-   ALL: ALL: DENY
-
-    /etc/hosts.allow
-   This file allows network services access. Enter the services you want to
-   allow here.
-   eg. to allow all machines to connect via ssh:
-   sshd: ALL: ALLOW
-
-    /etc/locale.gen
-
-   This file contains a list of all supported locales and charsets
-   available to you. When choosing a LOCALE in your /etc/rc.conf or when
-   starting a program, it is required to uncomment the respective locale
-   in this file, to make a "compiled" version available to the system,
-   and run the locale-gen command as root to generate all uncommented
-   locales and put them in their place afterwards. You should uncomment
-   all locales you intend to use.
-
-   During the installation process, you do not need to run locale-gen
-   manually, this will be taken care of automatically after saving your
-   changes to this file.
-
-   By default, all locales are enabled that would make sense by rc.conf's
-   LOCALE= setting. To make your system work smoothly, you should
-   check/edit/correct this file and uncomment at least the one locale
-   you're using in your rc.conf.
-     _________________________________________________________________
-
-    /boot/grub/menu.lst
-
-   GRUB is the default bootloader for Arch Linux. You should check and
-   modify this file to accommodate your boot setup if you want to use
-   GRUB, otherwise read on about the LILO configuration.
-
-   Make sure you read the warning regarding the pata transition
-   elaborated on in the fstab section! Again, the installer will have
-   pre-populated using UUID entries to get around this, which you may have
-   to change in the same cases you'd need to change them in your fstab.
-
-   Configuring GRUB is quite easy, the biggest hurdle is that it uses yet
-   another device naming scheme different from /dev; Your hard disks as a
-   whole are referred to as (hd0), (hd1), etc., sequentially numbered in
-   order of appearance on the IDE/SCSI bus, just like the sda, sdb, etc.
-   names in Linux. The partitions of a disk are referred to with (hd0,0),
-   (hd0,1) and so on, with 0 meaning the first partition. A few
-   conversion examples are included in the default menu.lst to aid your
-   understanding.
-
-   Once you grasped the concept of device naming, all you need to do is
-   to choose a nice title for your boot section(s), supply the correct
-   root partition device as a parameter to the root option to have it
-   mounted as / on bootup, and create a kernel line that includes the
-   partition and path where the kernel is located as well as any boot
-   parameters. If using the stock kernel, you'll also need an
-   initrd line that points to the kernel26.img file in your /boot
-   directory. The path you put on your initrd line should be the same as
-   the path to vmlinuz26 that you provide on the kernel line. You should
-   be fine with the defaults, just check whether the partition
-   information is correct in the root and kernel lines, especially in
-   regard to the pata issue!
-
-   To create a boot option that loads the boot sector of a different OS,
-   the following example might be helpful. You will probably succeed in
-   starting any Microsoft-based operating system with it, just add this
-   block to the file after any other sections, and modify the partition
-   device accordingly to refer to the partition containing the boot sector
-   of the OS you are intending to boot.
-     # (1) Other OS
-     title My Other OS
-     rootnoverify (hd0,1)
-     makeactive
-     chainloader +1
-
-   For advanced configuration of other OSes, please refer to the online
-   GRUB manual.
-
-   After checking your bootloader configuration for correctness, you'll
-   be prompted for a partition to install the loader to. Unless you're
-   using yet another boot loader, you should install GRUB to the MBR of
-   the installation disk, which is usually represented by the appropriate
-   device name without a number suffix.
-
-    /etc/lilo.conf
-
-   This is the configuration file for the LILO bootloader. Make sure you
-   check this one and get it right if you want to use LILO to boot your
-   system. See LILO documentation for help on this.
-
-   Things you should check are the root= lines in the image sections and
-   the boot= line right at the beginning of the file. The root lines
-   specify the device which shall be mounted as the root filesystem on
-   bootup. If you don't know what is supposed to be entered here, change
-   to another terminal and type mount to see a list of all currently
-   mounted drives, and look for the line which displays a device name
-   mounted on /tmp/install type [...]. The device path at the beginning of this
-   very line should be entered in the root lines of your lilo.conf.
-   Change if necessary, and keep the pata issue in mind! Again, UUIDs will
-   have been entered by default, and may need to be changed to device names
-   under the same circumstances as fstab entries need to be changed.
-
-   The boot line should be okay by default in most cases. Unless you have
-   a weird boot manager setup in mind with multiple OSes, the device
-   referenced here should be having the same prefix your root lines have,
-   but not end with a number. For example, a root of /dev/sda3 means you
-   probably want to install LILO into the Master Boot Record of the hard
-   disk, so you would set boot to /dev/sda, which references the disk as
-   a whole. During installation, the boot device must be the current name
-   of the device where you want to write the boot sector to; This may
-   differ from the name of the device after the first boot, thanks to the
-   pata transition! Check carefully what device to write to during the
-   installation stage, for example with the mount command.
-
-   To prevent some serious grief, you should make sure you know how to
-   restore the boot sector of your other OSes, for example with Windows's
-   FIXBOOT/FIXMBR tools.
-
-   To be on the safe side, you should keep the option lba32 listed. This
-   will prevent some geometry issues from happening.
-
-   In some cases, depending on your BIOS, LILO will not run on bootup and
-   spill out an error code infinitely. In most cases you either removed
-   the lba32 option, or your hardware setup is a little special, meaning
-   that maybe your CD-ROM drive is primary master and the hard disk you
-   installed secondary slave. This can very well confuse your BIOS, and
-   thus stop the boot process. To prevent that you can try and make the
-   install drive the primary master on your IDE bus. If you've got a
-   mixed IDE and SCSI system and the problem persists, you'll probably
-   need some experimentation with the disk and bios options of LILO to
-   provide a working mapping; The disk drives in your system are numbered
-   sequentially by your BIOS, starting with 0x80. If you're lucky your
-   SCSI controller tells you which drive has which BIOS ID, but usually
-   you're not. How the drives are effectively numbered is depending on
-   your BIOS, so in the worst case you can only guess until it works. A
-   typical disk line would look like this:
-     boot=/dev/hda
-     disk=/dev/hda bios=0x80
-
-   The disk option maps a BIOS ID to the disk device known to Linux. Note
-   that there is still no guarantee that things will work as other things
-   can be wrong, so do not despair if all your tries fail, but rather try
-   rearranging your hardware in a way that's not totally odd. In this
-   area too much can go wrong and needs special handling to be explained
-   here. In most cases the lba32 option will suffice anyway. Old hard
-   drives will usually need a little more special care until they do as
-   told.
-
-   Don't become fidgety when reading this section, I (Dennis) just
-   happened to stumble over this problem when experimenting with a rather
-   odd system, and figured it'd be a good idea to mention this show
-   stopper and workarounds here. You probably won't ever experience this,
-   as you should be using GRUB anyway.
-
-   How to recreate a LILO boot sector with only a rescue disk is
-   explained later in this document.
-
-    /etc/conf.d/*
-
-   During setup, this is totally unimportant. Consider this as reference
-   for the interested.
-
-   Some daemon scripts will have a matching configuration file in this
-   directory that contains some more-or-less useful default values. When
-   a daemon is started, it will first source the settings from it's
-   config file within this directory, and then source the /etc/rc.conf.
-   This means you can easily centralize all your daemon configuration
-   options in your /etc/rc.conf simply by setting an appropriate variable
-   value, or split up your configuration over multiple files if you
-   prefer a decentralized approach to this issue. Isn't life great if
-   it's all just simple scripting?
-
-    /etc/profile
-
-   This script is run on each user login to initialize the system. It is
-   kept quite simple under Arch Linux, as most things are. You may wish
-   to edit or customize it to suit your needs.
-
-  Boot Scripts
-
-   Arch Linux uses a fairly simple bootup sequence quite similar to
-   *BSDs. The first boot script to run is /etc/rc.sysinit. When it's
-   done, /etc/rc.multi will be called (in a normal bootup). The last
-   script to run will be /etc/rc.local. When started in runlevel 1, the
-   single user mode, the script /etc/rc.single is run instead of
-   /etc/rc.multi. You will not find an endless symlink collection in the
-   /etc/rc?.d/ directories to define the bootup sequence for all possible
-   runleves. In fact, due to this approach Arch only really has three
-   runlevels, if you take starting up X in runlevel 5 into account. The
-   boot scripts are using the variables and definitions found in the
-   /etc/rc.conf file and also a set of general functions defined in the
-   /etc/rc.d/functions script. If you plan to write your own daemon
-   files, you should consider having a look at this file and existing
-   daemon scripts.
-
-   Boot Script Overview
-
-    1. /etc/rc.sysinit
-    2. /etc/rc.single
-    3. /etc/rc.multi
-    4. /etc/rc.local
-    5. /etc/rc.shutdown
-    6. /etc/rc.local.shutdown
-    7. /etc/rc.d/*
-
-    /etc/rc.sysinit
-
-   The main system boot script. It does boot-critical things like
-   mounting filesystems, running udev, activating swap, loading modules,
-   setting localization parameters, etc. You will most likely never need
-   to edit this file!
-
-    /etc/rc.single
-
-   Single-user startup. Not used in a normal boot-up. If the system is
-   started in single-user mode, for example with the kernel parameter 1
-   before booting or during normal multi-user operation with the command
-   init 1, this script makes sure no daemons are running except for the
-   bare minimum; syslog-ng and udev. The single-user mode is useful if
-   you need to make any changes to the system while making sure that no
-   remote user can do anything that might cause data loss or damage.
-
-   For desktop users, this mode usually is useless as crud. You should
-   have no need to edit this script, either.
-
-    /etc/rc.multi
-
-   Multi-user startup script. It starts all daemons you configured in the
-   DAEMONS array (set in /etc/rc.conf) after which it calls
-   /etc/rc.local. You shouldn't feel a pressing need to edit this file.
-
-    /etc/rc.local
-
-   Local multi-user startup script. It is a good place to put any
-   last-minute commands you want the system to run at the very end of the
-   bootup process. This is finally the one and only script you should
-   modify if needed, and you have total freedom on what to add to this
-   script.
-
-   Most common system configuration tasks, like loading modules, changing
-   the console font or setting up devices, usually have a dedicated place
-   where they belong. To avoid confusion, you should make sure that
-   whatever you intend to add to your rc.local isn't feeling just as home
-   in /etc/profile.d/ or any other already existent config location
-   instead.
-
-    /etc/rc.shutdown
-
-   System shutdown script. It stops daemons, unmounts filesystems,
-   deactivates the swap, etc. Just don't touch.
-
-    /etc/rc.local.shutdown
-
-   Analogous to the /etc/rc.local file, this file may contain any
-   commands you want to run right before the common rc.shutdown is
-   executed. Please note that this file does not exist by default, and
-   for it to work properly, it must be set as executable.
-
-    /etc/rc.d/*
-
-   This directory contains the daemon scripts referred to from the
-   rc.conf's DAEMONS array. In addition to being called on bootup, you
-   can use these scripts when the system is running to manage the
-   services of your system. For example the command
-     # /etc/rc.d/postfix stop
-
-   will stop the postfix daemon. Of course a script only exists when the
-   appropriate package has been installed (in this case postfix). With a
-   basic system install, you don't have many scripts in here, but rest
-   assured that all relevant daemon scripts end up here. This directory
-   is pretty much the equivalent to the /etc/rc3.d/ or /etc/init.d/
-   directories of other distributions, without all the symlink spaghetti.
-
-  User Management
-
-   Users and groups can be added and deleted with the standard commands
-   provided in the util-linux package: useradd, userdel, groupadd,
-   groupdel, passwd, and gpasswd. The typical way of adding a user is
-   similar to this procedure:
-     # useradd -m -s /bin/bash johndoe
-     # passwd johndoe
-
-   The first command will add the user named johndoe to the system,
-   create a home directory for him at /home/johndoe, and place some
-   default login files in his home directory. It will also set his login
-   shell to be /bin/bash. The second command will ask you for a password
-   for the johndoe user. A password is required to activate the account.
-
-   As an alternative to the useradd command, the adduser script is also
-   available to interactively create new users on your system simply by
-   answering questions.
-
-   See the manpages for more information on the remaining commands. It is
-   a good idea to create one or multiple normal users for your day-to-day
-   work to fully use the available security features and minimize
-   potential damage that may be the result of using the root user for
-   anything but system administration tasks.
-
-  Internet Access
-
-   Due to a lack of developers using dialup, connecting Arch to the Internet
-   with a dialup line requires a lot of manual setup. If at all possible,
-   set up a dedicated router which you can then use as a default gateway on
-   the Arch box.
-
-   There are quite a few dialup related documents in the Arch Linux Wiki
-
-    Analog Modem
-
-   To be able to use a Hayes-compatible, external, analog modem, you need
-   to at least have the ppp package installed. Modify the file
-   /etc/ppp/options to suit your needs and according to man pppd. You
-   will need to define a chat script to supply your username and password
-   to the ISP after the initial connection has been established. The
-   manpages for pppd and chat have examples in them that should suffice
-   to get a connection up and running if you're either experienced or
-   stubborn enough. With udev, your serial ports are usually /dev/tts/0
-   and /dev/tts/1.
-
-   Instead of fighting a glorious battle with the plain pppd, you may opt
-   to install wvdial or a similar tool to ease the setup process
-   considerably.
-
-   In case you're using a so called WinModem, which is basically a PCI
-   plugin card working as an internal analog modem, you should indulge in
-   the vast information found on the LinModem homepage.
-
-    ISDN
-
-   Setting up ISDN is done in three steps:
-    1. Install and configure hardware
-    2. Install and configure the ISDN utilities
-    3. Add settings for your ISP
-
-   The current Arch stock kernels include the necessary ISDN modules,
-   meaning that you won't need to recompile your kernel unless you're
-   about to use rather odd or old ISDN hardware. After physically
-   installing your ISDN card in your machine or plugging in your USB
-   ISDN-Box, you can try loading the modules with modprobe. Nearly all
-   passive ISDN PCI cards are handled by the hisax module which needs two
-   parameters; type and protocol. You must set protocol to '1' if your
-   country uses the 1TR6 standard, '2' if it uses EuroISDN (EDSS1), '3'
-   if you're hooked to a so called leased-line without D-channel, and '4'
-   for US NI1.
-
-   Details on all those settings and how to set them is included in the
-   kernel documentation, more specifically in the isdn subdirectory,
-   available online. The type parameter depends on your card; A list of
-   all possible types is to be found in the README.HiSax kernel
-   documentation. Choose your card and load the module with the
-   appropriate options like this:
-     # modprobe hisax type=18 protocol=2
-
-   This will load the hisax module for my (Dennis) ELSA Quickstep
-   1000PCI, being used in Germany with the EDSS1 protocol. You should
-   find helpful debugging output in your /var/log/everything.log file in
-   which you should see your card being prepared for action. Please note
-   that you will probably need to load some usb modules before you can
-   work with an external USB ISDN Adapter.
-
-   Once you confirmed that your card works with certain settings, you can
-   add the module options to your /etc/modprobe.conf:
-     alias ippp0 hisax
-     options hisax type=18 protocol=2
-
-   Alternatively you can only add the options line here, and add hisax to
-   your MODULES array in the rc.conf. Your choice, really, but this
-   example has the advantage that the module will not be loaded until
-   it's really needed.
-
-   That being done you should have working, supported hardware. Now you
-   need the basic utilities to actually use it!
-
-   Install the isdn4k-utils package, and read the manpage to isdnctrl,
-   it'll get you started. Further down in the manpage you will find
-   explanations on how to create a configuration file that can be parsed
-   by isdnctrl, as well as some helpful setup examples.
-
-   Please note that you have to add your SPID to your MSN setting
-   separated by a colon if you use US NI1.
-
-   After you configured your ISDN card with the isdnctrl utility, you
-   should be able to dial into the machine you specified with the
-   PHONE_OUT parameter, but fail the username and password
-   authentication. To make this work add your username and password to
-   /etc/ppp/pap-secrets or /etc/ppp/chap-secrets as if you were
-   configuring a normal analogous PPP link, depending on which protocol
-   your ISP uses for authentication. If in doubt, put your data into both
-   files.
-
-   If you set up everything correctly, you should now be able to
-   establish a dialup connection with isdnctrl dial ippp0 as root. If you
-   have any problems, remember to check the logfiles!
-
-    DSL (PPPoE)
-
-   These instructions are only relevant to you if your PC itself is
-   supposed to manage the connection to your ISP. You do not need to do
-   anything but define a correct default gateway if you are using a
-   seperate router of some sort to do the grunt work.
-
-   Before you can use your DSL online connection, you will have to
-   physically install the network card that is supposed to be connected
-   to the DSL-Modem into your computer. After adding your newly installed
-   network card to the modprobe.conf or the MODULES array, you should
-   install the rp-pppoe package and run the pppoe-setup script to
-   configure your connection. After you have entered all required data,
-   you can connect and disconnect your line with
-     # /etc/rc.d/adsl start
-
-   and
-     # /etc/rc.d/adsl stop
-
-   respectively. The setup usually is rather easy and straightforward,
-   but feel free to read the manpages for hints. If you want to
-   automatically dial in on bootup, add adsl to your DAEMONS array.
-
-Package Management
-
-  Pacman
-
-   pacman is the package manager which tracks all the software installed
-   on your system. It has simple dependency support and uses the standard
-   gzipped tar archive format for all packages. Some common tasks are
-   explained below with the respective commands in long and short option
-   form. For an up to date explanation of pacman's options, read man
-   pacman. This overview is merely scratching the surface of pacman's
-   current capabilities.
-
-   Typical tasks:
-
-    1. Adding a new package with a package file
-    2. Upgrading a package with a package file
-    3. Removing packages
-    4. Refreshing the package list
-    5. Upgrading the system
-    6. Adding/Upgrading a package from the repositories
-    7. List installed packages
-    8. Check if a specific package is installed
-    9. Display specific package info
-   10. Display list of files contained in package
-   11. Find out which package a specific file belongs to
-
-    Adding a new package with a package file
-
-     # pacman --add foo.pkg.tar.gz
-     # pacman -A foo.pkg.tar.gz
-
-   This will install the foo.pkg.tar.gz package on the system. If
-   dependencies are missing, pacman will exit with an error and report
-   the missing deps, but not attempt to resolve the dependencies
-   automatically. Look at the --sync option if you expect this
-   functionality. Adding multiple package files is possible, and if the
-   listed files depend on each other, the packages will be automatically
-   installed in the correct order.
-
-    Upgrading a package with a package file
-
-     # pacman --upgrade foo.pkg.tar.gz
-     # pacman -U foo.pkg.tar.gz
-
-   This does essentially the same as the --add operation, but will
-   additionally upgrade an already-installed package at no extra cost. I
-   can personally not imagine a case where you'd prefer --add over this
-   --upgrade function, unless you want pacman to exit if a package is
-   already installed.
-
-    Removing packages
-
-     # pacman --remove foo
-     # pacman -R foo
-
-   This will remove all files belonging to the package named foo, except
-   for configuration files that have been edited. Only supply the name of
-   the package to this command, without the pkg.tar.gz suffix.
-
-   To remove any and all trace of a package, add the --nosave option to
-   the above command.
-
-    Refreshing the package list
-
-     # pacman --sync --refresh
-     # pacman -Sy
-
-   This will retrieve a fresh master package list from the repositories
-   defined in the /etc/pacman.conf file and decompress it into the
-   database area. You should use this before using --sysupgrade to make
-   sure you get the newest packages. Depending on your pacman.conf
-   settings, this command may require a working Internet connection to
-   access FTP/HTTP-based repositories. This option is quite similar to
-   Debian's apt-get update command.
-
-    Upgrading the system
-
-     # pacman --sync --sysupgrade
-     # pacman -Su
-
-   This command will upgrade all packages that are out-of-date on your
-   system by comparing the local package version to the versions in the
-   master package list that gets downloaded with the --refresh command.
-   It's a good idea to run this regularly to keep your system up to date.
-   Note that this command does NOT implicitly refresh the master package
-   list, so it's usually wiser to combine both commands into one like
-   this:
-     # pacman --sync --refresh --sysupgrade
-     # pacman -Syu
-
-   With these options pacman will automatically retrieve the current
-   master package list and do a full system upgrade to the latest
-   packages with all dependencies being automagically resolved. You will
-   want to run this quite often.
-
-    Adding/Upgrading a package from the repositories
-
-     # pacman --sync foo
-     # pacman -S foo
-
-   Retrieve and install package foo, complete with all dependencies it
-   requires. Before using any sync option, make sure you refreshed the
-   package list, or add --refresh or -y to the options to do it before
-   the installation attempt. Unlike --add, the --sync option does not
-   differ between installing and upgrading packages. Depending on your
-   pacman.conf settings this function requires working Internet access.
-
-   Receiving strange errors when downloading packages from the server,
-   ie. broken downloads or files that aren't found, usually are either
-   caused by not refreshing the package list with --sync, or if you're
-   unlucky enough to try downloading from a mirror while it's syncing
-   it's contents, and is thusly in an inconsistent state.
-
-    List installed packages
-
-     # pacman --query
-     # pacman -Q
-
-   Displays a list of all installed packages in the system.
-
-    Check if a specific package is installed
-
-     # pacman --query foo
-     # pacman -Q foo
-
-   Instead of grepping the full list for a name, you can append the name
-   of the package you are looking for to the query command. This command
-   will display the name and version of the foo package if it is
-   installed, nothing otherwise.
-
-    Display specific package info
-
-     # pacman --query --info foo
-     # pacman -Qi foo
-
-   Displays information on the installed package foo (size, install date,
-   build date, dependencies, conflicts, etc.). To display this
-   information for a package file that is not yet installed, add the
-   --file or -p option, respectively:
-     # pacman --query --info --file foo.pkg.tar.gz
-     # pacman -Qip foo.pkg.tar.gz
-
-    Display list of files contained in package
-
-     # pacman --query --list foo
-     # pacman -Ql foo
-
-   Lists all files belonging to package foo.
-
-    Find out which package a specific file belongs to
-
-     # pacman --query --owns /path/to/file
-     # pacman -Qo /path/to/file
-
-   This query displays the name and version of the package which contains
-   the file referenced by it's full path as a parameter. Just using the
-   file name without the path will not yield results.
-
-  Accessing Repositories
-
-   A package repository is a collection of packages and a package
-   meta-info file that can reside in a local directory or on a remote
-   FTP/HTTP server. The default repository for an Arch system is the
-   core repository. This is kept up to date by developers with the
-   latest version of most software and stays fairly bleeding-edge.
-
-   Many users also choose to activate the extra package repository which
-   contains more packages that are not part of Arch's core package set.
-   You can activate this repo by uncommenting the appropriate lines in
-   your /etc/pacman.conf. This repository is activated by default.
-
-   You can also build, maintain and use your own package repositories.
-   See the pacman manpage for instructions.
-
-   If you install from CD-ROM and end up having problems accessing the
-   Internet, you may need to install additional packages from the CD.
-   Refer to the FAQs, specifically FAQ #3 later in this document, to find
-   out how to define a repository that uses the installation CD-ROM as a
-   package source.
-
-Arch Build System (ABS)
-
-  Binary vs. Source
-
-   Where pacman is responsible for the binary side of the package world,
-   ABS is responsible for the source side: It helps you to build your own
-   custom packages from source code, also letting you rebuild Arch Linux
-   packages with your own customizations. The procedure usually goes as
-   follows:
-    1. Install the base-devel group if it was not installed previously.
-    2. Synchronize your ABS tree with the server.
-    3. Create a new directory in /var/abs/local/ named after the package
-        you are going to create.
-    4. Copy the PKGBUILD.proto prototype from /var/abs/ into your newly
-       created directory, remove the .proto suffix, and edit it to fit
-       the new package.
-    5. Run makepkg in the working directory with the PKGBUILD file.
-    6. Install the newly built package with pacman.
-    7. Send the package to your friends for bragging rights (or give it
-       to an Archer so s/he can stick it in the master ABS tree).
-
-  Synchronizing Your ABS Tree
-
-   You can synchronize all the required package building files in
-   /var/abs by running the abs script as root. It requires the cvsup
-   package to operate and will complain if you don't have it installed. A
-   working Internet connection is also required, of course. Using CVS as
-   the transfer medium allows you to follow different version trees
-   within ABS - this can be configured in /etc/abs/supfile.core. For
-   example, the default supfile is set to track the current package tree,
-   which is bleeding-edge and the recommended source to follow. You can
-   also follow specific versions. See the comments in the supfiles for
-   more info.
-
-   ABS supports multiple repositories, which can be enabled or disabled
-   in /etc/abs/abs.conf. By default, abs will follow the core and
-   extra repositories, but not anything else.
-
-   You will also see an /etc/abs/supfile.extra file. This will give you
-   access to all the unofficial build scripts that were not included in
-   the main ABS repository. If you do not want to use this repository,
-   you can delete the file, but usually it makes more sense to edit
-   abs.conf accordingly instead, and disable the repositories you don't
-   need.
-
-  How to Build Packages
-
-   The build process is thoroughly explained in the makepkg manpage. Read
-   it for instructions on building your own packages. If that's not
-   helping you, keep your eyes peeled for tutorials in the Wiki, or ask
-   for help in the forums or IRC.
-
-   Install the packages in the base-devel group as they are needed to
-   build most applications.
-
-  Package Guidelines
-
-   When building package for Arch Linux, you should adhere to the package
-   guidelines below, especially if you would like to contribute your new
-   package to Arch Linux.
-
-    Package Naming
-
-     * Package names should consist of alphanumeric characters only; all
-       letters should be lowercase.
-     * Package versions should be the same as the version released by the
-       author. Versions can include letters if need be (eg, nmap's
-       version was 2.54beta32 a good while ago). Version tags may not include
-       hyphens!  Letters, numbers, and periods only.
-     * Package releases are specific to Arch Linux packages. These allow
-       users to differentiate between newer and older package builds.
-       When a new package version is first released, the release count
-       starts at 1. Then as fixes and optimizations are made, the package
-       will be re-released to the AL public and the release number will
-       increment. When a new version comes out, the release count resets
-       to 1. Package release tags follow the same naming restrictions as
-       version tags.
-
-    Directories
-
-   Configuration files should be placed in the /etc directory. If there's
-   more than one configuration file, it's customary to use a subdirectory
-   in order to keep the /etc area as clean as possible. Use
-   /etc/{pkgname}/ where {pkgname} is the name of your package (or a
-   suitable alternative, eg, apache uses /etc/httpd/).
-
-   Package files should follow these general directory guidelines:
-
-   /etc             System-essential configuration files
-   /usr/bin         Application binaries
-   /usr/sbin        System binaries
-   /usr/lib         Libraries
-   /usr/include     Header files
-   /usr/lib/{pkg}   Modules, plugins, etc.
-   /usr/man         Manpages
-   /usr/share/{pkg} Application data
-   /etc/{pkg}       Configuration files for {pkg}
-   /opt
-
-   Packages that do not fit cleanly into Linux filesystem layout can be
-   placed here. If a package's files can be cleanly placed into the above
-   directories, then do so. If there are other high-level directories
-   that do not fit, then you should use /opt.
-
-   For example, the acrobat package has Browser, Reader, and Resource
-   directories sitting at the same level as the bin directory. This
-   doesn't fit into a normal Linux filesystem layout, so we place all the
-   files in a subdirectory of /opt.
-
-   Clear as mud? Good.
-
-    makepkg Duties
-
-   When you use makepkg to build a package for you, it does the following
-   automatically:
-    1. Checks if package dependencies are installed
-    2. Downloads source files from servers
-    3. Unpacks source files
-    4. Does any necessary patching
-    5. Builds the software and installs it in a fake root
-    6. Removes /usr/doc, /usr/info, /usr/share/doc, and /usr/share/info
-       from the package
-    7. Strips symbols from binaries
-    8. Strips debugging symbols from libraries
-    9. Generates the package meta file which is included with each
-       package
-   10. Compresses the fake root into the package file
-   11. Stores the package file in the configured destination directory
-       (cwd by default)
-
-    Other
-
-   Do not introduce new variables into your PKGBUILD build scripts,
-   unless the package cannot be built without doing so, as these could
-   possibly conflict with variables used in makepkg itself. If a new
-   variable is absolutely required, prefix the variable name with an
-   underscore.
-
-   Avoid using /usr/libexec/ for anything. Use /usr/lib/{pkgname}
-   instead.
-
-   The "Packager" field from the package meta file can be customized by
-   the package builder by modifying the appropriate option in the
-   /etc/makepkg.conf file, or alternatively by exporting the PACKAGER
-   environment variable before building packages with makepkg:
-     # export PACKAGER="John Doe <your.email>"
-
-    Submitting Packages
-
-   If you'd like to submit packages, please take a look at the Arch User
-   Repository and their guidelines. New packages should be submitted to
-   the AUR.
-
-   If you're submitting a package, please do the following:
-    1. Please add a comment line to the top of your PKGBUILD file that
-       follows this format:
-        # Contributor: Your Name <your.email>
-    2. Verify the package dependencies (eg, run ldd on dynamic
-       executables, check tools required by scripts, etc.). It's also a
-       good idea to use the namcap utility, written by Jason Chu
-       jason@archlinux.org, to analyze the sanity if your package. namcap
-       will tell you about bad permissions, missing dependencies,
-       un-needed dependencies, and other common mistakes. You can install
-       the namcap package with pacman as usual.
-    3. All packages should come as a compressed tar file containing a
-       directory with the newly built package, the PKGBUILD, filelist,
-       and additional files (patches, install, ...) in it. The archive
-       name should at least contain the name of the package.
-    4. Read the appropriate documents regarding the AUR, and the newest
-       version of the packaging guidelines on the AUR Homepage.
-
-Frequently Asked Questions
-
-   The FAQs listed here are only covering any problems that may keep you
-   from booting or installing an initial Arch Linux system. If you have
-   questions regarding further usage of the system utilities, X11 setup,
-   etc. or how to configure your hardware, please head over to the Wiki.
-   If you think an issue is not covered here that should be, please
-   notify the author of this document, whose address is to be found at
-   the very top of this file.
-
-  During package installation, pacman fails to resolve dependencies for package
-  A because package B is not in the package set
-
-   Unless something is very broken and thus very likely to be reported by
-   multiple people soon, you probably just forgot to mount your target
-   partitions properly. This causes pacman to decompress the package
-   database into the initial ramdisk, which fills up quite nicely and
-   ultimately leads to this error.
-
-   Make sure that you use the DONE and not the CANCEL option offered by
-   the Filesystem Mountpoints menu to apply your choices. This error
-   should not happen if you use the Auto-Prepare feature; If it does
-   nevertheless, please report this as a bug.
-
-  How can I install packages from the install CD with pacman --sync (so it
-  resolves dependencies for me)?
-
-   If you would rather have packages install from the CD instead of
-   downloading them, then mount the install CD somewhere (eg. /media/cd)
-   and add this line right below the [core] line in /etc/pacman.conf:
-     Server = file:///media/cd
-
-   Replace /media/cd with the mountpoint you chose. Then use pacman --sync
-   as you normally would - It will now check the /media/cd directory first
-   for packages.
-
-  How can I create multiple swap partitions during the install?
-
-   Naturally you won't be able to use the Auto-Prepare feature if you
-   want to create and use multiple swap partitions. Create the partitions
-   manually instead, and create as many swap partitions as your little
-   heart desires. Go through the rest of the disk preparation steps,
-   don't mind that you're only asked for one swap partition during the
-   mount-point setting. Once you're through with the install and are
-   about to edit your system configuration files, you can edit the fstab
-   file and include a line for every swap device you created earlier.
-   Simply copy the automatically generated swap line, and modify the
-   referenced device according to your setup. The additional swaps will
-   be activated after the bootup when swapon -a is being run by the
-   initscripts. Make sure you ran mkswap on all of your swap partitions
-   manually, or else your system will complain on bootup!
-
-   If, for any odd reason, you can not wait until after the installation
-   with activating multiple swap partitions or files, you will have to
-   open a shell on one of the virtual terminals and issue the swapon
-   <device> for every swap drive or file you partitioned/readied before
-   with mkswap. Then continue as explained above with the install.
-
-   In case you are honestly contemplating setting up multiple swap files
-   or drives, you should keep in mind that a kernel that needs to swap is
-   actually crying bitterly for more RAM, not more swap space. Please
-   keep your penguin well fed. Thank you.
-
-  How do I reconfigure LILO from the rescue system?
-
-   As a first step you simply boot from the Arch Install CD or disks. If
-   your partitions are intact and don't need checking, you can try
-   choosing one of the recovery boot options according to your partition
-   layout, or fiddle with the GRUB boot manager settings on your own to
-   get your existing system to boot properly. That will boot directly
-   into your system, and you can skip all but the last step of actually
-   reconfiguring and running LILO.
-
-   If you cannot boot your old root directly, boot from the CD as if you
-   were going to start an installation. Once you're in a shell, you mount
-   the root partition of your harddisk into the /mnt directory, for
-   example like this:
-     # mount /dev/sda3 /mnt
-
-   Then you mount any other partitions to their respective mount points
-   within that root of yours, for example a /boot partition:
-     # mount /dev/sda1 /mnt/boot
-
-   Now you need to mount a /dev tree in the /mnt area, where LILO will be
-   able to find it:
-      # /mnt/bin/mount --bind /dev /mnt/dev
-
-   Once everything is mounted, make this /mnt directory your new root
-   with the chroot /mnt command. This will start a new shell and drop you
-   into the /mnt directory, which will be considered your / from then on.
-
-   Now you can edit /etc/lilo.conf to your liking and run lilo to fix
-   anything that needs fixing. Simply type exit when you want to break
-   out of this root again, back into the original file tree. You can now
-   reboot and test your changes.
-
-  How do I reconfigure GRUB from the rescue system?
-
-  The first thing you will need is an Install CD. Any install CD should work,
-  however, using the latest CD will be easier than using an older CD.
-
-  Boot the CD as if you were doing an installation
-  (*DO NOT* use the root= option) and move on to the next step.
-
-  Now, you need to mount your current installation. The general process for
-  this is as follows. You need to know what the proper partitions and
-  filesystem types are for your disks, as well as ensuring you mount all
-  necessary drives and other various system filesystems.
-
-  The directions below are EXAMPLES; do not follow them character for character
-  unless your setup is identical.
-
-  --For an IDE setup with separate boot partition, ext3 filesystem:
-     # cd /
-     # mount -t ext3 /dev/sda3 /mnt
-     # mount -t ext3 /dev/sda1 /boot
-     # mount -o bind /dev /mnt/dev
-     # mount -t proc none /mnt/proc
-     # mount -t sysfs none /mnt/sys
-     # chroot /mnt /bin/bash
-
-  --For a SCSI setup, ext3 filesystem:
-     # cd /
-     # mount -t ext3 /dev/sda1 /mnt
-     # mount -o bind /dev /mnt/dev
-     # mount -t proc none /mnt/proc
-     # mount -t sysfs none /mnt/sys
-     # chroot /mnt /bin/bash
-
-  Now you should be logged in as root, and into your current installation as
-  if you had just booted it and logged in as root. Move on to the next step!
-
-  Edit /boot/grub/menu.lst and make sure that everything is in order. Once you
-  are completely sure that menu.lst is correct, run the following command
-  (assuming /dev/sda or /dev/hda is your boot device):
-     # grub-install /dev/sda
-   or
-     # grub-install /dev/hda
-
-  This command should complete successfully if you have followed all the steps.
-  (If not, take a look at the notes below.) That's it, you're done! Exit the
-  chroot and reboot:
-
-     # cd /
-     # umount -a
-     # exit
-     # cd /
-     # umount -a
-     # reboot
-
-  If you get an error that says "The file /boot/grub/stage1 was not read 
-  correctly", it probably means that your fstab/mtab is incorrect for some
-  reason and needs to be fixed up. These files are /etc/mtab and /etc/fstab.
-  Edit them and make sure they point to the correct partitions, then re-run
-  grub-install.
-
-  If you get an error that says sed: can't read /boot/grub/device.map: No such
-  file or directory, it means that you need to use the --recheck option with
-  grub-install.
-
-     # grub-install --recheck /dev/sda
-
-  Hopefully that covers all the issues you should encounter. If you get any
-  other errors, reboot and do the guide step by step again.
-
-  I can't ssh into my machine!
-
-   Edit your /etc/hosts.deny file. The default configuration will reject
-   all incoming connections, not only ssh connections.
-
-  How should I load modules during boot now?
-
-   If you want to load a module unconditionally without a specific device
-   binding, add the name of the module to the MODULES array of your
-   /etc/rc.conf. For on demand loading on device access, add it as usual
-   with the alias and option commands to your /etc/modprobe.conf, in the
-   rare cases that the automatisms employed by udev don't cut
-   it. To pass any options to a module you want to load through the
-   MODULES array, only add the appropriate options line to your
-   /etc/modprobe.conf.
-
-  Kernel refuses to boot because of "lost interrupt"
-
-   Kernel refuses to boot. It locks at:
-   IRQ probe failed for hda
-   hda lost interrupt
-
-   This or a similar error occurs for some HD controllers on kernel
-   2.6.x. A workaround is to pass the acpi=off option to the kernel at
-   boot time.
-
-  I get "access denied" errors trying to play music or read DVDs
-
-   Add your user to the optical and audio groups.
-     # gpasswd -a johndoe optical
-     # gpasswd -a johndoe audio
-
-   Logout, then login again as that user (eg. johndoe) so the group
-   changes can take effect, and the device permissions shouldn't be a
-   problem anymore.
-
-   If you have a DVD drive, you may want to create a /dev/dvd symlink to
-   your real DVD device. Usually udev does this for you already, but this
-   will serve well as an example for setting up similar symlinks.
-
-   For example, if your DVD drive is accessible through /dev/sdc, you can
-   do the following as root:
-     # cat >>/etc/udev/rules.d/00.rules <<EOF
-       > KERNEL="sdc", NAME="sdc", SYMLINK="dvd"
-       > EOF
-     # /etc/start_udev
-     # mount /dev/pts
-     # mount /dev/shm
-
+Useful links
+
+  Archboot resourses
+   Developer:        Tobias Powalowski <tpowa@archlinux.org>
+   Latest version:   ftp://ftp.archlinux.org/iso/archboot/
+   Development tree: http://projects.archlinux.org/archboot.git/
+
+  Arch Linux resources
+   Homepage:   http://www.archlinux.org
+   Wiki:       http://wiki.archlinux.org
+   Forum:      http://bbs.archlinux.org
+   Bugtracker: http://bugs.archlinux.org
+   AUR:        http://aur.archlinux.org
+   Subversion: http://www.archlinux.org/svn
 
 vim: ft=text autoindent tabstop=4 shiftwidth=4 expandtab

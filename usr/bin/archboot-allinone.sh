@@ -37,7 +37,7 @@ while [ $# -gt 0 ]; do
 		-i=*|--i=*) IMAGENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo $1 | awk -F= '{print $2;}')" ;;
-		-lts=*|--lts=*) KERNEL_LTS="$(echo $1 | awk -F= '{print $2;}')" ;;
+		-lts=*|--lts=*) LTS_KERNEL="$(echo $1 | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac

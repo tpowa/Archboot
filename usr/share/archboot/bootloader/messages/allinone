@@ -8,11 +8,11 @@ Distributed under the GNU General Public License (GPL)
 Creation Tool: 'archboot' written by Tobias Powalowski <tpowa@archlinux.org>
 
 ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM
-Release: @@RELEASENAME@@
 Creation Date: @@DATE@@
-RAM requirements: >= 288 MB 
-Standard kernel: @@KERNEL@@ / Long Term Support kernel: @@LTS_KERNEL@@
+Release: @@RELEASENAME@@
+Standard kernel: @@KERNEL@@ / Long Time Support kernel: @@LTS_KERNEL@@
 Architecture: i686 / x86_64
+RAM requirement to boot: 288 MB or greater 
 
 Available boot options (no input will boot the 32bit archboot system):
 - 'arch <any_other_boot_option>' to boot the archboot system.

@@ -12,7 +12,7 @@ run_hook ()
 		#	for alias in $(/sbin/modinfo $i|grep ^alias\:|cut -d' ' -f11); do 
 		#		[ -z "$(modprobe --show-depends $alias|grep '/ata/'|grep -v 'libata.ko')" ] && echo "$(basename ${i})" | sed -e 's/.ko//g' >> /tmp/.ide-blacklist
 		#	done
-		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
+		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/pci/*); do 
 			basename $i .ko | grep -v ^ide >> /tmp/.ide-blacklist
 		done
 		msg "Blacklisted IDE modules (old subsystem) for udev:"
