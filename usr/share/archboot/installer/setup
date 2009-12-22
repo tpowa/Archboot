@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation"
@@ -10,7 +10,7 @@ EDITOR=
 
 # name of the kernel image
 VMLINUZ="vmlinuz26"
-[ $(cat /proc/cmdline | grep -w arch.*-lts) ] && VMLINUZ="vmlinuz26-lts"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -2135,8 +2135,8 @@ installpkg() {
     [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
     [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     # Only install the booted kernel image!
-    PACKAGES=$(echo $PACKAGES | sed -i -e "s#\ kernel26\ ##g" -e  "s#\ kernel26-lts\ ##g")
-    PACKAGES="$PACKAGES $VMLINUZ"
+    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$PACKAGES $(echo $VMLINUZ | sed -e 's#vmlinuz#kernel#g')"
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
