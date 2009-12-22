@@ -11,6 +11,9 @@ EDITOR=
 # name of the kernel image
 VMLINUZ="vmlinuz26"
 [ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
+# name of kernel package
+KERNELPKG="kernel26"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="kernel26-lts"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -2136,7 +2139,7 @@ installpkg() {
     [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     # Only install the booted kernel image!
     PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
-    PACKAGES="$PACKAGES $(echo $VMLINUZ | sed -e 's#vmlinuz#kernel#g')"
+    PACKAGES="$PACKAGES $KERNELPKG"
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
@@ -2904,7 +2907,7 @@ run_mkinitcpio()
     ( \
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
-    chroot $DESTDIR /sbin/mkinitcpio -p $VMLINUZ >>/tmp/mkinitcpio.log 2>&1
+    chroot $DESTDIR /sbin/mkinitcpio -p $KERNELPKG >>/tmp/mkinitcpio.log 2>&1
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running
     ) &
