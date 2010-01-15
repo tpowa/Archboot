@@ -19,11 +19,11 @@ wpa_supplicant gzip rsync libarchive device-mapper cracklib nfs-utils nfsidmap r
 pcre cpio archboot fuse klibc libusb vim lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
 rt2x00-rt61-fw rt2x00-rt71w-fw ndiswrapper ndiswrapper-utils \
 zd1211-firmware ipw2100-fw ipw2200-fw iwlwifi-3945-ucode iwlwifi-4965-ucode iwlwifi-5000-ucode \
-smbclient tdb tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware parted tzdata ntp \
+smbclient tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware parted tzdata ntp \
 v86d wlan-ng26-utils iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl \
 gmp heimdal sqlite3 db dbus-core libcap fsarchiver iwlwifi-5150-ucode xz-utils librpcsecgss libtirpc \
 wipe ddrescue testdisk clamav iwlwifi-1000-ucode iwlwifi-6000-ucode ar9170-fw rt2870usb-fw ifplugd \
-libdaemon nouveau-drm wpa_actiond udev-compat"
+libdaemon nouveau-drm wpa_actiond udev-compat rfkill libgssglue"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do

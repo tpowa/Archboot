@@ -36,6 +36,13 @@ PKGARG=$3
 
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
+# name of the kernel image
+VMLINUZ="vmlinuz26"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
+# name of kernel package
+KERNELPKG="kernel26"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="kernel26-lts"
+
 if [ "$PKGARG" = "" ]; then
     usage
 fi

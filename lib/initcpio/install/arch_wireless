@@ -8,11 +8,15 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant loadndisdriver perl iw crda regdbdump wpa_actiond"
+    BINARIES="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase wpa_supplicant loadndisdriver perl iw crda regdbdump wpa_actiond rfkill"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
     add_file "/usr/share/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
+    # add rfkill
+    add_file "/usr/share/archboot/wireless/etc/conf.d/rfkill" "/etc/conf.d/rfkill"
+    add_file "/etc/rc.d/rfkill"
+    add_file "/lib/udev/rules.d/60-rfkill.rules"
     # add ar9170-fw
     add_file "/lib/firmware/ar9170.fw"
     add_file "/lib/firmware/ar9170-1.fw"
@@ -67,6 +71,7 @@ install ()
     add_file "/usr/share/licenses/crda/LICENSE"
     add_file "/usr/share/licenses/wireless-regdb/LICENSE"
     add_file "/usr/share/licenses/python/LICENSE"
+    add_file "/usr/share/licenses/rfkill/LICENSE"
 }
 
 help ()
