@@ -13,7 +13,7 @@ VMLINUZ="vmlinuz26"
 [ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="kernel26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="kernel26-lts"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && KERNELPKG="kernel26-lts"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -2133,7 +2133,7 @@ installpkg() {
         prepare_pacman_extra
     fi
     # Add packages which are not in core repository
-    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm"
+    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm nouveau-firmware"
     [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
     [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
     [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
@@ -2458,7 +2458,7 @@ dosyslinux() {
     getraidarrays
     getcryptsetup
     if [ ! -e /usr/bin/syslinux ]; then
-        DIALOG --msgbox "Error: Couldn't find syslinux binary.  Is SYSLINUX installed?" 0 0
+        DIALOG --msgbox "Error: Couldn't find syslinux binary. Is SYSLINUX installed?" 0 0
         return 1
     fi
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
@@ -2498,16 +2498,16 @@ dosyslinux() {
         if [ -n "${_uuid}" ]; then
             _rootpart="/dev/disk/by-uuid/${_uuid}"
         fi
-        echo "append initrd=$VMLINUZ.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+        echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
-        echo "append initrd=$VMLINUZ.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+        echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$UUIDPARAMETER" = "yes" ]; then
-        echo "append initrd=$VMLINUZ-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+        echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
-        echo "append initrd=$VMLINUZ-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" >> ${TEMPDIR}/syslinux.cfg
+        echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
     # create boot message
     [ -e ${TEMPDIR}/boot.msg ] && rm ${TEMPDIR}/boot.msg
@@ -2540,7 +2540,7 @@ dolilo() {
     getraidarrays
     getcryptsetup
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
-        DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf.  Is LILO installed?" 0 0
+        DIALOG --msgbox "Error: Couldn't find $DESTDIR/etc/lilo.conf. Is LILO installed?" 0 0
         return 1
     fi
     # Try to auto-configure LILO...
@@ -2555,6 +2555,8 @@ dolilo() {
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         fi
+        sed -i "s|image=/boot/vmlinuz26|image=/boot/$KERNELPKG|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|.*initrd=.*$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
     fi
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
@@ -2706,11 +2708,11 @@ dogrub() {
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
-                echo "initrd $subdir/$VMLINUZ.img" >>$DESTDIR/boot/grub/menu.lst
+                echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/menu.lst
                 echo "" >>$DESTDIR/boot/grub/menu.lst
                 # adding fallback/full image
                 NUMBER=$(($NUMBER+1))
@@ -2718,11 +2720,11 @@ dogrub() {
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
-                echo "initrd $subdir/$VMLINUZ-fallback.img" >>$DESTDIR/boot/grub/menu.lst
+                echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
             done
             echo "" >>$DESTDIR/boot/grub/menu.lst
@@ -3210,9 +3212,9 @@ auto_fb()
 {
     UVESAFB=""
     if [ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]; then
-        ! [ "$(grep nouveau $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep i915 $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep [a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep nouveau $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep i915 $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
     fi
     if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
         UVESAFB="$(grep [a-z] /etc/modprobe.d/uvesafb.conf)" 
