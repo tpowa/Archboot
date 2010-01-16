@@ -6,7 +6,7 @@ install ()
     BINARIES="pppoe pppoe-connect pppoe-relay pppoe-server pppoe-setup pppoe-sniff pppoe-start pppoe-status pppoe-stop"
     FILES=""
     SCRIPT=""
-    add_dir "/etc/ppp/peers/plugins"
+    add_dir "/usr/lib/rp-pppoe"
     add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-masq" "/etc/ppp/firewall-masq"
     add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-standalone" "/etc/ppp/firewall-standalone"
     add_file "/usr/share/archboot/pppoe/etc/ppp/pppoe-server-options" "/etc/ppp/pppoe-server-options"
