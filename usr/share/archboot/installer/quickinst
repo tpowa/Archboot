@@ -79,7 +79,7 @@ if [ "$INSTMODE" = "media" ]; then
 fi
 ! [ -d $DESTDIR/var/lib/pacman ] && mkdir -p $DESTDIR/var/lib/pacman
 ! [ -d /var/lib/pacman ] && mkdir -p /var/lib/pacman
-# mount proc/sysfs first, so mkinitrd can use auto-detection if it wants
+# mount proc/sysfs first, so mkinitcpio can use auto-detection if it wants
 ! [ -d $DESTDIR/proc ] && mkdir $DESTDIR/proc
 ! [ -d $DESTDIR/sys ] && mkdir $DESTDIR/sys
 ! [ -d $DESTDIR/dev ] && mkdir $DESTDIR/dev
@@ -130,9 +130,9 @@ echo "For LILO:"
 echo "  # lilo"
 echo
 echo "Next step, initramfs setup:"
-echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/kernel26-fallback.conf"
+echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/$KERNELPKG-fallback.conf"
 echo "to fit your needs. After that run:"
-echo "# mkinitcpio -p kernel26"
+echo "# mkinitcpio -p $KERNELPKG"
 echo
 echo "Then exit your chroot shell, edit $DESTDIR/etc/fstab and"
 echo "$DESTDIR/etc/rc.conf, and reboot!"
