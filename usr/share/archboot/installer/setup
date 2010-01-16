@@ -2556,7 +2556,9 @@ dolilo() {
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/$KERNELPKG|g" $DESTDIR/etc/lilo.conf
-        sed -i "s|.*initrd=.*$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/$KERNELPKG-fallback.img|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
     fi
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
@@ -2596,7 +2598,7 @@ dogrub() {
     FAIL_RAID=""
     FAIL_DM=""
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
-        DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst.  Is GRUB installed?" 0 0
+        DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/menu.lst. Is GRUB installed?" 0 0
         return 1
     fi
     if ! [ "$(dmraid -r | grep ^no )" ]; then
