@@ -1,35 +1,4 @@
 #! /bin/sh
-
-usage() {
-    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
-    echo
-    echo "This script is for users who would rather partition/mkfs/mount their target"
-    echo "media manually than go through the routines in the setup script."
-    echo
-    echo "First make sure you have all your filesystems mounted under <destdir>."
-    echo "e.g. mount -t iso9660 /dev/hdc or /dev/sr0 (for new naming sheme) /src "
-    echo "Then run this script to install all base packages to <destdir>."
-    echo
-    if [ -e /usr/bin/wget ]; then
-        echo "<install_mode> must be either 'ftp' or 'media'"
-    else
-        echo "<install_mode> must be 'media'"
-    fi
-    echo
-    echo "Examples:"
-    if [ -e /usr/bin/wget ]; then
-        if [ "$(uname -m)" = "x86_64" ]; then
-                echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/x86_64"
-        else
-                echo "  quickinst ftp /mnt ftp://ftp.archlinux.org/core/os/i686"
-        fi
-    fi
-
-    echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
-    echo ""
-    exit 0
-}
-
 INSTMODE=$1
 DESTDIR=$2
 PKGARG=$3
@@ -41,7 +10,134 @@ VMLINUZ="vmlinuz26"
 [ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="kernel26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="kernel26-lts"
+[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && KERNELPKG="kernel26-lts"
+
+usage() {
+    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
+    echo
+    echo "This script is for users who would rather partition/mkfs/mount their target"
+    echo "media manually than go through the routines in the setup script."
+    echo
+    echo "First make sure you have all your filesystems mounted under <destdir>."
+    echo "e.g. mount -t iso9660 /dev/cdrom /src "
+    echo "Then run this script to install all base packages to <destdir>."
+    echo
+    if [ -e /usr/bin/wget ]; then
+        echo "<install_mode> must be either 'net' or 'media'"
+    else
+        echo "<install_mode> must be 'media'"
+    fi
+    echo
+    echo "Examples:"
+    if [ -e /usr/bin/wget ]; then
+        if [ "$(uname -m)" = "x86_64" ]; then
+                echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/x86_64"
+                echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/x86_64"
+        else
+                echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/i686"
+                echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/i686"
+        fi
+    fi
+
+    echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
+    echo ""
+    exit 0
+}
+
+# pacman_conf()
+# creates temporary pacman.conf file
+pacman_conf() {
+    if [ "$MODE" = "media" ]; then
+        local serverurl="file://${PKGARG}"
+    elif [ "$MODE" = "net" ]; then
+        local serverurl="${PKGARG}"
+    fi
+    # Setup a pacman.conf in /tmp
+    cat << EOF > /tmp/pacman.conf
+[options]
+CacheDir = ${DESTDIR}/var/cache/pacman/pkg
+CacheDir = /src/core-$(uname -m)/pkg
+CacheDir = /src/core-any/pkg
+
+[core]
+Server = ${serverurl}
+EOF
+}
+
+# pacman_conf_extra()
+# adds extra repository for net installation mode
+pacman_conf_extra() {
+    local serverurl="${PKGARG}"
+    # Setup a pacman.conf in /tmp
+    echo "[extra]" >> /tmp/pacman.conf
+    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
+}
+
+# configures pacman and syncs for the first time on destination system
+# params: none
+# returns: 1 on error
+prepare_pacman() {
+    # Set up the necessary directories for pacman use
+    [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
+    [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+
+    DIALOG --infobox "Refreshing package database..." 6 45
+    $PACMAN -Sy >$LOG 2>&1 || return 1
+    return 0
+}
+
+# chroot_mount()
+# prepares target system as a chroot
+#
+chroot_mount()
+{
+    [ -e "${DESTDIR}/sys" ] || mkdir "${DESTDIR}/sys"
+    [ -e "${DESTDIR}/proc" ] || mkdir "${DESTDIR}/proc"
+    [ -e "${DESTDIR}/dev" ] || mkdir "${DESTDIR}/dev"
+    mount -t sysfs sysfs "${DESTDIR}/sys"
+    mount -t proc proc "${DESTDIR}/proc"
+    mount -o bind /dev "${DESTDIR}/dev"
+}
+
+# chroot_umount()
+# tears down chroot in target system
+#
+chroot_umount()
+{
+    umount $DESTDIR/proc
+    umount $DESTDIR/sys
+    umount $DESTDIR/dev
+}
+
+# package_installation
+installpkg() {
+    if [ "$INSTMODE" = "media" ]; then
+        PKGFILE=/tmp/.pkglist
+        cp $PKGARG/packages.txt $PKGFILE
+        if [ ! -f $PKGFILE ]; then
+            echo "error: Could not find package list: $PKGFILE"
+            exit 1
+        fi
+        PACKAGES=
+        # fix pacman list!
+        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' $PKGFILE
+        for pkg in $(cat $PKGFILE | grep 'base/' | cut -d/ -f2); do
+            pkgname=${pkg%-*-*}
+            PACKAGES="$PACKAGES $pkgname"
+        done
+    else
+        PACKAGES="$(pacman -Sg base | awk '{print $2}')"
+    fi
+    # Add packages which are not in core repository
+    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm nouveau-firmware"
+    [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+    [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+    # Only install the booted kernel image!
+    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$PACKAGES $KERNELPKG"
+    $PACMAN -S $PACKAGES
+}
 
 if [ "$PKGARG" = "" ]; then
     usage
@@ -49,65 +145,39 @@ fi
 
 ! [ -d /tmp ] && mkdir /tmp
 
-if [ "$INSTMODE" = "ftp" ]; then
-    echo "[core]" >/tmp/pacman.conf
-    echo "Server = $PKGARG" >>/tmp/pacman.conf
-    mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
-    rm -f /var/cache/pacman/pkg >/dev/null 2>&1
-    ln -sf $DESTDIR/var/cache/pacman/pkg /var/cache/pacman/pkg >/dev/null 2>&1
+# prepare pacman
+pacman_conf
+if [ "$INSTMODE" = "net" ]; then
+    pacman_conf_extra
+fi
+prepare_pacman
+if [ $? -ne 0 ]; then
+    echo "Pacman preparation FAILED!"
+    return 1
 fi
 
-if [ "$INSTMODE" = "media" ]; then
-    PKGFILE=/tmp/packages.txt
-    cp $PKGARG/packages.txt /tmp/packages.txt
-    if [ ! -f $PKGFILE ]; then
-        echo "error: Could not find package list: $PKGFILE"
-        exit 1
-    fi
-    echo "[core]" >/tmp/pacman.conf
-    echo "Server = file://$PKGARG" >>/tmp/pacman.conf
-    mkdir -p $DESTDIR/var/cache/pacman/pkg /var/cache/pacman >/dev/null 2>&1
-    rm -f /var/cache/pacman/pkg >/dev/null 2>&1
-    ln -sf $PKGARG /var/cache/pacman/pkg >/dev/null 2>&1
-    PKGLIST=
-    # fix pacman list!
-    sed -i -e 's/-i686//g' -e 's/-x86_64//g' $PKGFILE
-    for i in $(cat $PKGFILE | grep 'base/' | cut -d/ -f2); do
-      nm=${i%-*-*}
-      PKGLIST="$PKGLIST $nm"
-    done
-fi
-! [ -d $DESTDIR/var/lib/pacman ] && mkdir -p $DESTDIR/var/lib/pacman
-! [ -d /var/lib/pacman ] && mkdir -p /var/lib/pacman
 # mount proc/sysfs first, so mkinitcpio can use auto-detection if it wants
-! [ -d $DESTDIR/proc ] && mkdir $DESTDIR/proc
-! [ -d $DESTDIR/sys ] && mkdir $DESTDIR/sys
-! [ -d $DESTDIR/dev ] && mkdir $DESTDIR/dev
-mount -t proc none $DESTDIR/proc
-mount -t sysfs none $DESTDIR/sys
-mount -o bind /dev $DESTDIR/dev
-if [ "$INSTMODE" = "media" ]; then
-  $PACMAN -Sy $PKGLIST
-fi
-if [ "$INSTMODE" = "ftp" ]; then
-  $PACMAN -Sy base
-fi
+chroot_mount
+
+# install packages
+installpkg
 if [ $? -gt 0 ]; then
     echo
     echo "Package installation FAILED."
     echo
-    umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
+    chroot_umount
     exit 1
 fi
 
-umount $DESTDIR/proc $DESTDIR/sys $DESTDIR/dev
+# umount chroot
+chroot_umount
 
 echo
 echo "Package installation complete."
 echo
 echo "Please install a bootloader.  Edit the appropriate config file for"
-echo "your loader, and chroot into your system to install it into the"
-echo "boot sector:"
+echo "your loader. Please use $VMLINUZ as kernel image."
+echo "Chroot into your system to install it into the boot sector:"
 echo "  # mount -o bind /dev $DESTDIR/dev"
 echo "  # mount -t proc none $DESTDIR/proc"
 echo "  # mount -t sysfs none $DESTDIR/sys"

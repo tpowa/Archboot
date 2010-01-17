@@ -234,8 +234,8 @@ Common Installation Procedure
    through the installation process as this can also confuse the
    installer.
 
-   At any point in the install process, you can switch to your 5th
-   virtual console (ALT-F5) to view the output from the commands the
+   At any point in the install process, you can switch to your 7th
+   virtual console (ALT-F7) to view the output from the commands the
    setup is running. Use (ALT-F1) to get back to your first console where
    the installer is running, and any F-key in between if you need to open
    another console to intervene manually for any reason.

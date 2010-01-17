@@ -1924,61 +1924,39 @@ select_mirror() {
     echo "Using mirror: $SYNC_URL" >$LOG
 }
 
-# prepare_pacman()
+# pacman_conf()
+# creates temporary pacman.conf file
+pacman_conf() {
+    if [ "$MODE" = "media" ]; then
+        local serverurl="${FILE_URL}"
+    elif [ "$MODE" = "ftp" ]; then
+        local serverurl="${SYNC_URL}"
+    fi
+    # Setup a pacman.conf in /tmp
+    cat << EOF > /tmp/pacman.conf
+[options]
+CacheDir = ${DESTDIR}/var/cache/pacman/pkg
+CacheDir = /src/core-$(uname -m)/pkg
+CacheDir = /src/core-any/pkg
+
+[core]
+Server = ${serverurl}
+EOF
+}
+
+# pacman_conf_extra()
+# adds extra repository for ftp installation mode
+prepare_pacman_extra() {
+    local serverurl="${SYNC_URL}"
+    # Setup a pacman.conf in /tmp
+    echo "[extra]" >> /tmp/pacman.conf
+    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
+}
+
 # configures pacman and syncs for the first time on destination system
-#
 # params: none
 # returns: 1 on error
 prepare_pacman() {
-    if [ "$MODE" = "media" ]; then
-        local serverurl="${FILE_URL}"
-    elif [ "$MODE" = "ftp" ]; then
-        local serverurl="${SYNC_URL}"
-    fi
-    # Setup a pacman.conf in /tmp
-    cat << EOF > /tmp/pacman.conf
-[options]
-CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-CacheDir = /src/core-$(uname -m)/pkg
-CacheDir = /src/core-any/pkg
-
-[core]
-Server = ${serverurl}
-EOF
-
-    # Set up the necessary directories for pacman use
-    [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
-    [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-
-    DIALOG --infobox "Refreshing package database..." 6 45
-    $PACMAN -Sy >$LOG 2>&1 || return 1
-    return 0
-}
-
-# prepare_pacman()
-# configures pacman and syncs for the first time on destination system
-#
-# params: none
-# returns: 1 on error
-prepare_pacman_extra() {
-    if [ "$MODE" = "media" ]; then
-        local serverurl="${FILE_URL}"
-    elif [ "$MODE" = "ftp" ]; then
-        local serverurl="${SYNC_URL}"
-    fi
-    # Setup a pacman.conf in /tmp
-    cat << EOF > /tmp/pacman.conf
-[options]
-CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-CacheDir = /src/core-$(uname -m)/pkg
-CacheDir = /src/core-any/pkg
-
-[core]
-Server = ${serverurl}
-[extra]
-Server =  ${serverurl}
-EOF
-
     # Set up the necessary directories for pacman use
     [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
@@ -1998,12 +1976,17 @@ select_packages() {
         DIALOG --msgbox "Error:\nYou must select Source first." 0 0
         return 1
     fi
+    # set up our install location if necessary and sync up
+    # so we can get package lists
+    pacman_conf
+    prepare_pacman
+    if [ $? -ne 0 ]; then
+        DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
+        return 1
+    fi
     # Archboot setup media Mode uses packages.txt!
     if [ "$MODE" = "media" ]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
-        # set up our install location if necessary and sync up
-        # so we can get package lists
-        prepare_pacman
         PKGS="/src/core-$(uname -m)/pkg/packages.txt"
         if ! [ -f /tmp/.pkgcategory ]; then
             CHKLIST="base ^ ON"
@@ -2024,41 +2007,30 @@ select_packages() {
         DIALOG --yesno "Select all packages by default?" 0 0 && SELECTALL="yes"
         CHKLIST=
         for category in $(cat /tmp/.pkgcategory | sed 's|"||g'); do
-            if [ "$category" = "x11-drivers" ]; then
-                DIALOG --msgbox "NOTE:\n-------\nxf86-video-via and xf86-video-unichrome are disabled by default, please select the correct package you need and don't choose both! Else installation will fail!" 0 0
-            fi
             tag="OFF"
             if [ "$SELECTALL" = "yes" ]; then
                 tag="ON"
             fi
-            list=$(cat $PKGS | grep "$category/" | grep -v 'xf86-video-unichrome' | grep -v 'xf86-video-via' | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.gz$| ($category) $tag|g" | sort)
+            list=$(cat $PKGS | grep "$category/" | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.gz$| ($category) $tag|g" | sort)
             CHKLIST="$CHKLIST $list"
             tag="OFF"
-            list=$(cat $PKGS | grep "$category/" | grep 'xf86-video-unichrome' | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.gz$| ($category) $tag|g" | sort)
-            CHKLIST="$CHKLIST $list"
-            list=$(cat $PKGS | grep "$category/" | grep 'xf86-video-via' | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.gz$| ($category) $tag|g" | sort)
-            CHKLIST="$CHKLIST $list"
         done
         DIALOG --checklist "Select Packages to install.  Use SPACE to select." 19 60 12 $CHKLIST 2>/tmp/.pkglist || return 1
-    fi
+        # fix pacman list!
+        PACKAGES=
+        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' /tmp/.pkglist
+        for pkg in $(cat /tmp/.pkglist); do
+            pkgname=${pkg%-*-*}
+            PACKAGES="$PACKAGES $pkgname"
+        done
     # Use default ftp install routine from arch livecd
-    if [ "$MODE" = "ftp" ]; then
+    else
         # if selection has been done before, warn about loss of input
         # and let the user exit gracefully
         if [ $S_SELECT -ne 0 ]; then
             DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
         fi
-
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 15 70
-
-        # set up our install location if necessary and sync up
-        # so we can get package lists
-        prepare_pacman
-        if [ $? -ne 0 ]; then
-            DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
-            return 1
-        fi
-
         # show group listing for group selection
         local _catlist="base ^ ON"
         for i in $($PACMAN -Sg | sed "s/^base$/ /g"); do
@@ -2091,7 +2063,17 @@ select_packages() {
 
         DIALOG  --separate-output --checklist "Select Packages To Install." 19 60 12 $_pkglist 2>$ANSWER || return 1
         PACKAGES="$(cat $ANSWER)"
+        pacman_conf_extra
+        prepare_pacman
     fi
+    # Add packages which are not in core repository
+    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm nouveau-firmware"
+    [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+    [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+    # Only install the booted kernel image!
+    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$PACKAGES $KERNELPKG"
     NEXTITEM="5"
     S_SELECT=1
 }
@@ -2121,25 +2103,7 @@ installpkg() {
     fi
 
     DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
-    if [ "$MODE" = "media" ]; then
-        # fix pacman list!
-        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' /tmp/.pkglist
-        for pkg in $(cat /tmp/.pkglist); do
-            pkgname=${pkg%-*-*}
-            PACKAGES="$PACKAGES $pkgname"
-        done
-    else
-        # add extra repository for packages not in core!
-        prepare_pacman_extra
-    fi
-    # Add packages which are not in core repository
-    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm nouveau-firmware"
-    [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
-    [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
-    [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
-    # Only install the booted kernel image!
-    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
-    PACKAGES="$PACKAGES $KERNELPKG"
+
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
@@ -2158,9 +2122,6 @@ installpkg() {
         else
             echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
         fi
-        ### HACK to fix infofiles in bash and texinfo!
-        #[ "$(echo $PACKAGES | grep texinfo)" ] && $PACMAN -S texinfo 2>&1 >> /tmp/pacman.log
-        #[ "$(echo $PACKAGES | grep bash)" ] && $PACMAN -S bash 2>&1 >> /tmp/pacman.log
         rm /tmp/setup-pacman-running
     ) &
 
@@ -2183,9 +2144,6 @@ installpkg() {
     rm /tmp/.pacman-retcode
     DIALOG --title "$_result" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
-    # tear down the chroot environment
-    chroot_umount
-
     # ensure the disk is synced
     sync
 
@@ -2199,6 +2157,8 @@ installpkg() {
     auto_mdadm
     auto_luks
     auto_locale
+    # tear down the chroot environment
+    chroot_umount
 }
 
 # add archboot addons if activated
