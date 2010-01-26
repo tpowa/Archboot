@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   December, 17 2009
+   January, 26th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -20,7 +20,7 @@ Table Of Contents
     2. Archboot bootparameters
          1. What are general boot parameters?
          2. What are the video and framebuffer options?
-         3. What are other features of environment?
+         3. What are other included features of the environment?
     3. Installing Arch Linux with Archboot
          1. What you will need?
          2. Acquiring Archboot images
@@ -108,6 +108,11 @@ Archboot bootparameters
         disablemodules=<comma-separated-array>
         disablemodules=pcspkr,usblp
 
+   * load_modules=off
+      - disables all module loading done by udev and hwdetect
+      - Useful if you want to debug module loading or a 
+        unknown module hangs boot process.
+
    * disablehooks
       - disable a hook which is run during bootup
       - Usage:
@@ -169,7 +174,7 @@ Archboot bootparameters
        and activates setup routine to use it later on installed system.
      - Use it like this fbmodule=<yourmodule>, e.g. fbmodule=cirrusfb
 
-  What are other features of environment?
+  What are other included features of the environment?
 
    * ARCH_TIACX_WIRELESS:
      - Please identify the correct file(s) for your device in /usr/share/tiacx
