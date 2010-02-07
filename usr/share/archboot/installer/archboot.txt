@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   January, 26th 2010
+   February, 7th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -112,6 +112,12 @@ Archboot bootparameters
       - disables all module loading done by udev and hwdetect
       - Useful if you want to debug module loading or a 
         unknown module hangs boot process.
+
+   * earlymodules
+      - load modules before hooks are executed
+      - Usage:
+        earlymodules=<comma-separated-array>
+        earlymodules=ahci,ehci-hcd
 
    * disablehooks
       - disable a hook which is run during bootup
