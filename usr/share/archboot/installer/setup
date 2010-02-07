@@ -254,14 +254,14 @@ findpartitions() {
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
             #- part of lvm2 device
-            #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
+            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "lvm2")
             #- part of luks device
-            #  $(fstype 2>/dev/null </dev/$part | grep "luks")
+            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o $(fstype 2>/dev/null </dev/$part | grep "luks") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "lvm2")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -374,14 +374,14 @@ findbootloaderpartitions() {
                 #- part of raid device
                 #  $(cat /proc/mdstat 2>/dev/null | grep $part)
                 #- part of lvm2 device
-                #  $(fstype 2>/dev/null </dev/$part | grep "lvm2")
-                # part of luks device
-                #  $(fstype 2>/dev/null </dev/$part | grep "luks")
+                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "lvm2")
+                #- part of luks device
+                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")
                 #- extended partition
                 #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
                 #- extended partition on raid partition device
                 #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(fstype 2>/dev/null </dev/$part | grep "lvm2")" -o "$(fstype 2>/dev/null </dev/$part | grep "luks")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "lvm2")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
                     if [ -d $block/$disk/$part ]; then
                         echo "/dev/$part"
                         [ "$1" ] && echo $1
