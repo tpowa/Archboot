@@ -55,7 +55,7 @@ install ()
     add_file "/usr/share/licenses/shadow/COPYING"
     add_file "/usr/share/licenses/sdparm/COPYING"
     add_file "/usr/share/licenses/vim/license.txt"
-    add_file "/usr/share/licenses/zlib/license.txt"
+    add_file "/usr/share/licenses/zlib/LICENSE"
 }
 
 help ()
