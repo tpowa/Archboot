@@ -8,29 +8,31 @@ install ()
     SCRIPT="arch_udev"
     add_file /etc/modprobe.d/framebuffer_blacklist.conf
     add_file /etc/modprobe.d/usb-load-ehci-first.conf
-    add_file /lib/udev/load-modules.sh
-    add_file /lib/udev/ata_id
-    add_file /lib/udev/cdrom_id
+    add_binary /lib/udev/ata_id
+    add_binary /lib/udev/cdrom_id
     add_file /lib/udev/cdsymlinks.sh
-    add_file /lib/udev/collect
-    add_file /lib/udev/create_floppy_devices
-    add_file /lib/udev/edd_id
+    add_binary /lib/udev/collect
+    add_binary /lib/udev/create_floppy_devices
+    add_binary /lib/udev/edd_id
     add_file /lib/udev/findkeyboards
-    add_file /lib/udev/firmware.sh
-    add_file /lib/udev/fstab_import
-    add_file /lib/udev/hid2hci
+    add_binary /lib/udev/firmware
+    add_binary /lib/udev/fstab_import
+    add_binary /lib/udev/hid2hci
     add_file /lib/udev/ignore-remove.sh
-    add_file /lib/udev/keymap
-    add_file /lib/udev/modem-modeswitch
-    add_file /lib/udev/path_id
-    add_file /lib/udev/pci-db
+    add_binary /lib/udev/keymap
+    add_binary /lib/udev/input_id
+    add_file /lib/udev/keyboard-force-release.sh
+    add_file /lib/udev/load-modules.sh
+    add_binary /lib/udev/modem-modeswitch
+    add_binary /lib/udev/path_id
+    add_binary /lib/udev/pci-db
     add_file /lib/udev/root-link.sh
     add_file /lib/udev/rule_generator.functions
-    add_file /lib/udev/scsi_id
-    add_file /lib/udev/udev-acl
-    add_file /lib/udev/usb-db
-    add_file /lib/udev/usb_id
-    add_file /lib/udev/v4l_id
+    add_binary /lib/udev/scsi_id
+    add_binary /lib/udev/udev-acl
+    add_binary /lib/udev/usb-db
+    add_binary /lib/udev/usb_id
+    add_binary /lib/udev/v4l_id
     add_file /lib/udev/write_cd_rules
     add_file /lib/udev/write_net_rules
     # add rule files
@@ -38,16 +40,19 @@ install ()
         add_file /etc/udev/rules.d/$i
     done
     for i in 40-infiniband 40-isdn 40-pilot-links 40-zaptel 50-firmware 50-udev-default \
-             60-cdrom_id 60-persistent-alsa 60-persistent-input 60-persistent-serial \
+             60-cdrom_id 60-floppy 60-persistent-alsa 60-persistent-input 60-persistent-serial \
              60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
              61-mobile-action 61-option-modem-modeswitch 61-persistent-storage-edd \
              70-acl 70-hid2hci 75-net-description 75-tty-description 78-sound-card \
-             79-fstab_import 80-drivers 81-arch 95-keymap 95-udev-late; do
+             79-fstab_import 80-drivers 81-arch 95-keyboard-force-release 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
     # add keymap files
     for i in /lib/udev/keymaps/*; do
-        add_file "$i"
+        [ -f $i ] && add_file "$i"
+    done
+    for i in /lib/udev/keymaps/*/*; do
+        [ -f $i ] && add_file "$i"
     done
 }
 
