@@ -6,6 +6,8 @@ run_hook ()
 {
     if ! [ "$ENCRYPTRUN" = "1" ]; then
         /sbin/modprobe -a -q dm-crypt >/dev/null 2>&1
+        # fix if udev initialises /dev/mapper/control
+        sleep 0.5
         if [ -e "/sys/class/misc/device-mapper" ]; then
             if [ ! -e "/dev/mapper/control" ]; then
                 /bin/mknod "/dev/mapper/control" c $(cat /sys/class/misc/device-mapper/dev | sed 's|:| |')
