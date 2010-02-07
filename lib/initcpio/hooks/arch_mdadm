@@ -42,11 +42,7 @@ run_hook ()
             done
         fi
         # assemble everything
-        if [ -e $mdconfig ]; then
-            /sbin/mdassemble
-            #fix for udev creating md devices 
-            sleep 0.5
-        fi
+        [ -e $mdconfig ] && /sbin/mdassemble
     else
         msg ":: Skipping already run by arch_root_advanced hook..."
     fi
