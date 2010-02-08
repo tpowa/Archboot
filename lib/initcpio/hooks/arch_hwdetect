@@ -18,8 +18,8 @@ run_hook ()
 		msg "Blacklisted IDE modules (old subsystem) for udev:"
 		msg "--------------------------------------"
 		if [ -s /etc/modprobe.d/ide-blacklist.conf ]; then 
-			for i in $(sort -u /etc/modprobe.d/ide-blacklist.conf); do
-				echo -n "$i " | sed -e 's/blacklist//g' -e 's/  / /g'
+			for i in $(sort -u /etc/modprobe.d/ide-blacklist.conf | sed -e 's/blacklist //g'); do
+				echo -n "$i "
 			done
 			msg ""
 			msg "If you need them, please use 'ide-legacy' boot option or load them by hand!"
