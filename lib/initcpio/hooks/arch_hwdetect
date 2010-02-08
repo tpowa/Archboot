@@ -19,7 +19,7 @@ run_hook ()
 		msg "--------------------------------------"
 		if [ -s /etc/modprobe.d/ide-blacklist.conf ]; then 
 			for i in $(sort -u /etc/modprobe.d/ide-blacklist.conf); do
-				echo -n "$i " | sed 's/blacklist//g'
+				echo -n "$i " | sed -e 's/blacklist//g' -e 's/  / /g'
 			done
 			msg ""
 			msg "If you need them, please use 'ide-legacy' boot option or load them by hand!"
