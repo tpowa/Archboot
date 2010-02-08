@@ -782,7 +782,8 @@ _stopluks()
             LUKS_REAL_DEVICE="$(echo $(cryptsetup status $i | grep device: | sed -e 's#device:##g'))"
             cryptsetup remove $i > $LOG
             # delete header from device
-            dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10 > $LOG
+            wipefs -a $LUKS_REAL_DEVICE > $LOG
+            #dd if=/dev/zero of=$LUKS_REAL_DEVICE bs=512 count=10 > $LOG
         done
     fi
     [ -e /tmp/.crypttab ] && rm /tmp/.crypttab
