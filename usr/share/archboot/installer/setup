@@ -271,7 +271,7 @@ findpartitions() {
     done
     # device mapper devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypt_LUKS\"" | sed -e 's#:.*##g')"
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
         partofcrypt="$partofcrypt $k"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -291,7 +291,7 @@ findpartitions() {
     # include none partitionable raid md devices
     for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
         # exlude md partitions which are part of lvm
-        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypt_LUKS\"")" ]; then
+        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
                 echo "$devpath"
                 [ "$1" ] && echo $1
         fi
@@ -406,7 +406,7 @@ findbootloaderpartitions() {
     else
         # only show dmraid partitions!
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypt_LUKS\"" | sed -e 's#:.*##g')"
+            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
             partofcrypt="$partofcrypt $k"
         done
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
