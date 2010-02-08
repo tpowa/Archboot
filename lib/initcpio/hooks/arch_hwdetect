@@ -13,7 +13,7 @@ run_hook ()
 		#		[ -z "$(modprobe --show-depends $alias|grep '/ata/'|grep -v 'libata.ko')" ] && echo "$(basename ${i})" | sed -e 's/.ko//g' >> /tmp/.ide-blacklist
 		#	done
 		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
-			echo "blacklist $(basename $i .ko | grep -v ^ide) >> /etc/modprobe.d/ide-blacklist.conf
+			echo "blacklist $(basename $i .ko | grep -v ^ide)" >> /etc/modprobe.d/ide-blacklist.conf
 		done
 		msg "Blacklisted IDE modules (old subsystem) for udev:"
 		msg "--------------------------------------"
