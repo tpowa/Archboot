@@ -17,6 +17,7 @@ install ()
     add_dir "/tmp"
     add_dir "/tmp/install"
     add_dir "/var/run"
+    add_dir "/var/lock"
     add_dir "/var/log"
     add_dir "/addons"
     add_dir "/home"
