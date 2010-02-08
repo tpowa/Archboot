@@ -877,7 +877,7 @@ _raid()
                 ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
             fi
             # skip encrypted raid device
-            if [ "$(echo $devpath | grep block/254)" ]; then
+            if [ "$(echo $devpath | grep dm-)" ]; then
                 getsymlink="$(readlink $devpath)"
                 correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
                 if [ "$(cryptsetup status $(basename $correctdevice) | grep "device:.*/dev/md")" ]; then
@@ -992,7 +992,7 @@ _raidpartitions()
                 ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
             fi
             # skip encrypted raid device
-            if [ "$(echo $devpath | grep block/254)" ]; then
+            if [ "$(echo $devpath | grep dm-)" ]; then
                 getsymlink="$(readlink $devpath)"
                 correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
                 if [ "$(cryptsetup status $(basename $correctdevice) | grep "device:.*/dev/md")" ]; then
@@ -1255,7 +1255,7 @@ findpv()
 {
     for dev in $(pvs -o pv_name --noheading);do
         if [ "$(pvs -o vg_name --noheading $dev)" = "      " ]; then
-            if [ "$(echo "$dev" | grep "block/254")" ]; then
+            if [ "$(echo "$dev" | grep "dm-")" ]; then
                 getsymlink="$(readlink $dev)"
                 correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
                 echo "$correctdevice"
@@ -1271,7 +1271,7 @@ findpv()
 getavailablepv()
 {
     for i in "$(pvs -o pv_name,pv_size --noheading)"; do
-        if [ "$(echo $i | grep block/254)" ]; then
+        if [ "$(echo $i | grep dm-)" ]; then
             getsymlink="$(readlink $(echo $i | sed -e 's#\ .*$##g'))"
             correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
             echo "$i" | sed -e "s#.*\ #$correctdevice\ \\n#g"
@@ -1460,7 +1460,7 @@ _luks()
         done
         # skip already encrypted devices, device mapper with encrypted parts!
         for devpath in $(pvs -o pv_name --noheading); do
-	     if [ "$(echo $devpath | grep block/254)" ]; then
+	     if [ "$(echo $devpath | grep dm-)" ]; then
                 getsymlink="$(readlink $devpath)"
                 correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
                 if [ "$(cryptsetup status $(basename $correctdevice) >/dev/null 2>&1)" ]; then
