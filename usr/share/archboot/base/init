@@ -31,6 +31,8 @@ for cmd in ${CMDLINE}; do
         [0123456Ss]) ;;
         [0-9]*) ;;
         single) ;;
+        rw) readwrite="yes" ;;
+        ro) readwrite="no" ;;
         # only export stuff that does work :)
         *=*) rhs="$(echo "${cmd}" | cut -d= -f2-)"
              cmd="$(echo "${cmd}" | cut -d= -f1 | sed 's|\.|_|g')"
@@ -158,7 +160,12 @@ else
        # We didn't build filesystem support into busybox,
        # instead we use util-linux-ng's blkid for best compatibility
        fstype=$(eval $(/sbin/blkid -o udev -p "${root}"); echo $ID_FS_TYPE)
-       mount ${fstype:+-t ${fstype}} -o ro${rootflags:+,${rootflags}} "${root}" /new_root
+        if [ "${readwrite}" = "yes" ]; then
+            rwopt="rw"
+        else
+            rwopt="ro"
+        fi
+        mount ${fstype:+-t ${fstype}} -o ${rwopt}${rootflags:+,${rootflags}} "${root}" /new_root
     else
        # TODO: Actually implement this
        err "Mounting NFS root is not implemented yet."
