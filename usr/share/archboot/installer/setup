@@ -2227,19 +2227,6 @@ auto_mdadm()
             DIALOG --infobox "Adding raid setup to $DESTDIR/etc/mdadm.conf ..." 4 40
             mdadm -Ds >> $DESTDIR/etc/mdadm.conf
         fi
-        # create correct entry on raid partitions!
-        if [ "$(grep /dev/block $DESTDIR/etc/mdadm.conf)" ]; then
-            # get uuid
-            for i in $(grep /dev/block $DESTDIR/etc/mdadm.conf | sed -e 's#.*UUID=##g'); do
-                for k in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# .*##g'); do
-                    if [ "$(mdadm --detail /dev/$k | grep $i)" ]; then
-                        replace_string="$(grep $i $DESTDIR/etc/mdadm.conf)"
-                        corrected_string="$(echo $replace_string | sed -e "s#/dev/block/.*\ l#/dev/$k\ l#g")"
-                        sed -i -e "s#$replace_string#$corrected_string#g" $DESTDIR/etc/mdadm.conf
-                    fi
-                done
-            done
-        fi
     fi
 }
 
