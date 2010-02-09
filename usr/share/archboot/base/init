@@ -126,7 +126,7 @@ else
            else
                for dir in /sys/block/*; do
                    if [ -f ${dir}/${root:5}/dev ]; then
-                       rootdev="$(cat /sys/block/${dir}/${root:5}/dev | sed 's|:| |')"
+                       rootdev="$(cat ${dir}/${root:5}/dev | sed 's|:| |')"
                        break
                    fi
                done
