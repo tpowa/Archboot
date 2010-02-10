@@ -1,5 +1,5 @@
 #! /bin/sh
-INSTMODE=$1
+MODE=$1
 DESTDIR=$2
 PKGARG=$3
 
@@ -48,9 +48,9 @@ usage() {
 # creates temporary pacman.conf file
 pacman_conf() {
     if [ "$MODE" = "media" ]; then
-        local serverurl="file://${PKGARG}"
+        serverurl="file://${PKGARG}"
     elif [ "$MODE" = "net" ]; then
-        local serverurl="${PKGARG}"
+        serverurl="${PKGARG}"
     fi
     # Setup a pacman.conf in /tmp
     cat << EOF > /tmp/pacman.conf
@@ -67,7 +67,7 @@ EOF
 # pacman_conf_extra()
 # adds extra repository for net installation mode
 pacman_conf_extra() {
-    local serverurl="${PKGARG}"
+    serverurl="${PKGARG}"
     # Setup a pacman.conf in /tmp
     echo "[extra]" >> /tmp/pacman.conf
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
@@ -80,10 +80,7 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-
-    DIALOG --infobox "Refreshing package database..." 6 45
-    $PACMAN -Sy >$LOG 2>&1 || return 1
-    return 0
+    $PACMAN -Sy
 }
 
 # chroot_mount()
