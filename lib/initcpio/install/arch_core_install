@@ -87,6 +87,8 @@ install ()
         fi
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
+    ### HACK put udev-compat to support category!
+    sed -i -e 's#base/udev-compat#support/udev-compat' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
     # generate iso title name

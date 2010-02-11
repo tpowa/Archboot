@@ -132,7 +132,7 @@ installpkg() {
     [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     # Only install the booted kernel image!
     PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
-    PACKAGES="$PACKAGES $KERNELPKG"
+    PACKAGES="$KERNELPKG $PACKAGES"
     $PACMAN -S $PACKAGES
 }
 

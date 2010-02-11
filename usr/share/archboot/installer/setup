@@ -2067,7 +2067,7 @@ select_packages() {
     [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     # Only install the booted kernel image!
     PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
-    PACKAGES="$PACKAGES $KERNELPKG"
+    PACKAGES="$KERNELPKG $PACKAGES"
     NEXTITEM="5"
     S_SELECT=1
 }
@@ -3160,7 +3160,7 @@ auto_fb()
         ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
     fi
     if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
-        UVESAFB="$(grep [a-z] /etc/modprobe.d/uvesafb.conf)" 
+        UVESAFB="$(grep ^[a-z] /etc/modprobe.d/uvesafb.conf)" 
         sed -i -e "s#options.*#$UVESAFB#g" $DESTDIR/etc/modprobe.d/uvesafb.conf
     fi
 }
@@ -3226,6 +3226,7 @@ configure_system()
         auto_ftpmirror
         auto_network
         auto_parameters
+        auto_fb
         auto_hwdetect
     fi
     ## END PREPROCESS ##
