@@ -3155,6 +3155,8 @@ auto_fb()
 {
     UVESAFB=""
     if [ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]; then
+        # clean modprobe.conf file from options first
+        sed -i -e '/options/d' $DESTDIR/etc/modprobe.d/modprobe.conf
         ! [ "$(grep nouveau $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
         ! [ "$(grep i915 $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
         ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
