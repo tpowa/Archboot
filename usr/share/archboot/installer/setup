@@ -2651,9 +2651,9 @@ dogrub() {
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
                 echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/menu.lst
                 echo "" >>$DESTDIR/boot/grub/menu.lst
@@ -2663,9 +2663,9 @@ dogrub() {
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
                 echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
