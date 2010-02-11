@@ -3122,8 +3122,8 @@ auto_hwdetect()
         fi
         [ "$(grep -w ati-kms /proc/cmdline)" ] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [ "$(grep -w intel-kms /proc/cmdline)" ] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [ "$(grep -w nvidia-kms /proc/cmdline)" ]&& (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [ "$(grep -w fbmodule /proc/cmdline)" ]&& FBPARAMETER="--fbmodule"
+        [ "$(grep -w nvidia-kms /proc/cmdline)" ] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [ "$(grep -w fbmodule /proc/cmdline)" ] && FBPARAMETER="--fbmodule"
         if [ "$(grep usb_storage /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
         fi
@@ -3141,12 +3141,12 @@ auto_hwdetect()
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
-        HWDETECTMODULES="$(echo $(hwdetect --fbmodule $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER) | sed -e 's#.*\" ##g')"
+        HWDETECTMODULES="$(echo $(hwdetect $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $FBPARAMETER $HWPARAMETER)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
         [ -n "$HWDETECTMODULES" ] && sed -i -e "s/^MODULES=.*/$HWDETECTMODULES/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
-        [ -n "$HWDETECTFILES" ] && sed -i -e "s/^FILES=.*/FILES=\"$HWDETECTFILES\"/g" ${DESTDIR}/etc/mkinitcpio.conf
+        [ -n "$HWDETECTFILES" ] && sed -i -e "s#^FILES=.*#FILES=\"$HWDETECTFILES\"#g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
     fi
 }
