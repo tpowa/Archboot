@@ -651,12 +651,11 @@ _mkfs() {
 }
 
 # Get a list of available disks for use in the "Available disks" dialogs. This
-# will print the disks as follows, getting size info from hdparm:
-#   /dev/sda: 640133 MBytes (640 GB)
-#   /dev/sdb: 640135 MBytes (640 GB)
+# will print the mountpoints as follows, getting size info from /sys:
+#   /dev/sda: 64000 MB
+#   /dev/sdb: 64000 MB
 _getavaildisks()
 {
-    # NOTE: to test as non-root, stick in a 'sudo' before the hdparm call
     for i in $(finddisks); do
         #if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
             if [ $(echo "$i" | grep 'mapper') ]; then
@@ -670,8 +669,8 @@ _getavaildisks()
 
 # Get a list of available partitions for use in the "Available Mountpoints" dialogs. This
 # will print the mountpoints as follows, getting size info from /sys:
-#   /dev/sda: 640 MB
-#   /dev/sdb: 640 MB
+#   /dev/sda1: 640 MB
+#   /dev/sdb2: 640 MB
 _getavailpartitions()
 {
     for i in $(findpartitions); do
@@ -1573,7 +1572,7 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    DISC_SIZE=$(hdparm -I $DISC | grep -F '1000*1000' | sed "s/^.*:[ \t]*\([0-9]*\) MBytes.*$/\1/")
+    DISC_SIZE=$(echo $(($(expr 512 '*' $(cat /sys/block/$(basename $DISC)/size))/1000000)))
     while [ "$SET_DEFAULTFS" = "" ]; do
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
