@@ -77,11 +77,7 @@ doconsolefont() {
 	if [ "$font" ]; then
 		DIALOG --infobox "Loading font: $font" 0 0
 		for i in $(seq 1 6); do
-			if [ -d /dev/vc ]; then
-				setfont $BASEDIR/consolefonts/$font -C /dev/vc/${i} > /dev/null 2>&1
-			else
-				setfont $BASEDIR/consolefonts/$font -C /dev/tty${i} > /dev/null 2>&1
-			fi
+			setfont $BASEDIR/consolefonts/$font -C /dev/tty${i} > /dev/null 2>&1
 		done
 		[ -e /dev/ttyS0 ] && setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0 > /dev/null 2>&1
 	fi
