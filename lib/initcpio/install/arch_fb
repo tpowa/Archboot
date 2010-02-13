@@ -7,8 +7,6 @@ install ()
     FILES=""
     SCRIPT="arch_fb"
     add_file "/usr/share/archboot/fb/etc/modprobe.d/uvesafb.conf" "/etc/modprobe.d/uvesafb.conf"
-    # insert latest nouveau helper modules
-    add_full_dir "/lib/modules/$KERNELVERSION/kernel/updates"
 }
 
 help ()
