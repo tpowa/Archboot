@@ -79,7 +79,11 @@ doconsolefont() {
 		for i in $(seq 1 6); do
 			setfont $BASEDIR/consolefonts/$font -C /dev/tty${i} > /dev/null 2>&1
 		done
-		[ -e /dev/ttyS0 ] && setfont $BASEDIR/consolefonts/$font -C /dev/ttyS0 > /dev/null 2>&1
+		# set serial console if used too!
+		if [ "$(tty | grep /dev/ttyS)" ]; then
+			SERIAL="$(tty)"
+			setfont $BASEDIR/consolefonts/$font -C /dev/$SERIAL > /dev/null 2>&1
+		fi
 	fi
 S_NEXTITEM=3
 }
