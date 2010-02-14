@@ -107,14 +107,6 @@ else
         msg "$(cat /message)"
     fi
 
-    #Special handling if udev is running
-    udevpid=$(/bin/pidof udevd)
-    if [ -n "${udevpid}" ]; then
-        # Settle pending uevents, then kill udev
-        /sbin/udevadm settle
-        /bin/kill -9 ${udevpid} > /dev/null 2>&1
-        /bin/sleep 0.01
-    fi
     mkdir -p /new_root
     if [ -z "${nfsroot}" -a "${root}" != "/dev/nfs" ]; then
         if [ ${root:0:5} != "/dev/" ] || ! poll_device "${root}" ${rootdelay}; then
@@ -158,13 +150,30 @@ else
        fi
        # We didn't build filesystem support into busybox,
        # instead we use util-linux-ng's blkid for best compatibility
-       fstype=$(eval $(/sbin/blkid -o udev -p "${root}"); echo $ID_FS_TYPE)
-        if [ "${readwrite}" = "yes" ]; then
-            rwopt="rw"
-        else
-            rwopt="ro"
+       if [ -n "${rootfstype}" ]; then
+           fstype="${rootfstype}"
+       else
+           fstype=$(eval $(/sbin/blkid -o udev -p "${root}"); echo $ID_FS_TYPE)
+           if [ -z "${fstype}" ]; then
+             err "Unable to determine the file system type of ${root}:"
+             echo "Either it contains no filesystem, an unknown filesystem,"
+             echo "or more than one valid file system signature was found."
+             echo
+             echo "Try adding"
+             echo "    rootfstype=your_filesystem_type"
+             echo "to the kernel command line."
+             echo
+             echo "You are now being dropped into an emergency shell."
+             launch_interactive_shell
+             msg "Trying to continue (this will most likely fail) ..."
+           fi
         fi
-        mount ${fstype:+-t ${fstype}} -o ${rwopt}${rootflags:+,${rootflags}} "${root}" /new_root
+      if [ "${readwrite}" = "yes" ]; then
+        rwopt="rw"
+      else
+        rwopt="ro"
+      fi
+      mount ${fstype:+-t ${fstype}} -o ${rwopt}${rootflags:+,${rootflags}} "${root}" /new_root
     else
         if [ -z "$nfs_server" -o -z "$nfs_path" ]; then
             err "Unable to mount root filesystem over NFS: wrong parameters."
@@ -175,6 +184,16 @@ else
         fi
         nfsmount ${nfs_option:+-o ${nfs_option}} "${nfs_server}:${nfs_path}" /new_root
     fi
+
+    #Special handling if udev is running
+    udevpid=$(/bin/pidof udevd)
+    if [ -n "${udevpid}" ]; then
+        # Settle pending uevents, then kill udev
+        /sbin/udevadm settle
+        /bin/kill -9 ${udevpid} > /dev/null 2>&1
+        /bin/sleep 0.01
+    fi
+
     umount /proc
     umount /sys
     [ -z "${init}" ] && init="/sbin/init"
