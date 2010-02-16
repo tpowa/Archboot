@@ -1939,7 +1939,7 @@ EOF
 
 # pacman_conf_extra()
 # adds extra repository for ftp installation mode
-prepare_pacman_extra() {
+pacman_conf_extra() {
     local serverurl="${SYNC_URL}"
     # Setup a pacman.conf in /tmp
     echo "[extra]" >> /tmp/pacman.conf
