@@ -46,7 +46,7 @@ install ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g fuse dhclient v86d nouveau-drm"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g fuse dhclient v86d nouveau-drm nouveau-firmware"
         for i in base devel lib support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
