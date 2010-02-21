@@ -72,15 +72,15 @@ install ()
             . "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
                 for i in ${pkgname[@]}; do
-                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.gz ${TEMPDIR}/core-any/pkg/
-                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.gz || return 1
+                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
+                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
                 done
             else
                 for i in ${pkgname[@]}; do
-                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz ${TEMPDIR}/core-$(uname -m)/pkg/
-                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.gz || return 1
+                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
+                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
                 done
             fi
             unset pkgname
@@ -90,7 +90,12 @@ install ()
     ### HACK put udev-compat to support category!
     sed -i -e 's#base/udev-compat#support/udev-compat#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
-    sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt 
+    sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+    ### HACK add grub2 package to image
+    mkdir -p  ${TEMPDIR}/grub2
+    pacman -Sw --noconfirm grub2
+    grub2ver="$(pacman -Si grub2 | grep Version | cut -d ":" -f 2)"
+    cp /var/cache/pacman/pkg/grub2-${grub2ver}-$(uname -m).pkg.tar.* ${TEMPDIR}/grub2
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
