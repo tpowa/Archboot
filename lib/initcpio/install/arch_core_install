@@ -92,10 +92,11 @@ install ()
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK add grub2 package to image
-    mkdir -p  ${TEMPDIR}/grub2
-    pacman -Sw --noconfirm grub2
-    grub2ver="$(pacman -Si grub2 | grep Version | cut -d ":" -f 2)"
+    pacman -Sw --noconfirm grub2 freetype2
+    grub2ver="$(echo $(pacman -Si grub2 | grep Version | cut -d ":" -f 2))"
+    freetype2ver="$(echo $(pacman -Si freetype2 | grep Version | cut -d ":" -f 2))"
     cp /var/cache/pacman/pkg/grub2-${grub2ver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
+    cp /var/cache/pacman/pkg/freetype2-${freetype2ver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
