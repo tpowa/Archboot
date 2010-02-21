@@ -2014,6 +2014,7 @@ run_pacman(){
         --textbox "/tmp/pacman.log" 18 70 || return 1
     # ensure the disk is synced
     sync
+    chroot_umount
 }
 
 # select_packages()
@@ -2154,6 +2155,7 @@ installpkg() {
     run_pacman
     S_INSTALL=1
     NEXTITEM="6"
+    chroot_mount
     # automagic time!
     # any automatic configuration should go here
     DIALOG --infobox "Writing base configuration..." 6 40
@@ -2492,7 +2494,6 @@ dosyslinux() {
     [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
     $DESTDIR/usr/bin/syslinux $bootdev >$LOG 2>&1
     if [ $? -gt 0 ]; then
-        chroot_umount
         DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
