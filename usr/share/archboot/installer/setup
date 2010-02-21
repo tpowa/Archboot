@@ -1949,7 +1949,7 @@ pacman_conf_extra() {
 # pacman_conf_bootloader()
 # adds bootloader repository for media installation mode
 pacman_conf_bootloader() {
-    local serverurl="${SYNC_URL}"
+    local serverurl="${FILE_URL}"
     # Setup a pacman.conf in /tmp
     echo "[bootloader]" >> /tmp/pacman.conf
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
