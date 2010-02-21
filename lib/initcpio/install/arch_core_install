@@ -91,14 +91,14 @@ install ()
     sed -i -e 's#base/udev-compat#support/udev-compat#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add grub2 package to image
-    for i in grub2 freetype2; do
+    ### HACK add grub2 and syslinux packages to image, with separate db file
+    for i in grub2 freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
         pacman -Sw --noconfirm $i
         pkgver="$(echo $(pacman -Si $i | grep Version | cut -d ":" -f 2))"
         cp /var/cache/pacman/pkg/$i-${pkgver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
-        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/grub2.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.* || return 1
+        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/bootloader.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.* || return 1
     done
-    rm  ${TEMPDIR}/core-$(uname -m)/pkg/grub2.db.tar.gz.old
+    rm  ${TEMPDIR}/core-$(uname -m)/pkg/bootloader.db.tar.gz.old
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
