@@ -2524,7 +2524,7 @@ dolilo() {
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         fi
-        sed -i "s|image=/boot/vmlinuz26|image=/boot/$KERNELPKG|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|image=/boot/vmlinuz26|image=/boot/$VMLINUZ|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/$KERNELPKG-fallback.img|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
