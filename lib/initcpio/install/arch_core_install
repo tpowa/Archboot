@@ -95,7 +95,7 @@ install ()
     mkdir -p  ${TEMPDIR}/grub2
     pacman -Sw --noconfirm grub2
     grub2ver="$(pacman -Si grub2 | grep Version | cut -d ":" -f 2)"
-    cp /var/cache/pacman/pkg/grub2-${grub2ver}-$(uname -m).pkg.tar.* ${TEMPDIR}/grub2
+    cp /var/cache/pacman/pkg/grub2-${grub2ver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
