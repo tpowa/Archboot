@@ -2778,7 +2778,7 @@ dogrub2(){
         pacman -S grub2  2>&1 >> /tmp/pacman.log
     else
         DIALOG --infobox "Installing grub2 package..." 0 0
-        $PACMAN -U /src/core-$(uname -m)/pkg/grub2-* 2>&1 >> /tmp/pacman.log
+        $PACMAN -U /src/core-$(uname -m)/pkg/grub2-* /src/core-$(uname -m)/pkg/freetype2-* 2>&1 >> /tmp/pacman.log
     fi
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/grub.cfg Is GRUB2 installed?" 0 0
