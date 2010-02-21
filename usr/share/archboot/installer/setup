@@ -2004,7 +2004,7 @@ select_packages() {
             if [ "$SELECTALL" = "yes" ]; then
                 tag="ON"
             fi
-            list=$(cat $PKGS | grep "$category/" | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.gz$| ($category) $tag|g" | sort)
+            list=$(cat $PKGS | grep "$category/" | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.*$| ($category) $tag|g" | sort)
             CHKLIST="$CHKLIST $list"
             tag="OFF"
         done
