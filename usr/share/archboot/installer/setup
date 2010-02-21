@@ -46,9 +46,10 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_LILO=0        # using lilo
+S_LILO=0        # TODO: kill this - if using lilo
 S_GRUB=0        # using grub
 S_GRUB2=0       # using grub2
+S_BOOT=""       # bootloader installed (set to loader name instead of 1)
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
@@ -2162,7 +2163,7 @@ auto_addons()
         DIALOG --yesno "Would you like to install your addons packages to installed system?" 0 0 && DO_ADDON="yes"
         if [ "$DO_ADDON" = "yes" ] ; then
             DIALOG --infobox "Installing the addons packages..." 0 0
-            $PACMAN -U /tmp/packages/* 2>&1 >> /tmp/pacman.log
+            $PACMAN -U /tmp/packages/*
         fi
     fi
 }
@@ -2769,21 +2770,7 @@ EOF
 }
 
 dogrub2(){
-    ### HACK!
-    # grub2 is not part of core repository and conflicts with grub -> uninstall grub first!
-    if [ "$MODE" = "ftp" ]; then
-        pacman_conf_extra
-        prepare_pacman
-        DIALOG --infobox "Installing grub2 package..." 0 0
-        pacman -S grub2  2>&1 >> /tmp/pacman.log
-    else
-        DIALOG --infobox "Installing grub2 package..." 0 0
-        $PACMAN -U /src/core-$(uname -m)/pkg/grub2-* 2>&1 >> /tmp/pacman.log
-    fi
-    if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
-        DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/grub.cfg Is GRUB2 installed?" 0 0
-        return 1
-    fi
+echo "not yet implemented"
 }
 
 select_source()

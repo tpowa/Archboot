@@ -6,20 +6,10 @@ install ()
     BINARIES="net-auto-wired netcfg-wpa_actiond netcfg-wpa_actiond-action netcfg-menu netcfg2 netcfg"
     FILES=""
     SCRIPT=""
-    for i in /usr/lib/network/*; do
-        [ -f $i ] && add_file $i
-    done
-    for i in /usr/lib/network/connections/*; do
-        add_file $i
-    done
-    for i in /usr/lib/network/hooks/*; do
-        add_file $i
-    done
+    add_full_dir "/usr/lib/network/"
     add_dir "/var/run/network/interfaces"
     add_dir "/var/run/network/profiles"
-    for i in /etc/network.d/examples/*; do
-	add_file $i
-    done
+    add_full_dir "/etc/network.d/examples"
     add_dir "/etc/network.d/hooks"
     add_file "/etc/rc.d/net-profiles"
     add_file "/etc/rc.d/net-rename"
