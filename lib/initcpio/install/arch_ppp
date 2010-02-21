@@ -6,9 +6,7 @@ install ()
     BINARIES="poff pon chat plog pppd pppdump pppoe-discovery pppstats"
     FILES=""
     SCRIPT=""
-    for i in $(find /usr/lib/pppd ! -type d); do
-	add_file "$i"
-    done
+    add_full_dir "/usr/lib/pppd"
     add_dir "/etc/ppp/peers"
     add_file "/usr/share/archboot/ppp/etc/ppp/chap-secrets" "/etc/ppp/chap-secrets"
     add_file "/usr/share/archboot/ppp/etc/ppp/ip-down" "/etc/ppp/ip-down"
