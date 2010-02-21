@@ -1946,6 +1946,15 @@ pacman_conf_extra() {
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
+# pacman_conf_grub2()
+# adds grub2 repository for media installation mode
+pacman_conf_grub2() {
+    local serverurl="${SYNC_URL}"
+    # Setup a pacman.conf in /tmp
+    echo "[grub2]" >> /tmp/pacman.conf
+    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
+}
+
 # configures pacman and syncs for the first time on destination system
 # params: none
 # returns: 1 on error
@@ -2773,13 +2782,12 @@ dogrub2(){
     # grub2 is not part of core repository and conflicts with grub -> uninstall grub first!
     if [ "$MODE" = "ftp" ]; then
         pacman_conf_extra
-        prepare_pacman
-        DIALOG --infobox "Installing grub2 package..." 0 0
-        pacman -S grub2  2>&1 >> /tmp/pacman.log
     else
-        DIALOG --infobox "Installing grub2 package..." 0 0
-        $PACMAN -U /src/core-$(uname -m)/pkg/grub2-* /src/core-$(uname -m)/pkg/freetype2-* 2>&1 >> /tmp/pacman.log
+        pacman_conf_grub2
     fi
+    prepare_pacman
+    DIALOG --infobox "Installing grub2 package..." 0 0
+    $PACMAN -S grub2  2>&1 >> /tmp/pacman.log
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Error: Couldn't find $DESTDIR/boot/grub/grub.cfg Is GRUB2 installed?" 0 0
         return 1
