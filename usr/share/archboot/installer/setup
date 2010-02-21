@@ -3371,7 +3371,7 @@ install_bootloader()
 {
     CANCEL=""
     DIALOG --menu "Which bootloader would you like to use?  Grub is the Arch default.\n\n" \
-        12 55 3 \
+        12 55 4 \
         "GRUB" "Use the GRUB bootloader (default)" \
         "GRUB2" "Use the GRUB2 bootloader (experimental)" \
         "LILO" "Use the LILO bootloader" \
