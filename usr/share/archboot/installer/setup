@@ -1697,7 +1697,7 @@ autoprepare() {
     DIALOG --infobox "Partitioning $DEVICE" 0 0
     # clean partitiontable to avoid issues!
     dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
-    sfdisk $DEVICE -uM >$LOG 2>&1 <<EOF
+    sfdisk $DEVICE -uM -D >$LOG 2>&1 <<EOF
 $sfdisk_input
 EOF
     if [ $? -gt 0 ]; then
@@ -2801,6 +2801,18 @@ EOF
 }
 
 dogrub2(){
+    ### TODO CHECK if all parameters are needed!
+    _bootdev=""
+    _grubdev=""
+    bootdev=""
+    grubdev=""
+    redundant=""
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub_map
+    FAIL_RAID=""
+    FAIL_DM=""
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2816,6 +2828,249 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    ### TODO: check the funtcions and chagne them to correct grub2 usage!
+    ### raid, lvm and encrypt support needs to be added totally different!
+    ### nothing is working at the moment!
+    ### TODO check this!
+    #if ! [ "$(dmraid -r | grep ^no )" ]; then
+    #    USE_DMRAID=""
+    #    DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
+    #fi
+    # try to auto-configure GRUB...
+    if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
+        # check if raid device, devicemapper or dmraid is used
+        ### TODO implement this later!
+        #if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
+        #    if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+        #        # get redundant devices
+        #       for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+        #            _grubdev="$_grubdev $(mapdev $i)"
+        #        done
+        #        redundant="1"
+        #    else
+        #        # none raid1 devices are not bootable with grub, let it fail!
+        #        FAIL_RAID="1"
+        #    fi
+        #    if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
+        #        # partitionable raid is not supported by grub!
+        #        FAIL_RAID="1"
+        #    fi
+        #elif [ "$(echo $PART_ROOT | grep /dev/mapper)" ]; then
+        #    # dmraid check
+        #    if ! [ "$(dmsetup info $PART_ROOT | grep 'DMRAID')" ]; then
+        #        FAIL_DM="1"
+        #    else
+        #        _grubdev=$(mapdev $PART_ROOT)
+        #   fi
+        #else
+            # use normal device
+            _grubdev=$(mapdev $PART_ROOT)
+        #fi
+        # look for a separately-mounted /boot partition
+        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+        # check if raid device, devicemapper or dmraid is used  on /boot partition
+        ### TODO implement this later!
+        #if [ "$(echo $bootdev | grep /dev/md)" ]; then
+        #    if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+        #        # get redundant devices
+        #        for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+        #            _bootdev="$_bootdev $i"
+        #        done
+        #        redundant="1"
+        #        # remove fail if /boot is raid1!
+        #        FAIL_RAID=""
+        #    else
+        #        # none raid1 devices are not bootable with grub, let it fail!
+        #        FAIL_RAID="1"
+        #    fi
+        #elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
+        #        if ! [ "$(dmsetup info $bootdev | grep 'DMRAID')" ]; then
+        #            FAIL_DM="1"
+        #        else
+        #            FAIL_DM=""
+        #            _bootdev=$bootdev
+        #       fi
+        #else
+        #    # remove fail if /boot is on other device!
+        #    ! [ "$bootdev" = "" ] && FAIL_RAID=""
+        #    ! [ "$bootdev" = "" ] && FAIL_DM=""
+        #    if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
+        #       # partitionable raid is not supported by grub!
+        #       FAIL_RAID="1"
+        #    fi
+            # use normal device
+            _bootdev=$bootdev
+        #fi
+        ### TODO: implement this later!
+        #if [ "$FAIL_RAID" = "1" ]; then
+        #        DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
+        #        return 1
+        #fi
+        #if [ "$FAIL_DM" = "1" ]; then
+        #        DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
+        #        return 1
+        #fi
+        ### TODO probably add UUID to grub2 config file
+        if [ "$UUIDPARAMETER" = "yes" ]; then
+            local _rootpart="${PART_ROOT}"
+            local _uuid="$(getuuid ${PART_ROOT})"
+            if [ -n "${_uuid}" ]; then
+                _rootpart="/dev/disk/by-uuid/${_uuid}"
+            fi
+        fi
+        if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
+            cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
+            # remove the default entries by truncating the file at our little tag (#-*)
+            head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/boot/grub/grub.cfg
+            rm -f /tmp/.grub.cfg
+            subdir=
+            # create correct entry array
+            if [ "$_bootdev" != "" ]; then
+                for bootdev in $_bootdev; do
+                    _grubdev="$(mapdev $bootdev)"
+                done
+            else
+                subdir="/boot"
+            fi
+            ### TODO check if this is correct!
+            # keep the file from being completely bogus
+            if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
+                DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
+                _grubdev="(hd0,0)"
+            fi
+            NUMBER=0
+            # create default grub entries
+            for grubdev in $_grubdev; do
+                echo "" >>$DESTDIR/boot/grub/grub.cfg
+                echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
+                echo "menuentry \"Arch Linux\" \{" >>$DESTDIR/boot/grub/grub.cfg
+                echo "set root $grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                if [ "$UUIDPARAMETER" = "yes" ]; then
+                    echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+                else
+                    echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+                fi
+                echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/grub.cfg
+                echo "\}" >>$DESTDIR/boot/grub/grub.cfg
+                echo "" >>$DESTDIR/boot/grub/grub.cfg
+                # adding fallback/full image
+                NUMBER=$(($NUMBER+1))
+                echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
+                echo "menuentry  \"Arch Linux Fallback\" \{" >>$DESTDIR/boot/grub/grub.cfg
+                echo "set root $grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                if [ "$UUIDPARAMETER" = "yes" ]; then
+                    echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+                else
+                    echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+                fi
+                echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
+                echo "\}" >>$DESTDIR/boot/grub/grub.cfg
+                NUMBER=$(($NUMBER+1))
+            done
+            echo "" >>$DESTDIR/boot/grub/grub.cfg
+            echo "## ($NUMBER) Windows" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#menuentry \"Windows\" \{" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#set root (hd0,3)" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#chainloader +1" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#\}" >>$DESTDIR/boot/grub/grub.cfg
+        fi
+    fi
+
+    DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, you can install GRUB2." 0 0
+    [ "$EDITOR" ] || geteditor
+    $EDITOR ${DESTDIR}/boot/grub/grub.cfg
+
+    DEVS="$(findbootloaderdisks _)"
+    DEVS="$DEVS $(findbootloaderpartitions _)"
+    if [ "$DEVS" = "" ]; then
+        DIALOG --msgbox "No hard drives were found" 0 0
+        return 1
+    fi
+    S_GRUB2=""
+    while [ "$S_GRUB2" = "" ]; do
+        DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
+        ROOTDEV=$(cat $ANSWER)
+        DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
+        ### TODO, totally differen. probably not needed!
+        #cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
+        #sync
+        # freeze xfs filesystems to enable grub installation on xfs filesystems
+        if [ -x /usr/sbin/xfs_freeze ]; then
+            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
+            fi
+            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
+            fi
+        fi
+        # look for a separately-mounted /boot partition
+        bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+        #if [ "$(echo $bootpart | grep /dev/md)" ]; then
+        #    bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
+        #fi
+        if [ "$bootpart" = "" ]; then
+            if [ "$PART_ROOT" = "" ]; then
+                DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
+                bootpart=$(cat $ANSWER)
+            else
+                bootpart=$PART_ROOT
+                #if [ "$(echo $bootpart | grep /dev/md)" ]; then
+                #    bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
+                #fi
+            fi
+        fi
+        bootpart=$(mapdev $bootpart)
+        bootdev=$(mapdev $ROOTDEV)
+        if [ "$bootpart" = "" ]; then
+            DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
+            return 1
+        fi
+        ### TODO, check if this is still valid!
+        if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
+            DIALOG --msgbox "GRUB2 root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
+            return 1
+        fi
+	get_chs
+        ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
+        #grub_dmraid_hack
+        ### TODO: use install-grub2
+        chroot_mount
+        chroot install-grub
+        chroot_umount
+        #$DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub2.log 2>&1 <<EOF
+#geometry $realdev $CYLINDERS $HEADS $SECTORS
+#root $bootpart
+#setup $bootdev
+#quit
+#EOF
+        ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
+        #remove_grub_dmraid_hack
+        cat /tmp/grub2.log >$LOG
+        # unfreeze xfs filesystems
+        if [ -x /usr/sbin/xfs_freeze ]; then
+            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
+            fi
+            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
+            fi
+        fi
+
+        if grep "Error [0-9]*: " /tmp/grub2.log >/dev/null; then
+            DIALOG --msgbox "Error installing GRUB2. (see $LOG for output)" 0 0
+            return 1
+        fi
+        # copy device map file
+        cp -f /tmp/dev.map $DESTDIR/boot/grub/device.map
+        DIALOG --msgbox "GRUB2 was successfully installed." 0 0
+        S_GRUB2=1
+        ### TODO, i don't think this will be needed later.
+        #if [ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]; then
+        #    if [ "$redundant" = "1" ]; then
+        #        DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB2=""
+        #    fi
+        #fi
+    done
 }
 
 select_source()
