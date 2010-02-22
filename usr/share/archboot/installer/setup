@@ -3035,7 +3035,7 @@ dogrub2(){
         #grub_dmraid_hack
         ### TODO: use install-grub2
         chroot_mount
-        chroot install-grub
+        chroot $DESTDIR install-grub $bootdev
         chroot_umount
         #$DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub2.log 2>&1 <<EOF
 #geometry $realdev $CYLINDERS $HEADS $SECTORS
