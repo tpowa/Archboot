@@ -1970,8 +1970,6 @@ prepare_pacman() {
 
 # Set PACKAGES parameter before running to install wanted packages
 run_pacman(){
-    DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
-
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
@@ -2152,6 +2150,7 @@ installpkg() {
     if [ "$S_MKFS" != "1" -a "$S_MKFSAUTO" != "1" ]; then
         getdest
     fi
+    DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
     run_pacman
     S_INSTALL=1
     NEXTITEM="6"
