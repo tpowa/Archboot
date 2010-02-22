@@ -73,7 +73,7 @@ pacman_conf_extra() {
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
-# configures pacman and syncs for the first time on destination system
+# configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
 prepare_pacman() {
@@ -107,7 +107,7 @@ chroot_umount()
 }
 
 # package_installation
-installpkg() {
+install_packages() {
     if [ "$INSTMODE" = "media" ]; then
         PKGFILE=/tmp/.pkglist
         cp $PKGARG/packages.txt $PKGFILE
@@ -157,7 +157,7 @@ fi
 chroot_mount
 
 # install packages
-installpkg
+install_packages
 if [ $? -gt 0 ]; then
     echo
     echo "Package installation FAILED."

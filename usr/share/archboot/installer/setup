@@ -1955,7 +1955,7 @@ pacman_conf_bootloader() {
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
-# configures pacman and syncs for the first time on destination system
+# configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
 prepare_pacman() {
@@ -2128,10 +2128,10 @@ select_packages() {
 }
 
 
-# installpkg()
+# install_packages()
 # performs package installation to the target system
 #
-installpkg() {
+install_packages() {
     if ! [ "$S_SRC" = "1" ]; then
         DIALOG --msgbox "Error:\nYou must select Source first." 0 0
         return 1
@@ -3418,7 +3418,7 @@ mainmenu() {
         "4")
             select_packages ;;
         "5")
-            installpkg ;;
+            install_packages ;;
         "6")
             configure_system ;;
         "7")
