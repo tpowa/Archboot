@@ -3012,16 +3012,16 @@ dogrub2(){
         DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
         ROOTDEV=$(cat $ANSWER)
         DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
-        ### TODO, totally differen. probably not needed!
-        #cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
         sync
-        # freeze xfs filesystems to enable grub installation on xfs filesystems
+        # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
         if [ -x /usr/sbin/xfs_freeze ]; then
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
                 /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
             fi
             if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
                 /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
             fi
         fi
         # look for a separately-mounted /boot partition
@@ -3065,16 +3065,6 @@ dogrub2(){
         ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #remove_grub_dmraid_hack
         cat /tmp/grub2.log >$LOG
-        # unfreeze xfs filesystems
-        if [ -x /usr/sbin/xfs_freeze ]; then
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
-            fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
-            fi
-        fi
-
         if grep "Error [0-9]*: " /tmp/grub2.log >/dev/null; then
             DIALOG --msgbox "Error installing GRUB2. (see $LOG for output)" 0 0
             return 1
