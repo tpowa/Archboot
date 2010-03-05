@@ -478,10 +478,19 @@ remove_grub_dmraid_hack(){
     done
 }
 
+get_grub2_map() {
+    rm /tmp/device.map
+    DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
+    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map /tmp/device.map >/tmp/grub.log 2>&1 <<EOF
+quit
+EOF
+}
+
 mapdev() {
     partition_flag=0
     device_found=0
-    devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
+    [ "$GRUB_LEGACY" = "" ] && devs=$(cat /tmp/device.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
+    [ "$GRUB_LEGACY" = "1" ] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     # check if we use hd or sd device
     if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
         linuxdevice=$(echo $1 | sed -e 's#p[0-9].*$##')
@@ -491,14 +500,14 @@ mapdev() {
     if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
         if [ "$(echo $1 | egrep 'p[0-9].*$')" ]; then
             pnum=$(echo $1 | sed -e 's#.*p##g')
-            [ "$GRUB" = "1" ] && pnum=$(($pnum-1))
+            [ "$GRUB_LEGACY" = "1" ] && pnum=$(($pnum-1))
             partition_flag=1
         fi
     else
         if [ "$(echo $1 | egrep '[0-9]$')" ]; then
             # /dev/hdXY
             pnum=$(echo $1 | cut -b9-)
-            pnum=$(($pnum-1))
+            [ "$GRUB_LEGACY" = "1" ] && pnum=$(($pnum-1))
             partition_flag=1
         fi
     fi
@@ -2417,9 +2426,6 @@ getcryptsetup() {
 }
 
 dosyslinux() {
-    getrootfs
-    getraidarrays
-    getcryptsetup
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
         ### HACK!
@@ -2435,6 +2441,9 @@ dosyslinux() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    getrootfs
+    getraidarrays
+    getcryptsetup
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
@@ -2510,9 +2519,6 @@ dosyslinux() {
 }
 
 dolilo() {
-    getrootfs
-    getraidarrays
-    getcryptsetup
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
         prepare_pacman
@@ -2521,6 +2527,9 @@ dolilo() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    getrootfs
+    getraidarrays
+    getcryptsetup
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
@@ -2564,18 +2573,6 @@ dolilo() {
 }
 
 dogrub() {
-    _bootdev=""
-    _grubdev=""
-    bootdev=""
-    grubdev=""
-    redundant=""
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    get_grub_map
-    FAIL_RAID=""
-    FAIL_DM=""
-    GRUB="1"
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
         prepare_pacman
@@ -2588,6 +2585,18 @@ dogrub() {
         USE_DMRAID=""
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
+    _bootdev=""
+    _grubdev=""
+    bootdev=""
+    grubdev=""
+    redundant=""
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub_map
+    FAIL_RAID=""
+    FAIL_DM=""
+    GRUB_LEGACY="1"
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
         # check if raid device, devicemapper or dmraid is used
@@ -2812,19 +2821,6 @@ EOF
 }
 
 dogrub2(){
-    ### TODO CHECK if all parameters are needed!
-    _bootdev=""
-    _grubdev=""
-    bootdev=""
-    grubdev=""
-    redundant=""
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    get_grub_map
-    FAIL_RAID=""
-    FAIL_DM=""
-    GRUB=""
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2840,6 +2836,19 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    ### TODO CHECK if all parameters are needed!
+    _bootdev=""
+    _grubdev=""
+    bootdev=""
+    grubdev=""
+    redundant=""
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub2_map
+    FAIL_RAID=""
+    FAIL_DM=""
+    GRUB_LEGACY=""
     ### TODO: check the funtcions and chagne them to correct grub2 usage!
     ### raid, lvm and encrypt support needs to be added totally different!
     ### nothing is working at the moment!
@@ -3045,7 +3054,6 @@ dogrub2(){
 	get_chs
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #grub_dmraid_hack
-        ### TODO: use install-grub2
         chroot_mount
         chroot $DESTDIR install-grub $bootdev
         chroot_umount
