@@ -491,7 +491,7 @@ mapdev() {
     if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
         if [ "$(echo $1 | egrep 'p[0-9].*$')" ]; then
             pnum=$(echo $1 | sed -e 's#.*p##g')
-            pnum=$(($pnum-1))
+            [ "$GRUB" = "1" ] && pnum=$(($pnum-1))
             partition_flag=1
         fi
     else
@@ -2575,6 +2575,7 @@ dogrub() {
     get_grub_map
     FAIL_RAID=""
     FAIL_DM=""
+    GRUB="1"
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
         prepare_pacman
@@ -2823,6 +2824,7 @@ dogrub2(){
     get_grub_map
     FAIL_RAID=""
     FAIL_DM=""
+    GRUB=""
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2930,7 +2932,7 @@ dogrub2(){
         fi
         if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
             cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
-            # remove the default entries by truncating the file at our little tag (#-*)
+            # remove the default entries by truncating the file at our little tag (set default)
             head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/boot/grub/grub.cfg
             rm -f /tmp/.grub.cfg
             subdir=
