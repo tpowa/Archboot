@@ -2116,11 +2116,21 @@ select_packages() {
         prepare_pacman
     fi
     # Add packages which are not in core repository
-    [ "$(grep -w nvidia-kms /proc/cmdline)" ] && ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm nouveau-firmware"
-    [ "$(grep -w uvesafb /proc/cmdline)" ] && ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
-    [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ] && ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
-    [ -e /var/state/dhcp/dhclient.leases ] && ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+    if [ "$(grep -w nvidia-kms /proc/cmdline)" ]; then
+        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm"
+        ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+    fi
+    if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
+        ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+    fi
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
+        ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    fi
+    if [ -e /var/state/dhcp/dhclient.leases ]; then
+        ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+    fi
     # Only install the booted kernel image!
+    ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
     PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
     PACKAGES="$KERNELPKG $PACKAGES"
     NEXTITEM="5"
