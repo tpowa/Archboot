@@ -481,7 +481,7 @@ remove_grub_dmraid_hack(){
 get_grub2_map() {
     rm /tmp/device.map
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map /tmp/device.map >/tmp/grub.log 2>&1 <<EOF
+    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map /tmp/device.map >/tmp/grub2.log 2>&1 <<EOF
 quit
 EOF
 }
@@ -2964,36 +2964,36 @@ dogrub2(){
             for grubdev in $_grubdev; do
                 echo "" >>$DESTDIR/boot/grub/grub.cfg
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-                echo "menuentry \"Arch Linux\" \{" >>$DESTDIR/boot/grub/grub.cfg
-                echo "set root $grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
+                echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
                 if [ "$UUIDPARAMETER" = "yes" ]; then
                     echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 else
                     echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 fi
                 echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/grub.cfg
-                echo "\}" >>$DESTDIR/boot/grub/grub.cfg
+                echo "}" >>$DESTDIR/boot/grub/grub.cfg
                 echo "" >>$DESTDIR/boot/grub/grub.cfg
                 # adding fallback/full image
                 NUMBER=$(($NUMBER+1))
                 echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-                echo "menuentry  \"Arch Linux Fallback\" \{" >>$DESTDIR/boot/grub/grub.cfg
-                echo "set root $grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
+                echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
                 if [ "$UUIDPARAMETER" = "yes" ]; then
                     echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 else
                     echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 fi
                 echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
-                echo "\}" >>$DESTDIR/boot/grub/grub.cfg
+                echo "}" >>$DESTDIR/boot/grub/grub.cfg
                 NUMBER=$(($NUMBER+1))
             done
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             echo "## ($NUMBER) Windows" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#menuentry \"Windows\" \{" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#set root (hd0,3)" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#menuentry \"Windows\" {" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#set root=(hd0,3)" >>$DESTDIR/boot/grub/grub.cfg
             echo "#chainloader +1" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#\}" >>$DESTDIR/boot/grub/grub.cfg
+            echo "#}" >>$DESTDIR/boot/grub/grub.cfg
         fi
     fi
 
@@ -3014,7 +3014,7 @@ dogrub2(){
         DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
         ### TODO, totally differen. probably not needed!
         #cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
-        #sync
+        sync
         # freeze xfs filesystems to enable grub installation on xfs filesystems
         if [ -x /usr/sbin/xfs_freeze ]; then
             if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
@@ -3051,11 +3051,10 @@ dogrub2(){
             DIALOG --msgbox "GRUB2 root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
             return 1
         fi
-	get_chs
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #grub_dmraid_hack
         chroot_mount
-        chroot $DESTDIR install-grub $bootdev
+        chroot $DESTDIR grub-install $bootdev >> /tmp/grub2.log
         chroot_umount
         #$DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub2.log 2>&1 <<EOF
 #geometry $realdev $CYLINDERS $HEADS $SECTORS
@@ -3080,8 +3079,6 @@ dogrub2(){
             DIALOG --msgbox "Error installing GRUB2. (see $LOG for output)" 0 0
             return 1
         fi
-        # copy device map file
-        cp -f /tmp/dev.map $DESTDIR/boot/grub/device.map
         DIALOG --msgbox "GRUB2 was successfully installed." 0 0
         S_GRUB2=1
         ### TODO, i don't think this will be needed later.
