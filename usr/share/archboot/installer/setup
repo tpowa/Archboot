@@ -481,9 +481,7 @@ remove_grub_dmraid_hack(){
 get_grub2_map() {
     rm /tmp/device.map
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map /tmp/device.map >/tmp/grub2.log 2>&1 <<EOF
-quit
-EOF
+    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
 }
 
 mapdev() {
