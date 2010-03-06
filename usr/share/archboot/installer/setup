@@ -1882,6 +1882,15 @@ mountpoints() {
     S_MKFS=1
 }
 
+# source_set()
+# check if installation source is set, if not run select_source!
+source_set(){
+    if ! [ "$S_SRC" = "1" ]; then
+        DIALOG --msgbox "Error:\nYou must select Source first." 0 0
+        select_source
+    fi
+}
+
 getsource() {
     S_SRC=0
     if [ "$MODE" = "media" ]; then
@@ -1974,6 +1983,10 @@ prepare_pacman() {
 
     DIALOG --infobox "Refreshing package database..." 6 45
     $PACMAN -Sy >$LOG 2>&1 || return 1
+    if [ $? -ne 0 ]; then
+        DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
+        return 1
+    fi
     return 0
 }
 
@@ -2030,18 +2043,9 @@ run_pacman(){
 # params: none
 # returns: 1 on error
 select_packages() {
-    if ! [ "$S_SRC" = "1" ]; then
-        DIALOG --msgbox "Error:\nYou must select Source first." 0 0
-        return 1
-    fi
-    # set up our install location if necessary and sync up
-    # so we can get package lists
+    source_set
     pacman_conf
     prepare_pacman
-    if [ $? -ne 0 ]; then
-        DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
-        return 1
-    fi
     # Archboot setup media Mode uses packages.txt!
     if [ "$MODE" = "media" ]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
@@ -2151,10 +2155,7 @@ select_packages() {
 # performs package installation to the target system
 #
 install_packages() {
-    if ! [ "$S_SRC" = "1" ]; then
-        DIALOG --msgbox "Error:\nYou must select Source first." 0 0
-        return 1
-    fi
+    source_set
     if [ "$MODE" = "media" ]; then
         if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
             DIALOG --msgbox "You must select packages first." 0 0
@@ -2436,6 +2437,7 @@ dosyslinux() {
             pacman_conf_bootloader
         fi
         PACKAGES="syslinux"
+        source_set
         prepare_pacman
         run_pacman
         # reset PACKAGES after installing
@@ -2521,6 +2523,7 @@ dosyslinux() {
 dolilo() {
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
+        source_set
         prepare_pacman
         PACKAGES="lilo"
         run_pacman
@@ -2575,6 +2578,7 @@ dolilo() {
 dogrub() {
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
+        source_set
         prepare_pacman
         PACKAGES="grub"
         run_pacman
@@ -2830,6 +2834,7 @@ dogrub2(){
         else
             pacman_conf_bootloader
         fi
+        source_set
         prepare_pacman
         PACKAGES="grub2"
         run_pacman
