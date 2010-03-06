@@ -2424,6 +2424,14 @@ getcryptsetup() {
     fi
 }
 
+getrootuuid() {
+    local _rootpart="${PART_ROOT}"
+    local _uuid="$(getuuid ${PART_ROOT})"
+    if [ -n "${_uuid}" ]; then
+        _rootpart="/dev/disk/by-uuid/${_uuid}"
+    fi
+}
+
 dosyslinux() {
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
@@ -2476,11 +2484,7 @@ dosyslinux() {
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$UUIDPARAMETER" = "yes" ]; then
-        local _rootpart="${PART_ROOT}"
-        local _uuid="$(getuuid ${PART_ROOT})"
-        if [ -n "${_uuid}" ]; then
-            _rootpart="/dev/disk/by-uuid/${_uuid}"
-        fi
+        getrootuuid
         echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2488,6 +2492,7 @@ dosyslinux() {
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$UUIDPARAMETER" = "yes" ]; then
+        getrootuuid
         echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2534,11 +2539,7 @@ dolilo() {
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
-            local _rootpart="${PART_ROOT}"
-            local _uuid="$(getuuid ${PART_ROOT})"
-            if [ -n "${_uuid}" ]; then
-                _rootpart="/dev/disk/by-uuid/${_uuid}"
-            fi
+            getrootuuid
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
@@ -2671,11 +2672,7 @@ dogrub() {
                 return 1
         fi
         if [ "$UUIDPARAMETER" = "yes" ]; then
-            local _rootpart="${PART_ROOT}"
-            local _uuid="$(getuuid ${PART_ROOT})"
-            if [ -n "${_uuid}" ]; then
-                _rootpart="/dev/disk/by-uuid/${_uuid}"
-            fi
+            getrootuuid
         fi
         if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
             cp $DESTDIR/boot/grub/menu.lst /tmp/.menu.lst
@@ -2844,11 +2841,11 @@ dogrub2(){
     _grubdev=""
     bootdev=""
     grubdev=""
-    redundant=""
     getrootfs
     getraidarrays
     getcryptsetup
     get_grub2_map
+    raiduuid=""
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY=""
@@ -2862,9 +2859,17 @@ dogrub2(){
     #fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
-        # check if raid device, devicemapper or dmraid is used
         ### TODO implement this later!
-        #if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
+        # check if raid device, devicemapper or dmraid is used
+        if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
+            ### TODO!
+            ### grub2 can boot from raid devices, raid partitions is imho unsupported
+                FAIL_RAID="0"
+            if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
+                # partitionable raid is not supported by grub2!
+                FAIL_RAID="1"
+            fi
+        fi
         #    if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
         #        # get redundant devices
         #       for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
@@ -2887,14 +2892,37 @@ dogrub2(){
         #        _grubdev=$(mapdev $PART_ROOT)
         #   fi
         #else
+        #fi   
+        if [ "$FAIL_RAID" = "0" ]; then
+            _grubdev=$(basename $PART_ROOT)
+            raiduuid=$(getuuid $PART_ROOT)
+        else
             # use normal device
             _grubdev=$(mapdev $PART_ROOT)
-        #fi
+        fi
         # look for a separately-mounted /boot partition
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        # check if raid device, devicemapper or dmraid is used  on /boot partition
+        # remove fail if /boot is on other device!
+        ! [ "$bootdev" = "" ] && FAIL_RAID=""
+        ! [ "$bootdev" = "" ] && FAIL_DM=""
         ### TODO implement this later!
-        #if [ "$(echo $bootdev | grep /dev/md)" ]; then
+        # check if raid device, devicemapper or dmraid is used  on /boot partition
+        if [ "$(echo $bootdev | grep /dev/md)" ]; then
+            ### TODO!
+            ### grub2 can boot from raid devices, raid partitions is imho unsupported
+                FAIL_RAID="0"
+            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
+                # partitionable raid is not supported by grub2!
+                FAIL_RAID="1"
+            fi
+        fi
+        if [ "$FAIL_RAID" = "0" ]; then
+            _bootdev=$(basename $bootdev)
+            raiduuid=$(getuuid $bootdev)
+        else
+            # use normal device
+            _bootdev=$(mapdev $bootdev)
+        fi
         #    if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
         #        # get redundant devices
         #        for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
@@ -2915,32 +2943,18 @@ dogrub2(){
         #            _bootdev=$bootdev
         #       fi
         #else
-        #    # remove fail if /boot is on other device!
-        #    ! [ "$bootdev" = "" ] && FAIL_RAID=""
-        #    ! [ "$bootdev" = "" ] && FAIL_DM=""
-        #    if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
-        #       # partitionable raid is not supported by grub!
-        #       FAIL_RAID="1"
-        #    fi
-            # use normal device
-            _bootdev=$bootdev
         #fi
+        if [ "$FAIL_RAID" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from partitionable raid devices!" 0 0
+                return 1
+        fi
         ### TODO: implement this later!
-        #if [ "$FAIL_RAID" = "1" ]; then
-        #        DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
-        #        return 1
-        #fi
         #if [ "$FAIL_DM" = "1" ]; then
         #        DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
         #        return 1
         #fi
-        ### TODO probably add UUID to grub2 config file
         if [ "$UUIDPARAMETER" = "yes" ]; then
-            local _rootpart="${PART_ROOT}"
-            local _uuid="$(getuuid ${PART_ROOT})"
-            if [ -n "${_uuid}" ]; then
-                _rootpart="/dev/disk/by-uuid/${_uuid}"
-            fi
+            getrootuuid
         fi
         if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
             cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
@@ -2950,9 +2964,7 @@ dogrub2(){
             subdir=
             # create correct entry array
             if [ "$_bootdev" != "" ]; then
-                for bootdev in $_bootdev; do
-                    _grubdev="$(mapdev $bootdev)"
-                done
+                _grubdev="$_bootdev"
             else
                 subdir="/boot"
             fi
@@ -2963,12 +2975,15 @@ dogrub2(){
                 _grubdev="(hd0,1)"
             fi
             NUMBER=0
+            ### For probably not needed anymore!
             # create default grub entries
             for grubdev in $_grubdev; do
                 echo "" >>$DESTDIR/boot/grub/grub.cfg
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
                 echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
+                [ "$FAIL_RAID" = "0" ] && echo "insmod raid"
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid"
                 if [ "$UUIDPARAMETER" = "yes" ]; then
                     echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 else
@@ -2981,7 +2996,9 @@ dogrub2(){
                 NUMBER=$(($NUMBER+1))
                 echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
                 echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
+                [ "$FAIL_RAID" = "0" ] && echo "insmod raid"
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
+                [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid"
                 if [ "$UUIDPARAMETER" = "yes" ]; then
                     echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
                 else
@@ -3003,7 +3020,14 @@ dogrub2(){
     DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, you can install GRUB2." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/boot/grub/grub.cfg
+    ### TODO:
+    # A switch is needed if advanced /boot or / is used!
+    # It doesn't make sense to present device list if advanced roots are used.
+    # Configure it that /boot partition is used or / is used to install grub2 into!
+    # - Encryption supported, i guess yes? 
+    # - Are complex raid+lvm or lvm++raid setups supported too, and how about encrytion?
 
+    ### Why is this part not in the loop???
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
@@ -3011,6 +3035,7 @@ dogrub2(){
         return 1
     fi
     S_GRUB2=""
+    ### Loop probably not needed anymore!
     while [ "$S_GRUB2" = "" ]; do
         DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
         ROOTDEV=$(cat $ANSWER)
@@ -3043,6 +3068,7 @@ dogrub2(){
                 #fi
             fi
         fi
+        ### This should be done earlier!!!
         bootpart=$(mapdev $bootpart)
         bootdev=$(mapdev $ROOTDEV)
         if [ "$bootpart" = "" ]; then
@@ -3068,12 +3094,6 @@ dogrub2(){
         fi
         DIALOG --msgbox "GRUB2 was successfully installed." 0 0
         S_GRUB2=1
-        ### TODO, i don't think this will be needed later.
-        #if [ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]; then
-        #    if [ "$redundant" = "1" ]; then
-        #        DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB2=""
-        #    fi
-        #fi
     done
 }
 
