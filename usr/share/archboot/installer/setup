@@ -2849,9 +2849,9 @@ dogrub2(){
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY=""
-    ### TODO: check the funtcions and chagne them to correct grub2 usage!
+    ### TODO: check the functions and chagne them to correct grub2 usage!
     ### raid, lvm and encrypt support needs to be added totally different!
-    ### nothing is working at the moment!
+    ### Basic devices work!
     ### TODO check this!
     #if ! [ "$(dmraid -r | grep ^no )" ]; then
     #    USE_DMRAID=""
@@ -2956,8 +2956,8 @@ dogrub2(){
             ### TODO check if this is correct!
             # keep the file from being completely bogus
             if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
-                DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
-                _grubdev="(hd0,0)"
+                DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
+                _grubdev="(hd0,1)"
             fi
             NUMBER=0
             # create default grub entries
@@ -3048,7 +3048,7 @@ dogrub2(){
         fi
         ### TODO, check if this is still valid!
         if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
-            DIALOG --msgbox "GRUB2 root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
+            DIALOG --msgbox "GRUB2 root and setup devices could not be auto-located.  You will need to manually run the grub-install to install the bootloader." 0 0
             return 1
         fi
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
@@ -3056,12 +3056,6 @@ dogrub2(){
         chroot_mount
         chroot $DESTDIR grub-install $bootdev >> /tmp/grub2.log
         chroot_umount
-        #$DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub2.log 2>&1 <<EOF
-#geometry $realdev $CYLINDERS $HEADS $SECTORS
-#root $bootpart
-#setup $bootdev
-#quit
-#EOF
         ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #remove_grub_dmraid_hack
         cat /tmp/grub2.log >$LOG
