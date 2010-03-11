@@ -2883,7 +2883,6 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    ### TODO CHECK if all parameters are needed!
     bootdev=""
     grubdev=""
     complexuuid=""
@@ -3004,7 +3003,6 @@ dogrub2(){
         # LVM needs the mbr of a device
         ### TODO:
         # - Encryption not supported by grub2!
-
         if [ "$FAIL_COMPLEX" = "0" ]; then
              #check if mapper contains a md device!
              if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
