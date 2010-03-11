@@ -1651,11 +1651,6 @@ autoprepare() {
     FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+ swap:$SWAP_PART_SIZE:swap /:$ROOT_PART_SIZE:$FSTYPE /home:*:$FSTYPE"
     sfdisk_input=""
 
-    if [ "$S_MKFS" = "1" ]; then
-        DIALOG --msgbox "You have already prepared your filesystems manually" 0 0
-        return 0
-    fi
-
     # validate DEVICE
     if [ ! -b "$DEVICE" ]; then
       DIALOG --msgbox "Device '$DEVICE' is not valid" 0 0
@@ -1668,7 +1663,6 @@ autoprepare() {
         return 1
     fi
 
-    dev=$DEVICE
     rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
@@ -1763,10 +1757,6 @@ EOF
 }
 
 partition() {
-    if [ "$S_MKFSAUTO" = "1" ]; then
-        DIALOG --msgbox "You have already prepared your filesystems with Auto-prepare" 0 0
-        return 0
-    fi
     # disable swap and all mounted partitions, umount / last!
     _umountall
     # check on encrypted devices, else weird things can happen!
@@ -1805,10 +1795,6 @@ partition() {
 }
 
 mountpoints() {
-    if [ "$S_MKFSAUTO" = "1" ]; then
-        DIALOG --msgbox "You have already prepared your filesystems with Auto-prepare" 0 0
-        return 0
-    fi
     while [ "$PARTFINISH" != "DONE" ]; do
     : >/tmp/.fstab
     : >/tmp/.parts
