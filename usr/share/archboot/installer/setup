@@ -32,10 +32,6 @@ block=/sys/block
 PART_ROOT=
 ROOTFS=""
 
-# default filesystem specs (the + is bootable flag)
-# <mountpoint>:<partsize>:<fstype>[:+]
-DEFAULTFS="/boot:32:ext2:+ swap:256:swap /:7500:ext3 /home:*:ext3"
-
 # install stages
 S_SRC=0         # choose install medium
 S_NET=0         # network configuration
@@ -927,6 +923,8 @@ _raid()
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
         fi
+        METADATA="default"
+        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format, this will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -958,7 +956,7 @@ _raid()
             fi
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)\n\nMETADATA(superblock) FORMAT:$METADATA" 0 0 && MDFINISH="DONE"
     done
     _createraid
 }
@@ -1040,6 +1038,8 @@ _raidpartitions()
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
         fi
+        METADATA="default"
+        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format, this will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -1071,7 +1071,7 @@ _raidpartitions()
             fi
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)" 0 0 && MDFINISH="DONE"
+        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)\n\nMETADATA(superblock) FORMAT:$METADATA" 0 0 && MDFINISH="DONE"
     done
     _createraid
 }
@@ -1087,7 +1087,7 @@ _createraid()
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
-    RAIDOPTIONS="--force --run --level=$LEVEL"
+    RAIDOPTIONS="--force --run --level=$LEVEL --metadata=$METADATA"
     [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
     ! [ "$RAID_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
     ! [ "$SPARE_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
@@ -1573,14 +1573,14 @@ autoprepare() {
     else
         DISC=$DISCS
     fi
-    SET_DEFAULTFS=""
+    DEFAULTFS=""
     BOOT_PART_SET=""
     SWAP_PART_SET=""
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
     DISC_SIZE=$(echo $(($(expr 512 '*' $(cat /sys/block/$(basename $DISC)/size))/1000000)))
-    while [ "$SET_DEFAULTFS" = "" ]; do
+    while [ "$DEFAULTFS" = "" ]; do
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
         [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
@@ -1588,6 +1588,13 @@ autoprepare() {
         [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
         [ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
         [ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
+        # create 10MB bios_grub partition for grub2 support
+        if [ "$GUIDPARAMETER" = "yes" ]; then
+            GUID_PART_SIZE="10"
+        else
+            GUID_PART_SIZE="0"
+        fi
+        DISC_SIZE=$(($DISC_SIZE-$GUID_PART_SIZE))
         while [ "$BOOT_PART_SET" = "" ]; do
             DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: $DISC_SIZE MB" 10 65 "32" 2>$ANSWER || return 1
             BOOT_PART_SIZE="$(cat $ANSWER)"
@@ -1595,7 +1602,7 @@ autoprepare() {
                 DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
             else
                 if [ "$BOOT_PART_SIZE" -ge "$DISC_SIZE" -o "$BOOT_PART_SIZE" -lt "16" -o "$SBOOT_PART_SIZE" = "$DISC_SIZE" ]; then
-                    DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+                    DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     BOOT_PART_SET=1
                 fi
@@ -1606,7 +1613,7 @@ autoprepare() {
             DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: $DISC_SIZE MB" 10 65 "256" 2>$ANSWER || return 1
             SWAP_PART_SIZE=$(cat $ANSWER)
             if [ "$SWAP_PART_SIZE" = "" -o  "$SWAP_PART_SIZE" = "0" ]; then
-                DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
                 if [ "$SWAP_PART_SIZE" -ge "$DISC_SIZE" ]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
@@ -1620,7 +1627,7 @@ autoprepare() {
         DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  $DISC_SIZE MB" 10 65 "7500" 2>$ANSWER || return 1
         ROOT_PART_SIZE=$(cat $ANSWER)
             if [ "$ROOT_PART_SIZE" = "" -o "$ROOT_PART_SIZE" = "0" ]; then
-                DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
                 if [ "$ROOT_PART_SIZE" -ge "$DISC_SIZE" ]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
@@ -1634,13 +1641,14 @@ autoprepare() {
             FSTYPE=$(cat $ANSWER)
             DIALOG --yesno "$FSTYPE will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
-        SET_DEFAULTFS=1
+        DEFAULTFS=1
     done
-    REAL_DEFAULTFS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
     DIALOG --defaultno --yesno "$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
     || return 1
     DEVICE=$DISC
-    FSSPECS=$(echo $DEFAULTFS | sed -e "s|/:7500:ext3|/:$ROOT_PART_SIZE:$FSTYPE|g" -e "s|/home:\*:ext3|/home:\*:$FSTYPE|g" -e "s|swap:256|swap:$SWAP_PART_SIZE|g" -e "s|/boot:32|/boot:$BOOT_PART_SIZE|g")
+    # default filesystem specs (the + is bootable flag)
+    #  <mountpoint>:<partsize>:<fstype>[:+]
+    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+ swap:$SWAP_PART_SIZE:swap /:$ROOT_PART_SIZE:$FSTYPE /home:*:$FSTYPE"
     sfdisk_input=""
 
     if [ "$S_MKFS" = "1" ]; then
@@ -1660,62 +1668,75 @@ autoprepare() {
         return 1
     fi
 
-    # / required
-    if [ $(echo $FSSPECS | grep '/:' | wc -l) -ne 1 ]; then
-        DIALOG --msgbox "Need exactly one root partition" 0 0
-        return 1
-    fi
-
     dev=$DEVICE
-    # we assume a /dev/hdX format (or /dev/sdX)
-    PART_ROOT="${DEVICE}3"
-
     rm -f /tmp/.fstab
-
     # disable swap and all mounted partitions, umount / last!
     _umountall
-
-    # setup input var for sfdisk
-    for fsspec in $FSSPECS; do
-        fssize=$(echo $fsspec | tr -d ' ' | cut -f2 -d:)
-        if [ "$fssize" = "*" ]; then
-                fssize_spec=';'
-        else
-                fssize_spec=",$fssize"
-        fi
-        fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
-        if [ "$fstype" = "swap" ]; then
-                fstype_spec=",S"
-        else
-                fstype_spec=","
-        fi
-        bootflag=$(echo $fsspec | tr -d ' ' | cut -f4 -d:)
-        if [ "$bootflag" = "+" ]; then
-            bootflag_spec=",*"
-        else
-            bootflag_spec=""
-        fi
-        sfdisk_input="${sfdisk_input}${fssize_spec}${fstype_spec}${bootflag_spec}\n"
-    done
-    sfdisk_input=$(printf "$sfdisk_input")
-
-    # invoke sfdisk
-    printk off
-    DIALOG --infobox "Partitioning $DEVICE" 0 0
-    # clean partitiontable to avoid issues!
-    dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
-    sfdisk $DEVICE -uM -D >$LOG 2>&1 <<EOF
+    # we assume a /dev/hdX format (or /dev/sdX)
+    if [ "$GUIDPARAMETER" = "yes" ]; then
+        PART_ROOT="${DEVICE}4"
+        # GUID(GPT) is only supported by 'parted'
+        printk off
+        DIALOG --infobox "Partitioning $DEVICE" 0 0
+        # clean partitiontable to avoid issues!
+        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+        parted -s $DEVICE mklabel GPT >$LOG
+        parted -s $DEVICE mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
+        parted -s $DEVICE set 1 bios_grub on
+        parted -s $DEVICE name 1 GRUB2
+        parted -s $DEVICE mkpart 2 ext2 $GUID_PART_SIZE $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) >$LOG
+        parted -s $DEVICE mkpart 3 linux-swap $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) >$LOG
+        parted -s $DEVICE mkpart 4 ext2 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) >$LOG
+        parted -s $DEVICE mkpart 5 ext2 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) 100% >$LOG
+    else
+        PART_ROOT="${DEVICE}3"
+        # setup input var for sfdisk
+        for fsspec in $FSSPECS; do
+            fssize=$(echo $fsspec | tr -d ' ' | cut -f2 -d:)
+            if [ "$fssize" = "*" ]; then
+                    fssize_spec=';'
+            else
+                    fssize_spec=",$fssize"
+            fi
+            fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
+            if [ "$fstype" = "swap" ]; then
+                    fstype_spec=",S"
+            else
+                    fstype_spec=","
+            fi
+            bootflag=$(echo $fsspec | tr -d ' ' | cut -f4 -d:)
+            if [ "$bootflag" = "+" ]; then
+                bootflag_spec=",*"
+            else
+                bootflag_spec=""
+            fi
+            sfdisk_input="${sfdisk_input}${fssize_spec}${fstype_spec}${bootflag_spec}\n"
+        done
+        sfdisk_input=$(printf "$sfdisk_input")
+        echo $sfdisk_input
+        # invoke sfdisk
+        printk off
+        DIALOG --infobox "Partitioning $DEVICE" 0 0
+        # clean partitiontable to avoid issues!
+        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+        # create DOS MBR with parted
+        parted -s $DEVICE mklabel msdos >/dev/null 2>&1
+        sfdisk $DEVICE -uM -D >$LOG 2>&1 <<EOF
 $sfdisk_input
 EOF
+    fi
+
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error partitioning $DEVICE (see $LOG for details)" 0 0
         printk on
         return 1
     fi
     printk on
-
+    # wait until /dev initialized correct devices
+    udevadm settle
     # need to mount root first, then do it again for the others
     part=1
+    [ "$GUIDPARAMETER" = "yes" ] && part=2
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
@@ -1727,6 +1748,7 @@ EOF
 
     # make other filesystems
     part=1
+    [ "$GUIDPARAMETER" = "yes" ] && part=2
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
@@ -2425,8 +2447,8 @@ getcryptsetup() {
 }
 
 getrootuuid() {
-    local _rootpart="${PART_ROOT}"
-    local _uuid="$(getuuid ${PART_ROOT})"
+    _rootpart="${PART_ROOT}"
+    _uuid="$(getuuid ${PART_ROOT})"
     if [ -n "${_uuid}" ]; then
         _rootpart="/dev/disk/by-uuid/${_uuid}"
     fi
@@ -2452,6 +2474,7 @@ dosyslinux() {
     getrootfs
     getraidarrays
     getcryptsetup
+    getrootuuid
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
@@ -2484,7 +2507,6 @@ dosyslinux() {
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$UUIDPARAMETER" = "yes" ]; then
-        getrootuuid
         echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2492,7 +2514,6 @@ dosyslinux() {
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$UUIDPARAMETER" = "yes" ]; then
-        getrootuuid
         echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2536,10 +2557,10 @@ dolilo() {
     getrootfs
     getraidarrays
     getcryptsetup
+    getrootuuid
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
-            getrootuuid
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
@@ -2575,6 +2596,8 @@ dolilo() {
 }
 
 dogrub() {
+    ### TODO:
+    # cleanup up some mess and eventually merge parts with grub2
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
         source_set
@@ -2597,6 +2620,7 @@ dogrub() {
     getraidarrays
     getcryptsetup
     get_grub_map
+    getrootuuid
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY="1"
@@ -2671,9 +2695,6 @@ dogrub() {
                 DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
                 return 1
         fi
-        if [ "$UUIDPARAMETER" = "yes" ]; then
-            getrootuuid
-        fi
         if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
             cp $DESTDIR/boot/grub/menu.lst /tmp/.menu.lst
             # remove the default entries by truncating the file at our little tag (#-*)
@@ -2709,7 +2730,7 @@ dogrub() {
                 echo "" >>$DESTDIR/boot/grub/menu.lst
                 # adding fallback/full image
                 NUMBER=$(($NUMBER+1))
-                echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
+                echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [ "$UUIDPARAMETER" = "yes" ]; then
@@ -2837,19 +2858,18 @@ dogrub2(){
         PACKAGES=""
     fi
     ### TODO CHECK if all parameters are needed!
-    _bootdev=""
-    _grubdev=""
     bootdev=""
     grubdev=""
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    get_grub2_map
     raiduuid=""
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY=""
-    ### TODO: check the functions and chagne them to correct grub2 usage!
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub2_map
+    getrootuuid
+    ### TODO: check the functions and change them to correct grub2 usage!
     ### raid, lvm and encrypt support needs to be added totally different!
     ### Basic devices work!
     ### TODO check this!
@@ -2857,18 +2877,37 @@ dogrub2(){
     #    USE_DMRAID=""
     #    DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     #fi
-    # try to auto-configure GRUB...
+
+    # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
+        # look for a separately-mounted /boot partition
+        subdir=""
+        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+        if [ "$bootdev" = "" ]; then
+            subdir=/boot
+            bootdev=$PART_ROOT
+        fi
         ### TODO implement this later!
         # check if raid device, devicemapper or dmraid is used
-        if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
+        if [ "$(echo $bootdev | grep /dev/md)" ]; then
             ### TODO!
             ### grub2 can boot from raid devices, raid partitions is imho unsupported
                 FAIL_RAID="0"
-            if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
+            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub2!
                 FAIL_RAID="1"
             fi
+        fi
+        if [ "$FAIL_RAID" = "0" ]; then
+            grubdev=$(basename $bootdev)
+            raiduuid=$(getuuid $bootdev)
+        else
+            # use normal device
+            grubdev=$(mapdev $bootdev)
+        fi
+        if [ "$FAIL_RAID" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from partitionable raid devices!" 0 0
+                return 1
         fi
         #    if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
         #        # get redundant devices
@@ -2893,36 +2932,7 @@ dogrub2(){
         #   fi
         #else
         #fi   
-        if [ "$FAIL_RAID" = "0" ]; then
-            _grubdev=$(basename $PART_ROOT)
-            raiduuid=$(getuuid $PART_ROOT)
-        else
-            # use normal device
-            _grubdev=$(mapdev $PART_ROOT)
-        fi
-        # look for a separately-mounted /boot partition
-        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        # remove fail if /boot is on other device!
-        ! [ "$bootdev" = "" ] && FAIL_RAID=""
-        ! [ "$bootdev" = "" ] && FAIL_DM=""
-        ### TODO implement this later!
-        # check if raid device, devicemapper or dmraid is used  on /boot partition
-        if [ "$(echo $bootdev | grep /dev/md)" ]; then
-            ### TODO!
-            ### grub2 can boot from raid devices, raid partitions is imho unsupported
-                FAIL_RAID="0"
-            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
-                # partitionable raid is not supported by grub2!
-                FAIL_RAID="1"
-            fi
-        fi
-        if [ "$FAIL_RAID" = "0" ]; then
-            _bootdev=$(basename $bootdev)
-            raiduuid=$(getuuid $bootdev)
-        else
-            # use normal device
-            _bootdev=$(mapdev $bootdev)
-        fi
+
         #    if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
         #        # get redundant devices
         #        for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
@@ -2944,70 +2954,64 @@ dogrub2(){
         #       fi
         #else
         #fi
-        if [ "$FAIL_RAID" = "1" ]; then
-                DIALOG --msgbox "Error: Grub cannot boot from partitionable raid devices!" 0 0
-                return 1
-        fi
+
         ### TODO: implement this later!
         #if [ "$FAIL_DM" = "1" ]; then
         #        DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
         #        return 1
         #fi
-        if [ "$UUIDPARAMETER" = "yes" ]; then
-            getrootuuid
-        fi
-        if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
+        if [ "$grubdev" != "" ]; then
             cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
             # remove the default entries by truncating the file at our little tag (set default)
             head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/boot/grub/grub.cfg
             rm -f /tmp/.grub.cfg
-            subdir=
-            # create correct entry array
-            if [ "$_bootdev" != "" ]; then
-                _grubdev="$_bootdev"
-            else
-                subdir="/boot"
-            fi
             ### TODO check if this is correct!
             # keep the file from being completely bogus
-            if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
-                DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
-                _grubdev="(hd0,1)"
+            if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
+                DIALOG --msgbox "Your /boot device could not be autodetected by setup.  Ensure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
+                grubdev="(hd0,1)"
             fi
             NUMBER=0
-            ### For probably not needed anymore!
             # create default grub entries
-            for grubdev in $_grubdev; do
-                echo "" >>$DESTDIR/boot/grub/grub.cfg
-                echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-                echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
-                [ "$FAIL_RAID" = "0" ] && echo "insmod raid"
+            echo "" >>$DESTDIR/boot/grub/grub.cfg
+            echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
+            echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
+            if [ "$FAIL_RAID" = "0" ]; then
+                echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
+            else
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
-                [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid"
-                if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-                else
-                    echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-                fi
-                echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/grub.cfg
-                echo "}" >>$DESTDIR/boot/grub/grub.cfg
-                echo "" >>$DESTDIR/boot/grub/grub.cfg
-                # adding fallback/full image
-                NUMBER=$(($NUMBER+1))
-                echo "# (($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-                echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
-                [ "$FAIL_RAID" = "0" ] && echo "insmod raid"
+            fi
+            [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid" >>$DESTDIR/boot/grub/grub.cfg
+            if [ "$UUIDPARAMETER" = "yes" ]; then
+                echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+            else
+                echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+            fi
+            echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/grub.cfg
+            echo "}" >>$DESTDIR/boot/grub/grub.cfg
+            echo "" >>$DESTDIR/boot/grub/grub.cfg
+            # adding fallback/full image
+            NUMBER=$(($NUMBER+1))
+            echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
+            echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
+            if [ "$FAIL_RAID" = "0" ]; then
+                echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
+            else
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
-                [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid"
-                if [ "$UUIDPARAMETER" = "yes" ]; then
-                    echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-                else
-                    echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-                fi
-                echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
-                echo "}" >>$DESTDIR/boot/grub/grub.cfg
-                NUMBER=$(($NUMBER+1))
-            done
+            fi
+            [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid" >>$DESTDIR/boot/grub/grub.cfg
+            if [ "$UUIDPARAMETER" = "yes" ]; then
+                echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+            else
+                echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
+            fi
+            echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
+            echo "}" >>$DESTDIR/boot/grub/grub.cfg
+            ### TODO:
+            #Is it possible to detect a windows installation?
+            NUMBER=$(($NUMBER+1))
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             echo "## ($NUMBER) Windows" >>$DESTDIR/boot/grub/grub.cfg
             echo "#menuentry \"Windows\" {" >>$DESTDIR/boot/grub/grub.cfg
@@ -3017,28 +3021,31 @@ dogrub2(){
         fi
     fi
 
+    # Edit grub.cfg config file
     DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, you can install GRUB2." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/boot/grub/grub.cfg
-    ### TODO:
-    # A switch is needed if advanced /boot or / is used!
-    # It doesn't make sense to present device list if advanced roots are used.
-    # Configure it that /boot partition is used or / is used to install grub2 into!
-    # - Encryption supported, i guess yes? 
-    # - Are complex raid+lvm or lvm++raid setups supported too, and how about encrytion?
 
-    ### Why is this part not in the loop???
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="$DEVS $(findbootloaderpartitions _)"
-    if [ "$DEVS" = "" ]; then
-        DIALOG --msgbox "No hard drives were found" 0 0
-        return 1
-    fi
     S_GRUB2=""
-    ### Loop probably not needed anymore!
     while [ "$S_GRUB2" = "" ]; do
-        DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
-        ROOTDEV=$(cat $ANSWER)
+        ### TODO:
+        # A switch is needed if advanced /boot or / is used!
+        # It doesn't make sense to present device list if advanced roots are used.
+        # Configure it that /boot partition is used or / is used to install grub2 into!
+        # - Encryption supported, i guess yes?
+        # - Are complex raid+lvm or lvm++raid setups supported too, and how about encrytion?
+        if [ "$FAIL_RAID" = "0" ]; then
+             DIALOG --yesno "Setup detected your system contains /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
+        else
+            DEVS="$(findbootloaderdisks _)"
+            DEVS="$DEVS $(findbootloaderpartitions _)"
+            if [ "$DEVS" = "" ]; then
+                DIALOG --msgbox "No hard drives were found" 0 0
+                return 1
+            fi
+            DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
+            bootdev=$(cat $ANSWER)
+        fi
         DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
         sync
         # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
@@ -3052,38 +3059,10 @@ dogrub2(){
                 /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
             fi
         fi
-        # look for a separately-mounted /boot partition
-        bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        #if [ "$(echo $bootpart | grep /dev/md)" ]; then
-        #    bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
-        #fi
-        if [ "$bootpart" = "" ]; then
-            if [ "$PART_ROOT" = "" ]; then
-                DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
-                bootpart=$(cat $ANSWER)
-            else
-                bootpart=$PART_ROOT
-                #if [ "$(echo $bootpart | grep /dev/md)" ]; then
-                #    bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
-                #fi
-            fi
-        fi
-        ### This should be done earlier!!!
-        bootpart=$(mapdev $bootpart)
-        bootdev=$(mapdev $ROOTDEV)
-        if [ "$bootpart" = "" ]; then
-            DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
-            return 1
-        fi
-        ### TODO, check if this is still valid!
-        if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
-            DIALOG --msgbox "GRUB2 root and setup devices could not be auto-located.  You will need to manually run the grub-install to install the bootloader." 0 0
-            return 1
-        fi
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #grub_dmraid_hack
         chroot_mount
-        chroot $DESTDIR grub-install $bootdev >> /tmp/grub2.log
+        chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
         chroot_umount
         ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #remove_grub_dmraid_hack
@@ -3198,8 +3177,10 @@ prepare_harddrive()
     S_MKFS=0
     DONE=0
     UUIDPARAMETER=""
+    GUIDPARAMETER=""
     NEXTITEM=""
     DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Only 'parted' supports this type of partition table at the moment!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
     while [ "$DONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
