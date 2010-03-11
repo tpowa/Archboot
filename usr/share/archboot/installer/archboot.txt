@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   February, 7th 2010
+   March,11th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -85,7 +85,8 @@ Introduction
    * Media and Network installation mode
    * Changing keymap and consolefont
    * Changing time and date
-   * Preparing harddisk, like auto-prepare, partitioning etc.
+   * Preparing harddisk, like auto-prepare, partitioning,
+     GUID (gpt) support etc.
    * Creation of software raid/raid partitions, lvm2 devices and 
      luks encrypted devices
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
@@ -96,7 +97,7 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub,lilo and syslinux bootloader support
+   * grub, grub2, lilo and syslinux bootloader support
 
 Archboot bootparameters
 
@@ -265,6 +266,10 @@ Common Installation Procedure
    First you will be asked if you want to use UUID for device name scheme.
    It is recommended to use UUID, in order to avoid name collisions or 
    name switching of devices.
+
+   Then you will be asked if you want to use GUID (gpt) partition table.
+   If you have no clue for what you will need it or plan to use grub2,
+   it's save to answer no.
 
    Prepare Hard Drive will lead you into a submenu offering two
    alternatives of preparing your target drive for installation.
