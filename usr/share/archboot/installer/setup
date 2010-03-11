@@ -257,7 +257,9 @@ findpartitions() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+            #- bios_grub partitions
+            # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -377,7 +379,7 @@ findbootloaderpartitions() {
                 #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
                 #- extended partition on raid partition device
                 #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" ]; then
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
                     if [ -d $block/$disk/$part ]; then
                         echo "/dev/$part"
                         [ "$1" ] && echo $1
@@ -1782,10 +1784,48 @@ partition() {
         fi
         # Leave our loop if the user is done partitioning
         [ "$DISC" = "DONE" ] && break
+        GUID_DETECTED=""
+        MSDOS_DETECTED=""
+        BIOS_GRUB=""
+        CREATE_BIOS_GRUB=""
         if ! [ "$DISC" = "" ]; then
-            # Partition disc
-            DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.  NOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on to step 2." 18 70
-            cfdisk $DISC
+            if [ "$GUIDPARAMETER" = "yes" ]; then
+                [ "$(parted -s $DISC print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
+                [ "$(parted -s $DISC print | grep "bios_grub")" ] && BIOS_GRUB=1
+                if [ "$GUID_DETECTED" = "" ] ; then
+                     DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to create a GUID (gpt) partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+                     # clean partitiontable to avoid issues!
+                     dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+                     parted -s $DISC mklabel GPT >$LOG
+                fi
+                if [ "$BIOS_GRUB" = "" ]; then
+                    DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 10MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+                fi
+                if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
+                    # assume new partitiontable,if no GUID was already there,
+                    # no user interaction needed for bios_grub partition, jippie
+                    GUID_PART_SIZE="10"
+                    parted -s $DISC mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
+                    parted -s $DISC set 1 bios_grub on >$LOG
+                else
+                    [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 10MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+10>\nset <partitionnumber> bios_grub on" 0 0
+                fi
+                DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+                clear
+                parted $DISC print
+                parted $DISC
+            else
+                [ "$(parted $DISC print | grep "Partition Table: msdos")" ] && MSDOS_DETECTED=1
+                if [ "$MSDOS_DETECTED" = "" ] ; then
+                    DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on $DISC.\nDo you want to create a MS-DOS partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+                    # clean partitiontable to avoid issues!
+                    dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+                    parted -s $DISC mklabel msdos >$LOG
+                fi
+                # Partition disc
+                DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nNOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+                cfdisk $DISC
+            fi
         fi
     done
     # update dmraid
