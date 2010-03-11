@@ -91,7 +91,7 @@ chroot_umount()
 # returns:    nothing
 getuuid()
 {
-    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" ]; then
+    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" ]; then
         echo "$(blkid -s UUID -o value ${1})"
     fi
 }
@@ -926,7 +926,7 @@ _raid()
             PARTIY=$(cat $ANSWER)
         fi
         METADATA="default"
-        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format, this will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
+        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format?\n\nThis will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -1041,7 +1041,7 @@ _raidpartitions()
             PARTIY=$(cat $ANSWER)
         fi
         METADATA="default"
-        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format, this will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
+        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format?\n\nThis will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -1113,7 +1113,7 @@ _createraid()
             # get partition number of device
             l=$(echo $i | sed -e 's#.*p##g')
             DIALOG --infobox "Changing device $k$l to raid..." 0 0
-            sfdisk --change-id $k $l fd >$LOG 2>&1
+            [ "$GUIDPARAMETER" = "" ] && sfdisk --change-id $k $l fd >$LOG 2>&1
         done
     else
         for i in $(cat /tmp/.raid | grep -v missing); do
@@ -1137,7 +1137,7 @@ _createraid()
             DIALOG --infobox "Changing device $k$l to raid..." 0 0
             # only change id where it is possible!
             if [ "$(echo /dev/mapper/$(dmraid -s -c) | grep $i)" -o "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" -o "$(echo $i | grep /dev/ida/)" -o "$(echo $i | grep /dev/cciss/)" ]; then
-                sfdisk --change-id $k $l fd >$LOG 2>&1
+                [ "$GUIDPARAMETER" = "" ] && sfdisk --change-id $k $l fd >$LOG 2>&1
             fi
         done
     fi
@@ -2886,18 +2886,14 @@ dogrub2(){
     ### TODO CHECK if all parameters are needed!
     bootdev=""
     grubdev=""
-    raiduuid=""
-    FAIL_RAID=""
-    FAIL_DM=""
+    complexuuid=""
+    FAIL_COMPLEX=""
     GRUB_LEGACY=""
     getrootfs
     getraidarrays
     getcryptsetup
     get_grub2_map
     getrootuuid
-    ### TODO: check the functions and change them to correct grub2 usage!
-    ### raid, lvm and encrypt support needs to be added totally different!
-    ### Basic devices work!
     ### TODO check this!
     #if ! [ "$(dmraid -r | grep ^no )" ]; then
     #    USE_DMRAID=""
@@ -2913,85 +2909,32 @@ dogrub2(){
             subdir=/boot
             bootdev=$PART_ROOT
         fi
-        ### TODO implement this later!
+        ### TODO: Does dmraid work?
         # check if raid device, devicemapper or dmraid is used
-        if [ "$(echo $bootdev | grep /dev/md)" ]; then
-            ### TODO!
-            ### grub2 can boot from raid devices, raid partitions is imho unsupported
-                FAIL_RAID="0"
+        if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+            ### grub2 can boot from lvm and raid devices
+                FAIL_COMPLEX="0"
             if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub2!
-                FAIL_RAID="1"
+                FAIL_COMPLEX="1"
             fi
         fi
-        if [ "$FAIL_RAID" = "0" ]; then
+        if [ "$FAIL_COMPLEX" = "0" ]; then
             grubdev=$(basename $bootdev)
-            raiduuid=$(getuuid $bootdev)
+            complexuuid=$(getuuid $bootdev)
         else
             # use normal device
             grubdev=$(mapdev $bootdev)
         fi
-        if [ "$FAIL_RAID" = "1" ]; then
-                DIALOG --msgbox "Error: Grub cannot boot from partitionable raid devices!" 0 0
+        if [ "$FAIL_COMPLEX" = "1" ]; then
+                DIALOG --msgbox "Error: Grub cannot boot from your created devices!" 0 0
                 return 1
         fi
-        #    if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
-        #        # get redundant devices
-        #       for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-        #            _grubdev="$_grubdev $(mapdev $i)"
-        #        done
-        #        redundant="1"
-        #    else
-        #        # none raid1 devices are not bootable with grub, let it fail!
-        #        FAIL_RAID="1"
-        #    fi
-        #    if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
-        #        # partitionable raid is not supported by grub!
-        #        FAIL_RAID="1"
-        #    fi
-        #elif [ "$(echo $PART_ROOT | grep /dev/mapper)" ]; then
-        #    # dmraid check
-        #    if ! [ "$(dmsetup info $PART_ROOT | grep 'DMRAID')" ]; then
-        #        FAIL_DM="1"
-        #    else
-        #        _grubdev=$(mapdev $PART_ROOT)
-        #   fi
-        #else
-        #fi   
-
-        #    if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
-        #        # get redundant devices
-        #        for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-        #            _bootdev="$_bootdev $i"
-        #        done
-        #        redundant="1"
-        #        # remove fail if /boot is raid1!
-        #        FAIL_RAID=""
-        #    else
-        #        # none raid1 devices are not bootable with grub, let it fail!
-        #        FAIL_RAID="1"
-        #    fi
-        #elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
-        #        if ! [ "$(dmsetup info $bootdev | grep 'DMRAID')" ]; then
-        #            FAIL_DM="1"
-        #        else
-        #            FAIL_DM=""
-        #            _bootdev=$bootdev
-        #       fi
-        #else
-        #fi
-
-        ### TODO: implement this later!
-        #if [ "$FAIL_DM" = "1" ]; then
-        #        DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
-        #        return 1
-        #fi
         if [ "$grubdev" != "" ]; then
             cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
             # remove the default entries by truncating the file at our little tag (set default)
             head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/boot/grub/grub.cfg
             rm -f /tmp/.grub.cfg
-            ### TODO check if this is correct!
             # keep the file from being completely bogus
             if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
                 DIALOG --msgbox "Your /boot device could not be autodetected by setup.  Ensure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
@@ -3000,15 +2943,16 @@ dogrub2(){
             NUMBER=0
             # create default grub entries
             echo "" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_COMPLEX" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_COMPLEX" = "0" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
             echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
             echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
-            [ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$FAIL_RAID" = "0" ]; then
+            if [ "$FAIL_COMPLEX" = "0" ]; then
                 echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
-            [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
             if [ "$UUIDPARAMETER" = "yes" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
@@ -3021,13 +2965,13 @@ dogrub2(){
             NUMBER=$(($NUMBER+1))
             echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
             echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
-            [ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$FAIL_RAID" = "0" ]; then
+            #[ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
+            if [ "$FAIL_COMPLEX" = "0" ]; then
                 echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
-            [ "$FAIL_RAID" = "0" ] && echo "search --fs-uuid --set $raiduuid" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
             if [ "$UUIDPARAMETER" = "yes" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
@@ -3054,14 +2998,44 @@ dogrub2(){
 
     S_GRUB2=""
     while [ "$S_GRUB2" = "" ]; do
-        ### TODO:
         # A switch is needed if advanced /boot or / is used!
         # It doesn't make sense to present device list if advanced roots are used.
         # Configure it that /boot partition is used or / is used to install grub2 into!
-        # - Encryption supported, i guess yes?
-        # - Are complex raid+lvm or lvm++raid setups supported too, and how about encrytion?
-        if [ "$FAIL_RAID" = "0" ]; then
-             DIALOG --yesno "Setup detected your system contains /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
+        # LVM needs the mbr of a device
+        ### TODO:
+        # - Encryption not supported by grub2!
+
+        if [ "$FAIL_COMPLEX" = "0" ]; then
+             #check if mapper contains a md device!
+             if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
+                 # use function below if no raid is detected!
+                 RAID_ON_LVM="no"
+                 for devpath in $(pvs -o pv_name --noheading); do
+                     #check if mapper devices!
+                     if [ "$(echo $devpath | grep /dev/md)" ]; then
+                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
+                             # change bootdev to md device!
+                             real_bootdev=$bootdev
+                             bootdev=$(pvs -o pv_name --noheading $devpath)
+                             RAID_ON_LVM="yes"
+                             break
+                         fi
+                     fi
+                 done
+             fi
+             if [ "$RAID_ON_LVM" = "no" ]; then
+                 DEVS="$(findbootloaderdisks _)"
+                 if [ "$DEVS" = "" ]; then
+                     DIALOG --msgbox "No hard drives were found" 0 0
+                     return 1
+                 fi
+                 DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 $DEVS 2>$ANSWER || return 1
+                 bootdev=$(cat $ANSWER)
+             fi
+             if [ "$(echo $bootdev | grep /dev/md)" ]; then
+                 DIALOG --yesno "Setup detected your system contains /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
+             fi
         else
             DEVS="$(findbootloaderdisks _)"
             DEVS="$DEVS $(findbootloaderpartitions _)"
@@ -3087,14 +3061,24 @@ dogrub2(){
         fi
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #grub_dmraid_hack
+        ### HACK create no symlinked device mapper devices, else grub-install will fail!
+        # grub2 needs to be fixed here!
+        if [ "$FAIL_COMPLEX" = "0" -a "$(echo $bootdev | grep /dev/mapper)" ]; then
+            rm $bootdev
+            dmsetup mknodes
+        fi
+        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "yes" ]; then
+            rm $real_bootdev
+            dmsetup mknodes
+        fi
         chroot_mount
         chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
         chroot_umount
         ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
         #remove_grub_dmraid_hack
         cat /tmp/grub2.log >$LOG
-        if grep "Error [0-9]*: " /tmp/grub2.log >/dev/null; then
-            DIALOG --msgbox "Error installing GRUB2. (see $LOG for output)" 0 0
+        if ! [ -s /tmp/grub2.log ] ; then
+            DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
             return 1
         fi
         DIALOG --msgbox "GRUB2 was successfully installed." 0 0
