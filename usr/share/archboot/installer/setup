@@ -2481,6 +2481,7 @@ getrootuuid() {
 }
 
 dosyslinux() {
+    USE_DMRAID=""
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
         ### HACK!
@@ -2511,7 +2512,7 @@ dosyslinux() {
     # syslinux only can boot from vfat partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
     if ! [ "$FSTYPE" = "vfat" ]; then
-        DIALOG --msgbox "Error: Couldn't find vfat boot partition." 0 0
+        DIALOG --msgbox "Error: Couldn't find vfat /boot partition." 0 0
         return 1
     fi
     DEVS="$(findbootloaderdisks _)"
@@ -2571,6 +2572,7 @@ dosyslinux() {
 }
 
 dolilo() {
+    USE_DMRAID=""
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
         source_set
@@ -2624,19 +2626,6 @@ dolilo() {
 dogrub() {
     ### TODO:
     # cleanup up some mess and eventually merge parts with grub2
-    if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
-        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
-        source_set
-        prepare_pacman
-        PACKAGES="grub"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
-    fi
-    if ! [ "$(dmraid -r | grep ^no )" ]; then
-        USE_DMRAID=""
-        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
-    fi
     _bootdev=""
     _grubdev=""
     bootdev=""
@@ -2650,6 +2639,19 @@ dogrub() {
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY="1"
+    USE_DMRAID=""
+    if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
+        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
+        source_set
+        prepare_pacman
+        PACKAGES="grub"
+        run_pacman
+        # reset PACKAGES after installing
+        PACKAGES=""
+    fi
+    if ! [ "$(dmraid -r | grep ^no )" ]; then
+        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
+    fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
         # check if raid device, devicemapper or dmraid is used
@@ -2867,6 +2869,23 @@ EOF
 }
 
 dogrub2(){
+    ### TODO:
+    # - dmraid doesn't work:
+    #   https://bugs.launchpad.net/ubuntu/+source/ubuntu-meta/+bug/436340
+    #   grub2 restriction due to messy dmraid mapping
+    # - Encryption is not supported by grub2 yet!
+    bootdev=""
+    grubdev=""
+    complexuuid=""
+    FAIL_COMPLEX=""
+    GRUB_LEGACY=""
+    USE_DMRAID=""
+    RAID_ON_LVM=""
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub2_map
+    getrootuuid
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2883,28 +2902,9 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    bootdev=""
-    grubdev=""
-    complexuuid=""
-    FAIL_COMPLEX=""
-    GRUB_LEGACY=""
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    get_grub2_map
-    getrootuuid
-    ### TODO:
-    # - dmraid doesn't work:
-    #   https://bugs.launchpad.net/ubuntu/+source/ubuntu-meta/+bug/436340
-    #   grub2 restriction due to messy dmraid mapping
-    # - Encryption not supported by grub2!
-
-    ### TODO check this!
-    #if ! [ "$(dmraid -r | grep ^no )" ]; then
-    #    USE_DMRAID=""
-    #    DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
-    #fi
-
+    if ! [ "$(dmraid -r | grep ^no )" ]; then
+        DIALOG --yesno "Setup detected a running dmraid device.\nGrub2 doesn't support booting from any dmraid device!\n\nDo you want to install grub2 on an other device?" 0 0 || return 1
+    fi
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
         # look for a separately-mounted /boot partition
@@ -2926,12 +2926,31 @@ dogrub2(){
         if [ "$FAIL_COMPLEX" = "0" ]; then
             grubdev=$(basename $bootdev)
             complexuuid=$(getuuid $bootdev)
+            # check if mapper is used
+            if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
+                RAID_ON_LVM="0"
+                #check if mapper contains a md device!
+                for devpath in $(pvs -o pv_name --noheading); do
+                    if [ "$(echo $devpath | grep /dev/md)" ]; then
+                        detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
+                        if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
+                            # change bootdev to md device!
+                            real_bootdev=$bootdev
+                            bootdev=$(pvs -o pv_name --noheading $devpath)
+                            RAID_ON_LVM="1"
+                            break
+                        fi
+                    fi
+                done
+             fi
+             USE_RAID=""
+             [ "$(echo $bootdev | grep /dev/md)" ] && USE_RAID="1"
         else
             # use normal device
             grubdev=$(mapdev $bootdev)
         fi
         if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error: Grub cannot boot from your created devices!" 0 0
+                DIALOG --msgbox "Error: Grub2 cannot boot from your created devices!" 0 0
                 return 1
         fi
         if [ "$grubdev" != "" ]; then
@@ -2948,8 +2967,8 @@ dogrub2(){
             # create default grub entries
             # insert both raid and lvm, it doesn't hurt!
             echo "" >>$DESTDIR/boot/grub/grub.cfg
-            [ "$FAIL_COMPLEX" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
-            [ "$FAIL_COMPLEX" = "0" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
+            [ "$USE_RAID" = "1" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
+            ! [ "$RAID_ON_LVM" = "" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
             echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
             echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
             if [ "$FAIL_COMPLEX" = "0" ]; then
@@ -3002,30 +3021,12 @@ dogrub2(){
 
     S_GRUB2=""
     while [ "$S_GRUB2" = "" ]; do
-        # A switch is needed if advanced /boot or / is used!
-        # - It doesn't make sense to present device list if raid and raid+lvm root or /boot are used.
-        # - Configure it that /boot partition is used or / is used to install grub2 into!
-        # - LVM needs the MBR of a device and cannot be used as $bootdev
+        # A switch is needed if complex $bootdev is used!
+        # - It doesn't make sense to present device list, if raid or raid+lvm is used for $bootdev.
+        # - LVM $bootdev needs the MBR of a device and cannot be used itself as $bootdev
         if [ "$FAIL_COMPLEX" = "0" ]; then
-             #check if mapper contains a md device!
-             if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
-                 # use function below if no raid is detected!
-                 RAID_ON_LVM="no"
-                 for devpath in $(pvs -o pv_name --noheading); do
-                     #check if mapper devices!
-                     if [ "$(echo $devpath | grep /dev/md)" ]; then
-                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
-                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
-                             # change bootdev to md device!
-                             real_bootdev=$bootdev
-                             bootdev=$(pvs -o pv_name --noheading $devpath)
-                             RAID_ON_LVM="yes"
-                             break
-                         fi
-                     fi
-                 done
-             fi
-             if [ "$RAID_ON_LVM" = "no" ]; then
+             # use function below if no raid is detected!
+             if [ "$RAID_ON_LVM" = "0" ]; then
                  DEVS="$(findbootloaderdisks _)"
                  if [ "$DEVS" = "" ]; then
                      DIALOG --msgbox "No hard drives were found" 0 0
@@ -3034,7 +3035,7 @@ dogrub2(){
                  DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 $DEVS 2>$ANSWER || return 1
                  bootdev=$(cat $ANSWER)
              fi
-             if [ "$(echo $bootdev | grep /dev/md)" ]; then
+             if [ "$USE_RAID"  = "1" ]; then
                  DIALOG --yesno "Setup detected your system contains /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
              fi
         else
@@ -3063,12 +3064,12 @@ dogrub2(){
         ### HACK create no symlinked device mapper devices, else grub-install will fail!
         # grub2 needs to be fixed here!
         # for simple lvm device!
-        if [ "$FAIL_COMPLEX" = "0" -a "$(echo $bootdev | grep /dev/mapper)" ]; then
+        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "0" ]; then
             rm $bootdev
             dmsetup mknodes
         fi
         # hidden md device by lvm, you need to delete the lvm symlink not /dev/md!
-        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "yes" ]; then
+        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "1" ]; then
             rm $real_bootdev
             dmsetup mknodes
         fi
