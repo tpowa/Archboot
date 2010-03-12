@@ -2893,6 +2893,12 @@ dogrub2(){
     getcryptsetup
     get_grub2_map
     getrootuuid
+    ### TODO:
+    # - dmraid doesn't work:
+    #   https://bugs.launchpad.net/ubuntu/+source/ubuntu-meta/+bug/436340
+    #   grub2 restriction due to messy dmraid mapping
+    # - Encryption not supported by grub2!
+
     ### TODO check this!
     #if ! [ "$(dmraid -r | grep ^no )" ]; then
     #    USE_DMRAID=""
@@ -2908,10 +2914,9 @@ dogrub2(){
             subdir=/boot
             bootdev=$PART_ROOT
         fi
-        ### TODO: Does dmraid work?
-        # check if raid device, devicemapper or dmraid is used
+      # check if raid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
-            ### grub2 can boot from lvm and raid devices
+            # grub2 can boot from lvm and raid devices
                 FAIL_COMPLEX="0"
             if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub2!
@@ -2941,6 +2946,7 @@ dogrub2(){
             fi
             NUMBER=0
             # create default grub entries
+            # insert both raid and lvm, it doesn't hurt!
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             [ "$FAIL_COMPLEX" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
             [ "$FAIL_COMPLEX" = "0" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
@@ -2964,7 +2970,6 @@ dogrub2(){
             NUMBER=$(($NUMBER+1))
             echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
             echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
-            #[ "$FAIL_RAID" = "0" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
             if [ "$FAIL_COMPLEX" = "0" ]; then
                 echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
             else
@@ -2979,7 +2984,7 @@ dogrub2(){
             echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
             echo "}" >>$DESTDIR/boot/grub/grub.cfg
             ### TODO:
-            #Is it possible to detect a windows installation?
+            # Is it possible to detect a windows installation?
             NUMBER=$(($NUMBER+1))
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             echo "## ($NUMBER) Windows" >>$DESTDIR/boot/grub/grub.cfg
@@ -2998,11 +3003,9 @@ dogrub2(){
     S_GRUB2=""
     while [ "$S_GRUB2" = "" ]; do
         # A switch is needed if advanced /boot or / is used!
-        # It doesn't make sense to present device list if advanced roots are used.
-        # Configure it that /boot partition is used or / is used to install grub2 into!
-        # LVM needs the mbr of a device
-        ### TODO:
-        # - Encryption not supported by grub2!
+        # - It doesn't make sense to present device list if raid and raid+lvm root or /boot are used.
+        # - Configure it that /boot partition is used or / is used to install grub2 into!
+        # - LVM needs the MBR of a device and cannot be used as $bootdev
         if [ "$FAIL_COMPLEX" = "0" ]; then
              #check if mapper contains a md device!
              if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
@@ -3057,14 +3060,14 @@ dogrub2(){
                 /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
             fi
         fi
-        ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
-        #grub_dmraid_hack
         ### HACK create no symlinked device mapper devices, else grub-install will fail!
         # grub2 needs to be fixed here!
+        # for simple lvm device!
         if [ "$FAIL_COMPLEX" = "0" -a "$(echo $bootdev | grep /dev/mapper)" ]; then
             rm $bootdev
             dmsetup mknodes
         fi
+        # hidden md device by lvm, you need to delete the lvm symlink not /dev/md!
         if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "yes" ]; then
             rm $real_bootdev
             dmsetup mknodes
@@ -3072,8 +3075,6 @@ dogrub2(){
         chroot_mount
         chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
         chroot_umount
-        ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
-        #remove_grub_dmraid_hack
         cat /tmp/grub2.log >$LOG
         if ! [ -s /tmp/grub2.log ] ; then
             DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
