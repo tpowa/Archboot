@@ -2891,7 +2891,7 @@ dogrub2(){
     ### TODO:
     # Gpt checks:
     # - add gpt check, especially for complex devices!
-    # - add bios_grub check if gpt is used!
+    #   bios_grub is needed if gpt is used!
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2935,8 +2935,7 @@ dogrub2(){
                 RAID_ON_LVM="0"
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
-                    ### TODO: add check if raid partition is used!
-                    if [ "$(echo $devpath | grep /dev/md)" ]; then
+                    if [ "$(echo $devpath | | grep -v /dev/md_d | grep /dev/md)" ]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
                             # change bootdev to md device!
@@ -2958,8 +2957,17 @@ dogrub2(){
             # use normal device
             grubdev=$(mapdev $bootdev)
         fi
+        if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+            if ! [ "$(parted -sl | grep "bios_grub")" ]; then
+                DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 additionally to an other device, which contains a msdos partition table?" 0 0 || return 1
+            fi
+        else
+            if [ "$FAIL_COMPLEX" = "0" ]; then
+                DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
+            fi
+        fi
         if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error: Grub2 cannot boot from your device, which contains /boot!\n\nPossible error sources:\n- raid device has no 0.90 superblock format\n- raid partitions are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+                DIALOG --msgbox "Error: Grub2 cannot boot from your device, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partitions (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
                 return 1
         fi
         if [ "$grubdev" != "" ]; then
@@ -3070,7 +3078,8 @@ dogrub2(){
                 /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
             fi
         fi
-        ### HACK create no symlinked device mapper devices, else grub-install will fail!
+        ### HACK:
+        # create no symlinked device mapper devices, else grub-install will fail!
         # grub2 needs to be fixed here!
         # for simple lvm device!
         if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "0" ]; then
