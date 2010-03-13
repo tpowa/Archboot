@@ -1106,6 +1106,7 @@ _createraid()
     fi
     # writing raid information to partition table
     if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
+        ### TODO: GPT support missing here!
         for i in $(sfdisk -l $RAIDDEVICE | grep ^/dev | grep -v Empty | grep -v Extended | sed -e 's# .*##g'); do
             # output will be /dev/md_d0*
             # get device name

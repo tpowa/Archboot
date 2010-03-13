@@ -23,7 +23,7 @@ smbclient tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware part
 v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl \
 gmp heimdal sqlite3 db dbus-core libcap fsarchiver iwlwifi-5150-ucode xz-utils librpcsecgss libtirpc \
 wipe ddrescue testdisk clamav iwlwifi-1000-ucode iwlwifi-6000-ucode ar9170-fw rt2870usb-fw ifplugd \
-libdaemon nouveau-drm nouveau-firmware wpa_actiond rfkill libgssglue"
+libdaemon nouveau-drm nouveau-firmware wpa_actiond rfkill libgssglue gdisk"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
