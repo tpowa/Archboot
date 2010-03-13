@@ -2870,11 +2870,12 @@ EOF
 }
 
 dogrub2(){
-    ### TODO:
+    ### Grub2 restrictions:
     # - dmraid doesn't work:
     #   https://bugs.launchpad.net/ubuntu/+source/ubuntu-meta/+bug/436340
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
+    # - raid with no supperblock 0.90 is not supported by grub2 yet!
     bootdev=""
     grubdev=""
     complexuuid=""
@@ -2887,6 +2888,10 @@ dogrub2(){
     getcryptsetup
     get_grub2_map
     getrootuuid
+    ### TODO:
+    # Gpt checks:
+    # - add gpt check, especially for complex devices!
+    # - add bios_grub check if gpt is used!
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2903,9 +2908,6 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    if ! [ "$(dmraid -r | grep ^no )" ]; then
-        DIALOG --yesno "Setup detected a running dmraid device.\nGrub2 doesn't support booting from any dmraid device!\n\nDo you want to install grub2 on an other device?" 0 0 || return 1
-    fi
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
         # look for a separately-mounted /boot partition
@@ -2915,12 +2917,13 @@ dogrub2(){
             subdir=/boot
             bootdev=$PART_ROOT
         fi
-      # check if raid or device devicemapper is used
+      # check if raid, raid partitions, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
-            # grub2 can boot from lvm and raid devices
+                # boot from lvm and raid devices is supported
                 FAIL_COMPLEX="0"
-            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
-                # partitionable raid is not supported by grub2!
+            if [ "$(echo $bootdev | grep /dev/md_d)" -o "$(dmsetup info $bootdev | grep 'DMRAID')" -o "$(cryptsetup status $bootdev)" ]; then
+                # raid with no supperblock 0.90, partitionable raid, dmraid and encryption
+                # devices are not supported
                 FAIL_COMPLEX="1"
             fi
         fi
@@ -2932,6 +2935,7 @@ dogrub2(){
                 RAID_ON_LVM="0"
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
+                    ### TODO: add check if raid partition is used!
                     if [ "$(echo $devpath | grep /dev/md)" ]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
@@ -2945,13 +2949,17 @@ dogrub2(){
                 done
              fi
              USE_RAID=""
-             [ "$(echo $bootdev | grep /dev/md)" ] && USE_RAID="1"
+             if [ "$(echo $bootdev | grep /dev/md)" ]; then
+                 # check if raid superblock is 0.90 format, if not fail
+                 [ "$(mdadm -Q --detail $bootdev | grep 'Version : 0.90')" ] || FAIL_COMPLEX="1"
+                 USE_RAID="1"
+             fi
         else
             # use normal device
             grubdev=$(mapdev $bootdev)
         fi
         if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error: Grub2 cannot boot from your created devices!" 0 0
+                DIALOG --msgbox "Error: Grub2 cannot boot from your device, which contains /boot!\n\nPossible error sources:\n- raid device has no 0.90 superblock format\n- raid partitions are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
                 return 1
         fi
         if [ "$grubdev" != "" ]; then
@@ -2961,7 +2969,7 @@ dogrub2(){
             rm -f /tmp/.grub.cfg
             # keep the file from being completely bogus
             if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
-                DIALOG --msgbox "Your /boot device could not be autodetected by setup.  Ensure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
+                DIALOG --msgbox "Your device containing /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
                 grubdev="(hd0,1)"
             fi
             NUMBER=0
@@ -3016,7 +3024,7 @@ dogrub2(){
     fi
 
     # Edit grub.cfg config file
-    DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, you can install GRUB2." 0 0
+    DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/boot/grub/grub.cfg
 
