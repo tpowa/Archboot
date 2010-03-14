@@ -480,6 +480,13 @@ geteditor() {
     esac
 }
 
+# set uuid usage
+set_uuid() {
+    UUIDPARAMETER=""
+    DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme in config files?" 0 0 && UUIDPARAMETER=yes
+    UUID_RUN="1"
+}
+
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
 #
@@ -1333,6 +1340,7 @@ autoprepare() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
+    [ "$UUID_RUN" = "" ] && set_uuid
     DISCS=$(default_blockdevices)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
@@ -1601,6 +1609,7 @@ partition() {
 }
 
 mountpoints() {
+    [ "$UUID_RUN" = "" ] && set_uuid
     while [ "$PARTFINISH" != "DONE" ]; do
     : >/tmp/.fstab
     : >/tmp/.parts
@@ -1968,6 +1977,7 @@ select_packages() {
 #
 install_packages() {
     source_set
+    [ "$UUID_RUN" = "" ] && set_uuid
     if [ "$MODE" = "media" ]; then
         if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
             DIALOG --msgbox "You must select packages first." 0 0
@@ -2247,7 +2257,6 @@ getrootuuid() {
 }
 
 dosyslinux() {
-    USE_DMRAID=""
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
         ### HACK!
@@ -2264,6 +2273,8 @@ dosyslinux() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    [ "$UUID_RUN" = "" ] && set_uuid
+    USE_DMRAID=""
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2347,7 +2358,6 @@ dosyslinux() {
 }
 
 dolilo() {
-    USE_DMRAID=""
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
         source_set
@@ -2357,6 +2367,8 @@ dolilo() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    USE_DMRAID=""
+    [ "$UUID_RUN" = "" ] && set_uuid
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2411,6 +2423,7 @@ dogrub() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    [ "$UUID_RUN" = "" ] && set_uuid
     grubdev=""
     _grubdev=""
     bootdev=""
@@ -2611,6 +2624,7 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    [ "$UUID_RUN" = "" ] && set_uuid
     bootdev=""
     grubdev=""
     complexuuid=""
@@ -2907,10 +2921,8 @@ prepare_harddrive()
     S_MKFSAUTO=0
     S_MKFS=0
     DONE=0
-    UUIDPARAMETER=""
     GUIDPARAMETER=""
     NEXTITEM=""
-    DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
     DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
     while [ "$DONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
