@@ -2503,19 +2503,24 @@ dosyslinux() {
     getraidarrays
     getcryptsetup
     getrootuuid
-    DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
-        DIALOG --msgbox "Error: Couldn't find separate /boot partition." 0 0
+        DIALOG --msgbox "Error:\nCouldn't find separate /boot partition." 0 0
         return 1
     fi
     # syslinux only can boot from vfat partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
     if ! [ "$FSTYPE" = "vfat" ]; then
-        DIALOG --msgbox "Error: Couldn't find vfat /boot partition." 0 0
+        DIALOG --msgbox "Error:\nCouldn't find vfat /boot partition." 0 0
         return 1
     fi
+    # syslinux cannot boot from any raid, raid_partitions, ecncrypted and dmraid device
+    if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+        DIALOG --msgbox "Error:\nSyslinux cannot boot from any raid, raid partition, ecncrypted or dmraid device." 0 0
+        return 1
+    fi
+    DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
