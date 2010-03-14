@@ -2271,6 +2271,10 @@ dosyslinux() {
         DIALOG --msgbox "Error:\nSyslinux cannot boot from any raid, raid partition, ecncrypted or dmraid device." 0 0
         return 1
     fi
+    # check on GUID (gpt)
+    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nSyslinux doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install syslinux to an other device, which contains a msdos partition table?" 0 0 || return 1
+    fi
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
@@ -2343,6 +2347,10 @@ dolilo() {
     getraidarrays
     getcryptsetup
     getrootuuid
+    # check on GUID (gpt)
+    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
+    fi
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
@@ -2408,6 +2416,10 @@ dogrub() {
     fi
     if ! [ "$(dmraid -r | grep ^no )" ]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
+    fi
+    # check on GUID (gpt)
+    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
