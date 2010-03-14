@@ -1104,48 +1104,6 @@ _createraid()
         DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
         cfdisk $RAIDDEVICE
     fi
-    # writing raid information to partition table
-    if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
-        ### TODO: GPT support missing here!
-        for i in $(sfdisk -l $RAIDDEVICE | grep ^/dev | grep -v Empty | grep -v Extended | sed -e 's# .*##g'); do
-            # output will be /dev/md_d0*
-            # get device name
-            k=$(echo $i | sed -e 's#p[0-9]##g')
-            # get partition number of device
-            l=$(echo $i | sed -e 's#.*p##g')
-            DIALOG --infobox "Changing device $k$l to raid..." 0 0
-            [ "$GUIDPARAMETER" = "" ] && sfdisk --change-id $k $l fd >$LOG 2>&1
-        done
-    else
-        for i in $(cat /tmp/.raid | grep -v missing); do
-            # get device name
-            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" ]; then
-                k=$(echo $i | sed -e 's#p[0-9].*$##')
-            else
-                k=$(echo $i | sed -e 's#[0-9].*$##g')
-            fi
-            # get partition number of device
-            if ! [ "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" ]; then
-                if [ "$(echo $i | egrep 'p[0-9].*$')" ]; then
-                    l=$(echo $i | sed -e 's#.*p##g')
-                fi
-            else
-                if [ "$(echo $i | egrep '[0-9]$')" ]; then
-                    # /dev/hdXY
-                    l=$(echo $i | cut -b9-)
-                fi
-            fi
-            DIALOG --infobox "Changing device $k$l to raid..." 0 0
-            # only change id where it is possible!
-            if [ "$(echo /dev/mapper/$(dmraid -s -c) | grep $i)" -o "$(echo $i | grep /dev/sd)" -o "$(echo $i | grep /dev/hd)" -o "$(echo $i | grep /dev/ida/)" -o "$(echo $i | grep /dev/cciss/)" ]; then
-                [ "$GUIDPARAMETER" = "" ] && sfdisk --change-id $k $l fd >$LOG 2>&1
-            fi
-        done
-    fi
-    if [ $? -gt 0 ]; then
-        DIALOG --msgbox "Error changing partition $k$l to raid (see $LOG for details)." 0 0
-        return 1
-    fi
 }
 
 # help for lvm
@@ -2631,7 +2589,7 @@ dolilo() {
 
 dogrub() {
     ### TODO:
-    # cleanup up some mess and eventually merge parts with grub2
+    # cleanup up some mess and eventually merge parts from grub2 part
     _bootdev=""
     _grubdev=""
     bootdev=""
