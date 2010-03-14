@@ -2069,7 +2069,7 @@ auto_locale()
         sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
     done
     DIALOG --infobox "Generating glibc base locales..." 4 40
-    chroot ${DESTDIR} locale-gen >/dev/null
+    chroot ${DESTDIR} locale-gen >/dev/null 2>&1
 }
 
 # auto_mdadm()
