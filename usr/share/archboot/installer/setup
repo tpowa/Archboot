@@ -940,7 +940,7 @@ _raid()
         LEVEL=$(cat $ANSWER)
         # raid5 and raid10 support parity parameter
         PARITY=""
-        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
+        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid6" -o "$LEVEL" = "raid10" ]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
