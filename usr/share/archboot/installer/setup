@@ -327,6 +327,20 @@ findbootloaderpartitions() {
     fi
 }
 
+# freeze and unfreeze xfs, as hack for grub/grub2 installing
+freeze_xfs() {
+        if [ -x /usr/sbin/xfs_freeze ]; then
+            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
+            fi
+            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
+                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
+            fi
+        fi
+}
+
 get_grub_map() {
     rm /tmp/dev.map
     DIALOG --infobox "Generating GRUB device map...\nThis could take a while.\n\n Please be patient." 0 0
@@ -2389,9 +2403,6 @@ dolilo() {
 }
 
 dogrub() {
-    ### TODO:
-    # cleanup up some mess and eventually merge parts from grub2 part
-    _bootdev=""
     _grubdev=""
     bootdev=""
     grubdev=""
@@ -2421,13 +2432,24 @@ dogrub() {
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
+    if [ "$PART_ROOT" = "" ]; then
+        DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
+        PART_ROOT=$(cat $ANSWER)
+    fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
-        # check if raid device, devicemapper or dmraid is used
-        if [ "$(echo $PART_ROOT | grep /dev/md)" ]; then
-            if [ "$(mdadm --detail $PART_ROOT | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+        # look for a separately-mounted /boot partition
+        subdir=""
+        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+        if [ "$bootdev" = "" ]; then
+            subdir=/boot
+            bootdev=$PART_ROOT
+        fi
+        # check if raid device, devicemapper or dmraid is used  on /boot partition
+        if [ "$(echo $bootdev | grep /dev/md)" ]; then
+            if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
                 # get redundant devices
-                for i in $(mdadm --detail $PART_ROOT | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
+                for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
                     _grubdev="$_grubdev $(mapdev $i)"
                 done
                 redundant="1"
@@ -2435,35 +2457,8 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
-            if [ "$(echo $PART_ROOT | grep /dev/md_d)" ]; then
+            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
                 # partitionable raid is not supported by grub!
-                FAIL_RAID="1"
-            fi
-        elif [ "$(echo $PART_ROOT | grep /dev/mapper)" ]; then
-            # dmraid check
-            if ! [ "$(dmsetup info $PART_ROOT | grep 'DMRAID')" ]; then
-                FAIL_DM="1"
-            else
-                _grubdev=$(mapdev $PART_ROOT)
-            fi
-        else
-            # use normal device
-            _grubdev=$(mapdev $PART_ROOT)
-        fi
-        # look for a separately-mounted /boot partition
-        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        # check if raid device, devicemapper or dmraid is used  on /boot partition
-        if [ "$(echo $bootdev | grep /dev/md)" ]; then
-            if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
-                # get redundant devices
-                for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-                    _bootdev="$_bootdev $i"
-                done
-                redundant="1"
-                # remove fail if /boot is raid1!
-                FAIL_RAID=""
-            else
-                # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
         elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
@@ -2471,18 +2466,11 @@ dogrub() {
                     FAIL_DM="1"
                 else
                     FAIL_DM=""
-                    _bootdev=$bootdev
+                    _grubdev=$(mapdev $bootdev)
                 fi
         else
-            # remove fail if /boot is on other device!
-            ! [ "$bootdev" = "" ] && FAIL_RAID=""
-            ! [ "$bootdev" = "" ] && FAIL_DM=""
-            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
-                # partitionable raid is not supported by grub!
-                FAIL_RAID="1"
-            fi
             # use normal device
-            _bootdev=$bootdev
+            _grubdev=$(mapdev $bootdev)
         fi
         if [ "$FAIL_RAID" = "1" ]; then
                 DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
@@ -2492,20 +2480,11 @@ dogrub() {
                 DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
                 return 1
         fi
-        if [ "$_grubdev" != "" -o "$_bootdev" != "" ]; then
+        if [ "$_grubdev" != "" ]; then
             cp $DESTDIR/boot/grub/menu.lst /tmp/.menu.lst
             # remove the default entries by truncating the file at our little tag (#-*)
             head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >$DESTDIR/boot/grub/menu.lst
             rm -f /tmp/.menu.lst
-            subdir=
-            # create correct entry array
-            if [ "$_bootdev" != "" ]; then
-                for bootdev in $_bootdev; do
-                    _grubdev="$(mapdev $bootdev)"
-                done
-            else
-                subdir="/boot"
-            fi
             # keep the file from being completely bogus
             if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
                 DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
@@ -2538,6 +2517,8 @@ dogrub() {
                 echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
             done
+            ### TODO:
+            # Is it possible to detect a windows installation?
             echo "" >>$DESTDIR/boot/grub/menu.lst
             echo "# ($NUMBER) Windows" >>$DESTDIR/boot/grub/menu.lst
             echo "#title Windows" >>$DESTDIR/boot/grub/menu.lst
@@ -2565,29 +2546,10 @@ dogrub() {
         cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
         sync
         # freeze xfs filesystems to enable grub installation on xfs filesystems
-        if [ -x /usr/sbin/xfs_freeze ]; then
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
-            fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
-            fi
-        fi
-        # look for a separately-mounted /boot partition
-        bootpart=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+        freeze_xfs
+        bootpart=$bootdev
         if [ "$(echo $bootpart | grep /dev/md)" ]; then
             bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
-        fi
-        if [ "$bootpart" = "" ]; then
-            if [ "$PART_ROOT" = "" ]; then
-                DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
-                bootpart=$(cat $ANSWER)
-            else
-                bootpart=$PART_ROOT
-                if [ "$(echo $bootpart | grep /dev/md)" ]; then
-                    bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
-                fi
-            fi
         fi
         bootpart=$(mapdev $bootpart)
         bootdev=$(mapdev $ROOTDEV)
@@ -2611,16 +2573,6 @@ EOF
         ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
         remove_grub_dmraid_hack
         cat /tmp/grub.log >$LOG
-        # unfreeze xfs filesystems
-        if [ -x /usr/sbin/xfs_freeze ]; then
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
-            fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
-            fi
-        fi
-
         if grep "Error [0-9]*: " /tmp/grub.log >/dev/null; then
             DIALOG --msgbox "Error installing GRUB. (see $LOG for output)" 0 0
             return 1
@@ -2834,16 +2786,7 @@ dogrub2(){
         DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
         sync
         # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
-        if [ -x /usr/sbin/xfs_freeze ]; then
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
-                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
-            fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
-                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
-            fi
-        fi
+        freeze_xfs
         ### HACK:
         # create no symlinked device mapper devices, else grub-install will fail!
         # grub2 needs to be fixed here!
