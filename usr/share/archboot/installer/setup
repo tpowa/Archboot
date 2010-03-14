@@ -2888,10 +2888,6 @@ dogrub2(){
     getcryptsetup
     get_grub2_map
     getrootuuid
-    ### TODO:
-    # Gpt checks:
-    # - add gpt check, especially for complex devices!
-    #   bios_grub is needed if gpt is used!
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2959,15 +2955,18 @@ dogrub2(){
         fi
         if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
             if ! [ "$(parted -sl | grep "bios_grub")" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 additionally to an other device, which contains a msdos partition table?" 0 0 || return 1
+                DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
+            fi
+            if [ "$FAIL_COMPLEX" = "0" ]; then
+                DIALOG --defaultno --yesno "Warning:\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
             fi
         else
             if [ "$FAIL_COMPLEX" = "0" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
+                DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
             fi
         fi
         if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error: Grub2 cannot boot from your device, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partitions (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+                DIALOG --msgbox "Error:\nGrub2 cannot from $bootdev, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partitions (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
                 return 1
         fi
         if [ "$grubdev" != "" ]; then
@@ -2977,12 +2976,11 @@ dogrub2(){
             rm -f /tmp/.grub.cfg
             # keep the file from being completely bogus
             if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
-                DIALOG --msgbox "Your device containing /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
+                DIALOG --msgbox "Your device, which contains /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
                 grubdev="(hd0,1)"
             fi
             NUMBER=0
             # create default grub entries
-            # insert both raid and lvm, it doesn't hurt!
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             [ "$USE_RAID" = "1" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
             ! [ "$RAID_ON_LVM" = "" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
@@ -3053,7 +3051,7 @@ dogrub2(){
                  bootdev=$(cat $ANSWER)
              fi
              if [ "$USE_RAID"  = "1" ]; then
-                 DIALOG --yesno "Setup detected your system contains /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
+                 DIALOG --yesno "Setup detected /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
              fi
         else
             DEVS="$(findbootloaderdisks _)"
