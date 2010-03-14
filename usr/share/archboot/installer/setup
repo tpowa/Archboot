@@ -1122,15 +1122,8 @@ findpv()
 {
     for dev in $(pvs -o pv_name --noheading);do
         if [ "$(pvs -o vg_name --noheading $dev)" = "      " ]; then
-            #if [ "$(echo "$dev" | grep "dm-")" ]; then
-            #    getsymlink="$(readlink $dev)"
-            #    correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
-            #    echo "$correctdevice"
-            #    [ "$1" ] && echo $1
-            #else
                 echo "$dev"
                 [ "$1" ] && echo $1
-            #fi
         fi
     done
 }
@@ -1138,13 +1131,7 @@ findpv()
 getavailablepv()
 {
     for i in "$(pvs -o pv_name,pv_size --noheading)"; do
-        #if [ "$(echo $i | grep dm-)" ]; then
-            #getsymlink="$(readlink $(echo $i | sed -e 's#\ .*$##g'))"
-            #correctdevice="$(echo $getsymlink | sed -e 's#\.\.#/dev#g')"
-            #echo "$i" | sed -e "s#.*\ #$correctdevice\ \\n#g"
-        #else
             echo "$i" | sed -e 's#$#\\n#'
-        #fi
     done
 }
 
