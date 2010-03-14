@@ -295,6 +295,7 @@ finddisks() {
     default_blockdevices
     dmraid_devices
     partitionable_raid_devices
+    [ "$1" ] && echo $1
 }
 
 findpartitions() {
@@ -304,6 +305,7 @@ findpartitions() {
     default_blockdevices_partitions
     dmraid_partitions
     raid_devices
+    [ "$1" ] && echo $1
 }
 
 # don't check on raid devices!
@@ -313,6 +315,7 @@ findbootloaderdisks() {
     else
         dmraid_devices
     fi
+    [ "$1" ] && echo $1
 }
 
 # don't list raid devices, lvm2 and devicemapper!
@@ -325,6 +328,7 @@ findbootloaderpartitions() {
     else
         dmraid_partitions
     fi
+    [ "$1" ] && echo $1
 }
 
 # freeze and unfreeze xfs, as hack for grub/grub2 installing
@@ -2917,7 +2921,7 @@ prepare_harddrive()
     GUIDPARAMETER=""
     NEXTITEM=""
     DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme?" 0 0 && UUIDPARAMETER=yes
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Only 'parted' supports this type of partition table at the moment!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
     while [ "$DONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
