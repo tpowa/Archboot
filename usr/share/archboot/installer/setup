@@ -150,7 +150,8 @@ manual_media() {
     fi
 }
 
-findautoprepare() {
+# lists default linux blockdevices
+default_blockdevices() {
     # ide devices
     for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
         if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
@@ -189,44 +190,16 @@ findautoprepare() {
     fi
 }
 
-finddisks() {
-    # ide devices
-    for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
-        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
+# lists default linux partitionable raid devices
+partitionable_raid_devices() {
+    for dev in $(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9] | sed 's#:.*##g'); do
+        echo "/dev/$dev"
+        [ "$1" ] && echo $1
     done
-    #scsi/sata devices, and virtio blockdevices (/dev/vd*)
-    for dev in $(ls $block 2>/dev/null | egrep '^[sv]d'); do
-        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                    echo "/dev/$dev"
-                    [ "$1" ] && echo $1
-                fi
-            fi
-        fi
-    done
-    # cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep -v 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep -v 'p'); do
-                echo "/dev/ida/$dev"
-                [ "$1" ] && echo $1
-        done
-    fi
-    # dmraid devices
+}
+
+# lists default linux dmraid devices
+dmraid_devices() {
     if [ -d /dev/mapper ] ; then
         for fakeraid in $(dmraid -s -c); do
                 if [ "$(echo $fakeraid | grep '_')" ]; then
@@ -235,38 +208,68 @@ finddisks() {
                 fi
         done
     fi
-    # partitionable raid
-    for dev in $(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9] | sed 's#:.*##g'); do
-        echo "/dev/$dev"
-        [ "$1" ] && echo $1
-    done
 }
 
-findpartitions() {
-    for devpath in $(finddisks); do
+# lists default linux blockdevices partitions
+default_blockdevices_partitions() {
+    # inlcude cciss controllers
+    if [ -d /dev/cciss ] ; then
+        for dev in $(ls /dev/cciss | egrep 'p'); do
+            echo "/dev/cciss/$dev"
+            [ "$1" ] && echo $1
+        done
+    fi
+    # inlcude Smart 2 controllers
+    if [ -d /dev/ida ] ; then
+        for dev in $(ls /dev/ida | egrep 'p'); do
+            echo "/dev/ida/$dev"
+            [ "$1" ] && echo $1
+        done
+    fi
+}
+
+# do sanity checks on partitions, argument comes $devpath loop
+default_partition_check() {
         disk=$(basename $devpath)
         for part in $(ls $block/$disk 2>/dev/null | egrep ^$disk); do
             # exclude checks:
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
             #- part of lvm2 device
-            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")
+            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")
             #- part of luks device
-            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")
+            #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
                 fi
             fi
         done
+}
+
+# list none partitionable raid md devices
+raid_devices() {
+    for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
+        # exlude md partitions which are part of lvm or luks
+        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                echo "$devpath"
+                [ "$1" ] && echo $1
+        fi
     done
+}
+
+# only show dmraid partitions,
+# - remove part of encrypted devices
+# - remove part of lvm
+# - remove part ot raid
+dmraid_partitions() {
     # device mapper devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
         k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
@@ -286,79 +289,29 @@ findpartitions() {
             [ "$1" ] && echo $1
         fi
     done
-    # include none partitionable raid md devices
-    for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
-        # exlude md partitions which are part of lvm
-        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
-                echo "$devpath"
-                [ "$1" ] && echo $1
-        fi
+}
+
+finddisks() {
+    default_blockdevices
+    dmraid_devices
+    partitionable_raid_devices
+}
+
+findpartitions() {
+    for devpath in $(finddisks); do
+        default_partition_check
     done
-    # inlcude cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # inlcude Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep 'p'); do
-            echo "/dev/ida/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
+    default_blockdevices_partitions
+    dmraid_partitions
+    raid_devices
 }
 
 # don't check on raid devices!
 findbootloaderdisks() {
     if ! [ "$USE_DMRAID" = "1" ]; then
-        # ide devices
-        for dev in $(ls $block | egrep '^hd'); do
-            if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-                if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                        echo "/dev/$dev"
-                        [ "$1" ] && echo $1
-                    fi
-                fi
-            fi
-        done
-        #scsi/sata devices and virtio blockdevices (/dev/vd*)
-        for dev in $(ls $block | egrep '^[sv]d'); do
-            if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
-                if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
-                        echo "/dev/$dev"
-                        [ "$1" ] && echo $1
-                    fi
-                fi
-            fi
-        done
-        # cciss controllers
-        if [ -d /dev/cciss ] ; then
-            for dev in $(ls /dev/cciss | egrep -v 'p'); do
-                echo "/dev/cciss/$dev"
-                [ "$1" ] && echo $1
-            done
-        fi
-        # Smart 2 controllers
-        if [ -d /dev/ida ] ; then
-            for dev in $(ls /dev/ida | egrep -v 'p'); do
-                    echo "/dev/ida/$dev"
-                    [ "$1" ] && echo $1
-            done
-        fi
+        default_blockdevices
     else
-    # dmraid devices
-        if [ -d /dev/mapper ] ; then
-            for fakeraid in $(dmraid -s -c); do
-                if [ "$(echo $fakeraid | grep '_')" ]; then
-                    echo "/dev/mapper/$fakeraid"
-                    [ "$1" ] && echo $1
-                fi
-            done
-        fi
+        dmraid_devices
     fi
 }
 
@@ -366,63 +319,11 @@ findbootloaderdisks() {
 findbootloaderpartitions() {
     if ! [ "$USE_DMRAID" = "1" ]; then
         for devpath in $(findbootloaderdisks); do
-            disk=$(basename $devpath)
-            for part in $(ls $block/$disk | egrep ^$disk); do
-                # exclude checks:
-                #- part of raid device
-                #  $(cat /proc/mdstat 2>/dev/null | grep $part)
-                #- part of lvm2 device
-                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")
-                #- part of luks device
-                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")
-                #- extended partition
-                #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
-                #- extended partition on raid partition device
-                #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
-                    if [ -d $block/$disk/$part ]; then
-                        echo "/dev/$part"
-                        [ "$1" ] && echo $1
-                    fi
-                fi
-            done
+            default_partition_check
         done
-        # inlcude cciss controllers
-        if [ -d /dev/cciss ] ; then
-            for dev in $(ls /dev/cciss | egrep 'p'); do
-                echo "/dev/cciss/$dev"
-                [ "$1" ] && echo $1
-            done
-        fi
-        # inlcude Smart 2 controllers
-        if [ -d /dev/ida ] ; then
-            for dev in $(ls /dev/ida | egrep 'p'); do
-                echo "/dev/ida/$dev"
-                [ "$1" ] && echo $1
-            done
-        fi
+        default_blockdevices_partitions
     else
-        # only show dmraid partitions!
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
-            partofcrypt="$partofcrypt $k"
-        done
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
-            partoflvm="$partoflvm $k"
-        done
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
-            partofraid="$partofraid $k"
-        done
-        for i in $(dmraid -s -c); do
-            for devpath in $(echo /dev/mapper/$i*); do
-                if ! [ "$(dmraid -s -c | grep $(basename $devpath)$)" -o "$(ls $partofcrypt 2>/dev/null | grep $devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep $devpath$)" -o "$(ls $partofraid 2>/dev/null | grep $devpath$)" ]; then
-                    echo "$devpath"
-                    [ "$1" ] && echo $1
-                fi
-            done
-        done
+        dmraid_partitions
     fi
 }
 
@@ -1418,10 +1319,10 @@ autoprepare() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    DISCS=$(findautoprepare)
+    DISCS=$(default_blockdevices)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the hard drive to use" 14 55 7 $(findautoprepare _) 2>$ANSWER || return 1
+        DIALOG --menu "Select the hard drive to use" 14 55 7 $(default_blockdevices _) 2>$ANSWER || return 1
         DISC=$(cat $ANSWER)
     else
         DISC=$DISCS
