@@ -42,7 +42,6 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_LILO=0        # using lilo
 S_GRUB=0        # using grub
 S_GRUB2=0       # using grub2
 
@@ -292,57 +291,54 @@ dmraid_partitions() {
 }
 
 finddisks() {
-    default_blockdevices
-    dmraid_devices
-    partitionable_raid_devices
-    [ "$1" ] && echo $1
+    default_blockdevices $1
+    dmraid_devices $1
+    partitionable_raid_devices $1
 }
 
 findpartitions() {
     for devpath in $(finddisks); do
-        default_partition_check
+        default_partition_check $1
     done
-    default_blockdevices_partitions
-    dmraid_partitions
-    raid_devices
-    [ "$1" ] && echo $1
+    default_blockdevices_partitions $1
+    dmraid_partitions $1
+    raid_devices $1
 }
 
 # don't check on raid devices!
 findbootloaderdisks() {
     if ! [ "$USE_DMRAID" = "1" ]; then
-        default_blockdevices
+        default_blockdevices $1
     else
-        dmraid_devices
+        dmraid_devices $1
     fi
-    [ "$1" ] && echo $1
 }
 
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
     if ! [ "$USE_DMRAID" = "1" ]; then
         for devpath in $(findbootloaderdisks); do
-            default_partition_check
+            default_partition_check $1
         done
-        default_blockdevices_partitions
+        default_blockdevices_partitions $1
     else
-        dmraid_partitions
+        dmraid_partitions $1
     fi
-    [ "$1" ] && echo $1
 }
 
 # freeze and unfreeze xfs, as hack for grub/grub2 installing
 freeze_xfs() {
-        if [ -x /usr/sbin/xfs_freeze ]; then
-            if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
-                /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
-            fi
-            if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-                /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
-                /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
-            fi
+    sync
+    if [ -x /usr/sbin/xfs_freeze ]; then
+        if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
+            /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
+            /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
         fi
+        if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
+            /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
+            /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
+        fi
+    fi
 }
 
 get_grub_map() {
@@ -2370,7 +2366,7 @@ dolilo() {
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     # Try to auto-configure LILO...
-    if ! [ "$PART_ROOT" = "" -a "$S_LILO" = "1" ]; then
+    if ! [ "$PART_ROOT" = "" ]; then
         if [ "$UUIDPARAMETER" = "yes" ]; then
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
@@ -2403,10 +2399,19 @@ dolilo() {
     fi
     chroot_umount
     DIALOG --msgbox "LILO was successfully installed." 0 0
-    S_LILO=1
 }
 
 dogrub() {
+    if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
+        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
+        source_set
+        prepare_pacman
+        PACKAGES="grub"
+        run_pacman
+        # reset PACKAGES after installing
+        PACKAGES=""
+    fi
+    grubdev=""
     _grubdev=""
     bootdev=""
     grubdev=""
@@ -2420,15 +2425,6 @@ dogrub() {
     FAIL_DM=""
     GRUB_LEGACY="1"
     USE_DMRAID=""
-    if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
-        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
-        source_set
-        prepare_pacman
-        PACKAGES="grub"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
-    fi
     if ! [ "$(dmraid -r | grep ^no )" ]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
@@ -2441,7 +2437,7 @@ dogrub() {
         PART_ROOT=$(cat $ANSWER)
     fi
     # try to auto-configure GRUB...
-    if [ "$PART_ROOT" != "" -a "$S_GRUB" != "1" ]; then
+    if [ "$PART_ROOT" != "" ]; then
         # look for a separately-mounted /boot partition
         subdir=""
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
@@ -2548,7 +2544,6 @@ dogrub() {
         ROOTDEV=$(cat $ANSWER)
         DIALOG --infobox "Installing the GRUB bootloader..." 0 0
         cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
-        sync
         # freeze xfs filesystems to enable grub installation on xfs filesystems
         freeze_xfs
         bootpart=$bootdev
@@ -2600,18 +2595,6 @@ dogrub2(){
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
-    bootdev=""
-    grubdev=""
-    complexuuid=""
-    FAIL_COMPLEX=""
-    GRUB_LEGACY=""
-    USE_DMRAID=""
-    RAID_ON_LVM=""
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    get_grub2_map
-    getrootuuid
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
@@ -2628,8 +2611,20 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
+    bootdev=""
+    grubdev=""
+    complexuuid=""
+    FAIL_COMPLEX=""
+    GRUB_LEGACY=""
+    USE_DMRAID=""
+    RAID_ON_LVM=""
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    get_grub2_map
+    getrootuuid
     # try to auto-configure GRUB2...
-    if [ "$PART_ROOT" != "" -a "$S_GRUB2" != "1" ]; then
+    if [ "$PART_ROOT" != "" ]; then
         # look for a separately-mounted /boot partition
         subdir=""
         bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
@@ -2758,63 +2753,58 @@ dogrub2(){
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/boot/grub/grub.cfg
 
-    S_GRUB2=""
-    while [ "$S_GRUB2" = "" ]; do
-        # A switch is needed if complex $bootdev is used!
-        # - It doesn't make sense to present device list, if raid or raid+lvm is used for $bootdev.
-        # - LVM $bootdev needs the MBR of a device and cannot be used itself as $bootdev
-        if [ "$FAIL_COMPLEX" = "0" ]; then
-             # use function below if no raid is detected!
-             if [ "$RAID_ON_LVM" = "0" ]; then
-                 DEVS="$(findbootloaderdisks _)"
-                 if [ "$DEVS" = "" ]; then
-                     DIALOG --msgbox "No hard drives were found" 0 0
-                     return 1
-                 fi
-                 DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 $DEVS 2>$ANSWER || return 1
-                 bootdev=$(cat $ANSWER)
+    # A switch is needed if complex $bootdev is used!
+    # - It doesn't make sense to present device list, if raid or raid+lvm is used for $bootdev.
+    # - LVM $bootdev needs the MBR of a device and cannot be used itself as $bootdev
+    if [ "$FAIL_COMPLEX" = "0" ]; then
+         # use function below if no raid is detected!
+         if [ "$RAID_ON_LVM" = "0" ]; then
+             DEVS="$(findbootloaderdisks _)"
+             if [ "$DEVS" = "" ]; then
+                 DIALOG --msgbox "No hard drives were found" 0 0
+                 return 1
              fi
-             if [ "$USE_RAID"  = "1" ]; then
-                 DIALOG --yesno "Setup detected /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
-             fi
-        else
-            DEVS="$(findbootloaderdisks _)"
-            DEVS="$DEVS $(findbootloaderpartitions _)"
-            if [ "$DEVS" = "" ]; then
-                DIALOG --msgbox "No hard drives were found" 0 0
-                return 1
-            fi
-            DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
-            bootdev=$(cat $ANSWER)
-        fi
-        DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
-        sync
-        # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
-        freeze_xfs
-        ### HACK:
-        # create no symlinked device mapper devices, else grub-install will fail!
-        # grub2 needs to be fixed here!
-        # for simple lvm device!
-        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "0" ]; then
-            rm $bootdev
-            dmsetup mknodes
-        fi
-        # hidden md device by lvm, you need to delete the lvm symlink not /dev/md!
-        if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "1" ]; then
-            rm $real_bootdev
-            dmsetup mknodes
-        fi
-        chroot_mount
-        chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
-        chroot_umount
-        cat /tmp/grub2.log >$LOG
-        if ! [ -s /tmp/grub2.log ] ; then
-            DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
+             DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 $DEVS 2>$ANSWER || return 1
+             bootdev=$(cat $ANSWER)
+         fi
+         if [ "$USE_RAID"  = "1" ]; then
+             DIALOG --yesno "Setup detected /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
+         fi
+    else
+        DEVS="$(findbootloaderdisks _)"
+        DEVS="$DEVS $(findbootloaderpartitions _)"
+        if [ "$DEVS" = "" ]; then
+            DIALOG --msgbox "No hard drives were found" 0 0
             return 1
         fi
-        DIALOG --msgbox "GRUB2 was successfully installed." 0 0
-        S_GRUB2=1
-    done
+        DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
+        bootdev=$(cat $ANSWER)
+    fi
+    DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
+    # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
+    freeze_xfs
+    ### HACK:
+    # create no symlinked device mapper devices, else grub-install will fail!
+    # grub2 needs to be fixed here!
+    # for simple lvm device!
+    if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "0" ]; then
+        rm $bootdev
+        dmsetup mknodes
+    fi
+    # hidden md device by lvm, you need to delete the lvm symlink not /dev/md!
+    if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "1" ]; then
+        rm $real_bootdev
+        dmsetup mknodes
+    fi
+    chroot_mount
+    chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
+    chroot_umount
+    cat /tmp/grub2.log >$LOG
+    if ! [ -s /tmp/grub2.log ] ; then
+        DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
+        return 1
+    fi
+    DIALOG --msgbox "GRUB2 was successfully installed." 0 0
 }
 
 select_source()
