@@ -848,7 +848,7 @@ disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
 }
 
-# Create raid
+# Create raid or raid_partition
 _raid()
 {
     MDFINISH=""
@@ -908,122 +908,8 @@ _raid()
         # enter raid device name
         RAIDDEVICE=""
         while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
-            RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
-                RAIDDEVICE=""
-            fi
-        done
-        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
-        DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
-        LEVEL=$(cat $ANSWER)
-        # raid5 and raid10 support parity parameter
-        PARITY=""
-        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid10" ]; then
-            PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
-            PARTIY=$(cat $ANSWER)
-        fi
-        METADATA="default"
-        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format?\n\nThis will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
-        # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
-        # select the first device to use, no missing option available!
-        RAIDNUMBER=1
-        DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
-        echo "$PART" >>/tmp/.raid
-        while [ "$PART" != "DONE" ]; do
-            RAIDNUMBER=$(($RAIDNUMBER + 1))
-            # clean loop from used partition and options
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e "s#${PART}[0-9]\ _##g" -e "s#$(echo ${PART} | sed -e 's#[0-9]##g')\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
-            # raid0 doesn't support missing devices
-            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
-            # add more devices
-            DIALOG --menu "Select additional device $RAIDNUMBER" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
-            PART=$(cat $ANSWER)
-            SPARE=""
-            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
-            [ "$PART" = "DONE" ] && break
-            if [ "$PART" = "MISSING" ]; then
-                DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
-                echo "$DEGRADED" >>/tmp/.raid
-            else
-                if [ "$SPARE" = "1" ]; then
-                    echo "$PART" >>/tmp/.raid-spare
-                else
-                    echo "$PART" >>/tmp/.raid
-                fi
-            fi
-        done
-        # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create $RAIDDEVICE like this?\n\nLEVEL:\n$LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "$i\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "$i\n";done)\n\nMETADATA(superblock) FORMAT:$METADATA" 0 0 && MDFINISH="DONE"
-    done
-    _createraid
-}
-
-# Create raid partitions
-_raidpartitions()
-{
-    MDFINISH=""
-    while [ "$MDFINISH" != "DONE" ]; do
-        : >/tmp/.raid
-        : >/tmp/.raid-spare
-        # check for devices
-        PARTS="$(findpartitions _)"
-        ALREADYINUSE=""
-        #hell yeah, this is complicated! kill software raid devices already in use.
-        ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
-            k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-            if ! [ $(echo $k | grep ^md) ]; then
-                PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
-            fi
-        done
-        # skip encrypted mapper devices which contain raid devices!
-        ALREADYINUSE=""
-        for i in $(ls /dev/mapper/*); do
-            cryptsetup status $i 2>/dev/null | grep -q "device:.*/dev/md.*" && ALREADYINUSE="$ALREADYINUSE $i"
-        done
-        # skip lvm with raid devices
-        for devpath in $(pvs -o pv_name --noheading); do
-            # skip simple lvm with raid device
-            if [ "$(echo $devpath | grep /dev/md)" ]; then
-                killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
-                ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
-            fi
-            # skip encrypted raid device
-            if [ "$(echo $devpath | grep dm-)" ]; then
-                if [ "$(cryptsetup status $(basename $devpath) | grep "device:.*/dev/md")" ]; then
-                   killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
-                   ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
-                fi
-            fi
-        done
-        # skip already encrypted volume devices with raid device
-        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
-            realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            if [ "$(lvs $realdevice 2>/dev/null)" ]; then
-                vg="$(echo $(lvs -o vg_name --noheading $realdevice))"
-                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
-                   ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
-                fi
-            fi
-        done
-        for i in $ALREADYINUSE; do
-            PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
-        done
-        # break if all devices are in use
-        if [ "$PARTS" = "" ]; then
-            DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
-            return 1
-        fi
-        # enter raid device name
-        RAIDDEVICE=""
-        while [ "${RAIDDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
+            [ "$RAID_PARTITION" = "" ] && DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
+            [ "$RAID_PARTITION" = "1" ] && DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
             RAIDDEVICE=$(cat $ANSWER)
             if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
@@ -2473,7 +2359,7 @@ dosyslinux() {
         DIALOG --msgbox "Error:\nCouldn't find vfat /boot partition." 0 0
         return 1
     fi
-    # syslinux cannot boot from any raid, raid_partitions, ecncrypted and dmraid device
+    # syslinux cannot boot from any raid, raid partition, ecncrypted and dmraid device
     if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
         DIALOG --msgbox "Error:\nSyslinux cannot boot from any raid, raid partition, ecncrypted or dmraid device." 0 0
         return 1
@@ -2876,7 +2762,7 @@ dogrub2(){
             subdir=/boot
             bootdev=$PART_ROOT
         fi
-      # check if raid, raid partitions, dmraid or device devicemapper is used
+      # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported
                 FAIL_COMPLEX="0"
@@ -2929,7 +2815,7 @@ dogrub2(){
             fi
         fi
         if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error:\nGrub2 cannot from $bootdev, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partitions (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+                DIALOG --msgbox "Error:\nGrub2 cannot from $bootdev, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
                 return 1
         fi
         if [ "$grubdev" != "" ]; then
@@ -3269,9 +3155,11 @@ _createmd()
             "2")
                 _stopmd ;;
             "3")
+                RAID_PARTITION=""
                 _raid ;;
             "4")
-                _raidpartitions ;;
+                RAID_PARTITION="1"
+                _raid ;;
               *)
                 MDDONE=1 ;;
         esac
