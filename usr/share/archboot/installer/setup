@@ -832,6 +832,17 @@ You have two devices of approximately same size, and you want the two to\n
 be mirrors of each other. Eventually you have more devices, which you\n
 want to keep as stand-by spare-disks, that will automatically become a\n
 part of the mirror if one of the active devices break.\n\n
+RAID-4:\n
+You have three or more devices of roughly the same size and you want\n
+a way that protects data against loss of any one disk.\n
+Fault tolerance is achieved by adding an extra disk to the array, which\n
+is dedicated to storing parity information. The overall capacity of the array\n
+is reduced by one disk.\n
+The storage efficiency is 66 percent. With six drives, the storage efficiency\n
+is 87 percent. The main disadvantage is poor performance for multiple,\n
+simultaneous, and independent read/write operations.\n
+Thus, if any disk fails, all data stay intact. But if two disks fail, all data\n
+is lost.\n\n
 RAID-5:\n
 You have three or more devices of roughly the same size, you want to\n
 combine them into a larger device, but still to maintain a degree of\n
@@ -841,6 +852,14 @@ fails. If you use N devices where the smallest has size S, the size of the\n
 entire array will be (N-1)*S. This \"missing\" space is used for parity\n
 (redundancy) information. Thus, if any disk fails, all data stay intact.\n
 But if two disks fail, all data is lost.\n\n
+RAID-6:\n
+You have four or more devices of roughly the same size and you want\n
+a way that protects data against loss of any two disks.\n
+Fault tolerance is achieved by adding an two extra disk to the array, which\n
+is dedicated to storing parity information. The overall capacity of the array\n
+is reduced by 2 disks.\n
+Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
+all data is lost.\n\n
 RAID-10:\n
 Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
 two disks. It provides superior data security and can survive multiple\n
@@ -916,7 +935,7 @@ _raid()
                 RAIDDEVICE=""
             fi
         done
-        RAIDLEVELS="linear - raid0 - raid1 - raid5 - raid10 -"
+        RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         DIALOG --menu "Select the raid level you want to use" 21 50 13 $RAIDLEVELS 2>$ANSWER || return 1
         LEVEL=$(cat $ANSWER)
         # raid5 and raid10 support parity parameter
