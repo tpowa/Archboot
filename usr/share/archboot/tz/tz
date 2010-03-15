@@ -87,9 +87,9 @@ SET_TIME=""
 USE_NTPDATE=""
 HARDWARECLOCK=""
 if [ ! -s /tmp/.timezone ]; then
-	DIALOG --msgbox "You have to select a region and timezone first." 0 0
+	DIALOG --msgbox "Error:\nYou have to select a region and timezone first." 0 0
 	S_NEXTITEM="1"
-	return 1
+	dotimezone
 fi
 DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC confuses it." 15 65 && HARDWARECLOCK="UTC"
 DIALOG --infobox "Syncing hardwareclock to systemclock ..." 0 0
@@ -140,7 +140,7 @@ mainmenu() {
 		DEFAULT=""
 	fi
 	DIALOG $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
-		--menu "Use the UP and DOWN arrows to navigate menus. Use TAB to switch between buttons and ENTER to select." 15 55 8 \
+                --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
 		"1" "Select Region and Timezone" \
 		"2" "Set Time and Date" \
 		"3" "$EXIT" 2>$ANSWER

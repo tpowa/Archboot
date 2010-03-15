@@ -13,7 +13,7 @@ fi
 
 abort()
 {
-	DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 40 || return 0
+	DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 42 || return 0
 	[ -e /tmp/.km ] && rm -f /tmp/.km
 	[ -e /tmp/.keymap ] && rm -f /tmp/.keymap
 	[ -e /tmp/.font ] && rm -f /tmp/.font
@@ -95,7 +95,7 @@ mainmenu() {
 		DEFAULT=""
 	fi
 	DIALOG $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
-		--menu "Use the UP and DOWN arrows to navigate menus. Use TAB to switch between buttons and ENTER to select." 15 55 8 \
+                --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
 		"1" "Set Keymap" \
 		"2" "Set Consolefont" \
 		"3" "$EXIT" 2>$ANSWER
