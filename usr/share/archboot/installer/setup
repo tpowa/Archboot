@@ -487,6 +487,12 @@ set_uuid() {
     UUID_RUN="1"
 }
 
+# set GUID (gpt) usage
+set_guid () {
+    GUIDPARAMETER=""
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
+}
+
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
 #
@@ -499,6 +505,7 @@ set_uuid() {
 
 # returns: 1 on failure
 _mkfs() {
+    [ "$UUID_RUN" = "" ] && set_uuid
     local _domk=$1
     local _device=$2
     local _fstype=$3
@@ -1340,7 +1347,9 @@ autoprepare() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    [ "$UUID_RUN" = "" ] && set_uuid
+    UUID_RUN=""
+    # switch for mbr usage
+    set_guid
     DISCS=$(default_blockdevices)
     if [ $(echo $DISCS | wc -w) -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
@@ -1543,6 +1552,8 @@ partition() {
     _stoplvm
     # update dmraid
     _dmraid_update
+    # switch for mbr usage
+    set_guid
     # Select disk to partition
     DISCS=$(finddisks _)
     DISCS="$DISCS OTHER _ DONE +"
@@ -1609,7 +1620,7 @@ partition() {
 }
 
 mountpoints() {
-    [ "$UUID_RUN" = "" ] && set_uuid
+    UUID_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
     : >/tmp/.fstab
     : >/tmp/.parts
@@ -1977,7 +1988,6 @@ select_packages() {
 #
 install_packages() {
     source_set
-    [ "$UUID_RUN" = "" ] && set_uuid
     if [ "$MODE" = "media" ]; then
         if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
             DIALOG --msgbox "You must select packages first." 0 0
@@ -2921,9 +2931,7 @@ prepare_harddrive()
     S_MKFSAUTO=0
     S_MKFS=0
     DONE=0
-    GUIDPARAMETER=""
     NEXTITEM=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
     while [ "$DONE" = "0" ]; do
         if [ -n "$NEXTITEM" ]; then
             DEFAULT="--default-item $NEXTITEM"
