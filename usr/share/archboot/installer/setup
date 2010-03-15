@@ -149,6 +149,17 @@ manual_media() {
     fi
 }
 
+# mount_destdir()
+# check if PART_ROOT is set and if something is mounted on $DESTDIR
+# TODO: finish this!
+mount_destdir(){
+    ASK_MOUNTPOINTS=""
+    if [ "$PART_ROOT" = "" ]; then
+        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in $DESTDIR, please set mountpoints first." 0 0
+        mountpoints
+    fi
+}
+
 # lists default linux blockdevices
 default_blockdevices() {
     # ide devices
@@ -765,13 +776,13 @@ RAID-4:\n
 You have three or more devices of roughly the same size and you want\n
 a way that protects data against loss of any one disk.\n
 Fault tolerance is achieved by adding an extra disk to the array, which\n
-is dedicated to storing parity information. The overall capacity of the array\n
-is reduced by one disk.\n
-The storage efficiency is 66 percent. With six drives, the storage efficiency\n
-is 87 percent. The main disadvantage is poor performance for multiple,\n
-simultaneous, and independent read/write operations.\n
-Thus, if any disk fails, all data stay intact. But if two disks fail, all data\n
-is lost.\n\n
+is dedicated to storing parity information. The overall capacity of the\n
+array is reduced by one disk.\n
+The storage efficiency is 66 percent. With six drives, the storage\n
+efficiency is 87 percent. The main disadvantage is poor performance for\n
+multiple,\ simultaneous, and independent read/write operations.\n
+Thus, if any disk fails, all data stay intact. But if two disks fail,\n
+all data is lost.\n\n
 RAID-5:\n
 You have three or more devices of roughly the same size, you want to\n
 combine them into a larger device, but still to maintain a degree of\n
@@ -784,9 +795,9 @@ But if two disks fail, all data is lost.\n\n
 RAID-6:\n
 You have four or more devices of roughly the same size and you want\n
 a way that protects data against loss of any two disks.\n
-Fault tolerance is achieved by adding an two extra disk to the array, which\n
-is dedicated to storing parity information. The overall capacity of the array\n
-is reduced by 2 disks.\n
+Fault tolerance is achieved by adding an two extra disk to the array,\n
+which is dedicated to storing parity information. The overall capacity\n
+of the array is reduced by 2 disks.\n
 Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
 all data is lost.\n\n
 RAID-10:\n
@@ -1622,67 +1633,73 @@ partition() {
 mountpoints() {
     UUID_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
-    : >/tmp/.fstab
-    : >/tmp/.parts
-    FSOPTS=""
-    [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
-    [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
-    [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-    [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-    [ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
-    [ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
-    [ "$(which mkfs.ntfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS ntfs-3g NTFS"
-    [ "$(which mkfs.vfat 2>/dev/null)" ]   && FSOPTS="$FSOPTS vfat VFAT"
-    #
-    # Select mountpoints
-    #
-    DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-    PARTS=$(findpartitions _)
-    DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
-    PART=$(cat $ANSWER)
-    PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-    if [ "$PART" != "NONE" ]; then
-        DOMKFS="no"
-        DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-        echo "$PART:swap:swap:$DOMKFS" >>/tmp/.parts
-    fi
-    DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
-    PART=$(cat $ANSWER)
-    PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-    PART_ROOT=$PART
-    # Select root filesystem type
-    DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-    FSTYPE=$(cat $ANSWER)
-    DOMKFS="no"
-    DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-    echo "$PART:$FSTYPE:/:$DOMKFS" >>/tmp/.parts
-
-    #
-    # Additional partitions
-    #
-    DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
-    PART=$(cat $ANSWER)
-    while [ "$PART" != "DONE" ]; do
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        # Select a filesystem type
-        DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-        FSTYPE=$(cat $ANSWER)
-        MP=""
-        while [ "${MP}" = "" ]; do
-            DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
-            MP=$(cat $ANSWER)
-            if grep ":$MP:" /tmp/.parts; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
-                MP=""
-            fi
-        done
-        DOMKFS="no"
-        DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-        echo "$PART:$FSTYPE:$MP:$DOMKFS" >>/tmp/.parts
-        DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
+        : >/tmp/.fstab
+        : >/tmp/.parts
+        FSOPTS=""
+        [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
+        [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+        [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
+        [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
+        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
+        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
+        [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
+        [ "$(which mkfs.vfat 2>/dev/null)" ] && FSOPTS="$FSOPTS vfat VFAT"
+        #
+        # Select mountpoints
+        #
+        DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+        PARTS=$(findpartitions _)
+        DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
-    done
-    DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
+        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+        if [ "$PART" != "NONE" ]; then
+            DOMKFS="no"
+            [ "$ASK_MOUNTPOINTS" = "1" ] && DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+            echo "$PART:swap:swap:$DOMKFS" >>/tmp/.parts
+        fi
+        DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+        PART_ROOT=$PART
+        # Select root filesystem type
+        FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
+        DOMKFS="no"
+        if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+            DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
+            FSTYPE=$(cat $ANSWER)
+            DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+        fi
+        echo "$PART:$FSTYPE:/:$DOMKFS" >>/tmp/.parts
+
+        #
+        # Additional partitions
+        #
+        DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
+        PART=$(cat $ANSWER)
+        while [ "$PART" != "DONE" ]; do
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
+            # Select a filesystem type
+            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
+                FSTYPE=$(cat $ANSWER)
+            fi
+            MP=""
+            while [ "${MP}" = "" ]; do
+                DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
+                MP=$(cat $ANSWER)
+                if grep ":$MP:" /tmp/.parts; then
+                    DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
+                    MP=""
+                fi
+            done
+            DOMKFS="no"
+            [ "$ASK_MOUNTPOINTS" = "1" ] && DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+            echo "$PART:$FSTYPE:$MP:$DOMKFS" >>/tmp/.parts
+            DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+        done
+        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
@@ -1718,7 +1735,7 @@ mountpoints() {
 # check if installation source is set, if not run select_source!
 source_set(){
     if ! [ "$S_SRC" = "1" ]; then
-        DIALOG --msgbox "Error:\nYou must select Source first." 0 0
+        DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
         select_source
     fi
 }
@@ -1875,7 +1892,7 @@ run_pacman(){
 # params: none
 # returns: 1 on error
 select_packages() {
-    source_set
+    source_set || return 1
     pacman_conf
     prepare_pacman
     # Archboot setup media Mode uses packages.txt!
@@ -1987,16 +2004,17 @@ select_packages() {
 # performs package installation to the target system
 #
 install_packages() {
-    source_set
+    source_set || return 1
+    mount_destdir || return 1
     if [ "$MODE" = "media" ]; then
         if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
-            DIALOG --msgbox "You must select packages first." 0 0
-            return 1
+            DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
+            select_packages || return 1
         fi
     else
         if [ "$S_SELECT" != "1" ]; then
-            DIALOG --msgbox "You must select packages first." 0 0
-            return 1
+            DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
+            select_packages || return 1
         fi
     fi
     if [ "$S_MKFS" != "1" -a "$S_MKFSAUTO" != "1" ]; then
@@ -2283,7 +2301,6 @@ dosyslinux() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    [ "$UUID_RUN" = "" ] && set_uuid
     USE_DMRAID=""
     getrootfs
     getraidarrays
@@ -2378,7 +2395,6 @@ dolilo() {
         PACKAGES=""
     fi
     USE_DMRAID=""
-    [ "$UUID_RUN" = "" ] && set_uuid
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2433,7 +2449,6 @@ dogrub() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    [ "$UUID_RUN" = "" ] && set_uuid
     grubdev=""
     _grubdev=""
     bootdev=""
@@ -2634,7 +2649,6 @@ dogrub2(){
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    [ "$UUID_RUN" = "" ] && set_uuid
     bootdev=""
     grubdev=""
     complexuuid=""
@@ -2833,6 +2847,7 @@ dogrub2(){
 
 select_source()
 {
+    NEXTITEM="3"
     if ! [ $(which $DLPROG) ]; then
         DIALOG --menu "Please select an installation source" 10 35 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>$ANSWER || return 1
@@ -2958,6 +2973,7 @@ prepare_harddrive()
                 create_special ;;
             "4")
                 PARTFINISH=""
+                ASK_MOUNTPOINTS="1"
                 mountpoints ;;
             *)
                 DONE=1 ;;
@@ -3382,8 +3398,10 @@ configure_system()
 install_bootloader()
 {
     CANCEL=""
-    DIALOG --menu "Which bootloader would you like to use?  Grub is the Arch default.\n\n" \
-        12 55 4 \
+    mount_destdir
+    [ "$UUID_RUN" = "" ] && set_uuid
+    DIALOG --menu "Which bootloader would you like to use?" \
+        11 55 4 \
         "GRUB" "Use the GRUB bootloader (default)" \
         "GRUB2" "Use the GRUB2 bootloader (experimental)" \
         "LILO" "Use the LILO bootloader" \
@@ -3408,7 +3426,7 @@ mainmenu() {
         DEFAULT=""
     fi
     dialog $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
-    --menu "Use the UP and DOWN arrows to navigate menus.  Use TAB to switch between buttons and ENTER to select." 17 55 13 \
+    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
     "0" "Set Keyboard And Console Font" \
     "1" "Set Time and Date" \
     "2" "Prepare Hard Drive" \
@@ -3464,7 +3482,7 @@ fi
 : >/tmp/.setup-running
 : >/tmp/.setup
 
-DIALOG --msgbox "Welcome to the Arch Linux Installation program.  The install process is fairly straightforward, and you should run through the options in the order they are presented.  If you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.  You can view all output from commands by viewing your VC7 console (ALT-F7).  ALT-F1 will bring you back here." 14 65
+DIALOG --msgbox "Welcome to the Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your VC7 console (ALT-F7). ALT-F1 will bring you back here." 14 65
 
 while true; do
     mainmenu
