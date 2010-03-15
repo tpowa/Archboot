@@ -89,7 +89,7 @@ HARDWARECLOCK=""
 if [ ! -s /tmp/.timezone ]; then
 	DIALOG --msgbox "Error:\nYou have to select a region and timezone first." 0 0
 	S_NEXTITEM="1"
-	dotimezone
+	dotimezone || return 1
 fi
 DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC confuses it." 15 65 && HARDWARECLOCK="UTC"
 DIALOG --infobox "Syncing hardwareclock to systemclock ..." 0 0
