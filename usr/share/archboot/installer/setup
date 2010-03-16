@@ -1902,7 +1902,7 @@ select_packages() {
     if [ "$MODE" = "media" ]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
         PKGS="/src/core-$(uname -m)/pkg/packages.txt"
-        if ! [ -f /tmp/.pkgcategory ]; then
+        if ! [ -s /tmp/.pkgcategory ]; then
             CHKLIST="base ^ ON"
             for category in $(cat $PKGS | sed 's|/.*$||g' | uniq | grep -v base | grep -v kernels); do
                 CHKLIST="$CHKLIST $category - OFF"
