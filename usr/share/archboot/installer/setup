@@ -1810,18 +1810,13 @@ EOF
 # pacman_conf_extra()
 # adds extra repository for ftp installation mode
 pacman_conf_extra() {
-    local serverurl="${SYNC_URL}"
+    if [ "$MODE" = "ftp" ]; then
+        local serverurl="${SYNC_URL}"
+    else
+        local serverurl="${FILE_URL}"
+    fi
     # Setup a pacman.conf in /tmp
     echo "[extra]" >> /tmp/pacman.conf
-    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
-}
-
-# pacman_conf_bootloader()
-# adds bootloader repository for media installation mode
-pacman_conf_bootloader() {
-    local serverurl="${FILE_URL}"
-    # Setup a pacman.conf in /tmp
-    echo "[bootloader]" >> /tmp/pacman.conf
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
@@ -2292,11 +2287,7 @@ dosyslinux() {
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
         ### HACK!
         # syslinux is not part of core repository
-        if [ "$MODE" = "ftp" ]; then
-            pacman_conf_extra
-        else
-            pacman_conf_bootloader
-        fi
+        pacman_conf_extra
         PACKAGES="syslinux"
         source_set
         prepare_pacman
@@ -2640,11 +2631,7 @@ dogrub2(){
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         ### HACK!
         # grub2 is not part of core repository and conflicts with grub -> uninstall grub first!
-        if [ "$MODE" = "ftp" ]; then
-            pacman_conf_extra
-        else
-            pacman_conf_bootloader
-        fi
+        pacman_conf_extra
         source_set
         prepare_pacman
         PACKAGES="grub2"
