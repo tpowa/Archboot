@@ -155,7 +155,7 @@ destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     ASK_MOUNTPOINTS=""
     # check if something is mounted on $DESTDIR
-    [ "$PART_ROOT" = "" ] && PART_ROOT="$(mount | grep "$DESTDIR/ " | cut -d' ' -f 1)"
+    [ "$PART_ROOT" = "" ] && PART_ROOT="$(mount | grep "$DESTDIR " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on $DESTDIR
     if [ "$PART_ROOT" = "" ]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in $DESTDIR, please set mountpoints first." 0 0
@@ -3400,9 +3400,9 @@ configure_system()
 
 install_bootloader()
 {
-    CANCEL=""
-    destdir_mounts
+    destdir_mounts || return 1
     [ "$UUID_RUN" = "" ] && set_uuid
+    CANCEL=""
     DIALOG --menu "Which bootloader would you like to use?" \
         11 55 4 \
         "GRUB" "Use the GRUB bootloader (default)" \
