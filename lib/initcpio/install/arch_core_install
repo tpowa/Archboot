@@ -91,7 +91,7 @@ install ()
     sed -i -e 's#base/udev-compat#support/udev-compat#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add grub2 and syslinux packages to image, with separate db file
+    ### HACK add grub2 and syslinux packages to image, with separate extra db file
     for i in grub2 freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
         pacman -Sw --noconfirm $i
         pkgver="$(echo $(pacman -Si $i | grep Version | cut -d ":" -f 2))"

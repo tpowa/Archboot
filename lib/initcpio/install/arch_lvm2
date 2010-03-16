@@ -6,6 +6,11 @@ install ()
     BINARIES="lvm fsadm lvmdump vgcfgbackup vgcfgrestore vgchange vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay lvextend lvmchange lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs lvscan"
     FILES=""
     SCRIPT="arch_lvm2"
+    add_file "/lib/udev/rules.d/11-dm-lvm.rules"
+    add_dir "/etc/lvm/backup/"
+    add_dir "/etc/lvm/archive/"
+    add_file "/usr/share/archboot/lvm2/etc/lvm/lvm.conf" "/etc/lvm/lvm.conf"
+
 }
 
 help ()
