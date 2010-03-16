@@ -149,11 +149,14 @@ manual_media() {
     fi
 }
 
-# mount_destdir()
+# destdir_mounts()
 # check if PART_ROOT is set and if something is mounted on $DESTDIR
-# TODO: finish this!
-mount_destdir(){
+destdir_mounts(){
+    # Don't ask for filesystem and create new filesystems
     ASK_MOUNTPOINTS=""
+    # check if something is mounted on $DESTDIR
+    [ "$PART_ROOT" = "" ] && PART_ROOT="$(mount | grep "$DESTDIR/ " | cut -d' ' -f 1)"
+    # Run mountpoints, if nothing is mounted on $DESTDIR
     if [ "$PART_ROOT" = "" ]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in $DESTDIR, please set mountpoints first." 0 0
         mountpoints
@@ -2005,7 +2008,7 @@ select_packages() {
 #
 install_packages() {
     source_set || return 1
-    mount_destdir || return 1
+    destdir_mounts || return 1
     if [ "$MODE" = "media" ]; then
         if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
             DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
@@ -3398,7 +3401,7 @@ configure_system()
 install_bootloader()
 {
     CANCEL=""
-    mount_destdir
+    destdir_mounts
     [ "$UUID_RUN" = "" ] && set_uuid
     DIALOG --menu "Which bootloader would you like to use?" \
         11 55 4 \
