@@ -3,9 +3,10 @@
 install ()
 {
     MODULES=" $(checked_modules '/kernel/fs') "
-    BINARIES="mkswap debugreiserfs mkreiserfs reiserfsck reiserfstune resize_reiserfs badblocks blkid debugfs dumpe2fs e2fsck e2image findfs fsck logsave mkfs.ext2 resize2fs mkntfs ntfsmount ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs fsck.xfs xfs_repair xfs_admin xfs_bmap xfs_check xfs_copy xfs_db xfs_freeze xfs_growfs xfs_info xfs_io xfs_logprint xfs_mdrestore xfs_metadump xfs_mkfile xfs_ncheck xfs_quota xfs_rtcp mkdosfs dosfsck dosfslabel ntfs-3g mount.nfs mount.cifs umount.cifs mkfs.reiserfs fsck.reiserfs fsck.ext2 fsck.ext3 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs mkfs.jfs mkfs.vfat mkfs.msdos fsck.msdos fsck.vfat mkfs.ntfs mount.ntfs-fuse mount.fuse.ntfs mount.ntfs-3g mount.nfs4 umount.nfs umount.nfs4 wipefs blockdev"
+    BINARIES="mkswap debugreiserfs mkreiserfs reiserfsck reiserfstune resize_reiserfs badblocks blkid debugfs dumpe2fs e2fsck e2image findfs fsck logsave mkfs.ext2 resize2fs mkntfs ntfsmount ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs fsck.xfs xfs_repair xfs_admin xfs_bmap xfs_check xfs_copy xfs_db xfs_freeze xfs_growfs xfs_info xfs_io xfs_logprint xfs_mdrestore xfs_metadump xfs_mkfile xfs_ncheck xfs_quota xfs_rtcp mkdosfs dosfsck dosfslabel ntfs-3g mount.nfs mount.cifs umount.cifs mkfs.reiserfs fsck.reiserfs fsck.ext2 fsck.ext3 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs mkfs.jfs mkfs.vfat mkfs.msdos fsck.msdos fsck.vfat mkfs.ntfs mount.ntfs-fuse mount.fuse.ntfs mount.ntfs-3g mount.nfs4 umount.nfs umount.nfs4 wipefs blockdev btrfs btrfs-convert btrfs-debug-tree btrfs-map-logical btrfs-show btrfs-vol btrfsck btrfsctl mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp"
     FILES=""
     SCRIPT=""
+    add_file "/usr/share/archboot/filesystem/etc/nilfs_cleanerd.conf" "/etc/nilfs_cleanerd.conf"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
