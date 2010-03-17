@@ -131,6 +131,13 @@ Archboot bootparameters
       - Usage:
         root=/dev/<your-root-of-installed-system>
         root=/dev/sda3
+   * lvmwait=
+      - Using parameter followed by a comma-separated list of device names can
+        be given on the command line.
+      - It will cause the hook to wait until all given devices exist
+        before trying to scan and activate any volume groups.
+      - Usage:
+        lvmwait=/dev/mapper/device1,/dev/mapper/device2
 
    * advanced
       - This will override advanced hooks running order for your system.
