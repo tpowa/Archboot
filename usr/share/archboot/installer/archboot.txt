@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   March,11th 2010
+   March,17th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -263,14 +263,6 @@ Common Installation Procedure
 
   Prepare Hard Drive
 
-   First you will be asked if you want to use UUID for device name scheme.
-   It is recommended to use UUID, in order to avoid name collisions or 
-   name switching of devices.
-
-   Then you will be asked if you want to use GUID (gpt) partition table.
-   If you have no clue for what you will need it or plan to use grub2,
-   it's save to answer no.
-
    Prepare Hard Drive will lead you into a submenu offering two
    alternatives of preparing your target drive for installation.
 
@@ -288,12 +280,24 @@ Common Installation Procedure
    Read the warning presented by the installer very carefully, and make
    sure the correct device is about to be partitioned!
 
+   You will be asked if you want to use GUID (gpt) partition table.
+   If you have no clue for what you will need it or plan to use grub2,
+   it's save to answer no.
+
+   You will be asked if you want to use UUID for device name scheme.
+   It is recommended to use UUID, in order to avoid name collisions or
+   name switching of devices.
+
    If you prefer to do the partitioning manually, use the other two
    options, Partition Hard Drives and Set Filesystem Mountpoints to
    prepare the target media according to your specifications as outlined
    below. Then Return to Main Menu after a successful preparation.
 
   Partition Hard Drives
+
+   You will be asked if you want to use GUID (gpt) partition table.
+   If you have no clue for what you will need it or plan to use grub2,
+   it's save to answer no.
 
    You should select the disk(s) you want to partition, and
    you'll be dropped into the cfdisk program where you can freely modify
@@ -313,6 +317,10 @@ Common Installation Procedure
    You should select this choice once the partition information is edited 
    to your liking with the previous menu selection, or already existent through
    whatever other means.
+
+   You will be asked if you want to use UUID for device name scheme.
+   It is recommended to use UUID, in order to avoid name collisions or
+   name switching of devices.
 
    The first question to answer is what partition to use as swap. Select
    the previously created swap partition from the list, or NONE, if you
