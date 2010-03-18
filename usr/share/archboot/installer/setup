@@ -870,8 +870,12 @@ _raid()
         # enter raid device name
         RAIDDEVICE=""
         while [ "${RAIDDEVICE}" = "" ]; do
-            [ "$RAID_PARTITION" = "" ] && DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
-            [ "$RAID_PARTITION" = "1" ] && DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
+            if [ "$RAID_PARTITION" = "" ]; then
+                DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
+            fi
+            if [ "$RAID_PARTITION" = "1" ]; then
+                DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
+            fi
             RAIDDEVICE=$(cat $ANSWER)
             if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
@@ -949,8 +953,15 @@ _createraid()
         return 1
     fi
     if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
-        DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
-        cfdisk $RAIDDEVICE
+        # switch for mbr usage
+        set_guid
+        if [ "$GUIDPARAMETER" = "" ]; then
+            DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
+            cfdisk $RAIDDEVICE
+        else
+            DISC=$RAIDDEVICE
+            parted_gpt
+        fi
     fi
 }
 
@@ -1555,6 +1566,33 @@ EOF
     S_MKFSAUTO=1
 }
 
+parted_gpt() {
+    [ "$(parted -s $DISC print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
+    [ "$(parted -s $DISC print | grep "bios_grub")" ] && BIOS_GRUB=1
+    if [ "$GUID_DETECTED" = "" ] ; then
+        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to create a GUID (gpt) partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+        # clean partitiontable to avoid issues!
+        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+        parted -s $DISC mklabel GPT >$LOG
+    fi
+    if [ "$BIOS_GRUB" = "" ]; then
+        DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 10MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+    fi
+    if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
+        # assume new partitiontable,if no GUID was already there,
+        # no user interaction needed for bios_grub partition, jippie
+        GUID_PART_SIZE="10"
+        parted -s $DISC mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
+        parted -s $DISC set 1 bios_grub on >$LOG
+    else
+        [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 10MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+10>\nset <partitionnumber> bios_grub on" 0 0
+    fi
+    DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+    clear
+    parted $DISC print
+    parted $DISC
+}
+
 partition() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
@@ -1589,30 +1627,7 @@ partition() {
         CREATE_BIOS_GRUB=""
         if ! [ "$DISC" = "" ]; then
             if [ "$GUIDPARAMETER" = "yes" ]; then
-                [ "$(parted -s $DISC print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
-                [ "$(parted -s $DISC print | grep "bios_grub")" ] && BIOS_GRUB=1
-                if [ "$GUID_DETECTED" = "" ] ; then
-                     DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to create a GUID (gpt) partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-                     # clean partitiontable to avoid issues!
-                     dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
-                     parted -s $DISC mklabel GPT >$LOG
-                fi
-                if [ "$BIOS_GRUB" = "" ]; then
-                    DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 10MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
-                fi
-                if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
-                    # assume new partitiontable,if no GUID was already there,
-                    # no user interaction needed for bios_grub partition, jippie
-                    GUID_PART_SIZE="10"
-                    parted -s $DISC mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
-                    parted -s $DISC set 1 bios_grub on >$LOG
-                else
-                    [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 10MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+10>\nset <partitionnumber> bios_grub on" 0 0
-                fi
-                DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
-                clear
-                parted $DISC print
-                parted $DISC
+                parted_gpt
             else
                 [ "$(parted $DISC print | grep "Partition Table: msdos")" ] && MSDOS_DETECTED=1
                 if [ "$MSDOS_DETECTED" = "" ] ; then
@@ -2703,9 +2718,6 @@ dogrub2(){
         if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
             if ! [ "$(parted -sl | grep "bios_grub")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
-            fi
-            if [ "$FAIL_COMPLEX" = "0" ]; then
-                DIALOG --defaultno --yesno "Warning:\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
             fi
         else
             if [ "$FAIL_COMPLEX" = "0" ]; then
