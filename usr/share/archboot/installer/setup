@@ -2837,7 +2837,7 @@ dogrub2(){
         dmsetup mknodes
     fi
     chroot_mount
-    chroot $DESTDIR /sbin/grub-install $bootdev >> /tmp/grub2.log
+    chroot $DESTDIR /sbin/grub-install --no-floppy $bootdev >> /tmp/grub2.log
     chroot_umount
     cat /tmp/grub2.log >$LOG
     if ! [ -s /tmp/grub2.log ] ; then
