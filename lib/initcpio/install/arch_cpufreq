@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(checked_modules "arch/i386/kernel/cpu/cpufreq")  $(checked_modules "drivers/cpufreq") "
+    MODULES=" $(checked_modules "arch/x86/kernel/cpu/cpufreq")  $(checked_modules "drivers/cpufreq") "
 
     BINARIES="cpufreq-info cpufreq-set"
     FILES=""
