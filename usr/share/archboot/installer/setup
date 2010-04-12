@@ -519,7 +519,6 @@ set_guid () {
 
 # returns: 1 on failure
 _mkfs() {
-    [ "$UUID_RUN" = "" ] && set_uuid
     local _domk=$1
     local _device=$2
     local _fstype=$3
@@ -1476,6 +1475,7 @@ autoprepare() {
     rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
+    [ "$UUID_RUN" = "" ] && set_uuid
     # we assume a /dev/hdX format (or /dev/sdX)
     if [ "$GUIDPARAMETER" = "yes" ]; then
         PART_ROOT="${DEVICE}4"
@@ -1721,6 +1721,7 @@ mountpoints() {
     done
     # disable swap and all mounted partitions
     _umountall
+    [ "$UUID_RUN" = "" ] && set_uuid
     for line in $(cat /tmp/.parts); do
         PART=$(echo $line | cut -d: -f 1)
         FSTYPE=$(echo $line | cut -d: -f 2)
