@@ -12,7 +12,7 @@ Creation Date: @@DATE@@
 Release: @@RELEASENAME@@
 Standard kernel: @@KERNEL@@ / Long Time Support kernel: @@LTS_KERNEL@@
 Architecture: i686 / x86_64
-RAM requirement to boot: 288 MB or greater 
+RAM requirement to boot: 320 MB or greater
 
 Available boot options (no input will boot the 32bit archboot system):
 - 'arch <any_other_boot_option>' to boot the archboot system.
