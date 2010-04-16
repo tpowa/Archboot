@@ -66,7 +66,7 @@ fi
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.27-lts"
-[ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R2"
+[ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R3"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 # generate temp directories
