@@ -14,10 +14,10 @@ install ()
     # add unrar support
     add_file "/usr/lib/libclamunrar.so"
     add_file "/usr/lib/libclamunrar.so.6"
-    add_file "/usr/lib/libclamunrar.so.6.0.5"
+    add_file "/usr/lib/libclamunrar.so.6.1.2"
     add_file "/usr/lib/libclamunrar_iface.so"
     add_file "/usr/lib/libclamunrar_iface.so.6"
-    add_file "/usr/lib/libclamunrar_iface.so.6.0.5"
+    add_file "/usr/lib/libclamunrar_iface.so.6.1.2"
 }
 
 help ()
