@@ -126,6 +126,10 @@ get_media() {
             if [ "$(cat $block/$dev/device/type)" = "5" ]; then
                 check_media
             fi
+            #check virtio devices
+            if ! [ -e $block/$dev/device/type ]; then
+                check_media
+            fi
         done
     fi
     if [ "$SET_MEDIA" = "0" ]; then
@@ -178,7 +182,9 @@ default_blockdevices() {
     done
     #scsi/sata devices, and virtio blockdevices (/dev/vd*)
     for dev in $(ls $block 2>/dev/null | egrep '^[sv]d'); do
-        if ! [ "$(cat $block/$dev/device/type)" = "5" ]; then
+        # virtio device doesn't have type file!
+        blktype="$(cat $block/$dev/device/type 2>/dev/null)"
+        if ! [ "$blktype" = "5" ]; then
             if ! [ "$(cat $block/$dev/size)" = "0" ]; then
                 if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
                     echo "/dev/$dev"
