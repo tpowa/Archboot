@@ -3148,39 +3148,6 @@ _createluks()
     fi
 }
 
-do_pacmanmirror()
-{
-    SAMEMIRROR=""
-    mirrorlist="${DESTDIR}/etc/pacman.d/mirrorlist"
-    if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
-        DIALOG --yesno "Would you like to use the same MIRROR you used for installation?" 0 0 && SAMEMIRROR="yes"
-    fi
-    if ! [ "$SAMEMIRROR" = "yes" ]; then
-        DIALOG --msgbox "WARNING:\n\n- Please keep in mind ftp.archlinux.org is throttled!\n- Please select another mirror to get full download speed." 18 70
-        # this will find all mirrors in the mirrorlist, commented out or not
-        PAC_MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "$mirrorlist" | sed 's|$| _|g')
-        DIALOG --menu "Select the primary Pacman mirror" 14 55 7 $PAC_MIRRORS "Custom" "_" 2>$ANSWER || return 1
-        PAC_SYNC_SERVER="$(cat $ANSWER)"
-        if [ "$PAC_SYNC_SERVER" = "Custom" ]; then
-            DIALOG --inputbox "Enter the full URL to packages, for example:\nhttp://server.org/archlinux/\$repo/os/$(uname -m)" 8 65 "http://" 2>$ANSWER || return 1
-            PAC_SYNC_SERVER="$(cat $ANSWER)"
-        else
-            # Form the full URL for our mirror by grepping for the
-            # server name in our mirrorlist and pulling the full URL
-            # out. Ensure that if it was listed twice we only return
-            # one line for the mirror.
-            PAC_SYNC_SERVER=$(egrep -o "${PAC_SYNC_SERVER}.*" "$mirrorlist" | head -n1)
-        fi
-    else
-        PAC_SYNC_SERVER="${SYNC_URL}"
-    fi
-    # comment out all existing mirrors
-    sed -i -e 's/^Server/#Server/g' "$mirrorlist"
-    # add our new entry at the end of the file
-    echo "# Setup-configured entry" >> "$mirrorlist"
-    echo "Server = $PAC_SYNC_SERVER" >> "$mirrorlist"
-}
-
 auto_hwdetect()
 {
     HWDETECT=""
@@ -3328,7 +3295,7 @@ configure_system()
         else
             DEFAULT=""
         fi
-        DIALOG $DEFAULT --menu "Configuration" 20 80 16 \
+        DIALOG $DEFAULT --menu "Configuration" 20 80 15 \
             "/etc/rc.conf"                  "System Config" \
             "/etc/fstab"                    "Filesystem Mountpoints" \
             "/etc/mkinitcpio.conf"          "Initramfs Config" \
@@ -3338,7 +3305,6 @@ configure_system()
             "/etc/hosts.deny"               "Denied Network Services" \
             "/etc/hosts.allow"              "Allowed Network Services" \
             "/etc/locale.gen"               "Glibc Locales" \
-            "Pacman-Mirror"                 "Set the primary pacman mirror" \
             "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
             "/etc/pacman.conf"              "Pacman Config File" \
             "Root-Password"                 "Set the root password" \
@@ -3382,8 +3348,6 @@ configure_system()
             done
             chroot ${DESTDIR} passwd root < /tmp/.password
             rm /tmp/.password
-        elif [ "$FILE" = "Pacman-Mirror" ]; then            # non-file
-            do_pacmanmirror
         else                                                #regular file
             $EDITOR ${DESTDIR}${FILE}
         fi
