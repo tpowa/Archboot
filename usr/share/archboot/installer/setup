@@ -2311,11 +2311,12 @@ getrootuuid() {
 dosyslinux() {
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
+        source_set || return 1
+        pacman_conf
         ### HACK!
         # syslinux is not part of core repository
         pacman_conf_extra
         PACKAGES="syslinux"
-        source_set
         prepare_pacman
         run_pacman
         # reset PACKAGES after installing
@@ -2407,7 +2408,8 @@ dosyslinux() {
 dolilo() {
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
-        source_set
+        source_set || return 1
+        pacman_conf
         prepare_pacman
         PACKAGES="lilo"
         run_pacman
@@ -2462,7 +2464,8 @@ dolilo() {
 dogrub() {
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
-        source_set
+        source_set || return 1
+        pacman_conf
         prepare_pacman
         PACKAGES="grub"
         run_pacman
@@ -2655,10 +2658,11 @@ dogrub2(){
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
+        source_set || return 1
+        pacman_conf
         ### HACK!
         # grub2 is not part of core repository and conflicts with grub -> uninstall grub first!
         pacman_conf_extra
-        source_set
         prepare_pacman
         PACKAGES="grub2"
         run_pacman
