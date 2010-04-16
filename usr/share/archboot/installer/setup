@@ -422,13 +422,13 @@ mapdev() {
     device_found=0
     [ "$GRUB_LEGACY" = "" ] && devs=$(cat /tmp/device.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     [ "$GRUB_LEGACY" = "1" ] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
-    # check if we use hd or sd device
-    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+    # check if we use hd sd  or vd device
+    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]; then
         linuxdevice=$(echo $1 | sed -e 's#p[0-9].*$##')
     else
         linuxdevice=$(echo $1 | sed -e 's#[0-9].*$##g')
     fi
-    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" ]; then
+    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]; then
         if [ "$(echo $1 | egrep 'p[0-9].*$')" ]; then
             pnum=$(echo $1 | sed -e 's#.*p##g')
             [ "$GRUB_LEGACY" = "1" ] && pnum=$(($pnum-1))
