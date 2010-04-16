@@ -90,7 +90,7 @@ chroot_umount()
 # returns:    nothing
 getuuid()
 {
-    if [ "${1%%/[hs]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" ]; then
+    if [ "${1%%/[hsv]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" ]; then
         echo "$(blkid -s UUID -o value ${1})"
     fi
 }
@@ -369,6 +369,7 @@ quit
 EOF
 }
 
+# dmraid needs manual mapping
 get_grub_dmraid_map() {
     USE_DMRAID="1"
     rm /tmp/dev.map
@@ -376,6 +377,17 @@ get_grub_dmraid_map() {
     majorhd=0
     for i in $(dmraid -s -c); do
         echo "(hd$majorhd) /dev/mapper/$i" >> /tmp/dev.map
+        majorhd="$(($majorhd+1))"
+    done
+}
+
+# virtio devices need manual mapping
+get_grub_virtio_map() {
+    rm /tmp/dev.map
+    majorhd=0
+    #add virtio devices
+    for i in $(ls /dev/vd[a-z]); do
+        echo "(hd$majorhd) $i" >> /tmp/dev.map
         majorhd="$(($majorhd+1))"
     done
 }
@@ -1830,20 +1842,10 @@ CacheDir = /src/core-any/pkg
 
 [core]
 Server = ${serverurl}
-EOF
-}
 
-# pacman_conf_extra()
-# adds extra repository for ftp installation mode
-pacman_conf_extra() {
-    if [ "$MODE" = "ftp" ]; then
-        local serverurl="${SYNC_URL}"
-    else
-        local serverurl="${FILE_URL}"
-    fi
-    # Setup a pacman.conf in /tmp
-    echo "[extra]" >> /tmp/pacman.conf
-    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
+[extra]
+Server =  ${serverurl}
+EOF
 }
 
 # configures pacman and syncs db on destination system
@@ -1998,8 +2000,6 @@ select_packages() {
 
         DIALOG  --separate-output --checklist "Select Packages To Install." 19 60 12 $_pkglist 2>$ANSWER || return 1
         PACKAGES="$(cat $ANSWER)"
-        pacman_conf_extra
-        prepare_pacman
     fi
     # Add packages which are not in core repository
     if [ "$(grep -w nvidia-kms /proc/cmdline)" ]; then
@@ -2311,13 +2311,7 @@ getrootuuid() {
 dosyslinux() {
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
-        source_set || return 1
-        pacman_conf
-        ### HACK!
-        # syslinux is not part of core repository
-        pacman_conf_extra
         PACKAGES="syslinux"
-        prepare_pacman
         run_pacman
         # reset PACKAGES after installing
         PACKAGES=""
@@ -2408,9 +2402,6 @@ dosyslinux() {
 dolilo() {
     if [ ! -f $DESTDIR/etc/lilo.conf ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
-        source_set || return 1
-        pacman_conf
-        prepare_pacman
         PACKAGES="lilo"
         run_pacman
         # reset PACKAGES after installing
@@ -2446,6 +2437,12 @@ dolilo() {
     DIALOG --menu "Select the boot device where the LILO bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
     ROOTDEV=$(cat $ANSWER)
     sed -i "s|boot=.*$|boot=$ROOTDEV|g" $DESTDIR/etc/lilo.conf
+    # HACK: if virtio device is used
+    if [ "$(echo $ROOTDEV | grep /dev/vd)" ]; then
+        sed -i "s|.*disk=.*$|disk=$ROOTDEV bios=0x80 max-partitions=7|g" $DESTDIR/etc/lilo.conf
+    else
+        sed -i "s|^disk=.*$|# disk=$ROOTDEV bios=0x80|g" $DESTDIR/etc/lilo.conf
+    fi
     DIALOG --msgbox "Before installing LILO, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, LILO will be installed." 0 0
     [ "$EDITOR" ] || geteditor
     $EDITOR ${DESTDIR}/etc/lilo.conf
@@ -2464,9 +2461,6 @@ dolilo() {
 dogrub() {
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
-        source_set || return 1
-        pacman_conf
-        prepare_pacman
         PACKAGES="grub"
         run_pacman
         # reset PACKAGES after installing
@@ -2488,6 +2482,9 @@ dogrub() {
     USE_DMRAID=""
     if ! [ "$(dmraid -r | grep ^no )" ]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
+    fi
+    if  [ "$(ls /dev/vd[a-z] 2>/dev/null)" ]; then
+        DIALOG --yesno "Setup detected virtio devices.\nDo you want to install grub on this device?" 0 0 && get_grub_virtio_map
     fi
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
@@ -2658,12 +2655,6 @@ dogrub2(){
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
-        source_set || return 1
-        pacman_conf
-        ### HACK!
-        # grub2 is not part of core repository and conflicts with grub -> uninstall grub first!
-        pacman_conf_extra
-        prepare_pacman
         PACKAGES="grub2"
         run_pacman
         # reset PACKAGES after installing
@@ -3380,6 +3371,9 @@ install_bootloader()
 {
     destdir_mounts || return 1
     [ "$UUID_RUN" = "" ] && set_uuid
+    source_set || return 1
+    pacman_conf
+    prepare_pacman
     CANCEL=""
     DIALOG --menu "Which bootloader would you like to use?" \
         11 55 4 \
