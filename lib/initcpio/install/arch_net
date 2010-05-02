@@ -8,7 +8,7 @@ install ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="ping ping6 route nslookup telnet ssh arpd ctstat genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr rtstat ss tc dhclient ifplugd ifplugstatus nc"
+    BINARIES="ping ping6 route nslookup telnet ssh arpd ctstat genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr rtstat ss tc dhclient ifplugd ifplugstatus"
     FILES=""
     SCRIPT=""
     add_file "/sbin/dhcpcd"
