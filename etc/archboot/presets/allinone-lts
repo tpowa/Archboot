@@ -9,7 +9,7 @@ KERNEL_BOOT_OPTIONS="rootdelay=10"
 MKINITCPIO_CONFIG="/etc/archboot/allinone-lts.conf"
 
 # kernel version, defaulted to build for runtime kernel
-VERSION="2.6.27-lts"
+VERSION="2.6.32-lts"
 
 # kernel image, defaulted to stock arch kernel
 KERNEL="/boot/vmlinuz26-lts"
