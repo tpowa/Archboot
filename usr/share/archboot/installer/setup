@@ -2003,8 +2003,11 @@ select_packages() {
     fi
     # Add packages which are not in core repository
     if [ "$(grep -w nvidia-kms /proc/cmdline)" ]; then
-        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm"
-        ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+        if ! [ "$(grep -w nouveau-drm $PACKAGES)" ]; then
+            [ "$VMLINUZ" = "kernel26" ] && PACKAGES="$PACKAGES nouveau-drm"
+            [ "$VMLINUZ" = "kernel26-lts" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
+            ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+        fi
     fi
     if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
         ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
