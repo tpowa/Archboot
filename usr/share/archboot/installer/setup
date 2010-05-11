@@ -2702,7 +2702,7 @@ dogrub2(){
                 RAID_ON_LVM="0"
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
-                    if [ "$(echo $devpath | | grep -v /dev/md_d | grep /dev/md)" ]; then
+                    if [ "$(echo $devpath | grep -v /dev/md_d | grep /dev/md)" ]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
                             # change bootdev to md device!
