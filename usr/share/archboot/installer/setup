@@ -2700,13 +2700,17 @@ dogrub2(){
             # check if mapper is used
             if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
                 RAID_ON_LVM="0"
+                ### HACK:
+                # create no symlinked device mapper devices, else grub-install will fail!
+                # grub2 needs to be fixed here!
+                [ -e $bootdev ] && rm $bootdev
+                dmsetup mknodes
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
                     if [ "$(echo $devpath | grep -v /dev/md_d | grep /dev/md)" ]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
                             # change bootdev to md device!
-                            real_bootdev=$bootdev
                             bootdev=$(pvs -o pv_name --noheading $devpath)
                             RAID_ON_LVM="1"
                             break
@@ -2832,19 +2836,6 @@ dogrub2(){
     DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
     # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
     freeze_xfs
-    ### HACK:
-    # create no symlinked device mapper devices, else grub-install will fail!
-    # grub2 needs to be fixed here!
-    # for simple lvm device!
-    if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "0" ]; then
-        rm $bootdev
-        dmsetup mknodes
-    fi
-    # hidden md device by lvm, you need to delete the lvm symlink not /dev/md!
-    if [ "$FAIL_COMPLEX" = "0" -a "$RAID_ON_LVM" = "1" ]; then
-        rm $real_bootdev
-        dmsetup mknodes
-    fi
     chroot_mount
     chroot $DESTDIR /sbin/grub-install --no-floppy $bootdev >> /tmp/grub2.log
     chroot_umount
