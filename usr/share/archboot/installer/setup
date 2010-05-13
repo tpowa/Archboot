@@ -82,8 +82,7 @@ chroot_umount()
 }
 
 # getuuid()
-# converts /dev/[hs]d?[0-9] devices to UUIDs
-# including mapper, ida and cciss devices
+# converts /dev devices to UUIDs
 #
 # parameters: device file
 # outputs:    UUID on success
@@ -91,9 +90,7 @@ chroot_umount()
 # returns:    nothing
 getuuid()
 {
-    if [ "${1%%/[hsv]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" -o "${1%%/ida/c[0-9]d*}" != "${1}" -o "${1%%/cciss/c[0-9]d*}" != "${1}" ]; then
-        echo "$(blkid -s UUID -o value ${1})"
-    fi
+    echo "$(blkid -s UUID -o value ${1})"
 }
 
 # Check media on install packages
@@ -195,17 +192,22 @@ default_blockdevices() {
         fi
     done
     # Include additional controllers:
-    #   AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
+    #   Promise Fastrak, AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
     #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
     #   Compaq Intelligent Drive Array
-    EXTRA_CONTROLLER="amiraid carmel rd cciss ida"
+    EXTRA_CONTROLLER="ataraid amiraid carmel rd cciss ida"
     for i in $EXTRA_CONTROLLER; do
         if [ -d /dev/$i ] ; then
-            for dev in $(ls /dev/$i | egrep -v 'p'); do
+            for dev in $(ls /dev/$i 2>/dev/null | egrep -v 'p'); do
                 echo "/dev/$i/$dev"
                 [ "$1" ] && echo $1
             done
         fi
+    done
+    # Include MMC devices
+    for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
+        echo "/dev/$dev"
+        [ "$1" ] && echo $1
     done
 }
 
@@ -230,11 +232,11 @@ dmraid_devices() {
 }
 
 # lists additional linux blockdevices partitions:
-#   AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
+#   Promise Fastrak, AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
 #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
 #   Compaq Intelligent Drive Array
 additional_blockdevices_partitions() {
-    EXTRA_CONTROLLER="amiraid carmel rd cciss ida"
+    EXTRA_CONTROLLER="ataraid amiraid carmel rd cciss ida"
     for i in $EXTRA_CONTROLLER; do
         if [ -d /dev/$i ] ; then
             for dev in $(ls /dev/$i | egrep 'p'); do
@@ -242,6 +244,11 @@ additional_blockdevices_partitions() {
                 [ "$1" ] && echo $1
             done
         fi
+    done
+    # Include MMC devices
+    for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep 'p'); do
+        echo "/dev/$dev"
+        [ "$1" ] && echo $1
     done
 }
 
