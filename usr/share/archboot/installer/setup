@@ -83,6 +83,7 @@ chroot_umount()
 
 # getuuid()
 # converts /dev/[hs]d?[0-9] devices to UUIDs
+# including mapper, ida and cciss devices
 #
 # parameters: device file
 # outputs:    UUID on success
@@ -90,7 +91,7 @@ chroot_umount()
 # returns:    nothing
 getuuid()
 {
-    if [ "${1%%/[hsv]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" ]; then
+    if [ "${1%%/[hsv]d?[0-9]}" != "${1}" -o "${1%%/md[0-9]}" != "${1}" -o "${1%%/mapper/*}" != "${1}" -o "${1%%/ida/c[0-9]d*}" != "${1}" -o "${1%%/cciss/c[0-9]d*}" != "${1}" ]; then
         echo "$(blkid -s UUID -o value ${1})"
     fi
 }
@@ -193,20 +194,19 @@ default_blockdevices() {
             fi
         fi
     done
-    # cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep -v 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep -v 'p'); do
-                echo "/dev/ida/$dev"
+    # Include additional controllers:
+    #   AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
+    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+    #   Compaq Intelligent Drive Array
+    EXTRA_CONTROLLER="amiraid carmel rd cciss ida"
+    for i in $EXTRA_CONTROLLER; do
+        if [ -d /dev/$i ] ; then
+            for dev in $(ls /dev/$i | egrep -v 'p'); do
+                echo "/dev/$i/$dev"
                 [ "$1" ] && echo $1
-        done
-    fi
+            done
+        fi
+    done
 }
 
 # lists default linux partitionable raid devices
@@ -229,22 +229,20 @@ dmraid_devices() {
     fi
 }
 
-# lists default linux blockdevices partitions
-default_blockdevices_partitions() {
-    # inlcude cciss controllers
-    if [ -d /dev/cciss ] ; then
-        for dev in $(ls /dev/cciss | egrep 'p'); do
-            echo "/dev/cciss/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
-    # inlcude Smart 2 controllers
-    if [ -d /dev/ida ] ; then
-        for dev in $(ls /dev/ida | egrep 'p'); do
-            echo "/dev/ida/$dev"
-            [ "$1" ] && echo $1
-        done
-    fi
+# lists additional linux blockdevices partitions:
+#   AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
+#   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+#   Compaq Intelligent Drive Array
+additional_blockdevices_partitions() {
+    EXTRA_CONTROLLER="amiraid carmel rd cciss ida"
+    for i in $EXTRA_CONTROLLER; do
+        if [ -d /dev/$i ] ; then
+            for dev in $(ls /dev/$i | egrep 'p'); do
+                echo "/dev/$i/$dev"
+                [ "$1" ] && echo $1
+            done
+        fi
+    done
 }
 
 # do sanity checks on partitions, argument comes $devpath loop
@@ -320,7 +318,7 @@ findpartitions() {
     for devpath in $(finddisks); do
         default_partition_check $1
     done
-    default_blockdevices_partitions $1
+    additional_blockdevices_partitions $1
     dmraid_partitions $1
     raid_devices $1
 }
@@ -340,7 +338,7 @@ findbootloaderpartitions() {
         for devpath in $(findbootloaderdisks); do
             default_partition_check $1
         done
-        default_blockdevices_partitions $1
+        additional_blockdevices_partitions $1
     else
         dmraid_partitions $1
     fi
