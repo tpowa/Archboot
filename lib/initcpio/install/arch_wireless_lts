@@ -35,8 +35,8 @@ install ()
     # add ndiswrapper support
     add_file "/usr/sbin/ndiswrapper"
     add_file "/usr/share/perl5/core_perl/File/Path.pm"
-    add_file "/usr/share/perl5/core_perl/File/Spec/Unix.pm"
-    add_file "/usr/share/perl5/core_perl/File/Spec.pm"
+    add_file "/usr/lib/perl5/core_perl/File/Spec/Unix.pm"
+    add_file "/usr/lib/perl5/core_perl/File/Spec.pm"
     add_file "/usr/share/perl5/core_perl/File/Copy.pm"
     add_file "/usr/share/perl5/core_perl/File/Basename.pm"
     add_file "/usr/share/perl5/core_perl/Exporter/Heavy.pm"
@@ -57,7 +57,7 @@ install ()
     add_file "/usr/lib/perl5/core_perl/auto/DynaLoader/dl_findfile.al"
     add_file "/usr/lib/perl5/core_perl/Config.pm"
     add_file "/usr/lib/perl5/core_perl/DynaLoader.pm"
-    add_file "/usr/lib/perl5/core_perl/XSLoader.pm"
+    add_file "/usr/share/perl5/core_perl/XSLoader.pm"
     add_file "/usr/lib/perl5/core_perl/Fcntl.pm"
     # crda support
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless-regdom" "/etc/conf.d/wireless-regdom"
