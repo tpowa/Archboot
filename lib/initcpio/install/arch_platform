@@ -1,0 +1,19 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=" $(checked_modules "/platform/") "
+
+    MODULES=$(echo ${MODULES}) #trim whitespace
+    BINARIES=""
+    FILES=""
+    SCRIPT=""
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook adds the necessary modules for a platform device.
+HELPEOF
+}
+ 
