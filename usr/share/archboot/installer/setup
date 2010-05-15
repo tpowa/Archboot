@@ -96,7 +96,7 @@ getuuid()
 # Check media on install packages
 check_media() {
     ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media >/dev/null 2>&1
-    if [ -d $media/core-$(uname -m)/pkg ]; then
+    if [ -d $media/core-$(uname -m)/pkg -a -d $media/core-any/pkg ]; then
         SET_MEDIA=1
         break
     else
