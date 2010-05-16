@@ -138,6 +138,12 @@ get_media() {
             fi
         done
     fi
+    if [ "$SET_MEDIA" = "0" ]; then
+        # MMC devices with raw partitions
+        for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
+            check_media
+        done
+    fi
 }
 
 #check on manual mounted source
@@ -147,6 +153,10 @@ manual_media() {
     fi
     if [ ! -d /src/core-$(uname -m)/pkg ]; then
         DIALOG --msgbox "Package directory /src/core-$(uname -m)/pkg is missing!" 0 0
+        return 1
+    fi
+    if [ ! -d /src/core-any/pkg ]; then
+        DIALOG --msgbox "Package directory /src/core-any/pkg is missing!" 0 0
         return 1
     fi
 }
@@ -644,15 +654,21 @@ _getavaildisks()
 _getavailpartitions()
 {
     for i in $(findpartitions); do
-        if [ $(echo "$i" | grep '/md_d[0-9]') ]; then
+        # mmc and raid partitions
+        if [ $(echo "$i" | grep '/md_d[0-9]') -o $(echo "$i" | grep 'mmcblk') ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+        # raid device
         elif [ $(echo "$i" | grep 'md') ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+        # mapper devices
         elif [ $(echo "$i" | grep 'mapper') ]; then
+            # crypt device
             if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
+            # dmraid device
             elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
                 [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+            # mapper device
             else
                 echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
             fi
