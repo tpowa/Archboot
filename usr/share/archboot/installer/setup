@@ -637,13 +637,11 @@ _mkfs() {
 _getavaildisks()
 {
     for i in $(finddisks); do
-        #if ! [ "$(pvs -o pv_name --noheading | grep $i)" ]; then
             if [ $(echo "$i" | grep 'mapper') ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
-        #fi
     done
 }
 
