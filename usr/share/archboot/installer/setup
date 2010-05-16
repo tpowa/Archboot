@@ -275,7 +275,7 @@ default_partition_check() {
             #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")
             #- extended partition
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")
-            #- extended partition on raid partition device
+            #- extended partition on raid partition device and mmc device
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
