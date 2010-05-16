@@ -436,7 +436,6 @@ EOF
 get_grub_dmraid_map() {
     USE_DMRAID="1"
     rm /tmp/dev.map
-    DIALOG --infobox "Generating GRUB dmraid device map...\nThis could take a while.\n\n Please be patient." 0 0
     majorhd=0
     for i in $(dmraid -s -c); do
         echo "(hd$majorhd) /dev/mapper/$i" >> /tmp/dev.map
