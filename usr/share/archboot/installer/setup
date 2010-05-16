@@ -93,6 +93,50 @@ getuuid()
     echo "$(blkid -s UUID -o value ${1})"
 }
 
+# activate_dmraid()
+# activate dmraid devices
+activate_dmraid()
+{
+    if [ -e /sbin/dmraid ]; then
+        DIALOG --infobox "Activating dmraid arrays..." 0 0
+        /sbin/dmraid -ay -I -Z >/dev/null 2>&1
+    fi
+}
+
+# activate_lvm2
+# activate lvm2 devices
+activate_lvm2()
+{
+    if [ -e /sbin/lvm ]; then
+        DIALOG --infobox "Scanning logical volumes..." 0 0
+        /sbin/lvm vgscan --ignorelockingfailure >/dev/null 2>&1
+        DIALOG --infobox "Activating logical volumes..." 0 0
+        /sbin/lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
+    fi
+}
+
+# activate_raid
+# activate md devices
+activate_raid()
+{
+    if [ -e /sbin/mdadm ]; then
+        DIALOG --infobox "Activating RAID arrays..." 0 0
+        /sbin/mdadm --assemble --scan >/dev/null 2>&1
+    fi
+}
+
+# activate_special_devices()
+# activate special devices:
+# activate dmraid, lvm2 and raid devices, if not already activated during bootup!
+# raid needs to be involved twice, because lvm can hide it.
+activate_special_devices()
+{
+    activate_dmraid
+    activate_raid
+    activate_lvm2
+    activate_raid
+}
+
 # Check media on install packages
 check_media() {
     ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media >/dev/null 2>&1
@@ -326,12 +370,14 @@ dmraid_partitions() {
 }
 
 finddisks() {
+    activate_special_devices
     default_blockdevices $1
     dmraid_devices $1
     partitionable_raid_devices $1
 }
 
 findpartitions() {
+    activate_special_devices
     for devpath in $(finddisks); do
         default_partition_check $1
     done
@@ -342,6 +388,7 @@ findpartitions() {
 
 # don't check on raid devices!
 findbootloaderdisks() {
+    activate_special_devices
     if ! [ "$USE_DMRAID" = "1" ]; then
         default_blockdevices $1
     else
@@ -351,6 +398,7 @@ findbootloaderdisks() {
 
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
+    activate_special_devices
     if ! [ "$USE_DMRAID" = "1" ]; then
         for devpath in $(findbootloaderdisks); do
             default_partition_check $1
