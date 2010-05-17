@@ -2068,12 +2068,9 @@ select_packages() {
         PACKAGES="$(cat $ANSWER)"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" ]; then
-        if ! [ "$(grep -w nouveau-drm $PACKAGES)" ]; then
-            [ "$VMLINUZ" = "kernel26" ] && PACKAGES="$PACKAGES nouveau-drm"
-            [ "$VMLINUZ" = "kernel26-lts" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
-            ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
-        fi
+    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
+        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
+        ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
     fi
     if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
         ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
@@ -2549,12 +2546,14 @@ dogrub() {
     FAIL_DM=""
     GRUB_LEGACY="1"
     USE_DMRAID=""
+    #checks for custom dev.map filesystem
     if ! [ "$(dmraid -r | grep ^no )" ]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
     if  [ "$(ls /dev/vd[a-z] 2>/dev/null)" ]; then
         DIALOG --yesno "Setup detected virtio devices.\nDo you want to install grub on this device?" 0 0 && get_grub_virtio_map
     fi
+
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
