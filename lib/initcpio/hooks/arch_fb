@@ -18,7 +18,6 @@ run_hook ()
     fbmodule="nouveau"
   else
     echo "blacklist nouveau" >> /etc/modprobe.d/framebuffer_blacklist.conf
-    rm /lib/modules/$(uname -r)/updates/*
   fi
   if [ "$ati_kms" = "y" ]; then
     msg ":: Switching to ati kms mode..."
