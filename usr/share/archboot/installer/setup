@@ -267,9 +267,13 @@ default_blockdevices() {
 
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
-    for dev in $(cat /proc/mdstat 2>/dev/null | grep ^md_d[0-9] | sed 's#:.*##g'); do
-        echo "/dev/$dev"
-        [ "$1" ] && echo $1
+    for dev in $(ls $block 2>/dev/null | egrep '^md'); do
+        for i in $(ls $block/$dev | egrep ${dev}p); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+            fi
+        done
     done
 }
 
@@ -370,14 +374,12 @@ dmraid_partitions() {
 }
 
 finddisks() {
-    activate_special_devices
     default_blockdevices $1
     dmraid_devices $1
     partitionable_raid_devices $1
 }
 
 findpartitions() {
-    activate_special_devices
     for devpath in $(finddisks); do
         default_partition_check $1
     done
@@ -388,7 +390,6 @@ findpartitions() {
 
 # don't check on raid devices!
 findbootloaderdisks() {
-    activate_special_devices
     if ! [ "$USE_DMRAID" = "1" ]; then
         default_blockdevices $1
     else
@@ -398,7 +399,6 @@ findbootloaderdisks() {
 
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
-    activate_special_devices
     if ! [ "$USE_DMRAID" = "1" ]; then
         for devpath in $(findbootloaderdisks); do
             default_partition_check $1
@@ -684,7 +684,7 @@ _mkfs() {
 _getavaildisks()
 {
     for i in $(finddisks); do
-            if [ $(echo "$i" | grep 'mapper') ]; then
+            if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
@@ -700,13 +700,13 @@ _getavailpartitions()
 {
     for i in $(findpartitions); do
         # mmc and raid partitions
-        if [ $(echo "$i" | grep '/md_d[0-9]') -o $(echo "$i" | grep 'mmcblk') ]; then
+        if [ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         # raid device
-        elif [ $(echo "$i" | grep 'md') ]; then
+        elif [ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]; then
             echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
-        elif [ $(echo "$i" | grep 'mapper') ]; then
+        elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
             # crypt device
             if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
@@ -715,7 +715,7 @@ _getavailpartitions()
                 [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
             else
-                echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#M##g') MB; echo "\n"
+                echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
             fi
         else
             echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
@@ -898,6 +898,7 @@ _raid()
 {
     MDFINISH=""
     while [ "$MDFINISH" != "DONE" ]; do
+        activate_special_devices
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
@@ -1075,6 +1076,7 @@ _createpv()
 {
     PVFINISH=""
     while [ "$PVFINISH" != "DONE" ]; do
+        activate_special_devices
         : >/tmp/.pvs-create
         PVDEVICE=""
         #PARTS=$(finddisks _)
@@ -1342,6 +1344,7 @@ _luks()
 {
     LUKSFINISH=""
     while [ "$LUKSFINISH" != "DONE" ]; do
+        activate_special_devices
         #PARTS=$(finddisks _)
         PARTS="$(findpartitions _)"
         ALREADYINUSE=""
@@ -1739,6 +1742,7 @@ partition() {
 mountpoints() {
     UUID_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
+        activate_special_devices
         : >/tmp/.fstab
         : >/tmp/.parts
         FSOPTS=""
@@ -2383,6 +2387,7 @@ dosyslinux() {
         PACKAGES=""
     fi
     USE_DMRAID=""
+    activate_special_devices
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2474,6 +2479,7 @@ dolilo() {
         PACKAGES=""
     fi
     USE_DMRAID=""
+    activate_special_devices
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2537,6 +2543,7 @@ dogrub() {
     bootdev=""
     grubdev=""
     redundant=""
+    activate_special_devices
     getrootfs
     getraidarrays
     getcryptsetup
@@ -2735,6 +2742,7 @@ dogrub2(){
     GRUB_LEGACY=""
     USE_DMRAID=""
     RAID_ON_LVM=""
+    activate_special_devices
     getrootfs
     getraidarrays
     getcryptsetup
