@@ -259,9 +259,14 @@ default_blockdevices() {
         fi
     done
     # Include MMC devices
-    for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
-        echo "/dev/$dev"
-        [ "$1" ] && echo $1
+    for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
+        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$dev"
+                [ "$1" ] && echo $1
+                break
+            fi
+        done
     done
 }
 
@@ -317,9 +322,13 @@ additional_blockdevices_partitions() {
         fi
     done
     # Include MMC devices
-    for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep 'p'); do
-        echo "/dev/$dev"
-        [ "$1" ] && echo $1
+    for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
+        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$i"
+                [ "$1" ] && echo $1
+            fi
+        done
     done
 }
 
