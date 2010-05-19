@@ -268,9 +268,22 @@ default_blockdevices() {
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
     for dev in $(ls $block 2>/dev/null | egrep '^md'); do
-        for i in $(ls $block/$dev | egrep ${dev}p); do 
+        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
             if [ -d "$block/$dev/$i" ]; then 
                 echo "/dev/$dev"
+                [ "$1" ] && echo $1
+                break
+            fi
+        done
+    done
+}
+
+# lists default linux partitionable raid devices
+partitionable_raid_devices_partitions() {
+    for dev in $(ls $block 2>/dev/null | egrep '^md'); do
+        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$i"
                 [ "$1" ] && echo $1
             fi
         done
@@ -338,11 +351,13 @@ default_partition_check() {
 
 # list none partitionable raid md devices
 raid_devices() {
-    for devpath in $(ls -d /dev/md* 2>/dev/null | grep md[0-9]); do
-        # exlude md partitions which are part of lvm or luks
-        if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
-                echo "$devpath"
-                [ "$1" ] && echo $1
+    for dev in $(ls $block 2>/dev/null | egrep '^md'); do
+        if ! [ "$(ls $block/$dev 2>/dev/null | egrep ${dev}p)" ]; then 
+            # exlude md partitions which are part of lvm or luks
+            if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                    echo "$devpath"
+                    [ "$1" ] && echo $1
+            fi
         fi
     done
 }
@@ -386,6 +401,7 @@ findpartitions() {
     additional_blockdevices_partitions $1
     dmraid_partitions $1
     raid_devices $1
+    partitionable_raid_devices_partitions $1
 }
 
 # don't check on raid devices!
