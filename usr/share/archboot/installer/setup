@@ -245,6 +245,10 @@ default_blockdevices() {
             fi
         fi
     done
+}
+
+# lists additional linux blockdevices
+additional_blockdevices() {
     # Include additional controllers:
     #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
     #   Compaq Intelligent Drive Array
@@ -269,6 +273,45 @@ default_blockdevices() {
                 break
             fi
         done
+    done
+}
+
+# lists additional linux blockdevices partitions
+additional_blockdevices_partitions() {
+    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+    #   Compaq Intelligent Drive Array
+    EXTRA_CONTROLLER="rd cciss ida"
+    for k in $EXTRA_CONTROLLER; do
+        for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
+            for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
+                if [ -d "$block/$dev/$i" ]; then 
+                    echo "/dev/$k/$(echo $i | sed -e 's#.*\!##g')"
+                    [ "$1" ] && echo $1
+                fi
+            done
+        done
+    done
+    # Include MMC devices
+    for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
+        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$i"
+                [ "$1" ] && echo $1
+            fi
+        done
+    done
+}
+
+# list none partitionable raid md devices
+raid_devices() {
+    for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
+        if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
+            # exlude md partitions which are part of lvm or luks
+            if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                    echo "/dev/$devpath"
+                    [ "$1" ] && echo $1
+            fi
+        fi
     done
 }
 
@@ -309,29 +352,29 @@ dmraid_devices() {
     fi
 }
 
-# lists additional linux blockdevices partitions
-additional_blockdevices_partitions() {
-    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-    #   Compaq Intelligent Drive Array
-    EXTRA_CONTROLLER="rd cciss ida"
-    for k in $EXTRA_CONTROLLER; do
-        for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
-            for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
-                if [ -d "$block/$dev/$i" ]; then 
-                    echo "/dev/$k/$(echo $i | sed -e 's#.*\!##g')"
-                    [ "$1" ] && echo $1
-                fi
-            done
-        done
+# only show dmraid partitions,
+# - remove part of encrypted devices
+# - remove part of lvm
+# - remove part ot raid
+dmraid_partitions() {
+    # device mapper devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
+        partofcrypt="$partofcrypt $k"
     done
-    # Include MMC devices
-    for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
-        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then 
-                echo "/dev/$i"
-                [ "$1" ] && echo $1
-            fi
-        done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
+        partoflvm="$partoflvm $k"
+    done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
+        partofraid="$partofraid $k"
+    done
+    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
+            echo "/dev/mapper/$devpath"
+            [ "$1" ] && echo $1
+        fi
     done
 }
 
@@ -361,47 +404,9 @@ default_partition_check() {
         done
 }
 
-# list none partitionable raid md devices
-raid_devices() {
-    for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
-        if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
-            # exlude md partitions which are part of lvm or luks
-            if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
-                    echo "/dev/$devpath"
-                    [ "$1" ] && echo $1
-            fi
-        fi
-    done
-}
-
-# only show dmraid partitions,
-# - remove part of encrypted devices
-# - remove part of lvm
-# - remove part ot raid
-dmraid_partitions() {
-    # device mapper devices, only show dmraid partitions, remove part of encrypted devices, remove part of lvm, remove part ot raid!
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
-        partofcrypt="$partofcrypt $k"
-    done
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
-        partoflvm="$partoflvm $k"
-    done
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(blkid -c=/dev/null /dev/mapper/$devpath 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
-        partofraid="$partofraid $k"
-    done
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
-            echo "/dev/mapper/$devpath"
-            [ "$1" ] && echo $1
-        fi
-    done
-}
-
 finddisks() {
     default_blockdevices $1
+    additional_blockdevices $1
     dmraid_devices $1
     partitionable_raid_devices $1
 }
