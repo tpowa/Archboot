@@ -714,6 +714,13 @@ _getavaildisks()
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+            # special block devices
+            elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
+            elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
+            elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(($(expr 512 '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
