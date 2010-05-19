@@ -1155,7 +1155,7 @@ _createpv()
         done
         # skip md partition devices, which already have lvm devices!
         for i in $PARTS; do
-            mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
+            mdcheck="$(echo $i | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
             if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
@@ -1437,7 +1437,7 @@ _luks()
         done
         # skip md partition devices, which already has encrypted devices!
         for i in $PARTS; do
-            mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
+            mdcheck="$(echo $i | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
             if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     [ "$(cryptsetup status $(cat $k/dm/name))" ] && ALREADYINUSE="$ALREADYINUSE $i"
@@ -2637,7 +2637,7 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
-            if [ "$(echo $bootdev | grep /dev/md_d)" ]; then
+            if [ "$(echo $bootdev | grep /dev/md*p)" ]; then
                 # partitionable raid is not supported by grub!
                 FAIL_RAID="1"
             fi
@@ -2808,7 +2808,7 @@ dogrub2(){
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported
                 FAIL_COMPLEX="0"
-            if [ "$(echo $bootdev | grep /dev/md_d)" -o "$(dmsetup info $bootdev | grep 'DMRAID')" -o "$(cryptsetup status $bootdev)" ]; then
+            if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(dmsetup info $bootdev | grep 'DMRAID')" -o "$(cryptsetup status $bootdev)" ]; then
                 # raid with no supperblock 0.90, partitionable raid, dmraid and encryption
                 # devices are not supported
                 FAIL_COMPLEX="1"
@@ -2827,7 +2827,7 @@ dogrub2(){
                 dmsetup mknodes
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
-                    if [ "$(echo $devpath | grep -v /dev/md_d | grep /dev/md)" ]; then
+                    if [ "$(echo $devpath | grep -v /dev/md*p | grep /dev/md)" ]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                         if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
                             # change bootdev to md device!
