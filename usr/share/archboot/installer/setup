@@ -250,12 +250,14 @@ default_blockdevices() {
     #   Compaq Intelligent Drive Array
     EXTRA_CONTROLLER="rd cciss ida"
     for i in $EXTRA_CONTROLLER; do
-        for dev in $(ls $block/$i\!* 2>/dev/null | egrep "${i}\!*p"); do 
-            if [ -d "$block/$dev/$i" ]; then 
-                echo "/dev/$dev"
-                [ "$1" ] && echo $1
-                break
-            fi
+        for dev in $(ls $block 2>/dev/null | egrep "^$i"); do
+            for k in $(ls $block/$dev 2>/dev/null | egrep "${dev}*p"); do
+                if [ -d "$block/$dev/$k" ]; then
+                    echo "/dev/$i/$(echo $dev | sed -e 's#.*\!##g')"
+                    [ "$1" ] && echo $1
+                    break
+                fi
+            done
         done
     done
     # Include MMC devices
@@ -314,9 +316,9 @@ additional_blockdevices_partitions() {
     EXTRA_CONTROLLER="rd cciss ida"
     for k in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
-            for i in $(ls $block/${dev}\!* 2>/dev/null | egrep "${dev}\!*p"); do
+            for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
                 if [ -d "$block/$dev/$i" ]; then 
-                    echo "/dev/$dev/$i"
+                    echo "/dev/$k/$(echo $i | sed -e 's#.*\!##g')"
                     [ "$1" ] && echo $1
                 fi
             done
