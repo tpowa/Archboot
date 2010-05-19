@@ -715,7 +715,7 @@ _getavaildisks()
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             else
-                echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+                echo -n "$i : "; echo $(($(expr 512 '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
     done
 }
@@ -729,10 +729,17 @@ _getavailpartitions()
     for i in $(findpartitions); do
         # mmc and raid partitions
         if [ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]; then
-            echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+        # special block devices
+        elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/rd\!$(basename $i)/size))/1000000)) MB; echo "\n"
+        elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/cciss\!$(basename $i)/size))/1000000)) MB; echo "\n"
+        elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/ida\!$(basename $i)/size))/1000000)) MB; echo "\n"
         # raid device
         elif [ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]; then
-            echo -n "$i : "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
         elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
             # crypt device
@@ -740,13 +747,13 @@ _getavailpartitions()
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
             # dmraid device
             elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
-                [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+                [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
             else
-                echo -n "$i : "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
+                echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
             fi
         else
-            echo -n "$i: "; echo $(($(expr 512 '*' $(cat /sys/block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
     done
 }
@@ -1124,8 +1131,8 @@ _createpv()
         # skip md devices, which already have lvm devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
-            if ! [ "$(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
-                for k in $(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
+            if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
                     realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
                     [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
@@ -1137,8 +1144,8 @@ _createpv()
         # skip md partition devices, which already have lvm devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [ "$(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
-                for k in $(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
+            if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
+                for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
                     realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
                     [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
@@ -1391,8 +1398,8 @@ _luks()
              # remove hidden crypt by md device
              if [ "$(echo $devpath | grep /dev/md)" ]; then
                  mdcheck="$(echo $devpath | sed -e 's#/dev/##g')"
-                 if ! [ "$(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
-                     for k in $(find /sys/block/$mdcheck/slaves/ -name 'dm*'); do
+                 if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                     for k in $(find $block/$mdcheck/slaves/ -name 'dm*'); do
                          if [ "$(cryptsetup status $(cat $k/dm/name))" ]; then
                              killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                              ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
@@ -1404,8 +1411,8 @@ _luks()
         # skip md devices, which already has encrypted devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
-            if ! [ "$(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
-                for k in $(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
+            if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     [ "$(cryptsetup status $(cat $k/dm/name))"  ] && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
                     if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
@@ -1419,8 +1426,8 @@ _luks()
         # skip md partition devices, which already has encrypted devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md_d | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [ "$(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
-                for k in $(find /sys/block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
+            if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
+                for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     [ "$(cryptsetup status $(cat $k/dm/name))" ] && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
                     if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
@@ -1503,7 +1510,7 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    DISC_SIZE=$(echo $(($(expr 512 '*' $(cat /sys/block/$(basename $DISC)/size))/1000000)))
+    DISC_SIZE=$(echo $(($(expr 512 '*' $(cat $block/$(basename $DISC)/size))/1000000)))
     while [ "$DEFAULTFS" = "" ]; do
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
