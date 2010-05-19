@@ -246,17 +246,17 @@ default_blockdevices() {
         fi
     done
     # Include additional controllers:
-    #   Promise Fastrak, AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
     #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
     #   Compaq Intelligent Drive Array
-    EXTRA_CONTROLLER="ataraid amiraid carmel rd cciss ida"
+    EXTRA_CONTROLLER="rd cciss ida"
     for i in $EXTRA_CONTROLLER; do
-        if [ -d /dev/$i ] ; then
-            for dev in $(ls /dev/$i 2>/dev/null | egrep -v 'p'); do
-                echo "/dev/$i/$dev"
+        for dev in $(ls $block/$i\!* 2>/dev/null | egrep "${i}\!*p"); do 
+            if [ -d "$block/$dev/$i" ]; then 
+                echo "/dev/$dev"
                 [ "$1" ] && echo $1
-            done
-        fi
+                break
+            fi
+        done
     done
     # Include MMC devices
     for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
@@ -273,7 +273,7 @@ default_blockdevices() {
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
     for dev in $(ls $block 2>/dev/null | egrep '^md'); do
-        for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
+        for i in $(ls $block/$dev 2>/dev/null | egrep "${dev}\!*p"); do 
             if [ -d "$block/$dev/$i" ]; then 
                 echo "/dev/$dev"
                 [ "$1" ] && echo $1
@@ -307,19 +307,20 @@ dmraid_devices() {
     fi
 }
 
-# lists additional linux blockdevices partitions:
-#   Promise Fastrak, AMI HyperDisk RAID controller, Carmel 8-port SATA Disks, 
-#   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-#   Compaq Intelligent Drive Array
+# lists additional linux blockdevices partitions
 additional_blockdevices_partitions() {
-    EXTRA_CONTROLLER="ataraid amiraid carmel rd cciss ida"
-    for i in $EXTRA_CONTROLLER; do
-        if [ -d /dev/$i ] ; then
-            for dev in $(ls /dev/$i | egrep 'p'); do
-                echo "/dev/$i/$dev"
-                [ "$1" ] && echo $1
+    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+    #   Compaq Intelligent Drive Array
+    EXTRA_CONTROLLER="rd cciss ida"
+    for k in $EXTRA_CONTROLLER; do
+        for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
+            for i in $(ls $block/${dev}\!* 2>/dev/null | egrep "${dev}\!*p"); do
+                if [ -d "$block/$dev/$i" ]; then 
+                    echo "/dev/$dev/$i"
+                    [ "$1" ] && echo $1
+                fi
             done
-        fi
+        done
     done
     # Include MMC devices
     for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
