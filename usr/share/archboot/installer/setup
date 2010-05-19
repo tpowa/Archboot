@@ -326,7 +326,7 @@ additional_blockdevices_partitions() {
 # do sanity checks on partitions, argument comes $devpath loop
 default_partition_check() {
         disk=$(basename $devpath)
-        for part in $(ls $block/$disk 2>/dev/null | egrep ^$disk); do
+        for part in $(ls $block/$disk 2>/dev/null | egrep -v ^${disk}p | egrep ^$disk); do
             # exclude checks:
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep $part)
@@ -351,11 +351,11 @@ default_partition_check() {
 
 # list none partitionable raid md devices
 raid_devices() {
-    for dev in $(ls $block 2>/dev/null | egrep '^md'); do
-        if ! [ "$(ls $block/$dev 2>/dev/null | egrep ${dev}p)" ]; then 
+    for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
+        if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
             # exlude md partitions which are part of lvm or luks
             if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
-                    echo "$devpath"
+                    echo "/dev/$devpath"
                     [ "$1" ] && echo $1
             fi
         fi
