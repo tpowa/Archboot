@@ -425,6 +425,7 @@ findpartitions() {
 findbootloaderdisks() {
     if ! [ "$USE_DMRAID" = "1" ]; then
         default_blockdevices $1
+        additional_blockdevices $1
     else
         dmraid_devices $1
     fi
