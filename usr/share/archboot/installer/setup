@@ -32,6 +32,10 @@ block=/sys/block
 PART_ROOT=
 ROOTFS=""
 
+# Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+# Compaq Intelligent Drive Array
+EXTRA_CONTROLLER="rd cciss ida"
+
 # install stages
 S_SRC=0         # choose install medium
 S_NET=0         # network configuration
@@ -252,7 +256,6 @@ additional_blockdevices() {
     # Include additional controllers:
     #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
     #   Compaq Intelligent Drive Array
-    EXTRA_CONTROLLER="rd cciss ida"
     for i in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$i"); do
             for k in $(ls $block/$dev 2>/dev/null | egrep "${dev}*p"); do
@@ -280,7 +283,6 @@ additional_blockdevices() {
 additional_blockdevices_partitions() {
     #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
     #   Compaq Intelligent Drive Array
-    EXTRA_CONTROLLER="rd cciss ida"
     for k in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
             for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
@@ -482,9 +484,33 @@ get_grub_virtio_map() {
     rm /tmp/dev.map
     majorhd=0
     #add virtio devices
-    for i in $(ls /dev/vd[a-z]); do
+    for i in $(ls -d $block/vd[a-z]); do
         echo "(hd$majorhd) $i" >> /tmp/dev.map
         majorhd="$(($majorhd+1))"
+    done
+}
+
+# virtio devices need manual mapping
+get_grub_mmcblk_map() {
+    rm /tmp/dev.map
+    majorhd=0
+    #add virtio devices
+    for i in $(ls -d $block/mmcblk*); do
+        echo "(hd$majorhd) $i" >> /tmp/dev.map
+        majorhd="$(($majorhd+1))"
+    done
+}
+
+# extra devices need manual mapping
+get_grub_extra_devices_map() {
+    rm /tmp/dev.map
+    majorhd=0
+    #add extra devices
+    for k in $EXTRA_CONTROLLER; do
+        for i in $(ls -d $block/$k*); do
+            echo "(hd$majorhd) $(echo $i | sed -e 's#\!##g')" >> /tmp/dev.map
+            majorhd="$(($majorhd+1))"
+        done
     done
 }
 
@@ -2605,10 +2631,17 @@ dogrub() {
     if ! [ "$(dmraid -r | grep ^no )" ]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
-    if  [ "$(ls /dev/vd[a-z] 2>/dev/null)" ]; then
+    if  [ "$(ls $block/vd[a-z] 2>/dev/null)" ]; then
         DIALOG --yesno "Setup detected virtio devices.\nDo you want to install grub on this device?" 0 0 && get_grub_virtio_map
     fi
-
+    if  [ "$(ls $block/mmcblk* 2>/dev/null)" ]; then
+        DIALOG --yesno "Setup detected mmcblk devices.\nDo you want to install grub on this device?" 0 0 && get_grub_mmcblk_map
+    fi
+    for i in $EXTRA_CONTROLLER; do
+        if [ "$(ls $block/$i* 2>/dev/null)" ]; then
+                    DIALOG --yesno "Setup detected $i devices.\nDo you want to install grub on this device?" 0 0 && get_grub_extra_devices_map
+        fi
+    done
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
