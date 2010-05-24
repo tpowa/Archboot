@@ -646,7 +646,7 @@ geteditor() {
 set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS="UUID /dev/disk/by-uuid/<uuid> LABEL /dev/disk/by-label/<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use (recommended is UUID)" 21 50 13 $NAME_SCHEME_LEVELS 2>$ANSWER || return 1
+    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is UUID)" 11 50 5 $NAME_SCHEME_LEVELS 2>$ANSWER || return 1
     NAME_SCHEME_PARAMETER=$(cat $ANSWER)
     NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -734,7 +734,7 @@ _mkfs() {
     local _uuid="$(getuuid ${_device})"
     local _label="$(getlabel ${_device})"
     # add comment first
-    echo "# DEVICE: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.fstab
+    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.fstab
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         if [ -n "${_uuid}" ]; then
             _device="UUID=${_uuid}"
