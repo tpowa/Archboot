@@ -642,11 +642,13 @@ geteditor() {
     esac
 }
 
-# set uuid usage
-set_uuid() {
-    UUIDPARAMETER=""
-    DIALOG --yesno "Do you want to use UUID device name scheme,\ninstead of kernel device name scheme in config files?" 0 0 && UUIDPARAMETER=yes
-    UUID_RUN="1"
+# set device name scheme
+set_device_name_scheme() {
+    NAME_SCHEME_PARAMETER=""
+    NAME_SCHEME_LEVELS="UUID /dev/disk/by-uuid/<uuid> LABEL /dev/disk/by-label/<label> KERNEL /dev/<kernelname>"
+    DIALOG --menu "Select the device name scheme you want to use (recommended is UUID)" 21 50 13 $NAME_SCHEME_LEVELS 2>$ANSWER || return 1
+    NAME_SCHEME_PARAMETER=$(cat $ANSWER)
+    NAME_SCHEME_PARAMETER_RUN="1"
 }
 
 # set GUID (gpt) usage
@@ -729,7 +731,7 @@ _mkfs() {
     fi
 
     # add to temp fstab
-    if [ "$UUIDPARAMETER" = "yes" ]; then
+    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         local _uuid="$(getuuid ${_device})"
         if [ -n "${_uuid}" ]; then
             _device="UUID=${_uuid}"
@@ -1540,7 +1542,7 @@ autoprepare() {
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    UUID_RUN=""
+    NAME_SCHEME_PARAMETER_RUN=""
     # switch for mbr usage
     set_guid
     DISCS=$(default_blockdevices)
@@ -1648,7 +1650,7 @@ autoprepare() {
     rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    [ "$UUID_RUN" = "" ] && set_uuid
+    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
     # we assume a /dev/hdX format (or /dev/sdX)
     if [ "$GUIDPARAMETER" = "yes" ]; then
         PART_ROOT="${DEVICE}4"
@@ -1822,7 +1824,7 @@ partition() {
 }
 
 mountpoints() {
-    UUID_RUN=""
+    NAME_SCHEME_PARAMETER_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
         activate_special_devices
         : >/tmp/.fstab
@@ -1895,7 +1897,7 @@ mountpoints() {
     done
     # disable swap and all mounted partitions
     _umountall
-    [ "$UUID_RUN" = "" ] && set_uuid
+    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
     for line in $(cat /tmp/.parts); do
         PART=$(echo $line | cut -d: -f 1)
         FSTYPE=$(echo $line | cut -d: -f 2)
@@ -2439,7 +2441,7 @@ getcryptsetup() {
     if ! [ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive)" ]; then
         #avoid clash with dmraid here
         if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
-            if [ "$UUIDPARAMETER" = "yes" ]; then
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                 CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(blkid -s UUID -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
                 CRYPTNAME="$(basename $PART_ROOT)"
                 CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
@@ -2460,6 +2462,14 @@ getrootuuid() {
     fi
 }
 
+getrootlabel() {
+    _rootpart="${PART_ROOT}"
+    _label="$(getlabel ${PART_ROOT})"
+    if [ -n "${_label}" ]; then
+        _rootpart="/dev/disk/by-label/${_label}"
+    fi
+}
+
 dosyslinux() {
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
@@ -2474,6 +2484,7 @@ dosyslinux() {
     getraidarrays
     getcryptsetup
     getrootuuid
+    getrootlabel
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
@@ -2514,14 +2525,14 @@ dosyslinux() {
     echo "default arch"  >> ${TEMPDIR}/syslinux.cfg
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$UUIDPARAMETER" = "yes" ]; then
+    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$UUIDPARAMETER" = "yes" ]; then
+    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2566,13 +2577,14 @@ dolilo() {
     getraidarrays
     getcryptsetup
     getrootuuid
+    getrootlabel
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
-        if [ "$UUIDPARAMETER" = "yes" ]; then
+        if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
@@ -2631,6 +2643,7 @@ dogrub() {
     getcryptsetup
     get_grub_map
     getrootuuid
+    getrootlabel
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY="1"
@@ -2719,7 +2732,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-                if [ "$UUIDPARAMETER" = "yes" ]; then
+                if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
@@ -2731,7 +2744,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-                if [ "$UUIDPARAMETER" = "yes" ]; then
+                if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
@@ -2837,6 +2850,7 @@ dogrub2(){
     getcryptsetup
     get_grub2_map
     getrootuuid
+    getrootlabel
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         # look for a separately-mounted /boot partition
@@ -2926,7 +2940,7 @@ dogrub2(){
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
             [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$UUIDPARAMETER" = "yes" ]; then
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
@@ -2944,7 +2958,7 @@ dogrub2(){
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
             [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$UUIDPARAMETER" = "yes" ]; then
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
@@ -3538,7 +3552,7 @@ configure_system()
 install_bootloader()
 {
     destdir_mounts || return 1
-    [ "$UUID_RUN" = "" ] && set_uuid
+    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
     source_set || return 1
     pacman_conf
     prepare_pacman
