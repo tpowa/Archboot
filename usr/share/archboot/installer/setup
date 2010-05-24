@@ -97,6 +97,15 @@ getuuid()
     echo "$(blkid -s UUID -o value ${1})"
 }
 
+# parameters: device file
+# outputs:    LABEL on success
+#             nothing on failure
+# returns:    nothing
+getlabel()
+{
+    echo "$(blkid -s LABEL -o value ${1})"
+}
+
 # activate_dmraid()
 # activate dmraid devices
 activate_dmraid()
