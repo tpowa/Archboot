@@ -731,15 +731,20 @@ _mkfs() {
     fi
 
     # add to temp fstab
+    local _uuid="$(getuuid ${_device})"
+    local _label="$(getlabel ${_device})"
+    # add comment first
+    echo "# DEVICE: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.fstab
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
-        local _uuid="$(getuuid ${_device})"
         if [ -n "${_uuid}" ]; then
             _device="UUID=${_uuid}"
         fi
-        echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
-    else
-        echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
+    elif [ "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+        if [ -n "${_label}" ]; then
+            _device="LABEL=${_label}"
+        fi
     fi
+    echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
     if [ "${_fstype}" = "swap" ]; then
         echo "0" >>/tmp/.fstab
     else
