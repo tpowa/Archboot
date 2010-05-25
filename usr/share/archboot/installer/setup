@@ -733,7 +733,7 @@ _mkfs() {
     # add to .device-names for config files
     local _uuid="$(getuuid ${_device})"
     local _label="$(getlabel ${_device})"
-    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.device-names
+    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid LABEL=$_label" >> /tmp/.device-names
     # add to temp fstab
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         if [ -n "${_uuid}" ]; then
@@ -2452,13 +2452,13 @@ getcryptsetup() {
         if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
             if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
                 CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(blkid -s UUID -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
-                CRYPTNAME="$(basename $PART_ROOT)"
-                CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
+            elif [ "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+                CRYPTDEVICE="/dev/disk/by-label/$(echo $(blkid -s LABEL -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
             else
-                CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"
-                CRYPTNAME="$(basename $PART_ROOT)"
-                CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
+                CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"    
             fi
+            CRYPTNAME="$(basename $PART_ROOT)"
+            CRYPTSETUP="cryptdevice=$CRYPTDEVICE:$CRYPTNAME"
         fi
     fi
 }
@@ -2535,14 +2535,14 @@ dosyslinux() {
     sort /tmp/.device-names >> ${TEMPDIR}/syslinux.cfg
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2594,7 +2594,7 @@ dolilo() {
     fi
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
-        if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+        if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
@@ -2604,6 +2604,8 @@ dolilo() {
         sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
     fi
+    sed -i -e '/DEVICE DETAILS/d' >> $DESTDIR/etc/lilo.conf
+    sort /tmp/.device-names >> $DESTDIR/etc/lilo.conf
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
@@ -2743,7 +2745,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-                if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+                if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
@@ -2755,7 +2757,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
-                if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+                if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
@@ -2953,7 +2955,7 @@ dogrub2(){
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
             [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
@@ -2971,7 +2973,7 @@ dogrub2(){
                 echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
             fi
             [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
                 echo "linux $subdir/$VMLINUZ root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
             else
                 echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
