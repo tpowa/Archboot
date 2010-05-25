@@ -1854,8 +1854,13 @@ mountpoints() {
         PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         if [ "$PART" != "NONE" ]; then
             DOMKFS="no"
-            [ "$ASK_MOUNTPOINTS" = "1" ] && DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-            echo "$PART:swap:swap:$DOMKFS" >>/tmp/.parts
+            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+                 if [ "$DOMKFS" = "yes" ]; then
+                     enter_label_name
+                 fi
+                 echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+            fi   
         fi
         DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
@@ -1868,8 +1873,11 @@ mountpoints() {
             DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
             FSTYPE=$(cat $ANSWER)
             DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+                 if [ "$DOMKFS" = "yes" ]; then
+                     enter_label_name
+                 fi
         fi
-        echo "$PART:$FSTYPE:/:$DOMKFS" >>/tmp/.parts
+        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
 
         #
         # Additional partitions
@@ -1894,12 +1902,17 @@ mountpoints() {
                 fi
             done
             DOMKFS="no"
-            [ "$ASK_MOUNTPOINTS" = "1" ] && DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-            echo "$PART:$FSTYPE:$MP:$DOMKFS" >>/tmp/.parts
+            if [ "$ASK_MOUNTPOINTS" = "1" ]; then 
+                DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
+                    if [ "$DOMKFS" = "yes" ]; then
+                        enter_label_name
+                    fi
+            fi
+            echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
             DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
         done
-        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
+        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
@@ -2477,6 +2490,18 @@ getrootlabel() {
     if [ -n "${_label}" ]; then
         _rootpart="/dev/disk/by-label/${_label}"
     fi
+}
+
+enter_label_name() {
+    while [ "${LABEL_NAME}" = "" ]; do
+        DIALOG --inputbox "Enter the LABEL name for the device, keep it short and use no spaces." 8 65 \
+        "$(blkid -c=/dev/null -o value -s LABEL $PART)" 2>$ANSWER || return 1
+        LABEL_NAME=$(cat $ANSWER)
+        if grep ":$LABEL_NAME$" /tmp/.parts; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
+            LABEL_NAME=""
+        fi
+    done
 }
 
 dosyslinux() {
