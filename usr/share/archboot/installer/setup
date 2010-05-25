@@ -1852,28 +1852,35 @@ mountpoints() {
         #
         DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
-        DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        if [ "$PART" != "NONE" ]; then
+        DO_SWAP=""
+        while [ "DO_SWAP" != "DONE" ]; do
+            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            if [ "$PART" != "NONE" ]; then
+                DOMKFS="no"
+                [ "$ASK_MOUNTPOINTS" = "1" ] && create_filesystem
+                echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+            fi
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            DO_SWAP=DONE
+        done
+        DO_ROOT=""
+        while [ "DO_ROOT" != "DONE" ]; do
+            DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            PART_ROOT=$PART
+            # Select root filesystem type
+            FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
-            [ "$ASK_MOUNTPOINTS" = "1" ] && create_filesystem
-            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
-        fi
-        DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        PART_ROOT=$PART
-        # Select root filesystem type
-        FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
-        DOMKFS="no"
-        if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-            DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-            FSTYPE=$(cat $ANSWER)
-            create_filesystem
-        fi
-        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
-
+            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
+                FSTYPE=$(cat $ANSWER)
+                create_filesystem
+            fi
+            echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            DO_ROOT=DONE
+        done
         #
         # Additional partitions
         #
@@ -2483,7 +2490,8 @@ getrootlabel() {
     fi
 }
 
-create_filesystem() {           
+create_filesystem() {
+    LABEL_NAME=""          
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
     if [ "$DOMKFS" = "yes" ]; then
         while [ "${LABEL_NAME}" = "" ]; do
