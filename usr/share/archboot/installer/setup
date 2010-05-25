@@ -1725,7 +1725,7 @@ EOF
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
-        labelname=(echo $fsspec | tr -d ' ' | cut -f5 -d:)
+        labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
         fi
@@ -1738,7 +1738,7 @@ EOF
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
-        labelname=(echo $fsspec | tr -d ' ' | cut -f5 -d:)
+        labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         if [ $(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l) -eq 0 ]; then
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
         fi
