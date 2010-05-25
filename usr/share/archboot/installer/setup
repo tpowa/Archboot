@@ -730,11 +730,11 @@ _mkfs() {
         fi
     fi
 
-    # add to temp fstab
+    # add to .device-names for config files
     local _uuid="$(getuuid ${_device})"
     local _label="$(getlabel ${_device})"
-    # add comment first
-    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.fstab
+    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid  LABEL=$_label" >> /tmp/.device-names
+    # add to temp fstab
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
         if [ -n "${_uuid}" ]; then
             _device="UUID=${_uuid}"
@@ -1652,7 +1652,7 @@ autoprepare() {
         return 1
     fi
 
-    rm -f /tmp/.fstab
+    [ -e /tmp/.fstab ] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
     [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
@@ -1832,6 +1832,7 @@ mountpoints() {
     NAME_SCHEME_PARAMETER_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
         activate_special_devices
+        : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
         FSOPTS=""
@@ -2241,6 +2242,9 @@ auto_addons()
 auto_fstab(){
     # Modify fstab
     if [ "$S_MKFS" = "1" -o "$S_MKFSAUTO" = "1" ]; then
+        if [ -f /tmp/.device-names ]; then
+            sort /tmp/.device-names >>$DESTDIR/etc/fstab
+        fi
         if [ -f /tmp/.fstab ]; then
             # clean fstab first from /dev entries
             sed -i -e '/^\/dev/d' $DESTDIR/etc/fstab
@@ -2528,6 +2532,7 @@ dosyslinux() {
     echo "timeout 300" >> ${TEMPDIR}/syslinux.cfg
     echo "display boot.msg" >> ${TEMPDIR}/syslinux.cfg
     echo "default arch"  >> ${TEMPDIR}/syslinux.cfg
+    sort /tmp/.device-names >> ${TEMPDIR}/syslinux.cfg
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
@@ -2732,6 +2737,7 @@ dogrub() {
             fi
             NUMBER=0
             # create default grub entries
+            sort /tmp/.device-names >>$DESTDIR/boot/grub/menu.lst
             for grubdev in $_grubdev; do
                 echo "" >>$DESTDIR/boot/grub/menu.lst
                 echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
@@ -2933,6 +2939,8 @@ dogrub2(){
                 grubdev="(hd0,1)"
             fi
             NUMBER=0
+            echo "" >>$DESTDIR/boot/grub/grub.cfg
+            sort /tmp/.device-names >>$DESTDIR/boot/grub/grub.cfg
             # create default grub entries
             echo "" >>$DESTDIR/boot/grub/grub.cfg
             [ "$USE_RAID" = "1" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
