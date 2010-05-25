@@ -674,12 +674,13 @@ _mkfs() {
     local _fstype=$3
     local _dest=$4
     local _mountpoint=$5
+    local _labelname=$6
 
     # we have two main cases: "swap" and everything else.
     if [ "${_fstype}" = "swap" ]; then
         swapoff ${_device} >/dev/null 2>&1
         if [ "${_domk}" = "yes" ]; then
-            mkswap ${_device} >$LOG 2>&1
+            mkswap -L ${_labelname} ${_device} >$LOG 2>&1
             if [ $? != 0 ]; then
                 DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
                 return 1
@@ -704,14 +705,14 @@ _mkfs() {
         if [ "${_domk}" = "yes" ]; then
             local ret
             case ${_fstype} in
-                xfs)      mkfs.xfs -f ${_device} >$LOG 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${_device} >$LOG 2>&1; ret=$? ;;
-                reiserfs) yes | mkreiserfs ${_device} >$LOG 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext3)     mke2fs -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext4)     mke2fs -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                ntfs-3g)  mkfs.ntfs ${_device} >$LOG 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat ${_device} >$LOG 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs -L ${_labelname} -f ${_device} >$LOG 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                reiserfs) yes | mkreiserfs -l ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                ext3)     mke2fs -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
+                ext4)     mke2fs -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
+                ntfs-3g)  mkfs.ntfs -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [ $ret != 0 ]; then
@@ -1922,13 +1923,14 @@ mountpoints() {
         FSTYPE=$(echo $line | cut -d: -f 2)
         MP=$(echo $line | cut -d: -f 3)
         DOMKFS=$(echo $line | cut -d: -f 4)
+        LABEL_NAME=$(echo $line | cut -d: -f 5)
         if [ "$DOMKFS" = "yes" ]; then
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP || return 1
+            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME || return 1
         else
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
