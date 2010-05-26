@@ -646,7 +646,7 @@ geteditor() {
 set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS="UUID /dev/disk/by-uuid/<uuid> LABEL /dev/disk/by-label/<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is UUID)" 11 50 5 $NAME_SCHEME_LEVELS 2>$ANSWER || return 1
+    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is UUID)." 11 50 5 $NAME_SCHEME_LEVELS 2>$ANSWER || return 1
     NAME_SCHEME_PARAMETER=$(cat $ANSWER)
     NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -1656,7 +1656,9 @@ autoprepare() {
     [ -e /tmp/.fstab ] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
+    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+        set_device_name_scheme || return 1
+    fi
     # we assume a /dev/hdX format (or /dev/sdX)
     if [ "$GUIDPARAMETER" = "yes" ]; then
         PART_ROOT="${DEVICE}4"
@@ -1831,6 +1833,25 @@ partition() {
     S_PART=1
 }
 
+select_filesystem() {
+    RUN_CREATE_FILESYSTEM=""
+    DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
+    FSTYPE=$(cat $ANSWER)
+}
+
+enter_mountpoint() {
+    RUN_CREATE_FILESYSTEM=""
+    MP=""
+    while [ "${MP}" = "" ]; do
+        DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
+        MP=$(cat $ANSWER)
+        if grep ":$MP:" /tmp/.parts; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
+            MP=""
+        fi
+    done
+}
+
 mountpoints() {
     NAME_SCHEME_PARAMETER_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
@@ -1853,19 +1874,27 @@ mountpoints() {
         DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
         DO_SWAP=""
-        while [ "DO_SWAP" != "DONE" ]; do
+        while [ "$DO_SWAP" != "DONE" ]; do
             DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             if [ "$PART" != "NONE" ]; then
                 DOMKFS="no"
-                [ "$ASK_MOUNTPOINTS" = "1" ] && create_filesystem
-                echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+                if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                    create_filesystem
+                else
+                    RUN_CREATE_FILESYSTEM="yes"
+                fi
+            else
+                RUN_CREATE_FILESYSTEM="yes"
             fi
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            DO_SWAP=DONE
+            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_SWAP=DONE
         done
+        if [ "$PART" != "NONE" ]; then
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+        fi
         DO_ROOT=""
-        while [ "DO_ROOT" != "DONE" ]; do
+        while [ "$DO_ROOT" != "DONE" ]; do
             DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             PART_ROOT=$PART
@@ -1873,47 +1902,49 @@ mountpoints() {
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
             if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-                FSTYPE=$(cat $ANSWER)
-                create_filesystem
+                select_filesystem && create_filesystem
+            else
+                RUN_CREATE_FILESYSTEM="yes"
             fi
-            echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            DO_ROOT=DONE
+            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ROOT=DONE
         done
+        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
         # Additional partitions
         #
-        DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
         while [ "$PART" != "DONE" ]; do
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
-            # Select a filesystem type
-            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
-                FSTYPE=$(cat $ANSWER)
-            fi
-            MP=""
-            while [ "${MP}" = "" ]; do
-                DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
-                MP=$(cat $ANSWER)
-                if grep ":$MP:" /tmp/.parts; then
-                    DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
-                    MP=""
+            DO_ADDITIONAL=""
+            while [ "$DO_ADDITIONAL" != "DONE" ]; do
+                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
+                PART=$(cat $ANSWER)
+                if [ "$PART" != "DONE" ]; then
+                    FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
+                    DOMKFS="no"
+                    # Select a filesystem type
+                    if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                        enter_mountpoint && select_filesystem && create_filesystem
+                    else
+                        enter_mountpoint
+                        RUN_CREATE_FILESYSTEM="yes"
+                    fi
+                else
+                    RUN_CREATE_FILESYSTEM="yes"
                 fi
+                [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ADDITIONAL="DONE"
             done
-            DOMKFS="no"
-            [ "$ASK_MOUNTPOINTS" = "1" ] && create_filesystem
-            echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
-            DIALOG --menu "Select any additional partitions to mount under your new root" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
-            PART=$(cat $ANSWER)
+            if [ "$PART" != "DONE" ]; then
+                echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME" >>/tmp/.parts
+                PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            fi
         done
         DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
-    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
+    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+        set_device_name_scheme || return 1
+    fi
     for line in $(cat /tmp/.parts); do
         PART=$(echo $line | cut -d: -f 1)
         FSTYPE=$(echo $line | cut -d: -f 2)
@@ -2491,11 +2522,12 @@ getrootlabel() {
 }
 
 create_filesystem() {
-    LABEL_NAME=""          
+    LABEL_NAME=""
+    RUN_CREATE_FILESYSTEM=""
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
     if [ "$DOMKFS" = "yes" ]; then
         while [ "${LABEL_NAME}" = "" ]; do
-            DIALOG --inputbox "Enter the LABEL name for the device, keep it short and use no spaces." 8 65 \
+            DIALOG --inputbox "Enter the LABEL name for the device,\nkeep it short and use no spaces or special characters." 8 65 \
             "$(blkid -c=/dev/null -o value -s LABEL $PART)" 2>$ANSWER || return 1
             LABEL_NAME=$(cat $ANSWER)
             if grep ":$LABEL_NAME$" /tmp/.parts; then
@@ -2504,6 +2536,7 @@ create_filesystem() {
             fi
         done
     fi
+    RUN_CREATE_FILESYSTEM="yes"
 }
 
 dosyslinux() {
@@ -3594,7 +3627,9 @@ configure_system()
 install_bootloader()
 {
     destdir_mounts || return 1
-    [ "$NAME_SCHEME_PARAMETER_RUN" = "" ] && set_device_name_scheme
+    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+        set_device_name_scheme || return 1
+    fi
     source_set || return 1
     pacman_conf
     prepare_pacman
