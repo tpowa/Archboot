@@ -138,16 +138,36 @@ activate_raid()
     fi
 }
 
+# activate_luks
+# activate luks devices
+activate_luks()
+{
+    if [ -e /sbin/cryptsetup ]; then
+        DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
+        for PART in $(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
+            # skip already encrypted devices, device mapper!
+            OPEN_LUKS=""
+            for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+                [ "$(cryptsetup status $devpath | grep $PART)" ] && OPEN_LUKS="no"
+            done
+            ! [ "$OPEN_LUKS" = "no" ] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
+        done
+    fi
+}
+
 # activate_special_devices()
 # activate special devices:
 # activate dmraid, lvm2 and raid devices, if not already activated during bootup!
-# raid needs to be involved twice, because lvm can hide it.
+# run it 3 times, it can be hidden by each other!
 activate_special_devices()
 {
     activate_dmraid
-    activate_raid
-    activate_lvm2
-    activate_raid
+    for i in seq 1 3; do
+        activate_raid
+        activate_lvm2
+        activate_luks
+        [ "$i" = "3" ] && break
+    done
 }
 
 # Check media on install packages
@@ -263,8 +283,8 @@ default_blockdevices() {
 # lists additional linux blockdevices
 additional_blockdevices() {
     # Include additional controllers:
-    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-    #   Compaq Intelligent Drive Array
+    # Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+    # Compaq Intelligent Drive Array
     for i in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$i"); do
             for k in $(ls $block/$dev 2>/dev/null | egrep "${dev}*p"); do
@@ -290,14 +310,29 @@ additional_blockdevices() {
 
 # lists additional linux blockdevices partitions
 additional_blockdevices_partitions() {
-    #   Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-    #   Compaq Intelligent Drive Array
+    # Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
+    # Compaq Intelligent Drive Array
     for k in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
             for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
-                if [ -d "$block/$dev/$i" ]; then 
-                    echo "/dev/$k/$(echo $i | sed -e 's#.*\!##g')"
-                    [ "$1" ] && echo $1
+                if [ -d "$block/$dev/$i" ]; then
+                    disk="$k/$(echo $dev | sed -e 's#.*\!##g')"
+                    part="$k/$(echo $i | sed -e 's#.*\!##g')"
+                    # exclude checks:
+                    #- part of raid device
+                    #  $(cat /proc/mdstat 2>/dev/null | grep $part)
+                    #- part of lvm2 device
+                    #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")
+                    #- part of luks device
+                    #  $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")
+                    #- extended partition on device
+                    #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
+                    #- bios_grub partitions
+                    # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
+                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+                        echo "/dev/$part"
+                        [ "$1" ] && echo $1
+                    fi
                 fi
             done
         done
@@ -318,7 +353,7 @@ raid_devices() {
     for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
         if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
             # exlude md partitions which are part of lvm or luks
-            if ! [ "$(blkid -c=/dev/null $devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null $devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+            if [ ! "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"LVM2_member\"")" -a ! "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
                     echo "/dev/$devpath"
                     [ "$1" ] && echo $1
             fi
@@ -343,9 +378,12 @@ partitionable_raid_devices() {
 partitionable_raid_devices_partitions() {
     for dev in $(ls $block 2>/dev/null | egrep '^md'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then 
-                echo "/dev/$i"
-                [ "$1" ] && echo $1
+            if [ -d "$block/$dev/$i" ]; then
+                # exlude md partitions which are part of lvm or luks
+                if [ ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"LVM2_member\"")" -a ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                    echo "/dev/$i"
+                    [ "$1" ] && echo $1
+                fi
             fi
         done
     done
@@ -423,7 +461,7 @@ finddisks() {
 }
 
 findpartitions() {
-    for devpath in $(finddisks); do
+    for devpath in "$(finddisks)"; do
         default_partition_check $1
     done
     additional_blockdevices_partitions $1
@@ -1406,6 +1444,46 @@ _createlv()
     fi
 }
 
+# enter luks name
+_enter_luks_name() {
+    LUKSDEVICE=""
+    while [ "${LUKSDEVICE}" = "" ]; do
+        DIALOG --inputbox "Enter the name for luks encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
+        LUKSDEVICE=$(cat $ANSWER)
+        if ! [ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
+            LUKSDEVICE=""
+        fi
+    done
+}
+
+# enter luks passphrase
+_enter_luks_passphrase () {
+    LUKSPASSPHRASE=""
+    while [ "${LUKSPASSPHRASE}" = "" ]; do
+        DIALOG --insecure --passwordbox "Enter passphrase:" 0 0 2>$ANSWER || return 1
+        LUKSPASS=$(cat $ANSWER)
+        DIALOG --insecure --passwordbox "Retype passphrase:" 0 0 2>$ANSWER || return 1
+        LUKSPASS2=$(cat $ANSWER)
+        if [ "$LUKSPASS" = "$LUKSPASS2" ]; then
+            LUKSPASSPHRASE=$LUKSPASS
+            echo $LUKSPASSPHRASE > /tmp/.passphrase
+            LUKSPASSPHRASE=/tmp/.passphrase
+        else
+             DIALOG --msgbox "Passphrases didn't match, please enter again." 0 0
+        fi
+    done
+}
+
+# opening luks
+_opening_luks() {
+    DIALOG --infobox "Opening encrypted $PART..." 0 0
+    cryptsetup luksOpen $PART $LUKSDEVICE >$LOG <$LUKSPASSPHRASE  
+    LUKSPASSPHRASE="$(cat $LUKSPASSPHRASE)"
+    echo $LUKSDEVICE $PART $LUKSPASSPHRASE >> /tmp/.crypttab
+    [ -e /tmp/.passphrase ] && rm /tmp/.passphrase
+}
+
 # help for luks
 _helpluks()
 {
@@ -1506,39 +1584,14 @@ _luks()
         DIALOG --menu "Select device for luks encryption" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         # enter luks name
-        LUKSDEVICE=""
-        while [ "${LUKSDEVICE}" = "" ]; do
-            DIALOG --inputbox "Enter the name for luks encrypt device:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
-            LUKSDEVICE=$(cat $ANSWER)
-            if ! [ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
-                LUKSDEVICE=""
-            fi
-        done
+        _enter_luks_name
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to encrypt luks device below?\nName:$LUKSDEVICE\nDevice:$PART\n" 0 0 && LUKSFINISH="DONE"
     done
-    LUKSPASSPHRASE=""
-    while [ "${LUKSPASSPHRASE}" = "" ]; do
-        DIALOG --insecure --passwordbox "Enter passphrase:" 0 0 2>$ANSWER || return 1
-        LUKSPASS=$(cat $ANSWER)
-        DIALOG --insecure --passwordbox "Retype passphrase:" 0 0 2>$ANSWER || return 1
-        LUKSPASS2=$(cat $ANSWER)
-        if [ "$LUKSPASS" = "$LUKSPASS2" ]; then
-            LUKSPASSPHRASE=$LUKSPASS
-            echo $LUKSPASSPHRASE > /tmp/.passphrase
-            LUKSPASSPHRASE=/tmp/.passphrase
-        else
-             DIALOG --msgbox "Passphrases didn't match, please enter again." 0 0
-        fi
-    done
+    _enter_luks_passphrase
     DIALOG --infobox "Encrypting $PART..." 0 0
     cryptsetup -c aes-xts-plain -s 512 luksFormat $PART >$LOG <$LUKSPASSPHRASE
-    DIALOG --infobox "Opening encrypted $PART..." 0 0
-    cryptsetup luksOpen $PART $LUKSDEVICE >$LOG <$LUKSPASSPHRASE  
-    LUKSPASSPHRASE="$(cat $LUKSPASSPHRASE)"
-    echo $LUKSDEVICE $PART $LUKSPASSPHRASE >> /tmp/.crypttab
-    rm /tmp/.passphrase
+    _opening_luks
 }
 
 autoprepare() {
