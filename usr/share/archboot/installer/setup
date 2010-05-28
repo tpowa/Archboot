@@ -159,7 +159,10 @@ activate_luks()
                 [ "$(cryptsetup status $devpath | grep $PART)" ] && OPEN_LUKS="no"
             done
             if ! [ "$OPEN_LUKS" = "no" ]; then
-                _enter_luks_name && _enter_luks_passphrase && _opening_luks
+                    RUN_LUKS=""
+                    DIALOG --yesno "Setup detected luks encrypted device, do you want to activate $PART ?" 0 0 && RUN_LUKS="1"
+                    [ "$RUN_LUKS" = "1" ] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
+                    [ "$RUN_LUKS" = "" ] && ACTIVATE_LUKS="no"
             else
                 ACTIVATE_LUKS="no"
             fi
