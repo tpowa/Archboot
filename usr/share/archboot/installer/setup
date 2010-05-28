@@ -353,7 +353,7 @@ raid_devices() {
     for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
         if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
             # exlude md partitions which are part of lvm or luks
-            if [ ! "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"LVM2_member\"")" -a ! "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+            if ! [ "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
                     echo "/dev/$devpath"
                     [ "$1" ] && echo $1
             fi
@@ -380,7 +380,7 @@ partitionable_raid_devices_partitions() {
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
             if [ -d "$block/$dev/$i" ]; then
                 # exlude md partitions which are part of lvm or luks
-                if [ ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"LVM2_member\"")" -a ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                if ! [ "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"LVM2_member\"")" -o ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"crypto_LUKS\"")" ]; then
                     echo "/dev/$i"
                     [ "$1" ] && echo $1
                 fi
