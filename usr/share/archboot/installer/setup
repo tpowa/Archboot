@@ -340,9 +340,22 @@ additional_blockdevices_partitions() {
     # Include MMC devices
     for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then 
-                echo "/dev/$i"
-                [ "$1" ] && echo $1
+            if [ -d "$block/$dev/$i" ]; then
+                # exclude checks:
+                #- part of raid device
+                #  $(cat /proc/mdstat 2>/dev/null | grep $i)
+                #- part of lvm2 device
+                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "LVM2_member")
+                #- part of luks device
+                #  $(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "crypto_LUKS")
+                #- extended partition on device
+                #  $(sfdisk -c /dev/$dev $(echo $i | sed -e "s#${dev}\p##g" 2>/dev/null | grep "5")
+                #- bios_grub partitions
+                # $(echo $i | grep "[a-z]$(parted /dev/$dev print | grep bios_grub | cut -d " " -f 2)$")
+                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $i)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$dev $(echo $i | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" -o "$(echo $i | grep "[a-z]$(parted /dev/$dev print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+                    echo "/dev/$i"
+                    [ "$1" ] && echo $1
+                fi
             fi
         done
     done
