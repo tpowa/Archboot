@@ -1362,7 +1362,7 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [ "$(vgs -o vg_free --noheading --units m $dev | grep " 0M$")" ]; then
+        if ! [ "$(vgs -o vg_free --noheading --units m $dev | grep " 0m$")" ]; then
             echo "$dev"
             [ "$1" ] && echo $1
         fi
@@ -1372,7 +1372,7 @@ findvg()
 getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units m); do
-        if ! [ $(echo $i | grep " 0M$") ]; then
+        if ! [ $(echo $i | grep " 0m$") ]; then
             echo $i | sed -e 's#$#\\n#'
         fi
     done
@@ -1467,7 +1467,7 @@ _createlv()
                 if [ "$LV_SIZE" = "0" ]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#M##g')" ]; then
+                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]; then
                         DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         LV_SIZE_SET=1
