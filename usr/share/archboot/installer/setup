@@ -1353,7 +1353,18 @@ findpv()
 getavailablepv()
 {
     for i in "$(pvs -o pv_name,pv_size --noheading)"; do
-            echo "$i" | sed -e 's#$#\\n#'
+            if [ "$(echo $i | grep /dev/dm-)" ]; then
+                for k in $(ls /dev/mapper | grep -v control); do
+                    if [ -h /dev/mapper/$k ]; then
+                        dev="$(basename $i)"
+                        if [ "$(readlink /dev/mapper/$k | grep $dev)" ]; then
+                            echo "$i" | sed -e "s#/dev/dm-.* #/dev/mapper/$k #g" | sed -e 's#$#\\n#'
+                        fi
+                    fi
+                 done
+            else
+                echo "$i" | sed -e 's#$#\\n#'
+            fi
     done
 }
 
