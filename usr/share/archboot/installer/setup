@@ -1263,7 +1263,6 @@ _createpv()
         activate_special_devices
         : >/tmp/.pvs-create
         PVDEVICE=""
-        #PARTS=$(finddisks _)
         PARTS="$(findpartitions _)"
         ALREADYINUSE=""
         # skip volume devices
@@ -1321,7 +1320,7 @@ _createpv()
         while [ "$PART" != "DONE" ]; do
             DEVNUMBER=$(($DEVNUMBER + 1))
             # clean loop from used partition and options
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e "s#${PART}[0-9]\ _##g" -e "s#$(echo ${PART} | sed -e 's#[0-9]##g')\ _##g")"
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             # add more devices
             DIALOG --menu "Select additional device number $DEVNUMBER for physical volume" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
