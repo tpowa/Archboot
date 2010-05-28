@@ -128,8 +128,8 @@ activate_lvm2()
         /sbin/lvm vgscan --ignorelockingfailure >/dev/null 2>&1
         DIALOG --infobox "Activating logical volumes..." 0 0
         /sbin/lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
-        LVM2_GROUPS="$(vgs -o vg_name --noheading)"
-        LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator -)"
+        LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
+        LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
         [ "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" -a "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" ] && ACTIVATE_LVM2="no"
     fi
 }
