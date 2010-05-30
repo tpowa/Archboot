@@ -12,18 +12,17 @@ e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm module-init-tools
 ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
 syslog-ng sysvinit tar util-linux-ng which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
 grub inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
-dosfstools udev initscripts filesystem kernel26 kernel26-firmware glibc linux-api-headers xinetd links pacman pacman-mirrorlist screen kbd pam \
-dhcpcd bzip2 gcc-libs openssl zlib libelf gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap \
-rp-pppoe lilo grub iptables capi4k-utils ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
-wpa_supplicant gzip rsync libarchive device-mapper cracklib nfs-utils nfsidmap readline acl attr \
-pcre cpio archboot fuse libusb vim vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
-rt2x00-rt61-fw rt2x00-rt71w-fw ndiswrapper ndiswrapper-utils \
-zd1211-firmware ipw2100-fw ipw2200-fw iwlwifi-3945-ucode iwlwifi-4965-ucode iwlwifi-5000-ucode \
-smbclient tiacx tiacx-firmware dmraid linux-atm netcfg tiacx tiacx-firmware parted tzdata ntp \
-v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl \
-gmp heimdal sqlite3 db dbus-core libcap fsarchiver iwlwifi-5150-ucode xz-utils librpcsecgss libtirpc \
-wipe ddrescue testdisk clamav iwlwifi-1000-ucode iwlwifi-6000-ucode ar9170-fw rt2870usb-fw ifplugd \
-libdaemon wpa_actiond rfkill libgssglue gdisk btrfs-progs-unstable"
+dosfstools udev initscripts filesystem kernel26 glibc linux-api-headers xinetd links pacman \
+pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib libelf gpm sysfsutils \
+libgcrypt libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo grub iptables capi4k-utils \
+ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter wpa_supplicant gzip rsync \
+libarchive device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot \
+fuse libusb vim vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
+ndiswrapper ndiswrapper-utils zd1211-firmware smbclient tiacx tiacx-firmware dmraid \
+linux-atm netcfg parted tzdata ntp v86d iw crda wireless-regdb libnl iproute2 dhclient \
+syslinux mtools perl gmp heimdal sqlite3 db dbus-core libcap fsarchiver xz-utils librpcsecgss \
+libtirpc wipe ddrescue testdisk clamav ifplugd libdaemon wpa_actiond rfkill libgssglue gdisk \
+btrfs-progs-unstable linux-firmware"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
