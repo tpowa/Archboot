@@ -1342,10 +1342,22 @@ _createpv()
 #find physical volumes that are not in use
 findpv()
 {
-    for dev in $(pvs -o pv_name --noheading);do
-        if [ "$(pvs -o vg_name --noheading $dev)" = "      " ]; then
-                echo "$dev"
-                [ "$1" ] && echo $1
+    for i in $(pvs -o pv_name --noheading);do
+        if [ "$(pvs -o vg_name --noheading $i)" = "      " ]; then
+                if [ "$(echo $i | grep /dev/dm-)" ]; then
+                    for k in $(ls /dev/mapper | grep -v control); do
+                        if [ -h /dev/mapper/$k ]; then
+                            pv="$(basename $i)"
+                            if [ "$(readlink /dev/mapper/$k | grep $pv$)" ]; then
+                                echo "$i" | sed -e "s#/dev/dm-.*#/dev/mapper/$k#g"
+                                [ "$1" ] && echo $1
+                            fi
+                        fi
+                    done
+                else
+                    echo "$i"
+                    [ "$1" ] && echo $1
+                fi
         fi
     done
 }
@@ -1356,8 +1368,8 @@ getavailablepv()
             if [ "$(echo $i | grep /dev/dm-)" ]; then
                 for k in $(ls /dev/mapper | grep -v control); do
                     if [ -h /dev/mapper/$k ]; then
-                        dev="$(basename $i)"
-                        if [ "$(readlink /dev/mapper/$k | grep $dev)" ]; then
+                        pv="$(basename $i)"
+                        if [ "$(readlink /dev/mapper/$k | grep $pv$)" ]; then
                             echo "$i" | sed -e "s#/dev/dm-.* #/dev/mapper/$k #g" | sed -e 's#$#\\n#'
                         fi
                     fi
