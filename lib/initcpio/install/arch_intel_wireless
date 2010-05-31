@@ -6,7 +6,7 @@ install ()
 
     BINARIES=""
     FILES=""
-    SCRIPT="arch_intel_wireless"
+    SCRIPT=""
     # ipw2100 support
     add_file "/lib/firmware/ipw2100-1.3-i.fw" "/intel-firmware/ipw2100-1.3-i.fw"
     add_file "/lib/firmware/ipw2100-1.3-p.fw" "/intel-firmware/ipw2100-1.3-p.fw"
