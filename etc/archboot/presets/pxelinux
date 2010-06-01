@@ -23,6 +23,9 @@ BOOTMESSAGE=""
 APPENDBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-message"
 APPENDOPTIONSBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-options"
 
+# Background for menu
+BACKGROUND=/usr/share/archboot/bootloader/background/splash.png
+
 # Prompt on boot, 1=yes 0=no
 PROMPT="1"
 

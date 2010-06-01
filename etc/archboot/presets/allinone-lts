@@ -22,6 +22,9 @@ APPENDOPTIONSBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-options
 # isolinux.cfg files to use
 ISOLINUXCFG="/usr/share/archboot/bootloader/allinone.cfg"
 
+# Background for menu
+BACKGROUND=/usr/share/archboot/bootloader/background/splash.png
+
 # Prompt on boot, 1=yes 0=no
 PROMPT="1"
 
