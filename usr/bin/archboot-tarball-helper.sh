@@ -52,6 +52,9 @@ export USEKERNEL=${VERSION}
 # begin script
 mkdir -p ${TEMPDIR}/${BOOTDIRNAME}/
 install -m755 /usr/lib/syslinux/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.bin
+for i in /usr/lib/syslinux/*.c32; do
+    install -m644 $i ${TEMPDIR}/${BOOTDIRNAME}/$i
+done
 
 # Use config file
 echo ":: Creating isolinux.cfg ..."

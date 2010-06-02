@@ -121,7 +121,10 @@ mv ${CORE64_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64lts.img
 mv ${CORE}/tmp/*/isolinux/isolinux.cfg ${ALLINONE}/isolinux/
 mv ${CORE}/tmp/*/isolinux/boot.msg ${ALLINONE}/isolinux/
 mv ${CORE}/tmp/*/isolinux/options.msg ${ALLINONE}/isolinux/
+# place syslinux files
 mv ${CORE}/tmp/*/isolinux/isolinux.bin ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/isolinux/*.c32 ${ALLINONE}/isolinux/
+
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/isolinux/boot.msg
 
