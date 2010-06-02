@@ -30,7 +30,7 @@ SYSLINUXCFG="/usr/share/archboot/bootloader/bootloader.cfg"
 BACKGROUND=/usr/share/archboot/bootloader/background/splash.png
 
 # Prompt on boot, 1=yes 0=no
-PROMPT="1"
+PROMPT="0"
 
 # Timeout, 30 seconds to fix usb keyboard issues
 # 0 means wait for prompt

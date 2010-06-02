@@ -29,7 +29,7 @@ ISOLINUXCFG="/usr/share/archboot/bootloader/bootloader.cfg"
 BACKGROUND=/usr/share/archboot/bootloader/background/splash.png
 
 # Prompt on boot, 1=yes 0=no
-PROMPT="1"
+PROMPT="0"
 
 # Name of the ISO, if empty Arch Linux is used if not set by a HOOK later
 ISONAME=""

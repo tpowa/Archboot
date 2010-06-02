@@ -65,7 +65,7 @@ if [ "${ISOLINUXCFG}" = "" ]; then
 	echo "No isolinux.cfg file specified, aborting ..."
 	exit 1
 else
-	sed "s|@@PROMPT@@|${PROMPT}|g;s|@@TIMEOUT@@|${TIMEOUT}|g;s|@@KERNEL_BOOT_OPTIONS@@|${KERNEL_BOOT_OPTIONS}|g;s|@@BACKGROUND@@|${BACKGROUND}|g;" \
+	sed "s|@@PROMPT@@|${PROMPT}|g;s|@@TIMEOUT@@|${TIMEOUT}|g;s|@@KERNEL_BOOT_OPTIONS@@|${KERNEL_BOOT_OPTIONS}|g;s|@@BACKGROUND@@|$(basename ${BACKGROUND})|g;" \
 		${ISOLINUXCFG} > ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg ] && echo "No isolinux.cfg found" && exit 1
 fi
