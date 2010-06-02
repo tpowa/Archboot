@@ -14,11 +14,11 @@ Standard kernel: @@KERNEL@@ / Long Time Support kernel: @@LTS_KERNEL@@
 Architecture: i686 / x86_64
 RAM requirement to boot: 320 MB or greater
 
-Available boot options (no input will boot the 32bit archboot system):
-- 'arch <any_other_boot_option>' to boot the archboot system.
-- 'arch64 <any_other_boot_option>' to boot the 64bit archboot system.
-- 'arch-lts <any_other_boot_option>' to boot the LTS archboot system.
-- 'arch64-lts <any_other_boot_option>' to boot the 64bit LTS archboot system.
-- 'memtest' to start the memory test program memtest86+.
+
+
+
+
+
 
 - For troubleshooting and other options press the F2 key.
+- Press Enter to return to main menu.
