@@ -124,6 +124,8 @@ mv ${CORE}/tmp/*/isolinux/options.msg ${ALLINONE}/isolinux/
 # place syslinux files
 mv ${CORE}/tmp/*/isolinux/isolinux.bin ${ALLINONE}/isolinux/
 mv ${CORE}/tmp/*/isolinux/*.c32 ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/isolinux/pci.ids ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/isolinux/modules.pcimap ${ALLINONE}/isolinux/
 
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/isolinux/boot.msg

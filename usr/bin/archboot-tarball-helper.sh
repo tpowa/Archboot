@@ -51,10 +51,13 @@ export USEKERNEL=${VERSION}
 
 # begin script
 mkdir -p ${TEMPDIR}/${BOOTDIRNAME}/
+# prepare syslinux bootloader
 install -m755 /usr/lib/syslinux/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.bin
 for i in /usr/lib/syslinux/*.c32; do
     install -m644 $i ${TEMPDIR}/${BOOTDIRNAME}/$i
 done
+install -m644 /lib/modules/$(uname -r)/modules.pcimap ${TEMPDIR}/${BOOTDIRNAME}/modules.pcimap
+install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
 
 # Use config file
 echo ":: Creating isolinux.cfg ..."
