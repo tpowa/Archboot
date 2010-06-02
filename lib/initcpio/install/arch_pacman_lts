@@ -20,9 +20,9 @@ device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot f
 vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses ndiswrapper ndiswrapper-utils \
 zd1211-firmware smbclient tiacx tiacx-firmware dmraid linux-atm netcfg parted tzdata ntp \
 v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl gmp heimdal sqlite3 db \
-dbus-core libcap fsarchiver xz-utils librpcsecgss libtirpc wipe ddrescue testdisk clamav ifplugd \
+dbus-core libcap fsarchiver xz librpcsecgss libtirpc wipe ddrescue testdisk clamav ifplugd \
 libdaemon nouveau-drm-lts nouveau-firmware wpa_actiond rfkill libgssglue gdisk btrfs-progs-unstable \
-linux-firmware ipw2100-fw 'ipw2200-fw"
+linux-firmware ipw2100-fw 'pw2200-fw"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
