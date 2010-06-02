@@ -58,7 +58,7 @@ for i in /usr/lib/syslinux/*.c32; do
 done
 install -m644 /lib/modules/$(uname -r)/modules.pcimap ${TEMPDIR}/${BOOTDIRNAME}/modules.pcimap
 install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
-install -m644 $BACKGROUND ${TEMPDIR}/${BOOTDIRNAME}/$(basename $BACKGROUND)
+install -m644 $BACKGROUND ${TEMPDIR}/${BOOTDIRNAME}/splash.png
 
 # Use config file
 echo ":: Creating isolinux.cfg ..."
@@ -66,7 +66,7 @@ if [ "${ISOLINUXCFG}" = "" ]; then
 	echo "No isolinux.cfg file specified, aborting ..."
 	exit 1
 else
-	sed "s|@@PROMPT@@|${PROMPT}|g;s|@@TIMEOUT@@|${TIMEOUT}|g;s|@@KERNEL_BOOT_OPTIONS@@|${KERNEL_BOOT_OPTIONS}|g;s|@@BACKGROUND@@|$(basename ${BACKGROUND})|g;" \
+	sed "s|@@PROMPT@@|${PROMPT}|g;s|@@TIMEOUT@@|${TIMEOUT}|g;s|@@KERNEL_BOOT_OPTIONS@@|${KERNEL_BOOT_OPTIONS}|g" \
 		${ISOLINUXCFG} > ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg ] && echo "No isolinux.cfg found" && exit 1
 fi
