@@ -58,6 +58,7 @@ for i in /usr/lib/syslinux/*.c32; do
 done
 install -m644 /lib/modules/$(uname -r)/modules.pcimap ${TEMPDIR}/${BOOTDIRNAME}/modules.pcimap
 install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
+install -m644 $BACKGROUND ${TEMPDIR}/${BOOTDIRNAME}/$(basename $BACKGROUND)
 
 # Use config file
 echo ":: Creating isolinux.cfg ..."
