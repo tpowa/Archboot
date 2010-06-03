@@ -1772,7 +1772,7 @@ autoprepare() {
     DEVICE=$DISC
     # default filesystem specs (the + is bootable flag)
     #  <mountpoint>:<partsize>:<fstype>[:+]:labelname
-    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTOPREPARE swap:$SWAP_PART_SIZE:swap:SWAP_AUTOPREPARE /:$ROOT_PART_SIZE:$FSTYPE:ROOT_AUTOPREPARE /home:*:$FSTYPE:HOME_AUTOPREPARE"
+    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTOPREPARE swap:$SWAP_PART_SIZE:swap::SWAP_AUTOPREPARE /:$ROOT_PART_SIZE:$FSTYPE::ROOT_AUTOPREPARE /home:*:$FSTYPE::HOME_AUTOPREPARE"
     sfdisk_input=""
 
     # validate DEVICE
@@ -1863,6 +1863,7 @@ EOF
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
+            DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
         fi
         part=$(($part + 1))
@@ -1876,6 +1877,7 @@ EOF
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         if [ $(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l) -eq 0 ]; then
+            DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
         fi
         part=$(($part + 1))
