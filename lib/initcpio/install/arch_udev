@@ -18,14 +18,13 @@ install ()
     add_binary /lib/udev/firmware
     add_binary /lib/udev/fstab_import
     add_binary /lib/udev/hid2hci
-    add_file /lib/udev/ignore-remove.sh
     add_binary /lib/udev/keymap
     add_binary /lib/udev/input_id
     add_file /lib/udev/keyboard-force-release.sh
     add_file /lib/udev/load-modules.sh
-    add_binary /lib/udev/modem-modeswitch
     add_binary /lib/udev/path_id
     add_binary /lib/udev/pci-db
+    add_binary /lib/udev/mobile-action-modeswitch
     add_file /lib/udev/root-link.sh
     add_file /lib/udev/rule_generator.functions
     add_binary /lib/udev/scsi_id
