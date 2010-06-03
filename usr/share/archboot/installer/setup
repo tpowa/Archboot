@@ -3921,8 +3921,7 @@ install_bootloader()
     pacman_conf
     prepare_pacman
     CANCEL=""
-    DIALOG --menu "Which bootloader would you like to use?" \
-        11 55 5 \
+    DIALOG --menu "Which bootloader would you like to use?" 12 55 5 \
         "GRUB" "Use the GRUB bootloader (default)" \
         "GRUB2" "Use the GRUB2 bootloader (experimental)" \
         "LILO" "Use the LILO bootloader" \
