@@ -3,7 +3,11 @@
 run_hook ()
 {
     # mount tmpfs, else autodetection will fail!
-    mount -n -t tmpfs udev /dev -o mode=0755,size=10M,nosuid
+    if grep -q devtmpfs /proc/filesystems 2>/dev/null; then
+        /bin/mount -n -t devtmpfs udev /dev -o mode=0755,size=10M,nosuid
+    else
+        /bin/mount -n -t tmpfs udev /dev -o mode=0755,size=10M,nosuid
+    fi
     #create missing nodes
     mknod -m 0666 /dev/null c 1 3
     mknod -m 0660 /dev/zero c 1 5

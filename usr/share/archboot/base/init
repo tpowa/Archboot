@@ -146,7 +146,8 @@ else
         done
     fi
 
-    umount /proc
-    umount /sys
+    mount --move /proc /new_root/proc
+    mount --move /sys /new_root/sys
+    mount --move /dev /new_root/dev
     exec /sbin/switch_root -c /dev/console /new_root ${init} "$@"
 fi
