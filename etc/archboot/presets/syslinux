@@ -20,7 +20,7 @@ KERNEL="/boot/vmlinuz26"
 BOOTMESSAGE=""
 
 # append this file to the default bootmessage
-APPENDBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-message"
+APPENDBOOTMESSAGE=""
 APPENDOPTIONSBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-options"
 
 # syslinux.cfg files to use
