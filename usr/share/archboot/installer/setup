@@ -2718,12 +2718,43 @@ dosyslinux() {
     TEMPDIR=/tmp
     MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
     [ -e ${TEMPDIR}/syslinux.cfg ] && rm ${TEMPDIR}/syslinux.cfg
-    echo "prompt 1" >> ${TEMPDIR}/syslinux.cfg
-    echo "timeout 300" >> ${TEMPDIR}/syslinux.cfg
-    echo "display boot.msg" >> ${TEMPDIR}/syslinux.cfg
-    echo "default arch"  >> ${TEMPDIR}/syslinux.cfg
+    cat << EOF > ${TEMPDIR}/syslinux.cfg
+DEFAULT vesamenu.c32
+PROMPT 0
+MENU TITLE Arch Linux
+MENU BACKGROUND splash.png
+TIMEOUT 300
+
+MENU WIDTH 78
+MENU MARGIN 4
+MENU ROWS 10
+MENU VSHIFT 10
+MENU TIMEOUTROW 15
+MENU TABMSGROW 13
+MENU CMDLINEROW 11
+MENU HELPMSGROW 17
+MENU HELPMSGENDROW 29
+
+# Refer to http://syslinux.zytor.com/wiki/index.php/Doc/menu
+
+MENU COLOR border       30;44   #40ffffff #a0000000 std
+MENU COLOR title        1;36;44 #9033ccff #a0000000 std
+MENU COLOR sel          7;37;40 #e0ffffff #20ffffff all
+MENU COLOR unsel        37;44   #50ffffff #a0000000 std
+MENU COLOR help         37;40   #c0ffffff #a0000000 std
+MENU COLOR timeout_msg  37;40   #80ffffff #00000000 std
+MENU COLOR timeout      1;37;40 #c0ffffff #00000000 std
+MENU COLOR msg07        37;40   #90ffffff #a0000000 std
+MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
+
+ONTIMEOUT arch
+EOF
     sort /tmp/.device-names >> ${TEMPDIR}/syslinux.cfg
     echo "label arch" >> ${TEMPDIR}/syslinux.cfg
+    echo "TEXT HELP" >> ${TEMPDIR}/syslinux.cfg
+    echo "Boot Arch Linux" >> ${TEMPDIR}/syslinux.cfg
+    echo "ENDTEXT" >> ${TEMPDIR}/syslinux.cfg
+    echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
@@ -2731,20 +2762,16 @@ dosyslinux() {
         echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
     echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
+    echo "TEXT HELP" >> ${TEMPDIR}/syslinux.cfg
+    echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/syslinux.cfg
+    echo "ENDTEXT" >> ${TEMPDIR}/syslinux.cfg
+    echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/syslinux.cfg
     echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     else
         echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
     fi
-    # create boot message
-    [ -e ${TEMPDIR}/boot.msg ] && rm ${TEMPDIR}/boot.msg
-    echo "Arch Linux" >> ${TEMPDIR}/boot.msg
-    echo "SYSLINUX BOOT" >> ${TEMPDIR}/boot.msg
-    echo "" >> ${TEMPDIR}/boot.msg
-    echo "Available labels:"  >> ${TEMPDIR}/boot.msg
-    echo "- 'arch' for normal boot" >> ${TEMPDIR}/boot.msg
-    echo "- 'fallback' for fallback boot" >> ${TEMPDIR}/boot.msg
     # edit syslinux.cfg
     DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
     [ "$EDITOR" ] || geteditor
@@ -2752,7 +2779,7 @@ dosyslinux() {
     # install syslinux
     DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
     cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
-    cp  ${TEMPDIR}/boot.msg ${DESTDIR}/boot/boot.msg
+    cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
     cat ${MBR} > ${ROOTDEV}
     [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
     $DESTDIR/usr/bin/syslinux $bootdev >$LOG 2>&1
