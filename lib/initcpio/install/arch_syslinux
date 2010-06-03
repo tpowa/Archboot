@@ -7,7 +7,7 @@ install ()
     FILES=""
     SCRIPT=""
     for i in /usr/lib/syslinux/*; do
-        [ -e $i ] && add_file "$i"
+        [ -f $i ] && add_file "$i"
     done
     add_file "/usr/lib/gconv/gconv-modules"
     add_file "/usr/lib/gconv/IBM850.so"
