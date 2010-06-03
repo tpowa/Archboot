@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+
+
 Arch Linux
 http://www.archlinux.org
 Copyright 2002 - 2007 Judd Vinet <jvinet@zeroflux.org>
@@ -13,12 +23,3 @@ Release: @@RELEASENAME@@
 Standard kernel: @@KERNEL@@ / Long Time Support kernel: @@LTS_KERNEL@@
 Architecture: i686 / x86_64
 RAM requirement to boot: 320 MB or greater
-
-
-
-
-
-
-
-- For troubleshooting and other options press the F2 key.
-- Press Enter to return to main menu.
