@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   May,30th 2010
+   June,3th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -53,7 +53,7 @@ Introduction
   License Arch Linux
 
    2002-2007 Judd Vinet
-   2007-2009 Aaron Griffin
+   2007-2010 Aaron Griffin
    and are licensed under the GNU General Public License (GPL).
 
   What is Archboot?
@@ -68,10 +68,7 @@ Introduction
 
   What is the difference to the official install media?
 
-   * It uses syslinux as initial bootloader.
-   * It provides x86_64/i686 architecture in one image.
-   * It provides the long time support kernel as installation option. 
-   * It uses hybrid iso format.
+   * It provides the long time support kernel as installation option.
    * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
@@ -97,7 +94,7 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub, grub2, lilo and syslinux bootloader support
+   * grub, grub2, lilo, extlinux and syslinux bootloader support
 
 Archboot bootparameters
 
