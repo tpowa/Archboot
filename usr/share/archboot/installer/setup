@@ -2670,7 +2670,7 @@ create_filesystem() {
 }
 
 doextlinux () {
-    if [ ! -e $DESTDIR/usr/bin/extlinux ]; then
+    if [ ! -e $DESTDIR/usr/sbin/extlinux ]; then
         DIALOG --msgbox "Couldn't find extlinux binary, installing syslinux now ..." 0 0
         PACKAGES="syslinux"
         run_pacman

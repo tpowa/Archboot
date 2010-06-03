@@ -3,10 +3,12 @@
 install ()
 {
     MODULES=""
-    BINARIES="syslinux mtools mcopy mattrib"
+    BINARIES="syslinux extlinux mtools mcopy mattrib"
     FILES=""
     SCRIPT=""
-    add_file "/usr/lib/syslinux/mbr.bin"
+    for i in /usr/lib/syslinux/*; do
+        [ -e $i ] && add_file "$i"
+    done
     add_file "/usr/lib/gconv/gconv-modules"
     add_file "/usr/lib/gconv/IBM850.so"
 }
