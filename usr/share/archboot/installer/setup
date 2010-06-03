@@ -152,21 +152,25 @@ activate_luks()
     ACTIVATE_LUKS=""
     if [ -e /sbin/cryptsetup ]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
-        for PART in $(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
-            # skip already encrypted devices, device mapper!
-            OPEN_LUKS=""
-            for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-                [ "$(cryptsetup status $devpath | grep $PART)" ] && OPEN_LUKS="no"
-            done
-            if ! [ "$OPEN_LUKS" = "no" ]; then
+        if [ "$(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"")" ]; then
+            for PART in $(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
+                # skip already encrypted devices, device mapper!
+                OPEN_LUKS=""
+                for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+                    [ "$(cryptsetup status $devpath | grep $PART)" ] && OPEN_LUKS="no"
+                done
+                if ! [ "$OPEN_LUKS" = "no" ]; then
                     RUN_LUKS=""
                     DIALOG --yesno "Setup detected luks encrypted device, do you want to activate $PART ?" 0 0 && RUN_LUKS="1"
                     [ "$RUN_LUKS" = "1" ] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
                     [ "$RUN_LUKS" = "" ] && ACTIVATE_LUKS="no"
-            else
-                ACTIVATE_LUKS="no"
-            fi
-        done
+                else
+                    ACTIVATE_LUKS="no"
+                fi
+            done
+        else
+            ACTIVATE_LUKS="no"
+        fi
     fi
 }
 
