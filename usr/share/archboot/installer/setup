@@ -1772,7 +1772,7 @@ autoprepare() {
     DEVICE=$DISC
     # default filesystem specs (the + is bootable flag)
     #  <mountpoint>:<partsize>:<fstype>[:+]:labelname
-    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTOPREPARE swap:$SWAP_PART_SIZE:swap::SWAP_AUTOPREPARE /:$ROOT_PART_SIZE:$FSTYPE::ROOT_AUTOPREPARE /home:*:$FSTYPE::HOME_AUTOPREPARE"
+    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTO swap:$SWAP_PART_SIZE:swap::SWAP_AUTO /:$ROOT_PART_SIZE:$FSTYPE::ROOT_AUTO /home:*:$FSTYPE::HOME_AUTO"
     sfdisk_input=""
 
     # validate DEVICE
@@ -2663,7 +2663,7 @@ create_filesystem() {
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
     if [ "$DOMKFS" = "yes" ]; then
         while [ "${LABEL_NAME}" = "" ]; do
-            DIALOG --inputbox "Enter the LABEL name for the device,\nkeep it short and use no spaces or special characters." 8 65 \
+            DIALOG --inputbox "Enter the LABEL name for the device,\nkeep it short (not more than 12 characters) and use no spaces or special characters." 8 65 \
             "$(blkid -c=/dev/null -o value -s LABEL $PART)" 2>$ANSWER || return 1
             LABEL_NAME=$(cat $ANSWER)
             if grep ":$LABEL_NAME$" /tmp/.parts; then
