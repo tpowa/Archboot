@@ -2675,10 +2675,20 @@ create_filesystem() {
     RUN_CREATE_FILESYSTEM="yes"
 }
 
-doextlinux () {
-    bootdev=""
-    if [ ! -e $DESTDIR/usr/sbin/extlinux ]; then
-        DIALOG --msgbox "Couldn't find extlinux binary, installing syslinux now ..." 0 0
+# look for a separately-mounted /boot partition
+check_bootpart () {
+    subdir=""
+    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+    if [ "$bootdev" = "" ]; then
+        subdir=/boot
+        bootdev=$PART_ROOT
+    fi
+}
+
+# install syslinux and run preparation
+prepare_syslinux () {
+    if ! [ -e "$DESTDIR/usr/sbin/extlinux" -o -e "$DESTDIR/usr/bin/syslinux" ]; then
+        DIALOG --msgbox "Couldn't find bootloader binary, installing syslinux now ..." 0 0
         PACKAGES="syslinux"
         run_pacman
         # reset PACKAGES after installing
@@ -2691,34 +2701,13 @@ doextlinux () {
     getcryptsetup
     getrootuuid
     getrootlabel
-    # look for a separately-mounted /boot partition
-    subdir=""
-    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-    if [ "$bootdev" = "" ]; then
-        subdir=/boot
-        bootdev=$PART_ROOT
-    fi
-    # extlinux only can boot from ext2/3/4 and btrfs partitions!
-    FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-    if ! [ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]; then
-        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 or btrfs partition with /boot on it." 0 0
-        return 1
-    fi
-    # extlinux cannot boot from any raid partition, encrypted and dmraid device
-    if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
-        DIALOG --msgbox "Error:\EXTLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
-        return 1
-    fi
-    # check if raid1 device is used, else fail.
-    if [ "$(echo $bootdev | grep /dev/md)" ]; then
-        if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
-            DIALOG --msgbox "Error:\EXTLINUX cannot boot from none raid1 devices." 0 0
-            return 1
-        fi
-    fi
+}
+
+# common syslinux funtion
+common_syslinux () {
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nEXTLINUX doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install syslinux to an other device, which contains a msdos partition table?" 0 0 || return 1
+                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\n$SYSLINUX doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install $SYSLINUX_PROGRAM to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     DEVS="$(findbootloaderdisks _)"
@@ -2727,13 +2716,13 @@ doextlinux () {
         DIALOG --msgbox "No hard drives were found" 0 0
         return 1
     fi
-    DIALOG --menu "Select the boot device where the EXTLINUX bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
+    DIALOG --menu "Select the boot device where the $SYSLINUX bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
     ROOTDEV=$(cat $ANSWER)
-    # generate extlinux.conf
+    # generate config file
     TEMPDIR=/tmp
     MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
-    [ -e ${TEMPDIR}/extlinux.conf ] && rm ${TEMPDIR}/extlinux.conf
-    cat << EOF > ${TEMPDIR}/extlinux.conf
+    [ -e ${TEMPDIR}/${SYSLINUX_CONF} ] && rm ${TEMPDIR}/${SYSLINUX_CONF}
+    cat << EOF > ${TEMPDIR}/${SYSLINUX_CONF}
 DEFAULT vesamenu.c32
 PROMPT 0
 MENU TITLE Arch Linux
@@ -2764,67 +2753,92 @@ MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
 ONTIMEOUT arch
 EOF
-    sort /tmp/.device-names >> ${TEMPDIR}/extlinux.conf
-    echo "label arch" >> ${TEMPDIR}/extlinux.conf
-    echo "TEXT HELP" >> ${TEMPDIR}/extlinux.conf
-    echo "Boot Arch Linux" >> ${TEMPDIR}/extlinux.conf
-    echo "ENDTEXT" >> ${TEMPDIR}/extlinux.conf
-    echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/extlinux.conf
-    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/extlinux.conf
+    sort /tmp/.device-names >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "label arch" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "Boot Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=$subdir/$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
-    echo "label fallback" >> ${TEMPDIR}/extlinux.conf
-    echo "TEXT HELP" >> ${TEMPDIR}/extlinux.conf
-    echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/extlinux.conf
-    echo "ENDTEXT" >> ${TEMPDIR}/extlinux.conf
-    echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/extlinux.conf
-    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/extlinux.conf
+    echo "label fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
-    # edit extlinux.conf
-    DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
+    # edit config file
+    DIALOG --msgbox "Before installing $SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, $SYSLINUX will be installed." 0 0
     [ "$EDITOR" ] || geteditor
-    $EDITOR ${TEMPDIR}/extlinux.conf
+    $EDITOR ${TEMPDIR}/${SYSLINUX_CONF}
     # install syslinux
-    DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
-    cp  ${TEMPDIR}/extlinux.conf ${DESTDIR}/boot/extlinux.conf
+    DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
+    cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_CONF}
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
     cat ${MBR} > ${ROOTDEV}
     [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
-    chroot_mount
-    chroot $DESTDIR extlinux --install /boot >$LOG 2>&1
+}
+# finish_syslinux
+finish_syslinux () {
     if [ $? -gt 0 ]; then
         chroot_umount
-        DIALOG --msgbox "Error installing EXTLINUX. (see $LOG for output)" 0 0
+        DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
     [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
     chroot_umount
-    DIALOG --msgbox "EXTLINUX was successfully installed." 0 0
+    DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
 
+# install extlinux bootloader
+doextlinux () {
+    bootdev=""
+    SYSLINUX=EXTLINUX
+    SYSLINUX_PROGRAM=extlinux
+    SYSLINUX_CONF=extlinux.conf
+    prepare_syslinux
+    check_bootpart
+    # extlinux only can boot from ext2/3/4 and btrfs partitions!
+    FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+    if ! [ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]; then
+        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 or btrfs partition with /boot on it." 0 0
+        return 1
+    fi
+    # extlinux cannot boot from any raid partition, encrypted and dmraid device
+    if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
+        return 1
+    fi
+    # check if raid1 device is used, else fail.
+    if [ "$(echo $bootdev | grep /dev/md)" ]; then
+        if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+            DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from none raid1 devices." 0 0
+            return 1
+        fi
+    fi
+    common_syslinux
+    chroot_mount
+    chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
+    finish_syslinux
+}
+
+# install syslinux bootloader
 dosyslinux() {
     bootdev=""
-    if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
-        DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
-        PACKAGES="syslinux"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
-    fi
-    USE_DMRAID=""
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    getrootuuid
-    getrootlabel
+    subdir=""
+    SYSLINUX=SYSLINUX
+    SYSLINUX_CONF=syslinux.cfg
+    SYSLINUX_PROGRAM=syslinux
+    prepare_syslinux
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
@@ -2839,100 +2853,13 @@ dosyslinux() {
     fi
     # syslinux cannot boot from any raid, raid partition, encrypted and dmraid device
     if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
-        DIALOG --msgbox "Error:\nSyslinux cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
+        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
         return 1
     fi
-    # check on GUID (gpt)
-    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nSyslinux doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install syslinux to an other device, which contains a msdos partition table?" 0 0 || return 1
-    fi
-    DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="$DEVS $(findbootloaderpartitions _)"
-    if [ "$DEVS" = "" ]; then
-        DIALOG --msgbox "No hard drives were found" 0 0
-        return 1
-    fi
-    DIALOG --menu "Select the boot device where the SYSLINUX bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
-    ROOTDEV=$(cat $ANSWER)
-    # generate syslinux.cfg
-    TEMPDIR=/tmp
-    MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
-    [ -e ${TEMPDIR}/syslinux.cfg ] && rm ${TEMPDIR}/syslinux.cfg
-    cat << EOF > ${TEMPDIR}/syslinux.cfg
-DEFAULT vesamenu.c32
-PROMPT 0
-MENU TITLE Arch Linux
-MENU BACKGROUND splash.png
-TIMEOUT 300
-
-MENU WIDTH 78
-MENU MARGIN 4
-MENU ROWS 10
-MENU VSHIFT 10
-MENU TIMEOUTROW 15
-MENU TABMSGROW 13
-MENU CMDLINEROW 11
-MENU HELPMSGROW 17
-MENU HELPMSGENDROW 29
-
-# Refer to http://syslinux.zytor.com/wiki/index.php/Doc/menu
-
-MENU COLOR border       30;44   #40ffffff #a0000000 std
-MENU COLOR title        1;36;44 #9033ccff #a0000000 std
-MENU COLOR sel          7;37;40 #e0ffffff #20ffffff all
-MENU COLOR unsel        37;44   #50ffffff #a0000000 std
-MENU COLOR help         37;40   #c0ffffff #a0000000 std
-MENU COLOR timeout_msg  37;40   #80ffffff #00000000 std
-MENU COLOR timeout      1;37;40 #c0ffffff #00000000 std
-MENU COLOR msg07        37;40   #90ffffff #a0000000 std
-MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
-
-ONTIMEOUT arch
-EOF
-    sort /tmp/.device-names >> ${TEMPDIR}/syslinux.cfg
-    echo "label arch" >> ${TEMPDIR}/syslinux.cfg
-    echo "TEXT HELP" >> ${TEMPDIR}/syslinux.cfg
-    echo "Boot Arch Linux" >> ${TEMPDIR}/syslinux.cfg
-    echo "ENDTEXT" >> ${TEMPDIR}/syslinux.cfg
-    echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/syslinux.cfg
-    echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
-    else
-        echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
-    fi
-    echo "label fallback" >> ${TEMPDIR}/syslinux.cfg
-    echo "TEXT HELP" >> ${TEMPDIR}/syslinux.cfg
-    echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/syslinux.cfg
-    echo "ENDTEXT" >> ${TEMPDIR}/syslinux.cfg
-    echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/syslinux.cfg
-    echo "kernel $VMLINUZ" >> ${TEMPDIR}/syslinux.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
-    else
-        echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/syslinux.cfg
-    fi
-    # edit syslinux.cfg
-    DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
-    [ "$EDITOR" ] || geteditor
-    $EDITOR ${TEMPDIR}/syslinux.cfg
-    # install syslinux
-    DIALOG --infobox "Installing the SYSLINUX bootloader..." 0 0
-    cp  ${TEMPDIR}/syslinux.cfg ${DESTDIR}/boot/syslinux.cfg
-    cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
-    cat ${MBR} > ${ROOTDEV}
-    [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
+    common_syslinux
     chroot_mount
-    chroot $DESTDIR syslinux $bootdev >$LOG 2>&1
-    if [ $? -gt 0 ]; then
-        chroot_umount
-        DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
-        return 1
-    fi
-    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
-    chroot_umount
-    DIALOG --msgbox "SYSLINUX was successfully installed." 0 0
+    chroot $DESTDIR $SYSLINUX_PROGRAM $bootdev >$LOG 2>&1
+    finish_syslinux
 }
 
 dolilo() {
@@ -3047,13 +2974,7 @@ dogrub() {
     fi
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" ]; then
-        # look for a separately-mounted /boot partition
-        subdir=""
-        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        if [ "$bootdev" = "" ]; then
-            subdir=/boot
-            bootdev=$PART_ROOT
-        fi
+        check_bootpart
         # check if raid device, devicemapper or dmraid is used  on /boot partition
         if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
@@ -3228,14 +3149,8 @@ dogrub2(){
     getrootlabel
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
-        # look for a separately-mounted /boot partition
-        subdir=""
-        bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-        if [ "$bootdev" = "" ]; then
-            subdir=/boot
-            bootdev=$PART_ROOT
-        fi
-      # check if raid, raid partition, dmraid or device devicemapper is used
+        check_bootpart
+        # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported
                 FAIL_COMPLEX="0"
