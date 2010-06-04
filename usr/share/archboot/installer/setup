@@ -2689,7 +2689,7 @@ check_bootpart () {
 prepare_syslinux () {
     if ! [ -e "$DESTDIR/usr/sbin/extlinux" -o -e "$DESTDIR/usr/bin/syslinux" ]; then
         DIALOG --msgbox "Couldn't find bootloader binary, installing syslinux now ..." 0 0
-        PACKAGES="syslinux"
+        PACKAGES="$SYSLINUX_PACKAGES"
         run_pacman
         # reset PACKAGES after installing
         PACKAGES=""
@@ -2802,6 +2802,7 @@ finish_syslinux () {
 # install extlinux bootloader
 doextlinux () {
     bootdev=""
+    SYSLINUX_PACKAGES="syslinux"
     SYSLINUX=EXTLINUX
     SYSLINUX_PROGRAM=extlinux
     SYSLINUX_CONF=extlinux.conf
@@ -2835,6 +2836,7 @@ doextlinux () {
 dosyslinux() {
     bootdev=""
     subdir=""
+    SYSLINUX_PACKAGES="syslinux mtools"
     SYSLINUX=SYSLINUX
     SYSLINUX_CONF=syslinux.cfg
     SYSLINUX_PROGRAM=syslinux
