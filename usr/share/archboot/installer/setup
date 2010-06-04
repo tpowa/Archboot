@@ -2676,6 +2676,7 @@ create_filesystem() {
 }
 
 doextlinux () {
+    bootdev=""
     if [ ! -e $DESTDIR/usr/sbin/extlinux ]; then
         DIALOG --msgbox "Couldn't find extlinux binary, installing syslinux now ..." 0 0
         PACKAGES="syslinux"
@@ -2691,7 +2692,12 @@ doextlinux () {
     getrootuuid
     getrootlabel
     # look for a separately-mounted /boot partition
+    subdir=""
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+    if [ "$bootdev" = "" ]; then
+        subdir=/boot
+        bootdev=$PART_ROOT
+    fi
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
     if ! [ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]; then
@@ -2731,7 +2737,7 @@ doextlinux () {
 DEFAULT vesamenu.c32
 PROMPT 0
 MENU TITLE Arch Linux
-MENU BACKGROUND splash.png
+MENU BACKGROUND $subdir/splash.png
 TIMEOUT 300
 
 MENU WIDTH 78
@@ -2764,22 +2770,22 @@ EOF
     echo "Boot Arch Linux" >> ${TEMPDIR}/extlinux.conf
     echo "ENDTEXT" >> ${TEMPDIR}/extlinux.conf
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/extlinux.conf
-    echo "kernel $VMLINUZ" >> ${TEMPDIR}/extlinux.conf
+    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/extlinux.conf
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
     else
-        echo "append initrd=$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
     fi
     echo "label fallback" >> ${TEMPDIR}/extlinux.conf
     echo "TEXT HELP" >> ${TEMPDIR}/extlinux.conf
     echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/extlinux.conf
     echo "ENDTEXT" >> ${TEMPDIR}/extlinux.conf
     echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/extlinux.conf
-    echo "kernel $VMLINUZ" >> ${TEMPDIR}/extlinux.conf
+    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/extlinux.conf
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        echo "append initrd=$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
     else
-        echo "append initrd=$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${PART_ROOT} rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/extlinux.conf
     fi
     # edit extlinux.conf
     DIALOG --msgbox "Before installing SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, SYSLINUX will be installed." 0 0
@@ -2804,6 +2810,7 @@ EOF
 }
 
 dosyslinux() {
+    bootdev=""
     if [ ! -e $DESTDIR/usr/bin/syslinux ]; then
         DIALOG --msgbox "Couldn't find syslinux binary, installing syslinux now ..." 0 0
         PACKAGES="syslinux"
