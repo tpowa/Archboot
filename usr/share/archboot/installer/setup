@@ -592,7 +592,7 @@ get_grub_virtio_map() {
     majorhd=0
     #add virtio devices
     for i in $(ls -d $block/vd[a-z]); do
-        echo "(hd$majorhd) $i" >> /tmp/dev.map
+        echo "(hd$majorhd) /dev/$(basename $i)" >> /tmp/dev.map
         majorhd="$(($majorhd+1))"
     done
 }
@@ -603,7 +603,7 @@ get_grub_mmcblk_map() {
     majorhd=0
     #add virtio devices
     for i in $(ls -d $block/mmcblk*); do
-        echo "(hd$majorhd) $i" >> /tmp/dev.map
+        echo "(hd$majorhd) /dev/$(basename $i)" >> /tmp/dev.map
         majorhd="$(($majorhd+1))"
     done
 }
@@ -615,7 +615,7 @@ get_grub_extra_devices_map() {
     #add extra devices
     for k in $EXTRA_CONTROLLER; do
         for i in $(ls -d $block/$k*); do
-            echo "(hd$majorhd) $(echo $i | sed -e 's#\!##g')" >> /tmp/dev.map
+            echo "(hd$majorhd) /dev/$k/$(echo $(basename $i) | sed -e 's#\!##g')" >> /tmp/dev.map
             majorhd="$(($majorhd+1))"
         done
     done
