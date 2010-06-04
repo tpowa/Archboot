@@ -2791,11 +2791,15 @@ EOF
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
     cat ${MBR} > ${ROOTDEV}
     [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
-    chroot /usr/bin/extlinux --install /boot >$LOG 2>&1
+    chroot_mount
+    chroot $DESTDIR extlinux --install /boot >$LOG 2>&1
     if [ $? -gt 0 ]; then
+        chroot_umount
         DIALOG --msgbox "Error installing EXTLINUX. (see $LOG for output)" 0 0
         return 1
     fi
+    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
+    chroot_umount
     DIALOG --msgbox "EXTLINUX was successfully installed." 0 0
 }
 
@@ -2912,11 +2916,15 @@ EOF
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
     cat ${MBR} > ${ROOTDEV}
     [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm  ${DESTDIR}/boot/ldlinux.sys
-    $DESTDIR/usr/bin/syslinux $bootdev >$LOG 2>&1
+    chroot_mount
+    chroot $DESTDIR syslinux $bootdev >$LOG 2>&1
     if [ $? -gt 0 ]; then
+        chroot_umount
         DIALOG --msgbox "Error installing SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
+    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
+    chroot_umount
     DIALOG --msgbox "SYSLINUX was successfully installed." 0 0
 }
 
