@@ -2951,7 +2951,7 @@ dolilo() {
         sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
     fi
-    sed -i -e '/DEVICE DETAILS/d' >> $DESTDIR/etc/lilo.conf
+    sed -i -e '/DEVICE DETAILS/d' $DESTDIR/etc/lilo.conf
     sort /tmp/.device-names >> $DESTDIR/etc/lilo.conf
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
