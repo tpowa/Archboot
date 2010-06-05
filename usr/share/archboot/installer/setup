@@ -773,6 +773,7 @@ _mkfs() {
     local _dest=$4
     local _mountpoint=$5
     local _labelname=$6
+    local _fsoptions=$7
 
     # we have two main cases: "swap" and everything else.
     if [ "${_fstype}" = "swap" ]; then
@@ -792,7 +793,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local knownfs=0
-        for fs in xfs jfs reiserfs ext2 ext3 ext4 ntfs-3g vfat; do
+        for fs in xfs jfs reiserfs ext2 ext3 ext4 btrfs ntfs-3g vfat; do
             [ "${_fstype}" = "${fs}" ] && knownfs=1 && break
         done
         if [ $knownfs -eq 0 ]; then
@@ -803,14 +804,15 @@ _mkfs() {
         if [ "${_domk}" = "yes" ]; then
             local ret
             case ${_fstype} in
-                xfs)      mkfs.xfs -L ${_labelname} -f ${_device} >$LOG 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                reiserfs) yes | mkreiserfs -l ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                ext3)     mke2fs -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext4)     mke2fs -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                ntfs-3g)  mkfs.ntfs -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs ${_fsoptions} -L ${_labelname} -f ${_device} >$LOG 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                reiserfs) yes | mkreiserfs ${_fsoptions} -l ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                ext3)     mke2fs ${_fsoptions} -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
+                ext4)     mke2fs ${_fsoptions} -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [ $ret != 0 ]; then
@@ -1999,6 +2001,7 @@ mountpoints() {
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
         [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
         [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
+        [ "$(which mkfs.btrfs 2>/dev/null)" ] && FSOPTS="$FSOPTS btrfs Btrfs (experimental)"
         [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
         [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
         [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
@@ -2087,13 +2090,14 @@ mountpoints() {
         MP=$(echo $line | cut -d: -f 3)
         DOMKFS=$(echo $line | cut -d: -f 4)
         LABEL_NAME=$(echo $line | cut -d: -f 5)
+        FS_OPTIONS=$(echo $line | cut -d: -f 6)
         if [ "$DOMKFS" = "yes" ]; then
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME || return 1
+            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS || return 1
         else
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
@@ -2671,6 +2675,8 @@ create_filesystem() {
                 LABEL_NAME=""
             fi
         done
+        DIALOG --inputbox "Enter additional filesystem options to the creation utility for the device.\nUse this field only if the defaults are not matching your needs\nelse just leave it empty." 8 65 \
+        FS_OPTIONS=$(cat $ANSWER)
     fi
     RUN_CREATE_FILESYSTEM="yes"
 }
@@ -2977,6 +2983,11 @@ dogrub() {
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
+        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+        if [ "$FSTYPE" = "btrfs" ]; then
+            DIALOG --msgbox "Error:\nGrub cannot boot from btrfs partition with /boot on it." 0 0
+            return 1
+        fi
         # check if raid device, devicemapper or dmraid is used  on /boot partition
         if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
@@ -3152,6 +3163,11 @@ dogrub2(){
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
+        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+        if [ "$FSTYPE" = "btrfs" ]; then
+            DIALOG --msgbox "Error:\nGrub2 cannot boot from btrfs partition with /boot on it." 0 0
+            return 1
+        fi
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported
