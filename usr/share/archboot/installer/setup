@@ -2694,6 +2694,16 @@ check_bootpart () {
     fi
 }
 
+# basic checks needed for all bootloaders
+common_bootloader_checks() {
+    activate_special_devices
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    [ "$NAME_SCHEME_PARAMETER" = "UUID" ] && getrootuuid
+    [ "$NAME_SCHEME_PARAMETER" = "LABEL" ] && getrootlabel
+}
+
 # install syslinux and run preparation
 prepare_syslinux () {
     if ! [ -e "$DESTDIR/usr/sbin/extlinux" -o -e "$DESTDIR/usr/bin/mcopy" ]; then
@@ -2704,12 +2714,7 @@ prepare_syslinux () {
         PACKAGES=""
     fi
     USE_DMRAID=""
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    getrootuuid
-    getrootlabel
+    common_bootloader_checks
 }
 
 # common syslinux funtion
@@ -2882,12 +2887,7 @@ dolilo() {
         PACKAGES=""
     fi
     USE_DMRAID=""
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    getrootuuid
-    getrootlabel
+    common_bootloader_checks
     # check on GUID (gpt)
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
@@ -2949,13 +2949,8 @@ dogrub() {
     bootdev=""
     grubdev=""
     redundant=""
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
+    common_bootloader_checks
     get_grub_map
-    getrootuuid
-    getrootlabel
     FAIL_RAID=""
     FAIL_DM=""
     GRUB_LEGACY="1"
@@ -3156,13 +3151,8 @@ dogrub2(){
     GRUB_LEGACY=""
     USE_DMRAID=""
     RAID_ON_LVM=""
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
+    common_bootloader_checks
     get_grub2_map
-    getrootuuid
-    getrootlabel
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
