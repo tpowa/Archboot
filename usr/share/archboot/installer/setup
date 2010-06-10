@@ -1997,11 +1997,12 @@ mountpoints() {
         : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
+        # btrfs is not well supported by LTS .32 kernel
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
         [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
         [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-        [ "$(which mkfs.btrfs 2>/dev/null)" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
         [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
         [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
         [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
