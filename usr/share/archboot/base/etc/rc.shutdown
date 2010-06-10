@@ -64,7 +64,7 @@ stat_busy "Deactivating Swap"
 stat_done
 
 stat_busy "Unmounting Filesystems"
-/bin/umount -a -r -t noramfs,notmpfs,nosysfs,noproc -O no_netdev
+/bin/umount -a -r -t noramfs,notmpfs,nosysfs,noproc,nodevtmpfs -O no_netdev
 stat_done
 
 run_hook shutdown_poweroff
