@@ -2684,6 +2684,16 @@ create_filesystem() {
     RUN_CREATE_FILESYSTEM="yes"
 }
 
+# basic checks needed for all bootloaders
+common_bootloader_checks() {
+    activate_special_devices
+    getrootfs
+    getraidarrays
+    getcryptsetup
+    [ "$NAME_SCHEME_PARAMETER" = "UUID" ] && getrootuuid
+    [ "$NAME_SCHEME_PARAMETER" = "LABEL" ] && getrootlabel
+}
+
 # look for a separately-mounted /boot partition
 check_bootpart () {
     subdir=""
@@ -2694,14 +2704,13 @@ check_bootpart () {
     fi
 }
 
-# basic checks needed for all bootloaders
-common_bootloader_checks() {
-    activate_special_devices
-    getrootfs
-    getraidarrays
-    getcryptsetup
-    [ "$NAME_SCHEME_PARAMETER" = "UUID" ] && getrootuuid
-    [ "$NAME_SCHEME_PARAMETER" = "LABEL" ] && getrootlabel
+# check for btrfs bootpart and abort if detected
+abort_btrfs_bootpart() {
+        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+        if [ "$FSTYPE" = "btrfs" ]; then
+            DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot on it." 0 0
+            return 1
+        fi
 }
 
 # install syslinux and run preparation
@@ -2892,6 +2901,7 @@ dolilo() {
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
+    abort_btrfs_bootpart
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
         if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
@@ -2981,11 +2991,7 @@ dogrub() {
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
-        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-        if [ "$FSTYPE" = "btrfs" ]; then
-            DIALOG --msgbox "Error:\nGrub cannot boot from btrfs partition with /boot on it." 0 0
-            return 1
-        fi
+        abort_btrfs_bootpart
         # check if raid device, devicemapper or dmraid is used  on /boot partition
         if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
@@ -3156,11 +3162,7 @@ dogrub2(){
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
-        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-        if [ "$FSTYPE" = "btrfs" ]; then
-            DIALOG --msgbox "Error:\nGrub2 cannot boot from btrfs partition with /boot on it." 0 0
-            return 1
-        fi
+        abort_btrfs_bootpart
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported
