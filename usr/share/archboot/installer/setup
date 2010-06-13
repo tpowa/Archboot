@@ -2110,20 +2110,23 @@ mountpoints() {
         DOMKFS=$(echo $line | cut -d: -f 4)
         LABEL_NAME=$(echo $line | cut -d: -f 5)
         FS_OPTIONS=$(echo $line | cut -d: -f 6)
+        BTRFS_DEVICES=$(echo $line | cut -d: -f 7)
+        BTRFS_LEVEL=$(echo $line | cut -d: -f 8)
+        BTRFS_SUBVOLUME=$(echo $line | cut -d: -f 9)
         if [ "$DOMKFS" = "yes" ]; then
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS || return 1
+            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME || return 1
         else
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs no $PART $FSTYPE $DESTDIR $MP || return 1
+            _mkfs no $PART $FSTYPE $DESTDIR $MP $BTRFS_SUBVOLUME || return 1
         fi
         sleep 1
     done
@@ -2153,6 +2156,9 @@ _mkfs() {
     local _mountpoint=$5
     local _labelname=$6
     local _fsoptions=$7
+    local _btrfsdevices=$8
+    local _btrfslevel=$9
+    local _btrfssubvolume=$10
 
     # we have two main cases: "swap" and everything else.
     if [ "${_fstype}" = "swap" ]; then
