@@ -1873,34 +1873,12 @@ partition() {
     S_PART=1
 }
 
-select_btrfs_raid_devices () {
-    # show all devices with sizes
-    # DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
-    # select the second device to use, no missing option available!
-    RAIDNUMBER=2
-    DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
-    PART=$(cat $ANSWER)
-    echo "$PART" >>/tmp/.btrfs-raid
-    while [ "$PART" != "DONE" ]; do
-        BTRFS_DONE=""
-        RAIDNUMBER=$(($RAIDNUMBER + 1))
-        # RAID10 need 4 devices!
-        [ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
-        [ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
-        # clean loop from used partition and options
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        # add more devices
-        DIALOG --menu "Select additional device $RAIDNUMBER" 21 50 13 $PARTS $BTRFS_DONE 2>$ANSWER || return 1
-        PART=$(cat $ANSWER)
-        [ "$PART" = "DONE" ] && break
-        echo "$PART" >>/tmp/.btrfs-raid
-     done
-     # final step ask if everything is ok?
-     DIALOG --yesno "Would you like to create $BTRFS_DEVICE like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-raid); do echo "$i\n";done)" 0 0 && BTRFS_RAID_FINISH="DONE"
-     BTRFS_RAID_DEVICES=""
-     if [ -n /tmp/.btrfs-raid ]; then
-         for i in $(cat /tmp/.btrfs-raid); do
-             BTRFS_RAID_DEVICES="$BTRFS_RAID_DEVICES $i"
+remove_btrfs_parts() {
+     BTRFS_DEVICES=""
+     if [ -n /tmp/.btrfs-devices ]; then
+         for i in $(cat /tmp/.btrfs-devices); do
+             BTRFS_DEVICES="$i#$BTRFS_DEVICES"
+             PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
      fi
 }
@@ -1910,16 +1888,52 @@ btrfs_raid_level() {
     BTRFS_RAID_FINISH=""
     BTRFS_LEVEL=""
     BTRFS_DEVICE="$PART"
-    : >/tmp/.btrfs-raid
-    DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are RAID0, RAID1, RAID10 and single.\nSINGLE means that no duplication of metadata is done, which may be desired when using hardware raid. 
-RAID10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
+    : >/tmp/.btrfs-devices
+    DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are RAID0, RAID1, RAID10 and single.\nSINGLE means that no duplication of metadata is done, which may be desired when using hardware raid. RAID10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
     while [ "$BTRFS_RAID_FINISH" != "DONE" ]; do
         DIALOG --menu "Select the raid level you want to use" 21 50 13 $BTRFS_RAIDLEVELS 2>$ANSWER || return 1
         BTRFS_LEVEL=$(cat $ANSWER)
-        [ "$BTRFS_LEVEL" = "NONE" ] && break
-        # take selected device as 1st device, add additional devices in part below.
-        select_btrfs_raid_devices
+        if [ "$BTRFS_LEVEL" = "NONE" ]; then
+            echo "$BTRFS_DEVICE" >>/tmp/.btrfs-devices
+            remove_btrfs_parts
+            break
+        else
+            # take selected device as 1st device, add additional devices in part below.
+            select_btrfs_raid_devices
+        fi
     done
+}
+
+select_btrfs_raid_devices () {
+    # show all devices with sizes
+    # DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
+    # select the second device to use, no missing option available!
+    BTRFS_PART="$BTRFS_DEVICE"
+    BTRFS_PARTS="$PARTS"
+    : >/tmp/.btrfs-devices
+    echo "$BTRFS_PART" >>/tmp/.btrfs-devices
+    BTRFS_PARTS="$(echo $BTRFS_PARTS | sed -e "s#${BTRFS_PART}\ _##g")"
+    RAIDNUMBER=2
+    DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $BTRFS_PARTS 2>$ANSWER || return 1
+    BTRFS_PART=$(cat $ANSWER)
+    echo "$BTRFS_PART" >>/tmp/.btrfs-devices
+    while [ "$BTRFS_PART" != "DONE" ]; do
+        BTRFS_DONE=""
+        RAIDNUMBER=$(($RAIDNUMBER + 1))
+        # RAID10 need 4 devices!
+        [ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
+        [ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
+        # clean loop from used partition and options
+        BTRFS_PARTS="$(echo $BTRFS_PARTS | sed -e "s#${BTRFS_PART}\ _##g")"
+        # add more devices
+        DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $BTRFS_PARTS $BTRFS_DONE 2>$ANSWER || return 1
+        BTRFS_PART=$(cat $ANSWER)
+        [ "$BTRFS_PART" = "DONE" ] && break
+        echo "$BTRFS_PART" >>/tmp/.btrfs-devices
+     done
+     # final step ask if everything is ok?
+     DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n";done)" 0 0 && BTRFS_RAID_FINISH="DONE"
+     [ "$BTRFS_RAID_FINISH" = "DONE" ] && remove_btrfs_parts
 }
 
 # find btrfs subvolume
@@ -1982,17 +1996,143 @@ create_filesystem() {
             fi
         done
         if [ "$FSTYPE" = "btrfs" ]; then
-            prepare_btrfs
+            prepare_btrfs || return 1
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
     else
         if [ "$FSTYPE" = "btrfs" ]; then
-            choose_btrfs_subvolume
+            choose_btrfs_subvolume || return 1
         fi
     fi
     RUN_CREATE_FILESYSTEM="yes"
 }
+
+mountpoints() {
+    NAME_SCHEME_PARAMETER_RUN=""
+    while [ "$PARTFINISH" != "DONE" ]; do
+        activate_special_devices
+        : >/tmp/.device-names
+        : >/tmp/.fstab
+        : >/tmp/.parts
+        # btrfs is not well supported by LTS .32 kernel
+        FSOPTS=""
+        [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
+        [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+        [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
+        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+        [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
+        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
+        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
+        [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
+        [ "$(which mkfs.vfat 2>/dev/null)" ] && FSOPTS="$FSOPTS vfat VFAT"
+        #
+        # Select mountpoints
+        #
+        DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+        PARTS=$(findpartitions _)
+        DO_SWAP=""
+        while [ "$DO_SWAP" != "DONE" ]; do
+            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            if [ "$PART" != "NONE" ]; then
+                DOMKFS="no"
+                if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                    create_filesystem
+                else
+                    RUN_CREATE_FILESYSTEM="yes"
+                fi
+            else
+                RUN_CREATE_FILESYSTEM="yes"
+            fi
+            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_SWAP=DONE
+        done
+        if [ "$PART" != "NONE" ]; then
+            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME:$FS_OPTIONS" >>/tmp/.parts
+        fi
+        DO_ROOT=""
+        while [ "$DO_ROOT" != "DONE" ]; do
+            DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
+            PART=$(cat $ANSWER)
+            PART_ROOT=$PART
+            # Select root filesystem type
+            FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
+            DOMKFS="no"
+            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                select_filesystem && create_filesystem
+            else
+                RUN_CREATE_FILESYSTEM="yes"
+            fi
+            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ROOT=DONE
+        done
+        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME" >>/tmp/.parts
+        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+        #
+        # Additional partitions
+        #
+        while [ "$PART" != "DONE" ]; do
+            DO_ADDITIONAL=""
+            while [ "$DO_ADDITIONAL" != "DONE" ]; do
+                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
+                PART=$(cat $ANSWER)
+                if [ "$PART" != "DONE" ]; then
+                    FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
+                    DOMKFS="no"
+                    # Select a filesystem type
+                    if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                        enter_mountpoint && select_filesystem && create_filesystem
+                    else
+                        enter_mountpoint
+                        RUN_CREATE_FILESYSTEM="yes"
+                    fi
+                else
+                    RUN_CREATE_FILESYSTEM="yes"
+                fi
+                [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ADDITIONAL="DONE"
+            done
+            if [ "$PART" != "DONE" ]; then
+                echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME" >>/tmp/.parts
+                PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+            fi
+        done
+        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
+    done
+    # disable swap and all mounted partitions
+    _umountall
+    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+        set_device_name_scheme || return 1
+    fi
+    for line in $(cat /tmp/.parts); do
+        PART=$(echo $line | cut -d: -f 1)
+        FSTYPE=$(echo $line | cut -d: -f 2)
+        MP=$(echo $line | cut -d: -f 3)
+        DOMKFS=$(echo $line | cut -d: -f 4)
+        LABEL_NAME=$(echo $line | cut -d: -f 5)
+        FS_OPTIONS=$(echo $line | cut -d: -f 6)
+        if [ "$DOMKFS" = "yes" ]; then
+            if [ "$FSTYPE" = "swap" ]; then
+                DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
+            else
+                DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
+            fi
+            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS || return 1
+        else
+            if [ "$FSTYPE" = "swap" ]; then
+                DIALOG --infobox "Activating swapspace on $PART" 0 0
+            else
+                DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
+            fi
+            _mkfs no $PART $FSTYPE $DESTDIR $MP || return 1
+        fi
+        sleep 1
+    done
+
+    DIALOG --msgbox "Partitions were successfully mounted." 0 0
+    NEXTITEM="5"
+    S_MKFS=1
+}
+
 
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
@@ -2090,131 +2230,6 @@ _mkfs() {
     else
         echo "1" >>/tmp/.fstab
     fi
-}
-
-mountpoints() {
-    NAME_SCHEME_PARAMETER_RUN=""
-    while [ "$PARTFINISH" != "DONE" ]; do
-        activate_special_devices
-        : >/tmp/.device-names
-        : >/tmp/.fstab
-        : >/tmp/.parts
-        # btrfs is not well supported by LTS .32 kernel
-        FSOPTS=""
-        [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
-        [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
-        [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
-        [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
-        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
-        [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
-        [ "$(which mkfs.vfat 2>/dev/null)" ] && FSOPTS="$FSOPTS vfat VFAT"
-        #
-        # Select mountpoints
-        #
-        DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-        PARTS=$(findpartitions _)
-        DO_SWAP=""
-        while [ "$DO_SWAP" != "DONE" ]; do
-            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
-            PART=$(cat $ANSWER)
-            if [ "$PART" != "NONE" ]; then
-                DOMKFS="no"
-                if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                    create_filesystem
-                else
-                    RUN_CREATE_FILESYSTEM="yes"
-                fi
-            else
-                RUN_CREATE_FILESYSTEM="yes"
-            fi
-            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_SWAP=DONE
-        done
-        if [ "$PART" != "NONE" ]; then
-            PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME:$FS_OPTIONS" >>/tmp/.parts
-        fi
-        DO_ROOT=""
-        while [ "$DO_ROOT" != "DONE" ]; do
-            DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
-            PART=$(cat $ANSWER)
-            PART_ROOT=$PART
-            # Select root filesystem type
-            FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
-            DOMKFS="no"
-            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                select_filesystem && create_filesystem
-            else
-                RUN_CREATE_FILESYSTEM="yes"
-            fi
-            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ROOT=DONE
-        done
-        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_LEVEL:$BTRFS_SUBVOLUME" >>/tmp/.parts
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-        #
-        # Additional partitions
-        #
-        while [ "$PART" != "DONE" ]; do
-            DO_ADDITIONAL=""
-            while [ "$DO_ADDITIONAL" != "DONE" ]; do
-                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
-                PART=$(cat $ANSWER)
-                if [ "$PART" != "DONE" ]; then
-                    FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
-                    DOMKFS="no"
-                    # Select a filesystem type
-                    if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                        enter_mountpoint && select_filesystem && create_filesystem
-                    else
-                        enter_mountpoint
-                        RUN_CREATE_FILESYSTEM="yes"
-                    fi
-                else
-                    RUN_CREATE_FILESYSTEM="yes"
-                fi
-                [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ADDITIONAL="DONE"
-            done
-            if [ "$PART" != "DONE" ]; then
-                echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_LEVEL:$BTRFS_SUBVOLUME" >>/tmp/.parts
-                PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            fi
-        done
-        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
-    done
-    # disable swap and all mounted partitions
-    _umountall
-    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
-        set_device_name_scheme || return 1
-    fi
-    for line in $(cat /tmp/.parts); do
-        PART=$(echo $line | cut -d: -f 1)
-        FSTYPE=$(echo $line | cut -d: -f 2)
-        MP=$(echo $line | cut -d: -f 3)
-        DOMKFS=$(echo $line | cut -d: -f 4)
-        LABEL_NAME=$(echo $line | cut -d: -f 5)
-        FS_OPTIONS=$(echo $line | cut -d: -f 6)
-        if [ "$DOMKFS" = "yes" ]; then
-            if [ "$FSTYPE" = "swap" ]; then
-                DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
-            else
-                DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
-            fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS || return 1
-        else
-            if [ "$FSTYPE" = "swap" ]; then
-                DIALOG --infobox "Activating swapspace on $PART" 0 0
-            else
-                DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
-            fi
-            _mkfs no $PART $FSTYPE $DESTDIR $MP || return 1
-        fi
-        sleep 1
-    done
-
-    DIALOG --msgbox "Partitions were successfully mounted." 0 0
-    NEXTITEM="5"
-    S_MKFS=1
 }
 
 # source_set()
