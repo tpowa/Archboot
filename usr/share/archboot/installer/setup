@@ -1877,19 +1877,19 @@ remove_btrfs_parts() {
      BTRFS_DEVICES=""
      if [ -n /tmp/.btrfs-devices ]; then
          for i in $(cat /tmp/.btrfs-devices); do
-             BTRFS_DEVICES="$i#$BTRFS_DEVICES"
+             BTRFS_DEVICES="$BTRFS_DEVICES#$i"
              PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
      fi
 }
 
 btrfs_raid_level() {
-    BTRFS_RAIDLEVELS="NONE - RAID0 - RAID1 - RAID10 - SINGLE -"
+    BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid10 - single -"
     BTRFS_RAID_FINISH=""
     BTRFS_LEVEL=""
     BTRFS_DEVICE="$PART"
     : >/tmp/.btrfs-devices
-    DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are RAID0, RAID1, RAID10 and single.\nSINGLE means that no duplication of metadata is done, which may be desired when using hardware raid. RAID10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
+    DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are raid0, raid1, raid10 and single.\nsingle means that no duplication of metadata is done, which may be desired when using hardware raid. raid10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
     while [ "$BTRFS_RAID_FINISH" != "DONE" ]; do
         DIALOG --menu "Select the raid level you want to use" 21 50 13 $BTRFS_RAIDLEVELS 2>$ANSWER || return 1
         BTRFS_LEVEL=$(cat $ANSWER)
@@ -1921,8 +1921,8 @@ select_btrfs_raid_devices () {
         BTRFS_DONE=""
         RAIDNUMBER=$(($RAIDNUMBER + 1))
         # RAID10 need 4 devices!
-        [ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
-        [ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "RAID10" ] && BTRFS_DONE="DONE _"
+        [ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "raid10" ] && BTRFS_DONE="DONE _"
+        [ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "raid10" ] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
         BTRFS_PARTS="$(echo $BTRFS_PARTS | sed -e "s#${BTRFS_PART}\ _##g")"
         # add more devices
@@ -1932,13 +1932,17 @@ select_btrfs_raid_devices () {
         echo "$BTRFS_PART" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
-     DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n";done)" 0 0 && BTRFS_RAID_FINISH="DONE"
+     DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
      [ "$BTRFS_RAID_FINISH" = "DONE" ] && remove_btrfs_parts
+}
+
+btrfs_scan() {
+    btrfs device scan
 }
 
 # find btrfs subvolume
 find_btrfs_subvolume(){
-    btrfs device scan
+    btrfs_scan
     BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
     mount $PART $BTRFSMP
     for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
@@ -2000,6 +2004,7 @@ create_filesystem() {
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
+        [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
     else
         if [ "$FSTYPE" = "btrfs" ]; then
             choose_btrfs_subvolume || return 1
@@ -2096,7 +2101,7 @@ mountpoints() {
                 PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
         done
-        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
+        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts | sed -e 's, ,#,g'); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
@@ -2156,10 +2161,13 @@ _mkfs() {
     local _mountpoint=$5
     local _labelname=$6
     local _fsoptions=$7
-    local _btrfsdevices=$8
+    local _btrfsdevices="$(echo $8 | sed -e 's|#| |g')"
     local _btrfslevel=$9
     local _btrfssubvolume=$10
-
+    # correct empty entries
+    [ "${_fsoptions}" = "NONE" ] && _fsoptions=""
+    # add btrfs raid level, if needed
+    [ ! "${_btrfslevel}" = "NONE" -a "${_fstype}" = "btrfs" ] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
     # we have two main cases: "swap" and everything else.
     if [ "${_fstype}" = "swap" ]; then
         swapoff ${_device} >/dev/null 2>&1
@@ -2195,7 +2203,7 @@ _mkfs() {
                 ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ext3)     mke2fs ${_fsoptions} -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
                 ext4)     mke2fs ${_fsoptions} -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? ;;
                 ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
@@ -2204,6 +2212,7 @@ _mkfs() {
                 DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
                 return 1
             fi
+            btrfs_scan
             sleep 2
         fi
         # create our mount directory
