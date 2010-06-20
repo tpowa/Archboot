@@ -1937,7 +1937,36 @@ select_btrfs_raid_devices () {
 }
 
 btrfs_scan() {
-    btrfs device scan
+    btrfs device scan >/dev/null 2>&1
+}
+
+# check btrfs subvolume
+check_btrfs_subvolume(){
+    btrfs_scan
+    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
+    mount $PART $BTRFSMP
+    for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+        if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
+            BTRFS_SUBVOLUME=""
+        fi
+    done
+    umount $BTRFSMP
+    rm -r $BTRFSMP
+}
+
+create_btrfs_subvolume() {
+    BTRFS_SUBVOLUME=""
+    DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
+    if [ "$DOSUBVOLUME" = "yes" ]; then
+        while [ "${BTRFS_SUBVOLUME}" = "" ]; do
+            DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>$ANSWER || return 1
+            BTRFS_SUBVOLUME=$(cat $ANSWER)
+            check_btrfs_subvolume
+        done
+    else
+        BTRFS_SUBVOLUME="NONE"
+    fi
 }
 
 # find btrfs subvolume
@@ -1954,10 +1983,6 @@ find_btrfs_subvolume(){
 
 choose_btrfs_subvolume () {
  echo "dummy function"
-}
-
-create_btrfs_subvolume() {
-  echo "dummy function"
 }
 
 prepare_btrfs() {
