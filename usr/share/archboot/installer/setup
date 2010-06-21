@@ -1955,7 +1955,7 @@ check_btrfs_subvolume(){
     rm -r $BTRFSMP
 }
 
-create_btrfs_subvolume() {
+prepare_btrfs_subvolume() {
     BTRFS_SUBVOLUME=""
     DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     if [ "$DOSUBVOLUME" = "yes" ]; then
@@ -1967,6 +1967,15 @@ create_btrfs_subvolume() {
     else
         BTRFS_SUBVOLUME="NONE"
     fi
+}
+
+create_btrfs_subvolume() {
+    btrfs_scan
+    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
+    mount $PART $BTRFSMP
+    btrfs subvolume create $BTRFSMP/$_btrfssubvolume
+    umount $BTRFSMP
+    rm -r $BTRFSMP
 }
 
 # find btrfs subvolume
@@ -1987,7 +1996,7 @@ choose_btrfs_subvolume () {
 
 prepare_btrfs() {
     btrfs_raid_level
-    #create_btrfs_subvolume
+    prepare_btrfs_subvolume
     #btrfs_compress
 }
 
@@ -2188,9 +2197,10 @@ _mkfs() {
     local _fsoptions=$7
     local _btrfsdevices="$(echo $8 | sed -e 's|#| |g')"
     local _btrfslevel=$9
-    local _btrfssubvolume=$10
+    local _btrfssubvolume=${10}
     # correct empty entries
     [ "${_fsoptions}" = "NONE" ] && _fsoptions=""
+    [ "${_btrfssubvolume}" = "NONE" ] && _btrfssubvolume=""
     # add btrfs raid level, if needed
     [ ! "${_btrfslevel}" = "NONE" -a "${_fstype}" = "btrfs" ] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
     # we have two main cases: "swap" and everything else.
@@ -2237,13 +2247,20 @@ _mkfs() {
                 DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
                 return 1
             fi
-            btrfs_scan
+            if [ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" ]; then
+                create_btrfs_subvolume
+            fi
+            btrfs_scan 
             sleep 2
         fi
         # create our mount directory
         mkdir -p ${_dest}${_mountpoint}
         # mount the bad boy
-        mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+        if [ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" ]; then
+            mount -t ${_fstype} -o subvol=${_btrfssubvolume} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+        else
+            mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+        fi
         if [ $? != 0 ]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
