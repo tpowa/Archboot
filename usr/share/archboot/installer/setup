@@ -1873,6 +1873,19 @@ partition() {
     S_PART=1
 }
 
+# mount btrfs for checks
+mount_btrfs() {
+    btrfs_scan
+    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
+    mount $PART $BTRFSMP
+}
+
+# unmount btrfs after checks done
+umount_btrfs() {
+    umount $BTRFSMP
+    rm -r $BTRFSMP
+}
+
 remove_btrfs_parts() {
      BTRFS_DEVICES=""
      if [ -n /tmp/.btrfs-devices ]; then
@@ -1942,17 +1955,14 @@ btrfs_scan() {
 
 # check btrfs subvolume
 check_btrfs_subvolume(){
-    btrfs_scan
-    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
-    mount $PART $BTRFSMP
+    mount_btrfs
     for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
         if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
             DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
             BTRFS_SUBVOLUME=""
         fi
     done
-    umount $BTRFSMP
-    rm -r $BTRFSMP
+    umount_btrfs
 }
 
 prepare_btrfs_subvolume() {
@@ -1969,46 +1979,31 @@ prepare_btrfs_subvolume() {
     fi
 }
 
+# ask for btrfs compress option
 btrfs_compress() {
-    BTRFS_COMPRESS=""
-    DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && DOCOMPRESS="yes"
-    if [ "$DOCOMPRESS" = "yes" ]; then
-        BTRFS_COMPRESS="compress"
-    else
-        BTRFS_COMPRESS="NONE"
-    fi
+    BTRFS_COMPRESS="NONE"
+    DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
 }
-
+# ask for btrfs ssd option
 btrfs_ssd() {
-    BTRFS_SSD=""
-    DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && DOSSD="yes"
-    if [ "$DOSSD" = "yes" ]; then
-        BTRFS_SSD="ssd"
-    else
-        BTRFS_SSD="NONE"
-    fi
+    BTRFS_SSD="NONE"
+    DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
 }
 
 create_btrfs_subvolume() {
-    btrfs_scan
-    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
-    mount $PART $BTRFSMP
+    mount_btrfs
     btrfs subvolume create $BTRFSMP/$_btrfssubvolume >$LOG
-    umount $BTRFSMP
-    rm -r $BTRFSMP
+    umount_btrfs
 }
 
 # find btrfs subvolume
 find_btrfs_subvolume(){
-    btrfs_scan
-    BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
-    mount $PART $BTRFSMP
+    mount_btrfs
     for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
         echo $i
         [ "$1" ] && echo $1
     done
-    umount $BTRFSMP
-    rm -r $BTRFSMP
+    umount_btrfs
 }
 
 choose_btrfs_subvolume () {
@@ -2069,9 +2064,15 @@ create_filesystem() {
             choose_btrfs_subvolume || return 1
         fi
     fi
+    # Set values, to not confuse mkfs call!
     [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
     [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
     [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
+    if [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ]; then
+        LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
+    else
+        LABEL_NAME="NONE"
+    fi
     if [ "$FSTYPE" = "btrfs" ]; then
         btrfs_compress || return 1
         btrfs_ssd || return 1
