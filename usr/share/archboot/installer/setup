@@ -6,7 +6,7 @@ TITLE="Arch Linux Installation"
 LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/tmp/install"
-EDITOR=
+EDITOR=""
 
 # name of the kernel image
 VMLINUZ="vmlinuz26"
@@ -20,16 +20,16 @@ PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogr
 # downloader
 DLPROG="wget"
 # sources
-SYNC_URL=
+SYNC_URL=""
 FILE_URL="file:///src/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
-PACKAGES=
+PACKAGES=""
 
 # destination of blockdevices in /sys
 block=/sys/block
 
 # partitions
-PART_ROOT=
+PART_ROOT=""
 ROOTFS=""
 
 # Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
