@@ -1873,6 +1873,11 @@ partition() {
     S_PART=1
 }
 
+# scan and update btrfs devices
+btrfs_scan() {
+    btrfs device scan >/dev/null 2>&1
+}
+
 # mount btrfs for checks
 mount_btrfs() {
     btrfs_scan
@@ -1947,10 +1952,6 @@ select_btrfs_raid_devices () {
      # final step ask if everything is ok?
      DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
      [ "$BTRFS_RAID_FINISH" = "DONE" ] && remove_btrfs_parts
-}
-
-btrfs_scan() {
-    btrfs device scan >/dev/null 2>&1
 }
 
 # check btrfs subvolume
@@ -2037,6 +2038,31 @@ enter_mountpoint() {
     done
 }
 
+btrfs_subvolume() {
+    if [ "$FSTYPE" = "btrfs" ]; then
+        # use device if no subvolume is present
+        # choose btrfs subvolume if present
+        # create subvolume if requested
+        choose_btrfs_subvolume || return 1
+    fi
+}
+
+check_mkfs_values() {
+    # Set values, to not confuse mkfs call!
+    [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
+    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
+    [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
+    if [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ]; then
+        LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
+    else
+        LABEL_NAME="NONE"
+    fi
+    if [ "$FSTYPE" = "btrfs" ]; then
+        btrfs_compress || return 1
+        btrfs_ssd || return 1
+    fi
+}
+
 create_filesystem() {
     LABEL_NAME=""
     FS_OPTIONS=""
@@ -2059,27 +2085,6 @@ create_filesystem() {
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
-    else
-    ### Put this to another function! It's needed in bootloaders later too!
-        if [ "$FSTYPE" = "btrfs" ]; then
-            # use device if no subvolume is present
-            # choose present btrfs subvolume
-            # create subvolume if requested
-            choose_btrfs_subvolume || return 1
-        fi
-    fi
-    # Set values, to not confuse mkfs call!
-    [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
-    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
-    [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
-    if [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ]; then
-        LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
-    else
-        LABEL_NAME="NONE"
-    fi
-    if [ "$FSTYPE" = "btrfs" ]; then
-        btrfs_compress || return 1
-        btrfs_ssd || return 1
     fi
     RUN_CREATE_FILESYSTEM="yes"
 }
@@ -2138,8 +2143,10 @@ mountpoints() {
             if [ "$ASK_MOUNTPOINTS" = "1" ]; then
                 select_filesystem && create_filesystem
             else
+                btrfs_subvolume
                 RUN_CREATE_FILESYSTEM="yes"
             fi
+            check_mkfs_values
             [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ROOT=DONE
         done
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
@@ -2160,8 +2167,10 @@ mountpoints() {
                         enter_mountpoint && select_filesystem && create_filesystem
                     else
                         enter_mountpoint
+                        btrfs_subvolume
                         RUN_CREATE_FILESYSTEM="yes"
                     fi
+                    check_mkfs_values
                 else
                     RUN_CREATE_FILESYSTEM="yes"
                 fi
