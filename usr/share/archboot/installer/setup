@@ -1967,6 +1967,7 @@ check_btrfs_subvolume(){
 }
 
 prepare_btrfs_subvolume() {
+    DOSUBVOLUME=""
     BTRFS_SUBVOLUME=""
     DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     if [ "$DOSUBVOLUME" = "yes" ]; then
@@ -2008,10 +2009,13 @@ find_btrfs_subvolume(){
 }
 
 choose_btrfs_subvolume () {
-    BTRFS_SUBVOLUME=""
+    ### TODO not perfect yet!!!
+    BTRFS_SUBVOLUME="NONE"
     SUBVOLUMES=$(find_btrfs_subvolume _)
-    DIALOG --menu "Select the subvolume to mount" 21 50 13 $SUBVOLUMES 2>$ANSWER || return 1
-    BTRFS_SUBVOLUME=$(cat $ANSWER)
+    if [ -n "$SUBVOLUMES" ] ; then
+        DIALOG --menu "Select the subvolume to mount" 21 50 13 $SUBVOLUMES 2>$ANSWER || return 1
+        BTRFS_SUBVOLUME=$(cat $ANSWER)
+    fi
 }
 
 prepare_btrfs() {
@@ -2020,13 +2024,13 @@ prepare_btrfs() {
 }
 
 select_filesystem() {
-    RUN_CREATE_FILESYSTEM=""
+    FILESYSTEM_FINISH=""
     DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
     FSTYPE=$(cat $ANSWER)
 }
 
 enter_mountpoint() {
-    RUN_CREATE_FILESYSTEM=""
+    FILESYSTEM_FINISH=""
     MP=""
     while [ "${MP}" = "" ]; do
         DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
@@ -2039,12 +2043,19 @@ enter_mountpoint() {
 }
 
 btrfs_subvolume() {
-    if [ "$FSTYPE" = "btrfs" ]; then
-        # use device if no subvolume is present
-        # choose btrfs subvolume if present
-        # create subvolume if requested
-        choose_btrfs_subvolume || return 1
+    FILESYSTEM_FINISH=""
+    if [ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]; then
+        if [ $ASK_MOUNTPOINTS = "1" ]; then
+            # create subvolume if requested
+            # choose btrfs subvolume if present
+            prepare_btrfs_subvolume || return 1
+            choose_btrfs_subvolume || return 1
+        else
+            # use device if no subvolume is present
+            choose_btrfs_subvolume || return 1
+        fi
     fi
+    FILESYSTEM_FINISH="yes"
 }
 
 check_mkfs_values() {
@@ -2052,14 +2063,11 @@ check_mkfs_values() {
     [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
     [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
     [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
-    if [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ]; then
-        LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
-    else
-        LABEL_NAME="NONE"
-    fi
+    [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ] && LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
+    [ "$LABEL_NAME" = "" ] && LABEL_NAME="NONE"
     if [ "$FSTYPE" = "btrfs" ]; then
-        btrfs_compress || return 1
-        btrfs_ssd || return 1
+        btrfs_compress
+        btrfs_ssd
     fi
 }
 
@@ -2068,7 +2076,6 @@ create_filesystem() {
     FS_OPTIONS=""
     BTRFS_DEVICES=""
     BTRFS_LEVEL=""
-    RUN_CREATE_FILESYSTEM=""
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
     if [ "$DOMKFS" = "yes" ]; then
         while [ "${LABEL_NAME}" = "" ]; do
@@ -2086,7 +2093,6 @@ create_filesystem() {
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
     fi
-    RUN_CREATE_FILESYSTEM="yes"
 }
 
 mountpoints() {
@@ -2121,12 +2127,12 @@ mountpoints() {
                 if [ "$ASK_MOUNTPOINTS" = "1" ]; then
                     create_filesystem
                 else
-                    RUN_CREATE_FILESYSTEM="yes"
+                    FILESYSTEM_FINISH="yes"
                 fi
             else
-                RUN_CREATE_FILESYSTEM="yes"
+                FILESYSTEM_FINISH="yes"
             fi
-            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_SWAP=DONE
+            [ "$FILESYSTEM_FINISH" = "yes" ] && DO_SWAP=DONE
         done
         if [ "$PART" != "NONE" ]; then
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
@@ -2141,14 +2147,13 @@ mountpoints() {
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
             if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                select_filesystem && create_filesystem
+                select_filesystem && create_filesystem && btrfs_subvolume
             else
                 btrfs_subvolume
-                RUN_CREATE_FILESYSTEM="yes"
             fi
-            check_mkfs_values
-            [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ROOT=DONE
+            [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
+        check_mkfs_values
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
@@ -2164,19 +2169,19 @@ mountpoints() {
                     DOMKFS="no"
                     # Select a filesystem type
                     if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                        enter_mountpoint && select_filesystem && create_filesystem
+                        enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
                         btrfs_subvolume
-                        RUN_CREATE_FILESYSTEM="yes"
                     fi
                     check_mkfs_values
                 else
-                    RUN_CREATE_FILESYSTEM="yes"
+                    FILESYSTEM_FINISH="yes"
                 fi
-                [ "$RUN_CREATE_FILESYSTEM" = "yes" ] && DO_ADDITIONAL="DONE"
+                [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
             done
             if [ "$PART" != "DONE" ]; then
+                check_mkfs_values
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
                 PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
