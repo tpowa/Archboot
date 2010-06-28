@@ -1967,7 +1967,7 @@ check_btrfs_subvolume(){
 }
 
 prepare_btrfs_subvolume() {
-    DOSUBVOLUME=""
+    DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
     DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     if [ "$DOSUBVOLUME" = "yes" ]; then
@@ -2009,7 +2009,6 @@ find_btrfs_subvolume(){
 }
 
 choose_btrfs_subvolume () {
-    ### TODO not perfect yet!!!
     BTRFS_SUBVOLUME="NONE"
     SUBVOLUMES=$(find_btrfs_subvolume _)
     if [ -n "$SUBVOLUMES" ] ; then
@@ -2048,8 +2047,12 @@ btrfs_subvolume() {
         if [ $ASK_MOUNTPOINTS = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
-            prepare_btrfs_subvolume || return 1
-            choose_btrfs_subvolume || return 1
+            if ! [ "$(find_btrfs_subvolume)" = "" ]; then
+                prepare_btrfs_subvolume || return 1
+            fi
+            if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+                choose_btrfs_subvolume || return 1
+            fi
         else
             # use device if no subvolume is present
             choose_btrfs_subvolume || return 1
@@ -2072,6 +2075,7 @@ check_mkfs_values() {
 }
 
 create_filesystem() {
+    FILESYSTEM_FINISH=""
     LABEL_NAME=""
     FS_OPTIONS=""
     BTRFS_DEVICES=""
@@ -2093,6 +2097,7 @@ create_filesystem() {
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
     fi
+    FILESYSTEM_FINISH="yes"
 }
 
 mountpoints() {
@@ -2125,6 +2130,7 @@ mountpoints() {
             if [ "$PART" != "NONE" ]; then
                 DOMKFS="no"
                 if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                    FSTYPE="swap"
                     create_filesystem
                 else
                     FILESYSTEM_FINISH="yes"
@@ -2134,9 +2140,10 @@ mountpoints() {
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_SWAP=DONE
         done
+        check_mkfs_values
         if [ "$PART" != "NONE" ]; then
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
-            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME:$FS_OPTIONS" >>/tmp/.parts
+            echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         fi
         DO_ROOT=""
         while [ "$DO_ROOT" != "DONE" ]; do
@@ -2154,7 +2161,7 @@ mountpoints() {
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
         check_mkfs_values
-        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
+        echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
         # Additional partitions
@@ -2182,7 +2189,7 @@ mountpoints() {
             done
             if [ "$PART" != "DONE" ]; then
                 check_mkfs_values
-                echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
+                echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
                 PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
         done
@@ -2203,22 +2210,23 @@ mountpoints() {
         BTRFS_DEVICES=$(echo $line | cut -d: -f 7)
         BTRFS_LEVEL=$(echo $line | cut -d: -f 8)
         BTRFS_SUBVOLUME=$(echo $line | cut -d: -f 9)
-        BTRFS_COMPRESS=$(echo $line | cut -d: -f 10)
-        BTRFS_SSD=$(echo $line | cut -d: -f 11)
+        DOSUBVOLUME=$(echo $line | cut -d: -f 10)
+        BTRFS_COMPRESS=$(echo $line | cut -d: -f 11)
+        BTRFS_SSD=$(echo $line | cut -d: -f 12)
         if [ "$DOMKFS" = "yes" ]; then
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
+            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         else
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs no $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
+            _mkfs no $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         fi
         sleep 1
     done
@@ -2251,8 +2259,9 @@ _mkfs() {
     local _btrfsdevices="$(echo $8 | sed -e 's|#| |g')"
     local _btrfslevel=$9
     local _btrfssubvolume=${10}
-    local _btrfscompress=${11}
-    local _btrfsssd=${12}
+    local _dosubvolume=${11}
+    local _btrfscompress=${12}
+    local _btrfsssd=${13}
     # correct empty entries
     [ "${_fsoptions}" = "NONE" ] && _fsoptions=""
     [ "${_btrfsssd}" = "NONE" ] && _btrfsssd=""
@@ -2304,12 +2313,12 @@ _mkfs() {
                 DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
                 return 1
             fi
-            if [ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" ]; then
-                create_btrfs_subvolume
-            fi
-            btrfs_scan 
             sleep 2
         fi
+        if [ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" -a "${_dosubvolume}" = "yes" ]; then
+            create_btrfs_subvolume
+        fi
+        btrfs_scan
         # create our mount directory
         mkdir -p ${_dest}${_mountpoint}
         # prepare btrfs mount options
