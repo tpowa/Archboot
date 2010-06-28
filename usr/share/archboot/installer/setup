@@ -1892,15 +1892,18 @@ umount_btrfs() {
 }
 
 remove_btrfs_parts() {
-     BTRFS_DEVICES=""
-     if [ -n /tmp/.btrfs-devices ]; then
-         for i in $(cat /tmp/.btrfs-devices); do
-             BTRFS_DEVICES="$BTRFS_DEVICES#$i"
-             PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
-         done
-     fi
+    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+         BTRFS_DEVICES=""
+         if [ -n /tmp/.btrfs-devices ]; then
+             for i in $(cat /tmp/.btrfs-devices); do
+                 BTRFS_DEVICES="$BTRFS_DEVICES#$i"
+                 PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
+             done
+         fi
+    fi
 }
 
+### TODO: USE btrfs-devices for remove_btrfs_parts!
 btrfs_raid_level() {
     BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid10 - single -"
     BTRFS_RAID_FINISH=""
@@ -1913,7 +1916,6 @@ btrfs_raid_level() {
         BTRFS_LEVEL=$(cat $ANSWER)
         if [ "$BTRFS_LEVEL" = "NONE" ]; then
             echo "$BTRFS_DEVICE" >>/tmp/.btrfs-devices
-            remove_btrfs_parts
             break
         else
             # take selected device as 1st device, add additional devices in part below.
@@ -1951,7 +1953,6 @@ select_btrfs_raid_devices () {
      done
      # final step ask if everything is ok?
      DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
-     [ "$BTRFS_RAID_FINISH" = "DONE" ] && remove_btrfs_parts
 }
 
 # check btrfs subvolume
@@ -2064,8 +2065,10 @@ btrfs_subvolume() {
 check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
-    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
+    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="$PART"
     [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
+    [ "$BTRFS_SUBVOLUME" = "" ] && BTRFS_SUBVOLUME="NONE"
+    [ "$DOSUBVOLUME" = "" ] && DOSUBVOLUME="no"
     [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ] && LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
     [ "$LABEL_NAME" = "" ] && LABEL_NAME="NONE"
     if [ "$FSTYPE" = "btrfs" ]; then
@@ -2100,6 +2103,17 @@ create_filesystem() {
     FILESYSTEM_FINISH="yes"
 }
 
+# do not ask for filesystem creation, if already prepared for creation!
+check_filesystem_creation() {
+    SKIP_CREATE_FILESYSTEM="no"
+    for i in $(grep ^$PART: /tmp/.parts); do
+        if [ "$(echo $i | grep ":btrfs:")" ]; then
+            SKIP_CREATE_FILESYSTEM="yes"
+            break
+        fi 
+    done
+}
+
 mountpoints() {
     NAME_SCHEME_PARAMETER_RUN=""
     while [ "$PARTFINISH" != "DONE" ]; do
@@ -2125,12 +2139,12 @@ mountpoints() {
         PARTS=$(findpartitions _)
         DO_SWAP=""
         while [ "$DO_SWAP" != "DONE" ]; do
+            FSTYPE="swap"
             DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             if [ "$PART" != "NONE" ]; then
                 DOMKFS="no"
                 if [ "$ASK_MOUNTPOINTS" = "1" ]; then
-                    FSTYPE="swap"
                     create_filesystem
                 else
                     FILESYSTEM_FINISH="yes"
@@ -2153,7 +2167,8 @@ mountpoints() {
             # Select root filesystem type
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
-            if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+            check_filesystem_creation
+            if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_CREATE_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
                 btrfs_subvolume
@@ -2161,8 +2176,9 @@ mountpoints() {
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
         check_mkfs_values
+        remove_btrfs_parts
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
-        PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+        ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
         # Additional partitions
         #
@@ -2174,23 +2190,24 @@ mountpoints() {
                 if [ "$PART" != "DONE" ]; then
                     FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
                     DOMKFS="no"
+                    check_filesystem_creation
                     # Select a filesystem type
-                    if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                    if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_CREATE_FILESYSTEM" = "no" ]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
                         btrfs_subvolume
                     fi
-                    check_mkfs_values
                 else
                     FILESYSTEM_FINISH="yes"
                 fi
                 [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
             done
             if [ "$PART" != "DONE" ]; then
+                remove_btrfs_parts
                 check_mkfs_values
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
-                PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+                ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
         done
         DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts | sed -e 's, ,#,g'); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
