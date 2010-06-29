@@ -1891,6 +1891,7 @@ umount_btrfs() {
     rm -r $BTRFSMP
 }
 
+### TODO: change this to correct remove!
 remove_btrfs_parts() {
     if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
          BTRFS_DEVICES=""
@@ -1901,6 +1902,15 @@ remove_btrfs_parts() {
              done
          fi
     fi
+}
+
+btrfs_parts() {
+     BTRFS_DEVICES=""
+     if [ -n /tmp/.btrfs-devices ]; then
+         for i in $(cat /tmp/.btrfs-devices); do
+             BTRFS_DEVICES="$BTRFS_DEVICES#$i"
+         done
+     fi
 }
 
 ### TODO: USE btrfs-devices for remove_btrfs_parts!
@@ -2065,7 +2075,7 @@ btrfs_subvolume() {
 check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
-    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="$PART"
+    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
     [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
     [ "$BTRFS_SUBVOLUME" = "" ] && BTRFS_SUBVOLUME="NONE"
     [ "$DOSUBVOLUME" = "" ] && DOSUBVOLUME="no"
