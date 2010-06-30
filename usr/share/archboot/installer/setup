@@ -1891,29 +1891,17 @@ umount_btrfs() {
     rm -r $BTRFSMP
 }
 
-### TODO: change this to correct remove!
-remove_btrfs_parts() {
-    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
-         BTRFS_DEVICES=""
-         if [ -n /tmp/.btrfs-devices ]; then
-             for i in $(cat /tmp/.btrfs-devices); do
-                 BTRFS_DEVICES="$BTRFS_DEVICES#$i"
-                 PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
-             done
-         fi
-    fi
-}
-
 btrfs_parts() {
      BTRFS_DEVICES=""
      if [ -n /tmp/.btrfs-devices ]; then
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="$BTRFS_DEVICES#$i"
+             # remove if no subvolume is used!
+             [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
      fi
 }
 
-### TODO: USE btrfs-devices for remove_btrfs_parts!
 btrfs_raid_level() {
     BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid10 - single -"
     BTRFS_RAID_FINISH=""
@@ -2058,6 +2046,7 @@ btrfs_subvolume() {
         if [ $ASK_MOUNTPOINTS = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
+            ### TODO: This fails if nothing is created yet!
             if ! [ "$(find_btrfs_subvolume)" = "" ]; then
                 prepare_btrfs_subvolume || return 1
             fi
@@ -2114,9 +2103,10 @@ create_filesystem() {
 }
 
 # do not ask for filesystem creation, if already prepared for creation!
+### TODO: not 100% safe! $PART must be more exact!
 check_filesystem_creation() {
     SKIP_CREATE_FILESYSTEM="no"
-    for i in $(grep ^$PART: /tmp/.parts); do
+    for i in $(grep $PART /tmp/.parts); do
         if [ "$(echo $i | grep ":btrfs:")" ]; then
             SKIP_CREATE_FILESYSTEM="yes"
             break
@@ -2186,7 +2176,7 @@ mountpoints() {
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
         check_mkfs_values
-        remove_btrfs_parts
+        btrfs_parts
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
@@ -2214,8 +2204,8 @@ mountpoints() {
                 [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
             done
             if [ "$PART" != "DONE" ]; then
-                remove_btrfs_parts
                 check_mkfs_values
+                btrfs_parts
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
                 ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
