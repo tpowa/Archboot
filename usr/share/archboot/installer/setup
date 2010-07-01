@@ -3002,10 +3002,6 @@ prepare_syslinux () {
 
 # common syslinux funtion
 common_syslinux () {
-    # check on GUID (gpt)
-    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\n$SYSLINUX doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install $SYSLINUX_PROGRAM to an other device, which contains a msdos partition table?" 0 0 || return 1
-    fi
     DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
