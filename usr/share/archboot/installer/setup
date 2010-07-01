@@ -2127,14 +2127,14 @@ check_btrfs_filesystem_creation() {
     SKIP_ASK_SUBVOLUME="no"
     for i in $(grep $PART[:#] /tmp/.parts); do
         if [ "$(echo $i | grep ":btrfs:")"  -a "$(echo $i | cut -d: -f 4 | grep yes)" ]; then
-            FSTYPE="btrfs"
-            SUBVOLUME="$SUBVOLUME#$(echo $i | cut -d: -f 9)"
             DETECT_CREATE_FILESYSTEM="yes"
         fi
+        [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
         if [ "$(echo $i | grep ":btrfs:")" ]; then
+            FSTYPE="btrfs"
+            SUBVOLUME="$SUBVOLUME#$(echo $i | cut -d: -f 9)"
             SKIP_FILESYSTEM="yes"
         fi
-        [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
     done
 }
 
