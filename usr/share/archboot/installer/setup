@@ -1896,7 +1896,7 @@ btrfs_parts() {
      if [ -n /tmp/.btrfs-devices ]; then
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="$BTRFS_DEVICES#$i"
-             # remove if no subvolume is used!
+             # remove device if no subvolume is used!
              [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
      fi
@@ -1928,7 +1928,6 @@ select_btrfs_raid_devices () {
     # select the second device to use, no missing option available!
     BTRFS_PART="$BTRFS_DEVICE"
     BTRFS_PARTS="$PARTS"
-    : >/tmp/.btrfs-devices
     echo "$BTRFS_PART" >>/tmp/.btrfs-devices
     BTRFS_PARTS="$(echo $BTRFS_PARTS | sed -e "s#${BTRFS_PART}\ _##g")"
     RAIDNUMBER=2
@@ -1975,7 +1974,7 @@ check_btrfs_subvolume(){
 
 ### TODO: - need to check for available free subvolumes! If no subvolumes present go on create one!
 #         - BTRFS_DEVICE is not reset on chosing other device!
-#          - LABEL_NAME is not reset on chosing other device!
+#         - LABEL_NAME is not reset on chosing other device!
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
