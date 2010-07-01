@@ -1972,13 +1972,15 @@ check_btrfs_subvolume(){
     fi
 }
 
+### TODO: - need to check for available free subvolumes! If no subvolumes present go on create one!
+#         - use subvolumes_in_use instead of $SUBVOLUME!
+#         - BTRFS_DEVICE is not reset on chosing other device!
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
     if [ "$SKIP_ASK_SUBVOLUME" = "no" ]; then
         DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     else
-        ### TODO: need to check for available free subvolumes! If no subvolumes present go on create one!
         DOSUBVOLUME="yes"
     fi
     if [ "$DOSUBVOLUME" = "yes" ]; then
@@ -2019,14 +2021,10 @@ find_btrfs_subvolume() {
             [ "$1" ] && echo $1
         done
         umount_btrfs
-    ### NOT NEEDED, you will be asked for create new subvolumes then!
-    #else
-    #    # use the one from /tmp/.parts
-    #    echo $SUBVOLUME
-    #    [ "$1" ] && echo $1
     fi
 }
 
+# subvolumes already in use
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
     for i in $(grep $PART[:#] /tmp/.parts); do
@@ -2079,6 +2077,7 @@ btrfs_subvolume() {
         if [ $ASK_MOUNTPOINTS = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
+            ### TODO: I think this can be done now in an other way!
             if ! [ "$(find_btrfs_subvolume)" = "" ]; then
                 prepare_btrfs_subvolume || return 1
             fi
