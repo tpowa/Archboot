@@ -1955,20 +1955,32 @@ select_btrfs_raid_devices () {
 
 # check btrfs subvolume
 check_btrfs_subvolume(){
-    mount_btrfs
-    for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
-        if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
+    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+        mount_btrfs
+        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+            if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
+                BTRFS_SUBVOLUME=""
+            fi
+        done
+        umount_btrfs
+    else
+        if [ "$(echo $SUBVOLUME | egrep "$BTRFS_SUBVOLUME")" ]; then
             DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
             BTRFS_SUBVOLUME=""
         fi
-    done
-    umount_btrfs
+    fi
 }
 
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
-    DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
+    if [ "$SKIP_ASK_SUBVOLUME" = "no" ]; then
+        DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
+    else
+        ### TODO: need to check for available free subvolumes! If no subvolumes present go on create one!
+        DOSUBVOLUME="yes"
+    fi
     if [ "$DOSUBVOLUME" = "yes" ]; then
         while [ "${BTRFS_SUBVOLUME}" = "" ]; do
             DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>$ANSWER || return 1
@@ -1998,13 +2010,20 @@ create_btrfs_subvolume() {
 }
 
 # find btrfs subvolume
-find_btrfs_subvolume(){
-    mount_btrfs
-    for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
-        echo $i
+find_btrfs_subvolume() {
+    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+        # existing btrfs subvolumes
+        mount_btrfs
+        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+            echo $i
+            [ "$1" ] && echo $1
+        done
+        umount_btrfs
+    else
+        # use the one from /tmp/.parts
+        echo $SUBVOLUME
         [ "$1" ] && echo $1
-    done
-    umount_btrfs
+    fi
 }
 
 choose_btrfs_subvolume () {
@@ -2046,7 +2065,6 @@ btrfs_subvolume() {
         if [ $ASK_MOUNTPOINTS = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
-            ### TODO: This fails if nothing is created yet!
             if ! [ "$(find_btrfs_subvolume)" = "" ]; then
                 prepare_btrfs_subvolume || return 1
             fi
@@ -2102,15 +2120,21 @@ create_filesystem() {
     FILESYSTEM_FINISH="yes"
 }
 
-# do not ask for filesystem creation, if already prepared for creation!
-### TODO: not 100% safe! $PART must be more exact!
-check_filesystem_creation() {
-    SKIP_CREATE_FILESYSTEM="no"
-    for i in $(grep $PART /tmp/.parts); do
+# do not ask for btrfs filesystem creation, if already prepared for creation!
+check_btrfs_filesystem_creation() {
+    DETECT_CREATE_FILESYSTEM="no"
+    SKIP_FILESYSTEM="no"
+    SKIP_ASK_SUBVOLUME="no"
+    for i in $(grep $PART[:#] /tmp/.parts); do
+        if [ "$(echo $i | grep ":btrfs:")"  -a "$(echo $i | cut -d: -f 4 | grep yes)" ]; then
+            FSTYPE="btrfs"
+            SUBVOLUME="$SUBVOLUME#$(echo $i | cut -d: -f 9)"
+            DETECT_CREATE_FILESYSTEM="yes"
+        fi
         if [ "$(echo $i | grep ":btrfs:")" ]; then
-            SKIP_CREATE_FILESYSTEM="yes"
-            break
-        fi 
+            SKIP_FILESYSTEM="yes"
+        fi
+        [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
     done
 }
 
@@ -2167,8 +2191,8 @@ mountpoints() {
             # Select root filesystem type
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
-            check_filesystem_creation
-            if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_CREATE_FILESYSTEM" = "no" ]; then
+            check_btrfs_filesystem_creation
+            if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
                 btrfs_subvolume
@@ -2190,9 +2214,9 @@ mountpoints() {
                 if [ "$PART" != "DONE" ]; then
                     FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
                     DOMKFS="no"
-                    check_filesystem_creation
+                    check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_CREATE_FILESYSTEM" = "no" ]; then
+                    if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
