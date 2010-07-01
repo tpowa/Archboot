@@ -1891,6 +1891,18 @@ umount_btrfs() {
     rm -r $BTRFSMP
 }
 
+# ask for btrfs compress option
+btrfs_compress() {
+    BTRFS_COMPRESS="NONE"
+    DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
+}
+
+# ask for btrfs ssd option
+btrfs_ssd() {
+    BTRFS_SSD="NONE"
+    DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
+}
+
 # values that are only needed for btrfs creation
 clear_btrfs_values() {
     : >/tmp/.btrfs-devices
@@ -1919,12 +1931,14 @@ check_btrfs_filesystem_creation() {
 # remove devices with no subvolume from list and generate raid device list
 btrfs_parts() {
      BTRFS_DEVICES=""
-     if [ -n /tmp/.btrfs-devices ]; then
+     if [ -s /tmp/.btrfs-devices ]; then
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="$BTRFS_DEVICES#$i"
              # remove device if no subvolume is used!
              [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
+     else
+         [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
      fi
 }
 
@@ -1980,27 +1994,11 @@ select_btrfs_raid_devices () {
      DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n$BTRFS_LEVEL\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "$i\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
 }
 
-# check btrfs subvolume
-check_btrfs_subvolume(){
-    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
-        mount_btrfs
-        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
-            if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
-                BTRFS_SUBVOLUME=""
-            fi
-        done
-        umount_btrfs
-    else
-        subvolumes_in_use
-        if [ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]; then
-            DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
-            BTRFS_SUBVOLUME=""
-        fi
-    fi
+# prepare new btrfs device
+prepare_btrfs() {
+    btrfs_raid_level
+    prepare_btrfs_subvolume
 }
-
-### TODO: - need to check for available free subvolumes! If no subvolumes present go on create one!
 
 # prepare btrfs subvolume
 prepare_btrfs_subvolume() {
@@ -2022,16 +2020,24 @@ prepare_btrfs_subvolume() {
     fi
 }
 
-# ask for btrfs compress option
-btrfs_compress() {
-    BTRFS_COMPRESS="NONE"
-    DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
-}
-
-# ask for btrfs ssd option
-btrfs_ssd() {
-    BTRFS_SSD="NONE"
-    DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
+# check btrfs subvolume
+check_btrfs_subvolume(){
+    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+        mount_btrfs
+        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+            if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
+                DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
+                BTRFS_SUBVOLUME=""
+            fi
+        done
+        umount_btrfs
+    else
+        subvolumes_in_use
+        if [ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
+            BTRFS_SUBVOLUME=""
+        fi
+    fi
 }
 
 # create btrfs subvolume
@@ -2067,7 +2073,10 @@ subvolumes_in_use() {
 # choose btrfs subvolume from list
 choose_btrfs_subvolume () {
     BTRFS_SUBVOLUME="NONE"
+    SUBVOLUMES_DETECTED="no"
     SUBVOLUMES=$(find_btrfs_subvolume _)
+    # check if subvolumes are present
+    [ -n "$SUBVOLUMES" ] && SUBVOLUMES_DETECTED="yes"
     subvolumes_in_use
     for i in $SUBVOLUME_IN_USE; do
         SUBVOLUMES=$(echo $SUBVOLUMES | sed -e "s#$i\ _##g")
@@ -2075,14 +2084,16 @@ choose_btrfs_subvolume () {
     if [ -n "$SUBVOLUMES" ] ; then
         DIALOG --menu "Select the subvolume to mount" 21 50 13 $SUBVOLUMES 2>$ANSWER || return 1
         BTRFS_SUBVOLUME=$(cat $ANSWER)
+    else
+        if [ "$SUBVOLUMES_DETECTED" = "yes" ]; then
+            DIALOG --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
+            SKIP_ASK_SUBVOLUME=yes
+            prepare_btrfs_subvolume || return 1
+        fi
     fi
 }
 
-# prepare new btrfs device
-prepare_btrfs() {
-    btrfs_raid_level
-    prepare_btrfs_subvolume
-}
+### TODO: When using raid keep subvolumes in sync and don't ask for creation!
 
 # btrfs subvolume menu
 btrfs_subvolume() {
@@ -2218,17 +2229,17 @@ mountpoints() {
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
             check_btrfs_filesystem_creation
+            # clear values first!
+            clear_btrfs_values
             if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
-                # clear values first!
-                clear_btrfs_values
                 btrfs_subvolume
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
-        check_mkfs_values
         btrfs_parts
+        check_mkfs_values
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
@@ -2243,12 +2254,12 @@ mountpoints() {
                     FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
                     DOMKFS="no"
                     check_btrfs_filesystem_creation
+                    # clear values first!
+                    clear_btrfs_values
                     # Select a filesystem type
                     if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
-                        # clear values first!
-                        clear_btrfs_values
                         enter_mountpoint
                         btrfs_subvolume
                     fi
@@ -2258,8 +2269,8 @@ mountpoints() {
                 [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
             done
             if [ "$PART" != "DONE" ]; then
-                check_mkfs_values
                 btrfs_parts
+                check_mkfs_values
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
                 ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
