@@ -1891,6 +1891,32 @@ umount_btrfs() {
     rm -r $BTRFSMP
 }
 
+# values that are only needed for btrfs creation
+clear_btrfs_values() {
+    : >/tmp/.btrfs-devices
+    LABEL_NAME=""
+    FS_OPTIONS=""
+    BTRFS_DEVICES=""
+    BTRFS_LEVEL=""
+}
+
+# do not ask for btrfs filesystem creation, if already prepared for creation!
+check_btrfs_filesystem_creation() {
+    DETECT_CREATE_FILESYSTEM="no"
+    SKIP_FILESYSTEM="no"
+    SKIP_ASK_SUBVOLUME="no"
+    for i in $(grep $PART[:#] /tmp/.parts); do
+        if [ "$(echo $i | grep ":btrfs:")" ]; then
+            FSTYPE="btrfs"
+            SKIP_FILESYSTEM="yes"
+            # check on filesystem creation, skip subvolume asking then!
+            [ "$(echo $i | cut -d: -f 4 | grep yes)" ] && DETECT_CREATE_FILESYSTEM="yes"
+            [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
+        fi
+    done
+}
+
+# remove devices with no subvolume from list and generate raid device list
 btrfs_parts() {
      BTRFS_DEVICES=""
      if [ -n /tmp/.btrfs-devices ]; then
@@ -1902,6 +1928,7 @@ btrfs_parts() {
      fi
 }
 
+# choose raid level to use on btrfs device
 btrfs_raid_level() {
     BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid10 - single -"
     BTRFS_RAID_FINISH=""
@@ -1922,6 +1949,7 @@ btrfs_raid_level() {
     done
 }
 
+# select btrfs raid devices
 select_btrfs_raid_devices () {
     # show all devices with sizes
     # DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
@@ -1973,8 +2001,8 @@ check_btrfs_subvolume(){
 }
 
 ### TODO: - need to check for available free subvolumes! If no subvolumes present go on create one!
-#         - BTRFS_DEVICE is not reset on chosing other device!
-#         - LABEL_NAME is not reset on chosing other device!
+
+# prepare btrfs subvolume
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
@@ -2006,6 +2034,7 @@ btrfs_ssd() {
     DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
 }
 
+# create btrfs subvolume
 create_btrfs_subvolume() {
     mount_btrfs
     btrfs subvolume create $BTRFSMP/$_btrfssubvolume >$LOG
@@ -2035,6 +2064,7 @@ subvolumes_in_use() {
     done
 }
 
+# choose btrfs subvolume from list
 choose_btrfs_subvolume () {
     BTRFS_SUBVOLUME="NONE"
     SUBVOLUMES=$(find_btrfs_subvolume _)
@@ -2048,9 +2078,29 @@ choose_btrfs_subvolume () {
     fi
 }
 
+# prepare new btrfs device
 prepare_btrfs() {
     btrfs_raid_level
     prepare_btrfs_subvolume
+}
+
+# btrfs subvolume menu
+btrfs_subvolume() {
+    FILESYSTEM_FINISH=""
+    if [ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]; then
+        if [ $ASK_MOUNTPOINTS = "1" ]; then
+            # create subvolume if requested
+            # choose btrfs subvolume if present
+            prepare_btrfs_subvolume || return 1
+            if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+                choose_btrfs_subvolume || return 1
+            fi
+        else
+            # use device if no subvolume is present
+            choose_btrfs_subvolume || return 1
+        fi
+    fi
+    FILESYSTEM_FINISH="yes"
 }
 
 select_filesystem() {
@@ -2072,24 +2122,7 @@ enter_mountpoint() {
     done
 }
 
-btrfs_subvolume() {
-    FILESYSTEM_FINISH=""
-    if [ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]; then
-        if [ $ASK_MOUNTPOINTS = "1" ]; then
-            # create subvolume if requested
-            # choose btrfs subvolume if present
-            prepare_btrfs_subvolume || return 1
-            if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
-                choose_btrfs_subvolume || return 1
-            fi
-        else
-            # use device if no subvolume is present
-            choose_btrfs_subvolume || return 1
-        fi
-    fi
-    FILESYSTEM_FINISH="yes"
-}
-
+# set sane values for paramaters, if not already set
 check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
@@ -2129,22 +2162,6 @@ create_filesystem() {
         FS_OPTIONS=$(cat $ANSWER)
     fi
     FILESYSTEM_FINISH="yes"
-}
-
-# do not ask for btrfs filesystem creation, if already prepared for creation!
-check_btrfs_filesystem_creation() {
-    DETECT_CREATE_FILESYSTEM="no"
-    SKIP_FILESYSTEM="no"
-    SKIP_ASK_SUBVOLUME="no"
-    for i in $(grep $PART[:#] /tmp/.parts); do
-        if [ "$(echo $i | grep ":btrfs:")" ]; then
-            FSTYPE="btrfs"
-            SKIP_FILESYSTEM="yes"
-            # check on filesystem creation, skip subvolume asking then!
-            [ "$(echo $i | cut -d: -f 4 | grep yes)" ] && DETECT_CREATE_FILESYSTEM="yes"
-            [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
-        fi
-    done
 }
 
 mountpoints() {
@@ -2204,6 +2221,8 @@ mountpoints() {
             if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
+                # clear values first!
+                clear_btrfs_values
                 btrfs_subvolume
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
@@ -2228,6 +2247,8 @@ mountpoints() {
                     if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
+                        # clear values first!
+                        clear_btrfs_values
                         enter_mountpoint
                         btrfs_subvolume
                     fi
@@ -2285,7 +2306,6 @@ mountpoints() {
     NEXTITEM="5"
     S_MKFS=1
 }
-
 
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
