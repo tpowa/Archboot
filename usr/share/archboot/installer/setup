@@ -1959,22 +1959,23 @@ check_btrfs_subvolume(){
         mount_btrfs
         for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
             if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
+                DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
                 BTRFS_SUBVOLUME=""
             fi
         done
         umount_btrfs
     else
-        if [ "$(echo $SUBVOLUME | egrep "$BTRFS_SUBVOLUME")" ]; then
-            DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names! Please enter another name." 8 65
+        subvolumes_in_use
+        if [ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]; then
+            DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
             BTRFS_SUBVOLUME=""
         fi
     fi
 }
 
 ### TODO: - need to check for available free subvolumes! If no subvolumes present go on create one!
-#         - use subvolumes_in_use instead of $SUBVOLUME!
 #         - BTRFS_DEVICE is not reset on chosing other device!
+#          - LABEL_NAME is not reset on chosing other device!
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME=""
@@ -1999,6 +2000,7 @@ btrfs_compress() {
     BTRFS_COMPRESS="NONE"
     DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
 }
+
 # ask for btrfs ssd option
 btrfs_ssd() {
     BTRFS_SSD="NONE"
@@ -2077,10 +2079,7 @@ btrfs_subvolume() {
         if [ $ASK_MOUNTPOINTS = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
-            ### TODO: I think this can be done now in an other way!
-            if ! [ "$(find_btrfs_subvolume)" = "" ]; then
-                prepare_btrfs_subvolume || return 1
-            fi
+            prepare_btrfs_subvolume || return 1
             if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
                 choose_btrfs_subvolume || return 1
             fi
@@ -2141,7 +2140,6 @@ check_btrfs_filesystem_creation() {
     for i in $(grep $PART[:#] /tmp/.parts); do
         if [ "$(echo $i | grep ":btrfs:")" ]; then
             FSTYPE="btrfs"
-            SUBVOLUME="$SUBVOLUME $(echo $i | cut -d: -f 9)"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
             [ "$(echo $i | cut -d: -f 4 | grep yes)" ] && DETECT_CREATE_FILESYSTEM="yes"
