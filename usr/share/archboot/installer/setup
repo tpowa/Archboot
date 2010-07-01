@@ -2019,16 +2019,30 @@ find_btrfs_subvolume() {
             [ "$1" ] && echo $1
         done
         umount_btrfs
-    else
-        # use the one from /tmp/.parts
-        echo $SUBVOLUME
-        [ "$1" ] && echo $1
+    ### NOT NEEDED, you will be asked for create new subvolumes then!
+    #else
+    #    # use the one from /tmp/.parts
+    #    echo $SUBVOLUME
+    #    [ "$1" ] && echo $1
     fi
+}
+
+subvolumes_in_use() {
+    SUBVOLUME_IN_USE=""
+    for i in $(grep $PART[:#] /tmp/.parts); do
+        if [ "$(echo $i | grep ":btrfs:")" ]; then
+            SUBVOLUME_IN_USE="$SUBVOLUME_IN_USE $(echo $i | cut -d: -f 9)"
+        fi
+    done
 }
 
 choose_btrfs_subvolume () {
     BTRFS_SUBVOLUME="NONE"
     SUBVOLUMES=$(find_btrfs_subvolume _)
+    subvolumes_in_use
+    for i in $SUBVOLUME_IN_USE; do
+        SUBVOLUMES=$(echo $SUBVOLUMES | sed -e "s#$i\ _##g")
+    done
     if [ -n "$SUBVOLUMES" ] ; then
         DIALOG --menu "Select the subvolume to mount" 21 50 13 $SUBVOLUMES 2>$ANSWER || return 1
         BTRFS_SUBVOLUME=$(cat $ANSWER)
@@ -2128,7 +2142,7 @@ check_btrfs_filesystem_creation() {
     for i in $(grep $PART[:#] /tmp/.parts); do
         if [ "$(echo $i | grep ":btrfs:")" ]; then
             FSTYPE="btrfs"
-            SUBVOLUME="$SUBVOLUME#$(echo $i | cut -d: -f 9)"
+            SUBVOLUME="$SUBVOLUME $(echo $i | cut -d: -f 9)"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
             [ "$(echo $i | cut -d: -f 4 | grep yes)" ] && DETECT_CREATE_FILESYSTEM="yes"
