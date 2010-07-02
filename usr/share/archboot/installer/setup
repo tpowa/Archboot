@@ -1968,6 +1968,8 @@ select_btrfs_raid_devices () {
     # show all devices with sizes
     # DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
     # select the second device to use, no missing option available!
+    ### TODO: device listing is not correct on abort and redo selection!
+    : >/tmp/.btrfs-devices
     BTRFS_PART="$BTRFS_DEVICE"
     BTRFS_PARTS="$PARTS"
     echo "$BTRFS_PART" >>/tmp/.btrfs-devices
