@@ -1891,6 +1891,39 @@ umount_btrfs() {
     rm -r $BTRFSMP
 }
 
+# Set BTRFS_DEVICES on detected btrfs devices
+find_btrfs_raid_devices() {
+    btrfs_scan
+    if [ "$DETECT_CREATE_FILESYSTEM" = "no" -a "$FSTYPE" = "btrfs" ]; then
+        for i in $(btrfs filesystem show $PART | cut -d " " -f 11); do
+            BTRFS_DEVICES="$BTRFS_DEVICES#$i"
+        done
+    fi
+}
+
+# find btrfs subvolume
+find_btrfs_subvolume() {
+    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+        # existing btrfs subvolumes
+        mount_btrfs
+        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+            echo $i
+            [ "$1" ] && echo $1
+        done
+        umount_btrfs
+    fi
+}
+
+# subvolumes already in use
+subvolumes_in_use() {
+    SUBVOLUME_IN_USE=""
+    for i in $(grep $PART[:#] /tmp/.parts); do
+        if [ "$(echo $i | grep ":btrfs:")" ]; then
+            SUBVOLUME_IN_USE="$SUBVOLUME_IN_USE $(echo $i | cut -d: -f 9)"
+        fi
+    done
+}
+
 # ask for btrfs compress option
 btrfs_compress() {
     BTRFS_COMPRESS="NONE"
@@ -1930,8 +1963,8 @@ check_btrfs_filesystem_creation() {
 
 # remove devices with no subvolume from list and generate raid device list
 btrfs_parts() {
-     BTRFS_DEVICES=""
      if [ -s /tmp/.btrfs-devices ]; then
+         BTRFS_DEVICES=""
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="$BTRFS_DEVICES#$i"
              # remove device if no subvolume is used!
@@ -2048,29 +2081,6 @@ create_btrfs_subvolume() {
     umount_btrfs
 }
 
-# find btrfs subvolume
-find_btrfs_subvolume() {
-    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
-        # existing btrfs subvolumes
-        mount_btrfs
-        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
-            echo $i
-            [ "$1" ] && echo $1
-        done
-        umount_btrfs
-    fi
-}
-
-# subvolumes already in use
-subvolumes_in_use() {
-    SUBVOLUME_IN_USE=""
-    for i in $(grep $PART[:#] /tmp/.parts); do
-        if [ "$(echo $i | grep ":btrfs:")" ]; then
-            SUBVOLUME_IN_USE="$SUBVOLUME_IN_USE $(echo $i | cut -d: -f 9)"
-        fi
-    done
-}
-
 # choose btrfs subvolume from list
 choose_btrfs_subvolume () {
     BTRFS_SUBVOLUME="NONE"
@@ -2093,8 +2103,6 @@ choose_btrfs_subvolume () {
         fi
     fi
 }
-
-### TODO: When using raid keep subvolumes in sync and don't ask for creation!
 
 # btrfs subvolume menu
 btrfs_subvolume() {
@@ -2229,9 +2237,9 @@ mountpoints() {
             # Select root filesystem type
             FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
             DOMKFS="no"
-            check_btrfs_filesystem_creation
             # clear values first!
             clear_btrfs_values
+            check_btrfs_filesystem_creation
             if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
@@ -2239,6 +2247,7 @@ mountpoints() {
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
+        find_btrfs_raid_devices
         btrfs_parts
         check_mkfs_values
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
@@ -2254,9 +2263,9 @@ mountpoints() {
                 if [ "$PART" != "DONE" ]; then
                     FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
                     DOMKFS="no"
-                    check_btrfs_filesystem_creation
                     # clear values first!
                     clear_btrfs_values
+                    check_btrfs_filesystem_creation
                     # Select a filesystem type
                     if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
@@ -2270,6 +2279,7 @@ mountpoints() {
                 [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
             done
             if [ "$PART" != "DONE" ]; then
+                find_btrfs_raid_devices
                 btrfs_parts
                 check_mkfs_values
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
