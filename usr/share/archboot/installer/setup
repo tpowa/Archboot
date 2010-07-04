@@ -726,7 +726,7 @@ getdest() {
 # sets EDITOR global variable
 #
 geteditor() {
-    if ! [ $(which vi) ]; then
+    if ! [ "$(which vi)" ]; then
         DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
             "1" "nano (easier)" 2>$ANSWER
     else
@@ -804,7 +804,7 @@ _getavailpartitions()
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
             # dmraid device
             elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
-                [ $(echo $i | grep 'p*[0-9]$') ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+                [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
             else
                 echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
@@ -1001,7 +1001,7 @@ _raid()
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
             k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-            if ! [ $(echo $k | grep ^md) ]; then
+            if ! [ "$(echo $k | grep ^md)" ]; then
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
@@ -1302,7 +1302,7 @@ findvg()
 getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units m); do
-        if ! [ $(echo $i | grep " 0m$") ]; then
+        if ! [ "$(echo $i | grep " 0m$")" ]; then
             echo $i | sed -e 's#$#\\n#'
         fi
     done
@@ -1590,7 +1590,7 @@ autoprepare() {
     # switch for mbr usage
     set_guid
     DISCS=$(default_blockdevices)
-    if [ $(echo $DISCS | wc -w) -gt 1 ]; then
+    if [ "$(echo $DISCS | wc -w)" -gt 1 ]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         DIALOG --menu "Select the hard drive to use" 14 55 7 $(default_blockdevices _) 2>$ANSWER || return 1
         DISC=$(cat $ANSWER)
@@ -1780,7 +1780,7 @@ EOF
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
-        if [ $(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l) -eq 0 ]; then
+        if [ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
             _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
         fi
@@ -2078,6 +2078,9 @@ check_btrfs_subvolume(){
 create_btrfs_subvolume() {
     mount_btrfs
     btrfs subvolume create $BTRFSMP/$_btrfssubvolume >$LOG
+    # change permission from 700 to 755 
+    # to avoid warnings during package installation
+    chmod 755 $BTRFSMP/$_btrfssubvolume
     umount_btrfs
 }
 
@@ -2108,7 +2111,7 @@ choose_btrfs_subvolume () {
 btrfs_subvolume() {
     FILESYSTEM_FINISH=""
     if [ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]; then
-        if [ $ASK_MOUNTPOINTS = "1" ]; then
+        if [ "$ASK_MOUNTPOINTS" = "1" ]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
             prepare_btrfs_subvolume || return 1
@@ -3652,7 +3655,7 @@ dogrub2(){
 select_source()
 {
     NEXTITEM="3"
-    if ! [ $(which $DLPROG) ]; then
+    if ! [ "$(which $DLPROG)" ]; then
         DIALOG --menu "Please select an installation source" 10 35 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>$ANSWER || return 1
     else
