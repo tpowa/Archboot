@@ -1998,8 +1998,8 @@ select_btrfs_raid_devices () {
 
 # prepare new btrfs device
 prepare_btrfs() {
-    btrfs_raid_level
-    prepare_btrfs_subvolume
+    btrfs_raid_level || return 1
+    prepare_btrfs_subvolume || return 1
 }
 
 # prepare btrfs subvolume
