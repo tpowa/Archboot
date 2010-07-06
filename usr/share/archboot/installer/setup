@@ -3994,6 +3994,7 @@ auto_hwdetect()
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
+        [ "$(blkid -c=/dev/null -o value -s TYPE $PART_ROOT)" = "btrfs" ] && HWPARAMETER="$HWPARAMETER --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install --hooks $FBPARAMETER $HWPARAMETER)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
