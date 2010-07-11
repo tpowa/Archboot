@@ -10,6 +10,7 @@ install ()
     for i in $(pacman -Ql linux-firmware | cut -d ' ' -f2 | grep -v /$); do
         add_file "$i"
     done
+}
 
 help ()
 {
