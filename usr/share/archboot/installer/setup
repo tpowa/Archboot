@@ -1611,8 +1611,8 @@ autoprepare() {
         [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
         [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
         [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-        [ "$(which mkfs.xfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS xfs XFS"
-        [ "$(which mkfs.jfs 2>/dev/null)" ]   && FSOPTS="$FSOPTS jfs JFS"
+        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
+        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
         # create 10MB bios_grub partition for grub2 support
         if [ "$GUIDPARAMETER" = "yes" ]; then
             GUID_PART_SIZE="10"
@@ -3179,7 +3179,7 @@ doextlinux () {
             return 1
         fi
     fi
-    common_syslinux
+    common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
     finish_syslinux
@@ -3211,7 +3211,7 @@ dosyslinux() {
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
         return 1
     fi
-    common_syslinux
+    common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM $bootdev >$LOG 2>&1
     finish_syslinux
@@ -3277,6 +3277,10 @@ dolilo() {
 }
 
 dogrub() {
+    if [ -f $DESTDIR/boot/grub/grub.cfg ]; then
+        DIALOG --msgbox "Found $DESTDIR/boot/grub/grub.cfg, deinstalling grub2 now ..." 0 0
+        $PACMAN -R grub2 > $LOG
+    fi
     if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
         PACKAGES="grub"
@@ -3473,6 +3477,10 @@ dogrub2(){
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
+    if [ -f $DESTDIR/boot/grub/menu.lst ]; then
+        DIALOG --msgbox "Found $DESTDIR/boot/grub/menu.lst, deinstalling grub now ..." 0 0
+        $PACMAN -R grub > $LOG
+    fi
     if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
         DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
         PACKAGES="grub2"
