@@ -3140,7 +3140,9 @@ EOF
     cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_CONF}
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
     cat ${MBR} > ${ROOTDEV}
-    [ -e ${DESTDIR}/boot/ldlinux.sys ] && rm ${DESTDIR}/boot/ldlinux.sys
+    if [ -e ${DESTDIR}/boot/ldlinux.sys ]; then 
+        rm ${DESTDIR}/boot/ldlinux.sys
+    fi
 }
 # finish_syslinux
 finish_syslinux () {
@@ -3153,6 +3155,12 @@ finish_syslinux () {
     chroot_umount
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
+
+### TODO: 
+# - /boot on btrfs subvolume not acceptable
+# - raid not supported at all in btrfs mode
+# - findmnt doesn't list btrfs subvolumes!
+# - subvolumes are not correctly checked on create new
 
 # install extlinux bootloader
 doextlinux () {
