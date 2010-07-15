@@ -2983,7 +2983,7 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
 getrootflags() {
-ROOTFLAGS="$(findmnt -n -o options $PART_ROOT)"
+ROOTFLAGS="$(findmnt -m -n -o options $PART_ROOT)"
 }
 
 getraidarrays() {
@@ -3167,7 +3167,6 @@ finish_syslinux () {
 
 ### TODO:
 # - raid not supported at all in btrfs mode
-# - findmnt doesn't list btrfs subvolumes!
 # - subvolumes are not correctly checked on create new
 
 # install extlinux bootloader
