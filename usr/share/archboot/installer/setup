@@ -2997,7 +2997,7 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 }
 
 getrootflags() {
-ROOTFLAGS="$(findmnt -m -n -o options $PART_ROOT)"
+ROOTFLAGS="$(findmnt -m -n -o options -T $DESTDIR)"
 }
 
 getraidarrays() {
