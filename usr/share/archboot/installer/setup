@@ -1904,6 +1904,18 @@ find_btrfs_raid_devices() {
     fi
 }
 
+find_btrfs_raid_bootloader_devices() {
+    btrfs_scan
+    BTRFS_COUNT=1
+    if [ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]; then
+        BTRFS_DEVICES=""
+        for i in $(btrfs filesystem show $bootdev | cut -d " " -f 11); do
+            BTRFS_DEVICES="$BTRFS_DEVICES#$i"
+            BTRFS_COUNT=$(($BTRFS_COUNT+1))
+        done
+    fi
+}
+
 # find btrfs subvolume
 find_btrfs_subvolume() {
     if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
@@ -2115,7 +2127,7 @@ choose_btrfs_subvolume () {
 # boot on btrfs subvolume is not supported
 check_btrfs_boot_subvolume() {
     if [ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ] ; then
-        DIALOG --msgbox "ERROR: /boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
+        DIALOG --msgbox "ERROR: \n/boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
         FILESYSTEM_FINISH="no"
     fi
 }
@@ -3042,7 +3054,7 @@ common_bootloader_checks() {
 }
 
 # look for a separately-mounted /boot partition
-check_bootpart () {
+check_bootpart() {
     subdir=""
     bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
@@ -3167,9 +3179,6 @@ finish_syslinux () {
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
 
-### TODO:
-# - raid not supported at all in btrfs mode
-
 # install extlinux bootloader
 doextlinux () {
     bootdev=""
@@ -3198,6 +3207,11 @@ doextlinux () {
         fi
     fi
     # extlinux cannot boot from btrfs raid
+    find_btrfs_raid_bootloader_devices
+    if [ $BTRFS_COUNT -ge 3 ]; then
+        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any btrfs raid." 0 0
+        return 1
+    fi
     common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
@@ -3250,7 +3264,8 @@ dolilo() {
     if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
-    abort_btrfs_bootpart
+    check_bootpart
+    abort_btrfs_bootpart || return 1
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
         if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
@@ -3344,7 +3359,7 @@ dogrub() {
     # try to auto-configure GRUB...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
-        abort_btrfs_bootpart
+        abort_btrfs_bootpart || return 1
         # check if raid device, devicemapper or dmraid is used  on /boot partition
         if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
@@ -3519,7 +3534,7 @@ dogrub2(){
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
-        abort_btrfs_bootpart
+        abort_btrfs_bootpart || return 1
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported

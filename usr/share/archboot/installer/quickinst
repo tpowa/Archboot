@@ -108,7 +108,7 @@ chroot_umount()
 
 # package_installation
 install_packages() {
-    if [ "$INSTMODE" = "media" ]; then
+    if [ "$MODE" = "media" ]; then
         PKGFILE=/tmp/.pkglist
         cp $PKGARG/packages.txt $PKGFILE
         if [ ! -f $PKGFILE ]; then
@@ -140,7 +140,7 @@ install_packages() {
         ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     fi
     # Only install the booted kernel image!
-    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e "s#\ kernel26-lts\ # #g")"
     PACKAGES="$KERNELPKG $PACKAGES"
     $PACMAN -S $PACKAGES
 }
