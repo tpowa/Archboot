@@ -2047,7 +2047,8 @@ prepare_btrfs_subvolume() {
         DOSUBVOLUME="yes"
     fi
     if [ "$DOSUBVOLUME" = "yes" ]; then
-        while [ "${BTRFS_SUBVOLUME}" = "" ]; do
+        BTRFS_SUBVOLUME="NONE"
+        while [ "${BTRFS_SUBVOLUME}" = "NONE" ]; do
             DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>$ANSWER || return 1
             BTRFS_SUBVOLUME=$(cat $ANSWER)
             check_btrfs_subvolume
@@ -2059,6 +2060,7 @@ prepare_btrfs_subvolume() {
 
 # check btrfs subvolume
 check_btrfs_subvolume(){
+    [ "$DOMKFS" = "yes" -a "$FSTYPE" = "btrfs" ] && DETECT_CREATE_FILESYSTEM="yes"
     if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
         mount_btrfs
         for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
@@ -2112,10 +2114,10 @@ choose_btrfs_subvolume () {
 
 # boot on btrfs subvolume is not supported
 check_btrfs_boot_subvolume() {
-        if [ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ] ; then
-            DIALOG --msgbox "ERROR: /boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
-            return 1
-        fi
+    if [ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ] ; then
+        DIALOG --msgbox "ERROR: /boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
+        FILESYSTEM_FINISH="no"
+    fi
 }
 
 # btrfs subvolume menu
@@ -3167,7 +3169,6 @@ finish_syslinux () {
 
 ### TODO:
 # - raid not supported at all in btrfs mode
-# - subvolumes are not correctly checked on create new
 
 # install extlinux bootloader
 doextlinux () {
@@ -3196,6 +3197,7 @@ doextlinux () {
             return 1
         fi
     fi
+    # extlinux cannot boot from btrfs raid
     common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
