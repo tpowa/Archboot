@@ -2040,7 +2040,7 @@ prepare_btrfs() {
 # prepare btrfs subvolume
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
-    BTRFS_SUBVOLUME=""
+    BTRFS_SUBVOLUME="NONE"
     if [ "$SKIP_ASK_SUBVOLUME" = "no" ]; then
         DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     else
@@ -2064,7 +2064,7 @@ check_btrfs_subvolume(){
         for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
             if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
-                BTRFS_SUBVOLUME=""
+                BTRFS_SUBVOLUME="NONE"
             fi
         done
         umount_btrfs
@@ -2072,7 +2072,7 @@ check_btrfs_subvolume(){
         subvolumes_in_use
         if [ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]; then
             DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
-            BTRFS_SUBVOLUME=""
+            BTRFS_SUBVOLUME="NONE"
         fi
     fi
 }
@@ -2108,6 +2108,14 @@ choose_btrfs_subvolume () {
             prepare_btrfs_subvolume || return 1
         fi
     fi
+}
+
+# boot on btrfs subvolume is not supported
+check_btrfs_boot_subvolume() {
+        if [ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ] ; then
+            DIALOG --msgbox "ERROR: /boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
+            return 1
+        fi
 }
 
 # btrfs subvolume menu
@@ -2279,6 +2287,7 @@ mountpoints() {
                         enter_mountpoint
                         btrfs_subvolume
                     fi
+                    check_btrfs_boot_subvolume
                 else
                     FILESYSTEM_FINISH="yes"
                 fi
@@ -3156,8 +3165,7 @@ finish_syslinux () {
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
 
-### TODO: 
-# - /boot on btrfs subvolume not acceptable
+### TODO:
 # - raid not supported at all in btrfs mode
 # - findmnt doesn't list btrfs subvolumes!
 # - subvolumes are not correctly checked on create new
