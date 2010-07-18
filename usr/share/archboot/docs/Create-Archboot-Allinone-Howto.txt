@@ -1,0 +1,55 @@
+Archboot Allinone ISO Howto:
+(Quick regeneration of installation media with latest available core packages)
+
+Requirements:
+- x86_64 architecture
+- archboot ISO
+- ~ 3GB free space on disk
+
+Create archboot chroots:
+  # install archboot
+  pacman -S archboot
+  # mount recent archboot image file as loop device
+  mount -o loop <imagefile> <imagepath>
+  # create x86_64 chroot
+  mkdir <x86_64_chroot>
+  /usr/share/archboot/installer/quickinst media <x86_64_chroot> <imagepath>/core-i686/pkg
+  # create i686 chroot
+  mkdir <i686_chroot>
+  /usr/share/archboot/installer/quickinst media <i686_chroot> <imagepath>/core-x86_64/pkg
+  # unmount iso file
+  umount <imagepath>
+
+Enter archboot chroot like this:
+  mount -o bind /dev <chrootpath>/dev
+  mount -o bind /tmp <chrootpath>/tmp
+  mount -o bind /sys <chrootpath>/sys
+  mount -o bind /proc <chrootpath>/proc
+  cp -a /etc/mtab <chrootpath>/etc/mtab
+  cp /etc/resolv.conf  <chrootpath>/etc/resolv.conf
+  # enter chroot
+  chroot <chrootpath>
+
+Install archboot and update to latest packages:
+  # update in both chroots to latest available packages
+  pacman -Syu
+  #install in both chroots archboot:
+  pacman -S archboot
+
+Generate images:
+  # run in both chroots (needs quite some time ...)
+  archboot-allinone.sh -t
+  # put the generated tarballs in one directory and run (needs quite some time ...)
+  archboot-allinone.sh -g
+
+Finished you get a burnable iso image, a rawwrite usb image 
+and a hybrid image which is both in one.
+
+Don't forget after chroot leaving:
+  umount <chrootpath>/dev
+  umount <chrootpath>/tmp
+  umount <chrootpath>/sys
+  umount <chrootpath>/proc
+
+Have fun
+tpowa
