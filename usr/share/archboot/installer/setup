@@ -351,7 +351,7 @@ additional_blockdevices_partitions() {
                     #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
                     #- bios_grub partitions
                     # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
-                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
                         echo "/dev/$part"
                         [ "$1" ] && echo $1
                     fi
@@ -504,7 +504,7 @@ default_partition_check() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
                 if [ -d $block/$disk/$part ]; then
                     echo "/dev/$part"
                     [ "$1" ] && echo $1
@@ -521,7 +521,7 @@ finddisks() {
 }
 
 findpartitions() {
-    for devpath in "$(finddisks)"; do
+    for devpath in $(finddisks); do
         default_partition_check $1
     done
     additional_blockdevices_partitions $1
