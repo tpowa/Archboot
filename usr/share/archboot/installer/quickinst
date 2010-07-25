@@ -55,6 +55,7 @@ pacman_conf() {
     # Setup a pacman.conf in /tmp
     cat << EOF > /tmp/pacman.conf
 [options]
+Architecture = auto
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /src/core-$(uname -m)/pkg
 CacheDir = /src/core-any/pkg
