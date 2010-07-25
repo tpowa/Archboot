@@ -57,6 +57,7 @@ install ()
     add_file "/usr/share/licenses/sdparm/LICENSE"
     add_file "/usr/share/licenses/vim/license.txt"
     add_file "/usr/share/licenses/zlib/LICENSE"
+    add_file "/usr/share/licenses/iana-etc/LICENSE"
 }
 
 help ()
