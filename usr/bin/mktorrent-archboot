@@ -18,7 +18,7 @@ httpmirrorlist=$(wget http://www.archlinux.org/mirrorlist/all/http/ -q -O - \
 	- | grep 'http://' \
 	| awk "{print \$3\"/iso/${archver}/\";}" \
 	| sed -e 's#/$repo/os/$arch##' \
-	      -e 's#\s*# -w#')
+	      -e 's#\s*# -w #')
 
 echo 'Building torrent...'
 mktorrent \
