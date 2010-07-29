@@ -14,10 +14,9 @@ archver="${1}"
 isofile="${2}"
 
 echo 'Creating webseeds...'
-httpmirrorlist=$(wget http://www.archlinux.org/mirrorlist/i686/all/ -q -O - \
-	| grep 'http://' \
+httpmirrorlist=$(wget http://www.archlinux.org/mirrorlist/all/http/ -q -O - \
 	| awk "{print \$3\"/iso/${archver}/\";}" \
-	| sed -e 's#/$repo/os/i686##' \
+	| sed -e 's#/$repo/os/$arch##' \
 	      -e 's#\s*# -w#')
 
 echo 'Building torrent...'
