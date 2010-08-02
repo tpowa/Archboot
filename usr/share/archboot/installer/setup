@@ -2733,6 +2733,9 @@ select_packages() {
     if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
         ! [ "$(grep -w btrfs-progs-unstable $PACKAGES)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
     fi
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
+        ! [ "$(grep -w nilfs-utils $PACKAGES)" ] && PACKAGES="$PACKAGES nilfs-utils"
+    fi
     if [ -e /var/state/dhcp/dhclient.leases ]; then
         ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     fi
@@ -3075,6 +3078,15 @@ abort_btrfs_bootpart() {
         fi
 }
 
+# check for nilfs2 bootpart and abort if detected
+abort_nilfs_bootpart() {
+        FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
+        if [ "$FSTYPE" = "nilfs2" ]; then
+            DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
+            return 1
+        fi
+}
+
 # install syslinux and run preparation
 prepare_syslinux () {
     if ! [ -e "$DESTDIR/usr/sbin/extlinux" -o -e "$DESTDIR/usr/bin/mcopy" ]; then
@@ -3191,6 +3203,7 @@ doextlinux () {
     SYSLINUX_CONF=extlinux.conf
     prepare_syslinux
     check_bootpart
+    abort_nilfs_bootpart || return 1
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
     if ! [ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]; then
@@ -3269,6 +3282,7 @@ dolilo() {
     fi
     check_bootpart
     abort_btrfs_bootpart || return 1
+    abort_nilfs_bootpart || return 1
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
         if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
@@ -3363,6 +3377,7 @@ dogrub() {
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
         abort_btrfs_bootpart || return 1
+        abort_nilfs_bootpart || return 1
         # check if raid device, devicemapper or dmraid is used  on /boot partition
         if [ "$(echo $bootdev | grep /dev/md)" ]; then
             if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
@@ -3538,6 +3553,7 @@ dogrub2(){
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
         abort_btrfs_bootpart || return 1
+        abort_nilfs_bootpart || return 1
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
                 # boot from lvm and raid devices is supported

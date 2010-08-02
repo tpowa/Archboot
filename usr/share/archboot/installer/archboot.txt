@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July,12th 2010
+   August,2th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -88,7 +88,7 @@ Introduction
      luks encrypted devices
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
      and encrypted devices
-   * Filesystem support: ext2/3/4,btrfs,reiserfs,xfs,jfs,ntfs-3g,vfat
+   * Filesystem support: ext2/3/4,btrfs,nilfs2, reiserfs,xfs,jfs,ntfs-3g,vfat
    * Package selection support
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf

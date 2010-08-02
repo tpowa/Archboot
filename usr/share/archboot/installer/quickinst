@@ -127,8 +127,8 @@ install_packages() {
         PACKAGES="$(pacman -Sg base | awk '{print $2}')"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" ]; then
-        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm"
+    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
+        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
         ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
     fi
     if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
@@ -137,9 +137,16 @@ install_packages() {
     if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
         ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
     fi
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
+        ! [ "$(grep -w btrfs-progs-unstable $PACKAGES)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
+    fi
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
+        ! [ "$(grep -w nilfs-utils $PACKAGES)" ] && PACKAGES="$PACKAGES nilfs-utils"
+    fi
     if [ -e /var/state/dhcp/dhclient.leases ]; then
         ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     fi
+
     # Only install the booted kernel image!
     PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e "s#\ kernel26-lts\ # #g")"
     PACKAGES="$KERNELPKG $PACKAGES"
