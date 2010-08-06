@@ -15,7 +15,7 @@ Archboot options and troubleshooting:
   please have a look at: /arch/archboot.txt
 
 Archboot resourses:
-- Homepage:         ftp://ftp.archlinux.org/iso/archboot/index.html
+- Homepage:         http://wiki.archlinux.org/index.php/Archboot
 - Latest version:   ftp://ftp.archlinux.org/iso/archboot/
 - Development tree: http://projects.archlinux.org/archboot.git/
 - Developer:        Tobias Powalowski <tpowa@archlinux.org>
