@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# we rely on some output which is parsed in english!
+export LANG=EN_US
 ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation"
 # use the first VT not dedicated to a running console
@@ -2670,7 +2671,7 @@ select_packages() {
             CHKLIST="$CHKLIST $list"
             tag="OFF"
         done
-        DIALOG --checklist "Select Packages to install.  Use SPACE to select." 19 60 12 $CHKLIST 2>/tmp/.pkglist || return 1
+        DIALOG --checklist "Select Packages to install. Use SPACE to select." 19 60 12 $CHKLIST 2>/tmp/.pkglist || return 1
         # fix pacman list!
         PACKAGES=
         sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' /tmp/.pkglist
@@ -2685,25 +2686,27 @@ select_packages() {
         if [ $S_SELECT -ne 0 ]; then
             DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
         fi
-        DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 15 70
+        DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
         # show group listing for group selection
+        # don't show not necessary kde groups
         local _catlist="base ^ ON"
-        for i in $($PACMAN -Sg | sed "s/^base$/ /g"); do
+        for i in $($PACMAN -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" | sort); do
             _catlist="${_catlist} ${i} - OFF"
         done
 
-        DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 19 55 12 $_catlist 2>$ANSWER || return 1
+        DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 19 60 12 $_catlist 2>$ANSWER || return 1
         _catlist="$(cat $ANSWER)"
 
+        DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
         # assemble a list of packages with groups, marking pre-selected ones
         # <package> <group> <selected>
-        local _pkgtmp="$($PACMAN -Sl core | awk '{print $2}')"
+        local _pkgtmp="$($PACMAN -Sl core extra | awk '{print $2}')"
         local _pkglist=''
-
+        local _pkglist_none=''
+        # packages in groups
         $PACMAN -Si $_pkgtmp | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' > $ANSWER
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' > $ANSWER
         while read pkgname pkgcat; do
-
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
             if [ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]; then
@@ -2712,11 +2715,23 @@ select_packages() {
                 _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} OFF")"
             fi
         done < $ANSWER
+        # packages without groups
+        $PACMAN -Si $_pkgtmp | \
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' > $ANSWER
+        while read pkgname pkgcat; do
+            # check if this package is in a selected group
+            # slightly ugly but sorting later requires newlines in the variable
+            if [ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]; then
+                _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} ON")"
+            else
+                _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} OFF")"
+            fi
+        done < $ANSWER
 
         # sort by category
         _pkglist="$(echo "$_pkglist" | sort -f -k 2)"
-
-        DIALOG  --separate-output --checklist "Select Packages To Install." 19 60 12 $_pkglist 2>$ANSWER || return 1
+        _pkglist_none="$(echo "$_pkglist_none" | sort -f -k 2)"
+        DIALOG  --separate-output --checklist "Select Packages To Install." 19 80 12 $_pkglist $_pkglist_none 2>$ANSWER || return 1
         PACKAGES="$(cat $ANSWER)"
     fi
     # Add packages which are not in core repository
@@ -3229,6 +3244,7 @@ doextlinux () {
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any btrfs raid." 0 0
         return 1
     fi
+    ### TODO break if subvolume is used!
     common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
