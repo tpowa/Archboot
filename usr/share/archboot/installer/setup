@@ -2496,9 +2496,12 @@ source_set(){
     while ! [ "$S_SRC" = "1" ]; do
         if ! [ "$S_SRC" = "1" ]; then
             DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
-            select_source
+            select_source || break
         fi
     done
+    if [ "$S_SRC" = "0" ]; then
+        return 1
+    fi
 }
 
 getsource() {
@@ -2524,7 +2527,7 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
-    DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 10 65
+    DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 8 65
     # FIXME: this regex doesn't honor commenting
     MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
     DIALOG --menu "Select an FTP/HTTP mirror" 14 55 7 \
@@ -2694,11 +2697,12 @@ select_packages() {
         local _catlist="base ^ ON"
         for i in $($PACMAN -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
                                                       -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
-                                                      -e "qtcurve" -e "^telepathy" -e "^texlive" -e "i18n" | sort); do
+                                                      -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
+                                                      -e "i18n" -e "^koffice" -e "^vim" | sort); do
             _catlist="${_catlist} ${i} - OFF"
         done
 
-        DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 19 60 12 $_catlist 2>$ANSWER || return 1
+        DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 20 60 12 $_catlist 2>$ANSWER || return 1
         _catlist="$(cat $ANSWER)"
 
         DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
@@ -2739,24 +2743,24 @@ select_packages() {
         PACKAGES="$(cat $ANSWER)"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
-        ! [ "$(grep -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
-        ! [ "$(grep -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+    if [ "$(grep -q -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
+        ! [ "$(grep -q -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
+        ! [ "$(grep -q -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
     fi
-    if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
-        ! [ "$(grep -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+    if [ "$(grep -q -w uvesafb /proc/cmdline)" ]; then
+        ! [ "$(grep -q -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
-        ! [ "$(grep -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q ntfs)" ]; then
+        ! [ "$(grep -q -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
-        ! [ "$(grep -w btrfs-progs-unstable $PACKAGES)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q btrfs)" ]; then
+        ! [ "$(grep -q -w btrfs-progs-unstable $PACKAGES)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
-        ! [ "$(grep -w nilfs-utils $PACKAGES)" ] && PACKAGES="$PACKAGES nilfs-utils"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q nilfs2)" ]; then
+        ! [ "$(grep -q -w nilfs-utils $PACKAGES)" ] && PACKAGES="$PACKAGES nilfs-utils"
     fi
     if [ -e /var/state/dhcp/dhclient.leases ]; then
-        ! [ "$(grep -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+        ! [ "$(grep -q -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
@@ -3739,10 +3743,10 @@ select_source()
 {
     NEXTITEM="3"
     if ! [ "$(which $DLPROG)" ]; then
-        DIALOG --menu "Please select an installation source" 10 35 3 \
+        DIALOG --menu "Please select an installation source" 10 45 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>$ANSWER || return 1
     else
-        DIALOG --menu "Please select an installation source" 10 35 3 \
+        DIALOG --menu "Please select an installation source" 10 45 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" \
         "2" "FTP/HTTP" 2>$ANSWER || return 1
     fi
