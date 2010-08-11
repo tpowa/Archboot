@@ -1930,6 +1930,20 @@ find_btrfs_subvolume() {
     fi
 }
 
+find_btrfs_bootloader_subvolume() {
+    BTRFS_SUBVOLUME_COUNT=1
+    if [ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]; then
+        BTRFS_SUBVOLUMES=""
+        PART="$bootdev"
+        mount_btrfs
+        for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
+            BTRFS_SUBVOLUMES="$BTRFS_SUBVOLUMES#$i"
+            BTRFS_SUBVOLUME_COUNT=$(($BTRFS_COUNT+1))
+        done
+        umount_btrfs
+    fi
+}
+
 # subvolumes already in use
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
@@ -3252,7 +3266,12 @@ doextlinux () {
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any btrfs raid." 0 0
         return 1
     fi
-    ### TODO break if subvolume is used!
+    # extlinux cannot boot from btrfs subvolume
+    find_btrfs_bootloader_subvolume
+    if [ $BTRFS_SUBVOLUME_COUNT -ge 3 ]; then
+        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from btrfs subvolume." 0 0
+        return 1
+    fi  
     common_syslinux || return 1
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
