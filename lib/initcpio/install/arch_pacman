@@ -13,7 +13,7 @@ ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs s
 syslog-ng sysvinit tar util-linux-ng which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
 grub inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
 dosfstools udev initscripts filesystem kernel26 glibc linux-api-headers xinetd links pacman \
-pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib libelf gpm sysfsutils \
+pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib elfutils gpm sysfsutils \
 libgcrypt libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo grub iptables capi4k-utils \
 ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter wpa_supplicant gzip rsync \
 libarchive device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot \
