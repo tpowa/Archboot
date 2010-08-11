@@ -2493,10 +2493,12 @@ _mkfs() {
 # source_set()
 # check if installation source is set, if not run select_source!
 source_set(){
-    if ! [ "$S_SRC" = "1" ]; then
-        DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
-        select_source
-    fi
+    while ! [ "$S_SRC" = "1" ]; do
+        if ! [ "$S_SRC" = "1" ]; then
+            DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
+            select_source
+        fi
+    done
 }
 
 getsource() {
@@ -2504,13 +2506,13 @@ getsource() {
     if [ "$MODE" = "media" ]; then
         get_media
         #last fallback, if autodetection fails!
-        manual_media
+        manual_media || return 1
     fi
 
     if [ "$MODE" = "ftp" ]; then
         #in order to cache packages from media check on it first!
         get_media
-        select_mirror
+        select_mirror || return 1
         NEXTITEM="2"
     fi
     S_SRC=1
@@ -2688,9 +2690,11 @@ select_packages() {
         fi
         DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
         # show group listing for group selection
-        # don't show not necessary kde groups
+        # only show xorg and DEs
         local _catlist="base ^ ON"
-        for i in $($PACMAN -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" | sort); do
+        for i in $($PACMAN -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
+                                                      -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
+                                                      -e "qtcurve" -e "^telepathy" -e "^texlive" -e "i18n" | sort); do
             _catlist="${_catlist} ${i} - OFF"
         done
 
@@ -3754,7 +3758,7 @@ select_source()
 
     if [ "$MODE" = "media" ]; then
         TITLE="Arch Linux CDROM, USBSTICK or OTHER SOURCE Installation"
-        getsource
+        getsource || return 1
     else
         DEFAULT=
         TITLE="Arch Linux FTP/HTTP Installation"
@@ -3774,7 +3778,8 @@ select_source()
             "0")
                 donetwork ;;
             "1")
-                getsource ;;
+                getsource || return 1
+                ;;
              *)
                 break ;;
             esac
