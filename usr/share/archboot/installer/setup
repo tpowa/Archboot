@@ -1,6 +1,6 @@
 #!/bin/bash
 # we rely on some output which is parsed in english!
-export LANG=EN_US
+unset LANG
 ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation"
 # use the first VT not dedicated to a running console
