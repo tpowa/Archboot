@@ -2757,24 +2757,24 @@ select_packages() {
         PACKAGES="$(cat $ANSWER)"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -q -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
-        ! [ "$(grep -q -w nouveau-drm $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
-        ! [ "$(grep -q -w nouveau-firmware $PACKAGES)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
+        ! [ "$(echo $PACKAGES | grep -w nouveau-drm)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
+        ! [ "$(echo $PACKAGES | grep -w nouveau-firmware)" ] && PACKAGES="$PACKAGES nouveau-firmware"
     fi
-    if [ "$(grep -q -w uvesafb /proc/cmdline)" ]; then
-        ! [ "$(grep -q -w v86d $PACKAGES)" ] && PACKAGES="$PACKAGES v86d"
+    if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
+        ! [ "$(echo $PACKAGES | grep -w v86d)" ] && PACKAGES="$PACKAGES v86d"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q ntfs)" ]; then
-        ! [ "$(grep -q -w ntfs-3g $PACKAGES)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
+        ! [ "$(echo $PACKAGES | grep -w ntfs-3g)" ] && PACKAGES="$PACKAGES ntfs-3g"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q btrfs)" ]; then
-        ! [ "$(grep -q -w btrfs-progs-unstable $PACKAGES)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
+        ! [ "$(echo $PACKAGES | grep -w btrfs-progs-unstable)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep -q nilfs2)" ]; then
-        ! [ "$(grep -q -w nilfs-utils $PACKAGES)" ] && PACKAGES="$PACKAGES nilfs-utils"
+    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
+        ! [ "$(echo $PACKAGES | grep -w nilfs-utils)" ] && PACKAGES="$PACKAGES nilfs-utils"
     fi
     if [ -e /var/state/dhcp/dhclient.leases ]; then
-        ! [ "$(grep -q -w dhclient $PACKAGES)" ] && PACKAGES="$PACKAGES dhclient"
+        ! [ "$(echo $PACKAGES | grep -w dhclient)" ] && PACKAGES="$PACKAGES dhclient"
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
