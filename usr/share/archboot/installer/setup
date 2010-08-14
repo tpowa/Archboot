@@ -1613,6 +1613,8 @@ autoprepare() {
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
         [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
         [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
+        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+        [ "$(which mkfs.nilfs2 2>/dev/null)" ] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
         [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
         [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
         [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
@@ -1669,7 +1671,7 @@ autoprepare() {
             fi
         done
         while [ "$CHOSEN_FS" = "" ]; do
-            DIALOG --menu "Select a filesystem for / and /home:" 13 45 6 $FSOPTS 2>$ANSWER || return 1
+            DIALOG --menu "Select a filesystem for / and /home:" 16 45 8 $FSOPTS 2>$ANSWER || return 1
             FSTYPE=$(cat $ANSWER)
             DIALOG --yesno "$FSTYPE will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
@@ -1770,9 +1772,16 @@ EOF
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
+        fsoptions="NONE"
+        btrfsdevices="${DEVICE}${part}"
+        btrfsssd="NONE"
+        btrfscompress="NONE"
+        btrfssubvolume="NONE"
+        btrfslevel="NONE"
+        dosubvolume="no"
         if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
+            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
         part=$(($part + 1))
     done
@@ -1784,9 +1793,16 @@ EOF
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
+        fsoptions="NONE"
+        btrfsdevices="${DEVICE}${part}"
+        btrfsssd="NONE"
+        btrfscompress="NONE"
+        btrfssubvolume="NONE"
+        btrfslevel="NONE"
+        dosubvolume="no"
         if [ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" || return 1
+            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1|| return 1
         fi
         part=$(($part + 1))
     done
@@ -2441,7 +2457,8 @@ _mkfs() {
                 ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ext3)     mke2fs ${_fsoptions} -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
                 ext4)     mke2fs ${_fsoptions} -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? 
+                          echo ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >>/tmp/test.txt;;
                 nilfs2)   mkfs.nilfs2 ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
