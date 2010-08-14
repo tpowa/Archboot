@@ -1620,7 +1620,7 @@ autoprepare() {
         [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
         # create 10MB bios_grub partition for grub2 support
         if [ "$GUIDPARAMETER" = "yes" ]; then
-            GUID_PART_SIZE="10"
+            GUID_PART_SIZE="1"
         else
             GUID_PART_SIZE="0"
         fi
@@ -1826,7 +1826,7 @@ parted_gpt() {
     if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
         # assume new partitiontable,if no GUID was already there,
         # no user interaction needed for bios_grub partition, jippie
-        GUID_PART_SIZE="10"
+        GUID_PART_SIZE="1"
         parted -s $DISC mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
         parted -s $DISC set 1 bios_grub on >$LOG
     else
