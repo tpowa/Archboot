@@ -25,7 +25,6 @@ install ()
     add_binary /lib/udev/path_id
     add_binary /lib/udev/pci-db
     add_binary /lib/udev/mobile-action-modeswitch
-    add_file /lib/udev/root-link.sh
     add_file /lib/udev/rule_generator.functions
     add_binary /lib/udev/scsi_id
     add_binary /lib/udev/udev-acl
