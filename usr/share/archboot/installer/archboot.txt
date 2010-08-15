@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August,2th 2010
+   August,15th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -83,7 +83,7 @@ Introduction
    * Changing keymap and consolefont
    * Changing time and date
    * Preparing harddisk, like auto-prepare, partitioning,
-     GUID (gpt) support etc.
+     GUID (gpt) support, 4k sector drive support etc.
    * Creation of software raid/raid partitions, lvm2 devices and 
      luks encrypted devices
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
@@ -300,8 +300,8 @@ Common Installation Procedure
    it's save to answer no.
 
    You should select the disk(s) you want to partition, and
-   you'll be dropped into the cfdisk program where you can freely modify
-   the partitioning information until you [Write] and [Quit].
+   you'll be dropped into the fdisk program where you can freely modify
+   the partitioning information.
 
    You will need at least a root partition to continue the installation,
    and it's helpful to note somewhere which partition you're going to

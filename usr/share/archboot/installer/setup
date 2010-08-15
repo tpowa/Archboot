@@ -629,10 +629,10 @@ get_chs() {
     checkdev=""
     # we need the real device for geometry check!
     realdev="$(echo $bootdev | sed -e 's#,.*)#)#g')"
-    checkdev=$(grep $realdev /tmp/dev.map | sed -e 's#.*\ ##g')
-    CYLINDERS=$(sfdisk -G $checkdev | cut -d " " -f2)
-    HEADS=$(sfdisk -G $checkdev | cut -d " " -f4)
-    SECTORS=$(sfdisk -G $checkdev | cut -d " " -f6)
+    checkdev="$(grep $realdev /tmp/dev.map | sed -e 's#.*\ ##g')"
+    CYLINDERS="$(sfdisk -G $checkdev | cut -d " " -f2)"
+    HEADS="$(sfdisk -G $checkdev | cut -d " " -f4)"
+    SECTORS="$(sfdisk -G $checkdev | cut -d " " -f6)"
 }
 
 # we need symlinks for grub installation!
@@ -1136,8 +1136,10 @@ _createraid()
         # switch for mbr usage
         set_guid
         if [ "$GUIDPARAMETER" = "" ]; then
-            DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 18 70
-            cfdisk $RAIDDEVICE
+            DIALOG --msgbox "Now you'll be put into the fdisk program where you can partition your raiddevice to your needs." 18 70
+            clear
+            fdisk -l $DISC
+            fdisk $RAIDDEVICE
         else
             DISC=$RAIDDEVICE
             parted_gpt
@@ -1683,7 +1685,6 @@ autoprepare() {
     # default filesystem specs (the + is bootable flag)
     #  <mountpoint>:<partsize>:<fstype>[:+]:labelname
     FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTO swap:$SWAP_PART_SIZE:swap::SWAP_AUTO /:$ROOT_PART_SIZE:$FSTYPE::ROOT_AUTO /home:*:$FSTYPE::HOME_AUTO"
-    sfdisk_input=""
 
     # validate DEVICE
     if [ ! -b "$DEVICE" ]; then
@@ -1710,53 +1711,30 @@ autoprepare() {
         printk off
         DIALOG --infobox "Partitioning $DEVICE" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
-        parted -s $DEVICE mklabel GPT >$LOG
-        parted -s $DEVICE mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
-        parted -s $DEVICE set 1 bios_grub on
-        parted -s $DEVICE name 1 GRUB2
-        parted -s $DEVICE mkpart 2 ext2 $GUID_PART_SIZE $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) >$LOG
-        parted -s $DEVICE mkpart 3 linux-swap $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) >$LOG
-        parted -s $DEVICE mkpart 4 ext2 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) >$LOG
-        parted -s $DEVICE mkpart 5 ext2 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) 100% >$LOG
+        dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
+        parted -a optimal -s $DEVICE mklabel GPT >$LOG
+        parted -a optimal -s $DEVICE mkpart 1 1 $GUID_PART_SIZE >$LOG
+        parted -a optimal -s $DEVICE set 1 bios_grub on
+        parted -a optimal -s $DEVICE name 1 GRUB2
+        parted -a optimal -s $DEVICE mkpart 2 $GUID_PART_SIZE $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE mkpart 3 $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE mkpart 4 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE mkpart 5 $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) 100% >$LOG
     else
         PART_ROOT="${DEVICE}3"
-        # setup input var for sfdisk
-        for fsspec in $FSSPECS; do
-            fssize=$(echo $fsspec | tr -d ' ' | cut -f2 -d:)
-            if [ "$fssize" = "*" ]; then
-                    fssize_spec=';'
-            else
-                    fssize_spec=",$fssize"
-            fi
-            fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
-            if [ "$fstype" = "swap" ]; then
-                    fstype_spec=",S"
-            else
-                    fstype_spec=","
-            fi
-            bootflag=$(echo $fsspec | tr -d ' ' | cut -f4 -d:)
-            if [ "$bootflag" = "+" ]; then
-                bootflag_spec=",*"
-            else
-                bootflag_spec=""
-            fi
-            sfdisk_input="${sfdisk_input}${fssize_spec}${fstype_spec}${bootflag_spec}\n"
-        done
-        sfdisk_input=$(printf "$sfdisk_input")
-        echo $sfdisk_input
-        # invoke sfdisk
+        # start at sector 1 for 4k drive compatibility and correct alignment
         printk off
         DIALOG --infobox "Partitioning $DEVICE" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+        dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
         # create DOS MBR with parted
         parted -s $DEVICE mklabel msdos >/dev/null 2>&1
-        sfdisk $DEVICE -uM -D >$LOG 2>&1 <<EOF
-$sfdisk_input
-EOF
+        parted -a optimal -s $DEVICE mkpart primary 1 $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE toggle 1 boot >$LOG
+        parted -a optimal -s $DEVICE mkpart primary $(($GUID_PART_SIZE+$BOOT_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE mkpart primary $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) >$LOG
+        parted -a optimal -s $DEVICE mkpart primary $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) 100% >$LOG
     fi
-
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error partitioning $DEVICE (see $LOG for details)" 0 0
         printk on
@@ -1817,20 +1795,20 @@ parted_gpt() {
     if [ "$GUID_DETECTED" = "" ] ; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to create a GUID (gpt) partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
-        parted -s $DISC mklabel GPT >$LOG
+        dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
+        parted -a optimal -s $DISC mklabel GPT >$LOG
     fi
     if [ "$BIOS_GRUB" = "" ]; then
-        DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 10MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+        DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
     fi
     if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
         # assume new partitiontable,if no GUID was already there,
         # no user interaction needed for bios_grub partition, jippie
         GUID_PART_SIZE="2"
-        parted -s $DISC mkpart 1 ext2 0 $GUID_PART_SIZE >$LOG
-        parted -s $DISC set 1 bios_grub on >$LOG
+        parted -a optimal -s $DISC mkpart 1 1 $GUID_PART_SIZE >$LOG
+        parted -a optimal -s $DISC set 1 bios_grub on >$LOG
     else
-        [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 10MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+10>\nset <partitionnumber> bios_grub on" 0 0
+        [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
     fi
     DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
     clear
@@ -1878,12 +1856,14 @@ partition() {
                 if [ "$MSDOS_DETECTED" = "" ] ; then
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on $DISC.\nDo you want to create a MS-DOS partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
-                    dd if=/dev/zero of=$DEVICE bs=512 count=1 >/dev/null 2>&1
+                    dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
                     parted -s $DISC mklabel msdos >$LOG
                 fi
                 # Partition disc
-                DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nNOTE: cfdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
-                cfdisk $DISC
+                DIALOG --msgbox "Now you'll be put into the fdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'h' to get help text\n- 'p' to show  partition table\n- 'n' for new partition\n- 'd' for deleting a partition\n- 'q' to leave fdisk\n\nNOTE: fdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+                clear
+                fdisk -l $DISC
+                fdisk $DISC
             fi
         fi
     done
@@ -2457,8 +2437,7 @@ _mkfs() {
                 ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ext3)     mke2fs ${_fsoptions} -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
                 ext4)     mke2fs ${_fsoptions} -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? 
-                          echo ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >>/tmp/test.txt;;
+                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
