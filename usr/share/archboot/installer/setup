@@ -3148,6 +3148,10 @@ common_syslinux () {
     # generate config file
     TEMPDIR=/tmp
     MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
+    GPTMBR=$DESTDIR/usr/lib/syslinux/gptmbr.bin
+    # check if GPT/GUID is used
+    GUID_DETECTED=
+    [ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
     [ -e ${TEMPDIR}/${SYSLINUX_CONF} ] && rm ${TEMPDIR}/${SYSLINUX_CONF}
     cat << EOF > ${TEMPDIR}/${SYSLINUX_CONF}
 DEFAULT vesamenu.c32
@@ -3211,11 +3215,13 @@ EOF
     DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
     cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_CONF}
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
-    cat ${MBR} > ${ROOTDEV}
-    if [ -e ${DESTDIR}/boot/ldlinux.sys ]; then 
-        rm ${DESTDIR}/boot/ldlinux.sys
+    if [ "$GUID_DETECTED" = "" ]; then
+        cat ${MBR} > ${ROOTDEV}
+    else
+        cat ${GPTMBR} > ${ROOTDEV}
     fi
 }
+
 # finish_syslinux
 finish_syslinux () {
     if [ $? -gt 0 ]; then
@@ -3225,6 +3231,25 @@ finish_syslinux () {
     fi
     [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
     chroot_umount
+    # make partition with /boot active!
+    if [ "$GUID_DETECTED" = "" ]; then
+        fdisk $ROOTDEV > $LOG << EOF
+a
+$(echo $bootdev | sed -e 's#.*[a-z]##g')
+w
+EOF
+    else
+        ### TODO change 61 to 2 with next gdisk release, it's a known bug in 0.6.9!
+        gdisk $ROOTDEV > $LOG << EOF
+x
+a
+$(echo $bootdev | sed -e 's#.*[a-z]##g')
+61
+64
+w
+y
+EOF
+    fi
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
 
@@ -3235,6 +3260,7 @@ doextlinux () {
     SYSLINUX=EXTLINUX
     SYSLINUX_PROGRAM=extlinux
     SYSLINUX_CONF=extlinux.conf
+    SYSLINUX_OPTS=""
     prepare_syslinux
     check_bootpart
     abort_nilfs_bootpart || return 1
@@ -3246,7 +3272,7 @@ doextlinux () {
     fi
     # extlinux cannot boot from any raid partition, encrypted and dmraid device
     if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
-        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
+        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid partition, encrypted or dmraid device." 0 0
         return 1
     fi
     # check if raid1 device is used, else fail.
@@ -3254,6 +3280,8 @@ doextlinux () {
         if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
             DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from none raid1 devices." 0 0
             return 1
+        else
+            SYSLINUX_OPTS="--raid"
         fi
     fi
     # extlinux cannot boot from btrfs raid
@@ -3267,10 +3295,10 @@ doextlinux () {
     if [ $BTRFS_SUBVOLUME_COUNT -ge 3 ]; then
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from btrfs subvolume." 0 0
         return 1
-    fi  
-    common_syslinux || return 1
+    fi
+    common_syslinux
     chroot_mount
-    chroot $DESTDIR $SYSLINUX_PROGRAM --install /boot >$LOG 2>&1
+    chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot >$LOG 2>&1
     finish_syslinux
 }
 
