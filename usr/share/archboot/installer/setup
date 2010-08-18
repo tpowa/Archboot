@@ -765,19 +765,19 @@ set_guid () {
 #   /dev/sdb: 64000 MB
 _getavaildisks()
 {
-    ### TODO: probably not valid for 4k drives!
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
+                ### TODO: probably not valid for 4k drives!
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # special block devices
             elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
             elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
             elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
             else
-                echo -n "$i : "; echo $(($(expr 512 '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
+                echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
             fi
     done
 }
@@ -788,22 +788,22 @@ _getavaildisks()
 #   /dev/sdb2: 640 MB
 _getavailpartitions()
 {
-    ### TODO: probably not valid for 4k drives 
     for i in $(findpartitions); do
         # mmc and raid partitions
         if [ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]; then
-            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         # special block devices
         elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/rd\!$(basename $i)/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/rd\!$(basename $i)/size))/1000000)) MB; echo "\n"
         elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/cciss\!$(basename $i)/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/cciss\!$(basename $i)/size))/1000000)) MB; echo "\n"
         elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/ida\!$(basename $i)/size))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/ida\!$(basename $i)/size))/1000000)) MB; echo "\n"
         # raid device
         elif [ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]; then
-            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
+        ### TODO: probably not valid for 4k drives 
         elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
             # crypt device
             if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
@@ -816,7 +816,7 @@ _getavailpartitions()
                 echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
             fi
         else
-            echo -n "$i: "; echo $(($(expr 512 '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
+            echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
     done
 }
@@ -1611,7 +1611,7 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    DISC_SIZE=$(echo $(($(expr 512 '*' $(cat $block/$(basename $DISC)/size))/1000000)))
+    DISC_SIZE=$(echo $(($(expr $(cat $block/$(basename $DISC)/queue/logical_block_size) '*' $(cat $block/$(basename $DISC)/size))/1000000)))
     while [ "$DEFAULTFS" = "" ]; do
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
@@ -2166,6 +2166,19 @@ btrfs_subvolume() {
 
 select_filesystem() {
     FILESYSTEM_FINISH=""
+    # btrfs is not well supported by LTS .32 kernel
+    # don't allow vfat as / filesystem it will not work!
+    FSOPTS=""
+    [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
+    [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
+    [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
+    [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+    [ "$(which mkfs.nilfs2 2>/dev/null)" ] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
+    [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
+    [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
+    [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
+    [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
+    [ "$(which mkfs.vfat 2>/dev/null)" -a "$DO_ROOT" = "DONE" ] && FSOPTS="$FSOPTS vfat VFAT"
     DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
     FSTYPE=$(cat $ANSWER)
 }
@@ -2232,18 +2245,6 @@ mountpoints() {
         : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
-        # btrfs is not well supported by LTS .32 kernel
-        FSOPTS=""
-        [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
-        [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
-        [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
-        [ "$(which mkfs.nilfs2 2>/dev/null)" ] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
-        [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
-        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
-        [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
-        [ "$(which mkfs.vfat 2>/dev/null)" ] && FSOPTS="$FSOPTS vfat VFAT"
         #
         # Select mountpoints
         #
