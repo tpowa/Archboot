@@ -731,11 +731,11 @@ geteditor() {
     if ! [ "$EDITOR" ]; then
         if ! [ "$(which vi)" ]; then
             DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
-                "1" "nano (easier)" 2>$ANSWER
+                "1" "nano (easier)" 2>$ANSWER || return 1
         else
             DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
                 "1" "nano (easier)" \
-                "2" "vi" 2>$ANSWER
+                "2" "vi" 2>$ANSWER || return 1
         fi
         case $(cat $ANSWER) in
             "1") EDITOR="nano" ;;
