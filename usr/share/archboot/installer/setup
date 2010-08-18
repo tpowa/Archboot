@@ -765,6 +765,7 @@ set_guid () {
 #   /dev/sdb: 64000 MB
 _getavaildisks()
 {
+    ### TODO: probably not valid for 4k drives!
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
@@ -787,6 +788,7 @@ _getavaildisks()
 #   /dev/sdb2: 640 MB
 _getavailpartitions()
 {
+    ### TODO: probably not valid for 4k drives 
     for i in $(findpartitions); do
         # mmc and raid partitions
         if [ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]; then
@@ -3136,7 +3138,6 @@ prepare_syslinux () {
 
 # common syslinux funtion
 common_syslinux () {
-    DIALOG --msgbox "Attention:\nIn order to get a booting system, you need the boot flag on the partition syslinux will boot the kernel from!" 0 0
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
@@ -3231,13 +3232,10 @@ finish_syslinux () {
     fi
     [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
     chroot_umount
+    
     # make partition with /boot active!
     if [ "$GUID_DETECTED" = "" ]; then
-        fdisk $ROOTDEV > $LOG << EOF
-a
-$(echo $bootdev | sed -e 's#.*[a-z]##g')
-w
-EOF
+        parted -s $ROOTDEV set $(echo $bootdev | sed -e 's#.*[a-z]##g') boot on >$LOG
     else
         ### TODO change 61 to 2 with next gdisk release, it's a known bug in 0.6.9!
         gdisk $ROOTDEV > $LOG << EOF
