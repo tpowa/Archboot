@@ -2167,7 +2167,8 @@ btrfs_subvolume() {
 select_filesystem() {
     FILESYSTEM_FINISH=""
     # btrfs is not well supported by LTS .32 kernel
-    # don't allow vfat as / filesystem it will not work!
+    # don't allow vfat as / filesystem, it will not work!
+    # don't allow ntfs as / filesystem, this is stupid!
     FSOPTS=""
     [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
     [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
@@ -2177,7 +2178,7 @@ select_filesystem() {
     [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
     [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
     [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
-    [ "$(which mkfs.ntfs 2>/dev/null)" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
+    [ "$(which mkfs.ntfs 2>/dev/null)" -a "$DO_ROOT" = "DONE" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
     [ "$(which mkfs.vfat 2>/dev/null)" -a "$DO_ROOT" = "DONE" ] && FSOPTS="$FSOPTS vfat VFAT"
     DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
     FSTYPE=$(cat $ANSWER)
