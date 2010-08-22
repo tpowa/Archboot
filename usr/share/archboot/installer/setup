@@ -477,7 +477,8 @@ dmraid_partitions() {
     if [ -d /dev/mapper ] ; then
         for fakeraid in $(dmraid -s -c); do
             if [ "$(echo $fakeraid | grep '_')" ]; then
-                for devpath in $(ls /dev/mapper/$fakeraid*); do
+                for k in $(ls /dev/mapper/$fakeraid*); do
+                    devpath=$(basename $k)
                     if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
                         echo "/dev/mapper/$devpath"
                         [ "$1" ] && echo $1
