@@ -2456,6 +2456,8 @@ _mkfs() {
         sleep 2
         # create our mount directory
         mkdir -p ${_dest}${_mountpoint}
+        # change permission to 755, to avoid btrfs issues
+        chown 755 ${_dest}${_mountpoint}
         # prepare btrfs mount options
         _btrfsmountoptions=""
         [ -n "${_btrfssubvolume}" ] && _btrfsmountoptions="subvol=${_btrfssubvolume}"
