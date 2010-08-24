@@ -763,8 +763,7 @@ _getavaildisks()
 {
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
-                ### TODO: probably not valid for 4k drives!
-                echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+                echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # special block devices
             elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
@@ -799,12 +798,12 @@ _getavailpartitions()
         elif [ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]; then
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
-        ### TODO: probably not valid for 4k drives 
         elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
             # crypt device
             if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
-                echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
             # dmraid device
+            ### TODO: probably not valid for 4k drives 
             elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
                 [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
@@ -1271,7 +1270,7 @@ findpv()
                     [ "$1" ] && echo $1
                 fi
         fi
-    done
+    do
 }
 
 getavailablepv()
