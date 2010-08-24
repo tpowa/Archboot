@@ -3252,12 +3252,11 @@ finish_syslinux () {
     if [ "$GUID_DETECTED" = "" ]; then
         parted -s $ROOTDEV set $(echo $bootdev | sed -e 's#.*[a-z]##g') boot on >$LOG
     else
-        ### TODO change 61 to 2 with next gdisk release, it's a known bug in 0.6.9!
         gdisk $ROOTDEV > $LOG << EOF
 x
 a
 $(echo $bootdev | sed -e 's#.*[a-z]##g')
-61
+2
 64
 w
 y
