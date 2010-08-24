@@ -2156,6 +2156,8 @@ btrfs_subvolume() {
             # use device if no subvolume is present
             choose_btrfs_subvolume || return 1
         fi
+        btrfs_compress
+        btrfs_ssd
     fi
     FILESYSTEM_FINISH="yes"
 }
@@ -2229,11 +2231,6 @@ create_filesystem() {
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
-    else
-        if [ "$FSTYPE" = "btrfs" ]; then
-            btrfs_compress
-            btrfs_ssd
-        fi
     fi
     FILESYSTEM_FINISH="yes"
 }
@@ -2286,11 +2283,11 @@ mountpoints() {
             if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else                   
-                    if [ "$FSTYPE" = "btrfs" ]; then
-                        btrfs_compress
-                        btrfs_ssd
-                    fi
                 btrfs_subvolume
+                if [ "$FSTYPE" = "btrfs" ]; then
+                    btrfs_compress
+                    btrfs_ssd
+                fi
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
@@ -2318,11 +2315,11 @@ mountpoints() {
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
+                        btrfs_subvolume
                     if [ "$FSTYPE" = "btrfs" ]; then
                         btrfs_compress
                         btrfs_ssd
                     fi
-                        btrfs_subvolume
                     fi
                     check_btrfs_boot_subvolume
                 else
