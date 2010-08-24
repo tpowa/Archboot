@@ -2063,7 +2063,7 @@ prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME="NONE"
     if [ "$SKIP_ASK_SUBVOLUME" = "no" ]; then
-        DIALOG --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
+        DIALOG --defaultno --yesno "Would you like to create a subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     else
         DOSUBVOLUME="yes"
     fi
