@@ -462,7 +462,7 @@ dm_devices() {
     check_dm_devices
     if [ -d /dev/mapper ] ; then
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            if ! [ "$(dmraid -s -c | grep ^$devpath)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
+            if ! [ "$(dmraid -s -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
                 echo "/dev/mapper/$devpath"
                 [ "$1" ] && echo $1
             fi
