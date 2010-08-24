@@ -2292,10 +2292,6 @@ mountpoints() {
                 select_filesystem && create_filesystem && btrfs_subvolume
             else                   
                 btrfs_subvolume
-                if [ "$FSTYPE" = "btrfs" ]; then
-                    btrfs_compress
-                    btrfs_ssd
-                fi
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
         done
@@ -2324,10 +2320,6 @@ mountpoints() {
                     else
                         enter_mountpoint
                         btrfs_subvolume
-                    if [ "$FSTYPE" = "btrfs" ]; then
-                        btrfs_compress
-                        btrfs_ssd
-                    fi
                     fi
                     check_btrfs_boot_subvolume
                 else
