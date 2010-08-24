@@ -2203,10 +2203,6 @@ check_mkfs_values() {
     [ "$DOSUBVOLUME" = "" ] && DOSUBVOLUME="no"
     [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ] && LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
     [ "$LABEL_NAME" = "" ] && LABEL_NAME="NONE"
-    if [ "$FSTYPE" = "btrfs" ]; then
-        btrfs_compress
-        btrfs_ssd
-    fi
 }
 
 create_filesystem() {
@@ -2228,9 +2224,16 @@ create_filesystem() {
         done
         if [ "$FSTYPE" = "btrfs" ]; then
             prepare_btrfs || return 1
+            btrfs_compress
+            btrfs_ssd
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>$ANSWER || return 1
         FS_OPTIONS=$(cat $ANSWER)
+    else
+        if [ "$FSTYPE" = "btrfs" ]; then
+            btrfs_compress
+            btrfs_ssd
+        fi
     fi
     FILESYSTEM_FINISH="yes"
 }
@@ -2282,7 +2285,11 @@ mountpoints() {
             check_btrfs_filesystem_creation
             if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
-            else
+            else                   
+                    if [ "$FSTYPE" = "btrfs" ]; then
+                        btrfs_compress
+                        btrfs_ssd
+                    fi
                 btrfs_subvolume
             fi
             [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
@@ -2311,6 +2318,10 @@ mountpoints() {
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
+                    if [ "$FSTYPE" = "btrfs" ]; then
+                        btrfs_compress
+                        btrfs_ssd
+                    fi
                         btrfs_subvolume
                     fi
                     check_btrfs_boot_subvolume
