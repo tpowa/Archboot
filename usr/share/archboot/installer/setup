@@ -1951,13 +1951,21 @@ subvolumes_in_use() {
 # ask for btrfs compress option
 btrfs_compress() {
     BTRFS_COMPRESS="NONE"
-    DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
+    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+        DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
+    else
+        DIALOG --defaultno --yesno "Would you like to compress the data on $PART subvolume=$BTRFS_SUBVOLUME?" 0 0 && BTRFS_COMPRESS="compress"
+    fi
 }
 
 # ask for btrfs ssd option
 btrfs_ssd() {
     BTRFS_SSD="NONE"
-    DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
+    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+        DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
+    else
+        DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART subvolume=$BTRFS_SUBVOLUME?" 0 0 && BTRFS_SSD="ssd"
+    fi
 }
 
 # values that are only needed for btrfs creation
