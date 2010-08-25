@@ -78,7 +78,7 @@ ALLINONE=$(mktemp -d /tmp/allinone.XXX)
 
 # create directories
 mkdir ${ALLINONE}/arch
-mkdir ${ALLINONE}/isolinux
+mkdir ${ALLINONE}/syslinux
 
 # extract tarballs
 tar xvf core-i686.tar -C ${CORE} || exit 1
@@ -105,35 +105,35 @@ if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
 fi
 
 # place kernels and memtest
-mv ${CORE}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/
-mv ${CORE64}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64
-mv ${CORE_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vmlts
-mv ${CORE64_LTS}/tmp/*/isolinux/vmlinuz ${ALLINONE}/isolinux/vm64lts
-mv ${CORE}/tmp/*/isolinux/memtest ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/
+mv ${CORE64}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vm64
+mv ${CORE_LTS}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vmlts
+mv ${CORE64_LTS}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vm64lts
+mv ${CORE}/tmp/*/syslinux/memtest ${ALLINONE}/syslinux/
 
 # place initrd files
-mv ${CORE}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd.img
-mv ${CORE_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrdlts.img
-mv ${CORE64}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64.img
-mv ${CORE64_LTS}/tmp/*/isolinux/initrd.img ${ALLINONE}/isolinux/initrd64lts.img
+mv ${CORE}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd.img
+mv ${CORE_LTS}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrdlts.img
+mv ${CORE64}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd64.img
+mv ${CORE64_LTS}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd64lts.img
 
 # place config files
-mv ${CORE}/tmp/*/isolinux/isolinux.cfg ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/boot.msg ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/options.msg ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/syslinux/syslinux.cfg ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/boot.msg ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/options.msg ${ALLINONE}/syslinux/
 # place syslinux files
-mv ${CORE}/tmp/*/isolinux/isolinux.bin ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/*.c32 ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/pci.ids ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/modules.pcimap ${ALLINONE}/isolinux/
-mv ${CORE}/tmp/*/isolinux/splash.png ${ALLINONE}/isolinux/
+mv ${CORE}/tmp/*/syslinux/isolinux.bin ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/*.c32 ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/pci.ids ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/modules.pcimap ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/syslinux/splash.png ${ALLINONE}/syslinux/
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/isolinux/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/syslinux/boot.msg
 
 # generate iso file
 echo "Generating ALLINONE ISO ..."
-mkisofs -RlDJLV "Arch Linux ALLINONE" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
+mkisofs -RlDJLV "Arch Linux ALLINONE" -b syslinux/isolinux.bin -c syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
 
 # generate hybrid file
 echo "Generating ALLINONE hybrid ..."
@@ -143,10 +143,9 @@ isohybrid ${IMAGENAME}-hybrid.iso
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."
 rm ${ALLINONE}/isolinux/isolinux.bin
-mv ${ALLINONE}/isolinux/isolinux.cfg ${ALLINONE}/isolinux/syslinux.cfg
-mv ${ALLINONE}/isolinux/* ${ALLINONE}/
-rm -r ${ALLINONE}/isolinux
-mv ${CORE64}/tmp/*/isolinux/boot.msg ${ALLINONE}/
+mv ${ALLINONE}/syslinux/* ${ALLINONE}/
+rm -r ${ALLINONE}/syslinux
+mv ${CORE64}/tmp/*/syslinux/boot.msg ${ALLINONE}/
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot.msg
 

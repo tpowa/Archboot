@@ -19,8 +19,8 @@ KERNEL="/boot/vmlinuz26-lts"
 APPENDBOOTMESSAGE="/usr/share/archboot/bootloader/messages/allinone"
 APPENDOPTIONSBOOTMESSAGE="/usr/share/archboot/bootloader/messages/append-options"
 
-# isolinux.cfg files to use
-ISOLINUXCFG="/usr/share/archboot/bootloader/allinone.cfg"
+# syslinux.cfg files to use
+SYSLINUXCFG="/usr/share/archboot/bootloader/allinone.cfg"
 
 # Background for menu
 BACKGROUND=/usr/share/archboot/bootloader/background/splash.png

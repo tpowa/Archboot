@@ -43,7 +43,7 @@ fi
 [ -n "${APPENDOPTIONSBOOTMESSAGE}" ] && export APPENDOPTIONSBOOTMESSAGE
 
 export RUNPROGRAM="${APPNAME}"
-export BOOTDIRNAME="isolinux"
+export BOOTDIRNAME="syslinux"
 export USEKERNEL=${VERSION}
 
 [ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /tmp/bootmessage.XXXX)
@@ -61,14 +61,14 @@ install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
 install -m644 $BACKGROUND ${TEMPDIR}/${BOOTDIRNAME}/splash.png
 
 # Use config file
-echo ":: Creating isolinux.cfg ..."
-if [ "${ISOLINUXCFG}" = "" ]; then
-	echo "No isolinux.cfg file specified, aborting ..."
+echo ":: Creating syslinux.cfg ..."
+if [ "${SYSLINUXCFG}" = "" ]; then
+	echo "No syslinux.cfg file specified, aborting ..."
 	exit 1
 else
 	sed "s|@@PROMPT@@|${PROMPT}|g;s|@@TIMEOUT@@|${TIMEOUT}|g;s|@@KERNEL_BOOT_OPTIONS@@|${KERNEL_BOOT_OPTIONS}|g" \
-		${ISOLINUXCFG} > ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg
-	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/isolinux.cfg ] && echo "No isolinux.cfg found" && exit 1
+		${SYSLINUXCFG} > ${TEMPDIR}/${BOOTDIRNAME}/syslinux.cfg
+	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/syslinux.cfg ] && echo "No syslinux.cfg found" && exit 1
 fi
 # generate initramdisk
 echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} KERNEL=${VERSION} ..." 
