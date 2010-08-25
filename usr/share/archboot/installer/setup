@@ -814,7 +814,7 @@ _getavailpartitions()
                 [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
             else
-                echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
+                echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             fi
         else
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
