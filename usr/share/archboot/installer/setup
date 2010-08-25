@@ -1291,7 +1291,7 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [ "$(vgs -o vg_free --noheading --units M $dev | grep " M$")" ]; then
+        if ! [ "$(vgs -o vg_free --noheading --units M $dev | grep " 0M$")" ]; then
             echo "$dev"
             [ "$1" ] && echo $1
         fi
@@ -1301,7 +1301,7 @@ findvg()
 getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units M); do
-        if ! [ "$(echo $i | grep " M$")" ]; then
+        if ! [ "$(echo $i | grep " 0M$")" ]; then
             echo $i | sed -e 's#$#\\n#'
         fi
     done
