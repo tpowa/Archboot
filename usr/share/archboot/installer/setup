@@ -3241,7 +3241,7 @@ finish_syslinux () {
         DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
-    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot/syslinux
+    [ -f "/src/boot/syslinux/splash.png" ] && cp /src/boot/syslinux/splash.png $DESTDIR/boot/$SYSLINUX_DIR
     chroot_umount
     
     # make partition with /boot active!
