@@ -3307,7 +3307,6 @@ doextlinux () {
     fi
     common_syslinux
     chroot_mount
-    ### TODO: add possible raid option
     chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot >$LOG 2>&1
     finish_syslinux
 }
