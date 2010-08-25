@@ -3168,7 +3168,7 @@ common_syslinux () {
 DEFAULT vesamenu.c32
 PROMPT 0
 MENU TITLE Arch Linux
-MENU BACKGROUND $subdir/splash.png
+MENU BACKGROUND $subdir/${SYSLINUX_DIR}/splash.png
 TIMEOUT 300
 
 MENU WIDTH 78
@@ -3224,8 +3224,9 @@ EOF
     $EDITOR ${TEMPDIR}/${SYSLINUX_CONF}
     # install syslinux
     DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
-    cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_CONF}
-    cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/
+    ! [ -d ${DESTDIR}/boot/${SYSLINUX_DIR} ] && mkdir -p ${DESTDIR}/boot/${SYSLINUX_DIR}
+    cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}
+    cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/${SYSLINUX_DIR}
     if [ "$GUID_DETECTED" = "" ]; then
         cat ${MBR} > ${ROOTDEV}
     else
@@ -3240,7 +3241,7 @@ finish_syslinux () {
         DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
-    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot
+    [ -f "/src/isolinux/splash.png" ] && cp /src/isolinux/splash.png $DESTDIR/boot/syslinux
     chroot_umount
     
     # make partition with /boot active!
@@ -3266,6 +3267,7 @@ doextlinux () {
     SYSLINUX_PACKAGES="syslinux"
     SYSLINUX=EXTLINUX
     SYSLINUX_PROGRAM=extlinux
+    SYSLINUX_DIR=extlinux
     SYSLINUX_CONF=extlinux.conf
     SYSLINUX_OPTS=""
     prepare_syslinux
@@ -3305,6 +3307,7 @@ doextlinux () {
     fi
     common_syslinux
     chroot_mount
+    ### TODO: add possible raid option
     chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot >$LOG 2>&1
     finish_syslinux
 }
@@ -3315,6 +3318,7 @@ dosyslinux() {
     subdir=""
     SYSLINUX_PACKAGES="syslinux mtools"
     SYSLINUX=SYSLINUX
+    SYSLINUX_DIR=syslinux
     SYSLINUX_CONF=syslinux.cfg
     SYSLINUX_PROGRAM=syslinux
     prepare_syslinux

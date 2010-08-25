@@ -105,35 +105,35 @@ if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
 fi
 
 # place kernels and memtest
-mv ${CORE}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/
-mv ${CORE64}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vm64
-mv ${CORE_LTS}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vmlts
-mv ${CORE64_LTS}/tmp/*/syslinux/vmlinuz ${ALLINONE}/syslinux/vm64lts
-mv ${CORE}/tmp/*/syslinux/memtest ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/
+mv ${CORE64}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vm64
+mv ${CORE_LTS}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vmlts
+mv ${CORE64_LTS}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vm64lts
+mv ${CORE}/tmp/*/boot/syslinux/memtest ${ALLINONE}/boot/syslinux/
 
 # place initrd files
-mv ${CORE}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd.img
-mv ${CORE_LTS}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrdlts.img
-mv ${CORE64}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd64.img
-mv ${CORE64_LTS}/tmp/*/syslinux/initrd.img ${ALLINONE}/syslinux/initrd64lts.img
+mv ${CORE}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd.img
+mv ${CORE_LTS}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrdlts.img
+mv ${CORE64}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd64.img
+mv ${CORE64_LTS}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd64lts.img
 
 # place config files
-mv ${CORE}/tmp/*/syslinux/syslinux.cfg ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/boot.msg ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/options.msg ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/syslinux.cfg ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/boot.msg ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/options.msg ${ALLINONE}/boot/syslinux/
 # place syslinux files
-mv ${CORE}/tmp/*/syslinux/isolinux.bin ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/*.c32 ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/pci.ids ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/modules.pcimap ${ALLINONE}/syslinux/
-mv ${CORE}/tmp/*/syslinux/splash.png ${ALLINONE}/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/isolinux.bin ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/*.c32 ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/pci.ids ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/modules.pcimap ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/splash.png ${ALLINONE}/boot/syslinux/
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/syslinux/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
 
 # generate iso file
 echo "Generating ALLINONE ISO ..."
-mkisofs -RlDJLV "Arch Linux ALLINONE" -b syslinux/isolinux.bin -c syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
+mkisofs -RlDJLV "Arch Linux ALLINONE" -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
 
 # generate hybrid file
 echo "Generating ALLINONE hybrid ..."
@@ -142,12 +142,9 @@ isohybrid ${IMAGENAME}-hybrid.iso
 
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."
-rm ${ALLINONE}/isolinux/isolinux.bin
-mv ${ALLINONE}/syslinux/* ${ALLINONE}/
-rm -r ${ALLINONE}/syslinux
-mv ${CORE64}/tmp/*/syslinux/boot.msg ${ALLINONE}/
+rm ${ALLINONE}/boot/syslinux/isolinux.bin
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
 
 /usr/bin/archboot-usbimage-helper.sh ${ALLINONE} ${IMAGENAME}.img > /dev/null 2>&1
 

@@ -43,7 +43,7 @@ fi
 [ -n "${APPENDOPTIONSBOOTMESSAGE}" ] && export APPENDOPTIONSBOOTMESSAGE
 
 export RUNPROGRAM="${APPNAME}"
-export BOOTDIRNAME="syslinux"
+export BOOTDIRNAME="boot/syslinux"
 export USEKERNEL=${VERSION}
 
 [ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /tmp/bootmessage.XXXX)
