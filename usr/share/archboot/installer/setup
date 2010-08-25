@@ -769,7 +769,7 @@ _getavaildisks()
 {
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
-                echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+                echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(cat $block/$(basename $(readlink $i))/size))/1000000)) MB; echo "\n"
             # special block devices
             elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
