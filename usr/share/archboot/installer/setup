@@ -805,17 +805,7 @@ _getavailpartitions()
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
         elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
-            # crypt device
-            #if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(cat $block/$(basename $(readlink $i))/size))/1000000)) MB; echo "\n"
-            # dmraid device
-            ### TODO: probably not valid for 4k drives 
-            #elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
-             #   [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
-            # mapper device
-            #else
-             #   echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
-            #fi
         else
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
