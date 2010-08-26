@@ -463,11 +463,11 @@ dm_devices() {
     for i in $(dmraid -s -c); do
         EXCLUDE_DMRAID=""
         if [ "$(echo $i | grep '_')" ]; then
-             EXCLUDE_DMRAID="-v $EXCLUDE_DMRAID "
+             EXCLUDE_DMRAID="-e $EXCLUDE_DMRAID "
         fi
     done
     if [ -d /dev/mapper ] ; then
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control $EXCLUDE_DMRAID); do
+        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v -e control $EXCLUDE_DMRAID); do
             if ! [ "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
                 echo "/dev/mapper/$devpath"
                 [ "$1" ] && echo $1

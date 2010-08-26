@@ -66,7 +66,7 @@ fi
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.32-lts"
-[ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R6"
+[ "${RELEASENAME}" = "" ] && RELEASENAME="2k10-R7"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 # generate temp directories
@@ -105,17 +105,17 @@ if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
 fi
 
 # place kernels and memtest
-mv ${CORE}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/
-mv ${CORE64}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vm64
-mv ${CORE_LTS}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vmlts
-mv ${CORE64_LTS}/tmp/*/boot/syslinux/vmlinuz ${ALLINONE}/boot/syslinux/vm64lts
-mv ${CORE}/tmp/*/boot/syslinux/memtest ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/vmlinuz ${ALLINONE}/boot
+mv ${CORE64}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vm64
+mv ${CORE_LTS}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vmlts
+mv ${CORE64_LTS}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vm64lts
+mv ${CORE}/tmp/*/boot/memtest ${ALLINONE}/boot/
 
 # place initrd files
-mv ${CORE}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd.img
-mv ${CORE_LTS}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrdlts.img
-mv ${CORE64}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd64.img
-mv ${CORE64_LTS}/tmp/*/boot/syslinux/initrd.img ${ALLINONE}/boot/syslinux/initrd64lts.img
+mv ${CORE}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd.img
+mv ${CORE_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrdlts.img
+mv ${CORE64}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64.img
+mv ${CORE64_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64lts.img
 
 # place config files
 mv ${CORE}/tmp/*/boot/syslinux/syslinux.cfg ${ALLINONE}/boot/syslinux/
