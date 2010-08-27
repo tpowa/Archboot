@@ -769,7 +769,9 @@ _getavaildisks()
 {
     for i in $(finddisks); do
             if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
-                echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(cat $block/$(basename $(readlink $i))/size))/1000000)) MB; echo "\n"
+                # device mapper is always 512 aligned!
+                # only dmraid device can be here
+                echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # special block devices
             elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
@@ -805,7 +807,17 @@ _getavailpartitions()
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
         elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
-            echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $(readlink $i))/queue/logical_block_size) '*' $(cat $block/$(basename $(readlink $i))/size))/1000000)) MB; echo "\n"
+            # mapper devices are always 512 aligned
+            # crypt device
+            if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
+                echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
+            # dmraid device
+            elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
+                [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+            # mapper device
+            else
+                echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
+            fi
         else
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#[0-9].*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         fi
@@ -1271,7 +1283,7 @@ findpv()
 
 getavailablepv()
 {
-    for i in "$(pvs -o pv_name,pv_size --noheading)"; do
+    for i in "$(pvs -o pv_name,pv_size --noheading --units m)"; do
             if [ "$(echo $i | grep /dev/dm-)" ]; then
                 for k in $(ls /dev/mapper | grep -v control); do
                     if [ -h /dev/mapper/$k ]; then
@@ -1291,7 +1303,7 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [ "$(vgs -o vg_free --noheading --units M $dev | grep " 0M$")" ]; then
+        if ! [ "$(vgs -o vg_free --noheading --units m $dev | grep " 0m$")" ]; then
             echo "$dev"
             [ "$1" ] && echo $1
         fi
@@ -1300,8 +1312,8 @@ findvg()
 
 getavailablevg()
 {
-    for i in $(vgs -o vg_name,vg_free --noheading --units M); do
-        if ! [ "$(echo $i | grep " 0M$")" ]; then
+    for i in $(vgs -o vg_name,vg_free --noheading --units m); do
+        if ! [ "$(echo $i | grep " 0m$")" ]; then
             echo $i | sed -e 's#$#\\n#'
         fi
     done
@@ -1388,7 +1400,7 @@ _createlv()
         done
         while [ "$LV_SIZE_SET" = "" ]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units M $LV)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m $LV)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
                 LV_SIZE=$(cat $ANSWER)
                 if [ "$LV_SIZE" = "" ]; then
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
@@ -1396,7 +1408,7 @@ _createlv()
                 if [ "$LV_SIZE" = "0" ]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units M | sed -e 's#M##g')" ]; then
+                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]; then
                         DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         LV_SIZE_SET=1
@@ -1421,7 +1433,7 @@ _createlv()
     if [ "$LV_ALL" = "1" ]; then
         lvcreate $LV_EXTRA -l +100%FREE $LV -n $LVDEVICE >$LOG 2>&1
     else
-        lvcreate $LV_EXTRA -L $LV_SIZE\M $LV -n $LVDEVICE >$LOG 2>&1
+        lvcreate $LV_EXTRA -L $LV_SIZE $LV -n $LVDEVICE >$LOG 2>&1
     fi
     if [ $? -gt 0 ]; then
         DIALOG --msgbox "Error creating Logical Volume $LVDEVICE (see $LOG for details)." 0 0
