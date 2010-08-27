@@ -463,7 +463,7 @@ dm_devices() {
     for i in $(dmraid -s -c); do
         EXCLUDE_DMRAID=""
         if [ "$(echo $i | grep '_')" ]; then
-             EXCLUDE_DMRAID="-e $EXCLUDE_DMRAID "
+             EXCLUDE_DMRAID="$EXCLUDE_DMRAID -e $i "
         fi
     done
     if [ -d /dev/mapper ] ; then
