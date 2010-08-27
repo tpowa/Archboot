@@ -756,7 +756,7 @@ set_device_name_scheme() {
 }
 
 # set GUID (gpt) usage
-set_guid () {
+set_guid() {
     GUIDPARAMETER=""
     DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Extensible Firmware Interface (EFI) standard (Intel's proposed replacement for the PC BIOS), it is also used on some BIOS systems because of the limitations of MBR partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include this capability.\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS MBR gap." 0 0 && GUIDPARAMETER=yes
 }
@@ -868,9 +868,9 @@ _stoplvm()
 {
     DISABLELVM=""
     DETECTED_LVM=""
-    LV_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator -)"
-    LV_GROUPS="$(vgs -o vg_name --noheading)"
-    LV_PHYSICAL="$(pvs -o pv_name --noheading)"
+    LV_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
+    LV_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
+    LV_PHYSICAL="$(pvs -o pv_name --noheading 2>/dev/null)"
     ! [ "$LV_VOLUMES" = "" ] && DETECTED_LVM=1
     ! [ "$LV_GROUPS" = "" ] && DETECTED_LVM=1
     ! [ "$LV_PHYSICAL" = "" ] && DETECTED_LVM=1
@@ -1614,7 +1614,12 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    DISC_SIZE=$(echo $(($(expr $(cat $block/$(basename $DISC)/queue/logical_block_size) '*' $(cat $block/$(basename $DISC)/size))/1000000)))
+    if [ "$(cat $block/$(basename $DISC 2>/dev/null)/size 2>/dev/null)" ]; then
+        DISC_SIZE="$(($(expr $(cat $block/$(basename $DISC)/queue/logical_block_size) '*' $(cat $block/$(basename $DISC)/size))/1000000))"
+    else
+        DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
+        return 1
+    fi
     while [ "$DEFAULTFS" = "" ]; do
         FSOPTS=""
         [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
