@@ -1141,10 +1141,10 @@ _createraid()
         # switch for mbr usage
         set_guid
         if [ "$GUIDPARAMETER" = "" ]; then
-            DIALOG --msgbox "Now you'll be put into the fdisk program where you can partition your raiddevice to your needs." 18 70
+            DIALOG --msgbox "Now you'll be put into the parted program where you can partition your raiddevice to your needs." 18 70
             clear
-            fdisk -l $DISC
-            fdisk $RAIDDEVICE
+            parted $RAIDDEVICE print
+            parted $RAIDDEVICE
         else
             DISC=$RAIDDEVICE
             parted_gpt
@@ -1865,10 +1865,10 @@ partition() {
                     parted -s $DISC mklabel msdos >$LOG
                 fi
                 # Partition disc
-                DIALOG --msgbox "Now you'll be put into the fdisk program where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'h' to get help text\n- 'p' to show  partition table\n- 'n' for new partition\n- 'd' for deleting a partition\n- 'q' to leave fdisk\n\nNOTE: fdisk may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+                DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
                 clear
-                fdisk -l $DISC
-                fdisk $DISC
+                parted $DISC print
+                parted $DISC
             fi
         fi
     done
