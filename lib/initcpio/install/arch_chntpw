@@ -1,0 +1,16 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+install ()
+{
+    MODULES=""
+    BINARIES="chntpw reged cpnt"
+    FILES=""
+    SCRIPT=""
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes chntpw on an arch boot image.
+HELPEOF
+} 
