@@ -3844,7 +3844,7 @@ select_source()
             fi
             CANCEL=""
             DIALOG $DEFAULT --menu "FTP Installation" 10 35 3 \
-            "0" "Setup Network" \
+            "0" "Set up Network" \
             "1" "Choose Mirror" \
             "2" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
 
