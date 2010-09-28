@@ -5,9 +5,9 @@ install ()
     BINARIES=""
     FILES=""
     SCRIPT=""
-    [ ${RUNPROGRAM}  = "mkisolinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/syslinux/memtest"
-    [ ${RUNPROGRAM}  = "archboot-tarball-helper.sh" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/syslinux/memtest"
-    [ ${RUNPROGRAM}  = "mksyslinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/memtest"
+    [ ${RUNPROGRAM}  = "mkisolinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/${BOOTDIRNAME}/memtest"
+    [ ${RUNPROGRAM}  = "archboot-tarball-helper.sh" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/${BOOTDIRNAME}/memtest"
+    [ ${RUNPROGRAM}  = "mksyslinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/${BOOTDIRNAME}/memtest"
     [ ${RUNPROGRAM}  = "mkpxelinux" ] && cp "/boot/memtest86+/memtest.bin" "${INSTALLDIR}/memtest"
 }
 
