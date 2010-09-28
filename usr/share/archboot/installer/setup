@@ -4376,7 +4376,7 @@ mainmenu() {
     dialog $DEFAULT --backtitle "$TITLE" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
     "0" "Set Keyboard And Console Font" \
-    "1" "Set Time and Date" \
+    "1" "Set Time And Date" \
     "2" "Prepare Hard Drive" \
     "3" "Select Source" \
     "4" "Select Packages" \
