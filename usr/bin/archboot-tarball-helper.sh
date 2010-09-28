@@ -75,9 +75,9 @@ echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} KERNEL=${VERSION} ..."
 echo ":: Creating initramdisk ..."
 	mkinitcpio -c ${MKINITCPIO_CONFIG} -k ${VERSION} -g ${TEMPDIR}/${BOOTDIRNAME}/initrd.img
 echo ":: Using ${KERNEL} as image kernel ..."
-	install -m644 ${KERNEL} ${TEMPDIR}/${BOOTDIRNAME}/vmlinuz
-	install -m644 ${BOOTMESSAGE} ${TEMPDIR}/${BOOTDIRNAME}/boot.msg
-	install -m644 ${OPTIONSBOOTMESSAGE} ${TEMPDIR}/${BOOTDIRNAME}/options.msg
+	install -m644 ${KERNEL} ${TEMPDIR}/boot/vmlinuz
+	install -m644 ${BOOTMESSAGE} ${TEMPDIR}/boot/boot.msg
+	install -m644 ${OPTIONSBOOTMESSAGE} ${TEMPDIR}/boot/options.msg
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/boot.msg ] && echo 'ERROR:no boot.msg found, aborting!' && exit 1
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/options.msg ] && echo 'ERROR:no options.msg found, aborting!' && exit 1
 # create image
