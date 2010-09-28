@@ -1694,7 +1694,7 @@ autoprepare() {
     DEVICE=$DISC
     # default filesystem specs (the + is bootable flag)
     #  <mountpoint>:<partsize>:<fstype>[:+]:labelname
-    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_AUTO swap:$SWAP_PART_SIZE:swap::SWAP_AUTO /:$ROOT_PART_SIZE:$FSTYPE::ROOT_AUTO /home:*:$FSTYPE::HOME_AUTO"
+    FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_ARCH swap:$SWAP_PART_SIZE:swap::SWAP_ARCH /:$ROOT_PART_SIZE:$FSTYPE::ROOT_ARCH /home:*:$FSTYPE::HOME_ARCH"
 
     # validate DEVICE
     if [ ! -b "$DEVICE" ]; then
