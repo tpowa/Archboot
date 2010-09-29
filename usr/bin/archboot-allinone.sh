@@ -78,7 +78,7 @@ ALLINONE=$(mktemp -d /tmp/allinone.XXX)
 
 # create directories
 mkdir ${ALLINONE}/arch
-mkdir ${ALLINONE}/syslinux
+mkdir -p ${ALLINONE}/boot/syslinux
 
 # extract tarballs
 tar xvf core-i686.tar -C ${CORE} || exit 1
