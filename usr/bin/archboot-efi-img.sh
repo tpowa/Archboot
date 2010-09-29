@@ -250,10 +250,10 @@ echo
 ## Generate the BIOS+UEFI ISO image using xorriso (community/libisoburn package) in mkisofs emulation mode
 
 ## Exaggerated xorriso command
-xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -disable-deep-relocation -joliet -allow-leading-dots -volid "ARCHBOOT" -eltorito-boot syslinux/isolinux.bin -eltorito-catalog syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -output ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -disable-deep-relocation -joliet -allow-leading-dots -volid "ARCHBOOT" -eltorito-boot boot/syslinux/isolinux.bin -eltorito-catalog boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -output ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 
 ## Usually used xorriso command style
-# xorriso -as mkisofs -R -l -N -D -J -L -V "ARCHBOOT" -b syslinux/isolinux.bin -c syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+# xorriso -as mkisofs -R -l -N -D -J -L -V "ARCHBOOT" -b syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
 
 ## Generate a isohybrid image using syslinux
