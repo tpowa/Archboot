@@ -3265,15 +3265,19 @@ finish_syslinux () {
     if [ "$GUID_DETECTED" = "" ]; then
         parted -s $ROOTDEV set $(echo $bootdev | sed -e 's#.*[a-z]##g') boot on >$LOG
     else
-        gdisk $ROOTDEV > $LOG << EOF
+        PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
+        # change flag to bios legacy booting
+        if ! [ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]; then
+            gdisk  $ROOTDEV > $LOG << EOF
 x
 a
-$(echo $bootdev | sed -e 's#.*[a-z]##g')
+$PARTITION_NUMBER
 2
 64
 w
 y
 EOF
+        fi
     fi
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
@@ -3324,7 +3328,7 @@ doextlinux () {
     fi
     common_syslinux
     chroot_mount
-    chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot >$LOG 2>&1
+    chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot/$SYSLINUX_DIR >$LOG 2>&1
     finish_syslinux
 }
 
