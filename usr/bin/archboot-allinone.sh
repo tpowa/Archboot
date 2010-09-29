@@ -101,6 +101,7 @@ if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
     freshclam
     cp /var/lib/clamav/daily.cvd ${ALLINONE}/clamav/
     cp /var/lib/clamav/main.cvd ${ALLINONE}/clamav/
+    cp /var/lib/clamav/bytecode.cvd ${ALLINONE}/clamav/
     cp /var/lib/clamav/mirrors.dat ${ALLINONE}/clamav/
 fi
 
