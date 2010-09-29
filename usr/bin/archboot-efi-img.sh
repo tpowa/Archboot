@@ -7,7 +7,7 @@ export archboot_ext=${wd}/archboot_ext
 export iso_name="archboot_${archboot_ver}_efi"
 export grub2_name="grub2"
 
-export GRUB2_MODULES="part_gpt part_msdos fat ntfs ntfscomp ext2 iso9660 udf hfsplus fshelp memdisk tar normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop png"
+export GRUB2_MODULES="part_gpt part_msdos bsd fat ntfs ntfscomp ext2 iso9660 udf hfsplus fshelp memdisk tar normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop png"
 
 export MKTEMP_TEMPLATE="/tmp/grub2_efi.XXXXXXXXXX"
 
@@ -183,7 +183,7 @@ then
    set color_highlight=light-cyan/blue
 
    insmod png
-   background_image (\${archboot})/syslinux/splash.png
+   background_image (\${archboot})/boot/syslinux/splash.png
 fi
 
 insmod fat
