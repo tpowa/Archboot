@@ -3262,10 +3262,10 @@ finish_syslinux () {
     chroot_umount
     
     # make partition with /boot active!
+    PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
     if [ "$GUID_DETECTED" = "" ]; then
-        parted -s $ROOTDEV set $(echo $bootdev | sed -e 's#.*[a-z]##g') boot on >$LOG
+        parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
     else
-        PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
         # change flag to bios legacy booting
         if ! [ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]; then
             gdisk  $ROOTDEV > $LOG << EOF
