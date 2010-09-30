@@ -215,10 +215,6 @@ linux (\${archboot})/boot/vm64lts ro \${_kernel_params}
 initrd (\${archboot})/boot/initrd64lts.img
 }
 
-menuentry "Memtest86+" {
-netbsd (\${archboot})/boot/memtest
-}
-
 EOF
 echo
 
