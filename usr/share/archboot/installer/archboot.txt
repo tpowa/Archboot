@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August,15th 2010
+   October,1th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -70,6 +70,7 @@ Introduction
 
    * It provides the long time support kernel as installation option.
    * It runs a modified Arch Linux system in initramfs.
+   * It supports experimental (u)efi booting via grub2 1.99 beta.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
    * Initial module loading and hardware detection is done
