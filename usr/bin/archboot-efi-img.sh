@@ -1,6 +1,6 @@
 #! /bin/bash
 # Script for creating grub2 efi bootable isos
-# Contributed by "Keshav P.R." <skodabenz@rocketmail.com>
+# Contributed by "Keshav P R " <skodabenz at rocketmail dot com>
 
 export archboot_ver="2010.10-1"
 
@@ -26,9 +26,9 @@ fi
 set -x
 
 ## Remove old files and dir
-rm -rf archboot_ext
-rm ${iso_name}_isohybrid.iso
-rm ${iso_name}_usb.img
+rm -rf ${archboot_ext}/
+rm ${wd}/${iso_name}_isohybrid.iso
+rm ${wd}/${iso_name}_usb.img
 echo
 
 ## Create a dir to extract the archboot iso
@@ -48,6 +48,8 @@ then
     mkdir -p ${archboot_ext}/boot/
     cp -r ${archboot_ext}/isolinux ${archboot_ext}/boot/syslinux
     mv ${archboot_ext}/boot/syslinux/isolinux.cfg ${archboot_ext}/boot/syslinux/syslinux.cfg
+    # rm ${archboot_ext}/boot/syslinux/isolinux.cfg
+    # cp ${wd}/syslinux.cfg ${archboot_ext}/boot/syslinux/syslinux.cfg 
     rm -rf ${archboot_ext}/isolinux
     echo
 fi    
@@ -61,7 +63,7 @@ do
 done
 
 if [ -e ${archboot_ext}/boot/syslinux/splash.png ]
-  then
+then
       cp ${archboot_ext}/boot/syslinux/splash.png ${archboot_ext}/boot/splash.png
 fi
 
@@ -255,7 +257,7 @@ then
     ## Remove all i686 pkgs
     rm -rf ${archboot_ext}/core-i686/
     
-    ## Remove all i686 pkgs
+    ## Remove all x86_64 pkgs
     rm -rf ${archboot_ext}/core-x86_64/
     
     ## Remove all other common pkgs
@@ -321,7 +323,8 @@ mkfs.vfat -S 512 -F32 -n "ARCHBOOT" ${FSIMG}
 echo
 
 ## Mount the FAT32 image at the created temp dir
-mount -o loop,rw,users -t vfat ${FSIMG} ${TMPDIR}
+LOOP_DEVICE2=$(losetup --show --find ${FSIMG})
+mount -o rw,users -t vfat ${LOOP_DEVICE2} ${TMPDIR}
 echo
 
 ## Copy the contents of the ISO to the USB image
@@ -329,6 +332,7 @@ cp -r ${IMGROOT}/* ${TMPDIR}
 echo
 
 umount ${TMPDIR}
+losetup --detach ${LOOP_DEVICE2}
 echo
 
 ## Create the final USB image
