@@ -1,6 +1,8 @@
-#! /bin/sh
+#! /bin/bash
+# Script for creating grub2 efi bootable isos
+# Contributed by "Keshav P.R." <skodabenz@rocketmail.com>
 
-export archboot_ver="2010.09-1"
+export archboot_ver="2010.10-1"
 
 export wd=${PWD}
 export archboot_ext=${wd}/archboot_ext
@@ -15,28 +17,53 @@ export RM_UNWANTED="0"
 
 echo
 
+### check for root
+if ! [ $UID -eq 0 ]; then 
+	echo "ERROR: Please run as root user!"
+	exit 1
+fi
+
 set -x
 
 ## Remove old files and dir
 rm -rf archboot_ext
 rm ${iso_name}_isohybrid.iso
 rm ${iso_name}_usb.img
+echo
 
 ## Create a dir to extract the archboot iso
 mkdir -p ${archboot_ext}
-
-cp ${wd}/archlinux-${archboot_ver}-archboot.iso ${archboot_ext}/
-echo
-
-cd ${archboot_ext}
+cd ${archboot_ext}/
 
 ## Extract the archboot iso using bsdtar
-bsdtar xf archlinux-${archboot_ver}-archboot.iso
+bsdtar xf ${wd}/archlinux-${archboot_ver}-archboot.iso
 echo
 
 rm -rf ${archboot_ext}/[BOOT]/
-rm ${archboot_ext}/archlinux-${archboot_ver}-archboot.iso
 echo
+
+## Rename isolinux dir to /boot/syslinux if it exists
+if [ -d ${archboot_ext}/isolinux ] && [ ! -d ${archboot_ext}/boot/syslinux ]
+then
+    mkdir -p ${archboot_ext}/boot/
+    cp -r ${archboot_ext}/isolinux ${archboot_ext}/boot/syslinux
+    mv ${archboot_ext}/boot/syslinux/isolinux.cfg ${archboot_ext}/boot/syslinux/syslinux.cfg
+    rm -rf ${archboot_ext}/isolinux
+    echo
+fi    
+
+for file in vmlinuz initrd.img vm64 initrd64.img vmlts initrdlts.img vm64lts initrd64lts.img memtest
+do
+  if [ -e ${archboot_ext}/boot/syslinux/${file} ]
+  then
+      mv ${archboot_ext}/boot/syslinux/${file} ${archboot_ext}/boot/${file}
+  fi    
+done
+
+if [ -e ${archboot_ext}/boot/syslinux/splash.png ]
+  then
+      cp ${archboot_ext}/boot/syslinux/splash.png ${archboot_ext}/boot/splash.png
+fi
 
 rm -rf ${archboot_ext}/efi/grub2/
 rm -rf ${archboot_ext}/efi/boot/
@@ -62,12 +89,13 @@ echo
 
 
 ## Create a mountpoint for the grub2_efi.bin image if it does not exist
-grub2_efi_mp=`mktemp -d "$MKTEMP_TEMPLATE"`
+grub2_efi_mp=$(mktemp -d "$MKTEMP_TEMPLATE")
 echo
 
 ## Mount the ${archboot_ext}/efi/grub2/grub2_efi.bin image at ${grub2_efi_mp} as loop 
-sudo modprobe loop        
-sudo mount -t vfat -o loop,rw,users ${archboot_ext}/efi/grub2/grub2_efi.bin ${grub2_efi_mp}
+modprobe loop        
+LOOP_DEVICE=$(losetup --show --find ${archboot_ext}/efi/grub2/grub2_efi.bin)        
+mount -o rw,users -t vfat ${LOOP_DEVICE} ${grub2_efi_mp}
 echo
 
 
@@ -78,15 +106,15 @@ cp -r /usr/lib/${grub2_name}/i386-efi ${archboot_ext}/efi/grub2/i386-efi
 
 cp /etc/grub.d/unifont.pf2 /etc/grub.d/ascii.pf2 ${archboot_ext}/efi/grub2/
 
-# cp -r ${archboot_ext}/efi/grub2/x86_64-efi/locale ${archboot_ext}/efi/grub2/locale
-# rm -rf ${archboot_ext}/efi/grub2/x86_64-efi/locale/
-# rm -rf ${archboot_ext}/efi/grub2/i386-efi/locale/
+cp -r ${archboot_ext}/efi/grub2/x86_64-efi/locale ${archboot_ext}/efi/grub2/locale || true
+rm -rf ${archboot_ext}/efi/grub2/x86_64-efi/locale/ || true
+rm -rf ${archboot_ext}/efi/grub2/i386-efi/locale/ || true
 echo
 
 
 ## Create memdisk for bootx64.efi
-memdisk_64_img=`mktemp "$MKTEMP_TEMPLATE"`
-memdisk_64_dir=`mktemp -d "$MKTEMP_TEMPLATE"`
+memdisk_64_img=$(mktemp "$MKTEMP_TEMPLATE")
+memdisk_64_dir=$(mktemp -d "$MKTEMP_TEMPLATE")
 
 mkdir -p ${memdisk_64_dir}/efi/grub2
 echo
@@ -113,8 +141,8 @@ echo
 
 
 ## Create memdisk for bootia32.efi
-memdisk_32_img=`mktemp "$MKTEMP_TEMPLATE"`
-memdisk_32_dir=`mktemp -d "$MKTEMP_TEMPLATE"`
+memdisk_32_img=$(mktemp "$MKTEMP_TEMPLATE")
+memdisk_32_dir=$(mktemp -d "$MKTEMP_TEMPLATE")
 
 mkdir -p ${memdisk_32_dir}/efi/grub2
 echo
@@ -141,19 +169,21 @@ echo
 
 
 ## Create actual bootx64.efi and bootia32.efi files
-sudo mkdir -p ${grub2_efi_mp}/efi/boot
+mkdir -p ${grub2_efi_mp}/efi/boot
 echo
 
-sudo /bin/${grub2_name}-mkimage --directory=/usr/lib/${grub2_name}/x86_64-efi --memdisk=${memdisk_64_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootx64.efi --format=x86_64-efi ${GRUB2_MODULES}
+/bin/${grub2_name}-mkimage --directory=/usr/lib/${grub2_name}/x86_64-efi --memdisk=${memdisk_64_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootx64.efi --format=x86_64-efi ${GRUB2_MODULES}
 echo
 
-sudo /bin/${grub2_name}-mkimage --directory=/usr/lib/${grub2_name}/i386-efi --memdisk=${memdisk_32_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootia32.efi --format=i386-efi ${GRUB2_MODULES}
+/bin/${grub2_name}-mkimage --directory=/usr/lib/${grub2_name}/i386-efi --memdisk=${memdisk_32_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootia32.efi --format=i386-efi ${GRUB2_MODULES}
 echo
 
-sudo umount ${grub2_efi_mp}
+umount ${grub2_efi_mp}
 rm -rf ${grub2_efi_mp}
 echo
 
+losetup --detach ${LOOP_DEVICE}
+echo
 
 /bin/${grub2_name}-mkimage --directory=/usr/lib/${grub2_name}/x86_64-efi --memdisk=${memdisk_64_img} --prefix='(memdisk)/efi/grub2' --output=${archboot_ext}/efi/boot/bootx64.efi --format=x86_64-efi ${GRUB2_MODULES}
 echo
@@ -183,7 +213,7 @@ then
    set color_highlight=light-cyan/blue
 
    insmod png
-   background_image (\${archboot})/boot/syslinux/splash.png
+   background_image (\${archboot})/boot/splash.png
 fi
 
 insmod fat
@@ -225,15 +255,21 @@ then
     ## Remove all i686 pkgs
     rm -rf ${archboot_ext}/core-i686/
     
+    ## Remove all i686 pkgs
+    rm -rf ${archboot_ext}/core-x86_64/
+    
+    ## Remove all other common pkgs
+    rm -rf ${archboot_ext}/core-any/
+    
     ## Remove all LTS kernels and initramfs
-    rm ${archboot_ext}/syslinux/vmlts
-    rm ${archboot_ext}/syslinux/initrdlts.img
-    rm ${archboot_ext}/syslinux/vm64lts
-    rm ${archboot_ext}/syslinux/initrd64lts.img
+    rm ${archboot_ext}/boot/vmlts
+    rm ${archboot_ext}/boot/initrdlts.img
+    rm ${archboot_ext}/boot/vm64lts
+    rm ${archboot_ext}/boot/initrd64lts.img
     
     ## Remove i686 kernel and initramfs
-    # rm ${archboot_ext}/syslinux/vmlinuz
-    # rm ${archboot_ext}/syslinux/initrd.img
+    rm ${archboot_ext}/boot/vmlinuz
+    rm ${archboot_ext}/boot/initrd.img
     
     ## Remove clamav files
     rm -rf ${archboot_ext}/clamav/
@@ -250,7 +286,7 @@ echo
 xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -disable-deep-relocation -joliet -allow-leading-dots -volid "ARCHBOOT" -eltorito-boot boot/syslinux/isolinux.bin -eltorito-catalog boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -output ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 
 ## Usually used xorriso command style
-# xorriso -as mkisofs -R -l -N -D -J -L -V "ARCHBOOT" -b syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+# xorriso -as mkisofs -R -l -N -D -J -L -V "ARCHBOOT" -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
 
 ## Generate a isohybrid image using syslinux
@@ -285,14 +321,14 @@ mkfs.vfat -S 512 -F32 -n "ARCHBOOT" ${FSIMG}
 echo
 
 ## Mount the FAT32 image at the created temp dir
-sudo mount -o loop,rw,users -t vfat ${FSIMG} ${TMPDIR}
+mount -o loop,rw,users -t vfat ${FSIMG} ${TMPDIR}
 echo
 
 ## Copy the contents of the ISO to the USB image
-sudo cp -r ${IMGROOT}/* ${TMPDIR}
+cp -r ${IMGROOT}/* ${TMPDIR}
 echo
 
-sudo umount ${TMPDIR}
+umount ${TMPDIR}
 echo
 
 ## Create the final USB image
@@ -303,7 +339,7 @@ echo
 syslinux ${DISKIMG}
 echo
 
-sudo rm -rf ${TMPDIR} ${FSIMG}
+rm -rf ${TMPDIR} ${FSIMG}
 echo
 
 set +x
