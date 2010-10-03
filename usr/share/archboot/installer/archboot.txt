@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   October,1th 2010
+   October,3th 2010
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -301,7 +301,7 @@ Common Installation Procedure
    it's save to answer no.
 
    You should select the disk(s) you want to partition, and
-   you'll be dropped into the fdisk program where you can freely modify
+   you'll be dropped into the parted program where you can freely modify
    the partitioning information.
 
    You will need at least a root partition to continue the installation,
