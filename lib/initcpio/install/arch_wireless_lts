@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES="$(checked_modules "/drivers/net/wirless/") $(checked_modules "/net/wirless/") $(checked_modules "/net/ieee80211/") $(checked_modules "/net/mac80211/")"
+    MODULES="$(checked_modules "/drivers/net/wireless/") $(checked_modules "/net/wireless/") $(checked_modules "/net/ieee80211/") $(checked_modules "/net/mac80211/")"
     # add staging wireless here
     STAGING="otus rt2860 rt2870 rt3090 rtl8192e rtl8187se rtl8192su stlc45xx vt6655 vt6656 winbond wlan-ng"
     for i in $STAGING; do
