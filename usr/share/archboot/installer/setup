@@ -2874,29 +2874,6 @@ auto_fstab(){
         if [ -f /tmp/.fstab ]; then
             # clean fstab first from /dev entries
             sed -i -e '/^\/dev/d' $DESTDIR/etc/fstab
-            # clean /media from old floppy,cd,dvd entries
-            rm -r $DESTDIR/media/cd*
-            rm -r $DESTDIR/media/dvd*
-            rm -r $DESTDIR/media/fl*
-            # add floppy,cd and dvd entries first
-            for i in $(ls -d /dev/cdro* | grep -v "0"); do
-                k=$(echo $i | sed -e 's|/dev/||g')
-                echo "$i /media/$k   auto    ro,user,noauto,unhide   0      0" >>$DESTDIR/etc/fstab
-            # create dirs in /media
-                mkdir -p $DESTDIR/media/$k
-            done
-            for i in $(ls -d /dev/dvd* | grep -v "0"); do
-                k=$(echo $i | sed -e 's|/dev/||g')
-                echo "$i /media/$k   auto    ro,user,noauto,unhide   0      0" >>$DESTDIR/etc/fstab
-            # create dirs in /media
-                mkdir -p $DESTDIR/media/$k
-            done
-            for i in $(ls -d /dev/fd[0-9] | grep -v "[0-9][0-9][0-9]"); do
-                k=$(echo $i | sed -e 's|/dev/||g')
-                echo "$i /media/$k   auto    user,noauto   0      0" >>$DESTDIR/etc/fstab
-            # create dirs in /media
-                mkdir -p $DESTDIR/media/$k
-            done
             sort /tmp/.fstab >>$DESTDIR/etc/fstab
         fi
     fi
