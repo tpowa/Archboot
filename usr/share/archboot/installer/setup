@@ -3195,7 +3195,7 @@ EOF
     echo "Boot Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
@@ -3206,7 +3206,7 @@ EOF
     echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "kernel $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
         echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
