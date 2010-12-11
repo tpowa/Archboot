@@ -12,12 +12,9 @@ install ()
     add_dir "/var/log/clamav"
     add_file "/usr/share/archboot/clamav/etc/clamav/freshclam.conf" "/etc/clamav/freshclam.conf"
     # add unrar support
-    add_file "/usr/lib/libclamunrar.so"
-    add_file "/usr/lib/libclamunrar.so.6"
-    add_file "/usr/lib/libclamunrar.so.6.1.7"
-    add_file "/usr/lib/libclamunrar_iface.so"
-    add_file "/usr/lib/libclamunrar_iface.so.6"
-    add_file "/usr/lib/libclamunrar_iface.so.6.1.7"
+    for i in $(pacman -Ql clamav | cut -d ' ' -f2 | grep /usr/lib/libclamunrar); do
+      add_file "$i"
+    done
 }
 
 help ()
