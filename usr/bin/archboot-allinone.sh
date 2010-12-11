@@ -118,16 +118,8 @@ mv ${CORE_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrdlts.img
 mv ${CORE64}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64.img
 mv ${CORE64_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64lts.img
 
-# place config files
-mv ${CORE}/tmp/*/boot/syslinux/syslinux.cfg ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/boot.msg ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/options.msg ${ALLINONE}/boot/syslinux/
 # place syslinux files
-mv ${CORE}/tmp/*/boot/syslinux/isolinux.bin ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/*.c32 ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/pci.ids ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/modules.pcimap ${ALLINONE}/boot/syslinux/
-mv ${CORE}/tmp/*/boot/syslinux/splash.png ${ALLINONE}/boot/syslinux/
+mv ${CORE}/tmp/*/boot/syslinux/* ${ALLINONE}/boot/syslinux/
 
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
