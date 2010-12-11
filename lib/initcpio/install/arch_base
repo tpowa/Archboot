@@ -49,8 +49,8 @@ install ()
     add_file "/usr/bin/copy-mountpoint.sh"
 
     ### fix syslog-ng
-    add_file "usr/share/archboot/base/etc/modules.conf" "/etc/modules.conf"
-    add_file "usr/share/archboot/base/etc/scl.conf" "/etc/scl.conf"
+    add_file "/usr/share/archboot/base/etc/modules.conf" "/etc/modules.conf"
+    add_file "/usr/share/archboot/base/etc/scl.conf" "/etc/scl.conf"
     for i in /usr/lib/syslog-ng/*; do
       add_file "$i"
     done
