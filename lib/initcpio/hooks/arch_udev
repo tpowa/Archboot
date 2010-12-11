@@ -2,18 +2,6 @@
 
 run_hook ()
 {
-    # mount tmpfs, else autodetection will fail!
-    if grep -q devtmpfs /proc/filesystems 2>/dev/null; then
-        /bin/mount -n -t devtmpfs udev /dev -o mode=0755,size=10M,nosuid
-    else
-        /bin/mount -n -t tmpfs udev /dev -o mode=0755,size=10M,nosuid
-    fi
-    # make extra nodes
-    ln -sf /proc/self/fd /dev/fd
-    ln -sf /proc/self/fd/0 /dev/stdin
-    ln -sf /proc/self/fd/1 /dev/stdout
-    ln -sf /proc/self/fd/2 /dev/stderr
-    ln -sf /proc/kcore /dev/core
     # these static devices are created for convenience, to autoload the modules if necessary
     # /dev/loop0
     mknod -m 0660 /dev/loop0 b 7 0
