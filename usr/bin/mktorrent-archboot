@@ -24,6 +24,7 @@ echo 'Building torrent...'
 mktorrent \
 	-l 19 \
 	-a 'http://tracker.archlinux.org:6969/announce' \
+        -a 'http://linuxtracker.org:2710/announce' \
 	-c "Arch Linux ${archver} (www.archlinux.org)" \
 	${httpmirrorlist} \
 	"${isofile}"
