@@ -2,7 +2,7 @@
 # Script for creating grub2 efi bootable isos
 # Contributed by "Keshav P R " <skodabenz at rocketmail dot com>
 
-export archboot_ver="2010.10-1"
+export archboot_ver="2010.12-1"
 
 export wd=${PWD}
 export archboot_ext=${wd}/archboot_ext
