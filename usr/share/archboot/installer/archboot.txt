@@ -53,7 +53,7 @@ Introduction
   License Arch Linux
 
    2002-2007 Judd Vinet
-   2007-2010 Aaron Griffin
+   2007-2011 Aaron Griffin
    and are licensed under the GNU General Public License (GPL).
 
   What is Archboot?
