@@ -81,9 +81,9 @@ chroot_mount()
 #
 chroot_umount()
 {
-    umount $DESTDIR/proc
-    umount $DESTDIR/sys
-    umount $DESTDIR/dev
+    umount ${DESTDIR}/proc
+    umount ${DESTDIR}/sys
+    umount ${DESTDIR}/dev
 }
 
 # getuuid()
@@ -261,16 +261,16 @@ manual_media() {
 }
 
 # destdir_mounts()
-# check if PART_ROOT is set and if something is mounted on $DESTDIR
+# check if PART_ROOT is set and if something is mounted on ${DESTDIR}
 destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     ASK_MOUNTPOINTS=""
     PART_ROOT=""
-    # check if something is mounted on $DESTDIR
-    PART_ROOT="$(mount | grep "$DESTDIR " | cut -d' ' -f 1)"
-    # Run mountpoints, if nothing is mounted on $DESTDIR
+    # check if something is mounted on ${DESTDIR}
+    PART_ROOT="$(mount | grep "${DESTDIR} " | cut -d' ' -f 1)"
+    # Run mountpoints, if nothing is mounted on ${DESTDIR}
     if [ "$PART_ROOT" = "" ]; then
-        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in $DESTDIR, please set mountpoints first." 0 0
+        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
         mountpoints || return 1
     fi
 }
@@ -565,13 +565,13 @@ findbootloaderpartitions() {
 freeze_xfs() {
     sync
     if [ -x /usr/sbin/xfs_freeze ]; then
-        if [ "$(cat /proc/mounts | grep "$DESTDIR/boot " | grep " xfs ")" ]; then
-            /usr/sbin/xfs_freeze -f $DESTDIR/boot >/dev/null 2>&1
-            /usr/sbin/xfs_freeze -u $DESTDIR/boot >/dev/null 2>&1
+        if [ "$(cat /proc/mounts | grep "${DESTDIR}/boot " | grep " xfs ")" ]; then
+            /usr/sbin/xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
+            /usr/sbin/xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
         fi
-        if [ "$(cat /proc/mounts | grep "$DESTDIR " | grep " xfs ")" ]; then
-            /usr/sbin/xfs_freeze -f $DESTDIR >/dev/null 2>&1
-            /usr/sbin/xfs_freeze -u $DESTDIR >/dev/null 2>&1
+        if [ "$(cat /proc/mounts | grep "${DESTDIR} " | grep " xfs ")" ]; then
+            /usr/sbin/xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
+            /usr/sbin/xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
         fi
     fi
 }
@@ -579,7 +579,7 @@ freeze_xfs() {
 get_grub_map() {
     rm /tmp/dev.map
     DIALOG --infobox "Generating GRUB device map...\nThis could take a while.\n\n Please be patient." 0 0
-    $DESTDIR/sbin/grub --no-floppy --device-map /tmp/dev.map >/tmp/grub.log 2>&1 <<EOF
+    ${DESTDIR}/sbin/grub --no-floppy --device-map /tmp/dev.map >/tmp/grub.log 2>&1 <<EOF
 quit
 EOF
 }
@@ -664,7 +664,7 @@ remove_grub_dmraid_hack(){
 get_grub2_map() {
     rm /tmp/device.map
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    $DESTDIR/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
+    ${DESTDIR}/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
 }
 
 mapdev() {
@@ -725,7 +725,7 @@ printk()
 }
 
 getdest() {
-    [ "$DESTDIR" ] && return 0
+    [ "${DESTDIR}" ] && return 0
     DIALOG --inputbox "Enter the destination directory where your target system is mounted" 8 65 "/tmp/install" 2>$ANSWER || return 1
     DESTDIR=$(cat $ANSWER)
 }
@@ -1703,8 +1703,8 @@ autoprepare() {
     fi
 
     # validate DEST
-    if [ ! -d "$DESTDIR" ]; then
-        DIALOG --msgbox "Destination directory '$DESTDIR' is not valid" 0 0
+    if [ ! -d "${DESTDIR}" ]; then
+        DIALOG --msgbox "Destination directory '${DESTDIR}' is not valid" 0 0
         return 1
     fi
 
@@ -1769,7 +1769,7 @@ autoprepare() {
         dosubvolume="no"
         if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
+            _mkfs yes ${DEVICE}${part} "$fstype" "${DESTDIR}" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
         part=$(($part + 1))
     done
@@ -1790,7 +1790,7 @@ autoprepare() {
         dosubvolume="no"
         if [ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1|| return 1
+            _mkfs yes ${DEVICE}${part} "$fstype" "${DESTDIR}" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
         part=$(($part + 1))
     done
@@ -1800,30 +1800,43 @@ autoprepare() {
 }
 
 parted_gpt() {
-    [ "$(parted -s $DISC print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
-    [ "$(parted -s $DISC print | grep "bios_grub")" ] && BIOS_GRUB=1
-    if [ "$GUID_DETECTED" = "" ] ; then
-        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to create a GUID (gpt) partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-        # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
-        parted -a optimal -s $DISC mklabel GPT >$LOG
+    
+    [ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ] && GUID_DETECTED=1    
+    
+    if [ "${GUID_DETECTED}" = "" ] ; then
+        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
+        sgdisk --mbrtogpt ${DISC} >${LOG}
     fi
-    if [ "$BIOS_GRUB" = "" ]; then
-        DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+    
+    if [ "${GUID_DETECTED}" = "1" ]; then
+      if [ "${EFI_x86_64}" = "1" ] || [ "${EFI_i386}" = "1" ]; then
+         if ! [ "$(parted -s ${DISC} print | grep 'boot')" ]; then
+            DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on ${DISC}.\nDo you want to create an EFISYS partition on ${DISC}?" 0 0 && CREATE_EFISYS=1
+         fi
+      elif ! [ "$(parted -s ${DISC} print | grep 'bios_grub')" ]; then
+         DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+      fi      
     fi
-    if [ "$CREATE_BIOS_GRUB" = "1" -a "$GUID_DETECTED" = "" ]; then
+    
+    if [ "${CREATE_EFISYS}" = "1" ]; then
+        DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 100 to 200 MB FAT32 EFISYS Partition for installing grub2-efi in next step by hand.\n\nparted shell commands:\nmkpartfs <partitionnumber> fat32 <start> <end>\nset <partitionnumber> boot on" 0 0
+        parted ${DISC}
+    fi
+    
+    if [ "${CREATE_BIOS_GRUB}" = "1" -a "${GUID_DETECTED}" = "" ]; then
         # assume new partitiontable,if no GUID was already there,
         # no user interaction needed for bios_grub partition, jippie
         GUID_PART_SIZE="2"
-        parted -a optimal -s $DISC mkpart 1 1 $GUID_PART_SIZE >$LOG
-        parted -a optimal -s $DISC set 1 bios_grub on >$LOG
+        parted -a optimal -s ${DISC} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
+        parted -a optimal -s ${DISC} set 1 bios_grub on >${LOG}
     else
-        [ "$CREATE_BIOS_GRUB" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
+        [ "${CREATE_BIOS_GRUB}" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
     fi
     DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
     clear
-    parted $DISC print
-    parted $DISC
+    parted ${DISC} print
+    parted ${DISC}
+    
 }
 
 partition() {
@@ -2373,14 +2386,14 @@ mountpoints() {
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
+            _mkfs yes $PART $FSTYPE ${DESTDIR} $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         else
             if [ "$FSTYPE" = "swap" ]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs no $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
+            _mkfs no $PART $FSTYPE ${DESTDIR} $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         fi
         sleep 1
     done
@@ -2608,6 +2621,9 @@ Server = ${serverurl}
 
 [extra]
 Server =  ${serverurl}
+
+[skodabenz-arch-grub2]
+Server =  ${serverurl} 
 EOF
 }
 
@@ -2869,12 +2885,12 @@ auto_fstab(){
     # Modify fstab
     if [ "$S_MKFS" = "1" -o "$S_MKFSAUTO" = "1" ]; then
         if [ -f /tmp/.device-names ]; then
-            sort /tmp/.device-names >>$DESTDIR/etc/fstab
+            sort /tmp/.device-names >>${DESTDIR}/etc/fstab
         fi
         if [ -f /tmp/.fstab ]; then
             # clean fstab first from /dev entries
-            sed -i -e '/^\/dev/d' $DESTDIR/etc/fstab
-            sort /tmp/.fstab >>$DESTDIR/etc/fstab
+            sed -i -e '/^\/dev/d' ${DESTDIR}/etc/fstab
+            sort /tmp/.fstab >>${DESTDIR}/etc/fstab
         fi
     fi
 }
@@ -2894,10 +2910,10 @@ auto_locale()
 # add mdadm setup to existing /etc/mdadm.conf
 auto_mdadm()
 {
-    if [ -e $DESTDIR/etc/mdadm.conf ];then
+    if [ -e ${DESTDIR}/etc/mdadm.conf ];then
         if [ "$(cat /proc/mdstat | grep ^md)" ]; then
-            DIALOG --infobox "Adding raid setup to $DESTDIR/etc/mdadm.conf ..." 4 40
-            mdadm -Ds >> $DESTDIR/etc/mdadm.conf
+            DIALOG --infobox "Adding raid setup to ${DESTDIR}/etc/mdadm.conf ..." 4 40
+            mdadm -Ds >> ${DESTDIR}/etc/mdadm.conf
         fi
     fi
 }
@@ -3043,12 +3059,12 @@ ROOTFS="$(blkid -c /dev/null $PART_ROOT -o value -s TYPE)"
 
 getrootflags() {
 # remove gcpid for nilfs2
-ROOTFLAGS="$(findmnt -m -n -o options -T $DESTDIR | sed -e 's/,gcpid=.*[0-9]//g')"
+ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/,gcpid=.*[0-9]//g')"
 }
 
 getraidarrays() {
     RAIDARRAYS=""
-    if ! [ "$(grep ^ARRAY $DESTDIR/etc/mdadm.conf)" ]; then
+    if ! [ "$(grep ^ARRAY ${DESTDIR}/etc/mdadm.conf)" ]; then
         RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
     fi
 }
@@ -3102,7 +3118,7 @@ common_bootloader_checks() {
 # look for a separately-mounted /boot partition
 check_bootpart() {
     subdir=""
-    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+    bootdev=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
         subdir=/boot
         bootdev=$PART_ROOT
@@ -3129,7 +3145,7 @@ abort_nilfs_bootpart() {
 
 # install syslinux and run preparation
 prepare_syslinux () {
-    if ! [ -e "$DESTDIR/sbin/extlinux" -o -e "$DESTDIR/usr/bin/mcopy" ]; then
+    if ! [ -e "${DESTDIR}/sbin/extlinux" -o -e "${DESTDIR}/usr/bin/mcopy" ]; then
         DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
         PACKAGES="$SYSLINUX_PACKAGES"
         run_pacman
@@ -3152,8 +3168,8 @@ common_syslinux () {
     ROOTDEV=$(cat $ANSWER)
     # generate config file
     TEMPDIR=/tmp
-    MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
-    GPTMBR=$DESTDIR/usr/lib/syslinux/gptmbr.bin
+    MBR=${DESTDIR}/usr/lib/syslinux/mbr.bin
+    GPTMBR=${DESTDIR}/usr/lib/syslinux/gptmbr.bin
     # check if GPT/GUID is used
     GUID_DETECTED=
     [ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
@@ -3235,7 +3251,7 @@ finish_syslinux () {
         DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
-    [ -f "/src/boot/syslinux/splash.png" ] && cp /src/boot/syslinux/splash.png $DESTDIR/boot/$SYSLINUX_DIR
+    [ -f "/src/boot/syslinux/splash.png" ] && cp /src/boot/syslinux/splash.png ${DESTDIR}/boot/$SYSLINUX_DIR
     chroot_umount
     
     # make partition with /boot active!
@@ -3244,16 +3260,8 @@ finish_syslinux () {
         parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
     else
         # change flag to bios legacy booting
-        if ! [ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]; then
-            gdisk  $ROOTDEV > $LOG << EOF
-x
-a
-$PARTITION_NUMBER
-2
-64
-w
-y
-EOF
+        if ! [ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]; then
+            sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
         fi
     fi
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
@@ -3305,7 +3313,7 @@ doextlinux () {
     fi
     common_syslinux
     chroot_mount
-    chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot/$SYSLINUX_DIR >$LOG 2>&1
+    chroot ${DESTDIR} $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot/$SYSLINUX_DIR >$LOG 2>&1
     finish_syslinux
 }
 
@@ -3320,7 +3328,7 @@ dosyslinux() {
     SYSLINUX_PROGRAM=syslinux
     prepare_syslinux
     # look for a separately-mounted /boot partition
-    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
+    bootdev=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1)
     if [ "$bootdev" = "" ]; then
         DIALOG --msgbox "Error:\nCouldn't find separate /boot partition." 0 0
         return 1
@@ -3338,13 +3346,13 @@ dosyslinux() {
     fi
     common_syslinux || return 1
     chroot_mount
-    chroot $DESTDIR $SYSLINUX_PROGRAM $bootdev >$LOG 2>&1
+    chroot ${DESTDIR} $SYSLINUX_PROGRAM $bootdev >$LOG 2>&1
     finish_syslinux
 }
 
 dolilo() {
-    if [ ! -f $DESTDIR/etc/lilo.conf ]; then
-        DIALOG --msgbox "Couldn't find $DESTDIR/etc/lilo.conf, installing lilo now ..." 0 0
+    if [ ! -f ${DESTDIR}/etc/lilo.conf ]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/etc/lilo.conf, installing lilo now ..." 0 0
         PACKAGES="lilo"
         run_pacman
         # reset PACKAGES after installing
@@ -3362,17 +3370,17 @@ dolilo() {
     # Try to auto-configure LILO...
     if ! [ "$PART_ROOT" = "" ]; then
         if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" ${DESTDIR}/etc/lilo.conf
         else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" ${DESTDIR}/etc/lilo.conf
         fi
-        sed -i "s|image=/boot/vmlinuz26|image=/boot/$VMLINUZ|g" $DESTDIR/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/$KERNELPKG-fallback.img|g" $DESTDIR/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|image=/boot/vmlinuz26|image=/boot/$VMLINUZ|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/$KERNELPKG-fallback.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/$KERNELPKG.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/$KERNELPKG.img|g" ${DESTDIR}/etc/lilo.conf
     fi
-    sed -i -e '/DEVICE DETAILS/d' $DESTDIR/etc/lilo.conf
-    sort /tmp/.device-names >> $DESTDIR/etc/lilo.conf
+    sed -i -e '/DEVICE DETAILS/d' ${DESTDIR}/etc/lilo.conf
+    sort /tmp/.device-names >> ${DESTDIR}/etc/lilo.conf
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
     if [ "$DEVS" = "" ]; then
@@ -3381,19 +3389,19 @@ dolilo() {
     fi
     DIALOG --menu "Select the boot device where the LILO bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
     ROOTDEV=$(cat $ANSWER)
-    sed -i "s|boot=.*$|boot=$ROOTDEV|g" $DESTDIR/etc/lilo.conf
+    sed -i "s|boot=.*$|boot=$ROOTDEV|g" ${DESTDIR}/etc/lilo.conf
     # HACK: if virtio device is used
     if [ "$(echo $ROOTDEV | grep /dev/vd)" ]; then
-        sed -i "s|.*disk=.*$|disk=$ROOTDEV bios=0x80 max-partitions=7|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|.*disk=.*$|disk=$ROOTDEV bios=0x80 max-partitions=7|g" ${DESTDIR}/etc/lilo.conf
     else
-        sed -i "s|^disk=.*$|# disk=$ROOTDEV bios=0x80|g" $DESTDIR/etc/lilo.conf
+        sed -i "s|^disk=.*$|# disk=$ROOTDEV bios=0x80|g" ${DESTDIR}/etc/lilo.conf
     fi
     DIALOG --msgbox "Before installing LILO, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, LILO will be installed." 0 0
     geteditor || return 1
     $EDITOR ${DESTDIR}/etc/lilo.conf
     DIALOG --infobox "Installing the LILO bootloader..." 0 0
     chroot_mount
-    chroot $DESTDIR /sbin/lilo >$LOG 2>&1
+    chroot ${DESTDIR} /sbin/lilo >$LOG 2>&1
     if [ $? -gt 0 ]; then
         chroot_umount
         DIALOG --msgbox "Error installing LILO. (see $LOG for output)" 0 0
@@ -3404,12 +3412,12 @@ dolilo() {
 }
 
 dogrub() {
-    if [ -f $DESTDIR/boot/grub/grub.cfg ]; then
-        DIALOG --msgbox "Found $DESTDIR/boot/grub/grub.cfg, deinstalling grub2 now ..." 0 0
+    if [ -f ${DESTDIR}/boot/grub2/grub.cfg ]; then
+        DIALOG --msgbox "Found ${DESTDIR}/boot/grub2/grub.cfg, deinstalling grub2 now ..." 0 0
         $PACMAN -R grub2 > $LOG
     fi
-    if [ ! -f $DESTDIR/boot/grub/menu.lst ]; then
-        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/menu.lst, installing grub now ..." 0 0
+    if [ ! -f ${DESTDIR}/boot/grub/menu.lst ]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub/menu.lst, installing grub now ..." 0 0
         PACKAGES="grub"
         run_pacman
         # reset PACKAGES after installing
@@ -3490,9 +3498,9 @@ dogrub() {
                 return 1
         fi
         if [ "$_grubdev" != "" ]; then
-            cp $DESTDIR/boot/grub/menu.lst /tmp/.menu.lst
+            cp ${DESTDIR}/boot/grub/menu.lst /tmp/.menu.lst
             # remove the default entries by truncating the file at our little tag (#-*)
-            head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >$DESTDIR/boot/grub/menu.lst
+            head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >${DESTDIR}/boot/grub/menu.lst
             rm -f /tmp/.menu.lst
             # keep the file from being completely bogus
             if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
@@ -3501,40 +3509,40 @@ dogrub() {
             fi
             NUMBER=0
             # create default grub entries
-            sort /tmp/.device-names >>$DESTDIR/boot/grub/menu.lst
+            sort /tmp/.device-names >>${DESTDIR}/boot/grub/menu.lst
             for grubdev in $_grubdev; do
-                echo "" >>$DESTDIR/boot/grub/menu.lst
-                echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
-                echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
-                echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
+                echo "" >>${DESTDIR}/boot/grub/menu.lst
+                echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
+                echo "title  Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
+                echo "root   $grubdev" >>${DESTDIR}/boot/grub/menu.lst
                 if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
-                echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/menu.lst
-                echo "" >>$DESTDIR/boot/grub/menu.lst
+                echo "initrd $subdir/$KERNELPKG.img" >>${DESTDIR}/boot/grub/menu.lst
+                echo "" >>${DESTDIR}/boot/grub/menu.lst
                 # adding fallback/full image
                 NUMBER=$(($NUMBER+1))
-                echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/menu.lst
-                echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
-                echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
+                echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
+                echo "title  Arch Linux Fallback" >>${DESTDIR}/boot/grub/menu.lst
+                echo "root   $grubdev" >>${DESTDIR}/boot/grub/menu.lst
                 if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
-                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
-                echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/menu.lst
+                echo "initrd $subdir/$KERNELPKG-fallback.img" >>${DESTDIR}/boot/grub/menu.lst
                 NUMBER=$(($NUMBER+1))
             done
             ### TODO:
             # Is it possible to detect a windows installation?
-            echo "" >>$DESTDIR/boot/grub/menu.lst
-            echo "# ($NUMBER) Windows" >>$DESTDIR/boot/grub/menu.lst
-            echo "#title Windows" >>$DESTDIR/boot/grub/menu.lst
-            echo "#rootnoverify (hd0,0)" >>$DESTDIR/boot/grub/menu.lst
-            echo "#makeactive" >>$DESTDIR/boot/grub/menu.lst
-            echo "#chainloader +1" >>$DESTDIR/boot/grub/menu.lst
+            echo "" >>${DESTDIR}/boot/grub/menu.lst
+            echo "# ($NUMBER) Windows" >>${DESTDIR}/boot/grub/menu.lst
+            echo "#title Windows" >>${DESTDIR}/boot/grub/menu.lst
+            echo "#rootnoverify (hd0,0)" >>${DESTDIR}/boot/grub/menu.lst
+            echo "#makeactive" >>${DESTDIR}/boot/grub/menu.lst
+            echo "#chainloader +1" >>${DESTDIR}/boot/grub/menu.lst
         fi
     fi
 
@@ -3553,7 +3561,7 @@ dogrub() {
         DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
         ROOTDEV=$(cat $ANSWER)
         DIALOG --infobox "Installing the GRUB bootloader..." 0 0
-        cp -a $DESTDIR/usr/lib/grub/i386-pc/* $DESTDIR/boot/grub/
+        cp -a ${DESTDIR}/usr/lib/grub/i386-pc/* ${DESTDIR}/boot/grub/
         # freeze xfs filesystems to enable grub installation on xfs filesystems
         freeze_xfs
         bootpart=$bootdev
@@ -3573,7 +3581,7 @@ dogrub() {
 	get_chs
         ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
         grub_dmraid_hack
-        $DESTDIR/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub.log 2>&1 <<EOF
+        ${DESTDIR}/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub.log 2>&1 <<EOF
 geometry $realdev $CYLINDERS $HEADS $SECTORS
 root $bootpart
 setup $bootdev
@@ -3587,7 +3595,7 @@ EOF
             return 1
         fi
         # copy device map file
-        cp -f /tmp/dev.map $DESTDIR/boot/grub/device.map
+        cp -f /tmp/dev.map ${DESTDIR}/boot/grub/device.map
         DIALOG --msgbox "GRUB was successfully installed." 0 0
         S_GRUB=1
         if [ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]; then
@@ -3598,23 +3606,17 @@ EOF
     done
 }
 
-dogrub2(){
+dogrub2_common_before() {
+    ##### Check whether the below limitations still continue with ver 1.99~beta0
     ### Grub2 restrictions:
     # - dmraid doesn't work:
     #   https://bugs.launchpad.net/ubuntu/+source/ubuntu-meta/+bug/436340
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
-    if [ -f $DESTDIR/boot/grub/menu.lst ]; then
-        DIALOG --msgbox "Found $DESTDIR/boot/grub/menu.lst, deinstalling grub now ..." 0 0
+    if [ -f ${DESTDIR}/boot/grub/menu.lst ]; then
+        DIALOG --msgbox "Found ${DESTDIR}/boot/grub/menu.lst, deinstalling grub now ..." 0 0
         $PACMAN -R grub > $LOG
-    fi
-    if [ ! -f $DESTDIR/boot/grub/grub.cfg ]; then
-        DIALOG --msgbox "Couldn't find $DESTDIR/boot/grub/grub.cfg, installing grub2 now ..." 0 0
-        PACKAGES="grub2"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
     fi
     bootdev=""
     grubdev=""
@@ -3625,6 +3627,156 @@ dogrub2(){
     RAID_ON_LVM=""
     common_bootloader_checks
     get_grub2_map
+}
+
+dogrub2_config() {
+            
+            cp ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg /tmp/.grub.cfg
+            # remove the default entries by truncating the file at our little tag (set default)
+            head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            rm -f /tmp/.grub.cfg
+            # keep the file from being completely bogus
+            # if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
+            #    DIALOG --msgbox "Your device, which contains /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
+            #    grubdev="(hd0,1)"
+            # fi
+            NUMBER=0
+            
+cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+insmod part_gpt
+insmod part_msdos
+insmod fat
+insmod iso9660
+insmod udf
+insmod search_fs_file
+insmod linux
+
+search --file --no-floppy --set=root $subdir/$VMLINUZ
+
+set pager=1
+
+EOF
+
+if [ "${GRUB2_EFI}" = "1" ]; then
+
+cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+insmod efi_gop
+insmod font
+
+EOF
+
+fi
+
+if [ "${GRUB2_BIOS}" = "1" ]; then
+
+cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+insmod vbe
+insmod font
+
+EOF
+
+fi
+
+cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+if loadfont \${prefix}/unifont.pf2
+then
+   insmod gfxterm
+   set gfxmode="auto"
+   set gfxpayload=keep
+   terminal_output gfxterm
+fi
+
+EOF
+
+            echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            sort /tmp/.device-names >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # create default grub entries
+            echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            [ "$USE_RAID" = "1" ] && echo "insmod raid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            ! [ "$RAID_ON_LVM" = "" ] && echo "insmod lvm" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "menuentry \"Arch Linux\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # if [ "$FAIL_COMPLEX" = "0" ]; then
+            #    echo "set root=($grubdev)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # else
+            #    echo "set root=$grubdev" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            #fi
+            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+                echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            else
+                echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            fi
+            echo "initrd (\${root})/$subdir/$KERNELPKG.img" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # adding fallback/full image
+            NUMBER=$(($NUMBER+1))
+            echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "menuentry  \"Arch Linux Fallback\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # if [ "$FAIL_COMPLEX" = "0" ]; then
+            #    echo "set root=($grubdev)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # else
+            #    echo "set root=$grubdev" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            # fi
+            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+                echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            else
+                echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            fi
+            echo "initrd (\${root})/$subdir/$KERNELPKG-fallback.img" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            ### TODO:
+            # Is it possible to detect a windows installation?
+            NUMBER=$(($NUMBER+1))
+            echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "## ($NUMBER) Windows" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "#menuentry \"Windows\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "#set root=(hd0,3)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "#chainloader +1" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+            echo "#}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+}
+
+dogrub2_common_after() {    
+    
+    if [ "$PART_ROOT" != "" ]; then
+        if [ "${GRUB2_BIOS}" = "1" ]; then
+            [ "$grubdev" != "" ] && dogrub2_config
+        elif [ "${GRUB2_EFI}" = "1" ]; then
+            dogrub2_config
+        fi
+    fi
+
+    # Edit grub.cfg config file
+    DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
+    geteditor  || return 1
+    $EDITOR ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    
+    cp ${DESTDIR}/etc/grub.d/{unifont.pf2,ascii.pf2} ${DESTDIR}/${GRUB2_PREFIX_DIR}/
+    
+    GRUB2_BIOS=""
+    GRUB2_EFI=""
+
+}
+
+dogrub2_bios() {
+        
+    dogrub2_common_before
+    
+    if [ ! -f ${DESTDIR}/boot/grub2/grub.cfg ]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub2/grub.cfg, installing grub2 now ..." 0 0
+        PACKAGES="grub2-bios grub2-common"
+        run_pacman
+        # reset PACKAGES after installing
+        PACKAGES=""
+    fi
+    
     # try to auto-configure GRUB2...
     if [ "$PART_ROOT" != "" ]; then
         check_bootpart
@@ -3669,86 +3821,9 @@ dogrub2(){
             # use normal device
             grubdev=$(mapdev $bootdev)
         fi
-        if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
-            if ! [ "$(parted -sl | grep "bios_grub")" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
-            fi
-        else
-            if [ "$FAIL_COMPLEX" = "0" ]; then
-                DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
-            fi
-        fi
-        if [ "$FAIL_COMPLEX" = "1" ]; then
-                DIALOG --msgbox "Error:\nGrub2 cannot from $bootdev, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
-                return 1
-        fi
-        if [ "$grubdev" != "" ]; then
-            cp $DESTDIR/boot/grub/grub.cfg /tmp/.grub.cfg
-            # remove the default entries by truncating the file at our little tag (set default)
-            head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/boot/grub/grub.cfg
-            rm -f /tmp/.grub.cfg
-            # keep the file from being completely bogus
-            if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
-                DIALOG --msgbox "Your device, which contains /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
-                grubdev="(hd0,1)"
-            fi
-            NUMBER=0
-            echo "" >>$DESTDIR/boot/grub/grub.cfg
-            sort /tmp/.device-names >>$DESTDIR/boot/grub/grub.cfg
-            # create default grub entries
-            echo "" >>$DESTDIR/boot/grub/grub.cfg
-            [ "$USE_RAID" = "1" ] && echo "insmod raid" >>$DESTDIR/boot/grub/grub.cfg
-            ! [ "$RAID_ON_LVM" = "" ] && echo "insmod lvm" >>$DESTDIR/boot/grub/grub.cfg
-            echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-            echo "menuentry \"Arch Linux\" {" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$FAIL_COMPLEX" = "0" ]; then
-                echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
-            else
-                echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
-            fi
-            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-                echo "linux $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-            else
-                echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-            fi
-            echo "initrd $subdir/$KERNELPKG.img" >>$DESTDIR/boot/grub/grub.cfg
-            echo "}" >>$DESTDIR/boot/grub/grub.cfg
-            echo "" >>$DESTDIR/boot/grub/grub.cfg
-            # adding fallback/full image
-            NUMBER=$(($NUMBER+1))
-            echo "# ($NUMBER) Arch Linux" >>$DESTDIR/boot/grub/grub.cfg
-            echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$FAIL_COMPLEX" = "0" ]; then
-                echo "set root=($grubdev)" >>$DESTDIR/boot/grub/grub.cfg
-            else
-                echo "set root=$grubdev" >>$DESTDIR/boot/grub/grub.cfg
-            fi
-            [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/boot/grub/grub.cfg
-            if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-                echo "linux $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-            else
-                echo "linux $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/grub.cfg
-            fi
-            echo "initrd $subdir/$KERNELPKG-fallback.img" >>$DESTDIR/boot/grub/grub.cfg
-            echo "}" >>$DESTDIR/boot/grub/grub.cfg
-            ### TODO:
-            # Is it possible to detect a windows installation?
-            NUMBER=$(($NUMBER+1))
-            echo "" >>$DESTDIR/boot/grub/grub.cfg
-            echo "## ($NUMBER) Windows" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#menuentry \"Windows\" {" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#set root=(hd0,3)" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#chainloader +1" >>$DESTDIR/boot/grub/grub.cfg
-            echo "#}" >>$DESTDIR/boot/grub/grub.cfg
-        fi
     fi
-
-    # Edit grub.cfg config file
-    DIALOG --msgbox "Before installing GRUB2, you must review the configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
-    geteditor  || return 1
-    $EDITOR ${DESTDIR}/boot/grub/grub.cfg
-
+    
+    
     # A switch is needed if complex $bootdev is used!
     # - It doesn't make sense to present device list, if raid or raid+lvm is used for $bootdev.
     # - LVM $bootdev needs the MBR of a device and cannot be used itself as $bootdev
@@ -3776,18 +3851,102 @@ dogrub2(){
         DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
         bootdev=$(cat $ANSWER)
     fi
-    DIALOG --infobox "Installing the GRUB2 bootloader..." 0 0
+    
+    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+       if ! [ "$(parted -sl | grep "bios_grub")" ]; then
+         DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
+       fi
+    else
+       if [ "$FAIL_COMPLEX" = "0" ]; then
+         DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
+       fi
+    fi
+    
+    if [ "$FAIL_COMPLEX" = "1" ]; then
+       DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+       return 1
+    fi
+        
+    DIALOG --infobox "Installing the GRUB2 BIOS bootloader..." 0 0
     # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
     freeze_xfs
     chroot_mount
-    chroot $DESTDIR /sbin/grub-install --no-floppy $bootdev >> /tmp/grub2.log
+    chroot ${DESTDIR} /sbin/grub2_bios-install --boot-directory=/boot --no-floppy --recheck ${bootdev} >> /tmp/grub2.log
     chroot_umount
-    cat /tmp/grub2.log >$LOG
+    cat /tmp/grub2.log >${LOG}
     if ! [ -s /tmp/grub2.log ] ; then
-        DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     DIALOG --msgbox "GRUB2 was successfully installed." 0 0
+    
+    GRUB2_PREFIX_DIR=/boot/grub2/    
+    GRUB2_BIOS="1"
+    dogrub2_common_after
+
+}
+
+dogrub2_efi_common() {
+    
+    dogrub2_common_before
+    
+    DIALOG --msgbox "Installing grub2-efi-${EFI_ARCH} now ..." 0 0
+    PACKAGES="grub2-efi-${EFI_ARCH} grub2-common"
+    run_pacman
+    # reset PACKAGES after installing
+    PACKAGES=""
+    
+    DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+    
+    if [ "${DISC}" = "" ]; then
+       DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+       EFISYS=""
+    fi
+    
+    parted_gpt
+    
+    if [ -d ${DESTDIR}/boot/efi ]; then
+        EFISYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
+    else
+        mkdir -p ${DESTDIR}/boot/efi
+        EFISYS_PART=""
+    fi
+    
+    if [ "${EFISYS_PART}" = "" ]; then
+        EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        mount -o rw -t vfat ${DISC}${EFISYS_PART_NUM} ${DESTDIR}/boot/efi
+    else
+        mount -o rw -t vfat ${EFISYS_PART} ${DESTDIR}/boot/efi
+    fi
+        
+    chroot_mount
+    chroot ${DESTDIR} /sbin/grub2_efi_${EFI_ARCH}-install --boot-directory=/boot/efi/efi --bootloader-id=grub2 --no-floppy --recheck >> /tmp/grub2_efi.log
+    chroot_umount
+    cat /tmp/grub2_efi.log >${LOG}
+    if ! [ -s /tmp/grub2_efi.log ] ; then
+        DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
+        return 1
+    fi
+    DIALOG --msgbox "GRUB2 (U)EFI was successfully installed." 0 0
+    
+    GRUB2_PREFIX_DIR=/boot/efi/efi/grub2/    
+    GRUB2_EFI="1"
+    dogrub2_common_after
+    
+}
+
+dogrub2_efi_x86_64() {
+    
+    EFI_ARCH="x86_64"
+    dogrub2_efi_common
+    
+}
+
+dogrub2_efi_i386() {
+    
+    EFI_ARCH="i386"
+    dogrub2_efi_common
+    
 }
 
 select_source()
@@ -3875,7 +4034,7 @@ run_mkinitcpio()
     ( \
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
-    chroot $DESTDIR /sbin/mkinitcpio -p $KERNELPKG >>/tmp/mkinitcpio.log 2>&1
+    chroot ${DESTDIR} /sbin/mkinitcpio -p $KERNELPKG >>/tmp/mkinitcpio.log 2>&1
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running
     ) &
@@ -4103,11 +4262,11 @@ auto_hwdetect()
         # check on ide-legacy boot parameter
         [ "$(grep -w ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
         # check on used keymap
-        ! [ "$(grep '^KEYMAP="us"' $DESTDIR/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
+        ! [ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
         # check on usb input
         [ "$(grep hid /proc/modules)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
         # check on framebuffer modules and kms
-        if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+        if [ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
              FBPARAMETER="--uvesafb"
              HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
         fi
@@ -4127,14 +4286,14 @@ auto_hwdetect()
         if [ "$(grep nfs /proc/modules)" ]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
-        if [ -e $DESTDIR/lib/initcpio/hooks/dmraid ]; then
+        if [ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]; then
             if ! [ "$(dmraid -r | grep ^no )" ]; then
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
         [ "$(blkid -c=/dev/null -o value -s TYPE $PART_ROOT)" = "btrfs" ] && HWPARAMETER="$HWPARAMETER --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER) | sed -e 's#.*\" ##g')"
-        HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=$DESTDIR/lib/initcpio/install $FBPARAMETER $HWPARAMETER --hooks)"
+        HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=${DESTDIR}/lib/initcpio/install $FBPARAMETER $HWPARAMETER --hooks)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
         [ -n "$HWDETECTMODULES" ] && sed -i -e "s/^MODULES=.*/$HWDETECTMODULES/g" ${DESTDIR}/etc/mkinitcpio.conf
         [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
@@ -4148,14 +4307,14 @@ auto_fb()
     UVESAFB=""
     if [ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]; then
         # clean modprobe.conf file from options first
-        sed -i -e '/options/d' $DESTDIR/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep nouveau $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep i915 $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep radeon $DESTDIR/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> $DESTDIR/etc/modprobe.d/modprobe.conf
+        sed -i -e '/options/d' ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep nouveau ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep i915 ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [ "$(grep radeon ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
     fi
-    if [ -e $DESTDIR/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+    if [ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
         UVESAFB="$(grep ^[a-z] /etc/modprobe.d/uvesafb.conf)" 
-        sed -i -e "s#options.*#$UVESAFB#g" $DESTDIR/etc/modprobe.d/uvesafb.conf
+        sed -i -e "s#options.*#$UVESAFB#g" ${DESTDIR}/etc/modprobe.d/uvesafb.conf
     fi
 }
 
@@ -4328,15 +4487,26 @@ install_bootloader()
     pacman_conf
     prepare_pacman
     CANCEL=""
-    DIALOG --menu "Which bootloader would you like to use?" 12 55 5 \
-        "GRUB" "Use the GRUB bootloader (default)" \
-        "GRUB2" "Use the GRUB2 bootloader (experimental)" \
-        "LILO" "Use the LILO bootloader" \
+    
+    [ "$(dmesg | grep 'EFI_ARCH_x86_64')" ] && EFI_x86_64="1"
+    [ "$(dmesg | grep 'EFI_ARCH_i386')" ] && EFI_i386="1"
+    
+    [ "${EFI_x86_64}" = "1" ] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
+    [ "${EFI_i386}" = "1" ] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
+    
+    DIALOG --menu "Which bootloader would you like to use?" 12 55 7 \
+        "GRUB_LEGACY" "Use the GRUB LEGACY bootloader (default)" \
+        "GRUB2_BIOS" "Use the GRUB2 BIOS bootloader (experimental)" \
+        "GRUB2_EFI_x86_64" "Use the GRUB2 64-bit UEFI bootloader (experimental)" \
+        "GRUB2_EFI_i386" "Use the GRUB2 32-bit UEFI bootloader (experimental)" \
+        "LILO" "Use the LILO bootloader (not recommended)" \
         "EXTLINUX" "Use the EXTLINUX bootloader" \
         "SYSLINUX" "Use the SYSLINUX bootloader" 2>$ANSWER || CANCEL=1
     case $(cat $ANSWER) in
-        "GRUB") dogrub ;;
-        "GRUB2") dogrub2 ;;
+        "GRUB_LEGACY") dogrub ;;
+        "GRUB2_BIOS") dogrub2_bios ;;
+        "GRUB2_EFI_x86_64") dogrub2_efi_x86_64 ;;
+        "GRUB2_EFI_i386") dogrub2_efi_i386 ;;
         "LILO") dolilo ;;
         "EXTLINUX") doextlinux ;;
         "SYSLINUX") dosyslinux ;;

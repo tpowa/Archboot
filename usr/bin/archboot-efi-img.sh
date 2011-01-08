@@ -15,6 +15,10 @@ export MKTEMP_TEMPLATE="/tmp/grub2_efi.XXXXXXXXXX"
 
 export RM_UNWANTED="0"
 
+export EFI_INSTALLER="1"
+
+export GRUB2_PKG_VER="1.99beta0_r3010"
+
 echo
 
 ### check for root
@@ -36,10 +40,11 @@ mkdir -p ${archboot_ext}
 cd ${archboot_ext}/
 
 ## Extract the archboot iso using bsdtar
-bsdtar xf ${wd}/archlinux-${archboot_ver}-archboot.iso
+7z x ${wd}/archlinux-${archboot_ver}-archboot.iso
 echo
 
 rm -rf ${archboot_ext}/[BOOT]/
+rm -rf ${archboot_ext}/efi/
 echo
 
 ## Rename isolinux dir to /boot/syslinux if it exists
@@ -62,9 +67,40 @@ do
   fi    
 done
 
-if [ -e ${archboot_ext}/boot/syslinux/splash.png ]
+cp ${archboot_ext}/boot/syslinux/splash.png ${archboot_ext}/boot/splash.png || true
+
+[ -e ${wd}/splash.png ] && cp ${wd}/splash.png ${archboot_ext}/boot/splash.png
+
+if [ "${EFI_INSTALLER}" = "1" ]
 then
-      cp ${archboot_ext}/boot/syslinux/splash.png ${archboot_ext}/boot/splash.png
+    cp ${wd}/setup ${archboot_ext}/arch/setup
+    
+    for file in grub2-common-${GRUB2_PKG_VER}-1-x86_64.pkg.tar.xz grub2-common-${GRUB2_PKG_VER}-1-i686.pkg.tar.xz grub2-bios-${GRUB2_PKG_VER}-1-any.pkg.tar.xz grub2-efi-x86_64-${GRUB2_PKG_VER}-1-any.pkg.tar.xz grub2-efi-i386-${GRUB2_PKG_VER}-1-any.pkg.tar.xz skodabenz-arch-grub2.db.tar.gz
+    do
+      cd ${wd}/
+      
+      if [ ! -e ${wd}/${file} ]
+      then
+          if [ -e /var/cache/pacman/pkg/${file} ]
+          then
+              cp /var/cache/pacman/pkg/${file} ${wd}/
+          else
+              wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/${file}  
+          fi
+      fi
+    done
+    
+    pacman -U --noconfirm ${wd}/grub2-common-${GRUB2_PKG_VER}-1-$(uname -m).pkg.tar.xz
+    pacman -U --noconfirm ${wd}/grub2-*-any.pkg.tar.xz
+    
+    cp ${wd}/*-any.pkg.tar.xz ${archboot_ext}/core-any/pkg/
+    cp ${wd}/*-x86_64.pkg.tar.xz ${archboot_ext}/core-x86_64/pkg/
+    cp ${wd}/*-i686.pkg.tar.xz ${archboot_ext}/core-i686/pkg/
+    
+    cp ${wd}/skodabenz-arch-grub2.db.tar.gz ${archboot_ext}/core-x86_64/pkg/
+    cp ${wd}/skodabenz-arch-grub2.db.tar.gz ${archboot_ext}/core-i686/pkg/
+    
+    rm ${archboot_ext}/core-{x86_64,i686}/pkg/grub2-1.98-*.tar.*
 fi
 
 rm -rf ${archboot_ext}/efi/grub2/
@@ -200,6 +236,8 @@ echo
 ## Copy the actual grub2 config file
 cat << EOF > ${archboot_ext}/efi/boot/grub.cfg
 search --file --no-floppy --set=archboot /arch/archboot.txt
+
+set pager=1
 
 insmod efi_gop
 insmod font
@@ -356,3 +394,5 @@ unset grub2_name
 unset GRUB2_MODULES
 unset MKTEMP_TEMPLATE
 unset RM_UNWANTED
+unset EFI_INSTALLER
+unset GRUB2_PKG_VER
