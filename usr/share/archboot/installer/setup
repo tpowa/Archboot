@@ -2621,9 +2621,6 @@ Server = ${serverurl}
 
 [extra]
 Server = ${serverurl}
-
-[required-$(uname -m)]
-Server = ${serverurl}
 EOF
 }
 
