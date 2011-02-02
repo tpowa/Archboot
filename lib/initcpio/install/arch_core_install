@@ -94,7 +94,7 @@ install ()
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK add grub2 and syslinux packages to image, with separate extra db file
-    for i in grub2 freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
+    for i in grub2-bios grub2-common grub2-efi-i386 grub2-efi-x86_64 efibootmgr dosfstools freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
         pacman -Sw --noconfirm $i
         pkgver="$(echo $(pacman -Si $i | grep Version | cut -d ":" -f 2))"
         cp /var/cache/pacman/pkg/$i-${pkgver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
