@@ -3314,6 +3314,7 @@ doextlinux () {
     finish_syslinux
 }
 
+### TODO: Merge extlinux and syslinux into one function!
 # install syslinux bootloader
 dosyslinux() {
     bootdev=""
