@@ -22,7 +22,8 @@ zd1211-firmware smbclient tiacx tiacx-firmware dmraid linux-atm netcfg parted tz
 v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl gmp heimdal sqlite3 db \
 dbus-core libcap fsarchiver xz librpcsecgss libtirpc wipe ddrescue testdisk clamav ifplugd \
 libdaemon nouveau-drm-lts nouveau-firmware wpa_actiond rfkill libgssglue gdisk btrfs-progs-unstable \
-nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb"
+nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb grub2-bios grub2-common\
+grub2-efi-i386 grub2-efi-x86_64 efibootmgr dosfstools"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
