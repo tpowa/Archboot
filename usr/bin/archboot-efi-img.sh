@@ -2,22 +2,23 @@
 # Script for creating grub2 efi bootable isos
 # Contributed by "Keshav P R " <skodabenz at rocketmail dot com>
 
+## Most of the commands in this script have been copied from grub2's grub-mkrescue shell script with slight modifications
+
 export archboot_ver="2011.01-1"
 
-export wd=${PWD}
-export archboot_ext=${wd}/archboot_ext
+export wd=${PWD}/
+export archboot_ext=$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)
 export iso_name="archboot_${archboot_ver}_efi"
-export grub2_name="grub2"
+export grub2_name="grub"
 
-export GRUB2_MODULES="part_gpt part_msdos bsd fat ntfs ntfscomp ext2 iso9660 udf hfsplus fshelp memdisk tar normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop png"
+export GRUB2_MODULES="part_gpt part_msdos fat ntfs ntfscomp ext2 iso9660 udf hfsplus fshelp memdisk tar xzio gzio normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop png"
 
 export MKTEMP_TEMPLATE="/tmp/grub2_efi.XXXXXXXXXX"
 
-export RM_UNWANTED="0"
-
+export REPLACE_SETUP="1"
 export EFI_INSTALLER="1"
 
-export GRUB2_PKG_VER="1.99beta0_r3010"
+export CREATE_USB_IMG="0"
 
 echo
 
@@ -30,92 +31,243 @@ fi
 set -x
 
 ## Remove old files and dir
-rm -rf ${archboot_ext}/
-rm ${wd}/${iso_name}_isohybrid.iso
-rm ${wd}/${iso_name}_usb.img
+rm -rf ${archboot_ext}/ || true
+rm ${wd}/${iso_name}_isohybrid.iso || true
+rm ${wd}/${iso_name}_usb.img || true
 echo
 
 ## Create a dir to extract the archboot iso
 mkdir -p ${archboot_ext}
 cd ${archboot_ext}/
+echo
 
 ## Extract the archboot iso using bsdtar
-7z x ${wd}/archlinux-${archboot_ver}-archboot.iso
+bsdtar xf ${wd}/archlinux-${archboot_ver}-archboot.iso
+# 7z x ${wd}/archlinux-${archboot_ver}-archboot.iso
 echo
 
-rm -rf ${archboot_ext}/[BOOT]/
-rm -rf ${archboot_ext}/efi/
+rm -rf ${archboot_ext}/[BOOT]/ || true
+rm -rf ${archboot_ext}/efi/ || true
 echo
 
-## Rename isolinux dir to /boot/syslinux if it exists
-if [ -d ${archboot_ext}/isolinux ] && [ ! -d ${archboot_ext}/boot/syslinux ]
-then
-    mkdir -p ${archboot_ext}/boot/
-    cp -r ${archboot_ext}/isolinux ${archboot_ext}/boot/syslinux
-    mv ${archboot_ext}/boot/syslinux/isolinux.cfg ${archboot_ext}/boot/syslinux/syslinux.cfg
-    # rm ${archboot_ext}/boot/syslinux/isolinux.cfg
-    # cp ${wd}/syslinux.cfg ${archboot_ext}/boot/syslinux/syslinux.cfg 
-    rm -rf ${archboot_ext}/isolinux
-    echo
-fi    
 
 for file in vmlinuz initrd.img vm64 initrd64.img vmlts initrdlts.img vm64lts initrd64lts.img memtest
 do
-  if [ -e ${archboot_ext}/boot/syslinux/${file} ]
-  then
-      mv ${archboot_ext}/boot/syslinux/${file} ${archboot_ext}/boot/${file}
-  fi    
+	if [ -e ${archboot_ext}/boot/syslinux/${file} ]
+	then
+		mv ${archboot_ext}/boot/syslinux/${file} ${archboot_ext}/boot/${file}
+		echo
+	fi
 done
 
+
 cp ${archboot_ext}/boot/syslinux/splash.png ${archboot_ext}/boot/splash.png || true
+echo
 
 [ -e ${wd}/splash.png ] && cp ${wd}/splash.png ${archboot_ext}/boot/splash.png
+echo
+
+
+replace_arch_setup_initramfs() {
+	
+	initramfs_ext=$(mktemp -d /tmp/${initramfs_name}_ext.XXXXXXXXXX)
+	echo
+	
+	cd ${initramfs_ext}/
+	
+	bsdtar xf ${archboot_ext}/boot/${initramfs_name}.img
+	echo
+	
+	mv ${initramfs_ext}/arch/setup ${initramfs_ext}/arch/setup.old
+	echo
+	
+	cp ${wd}/setup ${initramfs_ext}/arch/setup
+	echo
+	
+	chmod +x ${initramfs_ext}/arch/setup
+	echo
+	
+	cd ${initramfs_ext}/
+	
+	find . | cpio --format=newc -o > ${wd}/${initramfs_name}
+	echo
+	
+	cd ${wd}/
+	
+	lzma -9 ${wd}/${initramfs_name}
+	echo
+	
+	rm ${wd}/${initramfs_name}.img
+	echo
+	
+	mv ${wd}/${initramfs_name}.lzma ${wd}/${initramfs_name}.img
+	echo
+	
+	rm ${archboot_ext}/boot/${initramfs_name}.img
+	echo
+	
+	cp ${wd}/${initramfs_name}.img ${archboot_ext}/boot/${initramfs_name}.img
+	echo
+	
+	unset initramfs_ext
+	unset initramfs__name
+	echo
+	
+}
+
+
+download_pkgs() {
+	
+	cd ${wd}/
+	
+	if [ "${pkg_arch}" = 'any' ]
+	then
+		wget -c http://www.archlinux.org/packages/${repo}/any/${package}/download/
+		echo
+	else
+		wget -c http://www.archlinux.org/packages/${repo}/x86_64/${package}/download/
+		echo
+		
+		wget -c http://www.archlinux.org/packages/${repo}/i686/${package}/download/
+		echo
+	fi
+	
+	unset repo
+	unset package
+	unset pkg_arch
+	echo
+	
+}
+
+
+if [ "${REPLACE_SETUP}" = "1" ]
+then
+	cd ${wd}/
+	
+	if [ -e ${wd}/setup ]
+	then
+		## The old method I tried, mount -o ro -t iso9660 /dev/sr0 /src, mv /arch/setup /arch/setup.old, cp /src/arch/setup /arch/setup, umount /dev/sr0
+		# cp ${wd}/setup ${archboot_ext}/arch/setup
+		
+		## Extracting using bsdtar, replacing /arch/setup and recompressing the iniramfs archive does not work. Archive format not compatible with initramfs format.
+		## Extracting using cpio and using 'newc' archive format works
+		
+		initramfs_name="initrd64"
+		replace_arch_setup_initramfs
+		
+		initramfs_name="initrd64lts"
+		replace_arch_setup_initramfs
+		
+		initramfs_name="initrd"
+		replace_arch_setup_initramfs
+		
+		initramfs_name="initrdlts"
+		replace_arch_setup_initramfs
+	fi
+	echo
+fi
+
 
 if [ "${EFI_INSTALLER}" = "1" ]
 then
-    cp ${wd}/setup ${archboot_ext}/arch/setup
-    
-    for file in grub2-common-${GRUB2_PKG_VER}-1-x86_64.pkg.tar.xz grub2-common-${GRUB2_PKG_VER}-1-i686.pkg.tar.xz grub2-bios-${GRUB2_PKG_VER}-1-any.pkg.tar.xz grub2-efi-x86_64-${GRUB2_PKG_VER}-1-any.pkg.tar.xz grub2-efi-i386-${GRUB2_PKG_VER}-1-any.pkg.tar.xz skodabenz-arch-grub2.db.tar.gz
-    do
-      cd ${wd}/
-      
-      if [ ! -e ${wd}/${file} ]
-      then
-          if [ -e /var/cache/pacman/pkg/${file} ]
-          then
-              cp /var/cache/pacman/pkg/${file} ${wd}/
-          else
-              wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/${file}  
-          fi
-      fi
-    done
-    
-    pacman -U --noconfirm ${wd}/grub2-common-${GRUB2_PKG_VER}-1-$(uname -m).pkg.tar.xz
-    pacman -U --noconfirm ${wd}/grub2-*-any.pkg.tar.xz
-    
-    cp ${wd}/*-any.pkg.tar.xz ${archboot_ext}/core-any/pkg/
-    cp ${wd}/*-x86_64.pkg.tar.xz ${archboot_ext}/core-x86_64/pkg/
-    cp ${wd}/*-i686.pkg.tar.xz ${archboot_ext}/core-i686/pkg/
-    
-    cp ${wd}/skodabenz-arch-grub2.db.tar.gz ${archboot_ext}/core-x86_64/pkg/
-    cp ${wd}/skodabenz-arch-grub2.db.tar.gz ${archboot_ext}/core-i686/pkg/
-    
-    rm ${archboot_ext}/core-{x86_64,i686}/pkg/grub2-1.98-*.tar.*
+	cd ${wd}/
+	
+	# rm ${wd}/*.pkg.tar.*
+	
+	package='dosfstools'
+	repo='extra'
+	pkg_arch=''
+	download_pkgs
+	
+	package='grub2-common'
+	repo='testing'
+	pkg_arch=''
+	download_pkgs
+	
+	package='grub2-bios'
+	repo='testing'
+	pkg_arch=''
+	download_pkgs
+	
+	package='grub2-efi-i386'
+	repo='testing'
+	pkg_arch=''
+	download_pkgs
+	
+	package='grub2-efi-x86_64'
+	repo='testing'
+	pkg_arch='any'
+	download_pkgs
+	
+	# package='efibootmgr'
+	# repo='extra'
+	# pkg_arch=''
+	# download_pkgs
+	
+	wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/efibootmgr-0.5.4-5-x86_64.pkg.tar.xz
+	wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/efibootmgr-0.5.4-5-i686.pkg.tar.xz
+	echo
+	
+	rm ${wd}/required-{x86_64,i686}.db.tar.gz
+	echo
+	
+	repo-add required-x86_64.db.tar.gz *-{x86_64,any}.pkg.tar.*
+	echo
+	
+	repo-add required-i686.db.tar.gz *-{i686,any}.pkg.tar.*
+	echo
+	
+	pacman -Udf --noconfirm ${wd}/dosfstools-*-$(uname -m).pkg.tar.xz || exit 1
+	echo
+	
+	pacman -Udf --noconfirm ${wd}/grub2-common-*-$(uname -m).pkg.tar.xz || exit 1
+	echo
+	
+	pacman -Udf --noconfirm ${wd}/grub2-efi-i386-*-$(uname -m).pkg.tar.xz || exit 1
+	echo
+	
+	pacman -Udf --noconfirm ${wd}/grub2-efi-x86_64-*-any.pkg.tar.xz || exit 1
+	echo
+	
+	cp ${wd}/*-any.pkg.tar.xz ${archboot_ext}/core-any/pkg/
+	cp ${wd}/*-x86_64.pkg.tar.xz ${archboot_ext}/core-x86_64/pkg/
+	cp ${wd}/*-i686.pkg.tar.xz ${archboot_ext}/core-i686/pkg/
+	echo
+	
+	rm ${archboot_ext}/core-x86_64/pkg/required-x86_64.db.tar.gz
+	rm ${archboot_ext}/core-i686/pkg/required-i686.db.tar.gz
+	echo
+	
+	rm ${archboot_ext}/core-x86_64/pkg/required-x86_64.db
+	rm ${archboot_ext}/core-i686/pkg/required-i686.db
+	echo
+	
+	cp ${wd}/required-x86_64.db.tar.gz ${archboot_ext}/core-x86_64/pkg/
+	cp ${wd}/required-i686.db.tar.gz ${archboot_ext}/core-i686/pkg/
+	echo
+	
+	## Required for pacman 3.5-git
+	cp ${wd}/required-x86_64.db.tar.gz ${archboot_ext}/core-x86_64/pkg/required-x86_64.db
+	cp ${wd}/required-i686.db.tar.gz ${archboot_ext}/core-i686/pkg/required-i686.db
+	echo
+	
+	rm ${archboot_ext}/core-{x86_64,i686}/pkg/grub2-1.98-*.tar.*
+	echo
 fi
 
-rm -rf ${archboot_ext}/efi/grub2/
-rm -rf ${archboot_ext}/efi/boot/
+
+rm -rf ${archboot_ext}/efi/grub2/ || true
+rm -rf ${archboot_ext}/efi/boot/ || true
+echo
 
 ## Create UEFI compliant ESP directory
 mkdir -p ${archboot_ext}/efi/grub2/
 mkdir -p ${archboot_ext}/efi/boot/
+echo
 
 ## Delete old ESP image
-if [ -e ${archboot_ext}/efi/grub2/grub2_efi.bin ]
-then
-    rm -rf ${archboot_ext}/efi/grub2/grub2_efi.bin
-    echo
-fi
+rm -rf ${archboot_ext}/efi/grub2/grub2_efi.bin
+echo
 
 ## Create a blank image to be converted to ESP IMG
 dd if=/dev/zero of=${archboot_ext}/efi/grub2/grub2_efi.bin bs=1024 count=2048
@@ -127,7 +279,7 @@ echo
 
 
 ## Create a mountpoint for the grub2_efi.bin image if it does not exist
-grub2_efi_mp=$(mktemp -d "$MKTEMP_TEMPLATE")
+grub2_efi_mp=$(mktemp -d "${MKTEMP_TEMPLATE}")
 echo
 
 ## Mount the ${archboot_ext}/efi/grub2/grub2_efi.bin image at ${grub2_efi_mp} as loop 
@@ -142,17 +294,16 @@ mkdir -p ${archboot_ext}/efi/grub2
 cp -r /usr/lib/${grub2_name}/x86_64-efi ${archboot_ext}/efi/grub2/x86_64-efi
 cp -r /usr/lib/${grub2_name}/i386-efi ${archboot_ext}/efi/grub2/i386-efi
 
-cp /etc/grub.d/unifont.pf2 /etc/grub.d/ascii.pf2 ${archboot_ext}/efi/grub2/
+cp /usr/share/grub/{unicode,ascii}.pf2 ${archboot_ext}/efi/grub2/
 
 cp -r ${archboot_ext}/efi/grub2/x86_64-efi/locale ${archboot_ext}/efi/grub2/locale || true
-rm -rf ${archboot_ext}/efi/grub2/x86_64-efi/locale/ || true
-rm -rf ${archboot_ext}/efi/grub2/i386-efi/locale/ || true
+rm -rf ${archboot_ext}/efi/grub2/{x86_64,i386}-efi/locale/ || true
 echo
 
 
 ## Create memdisk for bootx64.efi
-memdisk_64_img=$(mktemp "$MKTEMP_TEMPLATE")
-memdisk_64_dir=$(mktemp -d "$MKTEMP_TEMPLATE")
+memdisk_64_img=$(mktemp "${MKTEMP_TEMPLATE}")
+memdisk_64_dir=$(mktemp -d "${MKTEMP_TEMPLATE}")
 
 mkdir -p ${memdisk_64_dir}/efi/grub2
 echo
@@ -175,12 +326,13 @@ echo
 cd ${memdisk_64_dir}
 tar -cf - efi > ${memdisk_64_img}
 rm -rf ${memdisk_64_dir}
+unset memdisk_64_dir
 echo
 
 
 ## Create memdisk for bootia32.efi
-memdisk_32_img=$(mktemp "$MKTEMP_TEMPLATE")
-memdisk_32_dir=$(mktemp -d "$MKTEMP_TEMPLATE")
+memdisk_32_img=$(mktemp "${MKTEMP_TEMPLATE}")
+memdisk_32_dir=$(mktemp -d "${MKTEMP_TEMPLATE}")
 
 mkdir -p ${memdisk_32_dir}/efi/grub2
 echo
@@ -203,6 +355,7 @@ echo
 cd ${memdisk_32_dir}
 tar -cf - efi > ${memdisk_32_img}
 rm -rf ${memdisk_32_dir}
+unset memdisk_32_dir
 echo
 
 
@@ -233,6 +386,10 @@ rm ${memdisk_64_img}
 rm ${memdisk_32_img}
 echo
 
+unset memdisk_64_img
+unset memdisk_32_img
+echo
+
 ## Copy the actual grub2 config file
 cat << EOF > ${archboot_ext}/efi/boot/grub.cfg
 search --file --no-floppy --set=archboot /arch/archboot.txt
@@ -242,7 +399,7 @@ set pager=1
 insmod efi_gop
 insmod font
 
-if loadfont (\${archboot})/efi/grub2/unifont.pf2
+if loadfont (\${archboot})/efi/grub2/unicode.pf2
 then
    insmod gfxterm
    set gfxmode="auto"
@@ -289,44 +446,14 @@ EOF
 echo
 
 
-## Remove some files not needed for me - config files not modified - for now
-if [ ${RM_UNWANTED} = "1" ]
-then
-    ## Remove all i686 pkgs
-    rm -rf ${archboot_ext}/core-i686/
-    
-    ## Remove all x86_64 pkgs
-    rm -rf ${archboot_ext}/core-x86_64/
-    
-    ## Remove all other common pkgs
-    rm -rf ${archboot_ext}/core-any/
-    
-    ## Remove all LTS kernels and initramfs
-    rm ${archboot_ext}/boot/vmlts
-    rm ${archboot_ext}/boot/initrdlts.img
-    rm ${archboot_ext}/boot/vm64lts
-    rm ${archboot_ext}/boot/initrd64lts.img
-    
-    ## Remove i686 kernel and initramfs
-    rm ${archboot_ext}/boot/vmlinuz
-    rm ${archboot_ext}/boot/initrd.img
-    
-    ## Remove clamav files
-    rm -rf ${archboot_ext}/clamav/
-fi
-
-
 ## First create the BIOS+UEFI ISO
 cd ${wd}
 echo
 
 ## Generate the BIOS+UEFI ISO image using xorriso (community/libisoburn package) in mkisofs emulation mode
+## -output ${wd}/${iso_name}_isohybrid.iso is not working , -o ${wd}/${iso_name}_isohybrid.iso works
 
-## Exaggerated xorriso command
-xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -disable-deep-relocation -joliet -allow-leading-dots -volid "ARCHBOOT" -eltorito-boot boot/syslinux/isolinux.bin -eltorito-catalog boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -output ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
-
-## Usually used xorriso command style
-# xorriso -as mkisofs -R -l -N -D -J -L -V "ARCHBOOT" -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -joliet -volid "ARCHBOOT" -eltorito-boot boot/syslinux/isolinux.bin -eltorito-catalog boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
 
 ## Generate a isohybrid image using syslinux
@@ -334,55 +461,59 @@ isohybrid ${wd}/${iso_name}_isohybrid.iso
 echo
 
 
-## Second create the FAT32 USB image using syslinux
-
-## The below commands have been copied from archboot-usbimage-helper.sh with slight modifications
-
-## Output USB image
-DISKIMG=${wd}/${iso_name}_usb.img
-
-## Contents of the USB image
-IMGROOT=${archboot_ext}
-
-## Create required temp dirs
-TMPDIR=$(mktemp -d)
-FSIMG=$(mktemp)
-echo
-
-## Determine the required size of the USB image
-rootsize=$(du -bs ${IMGROOT}|cut -f1)
-IMGSZ=$(( (${rootsize}*102)/100/512 + 1)) ## image size in sectors
-echo
-
-## Create a FAT32 image with volume name "ARCHBOOT"
-dd if=/dev/zero of=${FSIMG} bs=512 count=${IMGSZ}
-echo
-mkfs.vfat -S 512 -F32 -n "ARCHBOOT" ${FSIMG}
-echo
-
-## Mount the FAT32 image at the created temp dir
-LOOP_DEVICE2=$(losetup --show --find ${FSIMG})
-mount -o rw,users -t vfat ${LOOP_DEVICE2} ${TMPDIR}
-echo
-
-## Copy the contents of the ISO to the USB image
-cp -r ${IMGROOT}/* ${TMPDIR}
-echo
-
-umount ${TMPDIR}
-losetup --detach ${LOOP_DEVICE2}
-echo
-
-## Create the final USB image
-cat ${FSIMG} > ${DISKIMG}
-echo
-
-## Install syslinux into the image
-syslinux ${DISKIMG}
-echo
-
-rm -rf ${TMPDIR} ${FSIMG}
-echo
+if [ "${CREATE_USB_IMG}" = "1" ]
+then
+	## Second create the FAT32 USB image using syslinux
+	
+	## The below commands have been copied from archboot-usbimage-helper.sh with slight modifications
+	
+	## Output USB image
+	DISKIMG=${wd}/${iso_name}_usb.img
+	
+	## Contents of the USB image
+	IMGROOT=${archboot_ext}
+	
+	## Create required temp dirs
+	TMPDIR=$(mktemp -d)
+	FSIMG=$(mktemp)
+	echo
+	
+	## Determine the required size of the USB image
+	rootsize=$(du -bs ${IMGROOT}|cut -f1)
+	IMGSZ=$(( (${rootsize}*102)/100/512 + 1)) ## image size in sectors
+	echo
+	
+	## Create a FAT32 image with volume name "ARCHBOOT"
+	dd if=/dev/zero of=${FSIMG} bs=512 count=${IMGSZ}
+	echo
+	
+	mkfs.vfat -S 512 -F32 -n "ARCHBOOT" ${FSIMG}
+	echo
+	
+	## Mount the FAT32 image at the created temp dir
+	LOOP_DEVICE2=$(losetup --show --find ${FSIMG})
+	mount -o rw,users -t vfat ${LOOP_DEVICE2} ${TMPDIR}
+	echo
+	
+	## Copy the contents of the ISO to the USB image
+	cp -r ${IMGROOT}/* ${TMPDIR}
+	echo
+	
+	umount ${TMPDIR}
+	losetup --detach ${LOOP_DEVICE2}
+	echo
+	
+	## Create the final USB image
+	cat ${FSIMG} > ${DISKIMG}
+	echo
+	
+	## Install syslinux into the image
+	syslinux ${DISKIMG}
+	echo
+	
+	rm -rf ${TMPDIR} ${FSIMG}
+	echo
+fi
 
 set +x
 
@@ -393,6 +524,6 @@ unset iso_name
 unset grub2_name
 unset GRUB2_MODULES
 unset MKTEMP_TEMPLATE
-unset RM_UNWANTED
+unset REPLACE_SETUP
 unset EFI_INSTALLER
-unset GRUB2_PKG_VER
+unset CREATE_USB_IMG
