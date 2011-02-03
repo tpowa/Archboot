@@ -6,19 +6,18 @@ install ()
     BINARIES="grub-bin2h grub-editenv grub-fstest grub-menulst2cfg grub-mkfont grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath grub-mkdevicemap grub-probe grub-setup grub-kbdcomp grub-mkrescue grub-mkconfig grub-mknetdir grub-reboot grub-set-default grub_bios-install grub_efi_i386-install grub_efi_x86_64-install"
     FILES=""
     
-    # add_file "/usr/share/archboot/grub/boot/grub/grub.cfg" "/boot/grub/grub.cfg"
-    add_file "/etc/default/grub" "/etc/default/grub"
-    
+    # add config files
+    add_file "/boot/grub/grub.cfg.example"
+    for i in $(find /usr/share/archboot/grub2/etc/* ! -type d); do
+        add_file "$i" "/etc/$(basename $i)"
+    done
+
     for i in $(find /usr/lib/grub ! -type d); do
-    	add_file "$i"
+        add_file "$i"
     done
-    
+
     for i in $(find /usr/share/grub ! -type d); do
-    	add_file "$i"
-    done
-    
-    for i in $(find /etc/grub.d ! -type d); do
-    	add_file "$i"
+        add_file "$i"
     done
 }
 
