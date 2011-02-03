@@ -2595,7 +2595,7 @@ select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(egrep || "${_server}.*" "${MIRRORLIST}" | head -n1)
+        SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     echo "Using mirror: $SYNC_URL" >$LOG
 }
