@@ -99,7 +99,7 @@ install ()
         pkgver="$(echo $(pacman -Si $i | grep Version | cut -d ":" -f 2))"
         pkgarch="$(echo $(pacman -Si $i | grep Architecture | cut -d ":" -f 2))"
         if [ "${pkgarch}" = 'any' ]; then
-            cp /var/cache/pacman/pkg/$i-${pkgver}-any.pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
+            cp /var/cache/pacman/pkg/$i-${pkgver}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
             repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.* || return 1
         else
             cp /var/cache/pacman/pkg/$i-${pkgver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
