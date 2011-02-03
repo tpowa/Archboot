@@ -11,10 +11,10 @@ EDITOR=""
 
 # name of the kernel image
 VMLINUZ="vmlinuz26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="kernel26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && KERNELPKG="kernel26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -68,9 +68,9 @@ DIALOG() {
 #
 chroot_mount()
 {
-    [ -e "${DESTDIR}/sys" ] || mkdir "${DESTDIR}/sys"
-    [ -e "${DESTDIR}/proc" ] || mkdir "${DESTDIR}/proc"
-    [ -e "${DESTDIR}/dev" ] || mkdir "${DESTDIR}/dev"
+    [[ -e "${DESTDIR}/sys" ]] || mkdir "${DESTDIR}/sys"
+    [[ -e "${DESTDIR}/proc" ]] || mkdir "${DESTDIR}/proc"
+    [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
     mount -t sysfs sysfs "${DESTDIR}/sys"
     mount -t proc proc "${DESTDIR}/proc"
     mount -o bind /dev "${DESTDIR}/dev"
@@ -111,7 +111,7 @@ getlabel()
 # activate dmraid devices
 activate_dmraid()
 {
-    if [ -e /sbin/dmraid ]; then
+    if [[ -e /sbin/dmraid ]]; then
         DIALOG --infobox "Activating dmraid arrays..." 0 0
         /sbin/dmraid -ay -I -Z >/dev/null 2>&1
     fi
@@ -122,7 +122,7 @@ activate_dmraid()
 activate_lvm2()
 {
     ACTIVATE_LVM2=""
-    if [ -e /sbin/lvm ]; then
+    if [[ -e /sbin/lvm ]]; then
         OLD_LVM2_GROUPS=$LVM2_GROUPS
         OLD_LVM2_VOLUMES=$LVM2_VOLUMES
         DIALOG --infobox "Scanning logical volumes..." 0 0
@@ -131,7 +131,7 @@ activate_lvm2()
         /sbin/lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
         LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
-        [ "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" -a "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" ] && ACTIVATE_LVM2="no"
+        [[ "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" -a "$OLD_LVM2_GROUPS" = "$LVM2_GROUPS" ]] && ACTIVATE_LVM2="no"
     fi
 }
 
@@ -140,7 +140,7 @@ activate_lvm2()
 activate_raid()
 {
     ACTIVATE_RAID=""
-    if [ -e /sbin/mdadm ]; then
+    if [[ -e /sbin/mdadm ]]; then
         DIALOG --infobox "Activating RAID arrays..." 0 0
         /sbin/mdadm --assemble --scan >/dev/null 2>&1 || ACTIVATE_RAID="no"
     fi
@@ -151,20 +151,20 @@ activate_raid()
 activate_luks()
 {
     ACTIVATE_LUKS=""
-    if [ -e /sbin/cryptsetup ]; then
+    if [[ -e /sbin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
-        if [ "$(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"")" ]; then
+        if [[ "$(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"")" ]]; then
             for PART in $(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
                 # skip already encrypted devices, device mapper!
                 OPEN_LUKS=""
                 for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-                    [ "$(cryptsetup status $devpath | grep $PART)" ] && OPEN_LUKS="no"
+                    [[ "$(cryptsetup status $devpath | grep $PART)" ]] && OPEN_LUKS="no"
                 done
-                if ! [ "$OPEN_LUKS" = "no" ]; then
+                if ! [[ "$OPEN_LUKS" = "no" ]]; then
                     RUN_LUKS=""
                     DIALOG --yesno "Setup detected luks encrypted device, do you want to activate $PART ?" 0 0 && RUN_LUKS="1"
-                    [ "$RUN_LUKS" = "1" ] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
-                    [ "$RUN_LUKS" = "" ] && ACTIVATE_LUKS="no"
+                    [[ "$RUN_LUKS" = "1" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
+                    [[ "$RUN_LUKS" = "" ]] && ACTIVATE_LUKS="no"
                 else
                     ACTIVATE_LUKS="no"
                 fi
@@ -185,7 +185,7 @@ activate_special_devices()
     ACTIVATE_LUKS=""
     ACTIVATE_LVM2=""
     activate_dmraid
-    while ! [ "$ACTIVATE_LVM2" = "no" -a "$ACTIVATE_RAID" = "no"  -a "$ACTIVATE_LUKS" = "no" ]; do
+    while ! [[ "$ACTIVATE_LVM2" = "no" -a "$ACTIVATE_RAID" = "no"  -a "$ACTIVATE_LUKS" = "no" ]]; do
         activate_raid
         activate_lvm2
         activate_luks
@@ -194,8 +194,8 @@ activate_special_devices()
 
 # Check media on install packages
 check_media() {
-    ! [ "$(cat /proc/mounts | grep /dev/$dev)" ] && mount /dev/$dev $media >/dev/null 2>&1
-    if [ -d $media/core-$(uname -m)/pkg -a -d $media/core-any/pkg ]; then
+    ! [[ "$(cat /proc/mounts | grep /dev/$dev)" ]] && mount /dev/$dev $media >/dev/null 2>&1
+    if [[ -d $media/core-$(uname -m)/pkg -a -d $media/core-any/pkg ]]; then
         SET_MEDIA=1
         break
     else
@@ -210,34 +210,34 @@ get_media() {
     #unmount media first, we may have leftovers ...
     umount $media  >/dev/null 2>&1
     # ide devices
-    if [ "$SET_MEDIA" = "0" ]; then
+    if [[ "$SET_MEDIA" = "0" ]]; then
         for dev in $(ls $block | egrep '^hd'); do
-            if [ "$(cat $block/$dev/device/media)" = "cdrom" ]; then
+            if [[ "$(cat $block/$dev/device/media)" = "cdrom" ]]; then
                 check_media
             fi
         done
     fi
-    if [ "$SET_MEDIA" = "0" ]; then
+    if [[ "$SET_MEDIA" = "0" ]]; then
         # scsi/sata and other devices
         for dev in $(ls $block | egrep '^[sv]d|^sr|^scd|^sg'); do
-            if [ "$(cat $block/$dev/device/type)" = "5" ]; then
+            if [[ "$(cat $block/$dev/device/type)" = "5" ]]; then
                 check_media
             fi
             #check virtio devices
-            if ! [ -e $block/$dev/device/type ]; then
+            if ! [[ -e $block/$dev/device/type ]]; then
                 check_media
             fi
         done
     fi
-    if [ "$SET_MEDIA" = "0" ]; then
+    if [[ "$SET_MEDIA" = "0" ]]; then
         # usb devices with raw partition
         for dev in $(ls $block | egrep '^sd'); do
-            if [ "$(cat $block/$dev/device/type)" = "0" -a "$(cat $block/$dev/removable)" = "1" -a ! "$(cat $block/$dev/size)" = "0" ]; then
+            if [[ "$(cat $block/$dev/device/type)" = "0" -a "$(cat $block/$dev/removable)" = "1" -a ! "$(cat $block/$dev/size)" = "0" ]]; then
                 check_media
             fi
         done
     fi
-    if [ "$SET_MEDIA" = "0" ]; then
+    if [[ "$SET_MEDIA" = "0" ]]; then
         # MMC devices with raw partitions
         for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
             check_media
@@ -247,14 +247,14 @@ get_media() {
 
 #check on manual mounted source
 manual_media() {
-    if [ "$SET_MEDIA" = "0" ]; then
+    if [[ "$SET_MEDIA" = "0" ]]; then
         DIALOG --msgbox "No source media was autodetected, please switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages are available under /src/core-$(uname -m)/pkg.\n\n" 15 55
     fi
-    if [ ! -d /src/core-$(uname -m)/pkg ]; then
+    if [[ ! -d /src/core-$(uname -m)/pkg ]]; then
         DIALOG --msgbox "Package directory /src/core-$(uname -m)/pkg is missing!" 0 0
         return 1
     fi
-    if [ ! -d /src/core-any/pkg ]; then
+    if [[ ! -d /src/core-any/pkg ]]; then
         DIALOG --msgbox "Package directory /src/core-any/pkg is missing!" 0 0
         return 1
     fi
@@ -269,7 +269,7 @@ destdir_mounts(){
     # check if something is mounted on ${DESTDIR}
     PART_ROOT="$(mount | grep "${DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${DESTDIR}
-    if [ "$PART_ROOT" = "" ]; then
+    if [[ "$PART_ROOT" = "" ]]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
         mountpoints || return 1
     fi
@@ -279,11 +279,11 @@ destdir_mounts(){
 default_blockdevices() {
     # ide devices
     for dev in $(ls $block 2>/dev/null | egrep '^hd'); do
-        if [ "$(cat $block/$dev/device/media)" = "disk" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+        if [[ "$(cat $block/$dev/device/media)" = "disk" ]]; then
+            if ! [[ "$(cat $block/$dev/size)" = "0" ]]; then
+                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]]; then
                     echo "/dev/$dev"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
             fi
         fi
@@ -292,11 +292,11 @@ default_blockdevices() {
     for dev in $(ls $block 2>/dev/null | egrep '^[sv]d'); do
         # virtio device doesn't have type file!
         blktype="$(cat $block/$dev/device/type 2>/dev/null)"
-        if ! [ "$blktype" = "5" ]; then
-            if ! [ "$(cat $block/$dev/size)" = "0" ]; then
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]; then
+        if ! [[ "$blktype" = "5" ]]; then
+            if ! [[ "$(cat $block/$dev/size)" = "0" ]]; then
+                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$dev\[")" -o "$(dmraid -rc | grep /dev/$dev)" ]]; then
                     echo "/dev/$dev"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
             fi
         fi
@@ -311,9 +311,9 @@ additional_blockdevices() {
     for i in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$i"); do
             for k in $(ls $block/$dev 2>/dev/null | egrep "${dev}*p"); do
-                if [ -d "$block/$dev/$k" ]; then
+                if [[ -d "$block/$dev/$k" ]]; then
                     echo "/dev/$i/$(echo $dev | sed -e 's#.*\!##g')"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                     break
                 fi
             done
@@ -322,9 +322,9 @@ additional_blockdevices() {
     # Include MMC devices
     for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then 
+            if [[ -d "$block/$dev/$i" ]]; then 
                 echo "/dev/$dev"
-                [ "$1" ] && echo $1
+                [[ "$1" ]] && echo $1
                 break
             fi
         done
@@ -338,7 +338,7 @@ additional_blockdevices_partitions() {
     for k in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
             for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
-                if [ -d "$block/$dev/$i" ]; then
+                if [[ -d "$block/$dev/$i" ]]; then
                     disk="$k/$(echo $dev | sed -e 's#.*\!##g')"
                     part="$k/$(echo $i | sed -e 's#.*\!##g')"
                     # exclude checks:
@@ -352,9 +352,9 @@ additional_blockdevices_partitions() {
                     #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
                     #- bios_grub partitions
                     # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
-                    if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                         echo "/dev/$part"
-                        [ "$1" ] && echo $1
+                        [[ "$1" ]] && echo $1
                     fi
                 fi
             done
@@ -363,7 +363,7 @@ additional_blockdevices_partitions() {
     # Include MMC devices
     for dev in $(ls $block 2>/dev/null | egrep '^mmcblk'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then
+            if [[ -d "$block/$dev/$i" ]]; then
                 # exclude checks:
                 #- part of raid device
                 #  $(cat /proc/mdstat 2>/dev/null | grep $i)
@@ -375,9 +375,9 @@ additional_blockdevices_partitions() {
                 #  $(sfdisk -c /dev/$dev $(echo $i | sed -e "s#${dev}\p##g" 2>/dev/null | grep "5")
                 #- bios_grub partitions
                 # $(echo $i | grep "[a-z]$(parted /dev/$dev print | grep bios_grub | cut -d " " -f 2)$")
-                if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $i)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$dev $(echo $i | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" -o "$(echo $i | grep "[a-z]$(parted /dev/$dev print | grep bios_grub | cut -d " " -f 2)$")" ]; then
+                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep $i)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "LVM2_member")" -o $(blkid -c=/dev/null -o value -s TYPE /dev/$i | grep "crypto_LUKS") -o "$(sfdisk -c /dev/$dev $(echo $i | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" -o "$(echo $i | grep "[a-z]$(parted /dev/$dev print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                     echo "/dev/$i"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
             fi
         done
@@ -387,11 +387,11 @@ additional_blockdevices_partitions() {
 # list none partitionable raid md devices
 raid_devices() {
     for devpath in $(ls $block 2>/dev/null | egrep '^md'); do
-        if ! [ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]; then 
+        if ! [[ "$(ls $block/$devpath 2>/dev/null | egrep ${devpath}p)" ]]; then 
             # exlude md partitions which are part of lvm or luks
-            if ! [ "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"crypto_LUKS\"")" ]; then
+            if ! [[ "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"LVM2_member\"")" -o "$(blkid -c=/dev/null /dev/$devpath | grep "TYPE=\"crypto_LUKS\"")" ]]; then
                     echo "/dev/$devpath"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
             fi
         fi
     done
@@ -401,9 +401,9 @@ raid_devices() {
 partitionable_raid_devices() {
     for dev in $(ls $block 2>/dev/null | egrep '^md'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep "${dev}\!*p"); do 
-            if [ -d "$block/$dev/$i" ]; then 
+            if [[ -d "$block/$dev/$i" ]]; then 
                 echo "/dev/$dev"
-                [ "$1" ] && echo $1
+                [[ "$1" ]] && echo $1
                 break
             fi
         done
@@ -414,11 +414,11 @@ partitionable_raid_devices() {
 partitionable_raid_devices_partitions() {
     for dev in $(ls $block 2>/dev/null | egrep '^md'); do
         for i in $(ls $block/$dev 2>/dev/null | egrep ${dev}p); do 
-            if [ -d "$block/$dev/$i" ]; then
+            if [[ -d "$block/$dev/$i" ]]; then
                 # exlude md partitions which are part of lvm or luks
-                if ! [ "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"LVM2_member\"")" -o ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"crypto_LUKS\"")" ]; then
+                if ! [[ "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"LVM2_member\"")" -o ! "$(blkid -c=/dev/null /dev/$i | grep "TYPE=\"crypto_LUKS\"")" ]]; then
                     echo "/dev/$i"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
             fi
         done
@@ -427,11 +427,11 @@ partitionable_raid_devices_partitions() {
 
 # lists default linux dmraid devices
 dmraid_devices() {
-    if [ -d /dev/mapper ] ; then
+    if [[ -d /dev/mapper ]] ; then
         for fakeraid in $(dmraid -s -c); do
-                if [ "$(echo $fakeraid | grep '_')" ]; then
+                if [[ "$(echo $fakeraid | grep '_')" ]]; then
                     echo "/dev/mapper/$fakeraid"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
         done
     fi
@@ -462,15 +462,15 @@ dm_devices() {
     check_dm_devices
     for i in $(dmraid -s -c); do
         EXCLUDE_DMRAID=""
-        if [ "$(echo $i | grep '_')" ]; then
+        if [[ "$(echo $i | grep '_')" ]]; then
              EXCLUDE_DMRAID="$EXCLUDE_DMRAID -e $i "
         fi
     done
-    if [ -d /dev/mapper ] ; then
+    if [[ -d /dev/mapper ]] ; then
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v -e control $EXCLUDE_DMRAID); do
-            if ! [ "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
+            if ! [[ "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]]; then
                 echo "/dev/mapper/$devpath"
-                [ "$1" ] && echo $1
+                [[ "$1" ]] && echo $1
             fi
         done
     fi
@@ -480,14 +480,14 @@ dm_devices() {
 # - show dmraid partitions
 dmraid_partitions() {
     check_dm_devices
-    if [ -d /dev/mapper ] ; then
+    if [[ -d /dev/mapper ]] ; then
         for fakeraid in $(dmraid -s -c); do
-            if [ "$(echo $fakeraid | grep '_')" ]; then
+            if [[ "$(echo $fakeraid | grep '_')" ]]; then
                 for k in $(ls /dev/mapper/$fakeraid*); do
                     devpath=$(basename $k)
-                    if ! [ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]; then
+                    if ! [[ "$(dmraid -s -c | grep $devpath$)" -o "$(ls $partofcrypt 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partoflvm 2>/dev/null | grep /dev/mapper/$devpath$)" -o "$(ls $partofraid 2>/dev/null | grep /dev/mapper/$devpath$)" ]]; then
                         echo "/dev/mapper/$devpath"
-                        [ "$1" ] && echo $1
+                        [[ "$1" ]] && echo $1
                     fi
                 done
             fi
@@ -512,10 +512,10 @@ default_partition_check() {
             #  $(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")
-            if ! [ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]; then
-                if [ -d $block/$disk/$part ]; then
+            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep $part)" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "LVM2_member")" -o "$(blkid -c=/dev/null -o value -s TYPE /dev/$part | grep "crypto_LUKS")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk##g") 2>/dev/null | grep "5")" -o "$(sfdisk -c /dev/$disk $(echo $part | sed -e "s#$disk\p##g") 2>/dev/null | grep "5")" -o "$(echo $part | grep "[a-z]$(parted /dev/$disk print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                if [[ -d $block/$disk/$part ]]; then
                     echo "/dev/$part"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
             fi
         done
@@ -541,7 +541,7 @@ findpartitions() {
 
 # don't check on raid devices!
 findbootloaderdisks() {
-    if ! [ "$USE_DMRAID" = "1" ]; then
+    if ! [[ "$USE_DMRAID" = "1" ]]; then
         default_blockdevices $1
         additional_blockdevices $1
     else
@@ -551,7 +551,7 @@ findbootloaderdisks() {
 
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
-    if ! [ "$USE_DMRAID" = "1" ]; then
+    if ! [[ "$USE_DMRAID" = "1" ]]; then
         for devpath in $(findbootloaderdisks); do
             default_partition_check $1
         done
@@ -564,12 +564,12 @@ findbootloaderpartitions() {
 # freeze and unfreeze xfs, as hack for grub/grub2 installing
 freeze_xfs() {
     sync
-    if [ -x /usr/sbin/xfs_freeze ]; then
-        if [ "$(cat /proc/mounts | grep "${DESTDIR}/boot " | grep " xfs ")" ]; then
+    if [[ -x /usr/sbin/xfs_freeze ]]; then
+        if [[ "$(cat /proc/mounts | grep "${DESTDIR}/boot " | grep " xfs ")" ]]; then
             /usr/sbin/xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
             /usr/sbin/xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
         fi
-        if [ "$(cat /proc/mounts | grep "${DESTDIR} " | grep " xfs ")" ]; then
+        if [[ "$(cat /proc/mounts | grep "${DESTDIR} " | grep " xfs ")" ]]; then
             /usr/sbin/xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
             /usr/sbin/xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
         fi
@@ -645,7 +645,7 @@ get_chs() {
 # we need symlinks for grub installation!
 grub_dmraid_hack() {
     for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [ "$(dmraid -s -c | grep $i$)" ]; then
+        if ! [[ "$(dmraid -s -c | grep $i$)" ]]; then
             rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
             ln -s /dev/mapper/$i  /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
         fi
@@ -655,7 +655,7 @@ grub_dmraid_hack() {
 # remove created symlinks
 remove_grub_dmraid_hack(){
     for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [ "$(dmraid -s -c | grep $i$)" ]; then
+        if ! [[ "$(dmraid -s -c | grep $i$)" ]]; then
             rm -f /dev/mapper/$(echo $i | sed -n -e "s/\(.*\)p/\1/p")
         fi
     done
@@ -670,40 +670,40 @@ get_grub2_map() {
 mapdev() {
     partition_flag=0
     device_found=0
-    [ "$GRUB_LEGACY" = "" ] && devs=$(cat /tmp/device.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
-    [ "$GRUB_LEGACY" = "1" ] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
+    [[ "$GRUB_LEGACY" = "" ]] && devs=$(cat /tmp/device.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
+    [[ "$GRUB_LEGACY" = "1" ]] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     # check if we use hd sd  or vd device
-    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]; then
+    if ! [[ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]]; then
         linuxdevice=$(echo $1 | sed -e 's#p[0-9].*$##')
     else
         linuxdevice=$(echo $1 | sed -e 's#[0-9].*$##g')
     fi
-    if ! [ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]; then
-        if [ "$(echo $1 | egrep 'p[0-9].*$')" ]; then
+    if ! [[ "$(echo $1 | grep /dev/sd)" -o "$(echo $1 | grep /dev/hd)" -o "$(echo $1 | grep /dev/vd)" ]]; then
+        if [[ "$(echo $1 | egrep 'p[0-9].*$')" ]]; then
             pnum=$(echo $1 | sed -e 's#.*p##g')
-            [ "$GRUB_LEGACY" = "1" ] && pnum=$(($pnum-1))
+            [[ "$GRUB_LEGACY" = "1" ]] && pnum=$(($pnum-1))
             partition_flag=1
         fi
     else
-        if [ "$(echo $1 | egrep '[0-9]$')" ]; then
+        if [[ "$(echo $1 | egrep '[0-9]$')" ]]; then
             # /dev/hdXY
             pnum=$(echo $1 | cut -b9-)
-            [ "$GRUB_LEGACY" = "1" ] && pnum=$(($pnum-1))
+            [[ "$GRUB_LEGACY" = "1" ]] && pnum=$(($pnum-1))
             partition_flag=1
         fi
     fi
     for  dev in $devs; do
-        if [ "(" = $(echo $dev | cut -b1) ]; then
+        if [[ "(" = $(echo $dev | cut -b1) ]]; then
             grubdevice="$dev"
         else
-            if [ "$dev" = "$linuxdevice" ]; then
+            if [[ "$dev" = "$linuxdevice" ]]; then
                 device_found=1
                 break
             fi
         fi
     done
-    if [ "$device_found" = "1" ]; then
-        if [ "$partition_flag" = "0" ]; then
+    if [[ "$device_found" = "1" ]]; then
+        if [[ "$partition_flag" = "0" ]]; then
             echo "$grubdevice"
         else
             grubdevice_stringlen=${#grubdevice}
@@ -725,7 +725,7 @@ printk()
 }
 
 getdest() {
-    [ "${DESTDIR}" ] && return 0
+    [[ "${DESTDIR}" ]] && return 0
     DIALOG --inputbox "Enter the destination directory where your target system is mounted" 8 65 "/tmp/install" 2>$ANSWER || return 1
     DESTDIR=$(cat $ANSWER)
 }
@@ -735,7 +735,7 @@ getdest() {
 # sets EDITOR global variable
 #
 geteditor() {
-    if ! [ "$EDITOR" ]; then
+    if ! [[ "$EDITOR" ]]; then
         DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
         "1" "nano (easier)" \
         "2" "vi" 2>$ANSWER || return 1
@@ -768,16 +768,16 @@ set_guid() {
 _getavaildisks()
 {
     for i in $(finddisks); do
-            if [ "$(echo "$i" | grep '/dev/mapper')" ]; then
+            if [[ "$(echo "$i" | grep '/dev/mapper')" ]]; then
                 # device mapper is always 512 aligned!
                 # only dmraid device can be here
                 echo -n "$i : "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # special block devices
-            elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
+            elif [[  "$(echo "$i" | grep "/dev/rd")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
-            elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
+            elif [[  "$(echo "$i" | grep "/dev/cciss")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
-            elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
+            elif [[  "$(echo "$i" | grep "/dev/ida")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
             else
                 echo -n "$i : "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
@@ -793,27 +793,27 @@ _getavailpartitions()
 {
     for i in $(findpartitions); do
         # mmc and raid partitions
-        if [ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]; then
+        if [[ "$(echo "$i" | grep '/dev/md_d[0-9]')"  -o  "$(echo "$i" | grep '/dev/md[0-9]p')" -o "$(echo "$i" | grep '/dev/mmcblk')" ]]; then
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/$(basename $i | sed -e 's#p.*##g')/$(basename $i)/size))/1000000)) MB; echo "\n"
         # special block devices
-        elif [  "$(echo "$i" | grep "/dev/rd")" ]; then
+        elif [[  "$(echo "$i" | grep "/dev/rd")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/rd\!$(basename $i | sed -e 's#p.*##g')/rd\!$(basename $i)/size))/1000000)) MB; echo "\n"
-        elif [  "$(echo "$i" | grep "/dev/cciss")" ]; then
+        elif [[  "$(echo "$i" | grep "/dev/cciss")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/cciss\!$(basename $i | sed -e 's#p.*##g')/cciss\!$(basename $i)/size))/1000000)) MB; echo "\n"
-        elif [  "$(echo "$i" | grep "/dev/ida")" ]; then
+        elif [[  "$(echo "$i" | grep "/dev/ida")" ]]; then
                 echo -n "$i: "; echo $(($(expr $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat $block/ida\!$(basename $i | sed -e 's#p.*##g')/ida\!$(basename $i)/size))/1000000)) MB; echo "\n"
         # raid device
-        elif [ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]; then
+        elif [[ "$(echo "$i" | grep -v 'p' |grep '/dev/md')" ]]; then
             echo -n "$i: "; echo $(($(expr $(cat $block/$(basename $i)/queue/logical_block_size) '*' $(cat $block/$(basename $i)/size))/1000000)) MB; echo "\n"
         # mapper devices
-        elif [ "$(echo "$i" | grep '/dev/mapper')" ]; then
+        elif [[ "$(echo "$i" | grep '/dev/mapper')" ]]; then
             # mapper devices are always 512 aligned
             # crypt device
-            if [ "$(cryptsetup status $i 2>/dev/null)" ]; then
+            if [[ "$(cryptsetup status $i 2>/dev/null)" ]]; then
                 echo -n "$i: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename $i) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
             # dmraid device
-            elif [ "$(dmsetup info $i | grep 'DMRAID')"  ]; then
-                [ "$(echo $i | grep 'p*[0-9]$')" ] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
+            elif [[ "$(dmsetup info $i | grep 'DMRAID')"  ]]; then
+                [[ "$(echo $i | grep 'p*[0-9]$')" ]] && echo -n "$i: "; echo $(($(expr 512 '*' $(dmsetup status $i | cut -f2 -d " "))/1000000)) MB; echo "\n"
             # mapper device
             else
                 echo -n "$i: "; echo $(lvs -o lv_size --noheading --units m $i | sed -e 's#m##g') MB; echo "\n"
@@ -837,10 +837,10 @@ _umountall()
 # Disable all software raid devices
 _stopmd()
 {
-    if [ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]; then
+    if [[ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]]; then
         DISABLEMD=""
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
-        if [ "$DISABLEMD" = "1" ]; then
+        if [[ "$DISABLEMD" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
                 mdadm --manage --stop /dev/$i > $LOG
@@ -852,9 +852,9 @@ _stopmd()
         fi
     fi
     DISABLEMDSB=""
-    if [ "$(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"")" ]; then
+    if [[ "$(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"")" ]]; then
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
-        if [ "$DISABLEMDSB" = "1" ]; then
+        if [[ "$DISABLEMDSB" = "1" ]]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(blkid -c=/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g'); do
                 mdadm --zero-superblock $i > $LOG
@@ -871,13 +871,13 @@ _stoplvm()
     LV_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
     LV_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
     LV_PHYSICAL="$(pvs -o pv_name --noheading 2>/dev/null)"
-    ! [ "$LV_VOLUMES" = "" ] && DETECTED_LVM=1
-    ! [ "$LV_GROUPS" = "" ] && DETECTED_LVM=1
-    ! [ "$LV_PHYSICAL" = "" ] && DETECTED_LVM=1
-    if [ "$DETECTED_LVM" = "1" ]; then
+    ! [[ "$LV_VOLUMES" = "" ]] && DETECTED_LVM=1
+    ! [[ "$LV_GROUPS" = "" ]] && DETECTED_LVM=1
+    ! [[ "$LV_PHYSICAL" = "" ]] && DETECTED_LVM=1
+    if [[ "$DETECTED_LVM" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && DISABLELVM="1"
     fi
-    if [ "$DISABLELVM" = "1" ]; then
+    if [[ "$DISABLELVM" = "1" ]]; then
         DIALOG --infobox "Removing logical volumes ..." 0 0
         for i in $LV_VOLUMES; do
             lvremove -f /dev/mapper/$i 2>/dev/null> $LOG
@@ -903,11 +903,11 @@ _stopluks()
     for i in $LUKS_DEVICES; do
         cryptsetup status $i 2>/dev/null && LUKSDEVICE="$LUKSDEVICE $i"
     done
-    ! [ "$LUKSDEVICE" = "" ] && DETECTED_LUKS=1
-    if [ "$DETECTED_LUKS" = "1" ]; then
+    ! [[ "$LUKSDEVICE" = "" ]] && DETECTED_LUKS=1
+    if [[ "$DETECTED_LUKS" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
-    if [ "$DISABLELUKS" = "1" ]; then
+    if [[ "$DISABLELUKS" = "1" ]]; then
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in $LUKSDEVICE; do
             LUKS_REAL_DEVICE="$(echo $(cryptsetup status $i | grep device: | sed -e 's#device:##g'))"
@@ -916,7 +916,7 @@ _stopluks()
             wipefs -a $LUKS_REAL_DEVICE > $LOG
         done
     fi
-    [ -e /tmp/.crypttab ] && rm /tmp/.crypttab
+    [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
 }
 
 #_dmraid_update
@@ -924,9 +924,9 @@ _dmraid_update()
 {
     DIALOG --infobox "Deactivating dmraid devices ..." 0 0
     dmraid -an >/dev/null 2>&1
-    if [ "$DETECTED_LVM" = "1" -o "$DETECTED_LUKS" = "1" ]; then
+    if [[ "$DETECTED_LVM" = "1" -o "$DETECTED_LUKS" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && RESETDM="1"
-        if [ "$RESETDM" = "1" ]; then
+        if [[ "$RESETDM" = "1" ]]; then
             DIALOG --infobox "Resetting devicemapper devices ..." 0 0
             dmsetup remove_all >/dev/null 2>&1
         fi
@@ -998,7 +998,7 @@ storage is duplication." 0 0
 _raid()
 {
     MDFINISH=""
-    while [ "$MDFINISH" != "DONE" ]; do
+    while [[ "$MDFINISH" != "DONE" ]]; do
         activate_special_devices
         : >/tmp/.raid
         : >/tmp/.raid-spare
@@ -1010,7 +1010,7 @@ _raid()
         for i in $ALREADYINUSE; do
             PARTS=$(echo $PARTS | sed -e "s#/dev/$i\ _##g" -e "s#/dev/$i\p[0-9]\ _##g")
             k=$(echo /dev/$i | sed -e 's#[0-9]##g')
-            if ! [ "$(echo $k | grep ^md)" ]; then
+            if ! [[ "$(echo $k | grep ^md)" ]]; then
                 PARTS=$(echo $PARTS | sed -e "s#$k\ _##g")
             fi
         done
@@ -1022,13 +1022,13 @@ _raid()
         # skip lvm with raid devices
         for devpath in $(pvs -o pv_name --noheading); do
             # skip simple lvm device with raid device
-            if [ "$(echo $devpath | grep /dev/md)" ]; then
+            if [[ "$(echo $devpath | grep /dev/md)" ]]; then
                 killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                 ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
             fi
             # skip encrypted raid device
-            if [ "$(echo $devpath | grep dm-)" ]; then
-                if [ "$(cryptsetup status $(basename $devpath) | grep "device:.*/dev/md")" ]; then
+            if [[ "$(echo $devpath | grep dm-)" ]]; then
+                if [[ "$(cryptsetup status $(basename $devpath) | grep "device:.*/dev/md")" ]]; then
                    killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                    ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                 fi
@@ -1037,9 +1037,9 @@ _raid()
         # skip already encrypted volume devices with raid device
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            if [ "$(lvs $realdevice 2>/dev/null)" ]; then
+            if [[ "$(lvs $realdevice 2>/dev/null)" ]]; then
                 vg="$(echo $(lvs -o vg_name --noheading $realdevice))"
-                if [ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]; then
+                if [[ "$(pvs -o pv_name,vg_name --noheading | grep "$vg$" | grep "/dev/md")" ]]; then
                    ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
                 fi
             fi
@@ -1048,21 +1048,21 @@ _raid()
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
         # break if all devices are in use
-        if [ "$PARTS" = "" ]; then
+        if [[ "$PARTS" = "" ]]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
             return 1
         fi
         # enter raid device name
         RAIDDEVICE=""
-        while [ "${RAIDDEVICE}" = "" ]; do
-            if [ "$RAID_PARTITION" = "" ]; then
+        while [[ "${RAIDDEVICE}" = "" ]]; do
+            if [[ "$RAID_PARTITION" = "" ]]; then
                 DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
             fi
-            if [ "$RAID_PARTITION" = "1" ]; then
+            if [[ "$RAID_PARTITION" = "1" ]]; then
                 DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>$ANSWER || return 1
             fi
             RAIDDEVICE=$(cat $ANSWER)
-            if [ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]; then
+            if [[ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo $RAIDDEVICE | sed -e 's#/dev/##g')")" ]]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
@@ -1072,7 +1072,7 @@ _raid()
         LEVEL=$(cat $ANSWER)
         # raid5 and raid10 support parity parameter
         PARITY=""
-        if [ "$LEVEL" = "raid5" -o "$LEVEL" = "raid6" -o "$LEVEL" = "raid10" ]; then
+        if [[ "$LEVEL" = "raid5" -o "$LEVEL" = "raid6" -o "$LEVEL" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 $PARITYLEVELS 2>$ANSWER || return 1
             PARTIY=$(cat $ANSWER)
@@ -1086,23 +1086,23 @@ _raid()
         DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         echo "$PART" >>/tmp/.raid
-        while [ "$PART" != "DONE" ]; do
+        while [[ "$PART" != "DONE" ]]; do
             RAIDNUMBER=$(($RAIDNUMBER + 1))
             # clean loop from used partition and options
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
-            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && MDEXTRA="MISSING _"
+            ! [[ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
             DIALOG --menu "Select additional device $RAIDNUMBER" 21 50 13 $PARTS $MDEXTRA DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             SPARE=""
-            ! [ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
-            [ "$PART" = "DONE" ] && break
-            if [ "$PART" = "MISSING" ]; then
+            ! [[ "$LEVEL" = "raid0" -o "$LEVEL" = "linear" ]] && DIALOG --yesno --defaultno "Would you like to use $PART as spare device?" 0 0 && SPARE="1"
+            [[ "$PART" = "DONE" ]] && break
+            if [[ "$PART" = "MISSING" ]]; then
                 DIALOG --yesno "Would you like to create a degraded raid on $RAIDDEVICE?" 0 0 && DEGRADED="missing"
                 echo "$DEGRADED" >>/tmp/.raid
             else
-                if [ "$SPARE" = "1" ]; then
+                if [[ "$SPARE" = "1" ]]; then
                     echo "$PART" >>/tmp/.raid-spare
                 else
                     echo "$PART" >>/tmp/.raid
@@ -1121,26 +1121,26 @@ _createraid()
     DEVICES="$(echo -n $(cat /tmp/.raid))"
     SPARES="$(echo -n $(cat /tmp/.raid-spare))"
     # combine both if spares are available, spares at the end!
-    [ -n $SPARES ] && DEVICES="$DEVICES $SPARES"
+    [[ -n $SPARES ]] && DEVICES="$DEVICES $SPARES"
     # get number of devices
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=$LEVEL --metadata=$METADATA"
-    [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
-    ! [ "$RAID_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
-    ! [ "$SPARE_DEVICES" = "0" ] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
-    ! [ "$PARITY" = "" ] && RAIDOPTIONS="$RAIDOPTIONS --layout=$PARITY"
+    [[ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]] && RAIDOPTIONS="$RAIDOPTIONS -a mdp"
+    ! [[ "$RAID_DEVICES" = "0" ]] && RAIDOPTIONS="$RAIDOPTIONS --raid-devices=$RAID_DEVICES"
+    ! [[ "$SPARE_DEVICES" = "0" ]] && RAIDOPTIONS="$RAIDOPTIONS --spare-devices=$SPARE_DEVICES"
+    ! [[ "$PARITY" = "" ]] && RAIDOPTIONS="$RAIDOPTIONS --layout=$PARITY"
     DIALOG --infobox "Creating $RAIDDEVICE..." 0 0
     mdadm --create $RAIDDEVICE $RAIDOPTIONS $DEVICES >$LOG 2>&1
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error creating $RAIDDEVICE (see $LOG for details)." 0 0
         return 1
     fi
-    if [ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]; then
+    if [[ "$(echo $RAIDDEVICE | grep /md_d[0-9])" ]]; then
         # switch for mbr usage
         set_guid
-        if [ "$GUIDPARAMETER" = "" ]; then
+        if [[ "$GUIDPARAMETER" = "" ]]; then
             DIALOG --msgbox "Now you'll be put into the parted program where you can partition your raiddevice to your needs." 18 70
             clear
             parted $RAIDDEVICE print
@@ -1178,7 +1178,7 @@ to modify.\n\nThe basic building block of LVM are:\n
 _createpv()
 {
     PVFINISH=""
-    while [ "$PVFINISH" != "DONE" ]; do
+    while [[ "$PVFINISH" != "DONE" ]]; do
         activate_special_devices
         : >/tmp/.pvs-create
         PVDEVICE=""
@@ -1186,38 +1186,38 @@ _createpv()
         ALREADYINUSE=""
         # skip volume devices
         for i in $(ls /dev/mapper/* | grep -v control); do
-            [ "$(lvs $i 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+            [[ "$(lvs $i 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
         done
         # skip already encrypted volume devices
         for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
             realdevice="$(cryptsetup status $devpath 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            if ! [ "$realdevice" = "" ]; then
-                [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            if ! [[ "$realdevice" = "" ]]; then
+                [[ "$(lvs $realdevice 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
             fi
         done
         # skip md devices, which already have lvm devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
-            if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+            if ! [[ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
                     realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-                    [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(lvs $realdevice 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                     # check on normal lvs
-                    [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                 done
             fi
         done
         # skip md partition devices, which already have lvm devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
+            if [[ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
                     # check encrypted volume
                     realdevice="$(cryptsetup status $(cat $k/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-                    [ "$(lvs $realdevice 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(lvs $realdevice 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                    # check on normal lvs
-                    [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                 done
             fi
         done
@@ -1225,7 +1225,7 @@ _createpv()
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
         # break if all devices are in use
-        if [ "$PARTS" = "" ]; then
+        if [[ "$PARTS" = "" ]]; then
             DIALOG --msgbox "No devices left for physical volume creation." 0 0
             return 1
         fi
@@ -1236,14 +1236,14 @@ _createpv()
         DIALOG --menu "Select device number $DEVNUMBER for physical volume" 21 50 13 $PARTS 2>$ANSWER || return 1
         PART=$(cat $ANSWER)
         echo "$PART" >>/tmp/.pvs-create
-        while [ "$PART" != "DONE" ]; do
+        while [[ "$PART" != "DONE" ]]; do
             DEVNUMBER=$(($DEVNUMBER + 1))
             # clean loop from used partition and options
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             # add more devices
             DIALOG --menu "Select additional device number $DEVNUMBER for physical volume" 21 50 13 $PARTS DONE _ 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
-            [ "$PART" = "DONE" ] && break
+            [[ "$PART" = "DONE" ]] && break
             echo "$PART" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
@@ -1252,7 +1252,7 @@ _createpv()
     DIALOG --infobox "Creating physical volume on $PART..." 0 0
     PART="$(echo -n $(cat /tmp/.pvs-create))"
     pvcreate $PART >$LOG 2>&1
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error creating physical volume on $PART (see $LOG for details)." 0 0
         return 1
     fi
@@ -1262,20 +1262,20 @@ _createpv()
 findpv()
 {
     for i in $(pvs -o pv_name --noheading);do
-        if [ "$(pvs -o vg_name --noheading $i)" = "      " ]; then
-                if [ "$(echo $i | grep /dev/dm-)" ]; then
+        if [[ "$(pvs -o vg_name --noheading $i)" = "      " ]]; then
+                if [[ "$(echo $i | grep /dev/dm-)" ]]; then
                     for k in $(ls /dev/mapper | grep -v control); do
-                        if [ -h /dev/mapper/$k ]; then
+                        if [[ -h /dev/mapper/$k ]]; then
                             pv="$(basename $i)"
-                            if [ "$(readlink /dev/mapper/$k | grep $pv$)" ]; then
+                            if [[ "$(readlink /dev/mapper/$k | grep $pv$)" ]]; then
                                 echo "$i" | sed -e "s#/dev/dm-.*#/dev/mapper/$k#g"
-                                [ "$1" ] && echo $1
+                                [[ "$1" ]] && echo $1
                             fi
                         fi
                     done
                 else
                     echo "$i"
-                    [ "$1" ] && echo $1
+                    [[ "$1" ]] && echo $1
                 fi
         fi
     done
@@ -1284,11 +1284,11 @@ findpv()
 getavailablepv()
 {
     for i in "$(pvs -o pv_name,pv_size --noheading --units m)"; do
-            if [ "$(echo $i | grep /dev/dm-)" ]; then
+            if [[ "$(echo $i | grep /dev/dm-)" ]]; then
                 for k in $(ls /dev/mapper | grep -v control); do
-                    if [ -h /dev/mapper/$k ]; then
+                    if [[ -h /dev/mapper/$k ]]; then
                         pv="$(basename $i)"
-                        if [ "$(readlink /dev/mapper/$k | grep $pv$)" ]; then
+                        if [[ "$(readlink /dev/mapper/$k | grep $pv$)" ]]; then
                             echo "$i" | sed -e "s#/dev/dm-.* #/dev/mapper/$k #g" | sed -e 's#$#\\n#'
                         fi
                     fi
@@ -1303,9 +1303,9 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [ "$(vgs -o vg_free --noheading --units m $dev | grep " 0m$")" ]; then
+        if ! [[ "$(vgs -o vg_free --noheading --units m $dev | grep " 0m$")" ]]; then
             echo "$dev"
-            [ "$1" ] && echo $1
+            [[ "$1" ]] && echo $1
         fi
     done
 }
@@ -1313,7 +1313,7 @@ findvg()
 getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units m); do
-        if ! [ "$(echo $i | grep " 0m$")" ]; then
+        if ! [[ "$(echo $i | grep " 0m$")" ]]; then
             echo $i | sed -e 's#$#\\n#'
         fi
     done
@@ -1323,21 +1323,21 @@ getavailablevg()
 _createvg()
 {
     VGFINISH=""
-    while [ "$VGFINISH" != "DONE" ]; do
+    while [[ "$VGFINISH" != "DONE" ]]; do
         : >/tmp/.pvs
         VGDEVICE=""
         PVS=$(findpv _)
         # break if all devices are in use
-        if [ "$PVS" = "" ]; then
+        if [[ "$PVS" = "" ]]; then
             DIALOG --msgbox "No devices left for Volume Group creation." 0 0
             return 1
         fi
         # enter volume group name
         VGDEVICE=""
-        while [ "${VGDEVICE}" = "" ]; do
+        while [[ "${VGDEVICE}" = "" ]]; do
             DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 15 65 "foogroup" 2>$ANSWER || return 1
             VGDEVICE=$(cat $ANSWER)
-            if [ "$(vgs -o vg_name --noheading 2>/dev/null | grep "^  $(echo $VGDEVICE)")" ]; then
+            if [[ "$(vgs -o vg_name --noheading 2>/dev/null | grep "^  $(echo $VGDEVICE)")" ]]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 VGDEVICE=""
             fi
@@ -1349,14 +1349,14 @@ _createvg()
         DIALOG --menu "Select Physical Volume $PVNUMBER for $VGDEVICE" 21 50 13 $PVS 2>$ANSWER || return 1
         PV=$(cat $ANSWER)
         echo "$PV" >>/tmp/.pvs
-        while [ "$PVS" != "DONE" ]; do
+        while [[ "$PVS" != "DONE" ]]; do
             PVNUMBER=$(($PVNUMBER + 1))
             # clean loop from used partition and options
             PVS="$(echo $PVS | sed -e "s#${PV}\ _##g")"
             # add more devices
             DIALOG --menu "Select additional Physical Volume $PVNUMBER for $VGDEVICE" 21 50 13 $PVS DONE _ 2>$ANSWER || return 1
             PV=$(cat $ANSWER)
-            [ "$PV" = "DONE" ] && break
+            [[ "$PV" = "DONE" ]] && break
             echo "$PV" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
@@ -1365,7 +1365,7 @@ _createvg()
     DIALOG --infobox "Creating Volume Group $VGDEVICE..." 0 0
     PV="$(echo -n $(cat /tmp/.pvs))"
     vgcreate $VGDEVICE $PV >$LOG 2>&1
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error creating Volume Group $VGDEVICE (see $LOG for details)." 0 0
         return 1
     fi
@@ -1375,12 +1375,12 @@ _createvg()
 _createlv()
 {
     LVFINISH=""
-    while [ "$LVFINISH" != "DONE" ]; do
+    while [[ "$LVFINISH" != "DONE" ]]; do
         LVDEVICE=""
         LV_SIZE_SET=""
         LVS=$(findvg _)
         # break if all devices are in use
-        if [ "$LVS" = "" ]; then
+        if [[ "$LVS" = "" ]]; then
             DIALOG --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
             return 1
         fi
@@ -1390,25 +1390,25 @@ _createlv()
         LV=$(cat $ANSWER)
         # enter logical volume name
         LVDEVICE=""
-        while [ "${LVDEVICE}" = "" ]; do
+        while [[ "${LVDEVICE}" = "" ]]; do
             DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
             LVDEVICE=$(cat $ANSWER)
-            if [ "$(lvs -o lv_name,vg_name --noheading 2>/dev/null | grep " $(echo $LVDEVICE) $(echo $LV)"$)" ]; then
+            if [[ "$(lvs -o lv_name,vg_name --noheading 2>/dev/null | grep " $(echo $LVDEVICE) $(echo $LV)"$)" ]]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 LVDEVICE=""
             fi
         done
-        while [ "$LV_SIZE_SET" = "" ]; do
+        while [[ "$LV_SIZE_SET" = "" ]]; do
             LV_ALL=""
             DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m $LV)B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>$ANSWER || return 1
                 LV_SIZE=$(cat $ANSWER)
-                if [ "$LV_SIZE" = "" ]; then
+                if [[ "$LV_SIZE" = "" ]]; then
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
                 fi
-                if [ "$LV_SIZE" = "0" ]; then
+                if [[ "$LV_SIZE" = "0" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]; then
+                    if [[ "$LV_SIZE" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         LV_SIZE_SET=1
@@ -1417,25 +1417,25 @@ _createlv()
         done
         #Contiguous doesn't work with +100%FREE
         LV_CONTIGUOUS=""
-        [ "$LV_ALL" = "" ] && DIALOG --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && LV_CONTIGUOUS="1"
-        if [ "$LV_CONTIGUOUS" = "1" ]; then
+        [[ "$LV_ALL" = "" ]] && DIALOG --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && LV_CONTIGUOUS="1"
+        if [[ "$LV_CONTIGUOUS" = "1" ]]; then
             CONTIGUOUS=yes
             LV_EXTRA="-C y"
         else
             CONTIGUOUS=no
             LV_EXTRA=""
         fi
-        [ "$LV_SIZE" = "" ] && LV_SIZE="All free space left"
+        [[ "$LV_SIZE" = "" ]] && LV_SIZE="All free space left"
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create Logical Volume $LVDEVICE like this?\nVolume Group:\n$LV\nVolume Size:\n$LV_SIZE\nContiguous Volume:\n$CONTIGUOUS" 0 0 && LVFINISH="DONE"
     done
     DIALOG --infobox "Creating Logical Volume $LVDEVICE..." 0 0
-    if [ "$LV_ALL" = "1" ]; then
+    if [[ "$LV_ALL" = "1" ]]; then
         lvcreate $LV_EXTRA -l +100%FREE $LV -n $LVDEVICE >$LOG 2>&1
     else
         lvcreate $LV_EXTRA -L $LV_SIZE $LV -n $LVDEVICE >$LOG 2>&1
     fi
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error creating Logical Volume $LVDEVICE (see $LOG for details)." 0 0
         return 1
     fi
@@ -1444,10 +1444,10 @@ _createlv()
 # enter luks name
 _enter_luks_name() {
     LUKSDEVICE=""
-    while [ "${LUKSDEVICE}" = "" ]; do
+    while [[ "${LUKSDEVICE}" = "" ]]; do
         DIALOG --inputbox "Enter the name for luks encrypted device $PART:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
         LUKSDEVICE=$(cat $ANSWER)
-        if ! [ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]; then
+        if ! [[ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]]; then
             DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
             LUKSDEVICE=""
         fi
@@ -1457,12 +1457,12 @@ _enter_luks_name() {
 # enter luks passphrase
 _enter_luks_passphrase () {
     LUKSPASSPHRASE=""
-    while [ "${LUKSPASSPHRASE}" = "" ]; do
+    while [[ "${LUKSPASSPHRASE}" = "" ]]; do
         DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device $PART:" 0 0 2>$ANSWER || return 1
         LUKSPASS=$(cat $ANSWER)
         DIALOG --insecure --passwordbox "Retype passphrasefor luks encrypted device $PART:" 0 0 2>$ANSWER || return 1
         LUKSPASS2=$(cat $ANSWER)
-        if [ "$LUKSPASS" = "$LUKSPASS2" ]; then
+        if [[ "$LUKSPASS" = "$LUKSPASS2" ]]; then
             LUKSPASSPHRASE=$LUKSPASS
             echo $LUKSPASSPHRASE > /tmp/.passphrase
             LUKSPASSPHRASE=/tmp/.passphrase
@@ -1478,7 +1478,7 @@ _opening_luks() {
     cryptsetup luksOpen $PART $LUKSDEVICE >$LOG <$LUKSPASSPHRASE  
     LUKSPASSPHRASE="$(cat $LUKSPASSPHRASE)"
     echo $LUKSDEVICE $PART $LUKSPASSPHRASE >> /tmp/.crypttab
-    [ -e /tmp/.passphrase ] && rm /tmp/.passphrase
+    [[ -e /tmp/.passphrase ]] && rm /tmp/.passphrase
 }
 
 # help for luks
@@ -1508,28 +1508,28 @@ are other ways to break into computers, while they are running." 0 0
 _luks()
 {
     LUKSFINISH=""
-    while [ "$LUKSFINISH" != "DONE" ]; do
+    while [[ "$LUKSFINISH" != "DONE" ]]; do
         activate_special_devices
         PARTS="$(findpartitions _)"
         ALREADYINUSE=""
         # skip already encrypted devices, device mapper!
         for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            [ "$(cryptsetup status $devpath)" ] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
+            [[ "$(cryptsetup status $devpath)" ]] && ALREADYINUSE="$ALREADYINUSE /dev/mapper/$devpath"
         done
         # skip already encrypted devices, device mapper with encrypted parts!
         for devpath in $(pvs -o pv_name --noheading); do
-             if [ "$(echo $devpath | grep dm-)" ]; then
-                if [ "$(cryptsetup status $(basename $devpath))" ]; then
+             if [[ "$(echo $devpath | grep dm-)" ]]; then
+                if [[ "$(cryptsetup status $(basename $devpath))" ]]; then
                    killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                    ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                 fi
              fi
              # remove hidden crypt by md device
-             if [ "$(echo $devpath | grep /dev/md)" ]; then
+             if [[ "$(echo $devpath | grep /dev/md)" ]]; then
                  mdcheck="$(echo $devpath | sed -e 's#/dev/##g')"
-                 if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+                 if ! [[ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
                      for k in $(find $block/$mdcheck/slaves/ -name 'dm*'); do
-                         if [ "$(cryptsetup status $(cat $k/dm/name))" ]; then
+                         if [[ "$(cryptsetup status $(cat $k/dm/name))" ]]; then
                              killvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
                              ALREADYINUSE="$ALREADYINUSE $(ls /dev/mapper/$killvolumegroup-*)"
                          fi
@@ -1540,13 +1540,13 @@ _luks()
         # skip md devices, which already has encrypted devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | sed -e 's#/dev/##g')"
-            if ! [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]; then
+            if ! [[ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
-                    [ "$(cryptsetup status $(cat $k/dm/name))"  ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(cryptsetup status $(cat $k/dm/name))"  ]] && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
-                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
+                    if [[ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]]; then
                         for devpath in $ALREADYINUSE; do
-                            [ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                            [[ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                         done
                     fi
                 done
@@ -1555,13 +1555,13 @@ _luks()
         # skip md partition devices, which already has encrypted devices!
         for i in $PARTS; do
             mdcheck="$(echo $i | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]; then
+            if [[ "$(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null)" != "" -a "$mdcheck" != "" ]]; then
                 for k in $(find $block/$mdcheck/slaves/ -name 'dm*' 2>/dev/null); do
-                    [ "$(cryptsetup status $(cat $k/dm/name))" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                    [[ "$(cryptsetup status $(cat $k/dm/name))" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                     # check lvm devices if encryption was used!
-                    if [ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]; then
+                    if [[ "$(lvs /dev/mapper/$(cat $k/dm/name) 2>/dev/null)" ]]; then
                         for devpath in $ALREADYINUSE; do
-                            [ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ] && ALREADYINUSE="$ALREADYINUSE $i"
+                            [[ "$(echo $devpath | grep "/dev/mapper/$(cat $k/dm/name)"$)" ]] && ALREADYINUSE="$ALREADYINUSE $i"
                         done
                     fi
                 done
@@ -1571,7 +1571,7 @@ _luks()
             PARTS=$(echo $PARTS | sed -e "s#$i\ _##g")
         done
         # break if all devices are in use
-        if [ "$PARTS" = "" ]; then
+        if [[ "$PARTS" = "" ]]; then
             DIALOG --msgbox "No devices left for luks encryption." 0 0
             return 1
         fi
@@ -1601,7 +1601,7 @@ autoprepare() {
     # switch for mbr usage
     set_guid
     DISCS=$(default_blockdevices)
-    if [ "$(echo $DISCS | wc -w)" -gt 1 ]; then
+    if [[ "$(echo $DISCS | wc -w)" -gt 1 ]]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         DIALOG --menu "Select the hard drive to use" 14 55 7 $(default_blockdevices _) 2>$ANSWER || return 1
         DISC=$(cat $ANSWER)
@@ -1614,36 +1614,36 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    if [ "$(cat $block/$(basename $DISC 2>/dev/null)/size 2>/dev/null)" ]; then
+    if [[ "$(cat $block/$(basename $DISC 2>/dev/null)/size 2>/dev/null)" ]]; then
         DISC_SIZE="$(($(expr $(cat $block/$(basename $DISC)/queue/logical_block_size) '*' $(cat $block/$(basename $DISC)/size))/1000000))"
     else
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
-    while [ "$DEFAULTFS" = "" ]; do
+    while [[ "$DEFAULTFS" = "" ]]; do
         FSOPTS=""
-        [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
-        [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
-        [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-        [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
-        [ "$(which mkfs.nilfs2 2>/dev/null)" ] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
-        [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-        [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
-        [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
+        [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext2 Ext2"
+        [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext3 Ext3"
+        [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext4 Ext4"
+        [[ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ]] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+        [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
+        [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS reiserfs Reiser3"
+        [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS xfs XFS"
+        [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS jfs JFS"
         # create 10MB bios_grub partition for grub2 support
-        if [ "$GUIDPARAMETER" = "yes" ]; then
+        if [[ "$GUIDPARAMETER" = "yes" ]]; then
             GUID_PART_SIZE="2"
         else
             GUID_PART_SIZE="0"
         fi
         DISC_SIZE=$(($DISC_SIZE-$GUID_PART_SIZE))
-        while [ "$BOOT_PART_SET" = "" ]; do
+        while [[ "$BOOT_PART_SET" = "" ]]; do
             DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: $DISC_SIZE MB" 10 65 "32" 2>$ANSWER || return 1
             BOOT_PART_SIZE="$(cat $ANSWER)"
-            if [ "$BOOT_PART_SIZE" = "" ]; then
+            if [[ "$BOOT_PART_SIZE" = "" ]]; then
                 DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
             else
-                if [ "$BOOT_PART_SIZE" -ge "$DISC_SIZE" -o "$BOOT_PART_SIZE" -lt "16" -o "$SBOOT_PART_SIZE" = "$DISC_SIZE" ]; then
+                if [[ "$BOOT_PART_SIZE" -ge "$DISC_SIZE" -o "$BOOT_PART_SIZE" -lt "16" -o "$SBOOT_PART_SIZE" = "$DISC_SIZE" ]]; then
                     DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     BOOT_PART_SET=1
@@ -1652,14 +1652,14 @@ autoprepare() {
         done
         DISC_SIZE=$(($DISC_SIZE-$BOOT_PART_SIZE))
         SWAP_SIZE="256"
-        [ "$DISC_SIZE" -lt "256" ] && SWAP_SIZE="$DISC_SIZE"
-        while [ "$SWAP_PART_SET" = "" ]; do
+        [[ "$DISC_SIZE" -lt "256" ]] && SWAP_SIZE="$DISC_SIZE"
+        while [[ "$SWAP_PART_SET" = "" ]]; do
             DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: $DISC_SIZE MB" 10 65 "$SWAP_SIZE" 2>$ANSWER || return 1
             SWAP_PART_SIZE=$(cat $ANSWER)
-            if [ "$SWAP_PART_SIZE" = "" -o  "$SWAP_PART_SIZE" = "0" ]; then
+            if [[ "$SWAP_PART_SIZE" = "" -o  "$SWAP_PART_SIZE" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
-                if [ "$SWAP_PART_SIZE" -ge "$DISC_SIZE" ]; then
+                if [[ "$SWAP_PART_SIZE" -ge "$DISC_SIZE" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     SWAP_PART_SET=1
@@ -1668,21 +1668,21 @@ autoprepare() {
         done
         DISC_SIZE=$(($DISC_SIZE-$SWAP_PART_SIZE))
         ROOT_SIZE="7500"
-        [ "$DISC_SIZE" -lt "7500" ] && ROOT_SIZE="$DISC_SIZE"
-        while [ "$ROOT_PART_SET" = "" ]; do
+        [[ "$DISC_SIZE" -lt "7500" ]] && ROOT_SIZE="$DISC_SIZE"
+        while [[ "$ROOT_PART_SET" = "" ]]; do
         DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  $DISC_SIZE MB" 10 65 "$ROOT_SIZE" 2>$ANSWER || return 1
         ROOT_PART_SIZE=$(cat $ANSWER)
-            if [ "$ROOT_PART_SIZE" = "" -o "$ROOT_PART_SIZE" = "0" ]; then
+            if [[ "$ROOT_PART_SIZE" = "" -o "$ROOT_PART_SIZE" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
-                if [ "$ROOT_PART_SIZE" -ge "$DISC_SIZE" ]; then
+                if [[ "$ROOT_PART_SIZE" -ge "$DISC_SIZE" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     DIALOG --yesno "$(($DISC_SIZE-$ROOT_PART_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
                 fi
             fi
         done
-        while [ "$CHOSEN_FS" = "" ]; do
+        while [[ "$CHOSEN_FS" = "" ]]; do
             DIALOG --menu "Select a filesystem for / and /home:" 16 45 8 $FSOPTS 2>$ANSWER || return 1
             FSTYPE=$(cat $ANSWER)
             DIALOG --yesno "$FSTYPE will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
@@ -1697,25 +1697,25 @@ autoprepare() {
     FSSPECS="/boot:$BOOT_PART_SIZE:ext2:+:BOOT_ARCH swap:$SWAP_PART_SIZE:swap::SWAP_ARCH /:$ROOT_PART_SIZE:$FSTYPE::ROOT_ARCH /home:*:$FSTYPE::HOME_ARCH"
 
     # validate DEVICE
-    if [ ! -b "$DEVICE" ]; then
+    if [[ ! -b "$DEVICE" ]]; then
       DIALOG --msgbox "Device '$DEVICE' is not valid" 0 0
       return 1
     fi
 
     # validate DEST
-    if [ ! -d "${DESTDIR}" ]; then
+    if [[ ! -d "${DESTDIR}" ]]; then
         DIALOG --msgbox "Destination directory '${DESTDIR}' is not valid" 0 0
         return 1
     fi
 
-    [ -e /tmp/.fstab ] && rm -f /tmp/.fstab
+    [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+    if [[ "$NAME_SCHEME_PARAMETER_RUN" = "" ]]; then
         set_device_name_scheme || return 1
     fi
     # we assume a /dev/hdX format (or /dev/sdX)
-    if [ "$GUIDPARAMETER" = "yes" ]; then
+    if [[ "$GUIDPARAMETER" = "yes" ]]; then
         PART_ROOT="${DEVICE}4"
         # GUID(GPT) is only supported by 'parted'
         printk off
@@ -1745,7 +1745,7 @@ autoprepare() {
         parted -a optimal -s $DEVICE mkpart primary $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE)) $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) >$LOG
         parted -a optimal -s $DEVICE mkpart primary $(($GUID_PART_SIZE+$BOOT_PART_SIZE+$SWAP_PART_SIZE+$ROOT_PART_SIZE)) 100% >$LOG
     fi
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning $DEVICE (see $LOG for details)" 0 0
         printk on
         return 1
@@ -1755,7 +1755,7 @@ autoprepare() {
     udevadm settle
     # need to mount root first, then do it again for the others
     part=1
-    [ "$GUIDPARAMETER" = "yes" ] && part=2
+    [[ "$GUIDPARAMETER" = "yes" ]] && part=2
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
@@ -1776,7 +1776,7 @@ autoprepare() {
 
     # make other filesystems
     part=1
-    [ "$GUIDPARAMETER" = "yes" ] && part=2
+    [[ "$GUIDPARAMETER" = "yes" ]] && part=2
     for fsspec in $FSSPECS; do
         mountpoint=$(echo $fsspec | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
@@ -1788,7 +1788,7 @@ autoprepare() {
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
-        if [ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]; then
+        if [[ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
             DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
             _mkfs yes ${DEVICE}${part} "$fstype" "${DESTDIR}" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
@@ -1801,36 +1801,36 @@ autoprepare() {
 
 parted_gpt() {
     
-    [ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ] && GUID_DETECTED=1    
+    [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
     
-    if [ "${GUID_DETECTED}" = "" ] ; then
+    if [[ "${GUID_DETECTED}" = "" ]] ; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt ${DISC} >${LOG}
     fi
     
-    if [ "${GUID_DETECTED}" = "1" ]; then
-        if [ "${EFI_x86_64}" = "1" ] || [ "${EFI_i386}" = "1" ]; then
-            if ! [ "$(parted -s ${DISC} print | grep 'boot')" ]; then
+    if [[ "${GUID_DETECTED}" = "1" ]]; then
+        if [[ "${EFI_x86_64}" = "1" ]] || [[ "${EFI_i386}" = "1" ]]; then
+            if ! [[ "$(parted -s ${DISC} print | grep 'boot')" ]]; then
             DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on ${DISC}.\nDo you want to create an EFISYS partition on ${DISC}?" 0 0 && CREATE_EFISYS=1
             fi
-        elif ! [ "$(parted -s ${DISC} print | grep 'bios_grub')" ]; then
+        elif ! [[ "$(parted -s ${DISC} print | grep 'bios_grub')" ]]; then
             DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
         fi
     fi
     
-    if [ "${CREATE_EFISYS}" = "1" ]; then
+    if [[ "${CREATE_EFISYS}" = "1" ]]; then
         DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 100 to 200 MB FAT32 EFISYS Partition for installing grub2-efi in next step by hand.\n\nparted shell commands:\nmkpartfs <partitionnumber> fat32 <start> <end>\nset <partitionnumber> boot on" 0 0
         parted ${DISC}
     fi
     
-    if [ "${CREATE_BIOS_GRUB}" = "1" -a "${GUID_DETECTED}" = "" ]; then
+    if [[ "${CREATE_BIOS_GRUB}" = "1" -a "${GUID_DETECTED}" = "" ]]; then
         # assume new partitiontable,if no GUID was already there,
         # no user interaction needed for bios_grub partition, jippie
         GUID_PART_SIZE="2"
         parted -a optimal -s ${DISC} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
         parted -a optimal -s ${DISC} set 1 bios_grub on >${LOG}
     else
-        [ "${CREATE_BIOS_GRUB}" = "1" ] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
+        [[ "${CREATE_BIOS_GRUB}" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
     fi
     DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
     clear
@@ -1861,22 +1861,22 @@ partition() {
         # Prompt the user with a list of known disks
         DIALOG --menu "Select the disk you want to partition\n(select DONE when finished)" 14 55 7 $DISCS 2>$ANSWER || return 1
         DISC=$(cat $ANSWER)
-        if [ "$DISC" = "OTHER" ]; then
+        if [[ "$DISC" = "OTHER" ]]; then
             DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>$ANSWER || DISC=""
             DISC=$(cat $ANSWER)
         fi
         # Leave our loop if the user is done partitioning
-        [ "$DISC" = "DONE" ] && break
+        [[ "$DISC" = "DONE" ]] && break
         GUID_DETECTED=""
         MSDOS_DETECTED=""
         BIOS_GRUB=""
         CREATE_BIOS_GRUB=""
-        if ! [ "$DISC" = "" ]; then
-            if [ "$GUIDPARAMETER" = "yes" ]; then
+        if ! [[ "$DISC" = "" ]]; then
+            if [[ "$GUIDPARAMETER" = "yes" ]]; then
                 parted_gpt
             else
-                [ "$(parted $DISC print | grep "Partition Table: msdos")" ] && MSDOS_DETECTED=1
-                if [ "$MSDOS_DETECTED" = "" ] ; then
+                [[ "$(parted $DISC print | grep "Partition Table: msdos")" ]] && MSDOS_DETECTED=1
+                if [[ "$MSDOS_DETECTED" = "" ]] ; then
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on $DISC.\nDo you want to create a MS-DOS partition table now on $DISC?\n\n$DISC will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of=$DEVICE bs=512 count=2048 >/dev/null 2>&1
@@ -1917,7 +1917,7 @@ umount_btrfs() {
 # Set BTRFS_DEVICES on detected btrfs devices
 find_btrfs_raid_devices() {
     btrfs_scan
-    if [ "$DETECT_CREATE_FILESYSTEM" = "no" -a "$FSTYPE" = "btrfs" ]; then
+    if [[ "$DETECT_CREATE_FILESYSTEM" = "no" -a "$FSTYPE" = "btrfs" ]]; then
         for i in $(btrfs filesystem show $PART | cut -d " " -f 11); do
             BTRFS_DEVICES="$BTRFS_DEVICES#$i"
         done
@@ -1927,7 +1927,7 @@ find_btrfs_raid_devices() {
 find_btrfs_raid_bootloader_devices() {
     btrfs_scan
     BTRFS_COUNT=1
-    if [ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]; then
+    if [[ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]]; then
         BTRFS_DEVICES=""
         for i in $(btrfs filesystem show $bootdev | cut -d " " -f 11); do
             BTRFS_DEVICES="$BTRFS_DEVICES#$i"
@@ -1938,12 +1938,12 @@ find_btrfs_raid_bootloader_devices() {
 
 # find btrfs subvolume
 find_btrfs_subvolume() {
-    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+    if [[ "$DETECT_CREATE_FILESYSTEM" = "no" ]]; then
         # existing btrfs subvolumes
         mount_btrfs
         for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
             echo $i
-            [ "$1" ] && echo $1
+            [[ "$1" ]] && echo $1
         done
         umount_btrfs
     fi
@@ -1951,7 +1951,7 @@ find_btrfs_subvolume() {
 
 find_btrfs_bootloader_subvolume() {
     BTRFS_SUBVOLUME_COUNT=1
-    if [ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]; then
+    if [[ "$(blkid -c /dev/null $bootdev -o value -s TYPE)" = "btrfs" ]]; then
         BTRFS_SUBVOLUMES=""
         PART="$bootdev"
         mount_btrfs
@@ -1967,7 +1967,7 @@ find_btrfs_bootloader_subvolume() {
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
     for i in $(grep $PART[:#] /tmp/.parts); do
-        if [ "$(echo $i | grep ":btrfs:")" ]; then
+        if [[ "$(echo $i | grep ":btrfs:")" ]]; then
             SUBVOLUME_IN_USE="$SUBVOLUME_IN_USE $(echo $i | cut -d: -f 9)"
         fi
     done
@@ -1976,7 +1976,7 @@ subvolumes_in_use() {
 # ask for btrfs compress option
 btrfs_compress() {
     BTRFS_COMPRESS="NONE"
-    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+    if [[ "$BTRFS_SUBVOLUME" = "NONE" ]]; then
         DIALOG --defaultno --yesno "Would you like to compress the data on $PART?" 0 0 && BTRFS_COMPRESS="compress"
     else
         DIALOG --defaultno --yesno "Would you like to compress the data on $PART subvolume=$BTRFS_SUBVOLUME?" 0 0 && BTRFS_COMPRESS="compress"
@@ -1986,7 +1986,7 @@ btrfs_compress() {
 # ask for btrfs ssd option
 btrfs_ssd() {
     BTRFS_SSD="NONE"
-    if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+    if [[ "$BTRFS_SUBVOLUME" = "NONE" ]]; then
         DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART?" 0 0 && BTRFS_SSD="ssd"
     else
         DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on $PART subvolume=$BTRFS_SUBVOLUME?" 0 0 && BTRFS_SSD="ssd"
@@ -2008,27 +2008,27 @@ check_btrfs_filesystem_creation() {
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
     for i in $(grep $PART[:#] /tmp/.parts); do
-        if [ "$(echo $i | grep ":btrfs:")" ]; then
+        if [[ "$(echo $i | grep ":btrfs:")" ]]; then
             FSTYPE="btrfs"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
-            [ "$(echo $i | cut -d: -f 4 | grep yes)" ] && DETECT_CREATE_FILESYSTEM="yes"
-            [ "$DETECT_CREATE_FILESYSTEM" = "yes" ] && SKIP_ASK_SUBVOLUME="yes"
+            [[ "$(echo $i | cut -d: -f 4 | grep yes)" ]] && DETECT_CREATE_FILESYSTEM="yes"
+            [[ "$DETECT_CREATE_FILESYSTEM" = "yes" ]] && SKIP_ASK_SUBVOLUME="yes"
         fi
     done
 }
 
 # remove devices with no subvolume from list and generate raid device list
 btrfs_parts() {
-     if [ -s /tmp/.btrfs-devices ]; then
+     if [[ -s /tmp/.btrfs-devices ]]; then
          BTRFS_DEVICES=""
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="$BTRFS_DEVICES#$i"
              # remove device if no subvolume is used!
-             [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
+             [[ "$BTRFS_SUBVOLUME" = "NONE"  ]] && PARTS="$(echo $PARTS | sed -e "s#${i}\ _##g")"
          done
      else
-         [ "$BTRFS_SUBVOLUME" = "NONE"  ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+         [[ "$BTRFS_SUBVOLUME" = "NONE"  ]] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
      fi
 }
 
@@ -2040,10 +2040,10 @@ btrfs_raid_level() {
     BTRFS_DEVICE="$PART"
     : >/tmp/.btrfs-devices
     DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are raid0, raid1, raid10 and single.\nsingle means that no duplication of metadata is done, which may be desired when using hardware raid. raid10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
-    while [ "$BTRFS_RAID_FINISH" != "DONE" ]; do
+    while [[ "$BTRFS_RAID_FINISH" != "DONE" ]]; do
         DIALOG --menu "Select the raid level you want to use" 21 50 9 $BTRFS_RAIDLEVELS 2>$ANSWER || return 1
         BTRFS_LEVEL=$(cat $ANSWER)
-        if [ "$BTRFS_LEVEL" = "NONE" ]; then
+        if [[ "$BTRFS_LEVEL" = "NONE" ]]; then
             echo "$BTRFS_DEVICE" >>/tmp/.btrfs-devices
             break
         else
@@ -2067,18 +2067,18 @@ select_btrfs_raid_devices () {
     DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $BTRFS_PARTS 2>$ANSWER || return 1
     BTRFS_PART=$(cat $ANSWER)
     echo "$BTRFS_PART" >>/tmp/.btrfs-devices
-    while [ "$BTRFS_PART" != "DONE" ]; do
+    while [[ "$BTRFS_PART" != "DONE" ]]; do
         BTRFS_DONE=""
         RAIDNUMBER=$(($RAIDNUMBER + 1))
         # RAID10 need 4 devices!
-        [ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "raid10" ] && BTRFS_DONE="DONE _"
-        [ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "raid10" ] && BTRFS_DONE="DONE _"
+        [[ "$RAIDNUMBER" -ge 3 -a ! "$BTRFS_LEVEL" = "raid10" ]] && BTRFS_DONE="DONE _"
+        [[ "$RAIDNUMBER" -ge 5 -a "$BTRFS_LEVEL" = "raid10" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
         BTRFS_PARTS="$(echo $BTRFS_PARTS | sed -e "s#${BTRFS_PART}\ _##g")"
         # add more devices
         DIALOG --menu "Select device $RAIDNUMBER" 21 50 13 $BTRFS_PARTS $BTRFS_DONE 2>$ANSWER || return 1
         BTRFS_PART=$(cat $ANSWER)
-        [ "$BTRFS_PART" = "DONE" ] && break
+        [[ "$BTRFS_PART" = "DONE" ]] && break
         echo "$BTRFS_PART" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
@@ -2095,14 +2095,14 @@ prepare_btrfs() {
 prepare_btrfs_subvolume() {
     DOSUBVOLUME="no"
     BTRFS_SUBVOLUME="NONE"
-    if [ "$SKIP_ASK_SUBVOLUME" = "no" ]; then
+    if [[ "$SKIP_ASK_SUBVOLUME" = "no" ]]; then
         DIALOG --defaultno --yesno "Would you like to create a new subvolume on $PART?" 0 0 && DOSUBVOLUME="yes"
     else
         DOSUBVOLUME="yes"
     fi
-    if [ "$DOSUBVOLUME" = "yes" ]; then
+    if [[ "$DOSUBVOLUME" = "yes" ]]; then
         BTRFS_SUBVOLUME="NONE"
-        while [ "${BTRFS_SUBVOLUME}" = "NONE" ]; do
+        while [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; do
             DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>$ANSWER || return 1
             BTRFS_SUBVOLUME=$(cat $ANSWER)
             check_btrfs_subvolume
@@ -2114,11 +2114,11 @@ prepare_btrfs_subvolume() {
 
 # check btrfs subvolume
 check_btrfs_subvolume(){
-    [ "$DOMKFS" = "yes" -a "$FSTYPE" = "btrfs" ] && DETECT_CREATE_FILESYSTEM="yes"
-    if [ "$DETECT_CREATE_FILESYSTEM" = "no" ]; then
+    [[ "$DOMKFS" = "yes" -a "$FSTYPE" = "btrfs" ]] && DETECT_CREATE_FILESYSTEM="yes"
+    if [[ "$DETECT_CREATE_FILESYSTEM" = "no" ]]; then
         mount_btrfs
         for i in $(btrfs subvolume list $BTRFSMP | cut -d " " -f 7); do
-            if [ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]; then
+            if [[ "$(echo $i | grep "$BTRFS_SUBVOLUME"$)" ]]; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
                 BTRFS_SUBVOLUME="NONE"
             fi
@@ -2126,7 +2126,7 @@ check_btrfs_subvolume(){
         umount_btrfs
     else
         subvolumes_in_use
-        if [ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]; then
+        if [[ "$(echo $SUBVOLUME_IN_USE | egrep "$BTRFS_SUBVOLUME")" ]]; then
             DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
             BTRFS_SUBVOLUME="NONE"
         fi
@@ -2149,16 +2149,16 @@ choose_btrfs_subvolume () {
     SUBVOLUMES_DETECTED="no"
     SUBVOLUMES=$(find_btrfs_subvolume _)
     # check if subvolumes are present
-    [ -n "$SUBVOLUMES" ] && SUBVOLUMES_DETECTED="yes"
+    [[ -n "$SUBVOLUMES" ]] && SUBVOLUMES_DETECTED="yes"
     subvolumes_in_use
     for i in $SUBVOLUME_IN_USE; do
         SUBVOLUMES=$(echo $SUBVOLUMES | sed -e "s#$i\ _##g")
     done
-    if [ -n "$SUBVOLUMES" ] ; then
+    if [[ -n "$SUBVOLUMES" ]] ; then
         DIALOG --menu "Select the subvolume to mount" 21 50 13 $SUBVOLUMES 2>$ANSWER || return 1
         BTRFS_SUBVOLUME=$(cat $ANSWER)
     else
-        if [ "$SUBVOLUMES_DETECTED" = "yes" ]; then
+        if [[ "$SUBVOLUMES_DETECTED" = "yes" ]]; then
             DIALOG --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
             SKIP_ASK_SUBVOLUME=yes
             prepare_btrfs_subvolume || return 1
@@ -2168,7 +2168,7 @@ choose_btrfs_subvolume () {
 
 # boot on btrfs subvolume is not supported
 check_btrfs_boot_subvolume() {
-    if [ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ] ; then
+    if [[ "$MP" = "/boot" -a "$FSTYPE" = "btrfs" -a ! "$BTRFS_SUBVOLUME" = "NONE" ]] ; then
         DIALOG --msgbox "ERROR: \n/boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
         FILESYSTEM_FINISH="no"
     fi
@@ -2177,12 +2177,12 @@ check_btrfs_boot_subvolume() {
 # btrfs subvolume menu
 btrfs_subvolume() {
     FILESYSTEM_FINISH=""
-    if [ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]; then
-        if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+    if [[ "$FSTYPE" = "btrfs" -a "$DOMKFS" = "no" ]]; then
+        if [[ "$ASK_MOUNTPOINTS" = "1" ]]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
             prepare_btrfs_subvolume || return 1
-            if [ "$BTRFS_SUBVOLUME" = "NONE" ]; then
+            if [[ "$BTRFS_SUBVOLUME" = "NONE" ]]; then
                 choose_btrfs_subvolume || return 1
             fi
         else
@@ -2201,16 +2201,16 @@ select_filesystem() {
     # don't allow vfat as / filesystem, it will not work!
     # don't allow ntfs as / filesystem, this is stupid!
     FSOPTS=""
-    [ "$(which mkfs.ext2 2>/dev/null)" ] && FSOPTS="$FSOPTS ext2 Ext2"
-    [ "$(which mkfs.ext3 2>/dev/null)" ] && FSOPTS="$FSOPTS ext3 Ext3"
-    [ "$(which mkfs.ext4 2>/dev/null)" ] && FSOPTS="$FSOPTS ext4 Ext4"
-    [ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
-    [ "$(which mkfs.nilfs2 2>/dev/null)" ] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
-    [ "$(which mkreiserfs 2>/dev/null)" ] && FSOPTS="$FSOPTS reiserfs Reiser3"
-    [ "$(which mkfs.xfs 2>/dev/null)" ] && FSOPTS="$FSOPTS xfs XFS"
-    [ "$(which mkfs.jfs 2>/dev/null)" ] && FSOPTS="$FSOPTS jfs JFS"
-    [ "$(which mkfs.ntfs 2>/dev/null)" -a "$DO_ROOT" = "DONE" ] && FSOPTS="$FSOPTS ntfs-3g NTFS"
-    [ "$(which mkfs.vfat 2>/dev/null)" -a "$DO_ROOT" = "DONE" ] && FSOPTS="$FSOPTS vfat VFAT"
+    [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext2 Ext2"
+    [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext3 Ext3"
+    [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="$FSOPTS ext4 Ext4"
+    [[ "$(which mkfs.btrfs 2>/dev/null)" -a "$KERNELPKG" = "kernel26" ]] && FSOPTS="$FSOPTS btrfs Btrfs-(Experimental!!!)"
+    [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="$FSOPTS nilfs2 Nilfs2-(Experimental!!!)"
+    [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS reiserfs Reiser3"
+    [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS xfs XFS"
+    [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="$FSOPTS jfs JFS"
+    [[ "$(which mkfs.ntfs 2>/dev/null)" -a "$DO_ROOT" = "DONE" ]] && FSOPTS="$FSOPTS ntfs-3g NTFS"
+    [[ "$(which mkfs.vfat 2>/dev/null)" -a "$DO_ROOT" = "DONE" ]] && FSOPTS="$FSOPTS vfat VFAT"
     DIALOG --menu "Select a filesystem for $PART" 21 50 13 $FSOPTS 2>$ANSWER || return 1
     FSTYPE=$(cat $ANSWER)
 }
@@ -2218,7 +2218,7 @@ select_filesystem() {
 enter_mountpoint() {
     FILESYSTEM_FINISH=""
     MP=""
-    while [ "${MP}" = "" ]; do
+    while [[ "${MP}" = "" ]]; do
         DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
         MP=$(cat $ANSWER)
         if grep ":$MP:" /tmp/.parts; then
@@ -2231,13 +2231,13 @@ enter_mountpoint() {
 # set sane values for paramaters, if not already set
 check_mkfs_values() {
     # Set values, to not confuse mkfs call!
-    [ "$FS_OPTIONS" = "" ] && FS_OPTIONS="NONE"
-    [ "$BTRFS_DEVICES" = "" ] && BTRFS_DEVICES="NONE"
-    [ "$BTRFS_LEVEL" = "" ] && BTRFS_LEVEL="NONE"
-    [ "$BTRFS_SUBVOLUME" = "" ] && BTRFS_SUBVOLUME="NONE"
-    [ "$DOSUBVOLUME" = "" ] && DOSUBVOLUME="no"
-    [ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ] && LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
-    [ "$LABEL_NAME" = "" ] && LABEL_NAME="NONE"
+    [[ "$FS_OPTIONS" = "" ]] && FS_OPTIONS="NONE"
+    [[ "$BTRFS_DEVICES" = "" ]] && BTRFS_DEVICES="NONE"
+    [[ "$BTRFS_LEVEL" = "" ]] && BTRFS_LEVEL="NONE"
+    [[ "$BTRFS_SUBVOLUME" = "" ]] && BTRFS_SUBVOLUME="NONE"
+    [[ "$DOSUBVOLUME" = "" ]] && DOSUBVOLUME="no"
+    [[ "$LABEL_NAME" = "" -a -n "$(blkid -c=/dev/null -o value -s LABEL $PART)" ]] && LABEL_NAME="$(blkid -c=/dev/null -o value -s LABEL $PART)"
+    [[ "$LABEL_NAME" = "" ]] && LABEL_NAME="NONE"
 }
 
 create_filesystem() {
@@ -2247,8 +2247,8 @@ create_filesystem() {
     BTRFS_DEVICES=""
     BTRFS_LEVEL=""
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-    if [ "$DOMKFS" = "yes" ]; then
-        while [ "${LABEL_NAME}" = "" ]; do
+    if [[ "$DOMKFS" = "yes" ]]; then
+        while [[ "${LABEL_NAME}" = "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(blkid -c=/dev/null -o value -s LABEL $PART)" 2>$ANSWER || return 1
             LABEL_NAME=$(cat $ANSWER)
@@ -2257,7 +2257,7 @@ create_filesystem() {
                 LABEL_NAME=""
             fi
         done
-        if [ "$FSTYPE" = "btrfs" ]; then
+        if [[ "$FSTYPE" = "btrfs" ]]; then
             prepare_btrfs || return 1
             btrfs_compress
             btrfs_ssd
@@ -2270,7 +2270,7 @@ create_filesystem() {
 
 mountpoints() {
     NAME_SCHEME_PARAMETER_RUN=""
-    while [ "$PARTFINISH" != "DONE" ]; do
+    while [[ "$PARTFINISH" != "DONE" ]]; do
         activate_special_devices
         : >/tmp/.device-names
         : >/tmp/.fstab
@@ -2281,13 +2281,13 @@ mountpoints() {
         DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
         DO_SWAP=""
-        while [ "$DO_SWAP" != "DONE" ]; do
+        while [[ "$DO_SWAP" != "DONE" ]]; do
             FSTYPE="swap"
             DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - $PARTS 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
-            if [ "$PART" != "NONE" ]; then
+            if [[ "$PART" != "NONE" ]]; then
                 DOMKFS="no"
-                if [ "$ASK_MOUNTPOINTS" = "1" ]; then
+                if [[ "$ASK_MOUNTPOINTS" = "1" ]]; then
                     create_filesystem
                 else
                     FILESYSTEM_FINISH="yes"
@@ -2295,15 +2295,15 @@ mountpoints() {
             else
                 FILESYSTEM_FINISH="yes"
             fi
-            [ "$FILESYSTEM_FINISH" = "yes" ] && DO_SWAP=DONE
+            [[ "$FILESYSTEM_FINISH" = "yes" ]] && DO_SWAP=DONE
         done
         check_mkfs_values
-        if [ "$PART" != "NONE" ]; then
+        if [[ "$PART" != "NONE" ]]; then
             PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             echo "$PART:swap:swap:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
         fi
         DO_ROOT=""
-        while [ "$DO_ROOT" != "DONE" ]; do
+        while [[ "$DO_ROOT" != "DONE" ]]; do
             DIALOG --menu "Select the partition to mount as /" 21 50 13 $PARTS 2>$ANSWER || return 1
             PART=$(cat $ANSWER)
             PART_ROOT=$PART
@@ -2313,34 +2313,34 @@ mountpoints() {
             # clear values first!
             clear_btrfs_values
             check_btrfs_filesystem_creation
-            if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
+            if [[ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else                   
                 btrfs_subvolume
             fi
-            [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ROOT=DONE
+            [[ "$FILESYSTEM_FINISH" = "yes" ]] && DO_ROOT=DONE
         done
         find_btrfs_raid_devices
         btrfs_parts
         check_mkfs_values
         echo "$PART:$FSTYPE:/:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
-        ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+        ! [[ "$FSTYPE" = "btrfs" ]] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
         #
         # Additional partitions
         #
-        while [ "$PART" != "DONE" ]; do
+        while [[ "$PART" != "DONE" ]]; do
             DO_ADDITIONAL=""
-            while [ "$DO_ADDITIONAL" != "DONE" ]; do
+            while [[ "$DO_ADDITIONAL" != "DONE" ]]; do
                 DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 $PARTS DONE _ 2>$ANSWER || return 1
                 PART=$(cat $ANSWER)
-                if [ "$PART" != "DONE" ]; then
+                if [[ "$PART" != "DONE" ]]; then
                     FSTYPE="$(blkid -c=/dev/null -o value -s TYPE $PART)"
                     DOMKFS="no"
                     # clear values first!
                     clear_btrfs_values
                     check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]; then
+                    if [[ "$ASK_MOUNTPOINTS" = "1" -a "$SKIP_FILESYSTEM" = "no" ]]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
@@ -2350,21 +2350,21 @@ mountpoints() {
                 else
                     FILESYSTEM_FINISH="yes"
                 fi
-                [ "$FILESYSTEM_FINISH" = "yes" ] && DO_ADDITIONAL="DONE"
+                [[ "$FILESYSTEM_FINISH" = "yes" ]] && DO_ADDITIONAL="DONE"
             done
-            if [ "$PART" != "DONE" ]; then
+            if [[ "$PART" != "DONE" ]]; then
                 find_btrfs_raid_devices
                 btrfs_parts
                 check_mkfs_values
                 echo "$PART:$FSTYPE:$MP:$DOMKFS:$LABEL_NAME:$FS_OPTIONS:$BTRFS_DEVICES:$BTRFS_LEVEL:$BTRFS_SUBVOLUME:$DOSUBVOLUME:$BTRFS_COMPRESS:$BTRFS_SSD" >>/tmp/.parts
-                ! [ "$FSTYPE" = "btrfs" ] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
+                ! [[ "$FSTYPE" = "btrfs" ]] && PARTS="$(echo $PARTS | sed -e "s#${PART}\ _##g")"
             fi
         done
         DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts | sed -e 's, ,#,g'); do echo "$i\n";done)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
-    if [ "$NAME_SCHEME_PARAMETER_RUN" = "" ]; then
+    if [[ "$NAME_SCHEME_PARAMETER_RUN" = "" ]]; then
         set_device_name_scheme || return 1
     fi
     for line in $(cat /tmp/.parts); do
@@ -2380,15 +2380,15 @@ mountpoints() {
         DOSUBVOLUME=$(echo $line | cut -d: -f 10)
         BTRFS_COMPRESS=$(echo $line | cut -d: -f 11)
         BTRFS_SSD=$(echo $line | cut -d: -f 12)
-        if [ "$DOMKFS" = "yes" ]; then
-            if [ "$FSTYPE" = "swap" ]; then
+        if [[ "$DOMKFS" = "yes" ]]; then
+            if [[ "$FSTYPE" = "swap" ]]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Creating $FSTYPE on $PART, mounting to ${DESTDIR}${MP}" 0 0
             fi
             _mkfs yes $PART $FSTYPE ${DESTDIR} $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         else
-            if [ "$FSTYPE" = "swap" ]; then
+            if [[ "$FSTYPE" = "swap" ]]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
             else
                 DIALOG --infobox "Mounting $FSTYPE on $PART to ${DESTDIR}${MP}" 0 0
@@ -2429,24 +2429,24 @@ _mkfs() {
     local _btrfscompress=${12}
     local _btrfsssd=${13}
     # correct empty entries
-    [ "${_fsoptions}" = "NONE" ] && _fsoptions=""
-    [ "${_btrfsssd}" = "NONE" ] && _btrfsssd=""
-    [ "${_btrfscompress}" = "NONE" ] && _btrfscompress=""
-    [ "${_btrfssubvolume}" = "NONE" ] && _btrfssubvolume=""
+    [[ "${_fsoptions}" = "NONE" ]] && _fsoptions=""
+    [[ "${_btrfsssd}" = "NONE" ]] && _btrfsssd=""
+    [[ "${_btrfscompress}" = "NONE" ]] && _btrfscompress=""
+    [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
-    [ ! "${_btrfslevel}" = "NONE" -a "${_fstype}" = "btrfs" ] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
+    [[ ! "${_btrfslevel}" = "NONE" -a "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
     # we have two main cases: "swap" and everything else.
-    if [ "${_fstype}" = "swap" ]; then
+    if [[ "${_fstype}" = "swap" ]]; then
         swapoff ${_device} >/dev/null 2>&1
-        if [ "${_domk}" = "yes" ]; then
+        if [[ "${_domk}" = "yes" ]]; then
             mkswap -L ${_labelname} ${_device} >$LOG 2>&1
-            if [ $? != 0 ]; then
+            if [[ $? != 0 ]]; then
                 DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
                 return 1
             fi
         fi
         swapon ${_device} >$LOG 2>&1
-        if [ $? != 0 ]; then
+        if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
             return 1
         fi
@@ -2454,14 +2454,14 @@ _mkfs() {
         # make sure the fstype is one we can handle
         local knownfs=0
         for fs in xfs jfs reiserfs ext2 ext3 ext4 btrfs nilfs2 ntfs-3g vfat; do
-            [ "${_fstype}" = "${fs}" ] && knownfs=1 && break
+            [[ "${_fstype}" = "${fs}" ]] && knownfs=1 && break
         done
-        if [ $knownfs -eq 0 ]; then
+        if [[ $knownfs -eq 0 ]]; then
             DIALOG --msgbox "unknown fstype ${_fstype} for ${_device}" 0 0
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [ "${_domk}" = "yes" ]; then
+        if [[ "${_domk}" = "yes" ]]; then
             local ret
             case ${_fstype} in
                 xfs)      mkfs.xfs ${_fsoptions} -L ${_labelname} -f ${_device} >$LOG 2>&1; ret=$? ;;
@@ -2476,13 +2476,13 @@ _mkfs() {
                 vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
-            if [ $ret != 0 ]; then
+            if [[ $ret != 0 ]]; then
                 DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
                 return 1
             fi
             sleep 2
         fi
-        if [ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" -a "${_dosubvolume}" = "yes" ]; then
+        if [[ "${_fstype}" = "btrfs" -a -n "${_btrfssubvolume}" -a "${_dosubvolume}" = "yes" ]]; then
             create_btrfs_subvolume
         fi
         btrfs_scan
@@ -2491,25 +2491,25 @@ _mkfs() {
         mkdir -p ${_dest}${_mountpoint}
         # prepare btrfs mount options
         _btrfsmountoptions=""
-        [ -n "${_btrfssubvolume}" ] && _btrfsmountoptions="subvol=${_btrfssubvolume}"
-        [ -n "${_btrfscompress}" ] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfscompress}"
-        [ -n "${_btrfsssd}" ] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfsssd}"
+        [[ -n "${_btrfssubvolume}" ]] && _btrfsmountoptions="subvol=${_btrfssubvolume}"
+        [[ -n "${_btrfscompress}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfscompress}"
+        [[ -n "${_btrfsssd}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfsssd}"
         _btrfsmountoptions="$(echo ${_btrfsmountoptions} | sed -e 's#^ ##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        if [ "${_fstype}" = "btrfs" -a -n "${_btrfsmountoptions}" ]; then
+        if [[ "${_fstype}" = "btrfs" -a -n "${_btrfsmountoptions}" ]]; then
             mount -t ${_fstype} -o ${_btrfsmountoptions} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
         else
             mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
         fi
-        if [ $? != 0 ]; then
+        if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
         fi
         # change permission of base directories to correct permission
         # to avoid btrfs issues
-        if [ "${_mountpoint}" = "/tmp" ]; then
+        if [[ "${_mountpoint}" = "/tmp" ]]; then
             chmod 1777 ${_dest}${_mountpoint}
-        elif [ "${_mountpoint}" = "/root" ]; then
+        elif [[ "${_mountpoint}" = "/root" ]]; then
             chmod 750 ${_dest}${_mountpoint}
         else
             chmod 755 ${_dest}${_mountpoint}
@@ -2521,21 +2521,21 @@ _mkfs() {
     local _label="$(getlabel ${_device})"
     echo "# DEVICE DETAILS: ${_device} UUID=$_uuid LABEL=$_label" >> /tmp/.device-names
     # add to temp fstab
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
-        if [ -n "${_uuid}" ]; then
+    if [[ "$NAME_SCHEME_PARAMETER" = "UUID" ]]; then
+        if [[ -n "${_uuid}" ]]; then
             _device="UUID=${_uuid}"
         fi
-    elif [ "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
-        if [ -n "${_label}" ]; then
+    elif [[ "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
+        if [[ -n "${_label}" ]]; then
             _device="LABEL=${_label}"
         fi
     fi
-    if [ "${_fstype}" = "btrfs" -a -n "${_btrfsmountoptions}" ]; then
+    if [[ "${_fstype}" = "btrfs" -a -n "${_btrfsmountoptions}" ]]; then
         echo -n "${_device} ${_mountpoint} ${_fstype} defaults,${_btrfsmountoptions} 0 " >>/tmp/.fstab
     else
         echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
     fi
-    if [ "${_fstype}" = "swap" ]; then
+    if [[ "${_fstype}" = "swap" ]]; then
         echo "0" >>/tmp/.fstab
     else
         echo "1" >>/tmp/.fstab
@@ -2545,26 +2545,26 @@ _mkfs() {
 # source_set()
 # check if installation source is set, if not run select_source!
 source_set(){
-    while ! [ "$S_SRC" = "1" ]; do
-        if ! [ "$S_SRC" = "1" ]; then
+    while ! [[ "$S_SRC" = "1" ]]; do
+        if ! [[ "$S_SRC" = "1" ]]; then
             DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
             select_source || break
         fi
     done
-    if [ "$S_SRC" = "0" ]; then
+    if [[ "$S_SRC" = "0" ]]; then
         return 1
     fi
 }
 
 getsource() {
     S_SRC=0
-    if [ "$MODE" = "media" ]; then
+    if [[ "$MODE" = "media" ]]; then
         get_media
         #last fallback, if autodetection fails!
         manual_media || return 1
     fi
 
-    if [ "$MODE" = "ftp" ]; then
+    if [[ "$MODE" = "ftp" ]]; then
         #in order to cache packages from media check on it first!
         get_media
         select_mirror || return 1
@@ -2586,7 +2586,7 @@ select_mirror() {
         $MIRRORS \
         "Custom" "_" 2>$ANSWER || return 1
     local _server=$(cat $ANSWER)
-    if [ "${_server}" = "Custom" ]; then
+    if [[ "${_server}" = "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to core repo." 8 65 \
             "ftp://ftp.archlinux.org/core/os/$(uname -m)" 2>$ANSWER || return 1
             SYNC_URL=$(cat $ANSWER)
@@ -2603,9 +2603,9 @@ select_mirror() {
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
-    if [ "$MODE" = "media" ]; then
+    if [[ "$MODE" = "media" ]]; then
         local serverurl="${FILE_URL}"
-    elif [ "$MODE" = "ftp" ]; then
+    elif [[ "$MODE" = "ftp" ]]; then
         local serverurl="${SYNC_URL}"
     fi
     # Setup a pacman.conf in /tmp
@@ -2629,12 +2629,12 @@ EOF
 # returns: 1 on error
 prepare_pacman() {
     # Set up the necessary directories for pacman use
-    [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
-    [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
 
     DIALOG --infobox "Refreshing package database..." 6 45
     $PACMAN -Sy >$LOG 2>&1 || return 1
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         DIALOG --msgbox "Pacman preparation failed! Check $LOG for errors." 6 60
         return 1
     fi
@@ -2656,7 +2656,7 @@ run_pacman(){
         touch /tmp/setup-pacman-running ; \
         $PACMAN -S $PACKAGES 2>&1 >> /tmp/pacman.log ; \
         echo $? > /tmp/.pacman-retcode ; \
-        if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
+        if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
             echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
         else
             echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
@@ -2668,14 +2668,14 @@ run_pacman(){
     sleep 2
     dialog --backtitle "$TITLE" --title " Installing... Please Wait " \
         --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>$ANSWER
-    while [ -f /tmp/setup-pacman-running ]; do
+    while [[ -f /tmp/setup-pacman-running ]]; do
         sleep 1
     done
     kill $(cat $ANSWER)
 
     # pacman finished, display scrollable output
     local _result=''
-    if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
+    if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         _result="Installation Failed (see errors below)"
     else
         _result="Installation Complete"
@@ -2698,10 +2698,10 @@ select_packages() {
     pacman_conf
     prepare_pacman
     # Archboot setup media Mode uses packages.txt!
-    if [ "$MODE" = "media" ]; then
+    if [[ "$MODE" = "media" ]]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
         PKGS="/src/core-$(uname -m)/pkg/packages.txt"
-        if ! [ -s /tmp/.pkgcategory ]; then
+        if ! [[ -s /tmp/.pkgcategory ]]; then
             CHKLIST="base ^ ON"
             for category in $(cat $PKGS | sed 's|/.*$||g' | uniq | grep -v base | grep -v kernels); do
                 CHKLIST="$CHKLIST $category - OFF"
@@ -2721,7 +2721,7 @@ select_packages() {
         CHKLIST=
         for category in $(cat /tmp/.pkgcategory | sed 's|"||g'); do
             tag="OFF"
-            if [ "$SELECTALL" = "yes" ]; then
+            if [[ "$SELECTALL" = "yes" ]]; then
                 tag="ON"
             fi
             list=$(cat $PKGS | grep "$category/" | sed 's|^[a-z0-9-]*/||g' | sed "s|.pkg.tar.*$| ($category) $tag|g" | sort)
@@ -2740,7 +2740,7 @@ select_packages() {
     else
         # if selection has been done before, warn about loss of input
         # and let the user exit gracefully
-        if [ $S_SELECT -ne 0 ]; then
+        if [[ $S_SELECT -ne 0 ]]; then
             DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
         fi
         DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
@@ -2769,7 +2769,7 @@ select_packages() {
         while read pkgname pkgcat; do
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
-            if [ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]; then
+            if [[ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]]; then
                 _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} ON")"
             else
                 _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} OFF")"
@@ -2781,7 +2781,7 @@ select_packages() {
         while read pkgname pkgcat; do
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
-            if [ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]; then
+            if [[ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]]; then
                 _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} ON")"
             else
                 _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} OFF")"
@@ -2795,24 +2795,24 @@ select_packages() {
         PACKAGES="$(cat $ANSWER)"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
-        ! [ "$(echo $PACKAGES | grep -w nouveau-drm)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
-        ! [ "$(echo $PACKAGES | grep -w nouveau-firmware)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+    if [[ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w nouveau-drm)" ]] && PACKAGES="$PACKAGES nouveau-drm-lts"
+        ! [[ "$(echo $PACKAGES | grep -w nouveau-firmware)" ]] && PACKAGES="$PACKAGES nouveau-firmware"
     fi
-    if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w v86d)" ] && PACKAGES="$PACKAGES v86d"
+    if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w v86d)" ]] && PACKAGES="$PACKAGES v86d"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w ntfs-3g)" ] && PACKAGES="$PACKAGES ntfs-3g"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w ntfs-3g)" ]] && PACKAGES="$PACKAGES ntfs-3g"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w btrfs-progs-unstable)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w btrfs-progs-unstable)" ]] && PACKAGES="$PACKAGES btrfs-progs-unstable"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w nilfs-utils)" ] && PACKAGES="$PACKAGES nilfs-utils"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w nilfs-utils)" ]] && PACKAGES="$PACKAGES nilfs-utils"
     fi
-    if [ -e /var/state/dhcp/dhclient.leases ]; then
-        ! [ "$(echo $PACKAGES | grep -w dhclient)" ] && PACKAGES="$PACKAGES dhclient"
+    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
+        ! [[ "$(echo $PACKAGES | grep -w dhclient)" ]] && PACKAGES="$PACKAGES dhclient"
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
@@ -2829,18 +2829,18 @@ select_packages() {
 install_packages() {
     source_set || return 1
     destdir_mounts || return 1
-    if [ "$MODE" = "media" ]; then
-        if [ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]; then
+    if [[ "$MODE" = "media" ]]; then
+        if [[ ! -f /tmp/.pkglist -o "$S_SELECT" != "1" ]]; then
             DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
             select_packages || return 1
         fi
     else
-        if [ "$S_SELECT" != "1" ]; then
+        if [[ "$S_SELECT" != "1" ]]; then
             DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
             select_packages || return 1
         fi
     fi
-    if [ "$S_MKFS" != "1" -a "$S_MKFSAUTO" != "1" ]; then
+    if [[ "$S_MKFS" != "1" -a "$S_MKFSAUTO" != "1" ]]; then
         getdest
     fi
     DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
@@ -2863,10 +2863,10 @@ install_packages() {
 # add archboot addons if activated
 auto_addons()
 {
-    if [ -d /tmp/packages ]; then
+    if [[ -d /tmp/packages ]]; then
         DO_ADDON=""
         DIALOG --yesno "Would you like to install your addons packages to installed system?" 0 0 && DO_ADDON="yes"
-        if [ "$DO_ADDON" = "yes" ] ; then
+        if [[ "$DO_ADDON" = "yes" ]] ; then
             DIALOG --infobox "Installing the addons packages..." 0 0
             $PACMAN -U /tmp/packages/* 2>&1 >> /tmp/pacman.log
         fi
@@ -2880,11 +2880,11 @@ auto_addons()
 #
 auto_fstab(){
     # Modify fstab
-    if [ "$S_MKFS" = "1" -o "$S_MKFSAUTO" = "1" ]; then
-        if [ -f /tmp/.device-names ]; then
+    if [[ "$S_MKFS" = "1" -o "$S_MKFSAUTO" = "1" ]]; then
+        if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>${DESTDIR}/etc/fstab
         fi
-        if [ -f /tmp/.fstab ]; then
+        if [[ -f /tmp/.fstab ]]; then
             # clean fstab first from /dev entries
             sed -i -e '/^\/dev/d' ${DESTDIR}/etc/fstab
             sort /tmp/.fstab >>${DESTDIR}/etc/fstab
@@ -2907,8 +2907,8 @@ auto_locale()
 # add mdadm setup to existing /etc/mdadm.conf
 auto_mdadm()
 {
-    if [ -e ${DESTDIR}/etc/mdadm.conf ];then
-        if [ "$(cat /proc/mdstat | grep ^md)" ]; then
+    if [[ -e ${DESTDIR}/etc/mdadm.conf ]];then
+        if [[ "$(cat /proc/mdstat | grep ^md)" ]]; then
             DIALOG --infobox "Adding raid setup to ${DESTDIR}/etc/mdadm.conf ..." 4 40
             mdadm -Ds >> ${DESTDIR}/etc/mdadm.conf
         fi
@@ -2922,15 +2922,15 @@ auto_mdadm()
 auto_network()
 {
     # exit if network wasn't configured in installer
-    if [ $S_NET -eq 0 ]; then
+    if [[ $S_NET -eq 0 ]]; then
         return 1
     fi
 
     DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
 
-    if [ "$S_DHCP" != "1" ]; then
+    if [[ "$S_DHCP" != "1" ]]; then
         sed -i -e "s#^eth.*#$INTERFACE=\"$INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST\"#g" ${DESTDIR}/etc/rc.conf
-            if [ "$GW" != "" ]; then
+            if [[ "$GW" != "" ]]; then
                 sed -i -e "s#gw 192.168.0.1#gw $GW#g" ${DESTDIR}/etc/rc.conf
                 sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf
             fi
@@ -2939,11 +2939,11 @@ auto_network()
         sed -i -e "s#^eth.*#$INTERFACE=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
     fi
         sed -i -e "s#eth0)#$INTERFACE)#g" ${DESTDIR}/etc/rc.conf
-    if [ "$PROXY_HTTP" != "" ]; then
+    if [[ "$PROXY_HTTP" != "" ]]; then
         echo "export http_proxy=$PROXY_HTTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
     fi
-    if [ "$PROXY_FTP" != "" ]; then
+    if [[ "$PROXY_FTP" != "" ]]; then
         echo "export ftp_proxy=$PROXY_FTP" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
     fi
@@ -2958,18 +2958,18 @@ donetwork() {
     INTERFACE=
     S_DHCP=
     ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
-    if [ "$ifaces" = "" ]; then
+    if [[ "$ifaces" = "" ]]; then
         DIALOG --yesno "Cannot find any ethernet interfaces. You probably haven't loaded\nyour network module yet.  You have two options:\n\n  1) Probe for not detectable module now. (very old hardware)\n  2) Switch to another VC (ALT-F2) and load your module\n     with the modprobe command, then switch back here (ALT-F1)\n     and continue.\n\nIf you know which module you need, you should do Step 2 and\nselect NO below.  If you don't know which module you need,\nchoose Step 1 by selecting YES below.\n\nProbe for network module?" 18 70
-        if [ $? -eq 0 ]; then
+        if [[ $? -eq 0 ]]; then
             net_notdetectable
         fi
         ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
-        if [ "$ifaces" = "" ]; then
+        if [[ "$ifaces" = "" ]]; then
             DIALOG --msgbox "No network interfaces available." 0 0
             return 1
         fi
     fi
-    while [ "$INTERFACE" = "" ]; do
+    while [[ "$INTERFACE" = "" ]]; do
         DIALOG --msgbox "Available Ethernet Interfaces:\n$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
         ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
         DIALOG --extra-button --extra-label "Probe" --ok-label "Select" --menu "Select a network interface" 14 55 7 $ifaces 2>$ANSWER
@@ -2980,25 +2980,25 @@ donetwork() {
         esac
     done
     # bring down everything, which could grab and affect the interface!
-    [ -e /var/run/dhcpcd-$INTERFACE.pid ] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid) && sleep 1
-    [ "$(ifconfig | grep $INTERFACE)" ] && ifconfig $INTERFACE down >$LOG 2>&1
-    [ "$(route | grep default)" ] && route del default >$LOG 2>&1
-    [ -e /etc/resolv.conf ] && rm /etc/resolv.conf >$LOG 2>&1
+    [[ -e /var/run/dhcpcd-$INTERFACE.pid ]] && kill $(cat /var/run/dhcpcd-$INTERFACE.pid) && sleep 1
+    [[ "$(ifconfig | grep $INTERFACE)" ]] && ifconfig $INTERFACE down >$LOG 2>&1
+    [[ "$(route | grep default)" ]] && route del default >$LOG 2>&1
+    [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >$LOG 2>&1
     DIALOG --yesno "Do you want to use DHCP?" 0 0
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         DIALOG --infobox "Please wait.  Polling for DHCP server on $INTERFACE..." 10 65
         dhcpcd $INTERFACE >$LOG 2>&1
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             DIALOG --msgbox "Failed to run dhcpcd.  See $LOG for details." 0 0
             return 1
         fi
-        if [ ! $(ifconfig $INTERFACE | grep 'inet addr:') ]; then
+        if [[ ! $(ifconfig $INTERFACE | grep 'inet addr:') ]]; then
             DIALOG --msgbox "DHCP request failed." 0 0 || return 1
         fi
         S_DHCP=1
     else
         NETPARAMETERS=""
-        while [ "$NETPARAMETERS" = "" ]; do
+        while [[ "$NETPARAMETERS" = "" ]]; do
             DIALOG --inputbox "Enter your IP address" 8 65 "192.168.0.2" 2>$ANSWER || return 1
             IPADDR=$(cat $ANSWER)
             DIALOG --inputbox "Enter your netmask" 8 65 "255.255.255.0" 2>$ANSWER || return 1
@@ -3021,15 +3021,15 @@ donetwork() {
         done
         echo "running: ifconfig $INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST up" >$LOG
         ifconfig $INTERFACE $IPADDR netmask $SUBNET broadcast $BROADCAST up >$LOG 2>&1 || DIALOG --msgbox "Failed to setup $INTERFACE interface." 0 0 || return 1
-        if [ "$GW" != "" ]; then
+        if [[ "$GW" != "" ]]; then
             route add default gw $GW >$LOG 2>&1 || DIALOG --msgbox "Failed to setup your gateway." 0 0 || return 1
         fi
-        if [ "$PROXY_HTTP" = "" ]; then
+        if [[ "$PROXY_HTTP" = "" ]]; then
             unset http_proxy
         else
             export http_proxy=$PROXY_HTTP
         fi
-        if [ "$PROXY_FTP" = "" ]; then
+        if [[ "$PROXY_FTP" = "" ]]; then
             unset ftp_proxy
         else
             export ftp_proxy=$PROXY_FTP
@@ -3061,19 +3061,19 @@ ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/,gcpid=.*[0-9]//
 
 getraidarrays() {
     RAIDARRAYS=""
-    if ! [ "$(grep ^ARRAY ${DESTDIR}/etc/mdadm.conf)" ]; then
+    if ! [[ "$(grep ^ARRAY ${DESTDIR}/etc/mdadm.conf)" ]]; then
         RAIDARRAYS="$(echo -n $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
     fi
 }
 
 getcryptsetup() {
     CRYPTSETUP=""
-    if ! [ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive)" ]; then
+    if ! [[ "$(cryptsetup status $(basename $PART_ROOT) | grep inactive)" ]]; then
         #avoid clash with dmraid here
-        if [ "$(cryptsetup status $(basename $PART_ROOT))" ]; then
-            if [ "$NAME_SCHEME_PARAMETER" = "UUID" ]; then
+        if [[ "$(cryptsetup status $(basename $PART_ROOT))" ]]; then
+            if [[ "$NAME_SCHEME_PARAMETER" = "UUID" ]]; then
                 CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(blkid -s UUID -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
-            elif [ "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+            elif [[ "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
                 CRYPTDEVICE="/dev/disk/by-label/$(echo $(blkid -s LABEL -o value $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g')))"
             else
                 CRYPTDEVICE="$(echo $(cryptsetup status $(basename $PART_ROOT) | grep device: | sed -e 's#device:##g'))"    
@@ -3087,7 +3087,7 @@ getcryptsetup() {
 getrootuuid() {
     _rootpart="${PART_ROOT}"
     _uuid="$(getuuid ${PART_ROOT})"
-    if [ -n "${_uuid}" ]; then
+    if [[ -n "${_uuid}" ]]; then
         _rootpart="/dev/disk/by-uuid/${_uuid}"
     fi
 }
@@ -3095,7 +3095,7 @@ getrootuuid() {
 getrootlabel() {
     _rootpart="${PART_ROOT}"
     _label="$(getlabel ${PART_ROOT})"
-    if [ -n "${_label}" ]; then
+    if [[ -n "${_label}" ]]; then
         _rootpart="/dev/disk/by-label/${_label}"
     fi
 }
@@ -3108,15 +3108,15 @@ common_bootloader_checks() {
     getraidarrays
     getcryptsetup
     getrootflags
-    [ "$NAME_SCHEME_PARAMETER" = "UUID" ] && getrootuuid
-    [ "$NAME_SCHEME_PARAMETER" = "LABEL" ] && getrootlabel
+    [[ "$NAME_SCHEME_PARAMETER" = "UUID" ]] && getrootuuid
+    [[ "$NAME_SCHEME_PARAMETER" = "LABEL" ]] && getrootlabel
 }
 
 # look for a separately-mounted /boot partition
 check_bootpart() {
     subdir=""
     bootdev=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1)
-    if [ "$bootdev" = "" ]; then
+    if [[ "$bootdev" = "" ]]; then
         subdir=/boot
         bootdev=$PART_ROOT
     fi
@@ -3125,7 +3125,7 @@ check_bootpart() {
 # check for btrfs bootpart and abort if detected
 abort_btrfs_bootpart() {
         FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-        if [ "$FSTYPE" = "btrfs" ]; then
+        if [[ "$FSTYPE" = "btrfs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot on it." 0 0
             return 1
         fi
@@ -3134,7 +3134,7 @@ abort_btrfs_bootpart() {
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
         FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-        if [ "$FSTYPE" = "nilfs2" ]; then
+        if [[ "$FSTYPE" = "nilfs2" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
@@ -3142,7 +3142,7 @@ abort_nilfs_bootpart() {
 
 # install syslinux and run preparation
 prepare_syslinux () {
-    if ! [ -e "${DESTDIR}/sbin/extlinux" -o -e "${DESTDIR}/usr/bin/mcopy" ]; then
+    if ! [[ -e "${DESTDIR}/sbin/extlinux" -o -e "${DESTDIR}/usr/bin/mcopy" ]]; then
         DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
         PACKAGES="$SYSLINUX_PACKAGES"
         run_pacman
@@ -3157,7 +3157,7 @@ prepare_syslinux () {
 common_syslinux () {
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
-    if [ "$DEVS" = "" ]; then
+    if [[ "$DEVS" = "" ]]; then
         DIALOG --msgbox "No hard drives were found" 0 0
         return 1
     fi
@@ -3169,8 +3169,8 @@ common_syslinux () {
     GPTMBR=${DESTDIR}/usr/lib/syslinux/gptmbr.bin
     # check if GPT/GUID is used
     GUID_DETECTED=
-    [ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ] && GUID_DETECTED=1
-    [ -e ${TEMPDIR}/${SYSLINUX_CONF} ] && rm ${TEMPDIR}/${SYSLINUX_CONF}
+    [[ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ]] && GUID_DETECTED=1
+    [[ -e ${TEMPDIR}/${SYSLINUX_CONF} ]] && rm ${TEMPDIR}/${SYSLINUX_CONF}
     cat << EOF > ${TEMPDIR}/${SYSLINUX_CONF}
 DEFAULT vesamenu.c32
 PROMPT 0
@@ -3209,7 +3209,7 @@ EOF
     echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+    if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
         echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
         echo "append initrd=$subdir/$KERNELPKG.img root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
@@ -3220,7 +3220,7 @@ EOF
     echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+    if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
         echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
         echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
@@ -3231,10 +3231,10 @@ EOF
     $EDITOR ${TEMPDIR}/${SYSLINUX_CONF}
     # install syslinux
     DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
-    ! [ -d ${DESTDIR}/boot/${SYSLINUX_DIR} ] && mkdir -p ${DESTDIR}/boot/${SYSLINUX_DIR}
+    ! [[ -d ${DESTDIR}/boot/${SYSLINUX_DIR} ]] && mkdir -p ${DESTDIR}/boot/${SYSLINUX_DIR}
     cp  ${TEMPDIR}/${SYSLINUX_CONF} ${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}
     cp  ${DESTDIR}/usr/lib/syslinux/*.c32 ${DESTDIR}/boot/${SYSLINUX_DIR}
-    if [ "$GUID_DETECTED" = "" ]; then
+    if [[ "$GUID_DETECTED" = "" ]]; then
         cat ${MBR} > ${ROOTDEV}
     else
         cat ${GPTMBR} > ${ROOTDEV}
@@ -3243,21 +3243,21 @@ EOF
 
 # finish_syslinux
 finish_syslinux () {
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         chroot_umount
         DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
-    [ -f "/src/boot/syslinux/splash.png" ] && cp /src/boot/syslinux/splash.png ${DESTDIR}/boot/$SYSLINUX_DIR
+    [[ -f "/src/boot/syslinux/splash.png" ]] && cp /src/boot/syslinux/splash.png ${DESTDIR}/boot/$SYSLINUX_DIR
     chroot_umount
     
     # make partition with /boot active!
     PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
-    if [ "$GUID_DETECTED" = "" ]; then
+    if [[ "$GUID_DETECTED" = "" ]]; then
         parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
     else
         # change flag to bios legacy booting
-        if ! [ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]; then
+        if ! [[ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]]; then
             sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
         fi
     fi
@@ -3278,18 +3278,18 @@ doextlinux () {
     abort_nilfs_bootpart || return 1
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-    if ! [ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]; then
+    if ! [[ "$FSTYPE" = "ext2" -o "$FSTYPE" = "ext3" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "btrfs" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 or btrfs partition with /boot on it." 0 0
         return 1
     fi
     # extlinux cannot boot from any raid partition, encrypted and dmraid device
-    if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+    if [[ "$(echo $bootdev | grep /dev/md*p)" -o "$(echo $bootdev | grep /dev/mapper)" ]]; then
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid partition, encrypted or dmraid device." 0 0
         return 1
     fi
     # check if raid1 device is used, else fail.
-    if [ "$(echo $bootdev | grep /dev/md)" ]; then
-        if ! [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+    if [[ "$(echo $bootdev | grep /dev/md)" ]]; then
+        if ! [[ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
             DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from none raid1 devices." 0 0
             return 1
         else
@@ -3298,13 +3298,13 @@ doextlinux () {
     fi
     # extlinux cannot boot from btrfs raid
     find_btrfs_raid_bootloader_devices
-    if [ $BTRFS_COUNT -ge 3 ]; then
+    if [[ $BTRFS_COUNT -ge 3 ]]; then
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any btrfs raid." 0 0
         return 1
     fi
     # extlinux cannot boot from btrfs subvolume
     find_btrfs_bootloader_subvolume
-    if [ $BTRFS_SUBVOLUME_COUNT -ge 3 ]; then
+    if [[ $BTRFS_SUBVOLUME_COUNT -ge 3 ]]; then
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from btrfs subvolume." 0 0
         return 1
     fi
@@ -3327,18 +3327,18 @@ dosyslinux() {
     prepare_syslinux
     # look for a separately-mounted /boot partition
     bootdev=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1)
-    if [ "$bootdev" = "" ]; then
+    if [[ "$bootdev" = "" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find separate /boot partition." 0 0
         return 1
     fi
     # syslinux only can boot from vfat partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-    if ! [ "$FSTYPE" = "vfat" ]; then
+    if ! [[ "$FSTYPE" = "vfat" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find vfat /boot partition." 0 0
         return 1
     fi
     # syslinux cannot boot from any raid, raid partition, encrypted and dmraid device
-    if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+    if [[ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]]; then
         DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
         return 1
     fi
@@ -3349,7 +3349,7 @@ dosyslinux() {
 }
 
 dolilo() {
-    if [ ! -f ${DESTDIR}/etc/lilo.conf ]; then
+    if [[ ! -f ${DESTDIR}/etc/lilo.conf ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/etc/lilo.conf, installing lilo now ..." 0 0
         PACKAGES="lilo"
         run_pacman
@@ -3359,15 +3359,15 @@ dolilo() {
     USE_DMRAID=""
     common_bootloader_checks
     # check on GUID (gpt)
-    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+    if [[ "$(parted -sl | grep "Partition Table: gpt")" ]]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     check_bootpart
     abort_btrfs_bootpart || return 1
     abort_nilfs_bootpart || return 1
     # Try to auto-configure LILO...
-    if ! [ "$PART_ROOT" = "" ]; then
-        if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+    if ! [[ "$PART_ROOT" = "" ]]; then
+        if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
             sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" ${DESTDIR}/etc/lilo.conf
         else
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" ${DESTDIR}/etc/lilo.conf
@@ -3381,7 +3381,7 @@ dolilo() {
     sort /tmp/.device-names >> ${DESTDIR}/etc/lilo.conf
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
-    if [ "$DEVS" = "" ]; then
+    if [[ "$DEVS" = "" ]]; then
         DIALOG --msgbox "No hard drives were found" 0 0
         return 1
     fi
@@ -3389,7 +3389,7 @@ dolilo() {
     ROOTDEV=$(cat $ANSWER)
     sed -i "s|boot=.*$|boot=$ROOTDEV|g" ${DESTDIR}/etc/lilo.conf
     # HACK: if virtio device is used
-    if [ "$(echo $ROOTDEV | grep /dev/vd)" ]; then
+    if [[ "$(echo $ROOTDEV | grep /dev/vd)" ]]; then
         sed -i "s|.*disk=.*$|disk=$ROOTDEV bios=0x80 max-partitions=7|g" ${DESTDIR}/etc/lilo.conf
     else
         sed -i "s|^disk=.*$|# disk=$ROOTDEV bios=0x80|g" ${DESTDIR}/etc/lilo.conf
@@ -3400,7 +3400,7 @@ dolilo() {
     DIALOG --infobox "Installing the LILO bootloader..." 0 0
     chroot_mount
     chroot ${DESTDIR} /sbin/lilo >$LOG 2>&1
-    if [ $? -gt 0 ]; then
+    if [[ $? -gt 0 ]]; then
         chroot_umount
         DIALOG --msgbox "Error installing LILO. (see $LOG for output)" 0 0
         return 1
@@ -3410,11 +3410,11 @@ dolilo() {
 }
 
 dogrub() {
-    if [ -f ${DESTDIR}/boot/grub2/grub.cfg ]; then
+    if [[ -f ${DESTDIR}/boot/grub2/grub.cfg ]]; then
         DIALOG --msgbox "Found ${DESTDIR}/boot/grub2/grub.cfg, deinstalling grub2 now ..." 0 0
         $PACMAN -R grub2 > $LOG
     fi
-    if [ ! -f ${DESTDIR}/boot/grub/menu.lst ]; then
+    if [[ ! -f ${DESTDIR}/boot/grub/menu.lst ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub/menu.lst, installing grub now ..." 0 0
         PACKAGES="grub"
         run_pacman
@@ -3433,36 +3433,36 @@ dogrub() {
     GRUB_LEGACY="1"
     USE_DMRAID=""
     #checks for custom dev.map filesystem
-    if ! [ "$(dmraid -r | grep ^no )" ]; then
+    if ! [[ "$(dmraid -r | grep ^no )" ]]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
     fi
-    if  [ "$(ls $block/vd[a-z] 2>/dev/null)" ]; then
+    if  [[ "$(ls $block/vd[a-z] 2>/dev/null)" ]]; then
         DIALOG --yesno "Setup detected virtio devices.\nDo you want to install grub on this device?" 0 0 && get_grub_virtio_map
     fi
-    if  [ "$(ls $block/mmcblk* 2>/dev/null)" ]; then
+    if  [[ "$(ls $block/mmcblk* 2>/dev/null)" ]]; then
         DIALOG --yesno "Setup detected mmcblk devices.\nDo you want to install grub on this device?" 0 0 && get_grub_mmcblk_map
     fi
     for i in $EXTRA_CONTROLLER; do
-        if [ "$(ls $block/$i* 2>/dev/null)" ]; then
+        if [[ "$(ls $block/$i* 2>/dev/null)" ]]; then
                     DIALOG --yesno "Setup detected $i devices.\nDo you want to install grub on this device?" 0 0 && get_grub_extra_devices_map
         fi
     done
     # check on GUID (gpt)
-    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
+    if [[ "$(parted -sl | grep "Partition Table: gpt")" ]]; then
                 DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
-    if [ "$PART_ROOT" = "" ]; then
+    if [[ "$PART_ROOT" = "" ]]; then
         DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>$ANSWER || return 1
         PART_ROOT=$(cat $ANSWER)
     fi
     # try to auto-configure GRUB...
-    if [ "$PART_ROOT" != "" ]; then
+    if [[ "$PART_ROOT" != "" ]]; then
         check_bootpart
         abort_btrfs_bootpart || return 1
         abort_nilfs_bootpart || return 1
         # check if raid device, devicemapper or dmraid is used  on /boot partition
-        if [ "$(echo $bootdev | grep /dev/md)" ]; then
-            if [ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]; then
+        if [[ "$(echo $bootdev | grep /dev/md)" ]]; then
+            if [[ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
                 # get redundant devices
                 for i in $(mdadm --detail $bootdev | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
                     _grubdev="$_grubdev $(mapdev $i)"
@@ -3472,12 +3472,12 @@ dogrub() {
                 # none raid1 devices are not bootable with grub, let it fail!
                 FAIL_RAID="1"
             fi
-            if [ "$(echo $bootdev | grep /dev/md*p)" ]; then
+            if [[ "$(echo $bootdev | grep /dev/md*p)" ]]; then
                 # partitionable raid is not supported by grub!
                 FAIL_RAID="1"
             fi
-        elif  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
-                if ! [ "$(dmsetup info $bootdev | grep 'DMRAID')" ]; then
+        elif  [[ "$(echo $bootdev | grep /dev/mapper)" ]]; then
+                if ! [[ "$(dmsetup info $bootdev | grep 'DMRAID')" ]]; then
                     FAIL_DM="1"
                 else
                     FAIL_DM=""
@@ -3487,21 +3487,21 @@ dogrub() {
             # use normal device
             _grubdev=$(mapdev $bootdev)
         fi
-        if [ "$FAIL_RAID" = "1" ]; then
+        if [[ "$FAIL_RAID" = "1" ]]; then
                 DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
                 return 1
         fi
-        if [ "$FAIL_DM" = "1" ]; then
+        if [[ "$FAIL_DM" = "1" ]]; then
                 DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
                 return 1
         fi
-        if [ "$_grubdev" != "" ]; then
+        if [[ "$_grubdev" != "" ]]; then
             cp ${DESTDIR}/boot/grub/menu.lst /tmp/.menu.lst
             # remove the default entries by truncating the file at our little tag (#-*)
             head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >${DESTDIR}/boot/grub/menu.lst
             rm -f /tmp/.menu.lst
             # keep the file from being completely bogus
-            if [ "$_grubdev" = "DEVICE NOT FOUND" ]; then
+            if [[ "$_grubdev" = "DEVICE NOT FOUND" ]]; then
                 DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
                 _grubdev="(hd0,0)"
             fi
@@ -3513,7 +3513,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
                 echo "title  Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
                 echo "root   $grubdev" >>${DESTDIR}/boot/grub/menu.lst
-                if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+                if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
@@ -3525,7 +3525,7 @@ dogrub() {
                 echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
                 echo "title  Arch Linux Fallback" >>${DESTDIR}/boot/grub/menu.lst
                 echo "root   $grubdev" >>${DESTDIR}/boot/grub/menu.lst
-                if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+                if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
                     echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
@@ -3550,12 +3550,12 @@ dogrub() {
 
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
-    if [ "$DEVS" = "" ]; then
+    if [[ "$DEVS" = "" ]]; then
         DIALOG --msgbox "No hard drives were found" 0 0
         return 1
     fi
     S_GRUB=""
-    while [ "$S_GRUB" = "" ]; do
+    while [[ "$S_GRUB" = "" ]]; do
         DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 $DEVS 2>$ANSWER || return 1
         ROOTDEV=$(cat $ANSWER)
         DIALOG --infobox "Installing the GRUB bootloader..." 0 0
@@ -3563,16 +3563,16 @@ dogrub() {
         # freeze xfs filesystems to enable grub installation on xfs filesystems
         freeze_xfs
         bootpart=$bootdev
-        if [ "$(echo $bootpart | grep /dev/md)" ]; then
+        if [[ "$(echo $bootpart | grep /dev/md)" ]]; then
             bootpart=$(mdadm --detail $bootpart | grep $ROOTDEV | sed -e 's#.* /#/#g')
         fi
         bootpart=$(mapdev $bootpart)
         bootdev=$(mapdev $ROOTDEV)
-        if [ "$bootpart" = "" ]; then
+        if [[ "$bootpart" = "" ]]; then
             DIALOG --msgbox "Error: Missing/Invalid root device: $bootpart" 0 0
             return 1
         fi
-        if [ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]; then
+        if [[ "$bootpart" = "DEVICE NOT FOUND" -o "$bootdev" = "DEVICE NOT FOUND" ]]; then
             DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
             return 1
         fi
@@ -3596,8 +3596,8 @@ EOF
         cp -f /tmp/dev.map ${DESTDIR}/boot/grub/device.map
         DIALOG --msgbox "GRUB was successfully installed." 0 0
         S_GRUB=1
-        if [ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]; then
-            if [ "$redundant" = "1" ]; then
+        if [[ "$(blkid -c /dev/null | grep TYPE=\"linux_raid_member\")" ]]; then
+            if [[ "$redundant" = "1" ]]; then
                 DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
             fi
         fi
@@ -3612,7 +3612,7 @@ dogrub2_common_before() {
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
-    if [ -f ${DESTDIR}/boot/grub/menu.lst ]; then
+    if [[ -f ${DESTDIR}/boot/grub/menu.lst ]]; then
         DIALOG --msgbox "Found ${DESTDIR}/boot/grub/menu.lst, deinstalling grub now ..." 0 0
         $PACMAN -R grub > $LOG
     fi
@@ -3634,7 +3634,7 @@ dogrub2_config() {
     head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     rm -f /tmp/.grub.cfg
     # keep the file from being completely bogus
-    # if [ "$grubdev" = "DEVICE NOT FOUND" ]; then
+    # if [[ "$grubdev" = "DEVICE NOT FOUND" ]]; then
     #     DIALOG --msgbox "Your device, which contains /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
     #     grubdev="(hd0,1)"
     # fi
@@ -3656,7 +3656,7 @@ set pager=1
 
 EOF
 
-    if [ "${GRUB2_EFI}" = "1" ]; then
+    if [[ "${GRUB2_EFI}" = "1" ]]; then
         
         cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
@@ -3667,7 +3667,7 @@ EOF
 
     fi
     
-    if [ "${GRUB2_BIOS}" = "1" ]; then
+    if [[ "${GRUB2_BIOS}" = "1" ]]; then
         
         cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
@@ -3694,17 +3694,17 @@ EOF
     sort /tmp/.device-names >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     # create default grub entries
     echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    [ "$USE_RAID" = "1" ] && echo "insmod raid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    ! [ "$RAID_ON_LVM" = "" ] && echo "insmod lvm" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    [[ "$USE_RAID" = "1" ]] && echo "insmod raid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    ! [[ "$RAID_ON_LVM" = "" ]] && echo "insmod lvm" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     echo "menuentry \"Arch Linux\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # if [ "$FAIL_COMPLEX" = "0" ]; then
+    # if [[ "$FAIL_COMPLEX" = "0" ]]; then
     #     echo "set root=($grubdev)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     # else
     #     echo "set root=$grubdev" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     # fi
-    [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
         echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     else
         echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
@@ -3716,13 +3716,13 @@ EOF
     NUMBER=$(($NUMBER+1))
     echo "# ($NUMBER) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     echo "menuentry  \"Arch Linux Fallback\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # if [ "$FAIL_COMPLEX" = "0" ]; then
+    # if [[ "$FAIL_COMPLEX" = "0" ]]; then
     #     echo "set root=($grubdev)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     # else
     #     echo "set root=$grubdev" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     # fi
-    [ "$FAIL_COMPLEX" = "0" ] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    if [ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]; then
+    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    if [[ "$NAME_SCHEME_PARAMETER" = "UUID" -o "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
         echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     else
         echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
@@ -3743,10 +3743,10 @@ EOF
 
 dogrub2_common_after() {    
     
-    if [ "$PART_ROOT" != "" ]; then
-        if [ "${GRUB2_BIOS}" = "1" ]; then
-            [ "$grubdev" != "" ] && dogrub2_config
-        elif [ "${GRUB2_EFI}" = "1" ]; then
+    if [[ "$PART_ROOT" != "" ]]; then
+        if [[ "${GRUB2_BIOS}" = "1" ]]; then
+            [[ "$grubdev" != "" ]] && dogrub2_config
+        elif [[ "${GRUB2_EFI}" = "1" ]]; then
             dogrub2_config
         fi
     fi
@@ -3767,7 +3767,7 @@ dogrub2_bios() {
     
     dogrub2_common_before
     
-    if [ ! -f ${DESTDIR}/boot/grub/grub.cfg ]; then
+    if [[ ! -f ${DESTDIR}/boot/grub/grub.cfg ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub/grub.cfg, installing grub2-bios now ..." 0 0
         PACKAGES="grub2-bios grub2-common"
         run_pacman
@@ -3776,31 +3776,31 @@ dogrub2_bios() {
     fi
     
     # try to auto-configure GRUB2...
-    if [ "$PART_ROOT" != "" ]; then
+    if [[ "$PART_ROOT" != "" ]]; then
         check_bootpart
         abort_btrfs_bootpart || return 1
         abort_nilfs_bootpart || return 1
         # check if raid, raid partition, dmraid or device devicemapper is used
-        if [ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]; then
+        if [[ "$(echo $bootdev | grep /dev/md)" -o "$(echo $bootdev | grep /dev/mapper)" ]]; then
             # boot from lvm and raid devices is supported
             FAIL_COMPLEX="0"
-            if [ "$(echo $bootdev | grep /dev/md*p)" -o "$(dmsetup info $bootdev | grep 'DMRAID')" -o "$(cryptsetup status $bootdev)" ]; then
+            if [[ "$(echo $bootdev | grep /dev/md*p)" -o "$(dmsetup info $bootdev | grep 'DMRAID')" -o "$(cryptsetup status $bootdev)" ]]; then
                 # raid with no supperblock 0.90, partitionable raid, dmraid and encryption
                 # devices are not supported
                 FAIL_COMPLEX="1"
             fi
         fi
-        if [ "$FAIL_COMPLEX" = "0" ]; then
+        if [[ "$FAIL_COMPLEX" = "0" ]]; then
             grubdev=$(basename $bootdev)
             complexuuid=$(getuuid $bootdev)
             # check if mapper is used
-            if  [ "$(echo $bootdev | grep /dev/mapper)" ]; then
+            if  [[ "$(echo $bootdev | grep /dev/mapper)" ]]; then
                 RAID_ON_LVM="0"
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
-                    if [ "$(echo $devpath | grep -v /dev/md*p | grep /dev/md)" ]; then
+                    if [[ "$(echo $devpath | grep -v /dev/md*p | grep /dev/md)" ]]; then
                         detectedvolumegroup="$(echo $(pvs -o vg_name --noheading $devpath))"
-                        if [ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]; then
+                        if [[ "$(echo /dev/mapper/$detectedvolumegroup-* | grep $bootdev)" ]]; then
                             # change bootdev to md device!
                             bootdev=$(pvs -o pv_name --noheading $devpath)
                             RAID_ON_LVM="1"
@@ -3810,9 +3810,9 @@ dogrub2_bios() {
                 done
             fi
             USE_RAID=""
-            if [ "$(echo $bootdev | grep /dev/md)" ]; then
+            if [[ "$(echo $bootdev | grep /dev/md)" ]]; then
                 # check if raid superblock is 0.90 format, if not fail
-                [ "$(mdadm -Q --detail $bootdev | grep 'Version : 0.90')" ] || FAIL_COMPLEX="1"
+                [[ "$(mdadm -Q --detail $bootdev | grep 'Version : 0.90')" ]] || FAIL_COMPLEX="1"
                 USE_RAID="1"
             fi
         else
@@ -3825,24 +3825,24 @@ dogrub2_bios() {
     # A switch is needed if complex $bootdev is used!
     # - It doesn't make sense to present device list, if raid or raid+lvm is used for $bootdev.
     # - LVM $bootdev needs the MBR of a device and cannot be used itself as $bootdev
-    if [ "$FAIL_COMPLEX" = "0" ]; then
+    if [[ "$FAIL_COMPLEX" = "0" ]]; then
         # use function below if no raid is detected!
-        if [ "$RAID_ON_LVM" = "0" ]; then
+        if [[ "$RAID_ON_LVM" = "0" ]]; then
             DEVS="$(findbootloaderdisks _)"
-            if [ "$DEVS" = "" ]; then
+            if [[ "$DEVS" = "" ]]; then
                 DIALOG --msgbox "No hard drives were found" 0 0
                 return 1
             fi
             DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 $DEVS 2>$ANSWER || return 1
             bootdev=$(cat $ANSWER)
         fi
-        if [ "$USE_RAID"  = "1" ]; then
+        if [[ "$USE_RAID"  = "1" ]]; then
             DIALOG --yesno "Setup detected /boot on a raid setup.\n\nContinue installing GRUB2 on $bootdev?" 0 0 || return 1
         fi
     else
         DEVS="$(findbootloaderdisks _)"
         DEVS="$DEVS $(findbootloaderpartitions _)"
-        if [ "$DEVS" = "" ]; then
+        if [[ "$DEVS" = "" ]]; then
             DIALOG --msgbox "No hard drives were found" 0 0
             return 1
         fi
@@ -3850,17 +3850,17 @@ dogrub2_bios() {
         bootdev=$(cat $ANSWER)
     fi
     
-    if [ "$(parted -sl | grep "Partition Table: gpt")" ]; then
-        if ! [ "$(parted -sl | grep "bios_grub")" ]; then
+    if [[ "$(parted -sl | grep "Partition Table: gpt")" ]]; then
+        if ! [[ "$(parted -sl | grep "bios_grub")" ]]; then
             DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
         fi
     else
-        if [ "$FAIL_COMPLEX" = "0" ]; then
+        if [[ "$FAIL_COMPLEX" = "0" ]]; then
             DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
         fi
     fi
     
-    if [ "$FAIL_COMPLEX" = "1" ]; then
+    if [[ "$FAIL_COMPLEX" = "1" ]]; then
         DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
         return 1
     fi
@@ -3872,7 +3872,7 @@ dogrub2_bios() {
     chroot ${DESTDIR} /sbin/grub_bios-install --boot-directory=/boot --no-floppy --recheck ${bootdev} >> /tmp/grub2.log
     chroot_umount
     cat /tmp/grub2.log >${LOG}
-    if ! [ -s /tmp/grub2.log ] ; then
+    if ! [[ -s /tmp/grub2.log ]] ; then
         DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
@@ -3892,7 +3892,7 @@ dogrub2_efibootmgr() {
     
     EFIBOOTMGR="/usr/sbin/efibootmgr"
     
-    if [ -d ${DESTDIR}/sys/firmware/efi/vars ]
+    if [[ -d ${DESTDIR}/sys/firmware/efi/vars ]]
     then
         # Delete old entries of grub2 - needs to run within chroot - command to be checked
         for bootnum in $(chroot ${DESTDIR} ${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
@@ -3902,9 +3902,9 @@ dogrub2_efibootmgr() {
         
         DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         
-        [ "${DISC}" = "" ] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+        [[ "${DISC}" = "" ]] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         
-        [ "${EFISYS_PART}" = "" ] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        [[ "${EFISYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
     chroot ${DESTDIR} ${EFIBOOTMGR} --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
@@ -3925,21 +3925,21 @@ dogrub2_efi_common() {
     
     DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
     
-    if [ "${DISC}" = "" ]; then
+    if [[ "${DISC}" = "" ]]; then
         DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         EFISYS=""
     fi
     
     parted_gpt
     
-    if [ -d ${DESTDIR}/boot/efi ]; then
+    if [[ -d ${DESTDIR}/boot/efi ]]; then
         EFISYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
     else
         mkdir -p ${DESTDIR}/boot/efi
         EFISYS_PART=""
     fi
     
-    if [ "${EFISYS_PART}" = "" ]; then
+    if [[ "${EFISYS_PART}" = "" ]]; then
         EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         mount -o rw -t vfat ${DISC}${EFISYS_PART_NUM} ${DESTDIR}/boot/efi
     else
@@ -3967,7 +3967,7 @@ dogrub2_efi_common() {
     
     chroot_umount
     cat /tmp/grub2_efi.log > ${LOG}
-    if ! [ -s /tmp/grub2_efi.log ] ; then
+    if ! [[ -s /tmp/grub2_efi.log ]] ; then
         DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
@@ -3999,7 +3999,7 @@ dogrub2_efi_i386() {
 select_source()
 {
     NEXTITEM="3"
-    if ! [ "$(which $DLPROG)" ]; then
+    if ! [[ "$(which $DLPROG)" ]]; then
         DIALOG --menu "Please select an installation source" 10 45 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>$ANSWER || return 1
     else
@@ -4017,14 +4017,14 @@ select_source()
             ;;
     esac
 
-    if [ "$MODE" = "media" ]; then
+    if [[ "$MODE" = "media" ]]; then
         TITLE="Arch Linux CDROM, USBSTICK or OTHER SOURCE Installation"
         getsource || return 1
     else
         DEFAULT=
         TITLE="Arch Linux FTP/HTTP Installation"
         while true; do
-            if [ -n "$NEXTITEM" ]; then
+            if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
             else
             DEFAULT=""
@@ -4046,7 +4046,7 @@ select_source()
             esac
         done
     fi
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -4055,7 +4055,7 @@ select_source()
 
 set_clock()
 {
-    if [ -e /usr/bin/tz ]; then
+    if [[ -e /usr/bin/tz ]]; then
         tz --setup && NEXTITEM="2"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
@@ -4064,7 +4064,7 @@ set_clock()
 
 set_keyboard()
 {
-    if [ -e /usr/bin/km ]; then
+    if [[ -e /usr/bin/km ]]; then
         km --setup && NEXTITEM="1"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
@@ -4087,7 +4087,7 @@ run_mkinitcpio()
     ) &
     sleep 2
     dialog --backtitle "$TITLE" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
-    while [ -f /tmp/setup-mkinitcpio-running ]; do
+    while [[ -f /tmp/setup-mkinitcpio-running ]]; do
         sleep 1
     done
     chroot_umount
@@ -4099,8 +4099,8 @@ prepare_harddrive()
     S_MKFS=0
     DONE=0
     NEXTITEM=""
-    while [ "$DONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
+    while [[ "$DONE" = "0" ]]; do
+        if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
         else
             DEFAULT=""
@@ -4113,11 +4113,11 @@ prepare_harddrive()
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>$ANSWER || CANCEL="1"
         NEXTITEM="$(cat $ANSWER)"
-        [ "$S_MKFSAUTO" = "1" ] && DONE=1
+        [[ "$S_MKFSAUTO" = "1" ]] && DONE=1
         case $(cat $ANSWER) in
             "1")
                 autoprepare
-                [ "$S_MKFSAUTO" = "1" ] && DONE=1
+                [[ "$S_MKFSAUTO" = "1" ]] && DONE=1
                 ;;
             "2")
                 partition ;;
@@ -4131,7 +4131,7 @@ prepare_harddrive()
                 DONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="2"
     else
         NEXTITEM="3"
@@ -4143,8 +4143,8 @@ create_special()
 {
     NEXTITEM=""
     SPECIALDONE=0
-    while [ "$SPECIALDONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
+    while [[ "$SPECIALDONE" = "0" ]]; do
+        if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
         else
             DEFAULT=""
@@ -4167,7 +4167,7 @@ create_special()
                 SPECIALDONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -4179,8 +4179,8 @@ _createmd()
 {
     NEXTITEM=""
     MDDONE=0
-    while [ "$MDDONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
+    while [[ "$MDDONE" = "0" ]]; do
+        if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
         else
             DEFAULT=""
@@ -4208,7 +4208,7 @@ _createmd()
                 MDDONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="1"
     else
         NEXTITEM="4"
@@ -4220,8 +4220,8 @@ _createlvm()
 {
     NEXTITEM=""
     LVMDONE=0
-    while [ "$LVMDONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
+    while [[ "$LVMDONE" = "0" ]]; do
+        if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
         else
             DEFAULT=""
@@ -4250,7 +4250,7 @@ _createlvm()
                 LVMDONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="2"
     else
         NEXTITEM="4"
@@ -4262,8 +4262,8 @@ _createluks()
 {
     NEXTITEM=""
     LUKSDONE=0
-    while [ "$LUKSDONE" = "0" ]; do
-        if [ -n "$NEXTITEM" ]; then
+    while [[ "$LUKSDONE" = "0" ]]; do
+        if [[ -n "$NEXTITEM" ]]; then
             DEFAULT="--default-item $NEXTITEM"
         else
             DEFAULT=""
@@ -4286,7 +4286,7 @@ _createluks()
                 LUKSDONE=1 ;;
         esac
     done
-    if [ "$CANCEL" = "1" ]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -4303,63 +4303,63 @@ auto_hwdetect()
     HWDETECTFILES=""
     HWDETECTRC=""
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
-    if [ "$HWDETECT" = "yes" ]; then
+    if [[ "$HWDETECT" = "yes" ]]; then
         # check if running in vmware
-        [ "$(vmware-detect)" ] && HWPARAMETER="$HWPARAMETER --vmware"
+        [[ "$(vmware-detect)" ]] && HWPARAMETER="$HWPARAMETER --vmware"
         # check on ide-legacy boot parameter
-        [ "$(grep -w ide-legacy /proc/cmdline)" ] && HWPARAMETER="$HWPARAMETER --ide-legacy"
+        [[ "$(grep -w ide-legacy /proc/cmdline)" ]] && HWPARAMETER="$HWPARAMETER --ide-legacy"
         # check on used keymap
-        ! [ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/rc.conf)" ] && HWPARAMETER="$HWPARAMETER --keymap"
+        ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/rc.conf)" ]] && HWPARAMETER="$HWPARAMETER --keymap"
         # check on usb input
-        [ "$(grep hid /proc/modules)" ] && HWPARAMETER="$HWPARAMETER --usbinput"
+        [[ "$(grep hid /proc/modules)" ]] && HWPARAMETER="$HWPARAMETER --usbinput"
         # check on framebuffer modules and kms
-        if [ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+        if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]]; then
              FBPARAMETER="--uvesafb"
              HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
         fi
-        [ "$(grep -w ati-kms /proc/cmdline)" ] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [ "$(grep -w intel-kms /proc/cmdline)" ] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [ "$(grep -w nvidia-kms /proc/cmdline)" ] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [ "$(grep -w fbmodule /proc/cmdline)" ] && FBPARAMETER="--fbmodule"
-        if [ "$(grep usb_storage /proc/modules)" ]; then
+        [[ "$(grep -w ati-kms /proc/cmdline)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep -w intel-kms /proc/cmdline)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep -w nvidia-kms /proc/cmdline)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
+        if [[ "$(grep usb_storage /proc/modules)" ]]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="$HWPARAMETER --usb"
         fi
-        if [ "$(grep sbp2 /proc/modules)" ]; then
+        if [[ "$(grep sbp2 /proc/modules)" ]]; then
             DIALOG --defaultno --yesno "Setup detected firewire storage driver...\nDo you need support for booting from firewire devices?" 0 0 && HWPARAMETER="$HWPARAMETER --fw"
         fi
-        if [ "$(grep pcmcia /proc/modules)" ]; then
+        if [[ "$(grep pcmcia /proc/modules)" ]]; then
             DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="$HWPARAMETER --pcmcia"
         fi
-        if [ "$(grep nfs /proc/modules)" ]; then
+        if [[ "$(grep nfs /proc/modules)" ]]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="$HWPARAMETER --nfs"
         fi
-        if [ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]; then
-            if ! [ "$(dmraid -r | grep ^no )" ]; then
+        if [[ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
+            if ! [[ "$(dmraid -r | grep ^no )" ]]; then
                 HWPARAMETER="$HWPARAMETER --dmraid"
             fi
         fi
-        [ "$(blkid -c=/dev/null -o value -s TYPE $PART_ROOT)" = "btrfs" ] && HWPARAMETER="$HWPARAMETER --btrfs"
+        [[ "$(blkid -c=/dev/null -o value -s TYPE $PART_ROOT)" = "btrfs" ]] && HWPARAMETER="$HWPARAMETER --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect $FBPARAMETER --hostcontroller --filesystem $HWPARAMETER) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --rootdevice=$PART_ROOT --hooks-dir=${DESTDIR}/lib/initcpio/install $FBPARAMETER $HWPARAMETER --hooks)"
         HWDETECTRC="$(echo $(hwdetect --net --sound $HWPARAMETER)| sed -e 's#.*) ##g')"
-        [ -n "$HWDETECTMODULES" ] && sed -i -e "s/^MODULES=.*/$HWDETECTMODULES/g" ${DESTDIR}/etc/mkinitcpio.conf
-        [ -n "$HWDETECTHOOKS" ] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
-        [ -n "$HWDETECTFILES" ] && sed -i -e "s#^FILES=.*#FILES=\"$HWDETECTFILES\"#g" ${DESTDIR}/etc/mkinitcpio.conf
-        [ -n "$HWDETECTRC" ] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
+        [[ -n "$HWDETECTMODULES" ]] && sed -i -e "s/^MODULES=.*/$HWDETECTMODULES/g" ${DESTDIR}/etc/mkinitcpio.conf
+        [[ -n "$HWDETECTHOOKS" ]] && sed -i -e "s/^HOOKS=.*/$HWDETECTHOOKS/g" ${DESTDIR}/etc/mkinitcpio.conf
+        [[ -n "$HWDETECTFILES" ]] && sed -i -e "s#^FILES=.*#FILES=\"$HWDETECTFILES\"#g" ${DESTDIR}/etc/mkinitcpio.conf
+        [[ -n "$HWDETECTRC" ]] && sed -i -e "s/^MODULES=.*/$HWDETECTRC/g" ${DESTDIR}/etc/rc.conf
     fi
 }
 
 auto_fb()
 {
     UVESAFB=""
-    if [ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]; then
+    if [[ "$(grep -w ati-kms /proc/cmdline)" -o "$(grep -w intel-kms /proc/cmdline)" -o "$(grep -w nvidia-kms /proc/cmdline)" ]]; then
         # clean modprobe.conf file from options first
         sed -i -e '/options/d' ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep nouveau ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep i915 ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [ "$(grep radeon ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [[ "$(grep nouveau ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [[ "$(grep i915 ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
+        ! [[ "$(grep radeon ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
     fi
-    if [ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]; then
+    if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d -a "$(grep -w uvesafb /proc/cmdline)" ]]; then
         UVESAFB="$(grep ^[a-z] /etc/modprobe.d/uvesafb.conf)" 
         sed -i -e "s#options.*#$UVESAFB#g" ${DESTDIR}/etc/modprobe.d/uvesafb.conf
     fi
@@ -4367,19 +4367,19 @@ auto_fb()
 
 auto_parameters()
 {
-    if [ -s /tmp/.keymap ]; then
+    if [[ -s /tmp/.keymap ]]; then
         DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
     fi
-    if [ -s /tmp/.font ]; then
+    if [[ -s /tmp/.font ]]; then
         DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s/^CONSOLEFONT=.*/CONSOLEFONT=\"$(cat /tmp/.font | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
     fi
-    if [ -s  /tmp/.hardwareclock ]; then
+    if [[ -s  /tmp/.hardwareclock ]]; then
         DIALOG --infobox "Setting the hardwareclock: $(cat /tmp/.hardwareclock | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s/^HARDWARECLOCK=.*/HARDWARECLOCK=\"$(cat /tmp/.hardwareclock | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
     fi
-    if [ -s  /tmp/.timezone ]; then
+    if [[ -s  /tmp/.timezone ]]; then
         DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf ..." 0 0
         sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
     fi
@@ -4387,7 +4387,7 @@ auto_parameters()
 
 auto_luks()
 {
-    if [ -e /tmp/.crypttab -a "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]; then
+    if [[ -e /tmp/.crypttab -a "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]]; then
         sed -i -e "/$(basename ${PART_ROOT})/d" /tmp/.crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
@@ -4397,11 +4397,11 @@ auto_timesetting()
 {
     TIMEZONE=""
     eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
-    if [ "$TIMEZONE" != "" -a -e ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ]; then
+    if [[ "$TIMEZONE" != "" -a -e ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ]]; then
         cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE ${DESTDIR}/etc/localtime
         cp ${DESTDIR}/usr/share/zoneinfo/$TIMEZONE /etc/localtime
     fi
-    if [ ! -f ${DESTDIR}/var/lib/hwclock/adjtime ]; then
+    if [[ ! -f ${DESTDIR}/var/lib/hwclock/adjtime ]]; then
         echo "0.0 0 0.0" > ${DESTDIR}/var/lib/hwclock/adjtime
     fi
 }
@@ -4410,7 +4410,7 @@ auto_ftpmirror()
 {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if [ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]; then
+    if [[ "$MODE" = "ftp" -a "${SYNC_URL}" != "" ]]; then
         SYNC_URL="${SYNC_URL}"
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
@@ -4422,7 +4422,7 @@ configure_system()
     destdir_mounts || return 1
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
-    if [ $S_CONFIG -eq 0 ]; then
+    if [[ $S_CONFIG -eq 0 ]]; then
         auto_ftpmirror
         auto_network
         auto_parameters
@@ -4436,7 +4436,7 @@ configure_system()
     # main menu loop
     while true; do
         S_CONFIG=0
-        if [ -n "$FILE" ]; then
+        if [[ -n "$FILE" ]]; then
             DEFAULT="--default-item $FILE"
         else
             DEFAULT=""
@@ -4457,10 +4457,10 @@ configure_system()
             "Return"                        "Return to Main Menu" 2>$ANSWER || break
         FILE="$(cat $ANSWER)"
 
-        if [ "$FILE" = "Return" -o -z "$FILE" ]; then       # exit
+        if [[ "$FILE" = "Return" -o -z "$FILE" ]]; then       # exit
             S_CONFIG=1
             break
-        elif [ "$FILE" = "/etc/rc.conf" ]; then    # non-file
+        elif [[ "$FILE" = "/etc/rc.conf" ]]; then    # non-file
                 # if user edited /etc/rc.conf, add the hostname to /etc/hosts if it's not already there.
                 # note that if the user edits rc.conf several times to change the hostname more then once, 
                 # we will add them all to /etc/hosts.  this is not perfect, but to avoid this, too much code would be required 
@@ -4468,34 +4468,34 @@ configure_system()
                 # we could maybe do this just once after the user is really done here, but then he doesn't get 
                 # to see the updated file while being in this menu...
                 HOSTNAME=$(sed -n '/^HOSTNAME/s/HOSTNAME=//p' ${DESTDIR}${FILE} | sed 's/"//g')
-                if ! [ "$(grep '127\.0\.0\.1' ${DESTDIR}/etc/hosts | grep -q "$HOSTNAME")" ]; then
+                if ! [[ "$(grep '127\.0\.0\.1' ${DESTDIR}/etc/hosts | grep -q "$HOSTNAME")" ]]; then
                     sed -i "s/127\.0\.0\.1.*/& $HOSTNAME/" ${DESTDIR}/etc/hosts
                 fi
                 $EDITOR ${DESTDIR}${FILE}
-        elif [ "$FILE" = "/etc/mkinitcpio.conf" ]; then    # non-file
+        elif [[ "$FILE" = "/etc/mkinitcpio.conf" ]]; then    # non-file
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
             $EDITOR ${DESTDIR}${FILE}
             for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do
-                [ -e ${DESTDIR}/lib/initcpio/install/$i ] || HOOK_ERROR=1
+                [[ -e ${DESTDIR}/lib/initcpio/install/$i ]] || HOOK_ERROR=1
             done
-            if [ "$HOOK_ERROR" = "1" ]; then
+            if [[ "$HOOK_ERROR" = "1" ]]; then
                 DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
             fi
-        elif [ "$FILE" = "/etc/locale.gen" ]; then          # non-file
+        elif [[ "$FILE" = "/etc/locale.gen" ]]; then          # non-file
             # enable glibc locales from rc.conf
                 for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
                     sed -i -e "s/^#$i/$i/g" ${DESTDIR}/etc/locale.gen
                 done
             $EDITOR ${DESTDIR}${FILE}
-        elif [ "$FILE" = "Root-Password" ]; then            # non-file
+        elif [[ "$FILE" = "Root-Password" ]]; then            # non-file
             PASSWORD=""
-            while [ "${PASSWORD}" = "" ]; do
+            while [[ "${PASSWORD}" = "" ]]; do
                 DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>$ANSWER || return 1
                 PASS=$(cat $ANSWER)
                 DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>$ANSWER || return 1
                 PASS2=$(cat $ANSWER)
-                if [ "$PASS" = "$PASS2" ]; then
+                if [[ "$PASS" = "$PASS2" ]]; then
                     PASSWORD=$PASS
                     echo $PASSWORD > /tmp/.password
                     echo $PASSWORD >> /tmp/.password
@@ -4510,7 +4510,7 @@ configure_system()
             $EDITOR ${DESTDIR}${FILE}
         fi
     done
-    if [ $S_CONFIG -eq 1 ]; then
+    if [[ $S_CONFIG -eq 1 ]]; then
         # only done on normal exit of configure menu
         ## POSTPROCESSING ##
         # adjust time
@@ -4527,7 +4527,7 @@ configure_system()
 install_bootloader()
 {
     destdir_mounts || return 1
-    if [ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]; then
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
         set_device_name_scheme || return 1
     fi
     source_set || return 1
@@ -4535,11 +4535,11 @@ install_bootloader()
     prepare_pacman
     CANCEL=""
     
-    [ "$(dmesg | grep 'EFI_ARCH_x86_64')" ] && EFI_x86_64="1"
-    [ "$(dmesg | grep 'EFI_ARCH_i386')" ] && EFI_i386="1"
+    [[ "$(dmesg | grep 'EFI_ARCH_x86_64')" ]] && EFI_x86_64="1"
+    [[ "$(dmesg | grep 'EFI_ARCH_i386')" ]] && EFI_i386="1"
     
-    [ "${EFI_x86_64}" = "1" ] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
-    [ "${EFI_i386}" = "1" ] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
+    [[ "${EFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
+    [[ "${EFI_i386}" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
     
     DIALOG --menu "Which bootloader would you like to use?" 12 55 7 \
         "GRUB_LEGACY" "Use the GRUB LEGACY bootloader (default)" \
@@ -4558,7 +4558,7 @@ install_bootloader()
         "EXTLINUX") doextlinux ;;
         "SYSLINUX") dosyslinux ;;
     esac
-    if [ "${CANCEL}" = "1" ]; then
+    if [[ "${CANCEL}" = "1" ]]; then
         NEXTITEM="7"
     else
         NEXTITEM="8"
@@ -4566,7 +4566,7 @@ install_bootloader()
 }
 
 mainmenu() {
-    if [ -n "$NEXTITEM" ]; then
+    if [[ -n "$NEXTITEM" ]]; then
         DEFAULT="--default-item $NEXTITEM"
     else
         DEFAULT=""
@@ -4601,10 +4601,10 @@ mainmenu() {
         "7")
             install_bootloader ;;
         "8")
-            if [ "$S_SRC" = "1" -a "$MODE" = "media" ]; then
+            if [[ "$S_SRC" = "1" -a "$MODE" = "media" ]]; then
                 umount /src >/dev/null 2>&1
             fi
-            [ -e /tmp/.setup-running ] && rm /tmp/.setup-running
+            [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear
             echo ""
             echo "If the install finished successfully, you can now type 'reboot'"
@@ -4612,14 +4612,14 @@ mainmenu() {
             echo ""
             exit 0 ;;
         *)
-            DIALOG --yesno "Abort Installation?" 6 40 && [ -e /tmp/.setup-running ] && rm /tmp/.setup-running && clear && exit 0
+            DIALOG --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
             ;;
     esac
 }
 
 #####################
 ## begin execution ##
-if [ -e /tmp/.setup-running ]; then
+if [[ -e /tmp/.setup-running ]]; then
     echo "HINT:"
     echo "setup already runs on a different console!"
     echo "Please remove /tmp/.setup-running first to launch setup!"
