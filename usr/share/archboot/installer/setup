@@ -2465,77 +2465,77 @@ _mkfs() {
             local ret
             case $_fstype in
                 xfs)      mkfs.xfs $_fsoptions -L $_labelname -f $_device >$LOG 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                reiserfs) yes | mkreiserfs ${_fsoptions} -l ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                ext3)     mke2fs ${_fsoptions} -L ${_labelname} -t ext3 ${_device} >$LOG 2>&1; ret=$? ;;
-                ext4)     mke2fs ${_fsoptions} -L ${_labelname} -t ext4 ${_device} >$LOG 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >$LOG 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat ${_fsoptions} -n ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs $_fsoptions -L $_labelname $_device >$LOG 2>&1; ret=$? ;;
+                reiserfs) yes | mkreiserfs $_fsoptions -l $_labelname $_device >$LOG 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -L $_fsoptions $_labelname $_device >$LOG 2>&1; ret=$? ;;
+                ext3)     mke2fs $_fsoptions -L $_labelname -t ext3 $_device >$LOG 2>&1; ret=$? ;;
+                ext4)     mke2fs $_fsoptions -L $_labelname -t ext4 $_device >$LOG 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs $_fsoptions -L $_labelname $_btrfsdevices >$LOG 2>&1; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 $_fsoptions -L $_labelname $_device >$LOG 2>&1; ret=$? ;;
+                ntfs-3g)  mkfs.ntfs $_fsoptions -L $_labelname $_device >$LOG 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat $_fsoptions -n $_labelname $_device >$LOG 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ $ret != 0 ]]; then
-                DIALOG --msgbox "Error creating filesystem ${_fstype} on ${_device}" 0 0
+                DIALOG --msgbox "Error creating filesystem $_fstype on $_device" 0 0
                 return 1
             fi
             sleep 2
         fi
-        if [[ "${_fstype}" = "btrfs" && -n "${_btrfssubvolume}" && "${_dosubvolume}" = "yes" ]]; then
+        if [[ "$_fstype" = "btrfs" && -n "$_btrfssubvolume" && "$_dosubvolume" = "yes" ]]; then
             create_btrfs_subvolume
         fi
         btrfs_scan
         sleep 2
         # create our mount directory
-        mkdir -p ${_dest}${_mountpoint}
+        mkdir -p $_dest$_mountpoint
         # prepare btrfs mount options
         _btrfsmountoptions=""
-        [[ -n "${_btrfssubvolume}" ]] && _btrfsmountoptions="subvol=${_btrfssubvolume}"
-        [[ -n "${_btrfscompress}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfscompress}"
-        [[ -n "${_btrfsssd}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfsssd}"
-        _btrfsmountoptions="$(echo ${_btrfsmountoptions} | sed -e 's#^ ##g' | sed -e 's# #,#g')"
+        [[ -n "$_btrfssubvolume" ]] && _btrfsmountoptions="subvol=$_btrfssubvolume"
+        [[ -n "$_btrfscompress" ]] && _btrfsmountoptions="$_btrfsmountoptions $_btrfscompress"
+        [[ -n "$_btrfsssd" ]] && _btrfsmountoptions="$_btrfsmountoptions $_btrfsssd"
+        _btrfsmountoptions="$(echo $_btrfsmountoptions | sed -e 's#^ ##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        if [[ "${_fstype}" = "btrfs" && -n "${_btrfsmountoptions}" ]]; then
-            mount -t ${_fstype} -o ${_btrfsmountoptions} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+        if [[ "$_fstype" = "btrfs" && -n "$_btrfsmountoptions" ]]; then
+            mount -t $_fstype -o $_btrfsmountoptions $_device $_dest$_mountpoint >$LOG 2>&1
         else
-            mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >$LOG 2>&1
+            mount -t $_fstype $_device $_dest$_mountpoint >$LOG 2>&1
         fi
         if [[ $? != 0 ]]; then
-            DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
+            DIALOG --msgbox "Error mounting $_dest$_mountpoint" 0 0
             return 1
         fi
         # change permission of base directories to correct permission
         # to avoid btrfs issues
-        if [[ "${_mountpoint}" = "/tmp" ]]; then
-            chmod 1777 ${_dest}${_mountpoint}
-        elif [[ "${_mountpoint}" = "/root" ]]; then
-            chmod 750 ${_dest}${_mountpoint}
+        if [[ "$_mountpoint" = "/tmp" ]]; then
+            chmod 1777 $_dest$_mountpoint
+        elif [[ "$_mountpoint" = "/root" ]]; then
+            chmod 750 $_dest$_mountpoint
         else
-            chmod 755 ${_dest}${_mountpoint}
+            chmod 755 $_dest$_mountpoint
         fi
     fi
 
     # add to .device-names for config files
-    local _uuid="$(getuuid ${_device})"
-    local _label="$(getlabel ${_device})"
-    echo "# DEVICE DETAILS: ${_device} UUID=$_uuid LABEL=$_label" >> /tmp/.device-names
+    local _uuid="$(getuuid $_device)"
+    local _label="$(getlabel $_device)"
+    echo "# DEVICE DETAILS: $_device UUID=$_uuid LABEL=$_label" >> /tmp/.device-names
     # add to temp fstab
     if [[ "$NAME_SCHEME_PARAMETER" = "UUID" ]]; then
-        if [[ -n "${_uuid}" ]]; then
-            _device="UUID=${_uuid}"
+        if [[ -n "$_uuid" ]]; then
+            _device="UUID=$_uuid"
         fi
     elif [[ "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-        if [[ -n "${_label}" ]]; then
-            _device="LABEL=${_label}"
+        if [[ -n "$_label" ]]; then
+            _device="LABEL=$_label"
         fi
     fi
-    if [[ "${_fstype}" = "btrfs" && -n "${_btrfsmountoptions}" ]]; then
-        echo -n "${_device} ${_mountpoint} ${_fstype} defaults,${_btrfsmountoptions} 0 " >>/tmp/.fstab
+    if [[ "$_fstype" = "btrfs" && -n "$_btrfsmountoptions" ]]; then
+        echo -n "$_device $_mountpoint $_fstype defaults,$_btrfsmountoptions 0 " >>/tmp/.fstab
     else
-        echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
+        echo -n "$_device $_mountpoint $_fstype defaults 0 " >>/tmp/.fstab
     fi
-    if [[ "${_fstype}" = "swap" ]]; then
+    if [[ "$_fstype" = "swap" ]]; then
         echo "0" >>/tmp/.fstab
     else
         echo "1" >>/tmp/.fstab
@@ -2581,12 +2581,12 @@ getsource() {
 select_mirror() {
     DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 8 65
     # FIXME: this regex doesn't honor commenting
-    MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
+    MIRRORS=$(egrep -o '((ftp)|(http))://[^/]*' "$MIRRORLIST" | sed 's|$| _|g')
     DIALOG --menu "Select an FTP/HTTP mirror" 14 55 7 \
         $MIRRORS \
         "Custom" "_" 2>$ANSWER || return 1
     local _server=$(cat $ANSWER)
-    if [[ "${_server}" = "Custom" ]]; then
+    if [[ "$_server" = "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to core repo." 8 65 \
             "ftp://ftp.archlinux.org/core/os/$(uname -m)" 2>$ANSWER || return 1
             SYNC_URL=$(cat $ANSWER)
@@ -2595,7 +2595,7 @@ select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
+        SYNC_URL=$(egrep -o "${_server}.*" "$MIRRORLIST" | head -n1)
     fi
     echo "Using mirror: $SYNC_URL" >$LOG
 }
@@ -2604,9 +2604,9 @@ select_mirror() {
 # creates temporary pacman.conf file
 pacman_conf() {
     if [[ "$MODE" = "media" ]]; then
-        local serverurl="${FILE_URL}"
+        local serverurl="$FILE_URL"
     elif [[ "$MODE" = "ftp" ]]; then
-        local serverurl="${SYNC_URL}"
+        local serverurl="$SYNC_URL"
     fi
     # Setup a pacman.conf in /tmp
     cat << EOF > /tmp/pacman.conf
@@ -2617,10 +2617,10 @@ CacheDir = /src/core-$(uname -m)/pkg
 CacheDir = /src/core-any/pkg
 
 [core]
-Server = ${serverurl}
+Server = $serverurl
 
 [extra]
-Server = ${serverurl}
+Server = $serverurl
 EOF
 }
 
@@ -2751,7 +2751,7 @@ select_packages() {
                                                       -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
                                                       -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
                                                       -e "i18n" -e "^koffice" -e "^vim" | sort); do
-            _catlist="${_catlist} ${i} - OFF"
+            _catlist="$_catlist $i - OFF"
         done
 
         DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 20 60 12 $_catlist 2>$ANSWER || return 1
@@ -2769,7 +2769,7 @@ select_packages() {
         while read pkgname pkgcat; do
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
-            if [[ "${_catlist/"\"$pkgcat\""/XXXX}" != "${_catlist}" ]]; then
+            if [[ "${_catlist/"\"$pkgcat\""/XXXX}" != "$_catlist" ]]; then
                 _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} ON")"
             else
                 _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} OFF")"
@@ -3045,7 +3045,7 @@ donetwork() {
 net_notdetectable() {
     # modules with no modalias exported! status kernel 2.6.18
     NOTDETECTABLE="hp ne de4x5 wd cs89x0 eepro smc9194 seeq8005 ni52 ni65 ac3200 smc-ultra at1700 hp-plus depca eexpress 82596 de600 eth16i de620 lance ewrk3 e2100 lp486e 3c501 3c503 3c505 3c507 3c509 3c515 myri10ge"
-    for mod in ${NOTDETECTABLE}; do
+    for mod in $NOTDETECTABLE; do
         modprobe $mod >/dev/null 2>&1
     done
 }
@@ -3087,16 +3087,16 @@ getcryptsetup() {
 getrootuuid() {
     _rootpart="$PART_ROOT"
     _uuid="$(getuuid $PART_ROOT)"
-    if [[ -n "${_uuid}" ]]; then
-        _rootpart="/dev/disk/by-uuid/${_uuid}"
+    if [[ -n "$_uuid" ]]; then
+        _rootpart="/dev/disk/by-uuid/$_uuid"
     fi
 }
 
 getrootlabel() {
     _rootpart="$PART_ROOT"
     _label="$(getlabel $PART_ROOT)"
-    if [[ -n "${_label}" ]]; then
-        _rootpart="/dev/disk/by-label/${_label}"
+    if [[ -n "$_label" ]]; then
+        _rootpart="/dev/disk/by-label/$_label"
     fi
 }
 
@@ -3917,7 +3917,7 @@ dogrub2_efi_common() {
     
     dogrub2_common_before
     
-    DIALOG --msgbox "Installing grub2-efi-${EFI_ARCH} now ..." 0 0
+    DIALOG --msgbox "Installing grub2-efi-$EFI_ARCH now ..." 0 0
     PACKAGES="grub2-efi-$EFI_ARCH grub2-common dosfstools efibootmgr"
     run_pacman
     # reset PACKAGES after installing
@@ -3943,15 +3943,15 @@ dogrub2_efi_common() {
         EFISYS_PART_NUM=$(sgdisk -p $DISC | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         mount -o rw -t vfat $DISC$EFISYS_PART_NUM $DESTDIR/boot/efi
     else
-        mount -o rw -t vfat ${EFISYS_PART} $DESTDIR/boot/efi
+        mount -o rw -t vfat $EFISYS_PART $DESTDIR/boot/efi
     fi
     
     chroot_mount
     
-    chroot $DESTDIR /sbin/grub_efi_${EFI_ARCH}-install --boot-directory=/boot/efi/efi --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_efi.log
+    chroot $DESTDIR /sbin/grub_efi_$EFI_ARCH-install --boot-directory=/boot/efi/efi --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_efi.log
     
-    chroot $DESTDIR /bin/grub-mkimage --directory=/usr/lib/grub/${EFI_ARCH}-efi \
-                                        --format=${EFI_ARCH}-efi \
+    chroot $DESTDIR /bin/grub-mkimage --directory=/usr/lib/grub/$EFI_ARCH-efi \
+                                        --format=$EFI_ARCH-efi \
                                         --prefix="" \
                                         --output=/boot/efi/efi/grub/grub_custom.efi \
                                         --compression=auto \
