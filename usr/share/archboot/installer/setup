@@ -95,7 +95,7 @@ chroot_umount()
 # returns:    nothing
 getuuid()
 {
-    echo "$(blkid -s UUID -o value ${1})"
+    echo "$(blkid -s UUID -o value $1)"
 }
 
 # parameters: device file
@@ -104,7 +104,7 @@ getuuid()
 # returns:    nothing
 getlabel()
 {
-    echo "$(blkid -s LABEL -o value ${1})"
+    echo "$(blkid -s LABEL -o value $1)"
 }
 
 # activate_dmraid()
@@ -337,7 +337,7 @@ additional_blockdevices_partitions() {
     # Compaq Intelligent Drive Array
     for k in $EXTRA_CONTROLLER; do
         for dev in $(ls $block 2>/dev/null | egrep "^$k"); do
-            for i in $(ls $block/${dev} 2>/dev/null | egrep "${dev}*p"); do
+            for i in $(ls $block/$dev 2>/dev/null | egrep "${dev}*p"); do
                 if [[ -d "$block/$dev/$i" ]]; then
                     disk="$k/$(echo $dev | sed -e 's#.*\!##g')"
                     part="$k/$(echo $i | sed -e 's#.*\!##g')"
@@ -1054,7 +1054,7 @@ _raid()
         fi
         # enter raid device name
         RAIDDEVICE=""
-        while [[ "${RAIDDEVICE}" = "" ]]; do
+        while [[ "$RAIDDEVICE" = "" ]]; do
             if [[ "$RAID_PARTITION" = "" ]]; then
                 DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>$ANSWER || return 1
             fi
@@ -1334,7 +1334,7 @@ _createvg()
         fi
         # enter volume group name
         VGDEVICE=""
-        while [[ "${VGDEVICE}" = "" ]]; do
+        while [[ "$VGDEVICE" = "" ]]; do
             DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 15 65 "foogroup" 2>$ANSWER || return 1
             VGDEVICE=$(cat $ANSWER)
             if [[ "$(vgs -o vg_name --noheading 2>/dev/null | grep "^  $(echo $VGDEVICE)")" ]]; then
@@ -1390,7 +1390,7 @@ _createlv()
         LV=$(cat $ANSWER)
         # enter logical volume name
         LVDEVICE=""
-        while [[ "${LVDEVICE}" = "" ]]; do
+        while [[ "$LVDEVICE" = "" ]]; do
             DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
             LVDEVICE=$(cat $ANSWER)
             if [[ "$(lvs -o lv_name,vg_name --noheading 2>/dev/null | grep " $(echo $LVDEVICE) $(echo $LV)"$)" ]]; then
@@ -1444,7 +1444,7 @@ _createlv()
 # enter luks name
 _enter_luks_name() {
     LUKSDEVICE=""
-    while [[ "${LUKSDEVICE}" = "" ]]; do
+    while [[ "$LUKSDEVICE" = "" ]]; do
         DIALOG --inputbox "Enter the name for luks encrypted device $PART:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>$ANSWER || return 1
         LUKSDEVICE=$(cat $ANSWER)
         if ! [[ "$(cryptsetup status $LUKSDEVICE | grep inactive)" ]]; then
@@ -1457,7 +1457,7 @@ _enter_luks_name() {
 # enter luks passphrase
 _enter_luks_passphrase () {
     LUKSPASSPHRASE=""
-    while [[ "${LUKSPASSPHRASE}" = "" ]]; do
+    while [[ "$LUKSPASSPHRASE" = "" ]]; do
         DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device $PART:" 0 0 2>$ANSWER || return 1
         LUKSPASS=$(cat $ANSWER)
         DIALOG --insecure --passwordbox "Retype passphrasefor luks encrypted device $PART:" 0 0 2>$ANSWER || return 1
@@ -1761,15 +1761,15 @@ autoprepare() {
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         fsoptions="NONE"
-        btrfsdevices="${DEVICE}${part}"
+        btrfsdevices="$DEVICE$part"
         btrfsssd="NONE"
         btrfscompress="NONE"
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
         if echo $mountpoint | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
-            DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
+            DIALOG --infobox "Creating $fstype on $DEVICE$part" 0 0
+            _mkfs yes $DEVICE$part "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
         part=$(($part + 1))
     done
@@ -1782,15 +1782,15 @@ autoprepare() {
         fstype=$(echo $fsspec | tr -d ' ' | cut -f3 -d:)
         labelname=$(echo $fsspec | tr -d ' ' | cut -f5 -d:)
         fsoptions="NONE"
-        btrfsdevices="${DEVICE}${part}"
+        btrfsdevices="$DEVICE$part"
         btrfsssd="NONE"
         btrfscompress="NONE"
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
         if [[ "$(echo $mountpoint | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
-            DIALOG --infobox "Creating $fstype on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
+            DIALOG --infobox "Creating $fstype on $DEVICE$part" 0 0
+            _mkfs yes $DEVICE$part "$fstype" "$DESTDIR" "$mountpoint" "$labelname" "$fsoptions" "$btrfsdevices" "$btrfssubvolume" "$btrfslevel" "$dosubvolume" "$btrfssd" "$btrfscompress" || return 1
         fi
         part=$(($part + 1))
     done
@@ -1801,41 +1801,41 @@ autoprepare() {
 
 parted_gpt() {
     
-    [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
+    [[ "$(parted -s $DISC print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
     
-    if [[ "${GUID_DETECTED}" = "" ]] ; then
-        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt ${DISC} >${LOG}
+    if [[ "$GUID_DETECTED" = "" ]] ; then
+        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on $DISC.\nDo you want to convert the existing MBR table in $DISC to a GUID (gpt) partition table?" 0 0 || return 1
+        sgdisk --mbrtogpt $DISC >$LOG
     fi
     
-    if [[ "${GUID_DETECTED}" = "1" ]]; then
-        if [[ "${EFI_x86_64}" = "1" ]] || [[ "${EFI_i386}" = "1" ]]; then
-            if ! [[ "$(parted -s ${DISC} print | grep 'boot')" ]]; then
-            DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on ${DISC}.\nDo you want to create an EFISYS partition on ${DISC}?" 0 0 && CREATE_EFISYS=1
+    if [[ "$GUID_DETECTED" = "1" ]]; then
+        if [[ "$EFI_x86_64" = "1" ]] || [[ "$EFI_i386" = "1" ]]; then
+            if ! [[ "$(parted -s $DISC print | grep 'boot')" ]]; then
+            DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on $DISC.\nDo you want to create an EFISYS partition on $DISC?" 0 0 && CREATE_EFISYS=1
             fi
-        elif ! [[ "$(parted -s ${DISC} print | grep 'bios_grub')" ]]; then
-            DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
+        elif ! [[ "$(parted -s $DISC print | grep 'bios_grub')" ]]; then
+            DIALOG --yesno "Setup detected no bios_grub flag on $DISC.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on $DISC?" 0 0 && CREATE_BIOS_GRUB=1
         fi
     fi
     
-    if [[ "${CREATE_EFISYS}" = "1" ]]; then
-        DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 100 to 200 MB FAT32 EFISYS Partition for installing grub2-efi in next step by hand.\n\nparted shell commands:\nmkpartfs <partitionnumber> fat32 <start> <end>\nset <partitionnumber> boot on" 0 0
-        parted ${DISC}
+    if [[ "$CREATE_EFISYS" = "1" ]]; then
+        DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 100 to 200 MB FAT32 EFISYS Partition for installing grub2-efi in next step by hand.\n\nparted shell commands:\nmkpartfs <partitionnumber> fat32 <start> <end>\nset <partitionnumber> boot on" 0 0
+        parted $DISC
     fi
     
-    if [[ "${CREATE_BIOS_GRUB}" = "1" && "${GUID_DETECTED}" = "" ]]; then
+    if [[ "$CREATE_BIOS_GRUB" = "1" && "$GUID_DETECTED" = "" ]]; then
         # assume new partitiontable,if no GUID was already there,
         # no user interaction needed for bios_grub partition, jippie
         GUID_PART_SIZE="2"
-        parted -a optimal -s ${DISC} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
-        parted -a optimal -s ${DISC} set 1 bios_grub on >${LOG}
+        parted -a optimal -s $DISC mkpart 1 1 $GUID_PART_SIZE >$LOG
+        parted -a optimal -s $DISC set 1 bios_grub on >$LOG
     else
-        [[ "${CREATE_BIOS_GRUB}" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
+        [[ "$CREATE_BIOS_GRUB" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on $DISC.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
     fi
     DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
     clear
-    parted ${DISC} print
-    parted ${DISC}
+    parted $DISC print
+    parted $DISC
     
 }
 
@@ -2102,7 +2102,7 @@ prepare_btrfs_subvolume() {
     fi
     if [[ "$DOSUBVOLUME" = "yes" ]]; then
         BTRFS_SUBVOLUME="NONE"
-        while [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; do
+        while [[ "$BTRFS_SUBVOLUME" = "NONE" ]]; do
             DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>$ANSWER || return 1
             BTRFS_SUBVOLUME=$(cat $ANSWER)
             check_btrfs_subvolume
@@ -2218,7 +2218,7 @@ select_filesystem() {
 enter_mountpoint() {
     FILESYSTEM_FINISH=""
     MP=""
-    while [[ "${MP}" = "" ]]; do
+    while [[ "$MP" = "" ]]; do
         DIALOG --inputbox "Enter the mountpoint for $PART" 8 65 "/boot" 2>$ANSWER || return 1
         MP=$(cat $ANSWER)
         if grep ":$MP:" /tmp/.parts; then
@@ -2248,7 +2248,7 @@ create_filesystem() {
     BTRFS_LEVEL=""
     DIALOG --yesno "Would you like to create a filesystem on $PART?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
     if [[ "$DOMKFS" = "yes" ]]; then
-        while [[ "${LABEL_NAME}" = "" ]]; do
+        while [[ "$LABEL_NAME" = "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(blkid -c=/dev/null -o value -s LABEL $PART)" 2>$ANSWER || return 1
             LABEL_NAME=$(cat $ANSWER)
@@ -2384,14 +2384,14 @@ mountpoints() {
             if [[ "$FSTYPE" = "swap" ]]; then
                 DIALOG --infobox "Creating and activating swapspace on $PART" 0 0
             else
-                DIALOG --infobox "Creating $FSTYPE on $PART, mounting to $DESTDIR${MP}" 0 0
+                DIALOG --infobox "Creating $FSTYPE on $PART, mounting to $DESTDIR$MP" 0 0
             fi
             _mkfs yes $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         else
             if [[ "$FSTYPE" = "swap" ]]; then
                 DIALOG --infobox "Activating swapspace on $PART" 0 0
             else
-                DIALOG --infobox "Mounting $FSTYPE on $PART to $DESTDIR${MP}" 0 0
+                DIALOG --infobox "Mounting $FSTYPE on $PART to $DESTDIR$MP" 0 0
             fi
             _mkfs no $PART $FSTYPE $DESTDIR $MP $LABEL_NAME $FS_OPTIONS $BTRFS_DEVICES $BTRFS_LEVEL $BTRFS_SUBVOLUME $DOSUBVOLUME $BTRFS_COMPRESS $BTRFS_SSD || return 1
         fi
@@ -2424,47 +2424,47 @@ _mkfs() {
     local _fsoptions=$7
     local _btrfsdevices="$(echo $8 | sed -e 's|#| |g')"
     local _btrfslevel=$9
-    local _btrfssubvolume=${10}
+    local _btrfssubvolume=$10}
     local _dosubvolume=${11}
     local _btrfscompress=${12}
     local _btrfsssd=${13}
     # correct empty entries
-    [[ "${_fsoptions}" = "NONE" ]] && _fsoptions=""
-    [[ "${_btrfsssd}" = "NONE" ]] && _btrfsssd=""
-    [[ "${_btrfscompress}" = "NONE" ]] && _btrfscompress=""
-    [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
+    [[ "$_fsoptions" = "NONE" ]] && _fsoptions=""
+    [[ "$_btrfsssd" = "NONE" ]] && _btrfsssd=""
+    [[ "$_btrfscompress" = "NONE" ]] && _btrfscompress=""
+    [[ "$_btrfssubvolume" = "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
-    [[ ! "${_btrfslevel}" = "NONE" && "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
+    [[ ! "$_btrfslevel" = "NONE" && "$_fstype" = "btrfs" ]] && _fsoptions="$_fsoptions -d $_btrfslevel"
     # we have two main cases: "swap" and everything else.
-    if [[ "${_fstype}" = "swap" ]]; then
-        swapoff ${_device} >/dev/null 2>&1
-        if [[ "${_domk}" = "yes" ]]; then
-            mkswap -L ${_labelname} ${_device} >$LOG 2>&1
+    if [[ "$_fstype" = "swap" ]]; then
+        swapoff $_device >/dev/null 2>&1
+        if [[ "$_domk" = "yes" ]]; then
+            mkswap -L $_labelname $_device >$LOG 2>&1
             if [[ $? != 0 ]]; then
-                DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
+                DIALOG --msgbox "Error creating swap: mkswap $_device" 0 0
                 return 1
             fi
         fi
-        swapon ${_device} >$LOG 2>&1
+        swapon $_device >$LOG 2>&1
         if [[ $? != 0 ]]; then
-            DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
+            DIALOG --msgbox "Error activating swap: swapon $_device" 0 0
             return 1
         fi
     else
         # make sure the fstype is one we can handle
         local knownfs=0
         for fs in xfs jfs reiserfs ext2 ext3 ext4 btrfs nilfs2 ntfs-3g vfat; do
-            [[ "${_fstype}" = "${fs}" ]] && knownfs=1 && break
+            [[ "$_fstype" = "$fs" ]] && knownfs=1 && break
         done
         if [[ $knownfs -eq 0 ]]; then
-            DIALOG --msgbox "unknown fstype ${_fstype} for ${_device}" 0 0
+            DIALOG --msgbox "unknown fstype $_fstype for $_device" 0 0
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [[ "${_domk}" = "yes" ]]; then
+        if [[ "$_domk" = "yes" ]]; then
             local ret
-            case ${_fstype} in
-                xfs)      mkfs.xfs ${_fsoptions} -L ${_labelname} -f ${_device} >$LOG 2>&1; ret=$? ;;
+            case $_fstype in
+                xfs)      mkfs.xfs $_fsoptions -L $_labelname -f $_device >$LOG 2>&1; ret=$? ;;
                 jfs)      yes | mkfs.jfs ${_fsoptions} -L ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 reiserfs) yes | mkreiserfs ${_fsoptions} -l ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
                 ext2)     mkfs.ext2 -L ${_fsoptions} ${_labelname} ${_device} >$LOG 2>&1; ret=$? ;;
@@ -3085,16 +3085,16 @@ getcryptsetup() {
 }
 
 getrootuuid() {
-    _rootpart="${PART_ROOT}"
-    _uuid="$(getuuid ${PART_ROOT})"
+    _rootpart="$PART_ROOT"
+    _uuid="$(getuuid $PART_ROOT)"
     if [[ -n "${_uuid}" ]]; then
         _rootpart="/dev/disk/by-uuid/${_uuid}"
     fi
 }
 
 getrootlabel() {
-    _rootpart="${PART_ROOT}"
-    _label="$(getlabel ${PART_ROOT})"
+    _rootpart="$PART_ROOT"
+    _label="$(getlabel $PART_ROOT)"
     if [[ -n "${_label}" ]]; then
         _rootpart="/dev/disk/by-label/${_label}"
     fi
@@ -3170,12 +3170,12 @@ common_syslinux () {
     # check if GPT/GUID is used
     GUID_DETECTED=
     [[ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ]] && GUID_DETECTED=1
-    [[ -e ${TEMPDIR}/${SYSLINUX_CONF} ]] && rm ${TEMPDIR}/${SYSLINUX_CONF}
-    cat << EOF > ${TEMPDIR}/${SYSLINUX_CONF}
+    [[ -e $TEMPDIR/$SYSLINUX_CONF ]] && rm $TEMPDIR/$SYSLINUX_CONF
+    cat << EOF > $TEMPDIR/$SYSLINUX_CONF
 DEFAULT vesamenu.c32
 PROMPT 0
 MENU TITLE Arch Linux
-MENU BACKGROUND $subdir/${SYSLINUX_DIR}/splash.png
+MENU BACKGROUND $subdir/$SYSLINUX_DIR/splash.png
 TIMEOUT 300
 
 MENU WIDTH 78
@@ -3202,42 +3202,42 @@ MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
 ONTIMEOUT arch
 EOF
-    sort /tmp/.device-names >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "label arch" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "Boot Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    sort /tmp/.device-names >> $TEMPDIR/$SYSLINUX_CONF
+    echo "label arch" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "TEXT HELP" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "Boot Arch Linux" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "ENDTEXT" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "MENU LABEL Arch Linux" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "LINUX $subdir/$VMLINUZ" >> $TEMPDIR/$SYSLINUX_CONF
     if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-        echo "append initrd=$subdir/$KERNELPKG.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=$subdir/$KERNELPKG.img root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> $TEMPDIR/$SYSLINUX_CONF
     else
-        echo "append initrd=$subdir/$KERNELPKG.img root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=$subdir/$KERNELPKG.img root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> $TEMPDIR/$SYSLINUX_CONF
     fi
-    echo "label fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "Boot Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "ENDTEXT" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
-    echo "LINUX $subdir/$VMLINUZ" >> ${TEMPDIR}/${SYSLINUX_CONF}
+    echo "label fallback" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "TEXT HELP" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "Boot Arch Linux Fallback" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "ENDTEXT" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "MENU LABEL Arch Linux Fallback" >> $TEMPDIR/$SYSLINUX_CONF
+    echo "LINUX $subdir/$VMLINUZ" >> $TEMPDIR/$SYSLINUX_CONF
     if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> $TEMPDIR/$SYSLINUX_CONF
     else
-        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=$subdir/$KERNELPKG-fallback.img root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> $TEMPDIR/$SYSLINUX_CONF
     fi
     # edit config file
     DIALOG --msgbox "Before installing $SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, $SYSLINUX will be installed." 0 0
     geteditor || return 1
-    $EDITOR ${TEMPDIR}/${SYSLINUX_CONF}
+    $EDITOR $TEMPDIR/$SYSLINUX_CONF
     # install syslinux
     DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
-    ! [[ -d $DESTDIR/boot/${SYSLINUX_DIR} ]] && mkdir -p $DESTDIR/boot/${SYSLINUX_DIR}
-    cp  ${TEMPDIR}/${SYSLINUX_CONF} $DESTDIR/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}
-    cp  $DESTDIR/usr/lib/syslinux/*.c32 $DESTDIR/boot/${SYSLINUX_DIR}
+    ! [[ -d $DESTDIR/boot/$SYSLINUX_DIR ]] && mkdir -p $DESTDIR/boot/$SYSLINUX_DIR
+    cp  $TEMPDIR/$SYSLINUX_CONF $DESTDIR/boot/$SYSLINUX_DIR/$SYSLINUX_CONF
+    cp  $DESTDIR/usr/lib/syslinux/*.c32 $DESTDIR/boot/$SYSLINUX_DIR
     if [[ "$GUID_DETECTED" = "" ]]; then
-        cat ${MBR} > ${ROOTDEV}
+        cat $MBR > $ROOTDEV
     else
-        cat ${GPTMBR} > ${ROOTDEV}
+        cat $GPTMBR > $ROOTDEV
     fi
 }
 
@@ -3257,8 +3257,8 @@ finish_syslinux () {
         parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
     else
         # change flag to bios legacy booting
-        if ! [[ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]]; then
-            sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
+        if ! [[ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]]; then
+            sgdisk $ROOTDEV --attributes=$PARTITION_NUMBER:set:2
         fi
     fi
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
@@ -3368,9 +3368,9 @@ dolilo() {
     # Try to auto-configure LILO...
     if ! [[ "$PART_ROOT" = "" ]]; then
         if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP\"|g" $DESTDIR/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/$VMLINUZ|g" $DESTDIR/etc/lilo.conf
         sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/$KERNELPKG-fallback.img|g" $DESTDIR/etc/lilo.conf
@@ -3514,7 +3514,7 @@ dogrub() {
                 echo "title  Arch Linux" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
@@ -3526,7 +3526,7 @@ dogrub() {
                 echo "title  Arch Linux Fallback" >>$DESTDIR/boot/grub/menu.lst
                 echo "root   $grubdev" >>$DESTDIR/boot/grub/menu.lst
                 if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-                    echo "kernel $subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
+                    echo "kernel $subdir/$VMLINUZ root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 else
                     echo "kernel $subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/boot/grub/menu.lst
                 fi
@@ -3629,9 +3629,9 @@ dogrub2_common_before() {
 
 dogrub2_config() {
     
-    cp $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg /tmp/.grub.cfg
+    cp $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg /tmp/.grub.cfg
     # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     rm -f /tmp/.grub.cfg
     # keep the file from being completely bogus
     # if [[ "$grubdev" = "DEVICE NOT FOUND" ]]; then
@@ -3640,7 +3640,7 @@ dogrub2_config() {
     # fi
     NUMBER=0
     
-    cat << EOF >> $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
 
 insmod part_gpt
 insmod part_msdos
@@ -3656,9 +3656,9 @@ set pager=1
 
 EOF
 
-    if [[ "${GRUB2_EFI}" = "1" ]]; then
+    if [[ "$GRUB2_EFI" = "1" ]]; then
         
-        cat << EOF >> $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        cat << EOF >> $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
 
 insmod efi_gop
 insmod font
@@ -3667,9 +3667,9 @@ EOF
 
     fi
     
-    if [[ "${GRUB2_BIOS}" = "1" ]]; then
+    if [[ "$GRUB2_BIOS" = "1" ]]; then
         
-        cat << EOF >> $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        cat << EOF >> $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
 
 insmod vbe
 insmod font
@@ -3678,7 +3678,7 @@ EOF
 
     fi
 
-    cat << EOF >> $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
 
 if loadfont \${prefix}/unicode.pf2
 then
@@ -3690,63 +3690,63 @@ fi
 
 EOF
 
-    echo "" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    sort /tmp/.device-names >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    sort /tmp/.device-names >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # create default grub entries
-    echo "" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    [[ "$USE_RAID" = "1" ]] && echo "insmod raid" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    ! [[ "$RAID_ON_LVM" = "" ]] && echo "insmod lvm" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "# ($NUMBER) Arch Linux" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "menuentry \"Arch Linux\" {" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    [[ "$USE_RAID" = "1" ]] && echo "insmod raid" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    ! [[ "$RAID_ON_LVM" = "" ]] && echo "insmod lvm" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "# ($NUMBER) Arch Linux" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "menuentry \"Arch Linux\" {" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # if [[ "$FAIL_COMPLEX" = "0" ]]; then
-    #     echo "set root=($grubdev)" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    #     echo "set root=($grubdev)" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # else
-    #     echo "set root=$grubdev" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    #     echo "set root=$grubdev" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # fi
-    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-        echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        echo "linux (\${root})/$subdir/$VMLINUZ root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     else
-        echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     fi
-    echo "initrd (\${root})/$subdir/$KERNELPKG.img" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "}" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "initrd (\${root})/$subdir/$KERNELPKG.img" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "}" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # adding fallback/full image
     NUMBER=$(($NUMBER+1))
-    echo "# ($NUMBER) Arch Linux" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "# ($NUMBER) Arch Linux" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "menuentry  \"Arch Linux Fallback\" {" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # if [[ "$FAIL_COMPLEX" = "0" ]]; then
-    #     echo "set root=($grubdev)" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    #     echo "set root=($grubdev)" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # else
-    #     echo "set root=$grubdev" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    #     echo "set root=$grubdev" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     # fi
-    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    [[ "$FAIL_COMPLEX" = "0" ]] && echo "search --fs-uuid --set $complexuuid" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     if [[ "$NAME_SCHEME_PARAMETER" = "UUID" || "$NAME_SCHEME_PARAMETER" = "LABEL" ]]; then
-        echo "linux (\${root})/$subdir/$VMLINUZ root=${_rootpart} rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        echo "linux (\${root})/$subdir/$VMLINUZ root=$_rootpart rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     else
-        echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+        echo "linux (\${root})/$subdir/$VMLINUZ root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     fi
-    echo "initrd (\${root})/$subdir/$KERNELPKG-fallback.img" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "}" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "initrd (\${root})/$subdir/$KERNELPKG-fallback.img" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "}" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     ### TODO:
     # Is it possible to detect a windows installation?
     NUMBER=$(($NUMBER+1))
-    echo "" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "## ($NUMBER) Windows" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#menuentry \"Windows\" {" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#set root=(hd0,3)" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#chainloader +1" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#}" >>$DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "## ($NUMBER) Windows" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "#menuentry \"Windows\" {" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "#set root=(hd0,3)" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "#chainloader +1" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
+    echo "#}" >>$DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     
 }
 
 dogrub2_common_after() {    
     
     if [[ "$PART_ROOT" != "" ]]; then
-        if [[ "${GRUB2_BIOS}" = "1" ]]; then
+        if [[ "$GRUB2_BIOS" = "1" ]]; then
             [[ "$grubdev" != "" ]] && dogrub2_config
-        elif [[ "${GRUB2_EFI}" = "1" ]]; then
+        elif [[ "$GRUB2_EFI" = "1" ]]; then
             dogrub2_config
         fi
     fi
@@ -3754,9 +3754,9 @@ dogrub2_common_after() {
     # Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
     geteditor  || return 1
-    $EDITOR $DESTDIR/${GRUB2_PREFIX_DIR}/grub.cfg
+    $EDITOR $DESTDIR/$GRUB2_PREFIX_DIR/grub.cfg
     
-    cp $DESTDIR/usr/share/grub/{unicode.pf2,ascii.pf2} $DESTDIR/${GRUB2_PREFIX_DIR}/
+    cp $DESTDIR/usr/share/grub/{unicode.pf2,ascii.pf2} $DESTDIR/$GRUB2_PREFIX_DIR/
     
     GRUB2_BIOS=""
     GRUB2_EFI=""
@@ -3861,7 +3861,7 @@ dogrub2_bios() {
     fi
     
     if [[ "$FAIL_COMPLEX" = "1" ]]; then
-        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\nGrub2 cannot boot from $bootdev, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
         return 1
     fi
     
@@ -3869,9 +3869,9 @@ dogrub2_bios() {
     # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
     freeze_xfs
     chroot_mount
-    chroot $DESTDIR /sbin/grub_bios-install --boot-directory=/boot --no-floppy --recheck ${bootdev} >> /tmp/grub2.log
+    chroot $DESTDIR /sbin/grub_bios-install --boot-directory=/boot --no-floppy --recheck $bootdev >> /tmp/grub2.log
     chroot_umount
-    cat /tmp/grub2.log >${LOG}
+    cat /tmp/grub2.log >$LOG
     if ! [[ -s /tmp/grub2.log ]] ; then
         DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev and /proc into $DESTDIR before chrooting." 0 0
         return 1
@@ -3895,18 +3895,18 @@ dogrub2_efibootmgr() {
     if [[ -d $DESTDIR/sys/firmware/efi/vars ]]
     then
         # Delete old entries of grub2 - needs to run within chroot - command to be checked
-        for bootnum in $(chroot $DESTDIR ${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
+        for bootnum in $(chroot $DESTDIR $EFIBOOTMGR | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
         do
-            chroot $DESTDIR ${EFIBOOTMGR} --bootnum "${bootnum}" --delete-bootnum
+            chroot $DESTDIR $EFIBOOTMGR --bootnum "$bootnum" --delete-bootnum
         done
         
         DISC=$(mount | grep $DESTDIR/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         
-        [[ "${DISC}" = "" ]] && DISC=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+        [[ "$DISC" = "" ]] && DISC=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         
-        [[ "${EFISYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        [[ "$EFISYS_PART" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p $DISC | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
-    chroot $DESTDIR ${EFIBOOTMGR} --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+    chroot $DESTDIR $EFIBOOTMGR --create --gpt --disk "$DISC" --part "$EFISYS_PART_NUM" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
     
     chroot_umount
@@ -3918,14 +3918,14 @@ dogrub2_efi_common() {
     dogrub2_common_before
     
     DIALOG --msgbox "Installing grub2-efi-${EFI_ARCH} now ..." 0 0
-    PACKAGES="grub2-efi-${EFI_ARCH} grub2-common dosfstools efibootmgr"
+    PACKAGES="grub2-efi-$EFI_ARCH grub2-common dosfstools efibootmgr"
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
     
     DISC=$(mount | grep $DESTDIR/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
     
-    if [[ "${DISC}" = "" ]]; then
+    if [[ "$DISC" = "" ]]; then
         DISC=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         EFISYS=""
     fi
@@ -3939,9 +3939,9 @@ dogrub2_efi_common() {
         EFISYS_PART=""
     fi
     
-    if [[ "${EFISYS_PART}" = "" ]]; then
-        EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
-        mount -o rw -t vfat ${DISC}${EFISYS_PART_NUM} $DESTDIR/boot/efi
+    if [[ "$EFISYS_PART" = "" ]]; then
+        EFISYS_PART_NUM=$(sgdisk -p $DISC | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        mount -o rw -t vfat $DISC$EFISYS_PART_NUM $DESTDIR/boot/efi
     else
         mount -o rw -t vfat ${EFISYS_PART} $DESTDIR/boot/efi
     fi
@@ -3966,7 +3966,7 @@ dogrub2_efi_common() {
                                         usbms usb_keyboard > /tmp/grub2_efi_mkimage.log
     
     chroot_umount
-    cat /tmp/grub2_efi.log > ${LOG}
+    cat /tmp/grub2_efi.log > $LOG
     if ! [[ -s /tmp/grub2_efi.log ]] ; then
         DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into $DESTDIR.\nDon't forget to bind /dev, /sys and /proc into $DESTDIR before chrooting." 0 0
         return 1
@@ -4388,7 +4388,7 @@ auto_parameters()
 auto_luks()
 {
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' $DESTDIR/etc/crypttab)"  = "" ]]; then
-        sed -i -e "/$(basename ${PART_ROOT})/d" /tmp/.crypttab
+        sed -i -e "/$(basename $PART_ROOT)/d" /tmp/.crypttab
         cat /tmp/.crypttab >> $DESTDIR/etc/crypttab
     fi
 }
@@ -4410,9 +4410,9 @@ auto_ftpmirror()
 {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if [[ "$MODE" = "ftp" && "${SYNC_URL}" != "" ]]; then
-        SYNC_URL="${SYNC_URL}"
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "$DESTDIR/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
+    if [[ "$MODE" = "ftp" && "$SYNC_URL" != "" ]]; then
+        SYNC_URL="$SYNC_URL"
+        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "$SYNC_URL"\n\n\") } 1 " "$DESTDIR/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "$DESTDIR/etc/pacman.d/mirrorlist"
     fi
 }
@@ -4467,15 +4467,15 @@ configure_system()
                 # (feel free to prove me wrong :))
                 # we could maybe do this just once after the user is really done here, but then he doesn't get 
                 # to see the updated file while being in this menu...
-                HOSTNAME=$(sed -n '/^HOSTNAME/s/HOSTNAME=//p' $DESTDIR${FILE} | sed 's/"//g')
+                HOSTNAME=$(sed -n '/^HOSTNAME/s/HOSTNAME=//p' $DESTDIR$FILE | sed 's/"//g')
                 if ! [[ "$(grep '127\.0\.0\.1' $DESTDIR/etc/hosts | grep -q "$HOSTNAME")" ]]; then
                     sed -i "s/127\.0\.0\.1.*/& $HOSTNAME/" $DESTDIR/etc/hosts
                 fi
-                $EDITOR $DESTDIR${FILE}
+                $EDITOR $DESTDIR$FILE
         elif [[ "$FILE" = "/etc/mkinitcpio.conf" ]]; then    # non-file
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
-            $EDITOR $DESTDIR${FILE}
+            $EDITOR $DESTDIR$FILE
             for i in $(cat $DESTDIR/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do
                 [[ -e $DESTDIR/lib/initcpio/install/$i ]] || HOOK_ERROR=1
             done
@@ -4487,10 +4487,10 @@ configure_system()
                 for i in $(grep "^LOCALE" $DESTDIR/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
                     sed -i -e "s/^#$i/$i/g" $DESTDIR/etc/locale.gen
                 done
-            $EDITOR $DESTDIR${FILE}
+            $EDITOR $DESTDIR$FILE
         elif [[ "$FILE" = "Root-Password" ]]; then            # non-file
             PASSWORD=""
-            while [[ "${PASSWORD}" = "" ]]; do
+            while [[ "$PASSWORD" = "" ]]; do
                 DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>$ANSWER || return 1
                 PASS=$(cat $ANSWER)
                 DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>$ANSWER || return 1
@@ -4507,7 +4507,7 @@ configure_system()
             chroot $DESTDIR passwd root < /tmp/.password
             rm /tmp/.password
         else                                                #regular file
-            $EDITOR $DESTDIR${FILE}
+            $EDITOR $DESTDIR$FILE
         fi
     done
     if [[ $S_CONFIG -eq 1 ]]; then
@@ -4527,7 +4527,7 @@ configure_system()
 install_bootloader()
 {
     destdir_mounts || return 1
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+    if [[ "$NAME_SCHEME_PARAMETER_RUN" = "" ]]; then
         set_device_name_scheme || return 1
     fi
     source_set || return 1
@@ -4538,8 +4538,8 @@ install_bootloader()
     [[ "$(dmesg | grep 'EFI_ARCH_x86_64')" ]] && EFI_x86_64="1"
     [[ "$(dmesg | grep 'EFI_ARCH_i386')" ]] && EFI_i386="1"
     
-    [[ "${EFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
-    [[ "${EFI_i386}" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
+    [[ "$EFI_x86_64" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
+    [[ "$EFI_i386" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
     
     DIALOG --menu "Which bootloader would you like to use?" 12 55 7 \
         "GRUB_LEGACY" "Use the GRUB LEGACY bootloader (default)" \
@@ -4548,8 +4548,8 @@ install_bootloader()
         "GRUB2_EFI_i386" "Use the GRUB2 32-bit UEFI bootloader (experimental)" \
         "LILO" "Use the LILO bootloader (not recommended)" \
         "EXTLINUX" "Use the EXTLINUX bootloader" \
-        "SYSLINUX" "Use the SYSLINUX bootloader" 2>${ANSWER} || CANCEL=1
-    case $(cat ${ANSWER}) in
+        "SYSLINUX" "Use the SYSLINUX bootloader" 2>$ANSWER || CANCEL=1
+    case $(cat $ANSWER) in
         "GRUB_LEGACY") dogrub ;;
         "GRUB2_BIOS") dogrub2_bios ;;
         "GRUB2_EFI_x86_64") dogrub2_efi_x86_64 ;;
@@ -4558,7 +4558,7 @@ install_bootloader()
         "EXTLINUX") doextlinux ;;
         "SYSLINUX") dosyslinux ;;
     esac
-    if [[ "${CANCEL}" = "1" ]]; then
+    if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="7"
     else
         NEXTITEM="8"
