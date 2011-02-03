@@ -43,4 +43,4 @@ help ()
 cat<<HELPEOF
   This hook includes the pacman on an arch boot image.
 HELPEOF
-} 
+}

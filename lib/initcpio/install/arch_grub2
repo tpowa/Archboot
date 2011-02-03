@@ -15,6 +15,6 @@ install ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes grub on an arch boot image.
+  This hook includes grub2 on an arch boot image.
 HELPEOF
 } 
