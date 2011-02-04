@@ -2,41 +2,41 @@
 . /etc/rc.conf
 . /etc/rc.d/functions
 
-mkdir -p /dev/pts
-mkdir -p /dev/shm
-mount /dev/pts
-mount /dev/shm
+echo " "
+printhl "Arch Linux\n"
+printhl "${C_H2}http://www.archlinux.org"
+printsep
+
+run_hook sysinit_start
 
 # anything more serious than KERN_WARNING goes to the console
-if grep -qw " verbose" /proc/cmdline; then
-	/bin/dmesg -n 8
+# 'verbose' cmdline parameter enables more messages
+if /bin/grep -q " verbose" /proc/cmdline; then
+  /bin/dmesg -n 8
 else
-	/bin/dmesg -n 3
+  /bin/dmesg -n 3
 fi
 
 # bring up the loopback interface
-if [ -d /sys/class/net/lo ]; then
-	stat_busy "Bringing up loopback interface"
-	ifconfig lo 127.0.0.1 up
-	if [ $? -ne 0 ]; then
-		stat_fail
-	else
-		stat_done
-	fi
-fi
+[[ -d /sys/class/net/lo ]] && \
+    status "Bringing up loopback interface" /sbin/ifconfig lo 127.0.0.1 up
+
+/bin/dmesg >| /var/log/dmesg.log
+
+# Load sysctl variables if sysctl.conf is present
+[[ -r /etc/sysctl.conf ]] && /sbin/sysctl -q -p &>/dev/null
 
 # Start daemons
 for daemon in "${DAEMONS[@]}"; do
-	if [ "$daemon" = "${daemon#!}" ]; then
-		if [ "$daemon" = "${daemon#@}" ]; then
-			/etc/rc.d/$daemon start
-		else
-			stat_bkgd "Starting ${daemon:1}"
-			(/etc/rc.d/${daemon:1} start) &>/dev/null &
-		fi
-	fi
+    case ${daemon:0:1} in
+        '!') continue;;     # Skip this daemon.
+        '@') start_daemon_bkgd "${daemon#@}";;
+        *)   start_daemon "$daemon";;
+    esac
 done
 
-if [ -x /etc/rc.local ]; then
-	/etc/rc.local
+if [[ -x /etc/rc.local ]]; then
+  /etc/rc.local
 fi
+
+run_hook sysinit_end
