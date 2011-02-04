@@ -3157,20 +3157,35 @@ prepare_syslinux () {
 common_syslinux () {
     DEVS="$(findbootloaderdisks _)"
     DEVS="$DEVS $(findbootloaderpartitions _)"
+    
     if [[ "$DEVS" = "" ]]; then
         DIALOG --msgbox "No hard drives were found" 0 0
         return 1
     fi
+    
     DIALOG --menu "Select the boot device where the $SYSLINUX bootloader will be installed (usually the MBR)" 14 55 7 $DEVS 2>$ANSWER || return 1
     ROOTDEV=$(cat $ANSWER)
+    
     # generate config file
     TEMPDIR=/tmp
-    MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
-    GPTMBR=$DESTDIR/usr/lib/syslinux/gptmbr.bin
+    
     # check if GPT/GUID is used
-    GUID_DETECTED=
+    GUID_DETECTED=''
     [[ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ]] && GUID_DETECTED=1
+    
+    PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
+    if [[ "$GUID_DETECTED" = '1' ]]; then
+        # Set Legacy BIOS Bootable GPT Partition Attribute using sgdisk
+        if ! [[ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]]; then
+            sgdisk $ROOTDEV --attributes=$PARTITION_NUMBER:set:2
+        fi
+    else
+        # mark the partition with /boot as active in MBR
+        parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
+    fi
+    
     [[ -e $TEMPDIR/$SYSLINUX_CONF ]] && rm $TEMPDIR/$SYSLINUX_CONF
+    
     cat << EOF > $TEMPDIR/$SYSLINUX_CONF
 DEFAULT vesamenu.c32
 PROMPT 0
@@ -3225,42 +3240,43 @@ EOF
     else
         echo "append initrd=$subdir/$KERNELPKG-fallback.img root=$PART_ROOT rootflags=$ROOTFLAGS rootfstype=$ROOTFS $RAIDARRAYS $CRYPTSETUP" | sed -e 's#  # #g' >> $TEMPDIR/$SYSLINUX_CONF
     fi
+    
     # edit config file
     DIALOG --msgbox "Before installing $SYSLINUX, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, $SYSLINUX will be installed." 0 0
     geteditor || return 1
     $EDITOR $TEMPDIR/$SYSLINUX_CONF
+    
     # install syslinux
     DIALOG --infobox "Installing the $SYSLINUX bootloader..." 0 0
     ! [[ -d $DESTDIR/boot/$SYSLINUX_DIR ]] && mkdir -p $DESTDIR/boot/$SYSLINUX_DIR
     cp  $TEMPDIR/$SYSLINUX_CONF $DESTDIR/boot/$SYSLINUX_DIR/$SYSLINUX_CONF
     cp  $DESTDIR/usr/lib/syslinux/*.c32 $DESTDIR/boot/$SYSLINUX_DIR
-    if [[ "$GUID_DETECTED" = "" ]]; then
-        cat $MBR > $ROOTDEV
-    else
-        cat $GPTMBR > $ROOTDEV
-    fi
 }
 
 # finish_syslinux
 finish_syslinux () {
+    MBR=$DESTDIR/usr/lib/syslinux/mbr.bin
+    GPTMBR=$DESTDIR/usr/lib/syslinux/gptmbr.bin
+    
+    # check if GPT/GUID is used
+    GUID_DETECTED=''
+    [[ "$(parted -s $ROOTDEV print | grep "Partition Table: gpt")" ]] && GUID_DETECTED=1
+    
+    if [[ "$GUID_DETECTED" = '1' ]]; then
+        cat $GPTMBR > $ROOTDEV
+    else
+        cat $MBR > $ROOTDEV
+    fi
+    
     if [[ $? -gt 0 ]]; then
         chroot_umount
         DIALOG --msgbox "Error installing $SYSLINUX. (see $LOG for output)" 0 0
         return 1
     fi
+    
     [[ -f "/src/boot/syslinux/splash.png" ]] && cp /src/boot/syslinux/splash.png $DESTDIR/boot/$SYSLINUX_DIR
     chroot_umount
     
-    # make partition with /boot active!
-    PARTITION_NUMBER=$(echo $bootdev | sed -e 's#.*[a-z]##g')
-    if [[ "$GUID_DETECTED" = "" ]]; then
-        parted -s $ROOTDEV set $PARTITION_NUMBER boot on >$LOG
-    else
-        # change flag to bios legacy booting
-        if ! [[ "$(sgdisk -i $PARTITION_NUMBER $ROOTDEV | grep '^Attribute' | grep '4$')" ]]; then
-            sgdisk $ROOTDEV --attributes=$PARTITION_NUMBER:set:2
-        fi
-    fi
     DIALOG --msgbox "$SYSLINUX was successfully installed." 0 0
 }
 
@@ -3270,16 +3286,16 @@ doextlinux () {
     SYSLINUX_PACKAGES="syslinux"
     SYSLINUX=EXTLINUX
     SYSLINUX_PROGRAM=extlinux
-    SYSLINUX_DIR=extlinux
-    SYSLINUX_CONF=extlinux.conf
+    SYSLINUX_DIR=syslinux
+    SYSLINUX_CONF=syslinux.cfg
     SYSLINUX_OPTS=""
     prepare_syslinux
     check_bootpart
     abort_nilfs_bootpart || return 1
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
     FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-    if ! [[ "$FSTYPE" = "ext2" || "$FSTYPE" = "ext3" || "$FSTYPE" = "ext4" || "$FSTYPE" = "btrfs" ]]; then
-        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 or btrfs partition with /boot on it." 0 0
+    if ! [[ "$FSTYPE" = "ext2" || "$FSTYPE" = "ext3" || "$FSTYPE" = "ext4" || "$FSTYPE" = "btrfs" || "$FSTYPE" = "vfat" ]]; then
+        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 , btrfs or vfat partition with /boot on it." 0 0
         return 1
     fi
     # extlinux cannot boot from any raid partition, encrypted and dmraid device
@@ -3290,7 +3306,7 @@ doextlinux () {
     # check if raid1 device is used, else fail.
     if [[ "$(echo $bootdev | grep /dev/md)" ]]; then
         if ! [[ "$(mdadm --detail $bootdev | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
-            DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from none raid1 devices." 0 0
+            DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from non raid1 devices." 0 0
             return 1
         else
             SYSLINUX_OPTS="--raid"
@@ -3311,40 +3327,6 @@ doextlinux () {
     common_syslinux
     chroot_mount
     chroot $DESTDIR $SYSLINUX_PROGRAM $SYSLINUX_OPTS --install /boot/$SYSLINUX_DIR >$LOG 2>&1
-    finish_syslinux
-}
-
-### TODO: Merge extlinux and syslinux into one function!
-# install syslinux bootloader
-dosyslinux() {
-    bootdev=""
-    subdir=""
-    SYSLINUX_PACKAGES="syslinux mtools"
-    SYSLINUX=SYSLINUX
-    SYSLINUX_DIR=syslinux
-    SYSLINUX_CONF=syslinux.cfg
-    SYSLINUX_PROGRAM=syslinux
-    prepare_syslinux
-    # look for a separately-mounted /boot partition
-    bootdev=$(mount | grep $DESTDIR/boot | cut -d' ' -f 1)
-    if [[ "$bootdev" = "" ]]; then
-        DIALOG --msgbox "Error:\nCouldn't find separate /boot partition." 0 0
-        return 1
-    fi
-    # syslinux only can boot from vfat partitions!
-    FSTYPE="$(blkid -c /dev/null $bootdev -o value -s TYPE)"
-    if ! [[ "$FSTYPE" = "vfat" ]]; then
-        DIALOG --msgbox "Error:\nCouldn't find vfat /boot partition." 0 0
-        return 1
-    fi
-    # syslinux cannot boot from any raid, raid partition, encrypted and dmraid device
-    if [[ "$(echo $bootdev | grep /dev/md)" || "$(echo $bootdev | grep /dev/mapper)" ]]; then
-        DIALOG --msgbox "Error:\n$SYSLINUX cannot boot from any raid, raid partition, encrypted or dmraid device." 0 0
-        return 1
-    fi
-    common_syslinux || return 1
-    chroot_mount
-    chroot $DESTDIR $SYSLINUX_PROGRAM $bootdev >$LOG 2>&1
     finish_syslinux
 }
 
@@ -4541,22 +4523,20 @@ install_bootloader()
     [[ "$EFI_x86_64" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
     [[ "$EFI_i386" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
     
-    DIALOG --menu "Which bootloader would you like to use?" 12 55 7 \
-        "GRUB_LEGACY" "Use the GRUB LEGACY bootloader (default)" \
+    DIALOG --menu "Which bootloader would you like to use?" 12 55 6 \
+        "EXTLINUX" "Use the EXTLINUX aka SYSLINUX BIOS bootloader" \
         "GRUB2_BIOS" "Use the GRUB2 BIOS bootloader (experimental)" \
         "GRUB2_EFI_x86_64" "Use the GRUB2 64-bit UEFI bootloader (experimental)" \
         "GRUB2_EFI_i386" "Use the GRUB2 32-bit UEFI bootloader (experimental)" \
-        "LILO" "Use the LILO bootloader (not recommended)" \
-        "EXTLINUX" "Use the EXTLINUX bootloader" \
-        "SYSLINUX" "Use the SYSLINUX bootloader" 2>$ANSWER || CANCEL=1
+        "GRUB_LEGACY" "Use the GRUB LEGACY BIOS bootloader (unmaintained)" \
+        "LILO" "Use the LILO BIOS bootloader (not recommended)" 2>$ANSWER || CANCEL=1
     case $(cat $ANSWER) in
-        "GRUB_LEGACY") dogrub ;;
+        "EXTLINUX") doextlinux ;;
         "GRUB2_BIOS") dogrub2_bios ;;
         "GRUB2_EFI_x86_64") dogrub2_efi_x86_64 ;;
         "GRUB2_EFI_i386") dogrub2_efi_i386 ;;
+        "GRUB_LEGACY") dogrub ;;
         "LILO") dolilo ;;
-        "EXTLINUX") doextlinux ;;
-        "SYSLINUX") dosyslinux ;;
     esac
     if [[ "$CANCEL" = "1" ]]; then
         NEXTITEM="7"
