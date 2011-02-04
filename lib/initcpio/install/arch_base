@@ -31,11 +31,10 @@ install ()
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/lib/initcpio/init_functions" "/init_functions"
     add_file "/etc/rc.d/functions"
-    add_file "/usr/share/archboot/base/etc/rc.conf" "/etc/rc.conf"
     add_file "/etc/rc.d/syslog-ng"
 
     ### adding config files of installation system
-    for i in $(find /usr/share/archboot/base/etc/*); do
+    for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
         add_file "$i" "/etc/$(basename $i)"
     done
 
@@ -47,8 +46,6 @@ install ()
     add_file "/usr/bin/copy-mountpoint.sh"
 
     ### fix syslog-ng
-    add_file "/usr/share/archboot/base/etc/modules.conf" "/etc/modules.conf"
-    add_file "/usr/share/archboot/base/etc/scl.conf" "/etc/scl.conf"
     for i in /usr/lib/syslog-ng/*; do
       add_file "$i"
     done
