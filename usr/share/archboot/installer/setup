@@ -2802,6 +2802,7 @@ select_packages() {
     if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
     fi
+    ### TODO: Add all filesystem tools to detection!
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
