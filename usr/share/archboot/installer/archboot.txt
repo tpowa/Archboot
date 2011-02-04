@@ -13,10 +13,9 @@ Table Of Contents
 
     1. Introduction
          1. What is Arch Linux?
-         2. License
-         3. What is Archboot
-         4. What is the difference to the official install media?
-         5. What are the Archboot Setup features?
+         2. What is Archboot
+         3. What is the difference to the official install media?
+         4. What are the Archboot Setup features?
     2. Archboot bootparameters
          1. What are general boot parameters?
          2. What are the video and framebuffer options?
@@ -49,12 +48,6 @@ Introduction
   What is Arch Linux?
 
    http://www.archlinux.org
-
-  License Arch Linux
-
-   2002-2007 Judd Vinet
-   2007-2011 Aaron Griffin
-   and are licensed under the GNU General Public License (GPL).
 
   What is Archboot?
 
