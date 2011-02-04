@@ -16,48 +16,13 @@ printhl "Initiating Shutdown..."
 echo " "
 
 # avoid NIS hanging syslog-ng on shutdown by unsetting the domainname
-if [ -x /bin/domainname ]; then
-	/bin/domainname ""
-fi
+[[ -x /bin/domainname ]] && /bin/domainname ""
+[[ -x /etc/rc.local.shutdown ]] && /etc/rc.local.shutdown
 
-if [ -x /etc/rc.local.shutdown ]; then
-	/etc/rc.local.shutdown
-fi
-
-# Find daemons NOT in the DAEMONS array. Shut these down first
-if [ -d /var/run/daemons ]; then
-	for daemon in $(/bin/ls -1t /var/run/daemons); do
-		if ! in_array $daemon ${DAEMONS[@]}; then
-			stop_daemon $daemon
-		fi
-	done
-fi
-# Shutdown daemons in reverse order
-let i=${#DAEMONS[@]}-1
-while [ $i -ge 0 ]; do
-	if [ "${DAEMONS[$i]:0:1}" != '!' ]; then
-		ck_daemon ${DAEMONS[$i]#@} || stop_daemon ${DAEMONS[$i]#@}
-	fi
-	let i=i-1
-done
-
-run_hook shutdown_prekillall
-
-# Terminate all processes
-stat_busy "Sending SIGTERM To Processes"
-/sbin/killall5 -15 &> /dev/null
-/bin/sleep 5
-stat_done
-
-stat_busy "Sending SIGKILL To Processes"
-/sbin/killall5 -9 &> /dev/null
-/bin/sleep 1
-stat_done
-
-run_hook shutdown_postkillall
+kill_everything shutdown
 
 # removing psmouse module to fix some reboot issues on newer laptops
-modprobe -r psmouse >/dev/null 2>&1
+/sbin/modprobe -r psmouse >/dev/null 2>&1
 
 stat_busy "Deactivating Swap"
 /sbin/swapoff -a
@@ -70,16 +35,15 @@ stat_done
 run_hook shutdown_poweroff
 
 # Power off or reboot
-if [ "$RUNLEVEL" = "0" ]; then
-	printsep
-	printhl "${C_H2}POWER OFF"
-	/sbin/poweroff -d -f -h -i
+printsep
+if [[ $RUNLEVEL = 0 ]]; then
+  printhl "${C_H2}POWER OFF"
+  /sbin/poweroff -d -f -h -i
 else
-	printsep
-	printhl "${C_H2}REBOOTING"
-	# if kexec is installed and a kernel is loaded, use it
-	[ -x /sbin/kexec ] && /sbin/kexec -e > /dev/null 2>&1
-	/sbin/reboot -d -f -i
+  printhl "${C_H2}REBOOTING"
+  # if kexec is installed and a kernel is loaded, use it
+  [[ -x /sbin/kexec ]] && /sbin/kexec -e > /dev/null 2>&1
+  /sbin/reboot -d -f -i
 fi
 
 # End of file
