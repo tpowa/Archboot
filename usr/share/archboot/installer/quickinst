@@ -1,7 +1,7 @@
 #! /bin/sh
-MODE=$1
-DESTDIR=$2
-PKGARG=$3
+MODE=${1}
+DESTDIR=${2}
+PKGARG=${3}
 
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
@@ -47,9 +47,9 @@ usage() {
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
-    if [ "$MODE" = "media" ]; then
+    if [ "${MODE}" = "media" ]; then
         serverurl="file://${PKGARG}"
-    elif [ "$MODE" = "net" ]; then
+    elif [ "${MODE}" = "net" ]; then
         serverurl="${PKGARG}"
     fi
     # Setup a pacman.conf in /tmp
@@ -81,7 +81,7 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-    $PACMAN -Sy
+    ${PACMAN} -Sy
 }
 
 # chroot_mount()
@@ -102,58 +102,58 @@ chroot_mount()
 #
 chroot_umount()
 {
-    umount $DESTDIR/proc
-    umount $DESTDIR/sys
-    umount $DESTDIR/dev
+    umount ${DESTDIR}/proc
+    umount ${DESTDIR}/sys
+    umount ${DESTDIR}/dev
 }
 
 # package_installation
 install_packages() {
-    if [ "$MODE" = "media" ]; then
+    if [ "${MODE}" = "media" ]; then
         PKGFILE=/tmp/.pkglist
-        cp $PKGARG/packages.txt $PKGFILE
-        if [ ! -f $PKGFILE ]; then
-            echo "error: Could not find package list: $PKGFILE"
+        cp ${PKGARG}/packages.txt ${PKGFILE}
+        if [ ! -f ${PKGFILE} ]; then
+            echo "error: Could not find package list: ${PKGFILE}"
             exit 1
         fi
         PACKAGES=
         # fix pacman list!
-        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' $PKGFILE
-        for pkg in $(cat $PKGFILE | grep 'base/' | cut -d/ -f2); do
+        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' ${PKGFILE}
+        for pkg in $(cat ${PKGFILE} | grep 'base/' | cut -d/ -f2); do
             pkgname=${pkg%-*-*}
-            PACKAGES="$PACKAGES $pkgname"
+            PACKAGES="${PACKAGES} ${pkgname}"
         done
     else
-        PACKAGES="$(pacman -Sg base | awk '{print $2}')"
+        PACKAGES="$(pacman -Sg base | awk '{print ${2}}')"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "$VMLINUZ" = "kernel26-lts" ]; then
-        ! [ "$(echo $PACKAGES | grep -w nouveau-drm)" ] && PACKAGES="$PACKAGES nouveau-drm-lts"
-        ! [ "$(echo $PACKAGES | grep -w nouveau-firmware)" ] && PACKAGES="$PACKAGES nouveau-firmware"
+    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "${VMLINUZ}" = "kernel26-lts" ]; then
+        ! [ "$(echo ${PACKAGES} | grep -w nouveau-drm)" ] && PACKAGES="${PACKAGES} nouveau-drm-lts"
+        ! [ "$(echo ${PACKAGES} | grep -w nouveau-firmware)" ] && PACKAGES="${PACKAGES} nouveau-firmware"
     fi
     if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w v86d)" ] && PACKAGES="$PACKAGES v86d"
+        ! [ "$(echo ${PACKAGES} | grep -w v86d)" ] && PACKAGES="${PACKAGES} v86d"
     fi
     if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w ntfs-3g)" ] && PACKAGES="$PACKAGES ntfs-3g"
+        ! [ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
     if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w btrfs-progs-unstable)" ] && PACKAGES="$PACKAGES btrfs-progs-unstable"
+        ! [ "$(echo ${PACKAGES} | grep -w btrfs-progs-unstable)" ] && PACKAGES="${PACKAGES} btrfs-progs-unstable"
     fi
     if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
-        ! [ "$(echo $PACKAGES | grep -w nilfs-utils)" ] && PACKAGES="$PACKAGES nilfs-utils"
+        ! [ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ] && PACKAGES="${PACKAGES} nilfs-utils"
     fi
     if [ -e /var/state/dhcp/dhclient.leases ]; then
-        ! [ "$(echo $PACKAGES | grep -w dhclient)" ] && PACKAGES="$PACKAGES dhclient"
+        ! [ "$(echo ${PACKAGES} | grep -w dhclient)" ] && PACKAGES="${PACKAGES} dhclient"
     fi
 
     # Only install the booted kernel image!
-    PACKAGES="$(echo $PACKAGES | sed -e "s#\ kernel26\ # #g" -e "s#\ kernel26-lts\ # #g")"
-    PACKAGES="$KERNELPKG $PACKAGES"
-    $PACMAN -S $PACKAGES
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ kernel26\ # #g" -e "s#\ kernel26-lts\ # #g")"
+    PACKAGES="${KERNELPKG} ${PACKAGES}"
+    ${PACMAN} -S ${PACKAGES}
 }
 
-if [ "$PKGARG" = "" ]; then
+if [ "${PKGARG}" = "" ]; then
     usage
 fi
 
@@ -161,7 +161,7 @@ fi
 
 # prepare pacman
 pacman_conf
-if [ "$INSTMODE" = "net" ]; then
+if [ "${INSTMODE}" = "net" ]; then
     pacman_conf_extra
 fi
 prepare_pacman
@@ -190,12 +190,12 @@ echo
 echo "Package installation complete."
 echo
 echo "Please install a bootloader.  Edit the appropriate config file for"
-echo "your loader. Please use $VMLINUZ as kernel image."
+echo "your loader. Please use ${VMLINUZ} as kernel image."
 echo "Chroot into your system to install it into the boot sector:"
-echo "  # mount -o bind /dev $DESTDIR/dev"
-echo "  # mount -t proc none $DESTDIR/proc"
-echo "  # mount -t sysfs none $DESTDIR/sys"
-echo "  # chroot $DESTDIR /bin/bash"
+echo "  # mount -o bind /dev ${DESTDIR}/dev"
+echo "  # mount -t proc none ${DESTDIR}/proc"
+echo "  # mount -t sysfs none ${DESTDIR}/sys"
+echo "  # chroot ${DESTDIR} /bin/bash"
 echo
 echo "For GRUB:"
 echo "  # install-grub /dev/sda /dev/sdaX (replace with your boot partition)"
@@ -204,22 +204,22 @@ echo "HINT XFS FILESYSTEM:"
 echo "If you have created xfs filesystems, freeze them before and unfreeze them after"
 echo "installing grub (outside the chroot):"
 echo "- freeze:"
-echo "  # xfs_freeze -f $DESTDIR/boot"
-echo "  # xfs_freeze -f $DESTDIR/"
+echo "  # xfs_freeze -f ${DESTDIR}/boot"
+echo "  # xfs_freeze -f ${DESTDIR}/"
 echo "- unfreeze:"
-echo "  # xfs_freeze -u $DESTDIR/boot"
-echo "  # xfs_freeze -u $DESTDIR/"
+echo "  # xfs_freeze -u ${DESTDIR}/boot"
+echo "  # xfs_freeze -u ${DESTDIR}/"
 echo
 echo "For LILO:"
 echo "  # lilo"
 echo
 echo "Next step, initramfs setup:"
-echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/$KERNELPKG-fallback.conf"
+echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/${KERNELPKG}-fallback.conf"
 echo "to fit your needs. After that run:"
-echo "# mkinitcpio -p $KERNELPKG"
+echo "# mkinitcpio -p ${KERNELPKG}"
 echo
-echo "Then exit your chroot shell, edit $DESTDIR/etc/fstab and"
-echo "$DESTDIR/etc/rc.conf, and reboot!"
+echo "Then exit your chroot shell, edit ${DESTDIR}/etc/fstab and"
+echo "${DESTDIR}/etc/rc.conf, and reboot!"
 echo
 exit 0
 
