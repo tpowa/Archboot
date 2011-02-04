@@ -3392,8 +3392,8 @@ dolilo() {
 }
 
 dogrub() {
-    if [[ -f $DESTDIR/boot/grub2/grub.cfg ]]; then
-        DIALOG --msgbox "Found $DESTDIR/boot/grub2/grub.cfg, deinstalling grub2 now ..." 0 0
+    if [[ -f $DESTDIR/boot/grub/grub.cfg ]]; then
+        DIALOG --msgbox "Found $DESTDIR/boot/grub/grub.cfg, deinstalling grub2 now ..." 0 0
         $PACMAN -R grub2 > $LOG
     fi
     if [[ ! -f $DESTDIR/boot/grub/menu.lst ]]; then
