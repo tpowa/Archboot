@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 MODE=${1}
 DESTDIR=${2}
 PKGARG=${3}
@@ -7,10 +7,10 @@ PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogr
 
 # name of the kernel image
 VMLINUZ="vmlinuz26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && VMLINUZ="vmlinuz26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="kernel26"
-[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ] && KERNELPKG="kernel26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
 
 usage() {
     echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
@@ -22,15 +22,15 @@ usage() {
     echo "e.g. mount -t iso9660 /dev/cdrom /src "
     echo "Then run this script to install all base packages to <destdir>."
     echo
-    if [ -e /usr/bin/wget ]; then
+    if [[ -e /usr/bin/wget ]]; then
         echo "<install_mode> must be either 'net' or 'media'"
     else
         echo "<install_mode> must be 'media'"
     fi
     echo
     echo "Examples:"
-    if [ -e /usr/bin/wget ]; then
-        if [ "$(uname -m)" = "x86_64" ]; then
+    if [[ -e /usr/bin/wget ]]; then
+        if [[ "$(uname -m)" = "x86_64" ]]; then
                 echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/x86_64"
                 echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/x86_64"
         else
@@ -47,9 +47,9 @@ usage() {
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
-    if [ "${MODE}" = "media" ]; then
+    if [[ "${MODE}" = "media" ]]; then
         serverurl="file://${PKGARG}"
-    elif [ "${MODE}" = "net" ]; then
+    elif [[ "${MODE}" = "net" ]]; then
         serverurl="${PKGARG}"
     fi
     # Setup a pacman.conf in /tmp
@@ -79,8 +79,8 @@ pacman_conf_extra() {
 # returns: 1 on error
 prepare_pacman() {
     # Set up the necessary directories for pacman use
-    [ ! -d "${DESTDIR}/var/cache/pacman/pkg" ] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
-    [ ! -d "${DESTDIR}/var/lib/pacman" ] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
     ${PACMAN} -Sy
 }
 
@@ -89,9 +89,9 @@ prepare_pacman() {
 #
 chroot_mount()
 {
-    [ -e "${DESTDIR}/sys" ] || mkdir "${DESTDIR}/sys"
-    [ -e "${DESTDIR}/proc" ] || mkdir "${DESTDIR}/proc"
-    [ -e "${DESTDIR}/dev" ] || mkdir "${DESTDIR}/dev"
+    [[ -e "${DESTDIR}/sys" ]] || mkdir "${DESTDIR}/sys"
+    [[ -e "${DESTDIR}/proc" ]] || mkdir "${DESTDIR}/proc"
+    [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
     mount -t sysfs sysfs "${DESTDIR}/sys"
     mount -t proc proc "${DESTDIR}/proc"
     mount -o bind /dev "${DESTDIR}/dev"
@@ -109,10 +109,10 @@ chroot_umount()
 
 # package_installation
 install_packages() {
-    if [ "${MODE}" = "media" ]; then
+    if [[ "${MODE}" = "media" ]]; then
         PKGFILE=/tmp/.pkglist
         cp ${PKGARG}/packages.txt ${PKGFILE}
-        if [ ! -f ${PKGFILE} ]; then
+        if [[ ! -f ${PKGFILE} ]]; then
             echo "error: Could not find package list: ${PKGFILE}"
             exit 1
         fi
@@ -127,24 +127,24 @@ install_packages() {
         PACKAGES="$(pacman -Sg base | awk '{print ${2}}')"
     fi
     # Add packages which are not in core repository
-    if [ "$(grep -w nvidia-kms /proc/cmdline)" -a "${VMLINUZ}" = "kernel26-lts" ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w nouveau-drm)" ] && PACKAGES="${PACKAGES} nouveau-drm-lts"
-        ! [ "$(echo ${PACKAGES} | grep -w nouveau-firmware)" ] && PACKAGES="${PACKAGES} nouveau-firmware"
+    if [[ "$(grep -w nvidia-kms /proc/cmdline)" && "${VMLINUZ}" = "kernel26-lts" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w nouveau-drm)" ]] && PACKAGES="${PACKAGES} nouveau-drm-lts"
+        ! [[ "$(echo ${PACKAGES} | grep -w nouveau-firmware)" ]] && PACKAGES="${PACKAGES} nouveau-firmware"
     fi
-    if [ "$(grep -w uvesafb /proc/cmdline)" ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w v86d)" ] && PACKAGES="${PACKAGES} v86d"
+    if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ] && PACKAGES="${PACKAGES} ntfs-3g"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w btrfs-progs-unstable)" ] && PACKAGES="${PACKAGES} btrfs-progs-unstable"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w btrfs-progs-unstable)" ]] && PACKAGES="${PACKAGES} btrfs-progs-unstable"
     fi
-    if [ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ] && PACKAGES="${PACKAGES} nilfs-utils"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ]] && PACKAGES="${PACKAGES} nilfs-utils"
     fi
-    if [ -e /var/state/dhcp/dhclient.leases ]; then
-        ! [ "$(echo ${PACKAGES} | grep -w dhclient)" ] && PACKAGES="${PACKAGES} dhclient"
+    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
 
     # Only install the booted kernel image!
@@ -153,19 +153,19 @@ install_packages() {
     ${PACMAN} -S ${PACKAGES}
 }
 
-if [ "${PKGARG}" = "" ]; then
+if [[ "${PKGARG}" = "" ]]; then
     usage
 fi
 
-! [ -d /tmp ] && mkdir /tmp
+! [[ -d /tmp ]] && mkdir /tmp
 
 # prepare pacman
 pacman_conf
-if [ "${INSTMODE}" = "net" ]; then
+if [[ "${INSTMODE}" = "net" ]]; then
     pacman_conf_extra
 fi
 prepare_pacman
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "Pacman preparation FAILED!"
     return 1
 fi
@@ -175,7 +175,7 @@ chroot_mount
 
 # install packages
 install_packages
-if [ $? -gt 0 ]; then
+if [[ $? -gt 0 ]]; then
     echo
     echo "Package installation FAILED."
     echo
