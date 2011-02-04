@@ -1625,8 +1625,8 @@ autoprepare() {
         [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
         [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
         [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
-        [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental!!!)"
-        [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental!!!)"
+        [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
+        [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
@@ -2204,8 +2204,8 @@ select_filesystem() {
     [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
     [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
     [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
-    [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental!!!)"
-    [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental!!!)"
+    [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
+    [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
     [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
@@ -4528,8 +4528,8 @@ install_bootloader()
         "GRUB2_BIOS" "Use the GRUB2 BIOS bootloader (experimental)" \
         "GRUB2_EFI_x86_64" "Use the GRUB2 64-bit UEFI bootloader (experimental)" \
         "GRUB2_EFI_i386" "Use the GRUB2 32-bit UEFI bootloader (experimental)" \
-        "GRUB_LEGACY" "Use the GRUB LEGACY BIOS bootloader (unmaintained)" \
-        "LILO" "Use the LILO BIOS bootloader (not recommended)" 2>${ANSWER} || CANCEL=1
+        "GRUB_LEGACY" "Use the GRUB LEGACY BIOS bootloader" \
+        "LILO" "Use the LILO BIOS bootloader" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "EXTLINUX") doextlinux ;;
         "GRUB2_BIOS") dogrub2_bios ;;
