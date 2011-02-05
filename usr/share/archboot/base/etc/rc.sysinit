@@ -2,6 +2,12 @@
 . /etc/rc.conf
 . /etc/rc.d/functions
 
+# needed in rc.sysinit, no fstab used!
+mkdir -p /dev/pts
+mkdir -p /dev/shm
+mount /dev/pts
+mount /dev/shm
+
 echo " "
 printhl "Arch Linux\n"
 printhl "${C_H2}http://www.archlinux.org"
