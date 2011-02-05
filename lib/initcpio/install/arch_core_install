@@ -46,7 +46,7 @@ install ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) gnu-netcat ntfs-3g fuse dhclient v86d nouveau-drm nouveau-drm-lts nouveau-firmware"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e ^core | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) gnu-netcat dosfstools ntfs-3g fuse dhclient v86d nouveau-drm-lts nouveau-firmware"
         for i in base devel lib support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
@@ -94,7 +94,7 @@ install ()
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK add grub2 and syslinux packages to image, with separate extra db file
-    for i in grub2-bios grub2-common grub2-efi-i386 grub2-efi-x86_64 efibootmgr dosfstools freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
+    for i in grub2-bios grub2-common grub2-efi-i386 grub2-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
         pacman -Sw --noconfirm $i
         pkgver="$(echo $(pacman -Si $i | grep Version | cut -d ":" -f 2))"
         pkgarch="$(echo $(pacman -Si $i | grep Architecture | cut -d ":" -f 2))"
