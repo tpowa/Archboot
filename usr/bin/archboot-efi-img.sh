@@ -16,7 +16,6 @@ export GRUB2_MODULES="part_gpt part_msdos fat ntfs ntfscomp ext2 iso9660 udf hfs
 export MKTEMP_TEMPLATE="/tmp/grub2_efi.XXXXXXXXXX"
 
 export REPLACE_SETUP="1"
-export EFI_INSTALLER="1"
 
 export CREATE_USB_IMG="0"
 
@@ -167,94 +166,8 @@ then
 	echo
 fi
 
-
-if [ "${EFI_INSTALLER}" = "1" ]
-then
-	cd ${wd}/
-	
-	# rm ${wd}/*.pkg.tar.*
-	
-	package='dosfstools'
-	repo='extra'
-	pkg_arch=''
-	download_pkgs
-	
-	package='grub2-common'
-	repo='testing'
-	pkg_arch=''
-	download_pkgs
-	
-	package='grub2-bios'
-	repo='testing'
-	pkg_arch=''
-	download_pkgs
-	
-	package='grub2-efi-i386'
-	repo='testing'
-	pkg_arch=''
-	download_pkgs
-	
-	package='grub2-efi-x86_64'
-	repo='testing'
-	pkg_arch='any'
-	download_pkgs
-	
-	# package='efibootmgr'
-	# repo='extra'
-	# pkg_arch=''
-	# download_pkgs
-	
-	wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/efibootmgr-0.5.4-5-x86_64.pkg.tar.xz
-	wget -c http://dl.dropbox.com/u/9710721/skodabenz-arch-grub2/efibootmgr-0.5.4-5-i686.pkg.tar.xz
-	echo
-	
-	rm ${wd}/required-{x86_64,i686}.db.tar.gz
-	echo
-	
-	repo-add required-x86_64.db.tar.gz *-{x86_64,any}.pkg.tar.*
-	echo
-	
-	repo-add required-i686.db.tar.gz *-{i686,any}.pkg.tar.*
-	echo
-	
-	pacman -Udf --noconfirm ${wd}/dosfstools-*-$(uname -m).pkg.tar.xz || exit 1
-	echo
-	
-	pacman -Udf --noconfirm ${wd}/grub2-common-*-$(uname -m).pkg.tar.xz || exit 1
-	echo
-	
-	pacman -Udf --noconfirm ${wd}/grub2-efi-i386-*-$(uname -m).pkg.tar.xz || exit 1
-	echo
-	
-	pacman -Udf --noconfirm ${wd}/grub2-efi-x86_64-*-any.pkg.tar.xz || exit 1
-	echo
-	
-	cp ${wd}/*-any.pkg.tar.xz ${archboot_ext}/core-any/pkg/
-	cp ${wd}/*-x86_64.pkg.tar.xz ${archboot_ext}/core-x86_64/pkg/
-	cp ${wd}/*-i686.pkg.tar.xz ${archboot_ext}/core-i686/pkg/
-	echo
-	
-	rm ${archboot_ext}/core-x86_64/pkg/required-x86_64.db.tar.gz
-	rm ${archboot_ext}/core-i686/pkg/required-i686.db.tar.gz
-	echo
-	
-	rm ${archboot_ext}/core-x86_64/pkg/required-x86_64.db
-	rm ${archboot_ext}/core-i686/pkg/required-i686.db
-	echo
-	
-	cp ${wd}/required-x86_64.db.tar.gz ${archboot_ext}/core-x86_64/pkg/
-	cp ${wd}/required-i686.db.tar.gz ${archboot_ext}/core-i686/pkg/
-	echo
-	
-	## Required for pacman 3.5-git
-	cp ${wd}/required-x86_64.db.tar.gz ${archboot_ext}/core-x86_64/pkg/required-x86_64.db
-	cp ${wd}/required-i686.db.tar.gz ${archboot_ext}/core-i686/pkg/required-i686.db
-	echo
-	
-	rm ${archboot_ext}/core-{x86_64,i686}/pkg/grub2-1.98-*.tar.*
-	echo
-fi
-
+pacman -S --noconfirm dosfstools grub2-common grub2-efi-x86_64 grub2-efi-i386 || exit 1
+echo
 
 rm -rf ${archboot_ext}/efi/grub2/ || true
 rm -rf ${archboot_ext}/efi/boot/ || true
@@ -525,5 +438,4 @@ unset grub2_name
 unset GRUB2_MODULES
 unset MKTEMP_TEMPLATE
 unset REPLACE_SETUP
-unset EFI_INSTALLER
 unset CREATE_USB_IMG
