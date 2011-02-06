@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" $(all_modules "/crypto/" | grep -v "aes.ko" ) "
+    MODULES=" $(all_modules "/crypto/" | grep -v "aes.ko" ) cryptoloop"
     BINARIES="cryptsetup"
     FILES=""
     SCRIPT="arch_encrypt"
