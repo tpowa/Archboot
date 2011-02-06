@@ -899,13 +899,15 @@ _stopluks()
     DISABLELUKS=""
     DETECTED_LUKS=""
     LUKSDEVICE=""
+
+    # detect already running luks devices
     LUKS_DEVICES="$(ls /dev/mapper/ | grep -v control)"
     for i in ${LUKS_DEVICES}; do
         cryptsetup status ${i} 2>/dev/null && LUKSDEVICE="${LUKSDEVICE} ${i}"
     done
     ! [[ "${LUKSDEVICE}" = "" ]] && DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
-        DIALOG --defaultno --yesno "Setup detected luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
+        DIALOG --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
     if [[ "${DISABLELUKS}" = "1" ]]; then
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
@@ -913,7 +915,23 @@ _stopluks()
             LUKS_REAL_DEVICE="$(echo $(cryptsetup status ${i} | grep device: | sed -e 's#device:##g'))"
             cryptsetup remove ${i} > ${LOG}
             # delete header from device
-            wipefs -a ${LUKS_REAL_DEVICE} > ${LOG}
+            dd if=/dev/zero of=${LUKS_REAL_DEVICE} bs=512 count=2048 >/dev/null 2>&1
+        done
+    fi
+    
+    DISABLELUKS=""
+    DETECTED_LUKS=""
+
+    # detect not running luks devices
+    [[ "$(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"")" ]] && DETECTED_LUKS=1
+    if [[ "${DETECTED_LUKS}" = "1" ]]; then
+        DIALOG --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
+    fi
+    if [[ "${DISABLELUKS}" = "1" ]]; then
+        DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
+        for i in $(blkid -c=/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
+            # delete header from device
+            dd if=/dev/zero of=${i} bs=512 count=2048 >/dev/null 2>&1
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
