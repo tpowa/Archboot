@@ -1492,9 +1492,26 @@ _enter_luks_passphrase () {
 
 # opening luks
 _opening_luks() {
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+        set_device_name_scheme || return 1
+    fi
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     cryptsetup luksOpen ${PART} ${LUKSDEVICE} >${LOG} <${LUKSPASSPHRASE}  
     LUKSPASSPHRASE="$(cat ${LUKSPASSPHRASE})"
+    # add to temp crypttab
+    local _uuid="$(getuuid ${PART})"
+    local _label="$(getlabel ${PART})"
+    echo "# DEVICE DETAILS: ${PART} UUID=${_uuid} LABEL=${_label}" >> /tmp/.crypttab
+    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
+        if [[ -n "${_uuid}" ]]; then
+            PART="UUID=${_uuid}"
+        fi
+    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
+        if [[ -n "${_label}" ]]; then
+            PART="LABEL=${_label}"
+        fi
+    fi
+    DIALOG --yesno "Would you like to safe the passphrase of luks device to crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
     echo ${LUKSDEVICE} ${PART} ${LUKSPASSPHRASE} >> /tmp/.crypttab
     [[ -e /tmp/.passphrase ]] && rm /tmp/.passphrase
 }
@@ -1525,6 +1542,7 @@ are other ways to break into computers, while they are running." 0 0
 # create luks device
 _luks()
 {
+    NAME_SCHEME_PARAMETER_RUN=""
     LUKSFINISH=""
     while [[ "${LUKSFINISH}" != "DONE" ]]; do
         activate_special_devices
@@ -1599,6 +1617,7 @@ _luks()
         PART=$(cat ${ANSWER})
         # enter luks name
         _enter_luks_name
+        ### TODO: offer more options for encrypt!
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to encrypt luks device below?\nName:${LUKSDEVICE}\nDevice:${PART}\n" 0 0 && LUKSFINISH="DONE"
     done
@@ -4388,8 +4407,21 @@ auto_parameters()
 
 auto_luks()
 {
+    # remove root device from crypttab
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]]; then
-        sed -i -e "/$(basename ${PART_ROOT})/d" /tmp/.crypttab
+        # add to temp crypttab
+        local _uuid="$(getuuid ${PART_ROOT})"
+        local _label="$(getlabel ${PART_ROOT})"
+        if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
+            if [[ -n "${_uuid}" ]]; then
+                PART_ROOT="UUID=${_uuid}"
+            fi
+        elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
+            if [[ -n "${_label}" ]]; then
+                PART_ROOT="LABEL=${_label}"
+            fi
+        fi      
+        sed -i -e "/ $(basename ${PART_ROOT}) /d" /tmp/.crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
 }
