@@ -1504,11 +1504,11 @@ _opening_luks() {
     echo "# DEVICE DETAILS: ${PART} UUID=${_uuid} LABEL=${_label}" >> /tmp/.crypttab
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
         if [[ -n "${_uuid}" ]]; then
-            PART="UUID=${_uuid}"
+            PART="/dev/disk/by-uuid/${_uuid}"
         fi
     elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
         if [[ -n "${_label}" ]]; then
-            PART="LABEL=${_label}"
+            PART="/dev/disk/by-label/${_label}"
         fi
     fi
     DIALOG --yesno "Would you like to safe the passphrase of luks device to crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
