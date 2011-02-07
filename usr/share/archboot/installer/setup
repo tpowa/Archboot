@@ -1501,7 +1501,7 @@ _opening_luks() {
     # add to temp crypttab
     local _uuid="$(getuuid ${PART})"
     local _label="$(getlabel ${PART})"
-    echo "# DEVICE DETAILS: ${PART} UUID=${_uuid} LABEL=${_label}" >> /tmp/.crypttab
+    echo "# DEVICE DETAILS: ${PART} /dev/disk/by-uuid/${_uuid} /dev/disk/by-label/${_label}" >> /tmp/.crypttab
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
         if [[ -n "${_uuid}" ]]; then
             PART="/dev/disk/by-uuid/${_uuid}"
@@ -4452,11 +4452,11 @@ auto_luks()
         local _label="$(getlabel ${PART_ROOT})"
         if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
             if [[ -n "${_uuid}" ]]; then
-                PART_ROOT="UUID=${_uuid}"
+                PART_ROOT="/dev/disk/by-uuid/${_uuid}"
             fi
         elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
             if [[ -n "${_label}" ]]; then
-                PART_ROOT="LABEL=${_label}"
+                PART_ROOT="/dev/disk/by-label/${_label}"
             fi
         fi      
         sed -i -e "/ $(basename ${PART_ROOT}) /d" /tmp/.crypttab
