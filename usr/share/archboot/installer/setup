@@ -3645,60 +3645,68 @@ dogrub2_common_before() {
     RAID_ON_LVM=""
     common_bootloader_checks
     get_grub2_map
+    
 }
 
 dogrub2_config() {
     
+    BOOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot)
+    BOOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot)
+    
+    BOOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot)
+    BOOT_DRIVE=$(grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot)
+    
+    ROOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/)
+    ROOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/)
+    
+    ROOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/)
+    ROOT_DEVICE=$(grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/)
+    
+    subdir='/boot'
+    [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
+    
     cp ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg /tmp/.grub.cfg
     # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg >${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
     rm -f /tmp/.grub.cfg
-    # keep the file from being completely bogus
-    # if [[ "${grubdev}" = "DEVICE NOT FOUND" ]]; then
-    #     DIALOG --msgbox "Your device, which contains /boot could not be autodetected by setup.\n\nEnsure you adjust the 'set root=(hd0,1)' line in your GRUB config accordingly." 0 0
-    #     grubdev="(hd0,1)"
-    # fi
+    
     NUMBER=0
+    
+    ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
+    ## with totally different configuration.
     
     cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
 insmod part_gpt
 insmod part_msdos
-insmod fat
-insmod iso9660
-insmod udf
-insmod search_fs_file
-insmod linux
 
-search --file --no-floppy --set=root ${subdir}/${VMLINUZ}
+# Include fat fs module - required for uefi systems.
+insmod fat
+
+insmod ${BOOT_FS}
+insmod ${ROOT_FS}
+
+insmod search_fs_file
+insmod search_fs_uuid
+insmod search_label
+
+insmod linux
+insmod chain
 
 set pager=1
 
 EOF
-
+    
+    [[ "${USE_RAID}" = "1" ]] && echo "insmod raid" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    
+    ## For UEFI systems, no kernel boot messages are displayed if framebuffer is not initialized in grub2. So initialize it.
     if [[ "${GRUB2_EFI}" = "1" ]]; then
         
         cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
 insmod efi_gop
 insmod font
-
-EOF
-
-    fi
-    
-    if [[ "${GRUB2_BIOS}" = "1" ]]; then
-        
-        cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-
-insmod vbe
-insmod font
-
-EOF
-
-    fi
-
-    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
 if loadfont \${prefix}/unicode.pf2
 then
@@ -3709,55 +3717,85 @@ then
 fi
 
 EOF
+    
+    fi
+    
+    echo "" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    sort /tmp/.device-names >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    
+    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]
+    then
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}"
+        _rootpart="/dev/disk/by-uuid/${ROOT_FS_UUID}"
+        
+    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]
+    then
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}"
+        _rootpart="/dev/disk/by-label/${ROOT_FS_LABEL}"
+        
+    else
+        GRUB_ROOT_DRIVE="set root=${BOOT_DRIVE}"
+        _rootpart="${ROOT_DEVICE}"
+        
+    fi
+    
+    LINUX_UNMOD_COMMAND="linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap"
+    LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
+    
+    ## create default kernel entry
+    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
-    echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    sort /tmp/.device-names >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # create default grub entries
-    echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    [[ "${USE_RAID}" = "1" ]] && echo "insmod raid" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "# (${NUMBER}) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "menuentry \"Arch Linux\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # if [[ "${FAIL_COMPLEX}" = "0" ]]; then
-    #     echo "set root=(${grubdev})" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # else
-    #     echo "set root=${grubdev}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # fi
-    [[ "${FAIL_COMPLEX}" = "0" ]] && echo "search --fs-uuid --set ${complexuuid}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    else
-        echo "linux (\${root})/${subdir}/${VMLINUZ} root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    fi
-    echo "initrd (\${root})/${subdir}/${KERNELPKG}.img" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # adding fallback/full image
+# (${NUMBER}) Arch Linux
+menuentry "Arch Linux" {
+    ${GRUB_ROOT_DRIVE}
+    ${LINUX_MOD_COMMAND}
+    initrd (\${root})/${subdir}/${KERNELPKG}.img
+}
+
+EOF
+    
     NUMBER=$((${NUMBER}+1))
-    echo "# (${NUMBER}) Arch Linux" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "menuentry  \"Arch Linux Fallback\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # if [[ "${FAIL_COMPLEX}" = "0" ]]; then
-    #     echo "set root=(${grubdev})" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # else
-    #     echo "set root=${grubdev}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    # fi
-    [[ "${FAIL_COMPLEX}" = "0" ]] && echo "search --fs-uuid --set ${complexuuid}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    else
-        echo "linux (\${root})/${subdir}/${VMLINUZ} root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    fi
-    echo "initrd (\${root})/${subdir}/${KERNELPKG}-fallback.img" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    ### TODO:
-    # Is it possible to detect a windows installation?
+    
+    ## create kernel fallback entry
+    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+# (${NUMBER}) Arch Linux
+menuentry "Arch Linux" {
+    ${GRUB_ROOT_DRIVE}
+    ${LINUX_MOD_COMMAND}
+    initrd (\${root})/${subdir}/${KERNELPKG}-fallback.img
+}
+
+EOF
+    
     NUMBER=$((${NUMBER}+1))
-    echo "" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "## (${NUMBER}) Windows" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#menuentry \"Windows\" {" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#set root=(hd0,3)" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#chainloader +1" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "#}" >>${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    
+    ## TODO: Detect actual Windows installation if any
+    ## create example file for windows
+    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+
+## (${NUMBER}) Windows
+#menuentry \"Windows\" {
+#    search --file --no-floppy --set=root /bootmgr
+#    chainloader (${root})+1
+#}
+
+EOF
+    
+    unset BOOT_FS_UUID
+    unset BOOT_FS
+    unset BOOT_FS_LABEL
+    unset BOOT_DRIVE
+    
+    unset ROOT_FS_UUID
+    unset ROOT_FS
+    unset ROOT_FS_LABEL
+    unset ROOT_DEVICE
+    
+    unset GRUB_ROOT_DRIVE
+    unset LINUX_UNMOD_COMMAND
+    unset LINUX_MOD_COMMAND
     
 }
 
@@ -3910,14 +3948,14 @@ dogrub2_efibootmgr() {
     
     chroot_mount
     
-    EFIBOOTMGR="/usr/sbin/efibootmgr"
+    EFIBOOTMGR="efibootmgr"
     
     if [[ -d ${DESTDIR}/sys/firmware/efi/vars ]]
     then
         # Delete old entries of grub2 - needs to run within chroot - command to be checked
-        for bootnum in $(chroot ${DESTDIR} ${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
+        for bootnum in $(${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
         do
-            chroot ${DESTDIR} ${EFIBOOTMGR} --bootnum "${bootnum}" --delete-bootnum
+            ${EFIBOOTMGR} --bootnum "${bootnum}" --delete-bootnum
         done
         
         DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
@@ -3926,7 +3964,7 @@ dogrub2_efibootmgr() {
         
         [[ "${EFISYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
-    chroot ${DESTDIR} ${EFIBOOTMGR} --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+    ${EFIBOOTMGR} --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
     
     chroot_umount
