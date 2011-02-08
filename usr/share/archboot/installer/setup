@@ -3084,7 +3084,8 @@ ROOTFS="$(blkid -c /dev/null ${PART_ROOT} -o value -s TYPE)"
 
 getrootflags() {
 # remove rw for all filesystems and gcpid for nilfs2
-ROOTFLAGS="rootflags\=$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
+ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
+[[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
 getraidarrays() {
@@ -3253,9 +3254,9 @@ EOF
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX ${subdir}/${VMLINUZ}" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
     echo "label fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
@@ -3264,9 +3265,9 @@ EOF
     echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX ${subdir}/${VMLINUZ}" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
     
     # edit config file
@@ -3378,9 +3379,9 @@ dolilo() {
     # Try to auto-configure LILO...
     if ! [[ "${PART_ROOT}" = "" ]]; then
         if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
         else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/${VMLINUZ}|g" ${DESTDIR}/etc/lilo.conf
         sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/${KERNELPKG}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
@@ -3524,9 +3525,9 @@ dogrub() {
                 echo "title  Arch Linux" >>${DESTDIR}/boot/grub/menu.lst
                 echo "root   ${grubdev}" >>${DESTDIR}/boot/grub/menu.lst
                 if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
+                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
-                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
+                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
                 echo "initrd ${subdir}/${KERNELPKG}.img" >>${DESTDIR}/boot/grub/menu.lst
                 echo "" >>${DESTDIR}/boot/grub/menu.lst
@@ -3536,9 +3537,9 @@ dogrub() {
                 echo "title  Arch Linux Fallback" >>${DESTDIR}/boot/grub/menu.lst
                 echo "root   ${grubdev}" >>${DESTDIR}/boot/grub/menu.lst
                 if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
+                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 else
-                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
+                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
                 echo "initrd ${subdir}/${KERNELPKG}-fallback.img" >>${DESTDIR}/boot/grub/menu.lst
                 NUMBER=$((${NUMBER}+1))
@@ -3730,7 +3731,7 @@ EOF
         
     fi
     
-    LINUX_UNMOD_COMMAND="linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} rootflags=${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap"
+    LINUX_UNMOD_COMMAND="linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
