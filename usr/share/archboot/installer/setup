@@ -3755,8 +3755,8 @@ EOF
     ## create kernel fallback entry
     cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
-# (${NUMBER}) Arch Linux
-menuentry "Arch Linux" {
+# (${NUMBER}) Arch Linux Fallback
+menuentry "Arch Linux Fallback" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
     initrd (\${root})/${subdir}/${KERNELPKG}-fallback.img
