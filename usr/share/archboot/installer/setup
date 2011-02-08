@@ -1478,7 +1478,7 @@ _enter_luks_passphrase () {
     while [[ "${LUKSPASSPHRASE}" = "" ]]; do
         DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device ${PART}:" 0 0 2>${ANSWER} || return 1
         LUKSPASS=$(cat ${ANSWER})
-        DIALOG --insecure --passwordbox "Retype passphrasefor luks encrypted device ${PART}:" 0 0 2>${ANSWER} || return 1
+        DIALOG --insecure --passwordbox "Retype passphrase for luks encrypted device ${PART}:" 0 0 2>${ANSWER} || return 1
         LUKSPASS2=$(cat ${ANSWER})
         if [[ "${LUKSPASS}" = "${LUKSPASS2}" ]]; then
             LUKSPASSPHRASE=${LUKSPASS}
@@ -1493,7 +1493,14 @@ _enter_luks_passphrase () {
 # opening luks
 _opening_luks() {
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
-    cryptsetup luksOpen ${PART} ${LUKSDEVICE} >${LOG} <${LUKSPASSPHRASE}  
+    luksOpen_success="0"
+    while [[ "${luksOpen_success}" = "0" ]]; do
+        cryptsetup luksOpen ${PART} ${LUKSDEVICE} >${LOG} <${LUKSPASSPHRASE} && luksOpen_success=1
+        if [[ "${luksOpen_success}" = "0" ]]; then
+            DIALOG --msgbox "Error: Passphrases didn't match, please enter again." 0 0
+            _enter_luks_passphrase || return 1
+        fi
+    done
     LUKSPASSPHRASE="$(cat ${LUKSPASSPHRASE})"
     DIALOG --yesno "Would you like to safe the passphrase of luks device to /etc/crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
     echo ${LUKSDEVICE} ${PART} ${LUKSPASSPHRASE} >> /tmp/.crypttab
@@ -2536,23 +2543,10 @@ _mkfs() {
             chmod 755 ${_dest}${_mountpoint}
         fi
     fi
-    local _uuid="$(getuuid ${_device})"
-    local _label="$(getlabel ${_device})"
-    # correct /tmp/.crypttab
-    _cryptdevice=${_device}
-    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
-        if [[ -n "${_uuid}" ]]; then
-            _cryptdevice="/dev/disk/by-uuid/${_uuid}"
-        fi
-    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        if [[ -n "${_label}" ]]; then
-            _cryptdevice="/dev/disk/by-label/${_label}"
-        fi
-    fi
-    sed -i -e "s# ${_device} # ${_cryptdevice} #g" /tmp/.crypttab
     # add to .device-names for config files
     echo "# DEVICE DETAILS: ${_device} UUID=${_uuid} LABEL=${_label}" >> /tmp/.device-names
-    echo "# DEVICE DETAILS: ${_device} /dev/disk/by-uuid/${_uuid} /dev/disk/by-label/${_label}" >> /tmp/.device-names
+    local _uuid="$(getuuid ${_device})"
+    local _label="$(getlabel ${_device})"
     # add to temp fstab
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
         if [[ -n "${_uuid}" ]]; then
@@ -4444,19 +4438,7 @@ auto_luks()
     # remove root device from crypttab
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]]; then
         # add to temp crypttab
-        local _uuid="$(getuuid ${PART_ROOT})"
-        local _label="$(getlabel ${PART_ROOT})"
-        if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
-            if [[ -n "${_uuid}" ]]; then
-                PART_ROOT="/dev/disk/by-uuid/${_uuid}"
-            fi
-        elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-            if [[ -n "${_label}" ]]; then
-                PART_ROOT="/dev/disk/by-label/${_label}"
-            fi
-        fi
-        sed -i -e "/ ${PART_ROOT} /d" /tmp/.crypttab
-        cat /tmp/.device-names >> ${DESTDIR}/etc/crypttab
+        sed -i -e "/ $(basename ${PART_ROOT}) /d" /tmp/.crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
 }
