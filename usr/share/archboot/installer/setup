@@ -4438,7 +4438,7 @@ auto_luks()
     # remove root device from crypttab
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]]; then
         # add to temp crypttab
-        sed -i -e "/ $(basename ${PART_ROOT}) /d" /tmp/.crypttab
+        sed -i -e "/^$(basename ${PART_ROOT}) /d" /tmp/.crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
 }
