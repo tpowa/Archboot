@@ -1492,26 +1492,10 @@ _enter_luks_passphrase () {
 
 # opening luks
 _opening_luks() {
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
-        set_device_name_scheme || return 1
-    fi
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     cryptsetup luksOpen ${PART} ${LUKSDEVICE} >${LOG} <${LUKSPASSPHRASE}  
     LUKSPASSPHRASE="$(cat ${LUKSPASSPHRASE})"
-    # add to temp crypttab
-    local _uuid="$(getuuid ${PART})"
-    local _label="$(getlabel ${PART})"
-    echo "# DEVICE DETAILS: ${PART} /dev/disk/by-uuid/${_uuid} /dev/disk/by-label/${_label}" >> /tmp/.crypttab
-    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
-        if [[ -n "${_uuid}" ]]; then
-            PART="/dev/disk/by-uuid/${_uuid}"
-        fi
-    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        if [[ -n "${_label}" ]]; then
-            PART="/dev/disk/by-label/${_label}"
-        fi
-    fi
-    DIALOG --yesno "Would you like to safe the passphrase of luks device to crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
+    DIALOG --yesno "Would you like to safe the passphrase of luks device to /etc/crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
     echo ${LUKSDEVICE} ${PART} ${LUKSPASSPHRASE} >> /tmp/.crypttab
     [[ -e /tmp/.passphrase ]] && rm /tmp/.passphrase
 }
@@ -2552,11 +2536,23 @@ _mkfs() {
             chmod 755 ${_dest}${_mountpoint}
         fi
     fi
-
-    # add to .device-names for config files
     local _uuid="$(getuuid ${_device})"
     local _label="$(getlabel ${_device})"
+    # correct /tmp/.crypttab
+    _cryptdevice=${_device}
+    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
+        if [[ -n "${_uuid}" ]]; then
+            _cryptdevice="/dev/disk/by-uuid/${_uuid}"
+        fi
+    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
+        if [[ -n "${_label}" ]]; then
+            _cryptdevice="/dev/disk/by-label/${_label}"
+        fi
+    fi
+    sed -i -e "s# ${_device} # ${_cryptdevice} #g" /tmp/.crypttab
+    # add to .device-names for config files
     echo "# DEVICE DETAILS: ${_device} UUID=${_uuid} LABEL=${_label}" >> /tmp/.device-names
+    echo "# DEVICE DETAILS: ${_device} /dev/disk/by-uuid/${_uuid} /dev/disk/by-label/${_label}" >> /tmp/.device-names
     # add to temp fstab
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]; then
         if [[ -n "${_uuid}" ]]; then
@@ -4458,8 +4454,9 @@ auto_luks()
             if [[ -n "${_label}" ]]; then
                 PART_ROOT="/dev/disk/by-label/${_label}"
             fi
-        fi      
-        sed -i -e "/ $(basename ${PART_ROOT}) /d" /tmp/.crypttab
+        fi
+        sed -i -e "/ ${PART_ROOT} /d" /tmp/.crypttab
+        cat /tmp/.device-names >> ${DESTDIR}/etc/crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
     fi
 }
