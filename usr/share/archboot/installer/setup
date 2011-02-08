@@ -3641,7 +3641,7 @@ dogrub2_common_before() {
 }
 
 dogrub2_config() {
-    ### TODO: grub-config cannot handle luks devices! Others need to be checked!
+
     BOOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot)
     BOOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot)
     
@@ -3653,7 +3653,7 @@ dogrub2_config() {
     
     ROOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/)
     ROOT_DEVICE=$(grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/)
-    
+
     subdir='/boot'
     [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
     
@@ -3731,7 +3731,10 @@ EOF
         _rootpart="${ROOT_DEVICE}"
         
     fi
-    
+    # fallback to device if no label or uuid can be detected, eg. luks device
+    [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
+    [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
+
     LINUX_UNMOD_COMMAND="linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
