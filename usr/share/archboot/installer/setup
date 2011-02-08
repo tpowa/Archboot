@@ -3083,8 +3083,8 @@ ROOTFS="$(blkid -c /dev/null ${PART_ROOT} -o value -s TYPE)"
 }
 
 getrootflags() {
-# remove gcpid for nilfs2
-ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/,gcpid=.*[0-9]//g')"
+# remove rw for all filesystems and gcpid for nilfs2
+ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
 }
 
 getraidarrays() {
