@@ -3636,8 +3636,6 @@ dogrub2_common_before() {
     USE_DMRAID=""
     RAID_ON_LVM=""
     common_bootloader_checks
-    get_grub2_map
-    
 }
 
 dogrub2_config() {
@@ -3827,7 +3825,7 @@ dogrub2_bios() {
         # reset PACKAGES after installing
         PACKAGES=""
     fi
-    
+    get_grub2_map
     # try to auto-configure GRUB2...
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
@@ -3975,7 +3973,7 @@ dogrub2_efi_common() {
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
-    
+    get_grub2_map
     DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
     
     if [[ "${DISC}" = "" ]]; then
