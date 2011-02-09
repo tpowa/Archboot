@@ -1502,7 +1502,7 @@ _opening_luks() {
         fi
     done
     LUKSPASSPHRASE="$(cat ${LUKSPASSPHRASE})"
-    DIALOG --yesno "Would you like to safe the passphrase of luks device to /etc/crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="none"
+    DIALOG --yesno "Would you like to safe the passphrase of luks device to /etc/crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
     echo ${LUKSDEVICE} ${PART} ${LUKSPASSPHRASE} >> /tmp/.crypttab
     [[ -e /tmp/.passphrase ]] && rm /tmp/.passphrase
 }
