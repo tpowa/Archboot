@@ -1614,7 +1614,7 @@ _luks()
     done
     _enter_luks_passphrase
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup -c aes-xts-plain -s 512 luksFormat ${PART} >${LOG} <${LUKSPASSPHRASE}
+    cryptsetup -c aes-cbc-essiv:sha256 -s 128 luksFormat ${PART} >${LOG} <${LUKSPASSPHRASE}
     _opening_luks
 }
 
@@ -3642,17 +3642,17 @@ dogrub2_common_before() {
 
 dogrub2_config() {
 
-    BOOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot)
-    BOOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot)
+    BOOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot 2>/dev/null)
     
-    BOOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot)
-    BOOT_DRIVE=$(grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot)
+    BOOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot 2>/dev/null)
+    BOOT_DRIVE=$(grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot 2>/dev/null)
     
-    ROOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/)
-    ROOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/)
+    ROOT_FS_UUID=$(grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS=$(grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/ 2>/dev/null)
     
-    ROOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/)
-    ROOT_DEVICE=$(grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/)
+    ROOT_FS_LABEL=$(grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/ 2>/dev/null)
+    ROOT_DEVICE=$(grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/ 2>/dev/null)
 
     subdir='/boot'
     [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
