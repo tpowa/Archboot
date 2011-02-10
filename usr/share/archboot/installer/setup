@@ -2452,7 +2452,7 @@ _mkfs() {
     local _fsoptions=${7}
     local _btrfsdevices="$(echo ${8} | sed -e 's|#| |g')"
     local _btrfslevel=${9}
-    local _btrfssubvolume=${10}}
+    local _btrfssubvolume=${10}
     local _dosubvolume=${11}
     local _btrfscompress=${12}
     local _btrfsssd=${13}
