@@ -3640,17 +3640,17 @@ dogrub2_common_before() {
 
 dogrub2_config() {
 
-    BOOT_FS_UUID=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot 2>/dev/null)
-    BOOT_FS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS_UUID=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot 2>/dev/null)
     
-    BOOT_FS_LABEL=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot 2>/dev/null)
-    BOOT_DRIVE=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS_LABEL=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot 2>/dev/null)
+    BOOT_DRIVE=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot 2>/dev/null)
     
-    ROOT_FS_UUID=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/ 2>/dev/null)
-    ROOT_FS=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS_UUID=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/ 2>/dev/null)
     
-    ROOT_FS_LABEL=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/ 2>/dev/null)
-    ROOT_DEVICE=$(LD_LIBRARY_PATH=${DESTDIR}/lib ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS_LABEL=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/ 2>/dev/null)
+    ROOT_DEVICE=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/ 2>/dev/null)
 
     subdir='/boot'
     [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
