@@ -644,19 +644,19 @@ get_chs() {
 
 # we need symlinks for grub installation!
 grub_dmraid_hack() {
-    for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [[ "$(dmraid -s -c | grep ${i}$)" ]]; then
-            rm -f /dev/mapper/$(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
-            ln -s /dev/mapper/${i}  /dev/mapper/$(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
+    for i in $(dmraid_partitions); do
+        if ! [[ "${i}" = "" ]]; then
+            rm -f $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
+            ln -s ${i} $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
         fi
     done
 }
 
 # remove created symlinks
 remove_grub_dmraid_hack(){
-    for i in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        if ! [[ "$(dmraid -s -c | grep ${i}$)" ]]; then
-            rm -f /dev/mapper/$(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
+    for i in $(dmraid_partitions); do
+        if ! [[ "${i}" = "" ]]; then
+            rm -f $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
         fi
     done
 }
@@ -2829,7 +2829,10 @@ select_packages() {
     if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
     fi
-    ### TODO: Add all filesystem tools to detection!
+    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
+    fi
+    # Add filesystem packages
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
@@ -2839,8 +2842,23 @@ select_packages() {
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ]] && PACKAGES="${PACKAGES} nilfs-utils"
     fi
-    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ext)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w e2fsprogs)" ]] && PACKAGES="${PACKAGES} e2fsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep reiserfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w reiserfsprogs)" ]] && PACKAGES="${PACKAGES} reiserfsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep xfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w xfsprogs)" ]] && PACKAGES="${PACKAGES} xfsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep jfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep vfat)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
+    fi
+    if ! [[ "$(dmraid_devices)" = "" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w dmraid)" ]] && PACKAGES="${PACKAGES} dmraid"
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
