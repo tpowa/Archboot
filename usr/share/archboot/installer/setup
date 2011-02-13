@@ -662,7 +662,7 @@ remove_grub_dmraid_hack(){
 }
 
 get_grub2_map() {
-    rm /tmp/device.map
+    [ -e /tmp/device.map ] && rm /tmp/device.map
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
     LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
 }
@@ -4614,18 +4614,14 @@ install_bootloader()
     [[ "${EFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
     [[ "${EFI_i386}" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
     
-    DIALOG --menu "Which bootloader would you like to use?" 12 55 6 \
-        "EXTLINUX" "Use the EXTLINUX aka SYSLINUX BIOS bootloader" \
-        "GRUB2_BIOS" "Use the GRUB2 BIOS bootloader (experimental)" \
-        "GRUB2_EFI_x86_64" "Use the GRUB2 64-bit UEFI bootloader (experimental)" \
-        "GRUB2_EFI_i386" "Use the GRUB2 32-bit UEFI bootloader (experimental)" \
-        "GRUB_LEGACY" "Use the GRUB LEGACY BIOS bootloader" \
-        "LILO" "Use the LILO BIOS bootloader" 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "Which BIOS bootloader would you like to use?" 12 55 6 \
+        "EXTLINUX" "EXTLINUX/SYSLINUX" \
+        "GRUB2_BIOS" "GRUB2" \
+        "GRUB_LEGACY" "GRUB LEGACY" \
+        "LILO" "LILO" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "EXTLINUX") doextlinux ;;
         "GRUB2_BIOS") dogrub2_bios ;;
-        "GRUB2_EFI_x86_64") dogrub2_efi_x86_64 ;;
-        "GRUB2_EFI_i386") dogrub2_efi_i386 ;;
         "GRUB_LEGACY") dogrub ;;
         "LILO") dolilo ;;
     esac
