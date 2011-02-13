@@ -11,12 +11,16 @@ Kernel changes:
 hwdetect changes:
 
 setup changes:
+- move syslinux and extlinux in one bootloader point
+- some dmraid fixes
+- add new grub2/grub2-efi package support
+- allow nilfs2 for grub2
+- install filesystem package, for detected filesystems
+- install dmraid package, if dmraid device is detected
 
 quickinst changes:
 
 Planned Features:
-- move syslinux and extlinux in one bootloader point
-
 - Chroot installation
 - Keymap changing during boot
 - AIF integration (perhaps not possible)
