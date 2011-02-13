@@ -3851,7 +3851,6 @@ dogrub2_bios() {
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
         abort_btrfs_bootpart || return 1
-        abort_nilfs_bootpart || return 1
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [[ "$(echo ${bootdev} | grep /dev/md)" || "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
             # boot from lvm, raid and dmraid devices is supported
