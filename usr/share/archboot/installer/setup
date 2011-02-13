@@ -664,7 +664,7 @@ remove_grub_dmraid_hack(){
 get_grub2_map() {
     rm /tmp/device.map
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    ${DESTDIR}/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
+    LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-mkdevicemap --no-floppy --device-map=/tmp/device.map >>/tmp/grub2.log
 }
 
 mapdev() {
@@ -3851,10 +3851,10 @@ dogrub2_bios() {
         abort_nilfs_bootpart || return 1
         # check if raid, raid partition, dmraid or device devicemapper is used
         if [[ "$(echo ${bootdev} | grep /dev/md)" || "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
-            # boot from lvm and raid devices is supported
+            # boot from lvm, raid and dmraid devices is supported
             FAIL_COMPLEX="0"
-            if [[ "$(echo ${bootdev} | grep /dev/md*p)" || "$(dmsetup info ${bootdev} | grep 'DMRAID')" || "$(cryptsetup status ${bootdev})" ]]; then
-                # raid with no supperblock 0.90, partitionable raid, dmraid and encryption
+            if [[ "$(echo ${bootdev} | grep /dev/md*p)" || "$(cryptsetup status ${bootdev})" ]]; then
+                # raid with no supperblock 0.90, partitionable raid and encryption
                 # devices are not supported
                 FAIL_COMPLEX="1"
             fi
@@ -3930,7 +3930,7 @@ dogrub2_bios() {
     fi
     
     if [[ "${FAIL_COMPLEX}" = "1" ]]; then
-        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- dmraid aka fakeraid devices are not supported\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- encrypted devices are not supported" 0 0
         return 1
     fi
     
