@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   October,3th 2010
+   February,13th 2011
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -63,7 +63,7 @@ Introduction
 
    * It provides the long time support kernel as installation option.
    * It runs a modified Arch Linux system in initramfs.
-   * It supports experimental (u)efi booting via grub2 1.99 beta.
+   * It supports (u)efi booting via grub2.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
    * Initial module loading and hardware detection is done
@@ -88,7 +88,7 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub, grub2, lilo, extlinux and syslinux bootloader support
+   * grub, grub2, lilo, extlinux/syslinux and grub2-efi bootloader support
 
 Archboot bootparameters
 
@@ -515,7 +515,7 @@ Common Installation Procedure
   Install Bootloader
 
    Choose the bootloader you want to use, if you are unsure which one to use
-   choose grub bootloader.
+   choose grub2 bootloader.
 
   Exit Install
 
