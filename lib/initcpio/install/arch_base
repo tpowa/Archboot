@@ -50,7 +50,7 @@ install ()
       add_file "$i"
     done
     add_dir "/var/lib/syslog-ng/"
-
+    add_dir "/etc/syslog-ng/patterndb.d"
     ### fix licenses
     add_file "/usr/share/licenses/bzip2/LICENSE"
     add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
