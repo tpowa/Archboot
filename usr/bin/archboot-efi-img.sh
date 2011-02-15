@@ -4,7 +4,7 @@
 
 ## Most of the commands in this script have been copied from grub2's grub-mkrescue shell script with slight modifications
 
-export archboot_ver="2011.01-1"
+export archboot_ver="2011.02-1"
 
 export wd=${PWD}/
 export archboot_ext=$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)
@@ -15,7 +15,7 @@ export GRUB2_MODULES="part_gpt part_msdos fat ntfs ntfscomp ext2 iso9660 udf hfs
 
 export MKTEMP_TEMPLATE="/tmp/grub2_efi.XXXXXXXXXX"
 
-export REPLACE_SETUP="1"
+export REPLACE_SETUP="0"
 
 export CREATE_USB_IMG="0"
 
@@ -366,8 +366,19 @@ echo
 ## Generate the BIOS+UEFI ISO image using xorriso (community/libisoburn package) in mkisofs emulation mode
 ## -output ${wd}/${iso_name}_isohybrid.iso is not working , -o ${wd}/${iso_name}_isohybrid.iso works
 
-xorriso -as mkisofs -rock -full-iso9660-filenames -omit-version-number -joliet -volid "ARCHBOOT" -eltorito-boot boot/syslinux/isolinux.bin -eltorito-catalog boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+xorriso -as mkisofs -rock -joliet \
+        -full-iso9660-filenames -omit-period \
+        -disable-deep-relocation \
+        -omit-version-number -allow-leading-dots \
+        -relaxed-filenames -allow-lowercase -allow-multidot \
+        -volid "ARCHBOOT" \
+        -eltorito-boot boot/syslinux/isolinux.bin \
+        -eltorito-catalog boot/syslinux/boot.cat \
+        -no-emul-boot -boot-load-size 4 -boot-info-table \
+        -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
+        -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
+
 
 ## Generate a isohybrid image using syslinux
 isohybrid ${wd}/${iso_name}_isohybrid.iso
