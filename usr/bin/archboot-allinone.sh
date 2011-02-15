@@ -98,7 +98,7 @@ mv ${CORE}/tmp/*/arch/archboot.txt ${ALLINONE}/arch/
 if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
     mkdir ${ALLINONE}/clamav
     rm -f /var/lib/clamav/*
-    freshclam
+    freshclam --user=root
     cp /var/lib/clamav/daily.cvd ${ALLINONE}/clamav/
     cp /var/lib/clamav/main.cvd ${ALLINONE}/clamav/
     cp /var/lib/clamav/bytecode.cvd ${ALLINONE}/clamav/
