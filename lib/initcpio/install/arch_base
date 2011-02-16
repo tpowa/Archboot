@@ -35,7 +35,7 @@ install ()
 
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
-        add_file "$i" "/etc/$(basename $i)"
+        add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
     done
 
     ### fixing network support
