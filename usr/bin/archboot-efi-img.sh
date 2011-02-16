@@ -375,7 +375,7 @@ xorriso -as mkisofs -rock -joliet \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
-        -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ 
+        -o ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
 
 
