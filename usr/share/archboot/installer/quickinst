@@ -137,11 +137,29 @@ install_packages() {
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
+    fi
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w btrfs-progs-unstable)" ]] && PACKAGES="${PACKAGES} btrfs-progs-unstable"
     fi
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep nilfs2)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ]] && PACKAGES="${PACKAGES} nilfs-utils"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ext)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w e2fsprogs)" ]] && PACKAGES="${PACKAGES} e2fsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep reiserfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w reiserfsprogs)" ]] && PACKAGES="${PACKAGES} reiserfsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep xfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w xfsprogs)" ]] && PACKAGES="${PACKAGES} xfsprogs"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep jfs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
+    fi
+    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep vfat)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
     fi
     if [[ -e /var/state/dhcp/dhclient.leases ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
