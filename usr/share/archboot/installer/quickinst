@@ -124,7 +124,7 @@ install_packages() {
             PACKAGES="${PACKAGES} ${pkgname}"
         done
     else
-        PACKAGES="$(pacman -Sg base | awk '{print ${2}}')"
+        PACKAGES="$(pacman -Sg base | awk '{print $2}')"
     fi
     # Add packages which are not in core repository
     if [[ "$(grep -w nvidia-kms /proc/cmdline)" && "${VMLINUZ}" = "kernel26-lts" ]]; then
