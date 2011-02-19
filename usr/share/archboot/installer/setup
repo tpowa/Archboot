@@ -2787,12 +2787,12 @@ select_packages() {
         DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
         # assemble a list of packages with groups, marking pre-selected ones
         # <package> <group> <selected>
-        local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print ${2}}')"
+        local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"
         local _pkglist=''
         local _pkglist_none=''
         # packages in groups
         ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",${3}) } /^Group/{ print ${3} }' | grep -v 'None' > ${ANSWER}
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' > ${ANSWER}
         while read pkgname pkgcat; do
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
@@ -2804,7 +2804,7 @@ select_packages() {
         done < ${ANSWER}
         # packages without groups
         ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",${3}) } /^Group/{ print ${3} }' | grep 'None' > ${ANSWER}
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' > ${ANSWER}
         while read pkgname pkgcat; do
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
