@@ -91,7 +91,6 @@ mkdir -p ${ALLINONE}/efi/grub2
 mkdir -p ${ALLINONE}/efi/boot
 mkdir -p ${memdisk_64_dir}/efi/grub2
 mkdir -p ${memdisk_32_dir}/efi/grub2
-mkdir -p ${grub2_efi_mp}/efi/boot
 
 # Create a blank image to be converted to ESP IMG
 dd if=/dev/zero of=${ALLINONE}/efi/grub2/grub2_efi.bin bs=1024 count=2048
@@ -103,6 +102,8 @@ mkfs.vfat -F12 -S 512 -n "grub2_efi" ${ALLINONE}/efi/grub2/grub2_efi.bin
 modprobe loop        
 LOOP_DEVICE=$(losetup --show --find ${ALLINONE}/efi/grub2/grub2_efi.bin)        
 mount -o rw,users -t vfat ${LOOP_DEVICE} ${grub2_efi_mp}
+
+mkdir -p ${grub2_efi_mp}/efi/boot
 
 # extract tarballs
 tar xvf core-i686.tar -C ${CORE} || exit 1
