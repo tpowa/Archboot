@@ -367,7 +367,7 @@ echo
 ## -output ${wd}/${iso_name}_isohybrid.iso is not working , -o ${wd}/${iso_name}_isohybrid.iso works
 
 xorriso -as mkisofs -rock -joliet \
-        -full-iso9660-filenames -omit-period \
+        -max-iso9660-filenames -omit-period \
         -omit-version-number -allow-leading-dots \
         -relaxed-filenames -allow-lowercase -allow-multidot \
         -volid "ARCHBOOT" \
