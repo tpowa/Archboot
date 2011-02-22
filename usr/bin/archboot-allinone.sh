@@ -152,8 +152,9 @@ cp -r /usr/lib/grub/i386-efi ${ALLINONE}/efi/grub2/i386-efi
 
 cp /usr/share/grub/{unicode,ascii}.pf2 ${ALLINONE}/efi/grub2/
 
-cp -r ${ALLINONE}/efi/grub2/x86_64-efi/locale ${ALLINONE}/efi/grub2/locale || true
-rm -rf ${ALLINONE}/efi/grub2/{x86_64,i386}-efi/locale/ || true
+# those files are not yet included in grub2 packages!
+# cp -r ${ALLINONE}/efi/grub2/x86_64-efi/locale ${ALLINONE}/efi/grub2/locale || true
+# rm -rf ${ALLINONE}/efi/grub2/{x86_64,i386}-efi/locale/ || true
 
 ## Create memdisk for bootx64.efi
 cat << EOF > ${memdisk_64_dir}/efi/grub2/grub.cfg
