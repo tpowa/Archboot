@@ -3,7 +3,7 @@
 install ()
 {
     MODULES=""
-    BINARIES="pacman"
+    BINARIES="pacman cleanupdelta makepkg pacman-optimize pkgdelta rankmirrors repo-add repo-remove testdb testpkg vercmp"
     FILES=""
     SCRIPT=""
 
@@ -34,6 +34,8 @@ for i in $DEPENDS; do
 done
 add_dir "/var/log"
 add_file "/usr/share/archboot/pacman/etc/pacman.conf" "/etc/pacman.conf"
+add_file "/usr/share/archboot/pacman/etc/makepkg.conf" "/etc/makepkg.conf"
+add_file "/etc/bash_completion.d/pacman"
 add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
 }
 
