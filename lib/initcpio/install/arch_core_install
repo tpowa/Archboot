@@ -87,9 +87,8 @@ install ()
         fi
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
-    ### HACK put udev-compat,kernel26-manpages and kernel26-docs to support category!
+    ### HACK put udev-compat and kernel26-docs to support category!
     sed -i -e 's#base/udev-compat#support/udev-compat#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    sed -i -e 's#base/kernel26-manpages#support/kernel26-manpages#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     sed -i -e 's#base/kernel26-docs#support/kernel26-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
