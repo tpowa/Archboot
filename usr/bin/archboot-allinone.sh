@@ -1,5 +1,6 @@
 #! /bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+# grub2-efi related commands copied from grub-mkrescue script from grub2 package
 APPNAME=$(basename "${0}")
 usage ()
 {
@@ -253,8 +254,7 @@ EOF
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
 
-## Generate the BIOS+UEFI ISO image using xorriso (community/libisoburn package) in mkisofs emulation mode
-## -output ${wd}/${iso_name}_isohybrid.iso is not working , -o ${wd}/${iso_name}_isohybrid.iso works
+## Generate the BIOS+UEFI ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE ISO ..."
 xorriso -as mkisofs -rock -joliet \
         -max-iso9660-filenames -omit-period \
@@ -265,7 +265,7 @@ xorriso -as mkisofs -rock -joliet \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
-        -o ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
+        -output ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
 
 # generate hybrid file
 echo "Generating ALLINONE hybrid ..."

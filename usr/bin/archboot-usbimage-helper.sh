@@ -44,22 +44,23 @@ rootsize=$(du -bs ${IMGROOT}|cut -f1)
 IMGSZ=$(( (${rootsize}*102)/100/512 + 1)) # image size in sectors
 
 # create the filesystem image file
-dd if=/dev/zero of="$FSIMG" bs=512 count="$IMGSZ"
+dd if=/dev/zero of="${FSIMG}" bs=512 count="${IMGSZ}"
 
 # create a filesystem on the image
-mkfs.vfat -S 512 "$FSIMG"
+mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 
 # mount the filesystem and copy data
 modprobe loop
-mount -o loop "$FSIMG" "$TMPDIR"
-cp -r "$IMGROOT"/* "$TMPDIR"
+LOOP_DEVICE=$(losetup --show --find ${FSIMG})
+mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
+cp -r "${IMGROOT}"/* "${TMPDIR}"
 
 # unmount filesystem
-umount "$TMPDIR"
-cat "$FSIMG" > "$DISKIMG"
+umount "${TMPDIR}"
+cat "${FSIMG}" > "${DISKIMG}"
 
 # install syslinux on the image
-syslinux "$DISKIMG"
+syslinux "${DISKIMG}"
 
 # all done :)
-rm -fr "$TMPDIR" "$FSIMG"
+rm -rf "${TMPDIR}" "${FSIMG}"
