@@ -69,7 +69,7 @@ fi
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.32-lts"
 [ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R2"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
-GRUB2_MODULES="part_gpt part_msdos fat ntfs ntfscomp ext2 iso9660 udf hfsplus fshelp memdisk tar xzio gzio normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop png"
+GRUB2_MODULES="part_gpt part_msdos fat ext2 reiserfs iso9660 udf fshelp memdisk tar xzio normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop efi_uga font png"
 
 # generate temp directories
 CORE=$(mktemp -d /tmp/core.XXX)
@@ -204,12 +204,13 @@ search --file --no-floppy --set=archboot /arch/archboot.txt
 set pager=1
 
 insmod efi_gop
+insmod efi_uga
 insmod font
 
 if loadfont (\${archboot})/efi/grub2/unicode.pf2
 then
    insmod gfxterm
-   set gfxmode="auto"
+   set gfxmode=auto
    set gfxpayload=keep
    terminal_output gfxterm
 
@@ -224,29 +225,32 @@ insmod fat
 insmod iso9660
 insmod udf
 insmod search_fs_file
-insmod bsd
 insmod linux
 
-set _kernel_params="nomodeset add_efi_memmap none=EFI_ARCH_\${_EFI_ARCH}"
+set _kernel_params="add_efi_memmap none=EFI_ARCH_\${_EFI_ARCH}"
 
 menuentry "Arch Linux (i686) archboot" {
-linux (\${archboot})/boot/vmlinuz ro \${_kernel_params}
-initrd (\${archboot})/boot/initrd.img
+set root=(\${archboot})
+linux /boot/vmlinuz ro \${_kernel_params}
+initrd /boot/initrd.img
 }
 
 menuentry "Arch Linux (x86_64) archboot" {
-linux (\${archboot})/boot/vm64 ro \${_kernel_params}
-initrd (\${archboot})/boot/initrd64.img
+set root=(\${archboot})
+linux /boot/vm64 ro \${_kernel_params}
+initrd /boot/initrd64.img
 }
 
 menuentry "Arch Linux LTS (i686) archboot" {
-linux (\${archboot})/boot/vmlts ro \${_kernel_params}
-initrd (\${archboot})/boot/initrdlts.img
+set root=(\${archboot})
+linux /boot/vmlts ro \${_kernel_params}
+initrd /boot/initrdlts.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
-linux (\${archboot})/boot/vm64lts ro \${_kernel_params}
-initrd (\${archboot})/boot/initrd64lts.img
+set root=(\${archboot})
+linux /boot/vm64lts ro \${_kernel_params}
+initrd /boot/initrd64lts.img
 }
 
 EOF
@@ -254,9 +258,10 @@ EOF
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
 
-## Generate the BIOS+UEFI ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-echo "Generating ALLINONE ISO ..."
-xorriso -as mkisofs -rock -joliet \
+## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+echo "Generating ALLINONE hybrid ISO ..."
+xorriso -as mkisofs \
+        -rock -joliet \
         -max-iso9660-filenames -omit-period \
         -omit-version-number -allow-leading-dots \
         -relaxed-filenames -allow-lowercase -allow-multidot \
@@ -265,12 +270,13 @@ xorriso -as mkisofs -rock -joliet \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
+        -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
 
 # generate hybrid file
-echo "Generating ALLINONE hybrid ..."
-cp ${IMAGENAME}.iso ${IMAGENAME}-hybrid.iso
-isohybrid ${IMAGENAME}-hybrid.iso
+#echo "Generating ALLINONE hybrid ..."
+#cp ${IMAGENAME}.iso ${IMAGENAME}-hybrid.iso
+#isohybrid ${IMAGENAME}-hybrid.iso
 
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."
@@ -282,7 +288,7 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@
 
 #create md5sums.txt
 [ -e md5sum.txt ] && rm -f md5sum.txt
-for i in ${IMAGENAME}.iso ${IMAGENAME}.img ${IMAGENAME}-hybrid.iso; do
+for i in ${IMAGENAME}.iso ${IMAGENAME}.img; do
 	md5sum $i >> md5sum.txt
 done
 

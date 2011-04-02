@@ -3717,12 +3717,13 @@ EOF
         cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
 
 insmod efi_gop
+insmod efi_uga
 insmod font
 
 if loadfont \${prefix}/unicode.pf2
 then
     insmod gfxterm
-    set gfxmode="auto"
+    set gfxmode=auto
     set gfxpayload=keep
     terminal_output gfxterm
 fi
@@ -3754,7 +3755,7 @@ EOF
     [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
     [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
 
-    LINUX_UNMOD_COMMAND="linux (\${root})/${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro nomodeset add_efi_memmap"
+    LINUX_UNMOD_COMMAND="linux /${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
@@ -3764,7 +3765,7 @@ EOF
 menuentry "Arch Linux" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd (\${root})/${subdir}/${KERNELPKG}.img
+    initrd /${subdir}/${KERNELPKG}.img
 }
 
 EOF
@@ -3778,7 +3779,7 @@ EOF
 menuentry "Arch Linux Fallback" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd (\${root})/${subdir}/${KERNELPKG}-fallback.img
+    initrd /${subdir}/${KERNELPKG}-fallback.img
 }
 
 EOF
@@ -3791,6 +3792,7 @@ EOF
 
 ## (${NUMBER}) Windows
 #menuentry \"Windows\" {
+#    insmod ntfs
 #    search --file --no-floppy --set=root /bootmgr
 #    chainloader (${root})+1
 #}
@@ -4032,8 +4034,8 @@ dogrub2_efi_common() {
                                         fshelp xzio gzio \
                                         normal chain linux ls \
                                         search search_fs_file search_fs_uuid search_label \
-                                        help boot configfile echo lvm efi_gop \
-                                        png jpeg tga \
+                                        help loopback boot configfile echo lvm efi_gop efi_uga \
+                                        font png jpeg tga \
                                         usbms usb_keyboard > /tmp/grub2_efi_mkimage.log
     
     chroot_umount

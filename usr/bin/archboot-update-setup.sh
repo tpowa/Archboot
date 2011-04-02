@@ -148,9 +148,10 @@ fi
 cd ${wd}
 echo
 
-## Generate the BIOS+UEFI ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 
-xorriso -as mkisofs -rock -joliet \
+xorriso -as mkisofs \
+        -rock -joliet \
         -max-iso9660-filenames -omit-period \
         -omit-version-number -allow-leading-dots \
         -relaxed-filenames -allow-lowercase -allow-multidot \
@@ -159,11 +160,13 @@ xorriso -as mkisofs -rock -joliet \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
-        -output ${wd}/${iso_name}_isohybrid.iso ${archboot_ext}/ > /dev/null 2>&1
+        -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
+        -output ${wd}/${iso_name}.iso ${archboot_ext}/ > /dev/null 2>&1
 echo
 
 ## Generate a isohybrid image using syslinux
-isohybrid ${wd}/${iso_name}_isohybrid.iso
+# cp ${wd}/${iso_name}.iso ${wd}/${iso_name}_isohybrid.iso
+# isohybrid ${wd}/${iso_name}_isohybrid.iso
 echo
 
 set +x
