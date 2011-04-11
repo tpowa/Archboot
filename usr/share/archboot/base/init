@@ -4,7 +4,6 @@
 ln -s /bin/bash /bin/sh
 ln -s /sbin/modprobe /bin/modprobe
 
-msg ":: Loading Initramfs"
 /bin/mount -t proc proc /proc -o nosuid,noexec,nodev
 /bin/mount -t sysfs sys /sys -o nosuid,noexec,nodev
 
@@ -19,8 +18,7 @@ else
   # /dev/mem is needed if we want to load uvesafb before triggering uevents
   /bin/mknod /dev/mem c 1 1
 fi
-
-read CMDLINE </proc/cmdline
+/bin/mount -t tmpfs run /run -o nosuid,noexec,nodev,mode=1777,size=10M
 
 root=""
 init=""
@@ -28,6 +26,9 @@ echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 
 # set default mount handler
 mount_handler="default_mount_handler"
+
+# parse the kernel command line
+parse_cmdline
 
 # if available, start udevd at this stage
 if [ -x /sbin/udevd ]; then
@@ -39,28 +40,6 @@ if [ -x /sbin/udevd ]; then
 else
     udevd_running=0
 fi
-
-for cmd in ${CMDLINE}; do
-    case "${cmd}" in
-        \#*) break ;; # ignore everything after a # in the commandline
-        # The kernel passes those to the kernel on its own
-        [0123456Ss]) ;;
-        [0-9]*) ;;
-        single) ;;
-        rw) readwrite="yes" ;;
-        ro) readwrite="no" ;;
-        # only export stuff that does work :)
-        *=*) rhs="$(echo "${cmd}" | cut -d= -f2-)"
-             cmd="$(echo "${cmd}" | cut -d= -f1 | sed 's|\.|_|g')"
-             cmd="$(echo "${cmd}" | sed 's|-|_|g')=${rhs}"
-             (echo "${cmd}" | grep -qe '^[0-9]') || eval "${cmd}"
-             ;;
-        *)   cmd="$(echo "${cmd}" | sed 's|\.|_|g')"
-             cmd="$(echo "${cmd}" | sed 's|-|_|g')"
-             (echo "${cmd}" | grep -qe '^[0-9]') || eval "${cmd}=y"
-             ;;
-    esac
-done
 
 if [ -n "${disablehooks}" ]; then
     for d in $(echo "${disablehooks}" | sed 's|,| |g'); do
@@ -156,8 +135,12 @@ else
         done
     fi
 
-    mount --move /proc /new_root/proc
-    mount --move /sys /new_root/sys
-    mount --move /dev /new_root/dev
+    for d in proc sys dev run; do
+        if [ -d /new_root/${d} ]; then
+            /bin/mount --move /${d} /new_root/${d}
+        else
+            /bin/umount /${d}
+        fi
+    done
     exec /sbin/switch_root -c /dev/console /new_root ${init} "$@"
 fi
