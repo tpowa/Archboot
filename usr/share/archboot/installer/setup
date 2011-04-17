@@ -4027,16 +4027,17 @@ dogrub2_efi_common() {
                                         --format=${EFI_ARCH}-efi \
                                         --prefix="" \
                                         --output=/boot/efi/efi/grub/grub_custom.efi \
-                                        --compression=auto \
+                                        --compression=xz \
                                         --verbose \
                                         part_gpt part_msdos part_apple \
-                                        fat ext2 reiserfs iso9660 udf hfsplus hfs ntfs ntfscomp \
-                                        fshelp xzio gzio \
-                                        normal chain linux ls \
+                                        fat ext2 reiserfs iso9660 udf hfsplus hfs \
+                                        btrfs nilfs2 xfs ntfs ntfscomp zfs zfsinfo \
+                                        relocator reboot multiboot multiboot2 \
+                                        fshelp xzio gzio memdisk tar lua \
+                                        normal gfxterm chain linux ls cat \
                                         search search_fs_file search_fs_uuid search_label \
                                         help loopback boot configfile echo lvm efi_gop efi_uga \
-                                        font png jpeg tga \
-                                        usbms usb_keyboard > /tmp/grub2_efi_mkimage.log
+                                        font png jpeg usbms usb_keyboard > /tmp/grub2_efi_mkimage.log
     
     chroot_umount
     cat /tmp/grub2_efi.log > ${LOG}

@@ -69,7 +69,7 @@ fi
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.32-lts"
 [ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R2"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
-GRUB2_MODULES="part_gpt part_msdos fat ext2 reiserfs iso9660 udf fshelp memdisk tar xzio normal chain linux ls search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop efi_uga font png"
+GRUB2_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga xzio font help lvm usbms usb_keyboard"
 
 # generate temp directories
 CORE=$(mktemp -d /tmp/core.XXX)
@@ -94,7 +94,7 @@ mkdir -p ${memdisk_64_dir}/efi/grub2
 mkdir -p ${memdisk_32_dir}/efi/grub2
 
 # Create a blank image to be converted to ESP IMG
-dd if=/dev/zero of=${ALLINONE}/efi/grub2/grub2_efi.bin bs=1024 count=2048
+dd if=/dev/zero of=${ALLINONE}/efi/grub2/grub2_efi.bin bs=1024 count=3072
 
 # Create a FAT12 FS with Volume label "grub2_efi"
 mkfs.vfat -F12 -S 512 -n "grub2_efi" ${ALLINONE}/efi/grub2/grub2_efi.bin
@@ -189,13 +189,9 @@ EOF
 
 tar -C ${memdisk_32_dir} -cf - efi > ${memdisk_32_img}
 
-/bin/grub-mkimage --directory=/usr/lib/grub/x86_64-efi --memdisk=${memdisk_64_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootx64.efi --format=x86_64-efi ${GRUB2_MODULES}
+/bin/grub-mkimage --directory=/usr/lib/grub/x86_64-efi --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --format=x86_64-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootx64.efi" ${GRUB2_MODULES}
 
-/bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk=${memdisk_32_img} --prefix='(memdisk)/efi/grub2' --output=${grub2_efi_mp}/efi/boot/bootia32.efi --format=i386-efi ${GRUB2_MODULES}
-
-/bin/grub-mkimage --directory=/usr/lib/grub/x86_64-efi --memdisk=${memdisk_64_img} --prefix='(memdisk)/efi/grub2' --output=${ALLINONE}/efi/boot/bootx64.efi --format=x86_64-efi ${GRUB2_MODULES}
-
-/bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk=${memdisk_32_img} --prefix='(memdisk)/efi/grub2' --output=${ALLINONE}/efi/boot/bootia32.efi --format=i386-efi ${GRUB2_MODULES}
+/bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootia32.efi" ${GRUB2_MODULES}
 
 ## Copy the actual grub2 config file
 cat << EOF > ${ALLINONE}/efi/boot/grub.cfg
@@ -293,8 +289,8 @@ for i in ${IMAGENAME}.iso ${IMAGENAME}.img; do
 done
 
 # umount images and loop
-losetup --detach ${LOOP_DEVICE}
 umount ${grub2_efi_mp}
+losetup --detach ${LOOP_DEVICE}
 
 # cleanup
 rm -rf ${memdisk_64_dir}

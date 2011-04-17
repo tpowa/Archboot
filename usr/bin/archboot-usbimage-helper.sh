@@ -36,6 +36,7 @@ fi
 DISKIMG="${2}"
 IMGROOT="${1}"
 TMPDIR=$(mktemp -d)
+TMPDIR2=$(mktemp -d)
 FSIMG=$(mktemp)
 
 # ext2 overhead's upper bound is 6%
@@ -53,14 +54,23 @@ mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 modprobe loop
 LOOP_DEVICE=$(losetup --show --find ${FSIMG})
 mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
+
+LOOP_DEVICE2=$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")
+mount -o ro,users -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
+cp "${TMPDIR2}"/boot{x64,ia32}.efi "${IMGROOT}"/efi/boot/
+
 cp -r "${IMGROOT}"/* "${TMPDIR}"
 
 # unmount filesystem
+umount "${TMPDIR2}"
 umount "${TMPDIR}"
+losetup --detach "${LOOP_DEVICE2}"
+losetup --detach "${LOOP_DEVICE}"
+
 cat "${FSIMG}" > "${DISKIMG}"
 
 # install syslinux on the image
 syslinux "${DISKIMG}"
 
 # all done :)
-rm -rf "${TMPDIR}" "${FSIMG}"
+rm -rf "${TMPDIR2}" "${TMPDIR}" "${FSIMG}"
