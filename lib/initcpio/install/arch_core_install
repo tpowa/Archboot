@@ -69,6 +69,8 @@ install ()
     mkdir -p ${TEMPDIR}/core-any/pkg/
     for COPY in ${SEARCHSVN};do
         if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
+            #clear epoch first!
+            epoch=""
             . "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
                 for i in ${pkgname[@]}; do
