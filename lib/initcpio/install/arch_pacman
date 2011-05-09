@@ -28,7 +28,7 @@ grub2-bios grub2-common grub2-efi-i386 grub2-efi-x86_64 efibootmgr file"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
-		add_file "$k/install"
+		[ -e "$k/install" ] && add_file "$k/install"
 		add_file "$k/files"
 		add_file "$k/desc"
 	done
