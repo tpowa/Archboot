@@ -16,8 +16,6 @@ install ()
     add_binary /lib/udev/edd_id
     add_file /lib/udev/findkeyboards
     add_binary /lib/udev/firmware
-    add_binary /lib/udev/fstab_import
-    add_binary /lib/udev/hid2hci
     add_binary /lib/udev/keymap
     add_binary /lib/udev/input_id
     add_file /lib/udev/keyboard-force-release.sh
@@ -42,7 +40,7 @@ install ()
              60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
              61-mobile-action 61-persistent-storage-edd \
              70-acl 70-hid2hci 75-net-description 75-tty-description 78-sound-card \
-             79-fstab_import 80-drivers 81-arch 95-keyboard-force-release 95-keymap 95-udev-late; do
+             80-drivers 81-arch 95-keyboard-force-release 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
     # add keymap files
