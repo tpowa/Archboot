@@ -71,17 +71,30 @@ install ()
         if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
             . "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
-                for i in ${pkgname[@]}; do
-                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
-                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
-                done
+                if  [ "${epoch}" = "" ]; then
+                    for i in ${pkgname[@]}; do
+                        cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
+                        echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
+                    done
+                 else
+                        cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
+                        echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
+                 fi
             else
-                for i in ${pkgname[@]}; do
-                    cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
-                    echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                    repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
-                done
+                if  [ "${epoch}" = "" ]; then
+                    for i in ${pkgname[@]}; do
+                        cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
+                        echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                       repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
+                    done
+                 else
+                     cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
+                        echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+                       repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
+                    done
+                 fi
             fi
             unset pkgname
         fi
