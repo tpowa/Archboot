@@ -47,7 +47,7 @@ install ()
     add_file "/usr/share/licenses/dhcpcd/LICENSE"
     add_file "/usr/share/licenses/dhclient/LICENSE"
     add_file "/usr/share/licenses/dnsutils/LICENSE"
-    add_file "/usr/share/licenses/krb5/LICENCE"
+    add_file "/usr/share/licenses/krb5/LICENSE"
     add_file "/usr/share/licenses/openssh/LICENCE"
     add_file "/usr/share/licenses/openssl/LICENSE"
     add_file "/usr/share/licenses/sqlite3/license.txt"
