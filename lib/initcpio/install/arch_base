@@ -32,7 +32,9 @@ install ()
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/lib/initcpio/init_functions" "/init_functions"
     add_file "/etc/rc.d/functions"
+    add_file "/sbin/rc"
     add_file "/etc/rc.d/syslog-ng"
+    add_file "/etc/rc.d/hwclock"
 
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
