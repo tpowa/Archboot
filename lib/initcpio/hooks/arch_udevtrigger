@@ -3,7 +3,8 @@
 run_hook ()
 {
     msg ":: Loading UDev uevents..."
-    /sbin/udevadm trigger --action=add
+    /sbin/udevadm trigger --action=add --type=subsystems
+    /sbin/udevadm trigger --action=add --type=devices
     /sbin/udevadm settle
     msg "done."
 }
