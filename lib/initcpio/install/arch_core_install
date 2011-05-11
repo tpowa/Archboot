@@ -69,9 +69,7 @@ install ()
     mkdir -p ${TEMPDIR}/core-any/pkg/
     for COPY in ${SEARCHSVN};do
         if ! [ "$(echo ${COPY} | awk -F/ '{print $3}')" = "" ]; then
-            #clear epoch first!
-            epoch=""
-            . "${COPY}/PKGBUILD"
+            local . "${COPY}/PKGBUILD"
             if [ "$(echo ${arch} | grep 'any')" ]; then
                 for i in ${pkgname[@]}; do
                     if  [ "${epoch}" = "" ]; then
@@ -98,6 +96,8 @@ install ()
                 done
             fi
             unset pkgname
+            unset pkgrel
+            unset epoch
         fi
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
