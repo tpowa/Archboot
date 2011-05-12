@@ -3,10 +3,12 @@
 . /etc/rc.d/functions
 
 # needed in rc.sysinit, no fstab used!
-mkdir -p /dev/pts
-mkdir -p /dev/shm
-mount /dev/pts
-mount /dev/shm
+/bin/mkdir -p /run/lock /dev/{pts,shm}
+/bin/chmod 1777 /run/lock
+/bin/mountpoint -q /dev/pts || /bin/mount /dev/pts &> /dev/null \
+	|| /bin/mount -n -t devpts devpts /dev/pts -o mode=620,gid=5,nosuid,noexec
+/bin/mountpoint -q /dev/shm || /bin/mount /dev/shm &> /dev/null \
+	|| /bin/mount -n -t tmpfs shm /dev/shm -o mode=1777,nosuid,nodev
 
 echo " "
 printhl "Arch Linux\n"
@@ -15,13 +17,12 @@ printsep
 
 run_hook sysinit_start
 
-# anything more serious than KERN_WARNING goes to the console
-# 'verbose' cmdline parameter enables more messages
-if /bin/grep -q " verbose" /proc/cmdline; then
-  /bin/dmesg -n 8
-else
-  /bin/dmesg -n 3
-fi
+# Set console verbosity
+for cmdarg in $(< /proc/cmdline); do
+        [[ "$cmdarg" == verbose ]] && VERBOSE=8 && break
+        [[ "$cmdarg" =~ verbose=[1-8] ]] && VERBOSE=${BASH_REMATCH[0]-8} && break
+done
+/bin/dmesg -n ${VERBOSE:-3}
 
 # bring up the loopback interface
 [[ -d /sys/class/net/lo ]] && \
