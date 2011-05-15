@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   February,13th 2011
+   May, 15th 2011
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -181,11 +181,6 @@ Archboot bootparameters
      - Please identify the correct file(s) for your device in /usr/share/tiacx
        and copy them to /lib/firmware and reload your kernel module.
      - See http://acx100.sourceforge.net/wiki/Firmware for details.
-
-   * ARCH_CLAMAV:
-     - Mount your boot media to /src to use the ondisk clamav db files. 
-     - If you want up to date db files use the freshclam program
-       (you will need a working network connection)
 
 Installing Arch Linux with Archboot 
 
