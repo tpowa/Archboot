@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES=" *virtio* "
+    MODULES="$( checked_modules "/*virtio*") "
     BINARIES=""
     FILES=""
     SCRIPT=""
