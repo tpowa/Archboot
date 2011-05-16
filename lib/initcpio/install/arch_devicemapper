@@ -2,7 +2,7 @@
 
 install ()
 {
-    MODULES="dm-*"
+    MODULES=" $(checked_modules "md/dm-*") "
     BINARIES="dmsetup dmeventd"
     FILES=""
     SCRIPT=""
