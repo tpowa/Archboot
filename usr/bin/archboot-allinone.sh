@@ -193,6 +193,10 @@ tar -C ${memdisk_32_dir} -cf - efi > ${memdisk_32_img}
 
 /bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootia32.efi" ${GRUB2_MODULES}
 
+# umount images and loop
+umount ${grub2_efi_mp}
+losetup --detach ${LOOP_DEVICE}
+
 ## Copy the actual grub2 config file
 cat << EOF > ${ALLINONE}/efi/boot/grub.cfg
 search --file --no-floppy --set=archboot /arch/archboot.txt
@@ -287,10 +291,6 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@
 for i in ${IMAGENAME}.iso ${IMAGENAME}.img; do
 	md5sum $i >> md5sum.txt
 done
-
-# umount images and loop
-umount ${grub2_efi_mp}
-losetup --detach ${LOOP_DEVICE}
 
 # cleanup
 rm -rf ${memdisk_64_dir}

@@ -130,6 +130,10 @@ replace_grub2_efi_iso_files() {
 	# replace_grub2_efi_i386_iso_files
 	echo
 	
+	# umount images and loop
+	umount ${grub2_efi_mp}
+	losetup --detach ${LOOP_DEVICE}
+
 	rm "${archboot_ext}/efi/boot/grub.cfg"
 	
 	cat << EOF > "${archboot_ext}/efi/boot/grub.cfg"
