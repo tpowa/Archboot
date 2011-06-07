@@ -17,8 +17,8 @@ pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib elfutils gpm
 libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo iptables capi4k-utils ntfs-3g \
 isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter wpa_supplicant gzip rsync libarchive \
 device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot fuse libusb-compat vim \
-vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses ndiswrapper ndiswrapper-utils \
-zd1211-firmware cifs-utils tiacx tiacx-firmware dmraid linux-atm netcfg parted tzdata ntp \
+vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
+zd1211-firmware cifs-utils dmraid linux-atm netcfg parted tzdata ntp \
 v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl gmp krb5 sqlite3 db \
 dbus-core libcap fsarchiver xz librpcsecgss libtirpc wipe ddrescue testdisk ifplugd \
 libdaemon nouveau-drm-lts nouveau-firmware wpa_actiond rfkill libgssglue icu gptfdisk btrfs-progs-unstable \
