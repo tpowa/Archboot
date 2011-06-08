@@ -94,12 +94,6 @@ Archboot bootparameters
 
   What are general boot parameters?
 
-   * disablemodules
-      - disable a module which is loaded during bootup
-      - Usage:
-        disablemodules=<comma-separated-array>
-        disablemodules=pcspkr,usblp
-
    * earlymodules
       - load modules before hooks are executed
       - Usage:
