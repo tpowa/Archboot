@@ -168,7 +168,7 @@ EOF
 
 cat << EOF > ${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg
 search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
-source (\${efi64})/efi/boot/grub.cfg
+source (\${efi64})/efi/grub2/grub.cfg
 EOF
 
 tar -C ${memdisk_64_dir} -cf - efi > ${memdisk_64_img}
@@ -184,7 +184,7 @@ EOF
  
 cat << EOF > ${ALLINONE}/efi/grub2/i386-efi/grub.cfg
 search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
-source (\${efi32})/efi/boot/grub.cfg
+source (\${efi32})/efi/grub2/grub.cfg
 EOF
 
 tar -C ${memdisk_32_dir} -cf - efi > ${memdisk_32_img}
@@ -198,7 +198,7 @@ umount ${grub2_efi_mp}
 losetup --detach ${LOOP_DEVICE}
 
 ## Copy the actual grub2 config file
-cat << EOF > ${ALLINONE}/efi/boot/grub.cfg
+cat << EOF > ${ALLINONE}/efi/grub2/grub.cfg
 search --file --no-floppy --set=archboot /arch/archboot.txt
 
 set pager=1

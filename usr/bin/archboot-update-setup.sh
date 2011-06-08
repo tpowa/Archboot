@@ -3,7 +3,7 @@
 # Previously the script for creating grub2 efi bootable isos - moved to all-in-one script
 # Contributed by "Keshav P R" <skodabenz aatt rocketmail ddoott ccoomm>
 
-export archboot_ver="2011.02-2"
+export archboot_ver="2011.05-2"
 
 export wd="${PWD}/"
 export archboot_ext="$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)"
@@ -68,7 +68,7 @@ EOF
 	
 	cat << EOF > "${archboot_ext}/efi/grub2/x86_64-efi/grub.cfg"
 search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
-source (\${efi64})/efi/boot/grub.cfg
+source (\${efi64})/efi/grub2/grub.cfg
 EOF
 	
 	tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
@@ -103,7 +103,7 @@ EOF
 	
 	cat << EOF > "${ALLINONE}/efi/grub2/i386-efi/grub.cfg"
 search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
-source (\${efi32})/efi/boot/grub.cfg
+source (\${efi32})/efi/grub2/grub.cfg
 EOF
 	
 	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
@@ -133,10 +133,11 @@ replace_grub2_efi_iso_files() {
 	# umount images and loop
 	umount ${grub2_efi_mp}
 	losetup --detach ${LOOP_DEVICE}
-
-	rm "${archboot_ext}/efi/boot/grub.cfg"
 	
-	cat << EOF > "${archboot_ext}/efi/boot/grub.cfg"
+	rm "${archboot_ext}/efi/boot/grub.cfg" || true
+	rm "${archboot_ext}/efi/grub2/grub.cfg"
+	
+	cat << EOF > "${archboot_ext}/efi/grub2/grub.cfg"
 search --file --no-floppy --set=archboot /arch/archboot.txt
 
 set pager=1
