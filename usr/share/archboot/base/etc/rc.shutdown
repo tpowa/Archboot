@@ -15,8 +15,6 @@ echo " "
 printhl "Initiating Shutdown..."
 echo " "
 
-# avoid NIS hanging syslog-ng on shutdown by unsetting the domainname
-[[ -x /bin/domainname ]] && /bin/domainname ""
 [[ -x /etc/rc.local.shutdown ]] && /etc/rc.local.shutdown
 
 kill_everything shutdown
@@ -24,9 +22,7 @@ kill_everything shutdown
 # removing psmouse module to fix some reboot issues on newer laptops
 /sbin/modprobe -r psmouse >/dev/null 2>&1
 
-stat_busy "Deactivating Swap"
-/sbin/swapoff -a
-stat_done
+status "Deactivating Swap" /sbin/swapoff -a
 
 stat_busy "Unmounting Filesystems"
 /bin/umount -a -r -t noramfs,notmpfs,nosysfs,noproc,nodevtmpfs -O no_netdev
