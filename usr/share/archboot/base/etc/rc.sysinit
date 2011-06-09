@@ -17,13 +17,6 @@ printsep
 
 run_hook sysinit_start
 
-# Set console verbosity
-for cmdarg in $(< /proc/cmdline); do
-        [[ "$cmdarg" == verbose ]] && VERBOSE=8 && break
-        [[ "$cmdarg" =~ verbose=[1-8] ]] && VERBOSE=${BASH_REMATCH[0]-8} && break
-done
-/bin/dmesg -n ${VERBOSE:-3}
-
 # bring up the loopback interface
 [[ -d /sys/class/net/lo ]] && \
     status "Bringing up loopback interface" /sbin/ifconfig lo 127.0.0.1 up
