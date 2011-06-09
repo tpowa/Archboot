@@ -4414,7 +4414,7 @@ auto_hwdetect()
         [[ "$(blkid -c=/dev/null -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
-        HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound ${HWPARAMETER})| sed -e 's#.*) ##g')"
+        HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound --blacklist ${HWPARAMETER})| sed -e 's#.*) ##g')"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
