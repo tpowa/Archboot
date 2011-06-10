@@ -2980,18 +2980,19 @@ auto_network()
     fi
 
     DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
-
+    sed -i -e "s#^interface=.*#interface=${INTERFACE}#g" ${DESTDIR}/etc/rc.conf
     if [[ "${S_DHCP}" != "1" ]]; then
-        sed -i -e "s#^eth.*#${INTERFACE}=\"${INTERFACE} ${IPADDR} netmask ${SUBNET} broadcast ${BROADCAST}\"#g" ${DESTDIR}/etc/rc.conf
-            if [[ "${GW}" != "" ]]; then
-                sed -i -e "s#gw 192.168.0.1#gw ${GW}#g" ${DESTDIR}/etc/rc.conf
-                sed -i -e "s#!gateway#gateway#g" ${DESTDIR}/etc/rc.conf
-            fi
+        sed -i -e "s#^address=.*#address=${IPADDR}#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^netmask=.*#netmask=${SUBNET}#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^broadcast=.*#broadcast=${BROADCAST}#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^gateway=.*#gateway=${GW}#g" ${DESTDIR}/etc/rc.conf
         echo "nameserver ${DNS}" >> ${DESTDIR}/etc/resolv.conf
     else
-        sed -i -e "s#^eth.*#${INTERFACE}=\"dhcp\"#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^address=.*#address=#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^netmask=.*#netmask=#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^broadcast=.*#broadcast=#g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s#^gateway=.*#gateway=#g" ${DESTDIR}/etc/rc.conf
     fi
-        sed -i -e "s#eth0)#${INTERFACE})#g" ${DESTDIR}/etc/rc.conf
     if [[ "${PROXY_HTTP}" != "" ]]; then
         echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
@@ -3034,11 +3035,11 @@ donetwork() {
     done
     # bring down everything, which could grab and affect the interface!
     if [[ -f /var/run/dhcpcd-${INTERFACE}.pid ]]; then
-            dhcpcd -k $INTERFACE ${LOG} 2>&1
+            dhcpcd -k $INTERFACE >${LOG} 2>&1
             sleep 1
     else
             ip route del default >${LOG} 2>&1
-            ip addr flush dev $INTERFACE ${LOG} 2>&1
+            ip addr flush dev ${INTERFACE} >${LOG} 2>&1
     fi
     ip link set dev $INTERFACE down >${LOG} 2>&1
     [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >${LOG} 2>&1
@@ -3077,10 +3078,11 @@ donetwork() {
                 0) NETPARAMETERS="1" ;;
             esac
         done
-        echo "running: ifconfig ${INTERFACE} ${IPADDR} netmask ${SUBNET} broadcast ${BROADCAST} up" >${LOG}
-        ifconfig ${INTERFACE} ${IPADDR} netmask ${SUBNET} broadcast ${BROADCAST} up >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup ${INTERFACE} interface." 0 0 || return 1
+        ip link set dev ${INTERFACE} up
+        echo "running: ip addr add ${IPADDR}/${SUBNET} broadcast ${BROADCAST:-+} dev ${INTERFACE}" >${LOG}
+        ip addr add ${IPADDR}/${SUBNET} broadcast ${BROADCAST:-+} dev ${INTERFACE} >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup ${INTERFACE} interface." 0 0 || return 1
         if [[ "${GW}" != "" ]]; then
-            route add default gw ${GW} >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup your gateway." 0 0 || return 1
+            ip route add default via ${GW} >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup your gateway." 0 0 || return 1
         fi
         if [[ "${PROXY_HTTP}" = "" ]]; then
             unset http_proxy
@@ -4513,7 +4515,7 @@ auto_ftpmirror()
 
 configure_system()
 {
-    destdir_mounts || return 1
+    destdir_mounts || return 1donet
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
