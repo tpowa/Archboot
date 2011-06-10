@@ -3035,13 +3035,13 @@ donetwork() {
     done
     # bring down everything, which could grab and affect the interface!
     if [[ -f /var/run/dhcpcd-${INTERFACE}.pid ]]; then
-            dhcpcd -k $INTERFACE >${LOG} 2>&1
+            dhcpcd -k ${INTERFACE} >${LOG} 2>&1
             sleep 1
     else
             ip route del default >${LOG} 2>&1
             ip addr flush dev ${INTERFACE} >${LOG} 2>&1
     fi
-    ip link set dev $INTERFACE down >${LOG} 2>&1
+    ip link set dev ${INTERFACE} down >${LOG} 2>&1
     [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >${LOG} 2>&1
     DIALOG --yesno "Do you want to use DHCP?" 0 0
     if [[ $? -eq 0 ]]; then
