@@ -107,6 +107,13 @@ getlabel()
     echo "$(blkid -s LABEL -o value ${1})"
 }
 
+# list eth devices with mac adress
+net_interfaces() {
+    for i in $(ls /sys/class/net | grep eth); do 
+        echo "$i $(cat /sys/class/net/$i/address)"
+    done
+}
+
 # activate_dmraid()
 # activate dmraid devices
 activate_dmraid()
@@ -3003,21 +3010,21 @@ auto_network()
 donetwork() {
     INTERFACE=
     S_DHCP=
-    ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
+    ifaces=$(net_interfaces)
     if [[ "${ifaces}" = "" ]]; then
         DIALOG --yesno "Cannot find any ethernet interfaces. You probably haven't loaded\nyour network module yet.  You have two options:\n\n  1) Probe for not detectable module now. (very old hardware)\n  2) Switch to another VC (ALT-F2) and load your module\n     with the modprobe command, then switch back here (ALT-F1)\n     and continue.\n\nIf you know which module you need, you should do Step 2 and\nselect NO below.  If you don't know which module you need,\nchoose Step 1 by selecting YES below.\n\nProbe for network module?" 18 70
         if [[ $? -eq 0 ]]; then
             net_notdetectable
         fi
-        ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
+        ifaces=$(net_interfaces)
         if [[ "${ifaces}" = "" ]]; then
             DIALOG --msgbox "No network interfaces available." 0 0
             return 1
         fi
     fi
     while [[ "${INTERFACE}" = "" ]]; do
-        DIALOG --msgbox "Available Ethernet Interfaces:\n$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
-        ifaces=$(ifconfig -a | grep "Link encap:Ethernet"| sed 's/ \+Link encap:Ethernet \+HWaddr \+/ /g')
+        DIALOG --msgbox "Available Ethernet Interfaces:\n$(net_interfaces)\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
+        ifaces=$(net_interfaces)
         DIALOG --extra-button --extra-label "Probe" --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>${ANSWER}
         case $? in
             1) return 1 ;;
@@ -3026,9 +3033,14 @@ donetwork() {
         esac
     done
     # bring down everything, which could grab and affect the interface!
-    [[ -e /var/run/dhcpcd-${INTERFACE}.pid ]] && kill $(cat /var/run/dhcpcd-${INTERFACE}.pid) && sleep 1
-    [[ "$(ifconfig | grep ${INTERFACE})" ]] && ifconfig ${INTERFACE} down >${LOG} 2>&1
-    [[ "$(route | grep default)" ]] && route del default >${LOG} 2>&1
+    if [[ -f /var/run/dhcpcd-${INTERFACE}.pid ]]; then
+            dhcpcd -k $INTERFACE ${LOG} 2>&1
+            sleep 1
+    else
+            ip route del default >${LOG} 2>&1
+            ip addr flush dev $INTERFACE ${LOG} 2>&1
+    fi
+    ip link set dev $INTERFACE down >${LOG} 2>&1
     [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >${LOG} 2>&1
     DIALOG --yesno "Do you want to use DHCP?" 0 0
     if [[ $? -eq 0 ]]; then
@@ -3038,7 +3050,7 @@ donetwork() {
             DIALOG --msgbox "Failed to run dhcpcd.  See ${LOG} for details." 0 0
             return 1
         fi
-        if [[ ! $(ifconfig ${INTERFACE} | grep 'inet addr:') ]]; then
+        if [[ ! $(ip addr show ${INTERFACE} | grep 'inet') ]]; then
             DIALOG --msgbox "DHCP request failed." 0 0 || return 1
         fi
         S_DHCP=1
