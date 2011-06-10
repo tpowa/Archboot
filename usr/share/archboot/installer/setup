@@ -4515,7 +4515,7 @@ auto_ftpmirror()
 
 configure_system()
 {
-    destdir_mounts || return 1donet
+    destdir_mounts || return 1
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
