@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     MODULES=""
     BINARIES="capiinfo rcapid capiinit avmcapictrl"

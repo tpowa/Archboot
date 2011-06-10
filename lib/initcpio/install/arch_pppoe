@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     MODULES=""
     BINARIES="pppoe pppoe-connect pppoe-relay pppoe-server pppoe-setup pppoe-sniff pppoe-start pppoe-status pppoe-stop"

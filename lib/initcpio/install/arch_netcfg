@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     MODULES=""
     BINARIES="net-auto-wired netcfg-wpa_actiond netcfg-wpa_actiond-action netcfg-menu netcfg2 netcfg"

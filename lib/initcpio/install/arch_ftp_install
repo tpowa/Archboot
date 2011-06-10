@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     ### check for root
     if ! [ $UID -eq 0 ]; then 
