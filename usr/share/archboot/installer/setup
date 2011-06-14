@@ -70,34 +70,32 @@ DIALOG() {
 # returns: whatever dialog did
 _checklist_dialog()
 {
-	dialog --backtitle "$TITLE" --aspect 15 "$@" 3>&1 1>&2 2>&3 3>&-
+    dialog --backtitle "$TITLE" --aspect 15 "$@" 3>&1 1>&2 2>&3 3>&-
 }
 
 _package_checklist ()
 {
-	str=$1
-	elaborate=$2
-	shift 2
-	list=()
-	while [ -n "$1" ]
-	do
-		list+=("$1" "$2" $3)
-		[ $elaborate -gt 0 ] && list+=("$4") # this can be an empty string, that's ok.
-		shift 3
-		[ $elaborate -gt 0 ] && shift
-	done
-	# i wish dialog would accept something like: --output-separator $'\0'
-	# but it doesn't. there really is no good way to separate items currently
-	# let's assume there are no newlines in the item tags
-	ANSWER_CHECKLIST=()
-	elab=''
-	[ $elaborate -gt 0 ] && elab='--item-help'
-	while read -r line
-	do
-		ANSWER_CHECKLIST+=("$line")
-	done < <(_checklist_dialog --separate-output $elab --checklist "$str" 19 60 12 "${list[@]}")
-	local ret=$?
-	return $ret
+    str=$1
+    elaborate=$2
+    shift 2
+    list=()
+    while [[ -n "$1" ]]; do
+        list+=("$1" "$2" $3)
+        [[ $elaborate -gt 0 ]] && list+=("$4") # this can be an empty string, that's ok.
+        shift 3
+        [[ $elaborate -gt 0 ]] && shift
+    done
+    # i wish dialog would accept something like: --output-separator $'\0'
+    # but it doesn't. there really is no good way to separate items currently
+    # let's assume there are no newlines in the item tags
+    ANSWER_CHECKLIST=()
+    elab=''
+    [[ $elaborate -gt 0 ]] && elab='--item-help'
+    while read -r line; do
+        ANSWER_CHECKLIST+=("$line")
+    done < <(_checklist_dialog --separate-output $elab --checklist "$str" 19 60 12 "${list[@]}")
+    local ret=$?
+    return $ret
 }
 
 # chroot_mount()
