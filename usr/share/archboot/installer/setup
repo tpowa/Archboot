@@ -2738,7 +2738,7 @@ run_pacman(){
     dialog --backtitle "${TITLE}" --title " Installing... Please Wait " \
         --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>${ANSWER}
     while [[ -f /tmp/setup-pacman-running ]]; do
-        sleep 1
+        /bin/true
     done
     kill $(cat ${ANSWER})
 
@@ -2832,49 +2832,67 @@ select_packages() {
         for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
                                                       -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
                                                       -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
-                                                      -e "i18n" -e "^koffice" -e "^vim" | sort); do
+                                                      -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice" -e "^pulseaudio" | sort); do
             _catlist="${_catlist} ${i} - OFF"
         done
 
         DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 20 60 12 ${_catlist} 2>${ANSWER} || return 1
         _catlist="$(cat ${ANSWER})"
 
-        DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
+        #DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
         # assemble a list of packages with groups, marking pre-selected ones
         # <package> <group> <selected>
         local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"
-        local _pkglist=''
-        local _pkglist_none=''
+        local _pkglist=()
+        # execute pkglist in a subshell so we can follow its progress
+        # output goes /tmp/package-process.log
+        # /tmp/package-process-running acts as a lockfile
+        ( \
+        echo "Generating list with packages, this might take some time ..." >/tmp/package-process.log
+        echo >>/tmp/package-process.log
+        touch /tmp/package-process-running
         # packages in groups
         ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' > ${ANSWER}
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -f -k 2 > ${ANSWER}
         while read pkgname pkgcat; do
+            pkgdesc $pkgname
+            echo "Processing "${pkgname}" ..." 2>&1 >> /tmp/package-process.log
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
             if [[ "${_catlist/"\"${pkgcat}\""/XXXX}" != "${_catlist}" ]]; then
-                _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} ON")"
+                _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
             else
-                _pkglist="$(echo -e "${_pkglist}\n${pkgname} ${pkgcat} OFF")"
+                _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
         done < ${ANSWER}
         # packages without groups
         ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' > ${ANSWER}
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -f -k 2 > ${ANSWER}
         while read pkgname pkgcat; do
+            pkgdesc $pkgname
+            echo "Processing "${pkgname} ..." " 2>&1 >> /tmp/package-process.log
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
             if [[ "${_catlist/"\"${pkgcat}\""/XXXX}" != "${_catlist}" ]]; then
-                _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} ON")"
+                _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
             else
-                _pkglist_none="$(echo -e "${_pkglist_none}\n${pkgname} ${pkgcat} OFF")"
+                _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
         done < ${ANSWER}
 
-        # sort by category
-        _pkglist="$(echo "${_pkglist}" | sort -f -k 2)"
-        _pkglist_none="$(echo "${_pkglist_none}" | sort -f -k 2)"
-        DIALOG  --separate-output --checklist "Select Packages To Install." 19 80 12 ${_pkglist} ${_pkglist_none} 2>${ANSWER} || return 1
-        PACKAGES="$(cat ${ANSWER})"
+        rm /tmp/package-process-running
+        ) &
+        # display pkglist output while it's running
+        sleep 2
+        dialog --backtitle "${TITLE}" --title "Generating list with packages, this might take some time ..." \
+            --no-kill --tailboxbg "/tmp/package-process.log" 18 70 2>${ANSWER}
+        while [[ -f /tmp/package-process-running ]]; do
+            /bin/true
+        done
+        kill $(cat ${ANSWER})
+
+        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}" || return 1
+        PACKAGES="${ANSWER_CHECKLIST[@]}"
     fi
     # Add packages which are not in core repository
     if [[ "$(grep -w nvidia-kms /proc/cmdline)" && "${VMLINUZ}" = "kernel26-lts" ]]; then
@@ -4223,7 +4241,7 @@ run_mkinitcpio()
     sleep 2
     dialog --backtitle "${TITLE}" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
     while [[ -f /tmp/setup-mkinitcpio-running ]]; do
-        sleep 1
+        /bin/true
     done
     chroot_umount
 }
