@@ -63,7 +63,7 @@ DIALOG() {
     return $?
 }
 
-# DIALOG() taken from setup
+# DIALOG() taken from aif installer
 # an el-cheapo dialog wrapper
 #
 # parameters: see dialog(1)
@@ -73,6 +73,9 @@ _checklist_dialog()
     dialog --backtitle "$TITLE" --aspect 15 "$@" 3>&1 1>&2 2>&3 3>&-
 }
 
+
+# generate menu for package selection
+# slightly modified from aif installer
 _package_checklist ()
 {
     str=$1
@@ -96,6 +99,11 @@ _package_checklist ()
     done < <(_checklist_dialog --separate-output $elab --checklist "$str" 19 60 12 "${list[@]}")
     local ret=$?
     return $ret
+}
+
+# get package description
+pkgdesc () {
+    PKGDESC=$(LANG=C $PACMAN -Si "$@" | awk '/^Name/{ printf("%s ",$3) } /^Version/{ printf("%s:",$3) }/^Description/{ for(i=3;i<=NF;++i) printf(" %s",$i); printf ("\n")}')
 }
 
 # chroot_mount()
@@ -2755,22 +2763,6 @@ run_pacman(){
     # ensure the disk is synced
     sync
     chroot_umount
-}
-
-
-# get group and packagedesc for packages
-# arguments: packages
-# output format: multiple lines, each line like:
-# <pkgname> <version> <group> <desc>
-# order is the same as the input
-# note that space is used as separator, but desc is the only thing that will contain spaces.
-pkginfo ()
-{
-    PACKAGE_INFO=`LANG=C $PACMAN -Si "$@" | awk '/^Name/{ printf("%s ",$3) } /^Version/{ printf("%s ",$3) } /^Group/{ printf("%s", $3) } /^Description/{ for(i=3;i<=NF;++i) printf(" %s",$i); printf ("\n")}'`
-}
-
-pkgdesc () {
-    PKGDESC=$(LANG=C $PACMAN -Si "$@" | awk '/^Name/{ printf("%s ",$3) } /^Version/{ printf("%s:",$3) }/^Description/{ for(i=3;i<=NF;++i) printf(" %s",$i); printf ("\n")}')
 }
 
 # select_packages()
