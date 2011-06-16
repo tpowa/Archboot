@@ -2,30 +2,19 @@
 
 run_hook ()
 {
+  if [ "$fbmodule" = "" ]; then
   # check for kms
-  if [ "$intel_kms" = "y" ]; then
-    msg ":: Switching to intel kms mode..."
-    # writing module options
-    echo "options i915 modeset=1" >> /etc/modprobe.d/modprobe.conf
-    fbmodule="i915"
-  else
-    echo "blacklist i915" >> /etc/modprobe.d/framebuffer_blacklist.conf
-  fi
-  if [ "$nvidia_kms" = "y" ]; then
-    msg ":: Switching to nvidia kms mode..."
-    # writing module options
-    echo "options nouveau modeset=1" >> /etc/modprobe.d/modprobe.conf
-    fbmodule="nouveau"
-  else
-    echo "blacklist nouveau" >> /etc/modprobe.d/framebuffer_blacklist.conf
-  fi
-  if [ "$ati_kms" = "y" ]; then
-    msg ":: Switching to ati kms mode..."
-    # writing module options
-    echo "options radeon modeset=1" >> /etc/modprobe.d/modprobe.conf
-    fbmodule="radeon"
-  else
-    echo "blacklist radeon" >> /etc/modprobe.d/framebuffer_blacklist.conf
+    for fb in i915 nouveau radeon; do
+      for pci in $(/sbin/modinfo -F alias $fb | sed -e 's/\*/\.&/g'); do
+        if cat /sys/bus/pci/devices/*/modalias | grep -i $pci >/dev/null; then
+          msg ":: Switching to $fb kms mode..."
+          echo "options $fb modeset=1" >> /etc/modprobe.d/modprobe.conf
+          fbmodule="$fb"
+        else
+          echo "blacklist $fb" >> /etc/modprobe.d/framebuffer_blacklist.conf
+        fi
+      done
+    done
   fi
   # check for uvesafb
   if [ "$(echo $uvesafb | grep "[0-9]*x[0-9]*-[0-9]*")" ]; then
@@ -34,7 +23,7 @@ run_hook ()
     fbmodule="uvesafb"
   fi
   # load correct module
-  if ! [ "$fbmodule" = "" -a "$fbmodule" = "y" ]; then
+  if ! [ "$fbmodule" = "" ]; then
     depmod -a
     msg ":: Loading ${fbmodule}..."
     modprobe -aq $fbmodule >/dev/null 2>&1

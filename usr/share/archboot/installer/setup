@@ -4460,9 +4460,9 @@ auto_hwdetect()
              FBPARAMETER="--uvesafb"
              HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
         fi
-        [[ "$(grep -w ati-kms /proc/cmdline)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep -w intel-kms /proc/cmdline)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep -w nvidia-kms /proc/cmdline)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        ! [[ "$(grep "radeon$" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        ! [[ "$(grep "i915" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        ! [[ "$(grep "nouveau" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
         if [[ "$(grep usb_storage /proc/modules)" ]]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --usb"
