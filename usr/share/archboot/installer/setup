@@ -3085,12 +3085,16 @@ donetwork() {
     done
     # bring down everything, which could grab and affect the interface!
     if [[ -f /var/run/dhcpcd-${INTERFACE}.pid ]]; then
-            dhcpcd -k ${INTERFACE} >${LOG} 2>&1
-            sleep 1
-    else
-            ip route del default >${LOG} 2>&1
-            ip addr flush dev ${INTERFACE} >${LOG} 2>&1
+        dhcpcd -k ${INTERFACE} >${LOG} 2>&1
+        sleep  1
     fi
+    if  [[ -f /var/run/dhclient.pid ]]; then
+        dhclient -x
+        [[ -f /var/run/dhclient.pid ]] && rm /var/run/dhclient.pid
+        sleep 1
+    fi
+    ip route del default >${LOG} 2>&1
+    ip addr flush dev ${INTERFACE} >${LOG} 2>&1
     ip link set dev ${INTERFACE} down >${LOG} 2>&1
     [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >${LOG} 2>&1
     DIALOG --yesno "Do you want to use DHCP?" 0 0
@@ -3098,8 +3102,10 @@ donetwork() {
         DIALOG --infobox "Please wait.  Polling for DHCP server on ${INTERFACE}..." 10 65
         dhcpcd ${INTERFACE} >${LOG} 2>&1
         if [[ $? -ne 0 ]]; then
-            DIALOG --msgbox "Failed to run dhcpcd.  See ${LOG} for details." 0 0
-            return 1
+            DIALOG --infobox "Failed to run dhcpcd.  See ${LOG} for details. dhclient as fallback will be called in 5 seconds." 0 0
+            sleep 5 
+            DIALOG --infobox "Please wait.  Polling for DHCP server on ${INTERFACE} with dhclient..." 0 0
+            dhclient ${INTERFACE} >${LOG} 2>&1
         fi
         if [[ ! $(ip addr show ${INTERFACE} | grep 'inet') ]]; then
             DIALOG --msgbox "DHCP request failed." 0 0 || return 1
