@@ -25,8 +25,8 @@ fi
 set -x
 
 ## Remove old files and dir
-rm -r "${archboot_ext}/" || true
-rm "${wd}/${iso_name}.iso" || true
+rm -rf "${archboot_ext}/" || true
+rm -rf "${wd}/${iso_name}.iso" || true
 echo
 
 ## Create a dir to extract the archboot iso
@@ -39,7 +39,7 @@ bsdtar xf "${wd}/archlinux-${archboot_ver}-archboot.iso"
 # 7z x "${wd}/archlinux-${archboot_ver}-archboot.iso"
 echo
 
-rm -r "${archboot_ext}/[BOOT]/" || true
+rm -rf "${archboot_ext}/[BOOT]/" || true
 echo
 
 [ -e "${wd}/splash.png" ] && cp "${wd}/splash.png" "${archboot_ext}/boot/splash.png"
@@ -50,10 +50,10 @@ replace_grub2_efi_x86_64_iso_files() {
 	memdisk_64_dir="$(mktemp -d /tmp/grub2_efi_64_dir.XXX)"
 	memdisk_64_img="$(mktemp /tmp/grub2_efi_64_img.XXX)"
 	
-	rm "${grub2_efi_mp}/efi/boot/bootx64.efi" || true
-	rm "${archboot_ext}/efi/boot/bootx64.efi" || true
+	rm -rf "${grub2_efi_mp}/efi/boot/bootx64.efi" || true
+	rm -rf "${archboot_ext}/efi/boot/bootx64.efi" || true
 	
-	rm -r "${archboot_ext}/efi/grub2/x86_64-efi" || true
+	rm -rf "${archboot_ext}/efi/grub2/x86_64-efi" || true
 	cp -r /usr/lib/grub/x86_64-efi "${archboot_ext}/efi/grub2/x86_64-efi"
 	
 	mkdir -p "${memdisk_64_dir}/efi/grub2/"
@@ -85,10 +85,10 @@ replace_grub2_efi_i386_iso_files() {
 	memdisk_32_dir="$(mktemp -d /tmp/grub2_efi_32_dir.XXX)"
 	memdisk_32_img="$(mktemp /tmp/grub2_efi_32_img.XXX)"
 	
-	rm "${grub2_efi_mp}/efi/boot/bootia32.efi" || true
-	rm "${archboot_ext}/efi/boot/bootia32.efi" || true
+	rm -rf "${grub2_efi_mp}/efi/boot/bootia32.efi" || true
+	rm -rf "${archboot_ext}/efi/boot/bootia32.efi" || true
 	
-	rm -r "${archboot_ext}/efi/grub2/i386-efi" || true
+	rm -rf "${archboot_ext}/efi/grub2/i386-efi" || true
 	cp -r /usr/lib/grub/i386-efi "${archboot_ext}/efi/grub2/i386-efi"
 	
 	mkdir -p "${memdisk_32_dir}/efi/grub2/"
@@ -131,11 +131,11 @@ replace_grub2_efi_iso_files() {
 	echo
 	
 	# umount images and loop
-	umount ${grub2_efi_mp}
-	losetup --detach ${LOOP_DEVICE}
+	umount "${grub2_efi_mp}"
+	losetup --detach "${LOOP_DEVICE}"
 	
-	rm "${archboot_ext}/efi/boot/grub.cfg" || true
-	rm "${archboot_ext}/efi/grub2/grub.cfg"
+	rm -rf "${archboot_ext}/efi/boot/grub.cfg" || true
+	rm -rf "${archboot_ext}/efi/grub2/grub.cfg"
 	
 	cat << EOF > "${archboot_ext}/efi/grub2/grub.cfg"
 search --file --no-floppy --set=archboot /arch/archboot.txt
@@ -220,22 +220,13 @@ replace_arch_setup_initramfs() {
 	
 	cd "${initramfs_ext}/"
 	
-	find . | cpio --format=newc -o > "${wd}/${initramfs_name}"
+	# Generate the actual initramfs file
+	find . -print0 | bsdcpio -0 --format newc -v -o | xz --check=crc32 -9 -v > "${wd}/${initramfs_name}.img"
 	echo
 	
 	cd "${wd}/"
 	
-	# Linux Kernel >=2.6.38 supports xz compressed initramfs but checksum should be crc32, not the default crc64
-	xz --check=crc32 -9 "${wd}/${initramfs_name}"
-	echo
-	
-	rm "${wd}/${initramfs_name}.img"
-	echo
-	
-	mv "${wd}/${initramfs_name}.xz" "${wd}/${initramfs_name}.img"
-	echo
-	
-	rm "${archboot_ext}/boot/${initramfs_name}.img"
+	rm -rf "${archboot_ext}/boot/${initramfs_name}.img"
 	echo
 	
 	cp "${wd}/${initramfs_name}.img" "${archboot_ext}/boot/${initramfs_name}.img"
@@ -283,7 +274,7 @@ then
 		# cp ${wd}/setup ${archboot_ext}/arch/setup
 		
 		## Extracting using bsdtar, replacing /arch/setup and recompressing the iniramfs archive does not work. Archive format not compatible with initramfs format.
-		## Compressing using cpio and using 'newc' archive format works
+		## Compressing using bsdcpio and using 'newc' archive format works, taken from falconindy's geninit program.
 		
 		initramfs_name="initrd64"
 		replace_arch_setup_initramfs
@@ -319,11 +310,6 @@ xorriso -as mkisofs \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${wd}/${iso_name}.iso" "${archboot_ext}/" > /dev/null 2>&1
-echo
-
-## Generate a isohybrid image using syslinux
-# cp ${wd}/${iso_name}.iso ${wd}/${iso_name}_isohybrid.iso
-# isohybrid ${wd}/${iso_name}_isohybrid.iso
 echo
 
 set +x

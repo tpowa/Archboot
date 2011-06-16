@@ -3742,7 +3742,15 @@ dogrub2_config() {
     
     ROOT_FS_LABEL=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/ 2>/dev/null)
     ROOT_DEVICE=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/sbin/grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/ 2>/dev/null)
-
+    
+    if [ "$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_SCHEME ${ROOT_DEVICE})" == 'gpt' ]
+    then
+        ROOT_GPT_PART_UUID=$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_UUID ${ROOT_DEVICE})
+        ROOT_GPT_PART_LABEL=$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_NAME ${ROOT_DEVICE})
+    fi
+    ## http://git.kernel.org/?p=linux/hotplug/udev.git;a=commitdiff;h=693b6344e193f5aeca21df5f1c98fd32148006ac;hp=7dc39c9cada5ada1f6dae55d50e25f0d8923d302
+    ## udev 172 onwards
+    
     subdir='/boot'
     [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
     
@@ -3811,16 +3819,27 @@ EOF
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}"
         _rootpart="/dev/disk/by-uuid/${ROOT_FS_UUID}"
         
+    elif [[ "${NAME_SCHEME_PARAMETER}" = "PARTUUID" ]]
+    then
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}" # GRUB2 does not yet support PARTUUID
+        _rootpart="/dev/disk/by-partuuid/${ROOT_GPT_PART_UUID}"
+        
     elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]
     then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}"
         _rootpart="/dev/disk/by-label/${ROOT_FS_LABEL}"
+        
+    elif [[ "${NAME_SCHEME_PARAMETER}" = "PARTLABEL" ]]
+    then
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}" # GRUB2 does not yet support PARTLABEL
+        _rootpart="/dev/disk/by-partlabel/${ROOT_GPT_PART_LABEL}"
         
     else
         GRUB_ROOT_DRIVE="set root=${BOOT_DRIVE}"
         _rootpart="${ROOT_DEVICE}"
         
     fi
+    
     # fallback to device if no label or uuid can be detected, eg. luks device
     [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
     [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
