@@ -2780,7 +2780,7 @@ select_packages() {
         PKGS="/src/core-$(uname -m)/pkg/packages.txt"
         if ! [[ -s /tmp/.pkgcategory ]]; then
             CHKLIST="base ^ ON"
-            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v base | grep -v kernels); do
+            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v base ); do
                 CHKLIST="${CHKLIST} ${category} - OFF"
             done
         else
@@ -2788,7 +2788,7 @@ select_packages() {
             for i in $(cat /tmp/.pkgcategory | sed 's|\"||g'); do
                 CHKLIST="${CHKLIST} ${i} ^ ON"
             done
-            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v kernels); do
+            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq ); do
                 grep ${category} /tmp/.pkgcategory >/dev/null 2>&1 || CHKLIST="${CHKLIST} ${category} - OFF"
             done
         fi
@@ -2810,7 +2810,7 @@ select_packages() {
         done
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}" || return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
-    # Use default ftp install routine from arch livecd
+    # ftp install routine
     else
         # if selection has been done before, warn about loss of input
         # and let the user exit gracefully
@@ -2818,34 +2818,37 @@ select_packages() {
             DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
         fi
         DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
-        # show group listing for group selection
-        # only show xorg and DEs
+        DO_EXTRA=""
+        DIALOG --yesno "Would you like to activate the [extra] repository for package installation to get the complete package list?" 0 0 && DO_EXTRA="yes"
         local _catlist="base ^ ON"
-        for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
-                                                      -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
-                                                      -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
-                                                      -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice" -e "^pulseaudio" | sort); do
-            _catlist="${_catlist} ${i} - OFF"
-        done
-
+        if [[ "${DO_EXTRA}" = "yes" ]] ; then
+            # show group listing for group selection
+            # only show xorg and DEs
+            for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
+                                                          -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
+                                                          -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
+                                                          -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice" -e "^pulseaudio" | sort); do
+                _catlist="${_catlist} ${i} - OFF"
+            done
+            local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"        
+        else
+            # show group listing for group selection
+            # only show xorg and DEs
+            for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep ^base | sort); do
+                _catlist="${_catlist} ${i} - OFF"
+            done
+            local _pkgtmp="$(${PACMAN} -Sl core | awk '{print $2}')"  
+        fi
         DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 20 60 12 ${_catlist} 2>${ANSWER} || return 1
         _catlist="$(cat ${ANSWER})"
-
-        #DIALOG --infobox "Generating list with packages, this might take some time ..." 5 65  
         # assemble a list of packages with groups, marking pre-selected ones
         # <package> <group> <selected>
-        local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"
         local _pkglist=()
-        # execute pkglist in a subshell so we can follow its progress
-        # output goes /tmp/package-process.log
-        # /tmp/package-process-running acts as a lockfile
-        ( \
-        echo "Generating list with packages, this might take some time ..." >/tmp/package-process.log
-        echo >>/tmp/package-process.log
-        touch /tmp/package-process-running
+        : >/tmp/package-process.log
+        # display pkglist output while it's running
+        dialog --backtitle "${TITLE}" --title "Generating list with packages, this might take some time ..." \
+            --no-kill --tailboxbg "/tmp/package-process.log" 18 70 2>${ANSWER}
         # packages in groups
-        ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -f -k 2 > ${ANSWER}
         while read pkgname pkgcat; do
             pkgdesc $pkgname
             echo "Processing "${pkgname}" ..." 2>&1 >> /tmp/package-process.log
@@ -2856,10 +2859,9 @@ select_packages() {
             else
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
-        done < ${ANSWER}
+        done < <(${PACMAN} -Si ${_pkgtmp} | \
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -f -k 2)
         # packages without groups
-        ${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -f -k 2 > ${ANSWER}
         while read pkgname pkgcat; do
             pkgdesc $pkgname
             echo "Processing "${pkgname} ..." " 2>&1 >> /tmp/package-process.log
@@ -2870,19 +2872,9 @@ select_packages() {
             else
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
-        done < ${ANSWER}
-
-        rm /tmp/package-process-running
-        ) &
-        # display pkglist output while it's running
-        sleep 2
-        dialog --backtitle "${TITLE}" --title "Generating list with packages, this might take some time ..." \
-            --no-kill --tailboxbg "/tmp/package-process.log" 18 70 2>${ANSWER}
-        while [[ -f /tmp/package-process-running ]]; do
-            /bin/true
-        done
+        done < <(${PACMAN} -Si ${_pkgtmp} | \
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -f -k 2)
         kill $(cat ${ANSWER})
-
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}" || return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
     fi
