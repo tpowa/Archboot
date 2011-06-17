@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+install ()
 {
     MODULES=""
     BINARIES="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd adduser chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv logoutd newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
