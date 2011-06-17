@@ -41,8 +41,6 @@ run_hook ()
                 esac 
             done
         fi
-        # assemble everything
-        [ -e $mdconfig ] && /sbin/mdassemble
     else
         msg ":: Skipping already run by arch_root_advanced hook..."
     fi

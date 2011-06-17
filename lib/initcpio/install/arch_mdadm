@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=" $(checked_modules "drivers/md/*" | grep -v "dm-") "
-    BINARIES="mdassemble mdadm mdmon"
+    BINARIES="mdadm mdmon"
     FILES=""
     SCRIPT="arch_mdadm"
     # check if a custom mdadm.conf exists
