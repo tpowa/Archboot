@@ -4503,7 +4503,7 @@ auto_hwdetect()
         [[ "$(blkid -c=/dev/null -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
-        HWDETECTRC="$(echo $(hwdetect --usbhost --net --sound --blacklist ${HWPARAMETER})| sed -e 's#.*) ##g')"
+        HWDETECTRC="$(echo $(hwdetect --net --sound --blacklist ${HWPARAMETER})| sed -e 's#.*) ##g')"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
@@ -4511,10 +4511,8 @@ auto_hwdetect()
         # add blacklisting files
         [[ -e "${DESTDIR}/etc/modprobe.d/blacklist_net.conf" ]] && rm ${DESTDIR}/etc/modprobe.d/blacklist_net.conf
         [[ -e "${DESTDIR}/etc/modprobe.d/blacklist_sound.conf" ]] && rm ${DESTDIR}/etc/modprobe.d/blacklist_sound.conf
-        [[ -e "${DESTDIR}/etc/modprobe.d/blacklist_usbhost.conf" ]] && rm ${DESTDIR}/etc/modprobe.d/blacklist_usbhost.conf
         [[ -s "/tmp/blacklist_net.conf" ]] && cp /tmp/blacklist_net.conf ${DESTDIR}/etc/modprobe.d/blacklist_net.conf
         [[ -s "/tmp/blacklist_sound.conf" ]] && cp /tmp/blacklist_sound.conf ${DESTDIR}/etc/modprobe.d/blacklist_sound.conf
-        [[ -s "/tmp/blacklist_usbhost.conf" ]] && cp /tmp/blacklist_usbhost.conf ${DESTDIR}/etc/modprobe.d/blacklist_usbhost.conf
     fi
 }
 
