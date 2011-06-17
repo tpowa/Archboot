@@ -3844,7 +3844,7 @@ EOF
     [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
     [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
 
-    LINUX_UNMOD_COMMAND="linux /${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro add_efi_memmap"
+    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
@@ -3854,7 +3854,7 @@ EOF
 menuentry "Arch Linux" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd /${subdir}/${KERNELPKG}.img
+    initrd ${subdir}/${KERNELPKG}.img
 }
 
 EOF
@@ -3868,7 +3868,7 @@ EOF
 menuentry "Arch Linux Fallback" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd /${subdir}/${KERNELPKG}-fallback.img
+    initrd ${subdir}/${KERNELPKG}-fallback.img
 }
 
 EOF
