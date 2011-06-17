@@ -10,36 +10,24 @@ install ()
     add_file /etc/modprobe.d/usb-load-ehci-first.conf
     add_binary /lib/udev/ata_id
     add_binary /lib/udev/cdrom_id
-    add_file /lib/udev/cdsymlinks.sh
     add_binary /lib/udev/collect
-    add_binary /lib/udev/create_floppy_devices
-    add_binary /lib/udev/edd_id
     add_file /lib/udev/findkeyboards
     add_binary /lib/udev/firmware
     add_binary /lib/udev/keymap
     add_binary /lib/udev/input_id
     add_file /lib/udev/keyboard-force-release.sh
-    add_file /lib/udev/load-modules.sh
     add_binary /lib/udev/path_id
     add_binary /lib/udev/pci-db
-    add_binary /lib/udev/mobile-action-modeswitch
-    add_file /lib/udev/rule_generator.functions
     add_binary /lib/udev/scsi_id
     add_binary /lib/udev/udev-acl
     add_binary /lib/udev/usb-db
     add_binary /lib/udev/usb_id
     add_binary /lib/udev/v4l_id
-    add_file /lib/udev/write_cd_rules
-    add_file /lib/udev/write_net_rules
     # add rule files
-    for i in 75-cd-aliases-generator.rules.optional 75-persistent-net-generator.rules.optional; do
-        add_file /etc/udev/rules.d/$i
-    done
     for i in 50-firmware 50-udev-default \
-             60-cdrom_id 60-floppy 60-persistent-alsa 60-persistent-input 60-persistent-serial \
+             60-cdrom_id 60-persistent-alsa 60-persistent-input 60-persistent-serial \
              60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
-             61-mobile-action 61-persistent-storage-edd \
-             70-acl 70-hid2hci 75-net-description 75-tty-description 78-sound-card \
+             70-acl 75-net-description 75-tty-description 78-sound-card \
              80-drivers 81-arch 95-keyboard-force-release 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
