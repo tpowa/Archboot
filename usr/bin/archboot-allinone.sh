@@ -67,7 +67,7 @@ fi
 # set defaults, if nothing given
 [ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.32-lts"
-[ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R2"
+[ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R3"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 GRUB2_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga xzio font help lvm usbms usb_keyboard"
 

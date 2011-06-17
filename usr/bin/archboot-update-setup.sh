@@ -3,7 +3,7 @@
 # Previously the script for creating grub2 efi bootable isos - moved to all-in-one script
 # Contributed by "Keshav P R" <skodabenz aatt rocketmail ddoott ccoomm>
 
-export archboot_ver="2011.05-2"
+export archboot_ver="2011.06-1"
 
 export wd="${PWD}/"
 export archboot_ext="$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)"
