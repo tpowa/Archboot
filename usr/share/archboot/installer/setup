@@ -2933,7 +2933,7 @@ install_packages() {
     source_set || return 1
     destdir_mounts || return 1
     if [[ "${MODE}" = "media" ]]; then
-        if [[ ! ${PACKAGES} = "" || "${S_SELECT}" != "1" ]]; then
+        if [[ "${PACKAGES}" = "" || "${S_SELECT}" != "1" ]]; then
             DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
             select_packages || return 1
         fi
