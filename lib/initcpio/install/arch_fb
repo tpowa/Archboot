@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     MODULES=" $(checked_modules "drivers/video/" | grep 'fb')  $(checked_modules "drivers/char/agp") i915 radeon nouveau "
     BINARIES="v86d"

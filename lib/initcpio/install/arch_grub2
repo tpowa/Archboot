@@ -1,6 +1,6 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-install ()
+build ()
 {
     MODULES=""
     BINARIES="grub-bin2h grub-editenv grub-fstest grub-menulst2cfg grub-mkfont grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath grub-mkdevicemap grub-probe grub-setup grub-kbdcomp grub-mkrescue grub-mkconfig grub-mknetdir grub-reboot grub-set-default grub_bios-install grub_efi_i386-install grub_efi_x86_64-install efibootmgr"
