@@ -86,10 +86,6 @@ if [ "${root}" = "" -a "${ip}" = "" ]; then
     # enter install environment
     exec /sbin/init
 else
-    if [ -f "/message" ]; then
-        msg "$(cat /message)"
-    fi
-
     # Mount root at /new_root
     ${mount_handler} /new_root
 
