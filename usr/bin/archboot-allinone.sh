@@ -1,7 +1,11 @@
 #! /bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # grub2-efi related commands copied from grub-mkrescue script from grub2 package
-APPNAME=$(basename "${0}")
+
+WD="${PWD}/"
+
+APPNAME="$(basename "${0}")"
+
 usage ()
 {
     echo "${APPNAME}: usage"
@@ -24,7 +28,7 @@ usage ()
     exit 1
 }
 
-[ "$1" == "" ] && usage && exit 1
+[ "${1}" == "" ] && usage && exit 1
 
 ALLINONE="/etc/archboot/presets/allinone"
 ALLINONE_LTS="/etc/archboot/presets/allinone-lts"
@@ -35,13 +39,13 @@ USBIMAGE_HELPER="/usr/bin/archboot-tarball-helper.sh"
 export LANG=en_US
 
 while [ $# -gt 0 ]; do
-	case $1 in
+	case ${1} in
 		-g|--g) GENERATE="1" ;;
 		-t|--t) TARBALL="1" ;;
-		-i=*|--i=*) IMAGENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
-		-r=*|--r=*) RELEASENAME="$(echo $1 | awk -F= '{print $2;}')" ;;
-		-k=*|--k=*) KERNEL="$(echo $1 | awk -F= '{print $2;}')" ;;
-		-lts=*|--lts=*) LTS_KERNEL="$(echo $1 | awk -F= '{print $2;}')" ;;
+		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-lts=*|--lts=*) LTS_KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -49,116 +53,140 @@ while [ $# -gt 0 ]; do
 done
 
 ### check for root
-if ! [ $UID -eq 0 ]; then 
+if ! [ ${UID} -eq 0 ]; then 
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
 
-if [ ${TARBALL} = "1" ]; then
-	${TARBALL_HELPER} -c=${ALLINONE} -t=core-$(uname -m).tar
-	${TARBALL_HELPER} -c=${ALLINONE_LTS} -t=core-lts-$(uname -m).tar
+if [ "${TARBALL}" == "1" ]; then
+	"${TARBALL_HELPER}" -c="${ALLINONE}" -t="core-$(uname -m).tar"
+	"${TARBALL_HELPER}" -c="${ALLINONE_LTS}" -t="core-lts-$(uname -m).tar"
 	exit 0
 fi
 
-if ! [ ${GENERATE} = "1" ]; then
+if ! [ "${GENERATE}" = "1" ]; then
 	usage
 fi
 
 # set defaults, if nothing given
-[ "${KERNEL}" = "" ] && KERNEL=$(uname -r)
+[ "${KERNEL}" = "" ] && KERNEL="$(uname -r)"
 [ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="2.6.32-lts"
 [ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R3"
 [ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
+
 GRUB2_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga xzio font help lvm usbms usb_keyboard"
 
 # generate temp directories
-CORE=$(mktemp -d /tmp/core.XXX)
-CORE64=$(mktemp -d /tmp/core64.XXX)
-CORE_LTS=$(mktemp -d /tmp/core-lts.XXX)
-CORE64_LTS=$(mktemp -d /tmp/core64-lts.XXX)
-ALLINONE=$(mktemp -d /tmp/allinone.XXX)
-grub2_efi_mp=$(mktemp -d /tmp/grub2_efi_mp.XXX)
-memdisk_64_dir=$(mktemp -d /tmp/grub2_efi_64_dir.XXX)
-memdisk_32_dir=$(mktemp -d /tmp/grub2_efi_32_dir.XXX)
+CORE="$(mktemp -d /tmp/core.XXX)"
+CORE64="$(mktemp -d /tmp/core64.XXX)"
+CORE_LTS="$(mktemp -d /tmp/core-lts.XXX)"
+CORE64_LTS="$(mktemp -d /tmp/core64-lts.XXX)"
+PACKAGES_TEMP_DIR="$(mktemp -d /tmp/pkgs_temp.XXX)"
+ALLINONE="$(mktemp -d /tmp/allinone.XXX)"
+grub2_efi_mp="$(mktemp -d /tmp/grub2_efi_mp.XXX)"
+memdisk_64_dir="$(mktemp -d /tmp/grub2_efi_64_dir.XXX)"
+memdisk_32_dir="$(mktemp -d /tmp/grub2_efi_32_dir.XXX)"
 
 # generate temp files
-memdisk_64_img=$(mktemp /tmp/grub2_efi_64_img.XXX)
-memdisk_32_img=$(mktemp /tmp/grub2_efi_32_img.XXX)
+memdisk_64_img="$(mktemp /tmp/grub2_efi_64_img.XXX)"
+memdisk_32_img="$(mktemp /tmp/grub2_efi_32_img.XXX)"
 
 # create directories
-mkdir ${ALLINONE}/arch
-mkdir -p ${ALLINONE}/boot/syslinux
-mkdir -p ${ALLINONE}/efi/grub2
-mkdir -p ${ALLINONE}/efi/boot
-mkdir -p ${memdisk_64_dir}/efi/grub2
-mkdir -p ${memdisk_32_dir}/efi/grub2
+mkdir "${ALLINONE}/arch"
+mkdir -p "${ALLINONE}/boot/syslinux"
+mkdir -p "${ALLINONE}/efi/grub2"
+mkdir -p "${ALLINONE}/efi/boot"
+mkdir -p "${memdisk_64_dir}/efi/grub2"
+mkdir -p "${memdisk_32_dir}/efi/grub2"
 
 # Create a blank image to be converted to ESP IMG
-dd if=/dev/zero of=${ALLINONE}/efi/grub2/grub2_efi.bin bs=1024 count=3072
+dd if=/dev/zero of="${ALLINONE}/efi/grub2/grub2_efi.bin" bs=1024 count=3072
 
 # Create a FAT12 FS with Volume label "grub2_efi"
-mkfs.vfat -F12 -S 512 -n "grub2_efi" ${ALLINONE}/efi/grub2/grub2_efi.bin
+mkfs.vfat -F12 -S 512 -n "grub2_efi" "${ALLINONE}/efi/grub2/grub2_efi.bin"
 
 ## Mount the ${ALLINONE}/efi/grub2/grub2_efi.bin image at ${grub2_efi_mp} as loop 
-modprobe loop        
-LOOP_DEVICE=$(losetup --show --find ${ALLINONE}/efi/grub2/grub2_efi.bin)        
-mount -o rw,users -t vfat ${LOOP_DEVICE} ${grub2_efi_mp}
+modprobe -q loop
+LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_efi.bin")"
+mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_efi_mp}"
 
-mkdir -p ${grub2_efi_mp}/efi/boot
+mkdir -p "${grub2_efi_mp}/efi/boot/"
 
 # extract tarballs
-tar xvf core-i686.tar -C ${CORE} || exit 1
-tar xvf core-x86_64.tar -C ${CORE64} || exit 1
-tar xvf core-lts-x86_64.tar -C ${CORE64_LTS} || exit 1
-tar xvf core-lts-i686.tar -C ${CORE_LTS} || exit 1
+tar xvf core-i686.tar -C "${CORE}" || exit 1
+tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
+tar xvf core-lts-x86_64.tar -C "${CORE64_LTS}" || exit 1
+tar xvf core-lts-i686.tar -C "${CORE_LTS}" || exit 1
 
-# move in packages
-mv ${CORE_LTS}/tmp/*/core-i686 ${ALLINONE}/
-mv ${CORE64_LTS}/tmp/*/core-x86_64 ${ALLINONE}/
-mv ${CORE_LTS}/tmp/*/core-any ${ALLINONE}/
+# move in i686 packages
+cp -r "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
+rm -rf "${CORE_LTS}/tmp"/*/core-i686
+mksquashfs "${PACKAGES_TEMP_DIR}"/core-i686/ "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" -comp gzip -all-root
+
+# move in x86_64 packages
+cp -r "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
+rm -rf "${CORE64_LTS}/tmp"/*/core-x86_64
+mksquashfs "${PACKAGES_TEMP_DIR}"/core-x86_64/ "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp gzip -all-root
+
+# move in 'any' packages
+cp -r "${CORE_LTS}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
+rm -rf "${CORE_LTS}/tmp"/*/core-any
+mksquashfs "${PACKAGES_TEMP_DIR}"/core-any/ "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp gzip -all-root
+
+cd "${WD}/"
+
+mkdir -p "${ALLINONE}/packages/"
+mv "${PACKAGES_TEMP_DIR}"/archboot_packages_{i686,x86_64,any}.squashfs "${ALLINONE}/packages/"
 
 # move in doc
-mv ${CORE}/tmp/*/arch/archboot.txt ${ALLINONE}/arch/
+mkdir -p "${ALLINONE}/arch/"
+mv "${CORE}/tmp"/*/arch/archboot.txt "${ALLINONE}/arch/"
 
 # copy in clamav db files
 if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
-    mkdir ${ALLINONE}/clamav
+    mkdir -p "${ALLINONE}/clamav"
     rm -f /var/lib/clamav/*
     freshclam --user=root
-    cp /var/lib/clamav/daily.cvd ${ALLINONE}/clamav/
-    cp /var/lib/clamav/main.cvd ${ALLINONE}/clamav/
-    cp /var/lib/clamav/bytecode.cvd ${ALLINONE}/clamav/
-    cp /var/lib/clamav/mirrors.dat ${ALLINONE}/clamav/
+    cp /var/lib/clamav/{daily,main,bytecode}.cvd "${ALLINONE}/clamav/"
+    cp /var/lib/clamav/mirrors.dat "${ALLINONE}/clamav/"
 fi
 
 # place kernels and memtest
-mv ${CORE}/tmp/*/boot/vmlinuz ${ALLINONE}/boot
-mv ${CORE64}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vm64
-mv ${CORE_LTS}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vmlts
-mv ${CORE64_LTS}/tmp/*/boot/vmlinuz ${ALLINONE}/boot/vm64lts
-mv ${CORE}/tmp/*/boot/memtest ${ALLINONE}/boot/
+mv "${CORE}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz"
+mv "${CORE64}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vm64"
+mv "${CORE_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlts"
+mv "${CORE64_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vm64lts"
+mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
 
 # place initrd files
-mv ${CORE}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd.img
-mv ${CORE_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrdlts.img
-mv ${CORE64}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64.img
-mv ${CORE64_LTS}/tmp/*/boot/initrd.img ${ALLINONE}/boot/initrd64lts.img
+mv "${CORE}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd.img"
+mv "${CORE_LTS}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrdlts.img"
+mv "${CORE64}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd64.img"
+mv "${CORE64_LTS}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd64lts.img"
 
 # place syslinux files
-mv ${CORE}/tmp/*/boot/syslinux/* ${ALLINONE}/boot/syslinux/
+mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
 
 # place grub2 files
-cp -r /usr/lib/grub/x86_64-efi ${ALLINONE}/efi/grub2/x86_64-efi
-cp -r /usr/lib/grub/i386-efi ${ALLINONE}/efi/grub2/i386-efi
+cp -r /usr/lib/grub/x86_64-efi "${ALLINONE}/efi/grub2/x86_64-efi"
+cp -r /usr/lib/grub/i386-efi "${ALLINONE}/efi/grub2/i386-efi"
 
-cp /usr/share/grub/{unicode,ascii}.pf2 ${ALLINONE}/efi/grub2/
+cp /usr/share/grub/{unicode,ascii}.pf2 "${ALLINONE}/efi/grub2/"
 
-# those files are not yet included in grub2 packages!
-# cp -r ${ALLINONE}/efi/grub2/x86_64-efi/locale ${ALLINONE}/efi/grub2/locale || true
-# rm -rf ${ALLINONE}/efi/grub2/{x86_64,i386}-efi/locale/ || true
+mkdir -p "${ALLINONE}/efi/grub2/locale/"
+
+## Taken from /sbin/grub-install
+for dir in "/usr/share/locale"/*
+do
+    if test -f "${dir}/LC_MESSAGES/grub.mo"
+    then
+        # cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/efi/grub2/locale/${dir##*/}.mo"
+        echo
+    fi
+done
 
 ## Create memdisk for bootx64.efi
-cat << EOF > ${memdisk_64_dir}/efi/grub2/grub.cfg
+cat << EOF > "${memdisk_64_dir}/efi/grub2/grub.cfg"
 set _EFI_ARCH="x86_64"
 
 search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
@@ -166,15 +194,15 @@ set prefix=(\${efi64})/efi/grub2/x86_64-efi
 source \${prefix}/grub.cfg
 EOF
 
-cat << EOF > ${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg
+cat << EOF > "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg"
 search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
 source (\${efi64})/efi/grub2/grub.cfg
 EOF
 
-tar -C ${memdisk_64_dir} -cf - efi > ${memdisk_64_img}
+tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
 
 ## Create memdisk for bootia32.efi
-cat << EOF > ${memdisk_32_dir}/efi/grub2/grub.cfg
+cat << EOF > "${memdisk_32_dir}/efi/grub2/grub.cfg"
 set _EFI_ARCH="i386"
 
 search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
@@ -182,26 +210,27 @@ set prefix=(\${efi32})/efi/grub2/i386-efi
 source \${prefix}/grub.cfg
 EOF
  
-cat << EOF > ${ALLINONE}/efi/grub2/i386-efi/grub.cfg
+cat << EOF > "${ALLINONE}/efi/grub2/i386-efi/grub.cfg"
 search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
 source (\${efi32})/efi/grub2/grub.cfg
 EOF
 
-tar -C ${memdisk_32_dir} -cf - efi > ${memdisk_32_img}
+tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
 
 /bin/grub-mkimage --directory=/usr/lib/grub/x86_64-efi --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --format=x86_64-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootx64.efi" ${GRUB2_MODULES}
 
 /bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootia32.efi" ${GRUB2_MODULES}
 
 # umount images and loop
-umount ${grub2_efi_mp}
-losetup --detach ${LOOP_DEVICE}
+umount "${grub2_efi_mp}"
+losetup --detach "${LOOP_DEVICE}"
 
 ## Copy the actual grub2 config file
-cat << EOF > ${ALLINONE}/efi/grub2/grub.cfg
+cat << EOF > "${ALLINONE}/efi/grub2/grub.cfg"
 search --file --no-floppy --set=archboot /arch/archboot.txt
 
 set pager=1
+set locale_dir=(\${archboot})/efi/grub2/locale
 
 insmod efi_gop
 insmod efi_uga
@@ -256,7 +285,7 @@ initrd /boot/initrd64lts.img
 EOF
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
 ## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE hybrid ISO ..."
@@ -271,35 +300,36 @@ xorriso -as mkisofs \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
-        -output ${IMAGENAME}.iso ${ALLINONE}/ > /dev/null 2>&1
+        -output "${IMAGENAME}.iso" "${ALLINONE}/" > /dev/null 2>&1
 
 # generate hybrid file
 #echo "Generating ALLINONE hybrid ..."
-#cp ${IMAGENAME}.iso ${IMAGENAME}-hybrid.iso
-#isohybrid ${IMAGENAME}-hybrid.iso
+#cp "${IMAGENAME}.iso" "${IMAGENAME}-hybrid.iso"
+#isohybrid "${IMAGENAME}-hybrid.iso"
 
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."
-rm ${ALLINONE}/boot/syslinux/isolinux.bin
+rm -f "${ALLINONE}/boot/syslinux/isolinux.bin"
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" ${ALLINONE}/boot/syslinux/boot.msg
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
-/usr/bin/archboot-usbimage-helper.sh ${ALLINONE} ${IMAGENAME}.img > /dev/null 2>&1
+/usr/bin/archboot-usbimage-helper.sh "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 #create md5sums.txt
 [ -e md5sum.txt ] && rm -f md5sum.txt
-for i in ${IMAGENAME}.iso ${IMAGENAME}.img; do
-	md5sum $i >> md5sum.txt
+for i in "${IMAGENAME}.iso" "${IMAGENAME}.img"; do
+	md5sum "${i}" >> md5sum.txt
 done
 
 # cleanup
-rm -rf ${memdisk_64_dir}
-rm -rf ${memdisk_32_dir}
-rm -rf ${grub2_efi_mp}
-rm ${memdisk_64_img}
-rm ${memdisk_32_img}
-rm -r ${CORE}
-rm -r ${CORE64}
-rm -r ${CORE_LTS}
-rm -r ${CORE64_LTS}
-rm -r ${ALLINONE}
+rm -rf "${memdisk_64_dir}"
+rm -rf "${memdisk_32_dir}"
+rm -rf "${grub2_efi_mp}"
+rm -f "${memdisk_64_img}"
+rm -f "${memdisk_32_img}"
+rm -rf "${CORE}"
+rm -rf "${CORE64}"
+rm -rf "${CORE_LTS}"
+rm -rf "${CORE64_LTS}"
+rm -rf "${PACKAGES_TEMP_DIR}"
+rm -rf "${ALLINONE}"

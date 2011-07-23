@@ -22,7 +22,7 @@ PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogr
 DLPROG="wget"
 # sources
 SYNC_URL=""
-FILE_URL="file:///src/core-$(uname -m)/pkg"
+FILE_URL="file:///packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 PACKAGES=""
 
@@ -242,10 +242,28 @@ activate_special_devices()
     done
 }
 
+_mount_packages_squashfs_images() {
+    
+    umount "/packages/core-$(uname -m)"
+    umount "/packages/core-any"
+    rm -rf "/packages/core-$(uname -m)"
+    rm -rf "/packages/core-any"
+    
+    mkdir -p "/packages/core-$(uname -m)"
+    mkdir -p "/packages/core-any"
+    
+    modprobe -q loop
+    modprobe -q squashfs
+    mount -o ro,loop -t squashfs "/src/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
+    mount -o ro,loop -t squashfs "/src/packages/archboot_packages_any.squashfs" "/packages/core-any"
+    
+}
+
 # Check media on install packages
 check_media() {
     ! [[ "$(cat /proc/mounts | grep /dev/${dev})" ]] && mount /dev/${dev} ${media} >/dev/null 2>&1
-    if [[ -d ${media}/core-$(uname -m)/pkg && -d ${media}/core-any/pkg ]]; then
+    if [[ -e "${media}/packages/archboot_packages_$(uname -m).squashfs" && -e "${media}/packages/archboot_packages_any.squashfs" ]]; then
+       _mount_packages_squashfs_images
         SET_MEDIA=1
         break
     else
@@ -298,14 +316,14 @@ get_media() {
 #check on manual mounted source
 manual_media() {
     if [[ "${SET_MEDIA}" = "0" ]]; then
-        DIALOG --msgbox "No source media was autodetected, please switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages are available under /src/core-$(uname -m)/pkg.\n\n" 15 55
+        DIALOG --msgbox "No source media was autodetected, please switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages tar archive is available at /src/packages/archboot_packages_$(uname -m).tar .\n\n" 15 55
     fi
-    if [[ ! -d /src/core-$(uname -m)/pkg ]]; then
-        DIALOG --msgbox "Package directory /src/core-$(uname -m)/pkg is missing!" 0 0
+    if [[ ! -e "/src/packages/archboot_packages_$(uname -m).squashfs" ]]; then
+        DIALOG --msgbox "$(uname -m) packages squashfs image /src/packages/archboot_packages_$(uname -m).squashfs is missing!" 0 0
         return 1
     fi
-    if [[ ! -d /src/core-any/pkg ]]; then
-        DIALOG --msgbox "Package directory /src/core-any/pkg is missing!" 0 0
+    if [[ ! -e "/src/packages/archboot_packages_any.squashfs" ]]; then
+        DIALOG --msgbox "'any' packages squashfs image /src/packages/archboot_packages_any.squashfs is missing!" 0 0
         return 1
     fi
 }
@@ -2690,8 +2708,8 @@ pacman_conf() {
 [options]
 Architecture = auto
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-CacheDir = /src/core-$(uname -m)/pkg
-CacheDir = /src/core-any/pkg
+CacheDir = /packages/core-$(uname -m)/pkg
+CacheDir = /packages/core-any/pkg
 
 [core]
 Server = ${serverurl}
@@ -2777,7 +2795,7 @@ select_packages() {
     # Archboot setup media Mode uses packages.txt!
     if [[ "${MODE}" = "media" ]]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
-        PKGS="/src/core-$(uname -m)/pkg/packages.txt"
+        PKGS="/packages/core-$(uname -m)/pkg/packages.txt"
         if ! [[ -s /tmp/.pkgcategory ]]; then
             CHKLIST="base ^ ON"
             for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v base ); do
@@ -3783,6 +3801,7 @@ insmod linux
 insmod chain
 
 set pager=1
+set locale_dir=\${prefix}/efi/grub2/locale
 
 EOF
     
@@ -4053,12 +4072,12 @@ dogrub2_efibootmgr() {
     
     EFIBOOTMGR="efibootmgr"
     
-    if [[ -d ${DESTDIR}/sys/firmware/efi/vars ]]
+    if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]
     then
         # Delete old entries of grub2 - needs to run within chroot - command to be checked
         for bootnum in $(${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
         do
-            ${EFIBOOTMGR} --bootnum "${bootnum}" --delete-bootnum
+            "${EFIBOOTMGR}" --bootnum "${bootnum}" --delete-bootnum
         done
         
         DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
@@ -4067,7 +4086,7 @@ dogrub2_efibootmgr() {
         
         [[ "${EFISYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
-    ${EFIBOOTMGR} --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+    "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
     
     chroot_umount
