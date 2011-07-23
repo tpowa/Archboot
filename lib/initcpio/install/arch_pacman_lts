@@ -11,7 +11,7 @@ DEPENDS="initscripts wget bash coreutils cryptsetup dialog \
 e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm module-init-tools nano \
 ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
 syslog-ng sysvinit tar util-linux which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
-inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links tcp_wrappers \
+inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links \
 dosfstools udev initscripts filesystem kernel26 glibc linux-api-headers xinetd links pacman \
 pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib elfutils gpm sysfsutils libgcrypt \
 libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo iptables capi4k-utils ntfs-3g \
