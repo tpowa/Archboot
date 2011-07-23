@@ -3361,9 +3361,9 @@ EOF
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX ${subdir}/${VMLINUZ}" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${KERNELPKG}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
     echo "label fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
@@ -3486,9 +3486,9 @@ dolilo() {
     # Try to auto-configure LILO...
     if ! [[ "${PART_ROOT}" = "" ]]; then
         if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
         else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}\"|g" ${DESTDIR}/etc/lilo.conf
+            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/${VMLINUZ}|g" ${DESTDIR}/etc/lilo.conf
         sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/${KERNELPKG}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
