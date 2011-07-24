@@ -1,6 +1,6 @@
-#! /bin/bash
+#!/bin/bash
 # Script for updating existing /arch/setup script in the initramfs files of archboot.
-# Previously the script for creating grub2 efi bootable isos - moved to all-in-one script
+# Previously the script for creating grub2 uefi bootable isos - moved to all-in-one script
 # Contributed by "Keshav P R" <skodabenz aatt rocketmail ddoott ccoomm>
 
 export archboot_ver="2011.06-1"
@@ -9,9 +9,9 @@ export wd="${PWD}/"
 export archboot_ext="$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)"
 export iso_name="archboot_${archboot_ver}_mod"
 
-export GRUB2_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga xzio font help lvm usbms usb_keyboard"
+export GRUB2_UEFI_APP_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga xzio font help lvm usbms usb_keyboard"
 
-export REPLACE_GRUB2_EFI="1"
+export REPLACE_GRUB2_UEFI="1"
 export REPLACE_SETUP="1"
 
 echo
@@ -26,7 +26,7 @@ set -x
 
 ## Remove old files and dir
 rm -rf "${archboot_ext}/" || true
-rm -rf "${wd}/${iso_name}.iso" || true
+rm -f "${wd}/${iso_name}.iso" || true
 echo
 
 ## Create a dir to extract the archboot iso
@@ -45,13 +45,13 @@ echo
 [ -e "${wd}/splash.png" ] && cp "${wd}/splash.png" "${archboot_ext}/boot/splash.png"
 echo
 
-replace_grub2_efi_x86_64_iso_files() {
+replace_grub2_uefi_x86_64_iso_files() {
 	
-	memdisk_64_dir="$(mktemp -d /tmp/grub2_efi_64_dir.XXX)"
-	memdisk_64_img="$(mktemp /tmp/grub2_efi_64_img.XXX)"
+	memdisk_64_dir="$(mktemp -d /tmp/grub2_uefi_64_dir.XXX)"
+	memdisk_64_img="$(mktemp /tmp/grub2_uefi_64_img.XXX)"
 	
-	rm -rf "${grub2_efi_mp}/efi/boot/bootx64.efi" || true
-	rm -rf "${archboot_ext}/efi/boot/bootx64.efi" || true
+	rm -f "${grub2_uefi_mp}/efi/boot/bootx64.efi" || true
+	rm -f "${archboot_ext}/efi/boot/bootx64.efi" || true
 	
 	rm -rf "${archboot_ext}/efi/grub2/x86_64-efi" || true
 	cp -r /usr/lib/grub/x86_64-efi "${archboot_ext}/efi/grub2/x86_64-efi"
@@ -59,7 +59,7 @@ replace_grub2_efi_x86_64_iso_files() {
 	mkdir -p "${memdisk_64_dir}/efi/grub2/"
 	
 	cat << EOF > "${memdisk_64_dir}/efi/grub2/grub.cfg"
-set _EFI_ARCH="x86_64"
+set _UEFI_ARCH="x86_64"
 
 search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
 set prefix=(\${efi64})/efi/grub2/x86_64-efi
@@ -73,20 +73,23 @@ EOF
 	
 	tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
 	
-	/bin/grub-mkimage --directory=/usr/lib/grub/x86_64-efi --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --output="${grub2_efi_mp}/efi/boot/bootx64.efi" --format=x86_64-efi ${GRUB2_MODULES}
+	"$(which grub-mkimage)" --directory="/usr/lib/grub/x86_64-efi" --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" --format=x86_64-efi ${GRUB2_UEFI_APP_MODULES}
+	
+	mkdir -p "${ALLINONE}/efi/boot/"
+	cp "${grub2_uefi_mp}/efi/boot/bootx64.efi" "${archboot_ext}/efi/boot/bootx64.efi"
 	
 	unset memdisk_64_dir
 	unset memdisk_64_img
 	echo
 }
 
-replace_grub2_efi_i386_iso_files() {
+replace_grub2_uefi_i386_iso_files() {
 	
-	memdisk_32_dir="$(mktemp -d /tmp/grub2_efi_32_dir.XXX)"
-	memdisk_32_img="$(mktemp /tmp/grub2_efi_32_img.XXX)"
+	memdisk_32_dir="$(mktemp -d /tmp/grub2_uefi_32_dir.XXX)"
+	memdisk_32_img="$(mktemp /tmp/grub2_uefi_32_img.XXX)"
 	
-	rm -rf "${grub2_efi_mp}/efi/boot/bootia32.efi" || true
-	rm -rf "${archboot_ext}/efi/boot/bootia32.efi" || true
+	rm -f "${grub2_uefi_mp}/efi/boot/bootia32.efi" || true
+	rm -f "${archboot_ext}/efi/boot/bootia32.efi" || true
 	
 	rm -rf "${archboot_ext}/efi/grub2/i386-efi" || true
 	cp -r /usr/lib/grub/i386-efi "${archboot_ext}/efi/grub2/i386-efi"
@@ -94,7 +97,7 @@ replace_grub2_efi_i386_iso_files() {
 	mkdir -p "${memdisk_32_dir}/efi/grub2/"
 	
 	cat << EOF > "${memdisk_32_dir}/efi/grub2/grub.cfg"
-set _EFI_ARCH="i386"
+set _UEFI_ARCH="i386"
 
 search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
 set prefix=(\${efi32})/efi/grub2/i386-efi
@@ -108,7 +111,7 @@ EOF
 	
 	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
 	
-	/bin/grub-mkimage --directory=/usr/lib/grub/i386-efi --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_efi_mp}/efi/boot/bootia32.efi" ${GRUB2_MODULES}
+	"$(which grub-mkimage)" --directory="/usr/lib/grub/i386-efi" --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_uefi_mp}/efi/boot/bootia32.efi" ${GRUB2_UEFI_APP_MODULES}
 	
 	unset memdisk_32_dir
 	unset memdisk_32_img
@@ -116,26 +119,26 @@ EOF
 	
 }
 
-replace_grub2_efi_iso_files() {
+replace_grub2_uefi_iso_files() {
 	
-	grub2_efi_mp="$(mktemp -d /tmp/grub2_efi_mp.XXX)"
+	grub2_uefi_mp="$(mktemp -d /tmp/grub2_uefi_mp.XXX)"
 	
-	modprobe loop
-	LOOP_DEVICE="$(losetup --show --find ${archboot_ext}/efi/grub2/grub2_efi.bin)"
-	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_efi_mp}"
+	modprobe -q loop
+	LOOP_DEVICE="$(losetup --show --find ${archboot_ext}/efi/grub2/grub2_uefi.bin)"
+	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
 	echo
 	
-	replace_grub2_efi_x86_64_iso_files
+	replace_grub2_uefi_x86_64_iso_files
 	echo
-	# replace_grub2_efi_i386_iso_files
+	# replace_grub2_uefi_i386_iso_files
 	echo
 	
 	# umount images and loop
-	umount "${grub2_efi_mp}"
+	umount "${grub2_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	
-	rm -rf "${archboot_ext}/efi/boot/grub.cfg" || true
-	rm -rf "${archboot_ext}/efi/grub2/grub.cfg"
+	rm -f "${archboot_ext}/efi/boot/grub.cfg" || true
+	rm -f "${archboot_ext}/efi/grub2/grub.cfg"
 	
 	cat << EOF > "${archboot_ext}/efi/grub2/grub.cfg"
 search --file --no-floppy --set=archboot /arch/archboot.txt
@@ -166,7 +169,7 @@ insmod udf
 insmod search_fs_file
 insmod linux
 
-set _kernel_params="add_efi_memmap none=EFI_ARCH_\${_EFI_ARCH}"
+set _kernel_params="add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
 
 menuentry "Arch Linux (i686) archboot" {
 set root=(\${archboot})
@@ -194,7 +197,7 @@ initrd /boot/initrd64lts.img
 
 EOF
 	
-	unset grub2_efi_mp
+	unset grub2_uefi_mp
 	unset LOOP_DEVICE
 	
 }
@@ -226,7 +229,7 @@ replace_arch_setup_initramfs() {
 	
 	cd "${wd}/"
 	
-	rm -rf "${archboot_ext}/boot/${initramfs_name}.img"
+	rm -f "${archboot_ext}/boot/${initramfs_name}.img"
 	echo
 	
 	cp "${wd}/${initramfs_name}.img" "${archboot_ext}/boot/${initramfs_name}.img"
@@ -262,7 +265,7 @@ download_pkgs() {
 	
 }
 
-[ "${REPLACE_GRUB2_EFI}" = "1" ] && replace_grub2_efi_iso_files
+[ "${REPLACE_GRUB2_UEFI}" = "1" ] && replace_grub2_uefi_iso_files
 
 if [ "${REPLACE_SETUP}" = "1" ]
 then
@@ -307,7 +310,7 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -eltorito-alt-boot --efi-boot efi/grub2/grub2_efi.bin -no-emul-boot \
+        -eltorito-alt-boot --efi-boot efi/grub2/grub2_uefi.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${wd}/${iso_name}.iso" "${archboot_ext}/" > /dev/null 2>&1
 echo
@@ -318,6 +321,6 @@ unset archboot_ver
 unset wd
 unset archboot_ext
 unset iso_name
-unset GRUB2_MODULES
-unset REPLACE_GRUB2_EFI
+unset GRUB2_UEFI_APP_MODULES
+unset REPLACE_GRUB2_UEFI
 unset REPLACE_SETUP

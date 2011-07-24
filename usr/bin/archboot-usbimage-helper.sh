@@ -20,17 +20,19 @@
 
 # usage(exitvalue)
 # outputs a usage message and exits with value
-APPNAME=$(basename "${0}")
-usage()
+
+APPNAME="$(basename "${0}")"
+
+_usage()
 {
     echo "usage: ${APPNAME} <imageroot> <imagefile>"
-    exit $1
+    exit ${1}
 }
 
 ##################################################
 
 if [ $# -ne 2 ]; then
-    usage 1
+    _usage 1
 fi
 
 DISKIMG="${2}"
@@ -52,19 +54,27 @@ mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 
 # mount the filesystem and copy data
 modprobe loop
-LOOP_DEVICE=$(losetup --show --find ${FSIMG})
+LOOP_DEVICE="$(losetup --show --find "${FSIMG}")"
 mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
 
-LOOP_DEVICE2=$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")
-mount -o ro,users -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
-cp "${TMPDIR2}"/boot{x64,ia32}.efi "${IMGROOT}"/efi/boot/
+if [ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]
+then
+	
+	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")"
+	mount -o ro,users -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
+	cp "${TMPDIR2}/bootx64.efi" "${IMGROOT}/efi/boot/bootx64.efi"
+	
+	umount "${TMPDIR2}"
+	losetup --detach "${LOOP_DEVICE2}"
+	
+	rm -rf "${TMPDIR2}"
+	
+}
 
 cp -r "${IMGROOT}"/* "${TMPDIR}"
 
 # unmount filesystem
-umount "${TMPDIR2}"
 umount "${TMPDIR}"
-losetup --detach "${LOOP_DEVICE2}"
 losetup --detach "${LOOP_DEVICE}"
 
 cat "${FSIMG}" > "${DISKIMG}"
@@ -73,4 +83,5 @@ cat "${FSIMG}" > "${DISKIMG}"
 syslinux "${DISKIMG}"
 
 # all done :)
-rm -rf "${TMPDIR2}" "${TMPDIR}" "${FSIMG}"
+rm -rf "${TMPDIR}"
+rm -f "${FSIMG}"

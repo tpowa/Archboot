@@ -1905,7 +1905,7 @@ parted_gpt() {
     fi
     
     if [[ "${GUID_DETECTED}" = "1" ]]; then
-        if [[ "${EFI_x86_64}" = "1" ]] || [[ "${EFI_i386}" = "1" ]]; then
+        if [[ "${UEFI_x86_64}" = "1" ]] || [[ "${UEFI_i386}" = "1" ]]; then
             if ! [[ "$(parted -s ${DISC} print | grep 'boot')" ]]; then
             DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on ${DISC}.\nDo you want to create an EFISYS partition on ${DISC}?" 0 0 && CREATE_EFISYS=1
             fi
@@ -3730,7 +3730,7 @@ dogrub2_common_before() {
     #   grub2 restriction due to messy dmraid mapping
     # - Encryption is not supported by grub2 yet!
     # - raid with no supperblock 0.90 is not supported by grub2 yet!
-    if [[ -f ${DESTDIR}/boot/grub/menu.lst ]]; then
+    if [[ -f "${DESTDIR}/boot/grub/menu.lst" ]]; then
         DIALOG --msgbox "Found ${DESTDIR}/boot/grub/menu.lst, deinstalling grub now ..." 0 0
         ${PACMAN} -R grub > ${LOG}
     fi
@@ -3772,9 +3772,9 @@ dogrub2_config() {
     subdir='/boot'
     [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
     
-    cp ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg /tmp/.grub.cfg
+    cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     rm -f /tmp/.grub.cfg
     
     NUMBER=0
@@ -3782,7 +3782,7 @@ dogrub2_config() {
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
-    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 insmod part_gpt
 insmod part_msdos
@@ -3801,17 +3801,17 @@ insmod linux
 insmod chain
 
 set pager=1
-set locale_dir=\${prefix}/efi/grub2/locale
+set locale_dir=\${prefix}/locale
 
 EOF
     
-    [[ "${USE_RAID}" = "1" ]] && echo "insmod raid" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    [[ "${USE_RAID}" = "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     ## For UEFI systems, no kernel boot messages are displayed if framebuffer is not initialized in grub2. So initialize it.
     if [[ "${GRUB2_EFI}" = "1" ]]; then
         
-        cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+        cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 insmod efi_gop
 insmod efi_uga
@@ -3829,9 +3829,9 @@ EOF
     
     fi
     
-    echo "" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    sort /tmp/.device-names >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
-    echo "" >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    sort /tmp/.device-names >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]
     then
@@ -3867,7 +3867,7 @@ EOF
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
-    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
@@ -3881,7 +3881,7 @@ EOF
     NUMBER=$((${NUMBER}+1))
     
     ## create kernel fallback entry
-    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 # (${NUMBER}) Arch Linux Fallback
 menuentry "Arch Linux Fallback" {
@@ -3896,13 +3896,31 @@ EOF
     
     ## TODO: Detect actual Windows installation if any
     ## create example file for windows
-    cat << EOF >> ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
-## (${NUMBER}) Windows
-#menuentry \"Windows\" {
+## (${NUMBER}) Windows BIOS
+## Will work only in grub2 bios
+#menuentry \"Windows in BIOS systems\" {
+#    insmod part_msdos
 #    insmod ntfs
+#    insmod fat
 #    search --file --no-floppy --set=root /bootmgr
 #    chainloader (${root})+1
+#}
+
+EOF
+    
+    NUMBER=$((${NUMBER}+1))
+    
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+
+## (${NUMBER}) Windows x86_64 UEFI
+## Will work only in grub2 (u)efi x86_64
+#menuentry \"Windows in x86_64 UEFI systems\" {
+#    insmod part_gpt
+#    insmod fat
+#    search --file --no-floppy --set=root /efi/microsoft/boot/bootmgfw.efi
+#    chainloader (${root})/efi/microsoft/boot/bootmgfw.efi
 #}
 
 EOF
@@ -3936,9 +3954,9 @@ dogrub2_common_after() {
     # Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
     geteditor  || return 1
-    ${EDITOR} ${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg
+    "${EDITOR}" "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
-    cp ${DESTDIR}/usr/share/grub/{unicode.pf2,ascii.pf2} ${DESTDIR}/${GRUB2_PREFIX_DIR}/
+    cp "${DESTDIR}/usr/share/grub"/{unicode.pf2,ascii.pf2} "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
     
     GRUB2_BIOS=""
     GRUB2_EFI=""
@@ -3949,7 +3967,7 @@ dogrub2_bios() {
     
     dogrub2_common_before
     
-    if [[ ! -f ${DESTDIR}/boot/grub/grub.cfg ]]; then
+    if [[ ! -f "${DESTDIR}/boot/grub/grub.cfg" ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub/grub.cfg, installing grub2-bios now ..." 0 0
         PACKAGES="grub2-bios grub2-common"
         run_pacman
@@ -4049,7 +4067,7 @@ dogrub2_bios() {
     # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
     freeze_xfs
     chroot_mount
-    chroot ${DESTDIR} /sbin/grub_bios-install --boot-directory=/boot --no-floppy --recheck ${bootdev} >> /tmp/grub2.log
+    chroot "${DESTDIR}" /sbin/grub_bios-install --boot-directory=/boot --no-floppy --recheck "${bootdev}" >> /tmp/grub2.log
     chroot_umount
     cat /tmp/grub2.log >${LOG}
     if ! [[ -s /tmp/grub2.log ]] ; then
@@ -4084,9 +4102,9 @@ dogrub2_efibootmgr() {
         
         [[ "${DISC}" = "" ]] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
         
-        [[ "${EFISYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        [[ "${UEFI_SYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
-    "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${EFISYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+    "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
     
     chroot_umount
@@ -4097,8 +4115,8 @@ dogrub2_efi_common() {
     
     dogrub2_common_before
     
-    DIALOG --msgbox "Installing grub2-efi-${EFI_ARCH} now ..." 0 0
-    PACKAGES="grub2-efi-${EFI_ARCH} grub2-common dosfstools efibootmgr"
+    DIALOG --msgbox "Installing grub2-efi-${UEFI_ARCH} now ..." 0 0
+    PACKAGES="grub2-efi-${UEFI_ARCH} grub2-common dosfstools efibootmgr"
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
@@ -4112,39 +4130,33 @@ dogrub2_efi_common() {
     
     parted_gpt
     
-    if [[ -d ${DESTDIR}/boot/efi ]]; then
+    if [[ -d "${DESTDIR}/boot/efi" ]]; then
         EFISYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
     else
-        mkdir -p ${DESTDIR}/boot/efi
+        mkdir -p "${DESTDIR}/boot/efi"
         EFISYS_PART=""
     fi
     
-    if [[ "${EFISYS_PART}" = "" ]]; then
+    if [[ "${UEFI_SYS_PART}" = "" ]]; then
         EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
-        mount -o rw -t vfat ${DISC}${EFISYS_PART_NUM} ${DESTDIR}/boot/efi
+        mount -o rw -t vfat "${DISC}${UEFI_SYS_PART_NUM}" "${DESTDIR}/boot/efi"
     else
-        mount -o rw -t vfat ${EFISYS_PART} ${DESTDIR}/boot/efi
+        mount -o rw -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
     fi
     
     chroot_mount
     
-    chroot ${DESTDIR} /sbin/grub_efi_${EFI_ARCH}-install --boot-directory=/boot/efi/efi --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_efi.log
+    chroot "${DESTDIR}" "/sbin/grub_efi_${UEFI_ARCH}-install" --boot-directory="/boot/efi/efi" --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_efi.log
     
-    chroot ${DESTDIR} /bin/grub-mkimage --directory=/usr/lib/grub/${EFI_ARCH}-efi \
-                                        --format=${EFI_ARCH}-efi \
-                                        --prefix="" \
-                                        --output=/boot/efi/efi/grub/grub_custom.efi \
-                                        --compression=xz \
-                                        --verbose \
-                                        part_gpt part_msdos part_apple \
-                                        fat ext2 reiserfs iso9660 udf hfsplus hfs \
-                                        btrfs nilfs2 xfs ntfs ntfscomp zfs zfsinfo \
-                                        relocator reboot multiboot multiboot2 \
-                                        fshelp xzio gzio memdisk tar lua \
-                                        normal gfxterm chain linux ls cat \
-                                        search search_fs_file search_fs_uuid search_label \
-                                        help loopback boot configfile echo lvm efi_gop efi_uga \
-                                        font png jpeg usbms usb_keyboard > /tmp/grub2_efi_mkimage.log
+    GRUB2_UEFI_APP_MODULES="part_gpt part_msdos part_apple fat ext2 reiserfs iso9660 udf hfsplus hfs btrfs nilfs2 xfs ntfs ntfscomp zfs zfsinfo relocator reboot multiboot multiboot2 fshelp xzio gzio memdisk tar lua normal gfxterm chain linux ls cat search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop efi_uga font png jpeg usbms usb_keyboard"
+    
+    chroot "${DESTDIR}" /bin/grub-mkimage --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
+                                          --format=${UEFI_ARCH}-efi \
+                                          --prefix="" \
+                                          --output="/boot/efi/efi/grub/grub_custom.efi" \
+                                          --compression=xz \
+                                          --verbose \
+                                          ${GRUB2_UEFI_APP_MODULES} > /tmp/grub2_efi_mkimage.log
     
     chroot_umount
     cat /tmp/grub2_efi.log > ${LOG}
@@ -4157,22 +4169,22 @@ dogrub2_efi_common() {
     
     DIALOG --msgbox "GRUB2 UEFI was successfully installed." 0 0
     
-    GRUB2_PREFIX_DIR=/boot/efi/efi/grub/
+    GRUB2_PREFIX_DIR="/boot/efi/efi/grub/"
     GRUB2_EFI="1"
     dogrub2_common_after
     
 }
 
-dogrub2_efi_x86_64() {
+dogrub2_uefi_x86_64() {
     
-    EFI_ARCH="x86_64"
+    UEFI_ARCH="x86_64"
     dogrub2_efi_common
     
 }
 
-dogrub2_efi_i386() {
+dogrub2_uefi_i386() {
     
-    EFI_ARCH="i386"
+    UEFI_ARCH="i386"
     dogrub2_efi_common
     
 }
@@ -4721,24 +4733,24 @@ install_bootloader()
     prepare_pacman
     CANCEL=""
     
-    [[ "$(dmesg | grep 'EFI_ARCH_x86_64')" ]] && EFI_x86_64="1"
-    [[ "$(dmesg | grep 'EFI_ARCH_i386')" ]] && EFI_i386="1"
+    [[ "$(dmesg | grep 'UEFI_ARCH_x86_64')" ]] && UEFI_x86_64="1"
+    [[ "$(dmesg | grep 'UEFI_ARCH_i386')" ]] && UEFI_i386="1"
     
-    [[ "${EFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) (U)EFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_efi_x86_64
-    [[ "${EFI_i386}" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) (U)EFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_efi_i386
+    [[ "${UEFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) UEFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_uefi_x86_64
+    [[ "${UEFI_i386}" = "1" ]] && DIALOG --yesno "Setup detected that you are using i386 (32-bit) UEFI ...\nDo you want to install grub2-efi-i386 as the bootloader?" 0 0 && dogrub2_uefi_i386
     
     DIALOG --menu "Which BIOS/UEFI bootloader would you like to use?" 13 55 7 \
         "EXTLINUX" "EXTLINUX/SYSLINUX" \
         "GRUB2_BIOS" "GRUB2" \
-        "GRUB2_EFI_x86_64" "GRUB2 64-bit UEFI" \
-        "GRUB2_EFI_i386" "GRUB2 32-bit UEFI" \
+        "GRUB2_UEFI_x86_64" "GRUB2 64-bit UEFI" \
+        "GRUB2_UEFI_i386" "GRUB2 32-bit UEFI" \
         "GRUB_LEGACY" "GRUB LEGACY" \
         "LILO" "LILO" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "EXTLINUX") doextlinux ;;
         "GRUB2_BIOS") dogrub2_bios ;;
-        "GRUB2_EFI_x86_64") dogrub2_efi_x86_64 ;;
-        "GRUB2_EFI_i386") dogrub2_efi_i386 ;;
+        "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
+        "GRUB2_UEFI_i386") dogrub2_uefi_i386 ;;
         "GRUB_LEGACY") dogrub ;;
         "LILO") dolilo ;;
     esac
