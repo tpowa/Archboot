@@ -56,7 +56,7 @@ install -m755 /usr/lib/syslinux/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.
 for i in /usr/lib/syslinux/*; do
     [ -f $i ] && install -m644 $i ${TEMPDIR}/${BOOTDIRNAME}/$(basename $i)
 done
-install -m644 /lib/modules/$(uname -r)/modules.pcimap ${TEMPDIR}/${BOOTDIRNAME}/modules.pcimap
+install -m644 /lib/modules/${VERSION}/modules.pcimap ${TEMPDIR}/${BOOTDIRNAME}/modules.pcimap
 install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
 install -m644 $BACKGROUND ${TEMPDIR}/${BOOTDIRNAME}/splash.png
 
