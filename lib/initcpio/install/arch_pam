@@ -10,9 +10,6 @@ build ()
     	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/pam/etc|/etc|g')"
     done
     add_file "/usr/share/archboot/pam/etc/environment" "/etc/environment"
-    for i in $(echo /lib/libpam*); do
-    	add_file "$i"
-    done
     for i in $(echo /lib/security/pam_*.so); do
     	add_file "$i"
     done
