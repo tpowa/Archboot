@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="pptp"
+    BINARIES="/usr/sbin/pptp"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/pptpclient/etc/ppp/options.pptp" "/etc/ppp/options.pptp"

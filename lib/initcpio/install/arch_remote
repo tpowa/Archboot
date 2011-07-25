@@ -4,7 +4,7 @@ build ()
 {
     MODULES=" $(checked_modules "/drivers/net/") "
 
-    BINARIES="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd xinetd telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount sm-notify start-statd slogin screen rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd mountpoint"
+    BINARIES="/usr/bin/findssl.sh /usr/bin/scp /usr/bin/sftp /usr/bin/ssh-add /usr/bin/ssh-agent /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/sbin/sshd /usr/sbin/xinetd /usr/sbin/telnetd /usr/bin/rsync /usr/sbin/exportfs /usr/sbin/nfsstat /usr/sbin/rpc.idmapd /usr/sbin/rpc.mountd /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpcdebug /usr/sbin/showmount /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/slogin /usr/bin/screen /usr/bin/rpcbind /usr/bin/rpcinfo /usr/sbin/gss_clnt_send_err /usr/sbin/gss_destroy_creds /usr/sbin/rpc.gssd /usr/sbin/rpc.svcgssd /bin/mountpoint"
     FILES=""
     SCRIPT="arch_remote"
     add_file "/usr/share/archboot/remote/etc/screenrc" "/etc/screenrc"

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="openvpn"
+    BINARIES="/usr/sbin/openvpn"
     FILES=""
     SCRIPT=""
     add_dir "/etc/openvpn"

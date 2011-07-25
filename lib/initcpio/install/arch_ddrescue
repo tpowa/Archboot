@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="ddrescue"
+    BINARIES="/usr/bin/ddrescue"
     FILES=""
     SCRIPT=""
 }

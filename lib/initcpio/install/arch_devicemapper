@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=" $(checked_modules "md/dm-*") "
-    BINARIES="dmsetup dmeventd"
+    BINARIES="/sbin/dmsetup /sbin/dmeventd"
     FILES=""
     SCRIPT=""
     add_dir "/dev/mapper"

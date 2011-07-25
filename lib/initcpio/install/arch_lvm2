@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="lvm fsadm lvmdump vgcfgbackup vgcfgrestore vgchange vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay lvextend lvmchange lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs lvscan"
+    BINARIES="/sbin/lvm /sbin/fsadm /sbin/lvmdump /sbin/vgcfgbackup /sbin/vgcfgrestore /sbin/vgchange /sbin/vgck /sbin/vgconvert /sbin/vgcreate /sbin/vgdisplay /sbin/vgexport /sbin/vgextend /sbin/vgimport /sbin/vgmerge /sbin/vgmknodes /sbin/vgreduce /sbin/vgremove /sbin/vgrename /sbin/vgs /sbin/vgscan /sbin/vgsplit /sbin/pvchange /sbin/pvck /sbin/pvcreate /sbin/pvdisplay /sbin/pvmove /sbin/pvremove /sbin/pvresize /sbin/pvs /sbin/pvscan /sbin/lvchange /sbin/lvconvert /sbin/lvcreate /sbin/lvdisplay /sbin/lvextend /sbin/lvmchange /sbin/lvmdiskscan /sbin/lvmsadc /sbin/lvmsar /sbin/lvreduce /sbin/lvremove /sbin/lvrename /sbin/lvresize /sbin/lvs /sbin/lvscan"
     FILES=""
     SCRIPT="arch_lvm2"
     add_file "/lib/udev/rules.d/11-dm-lvm.rules"

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=" $(checked_modules "/drivers/atm") $(checked_modules "/drivers/usb/atm") "
-    BINARIES="aread atmdiag atmdump awrite saaldump sonetdiag ttcp_atm atmaddr atmarp atmarpd atmloop atmsigd atmtcp bus enitune esi ilmid lecs les mpcd zeppelin zntune"
+    BINARIES="/usr/bin/aread /usr/bin/atmdiag /usr/bin/atmdump /usr/bin/awrite /usr/bin/saaldump /usr/bin/sonetdiag /usr/bin/ttcp_atm /usr/sbin/atmaddr /usr/sbin/atmarp /usr/sbin/atmarpd /usr/sbin/atmloop /usr/sbin/atmsigd /usr/sbin/atmtcp /usr/sbin/bus /usr/sbin/enitune /usr/sbin/esi /usr/sbin/ilmid /usr/sbin/lecs /usr/sbin/les /usr/sbin/mpcd /usr/sbin/zeppelin /usr/sbin/zntune"
     FILES=""
     SCRIPT=""
     add_dir "/etc/ppp/peers/plugins"

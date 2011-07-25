@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="lsusb"
+    BINARIES="/usr/bin/lsusb"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/hwdata/usb.ids"

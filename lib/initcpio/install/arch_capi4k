@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="capiinfo rcapid capiinit avmcapictrl"
+    BINARIES="/usr/bin/capiinfo /usr/sbin/rcapid /usr/sbin/capiinit /usr/sbin/avmcapictrl"
     FILES=""
     SCRIPT=""
     for i in $(find /usr/lib/pppd ! -type d); do

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="udevadm"
+    BINARIES="/sbin/udevadm"
     SCRIPT="arch_udevtrigger"
 }
 

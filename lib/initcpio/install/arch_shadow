@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd adduser chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv logoutd newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
+    BINARIES="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd /usr/sbin/adduser /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg /usr/sbin/vigr"
     FILES=""
     SCRIPT=""
     for i in $(echo /usr/share/archboot/shadow/etc/*/*); do

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="poff pon chat plog pppd pppdump pppoe-discovery pppstats"
+    BINARIES="/usr/bin/poff /usr/bin/pon /usr/sbin/chat /usr/sbin/plog /usr/sbin/pppd /usr/sbin/pppdump /usr/sbin/pppoe-discovery /usr/sbin/pppstats"
     FILES=""
     SCRIPT=""
     add_full_dir "/usr/lib/pppd"

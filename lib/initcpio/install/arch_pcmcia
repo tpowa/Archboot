@@ -4,7 +4,7 @@ build ()
 {
     MODULES=" $(checked_modules "/pcmcia/" | grep -ve "sound" -e "net") $(checked_modules "/ide/legacy")"
     MODULES=$(echo ${MODULES}) #trim whitespace
-    BINARIES="lspcmcia pccardctl"
+    BINARIES="/sbin/lspcmcia /sbin/pccardctl"
     FILES=""
     SCRIPT=""
     add_binary "/lib/udev/pcmcia-socket-startup"

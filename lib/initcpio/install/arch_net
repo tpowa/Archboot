@@ -8,7 +8,7 @@ build ()
     for i in $STAGING; do
         MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
     done
-    BINARIES="dnsdomainname domainname netstat nisdomainname ypdomainname arp ipmaddr iptunnel mii-tool nameif plipconfig rarp slattach ping ping6 traceroute traceroute6 arping clockdiff rarpd rdisc tftpd tracepath tracepath6 route dig host nslookup nsupdate telnet ssh arpd ctstat genl ifcfg ifstat ip lnstat nstat routef routel rtacct rtmon rtpr rtstat ss tc dhclient ifplugd ifplugstatus"
+    BINARIES="/bin/dnsdomainname /usr/bin/domainname /bin/netstat /usr/bin/nisdomainname /usr/bin/ypdomainname /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp /sbin/slattach /bin/ping /bin/ping6 /bin/traceroute /bin/traceroute6 /usr/sbin/arping /usr/sbin/clockdiff /usr/sbin/rarpd /usr/sbin/rdisc /usr/sbin/tftpd /usr/sbin/tracepath /usr/sbin/tracepath6 /sbin/route /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd /usr/sbin/ctstat /usr/sbin/genl /usr/sbin/ifcfg /usr/sbin/ifstat /usr/sbin/ip /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtacct /usr/sbin/rtmon /usr/sbin/rtpr /usr/sbin/rtstat /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd /usr/sbin/ifplugstatus"
     FILES=""
     SCRIPT=""
     add_file "/sbin/dhcpcd"

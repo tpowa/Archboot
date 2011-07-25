@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="wipe"
+    BINARIES="/usr/bin/wipe"
     FILES=""
     SCRIPT=""
 }

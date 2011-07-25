@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="links"
+    BINARIES="/usr/bin/links"
     FILES=""
     SCRIPT=""
 }

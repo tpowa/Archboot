@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="vmware-detect hwdetect"
+    BINARIES="/usr/bin/vmware-detect /sbin/hwdetect"
     FILES=""
     SCRIPT="arch_hwdetect"
 }

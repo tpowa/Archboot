@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=" $(all_modules "/crypto/" | grep -v "aes.ko" ) cryptoloop"
-    BINARIES="cryptsetup"
+    BINARIES="/sbin/cryptsetup"
     FILES=""
     SCRIPT="arch_encrypt"
     # fix licenses

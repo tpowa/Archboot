@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="grub-bin2h grub-editenv grub-fstest grub-menulst2cfg grub-mkfont grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath grub-mkdevicemap grub-probe grub-setup grub-kbdcomp grub-mkrescue grub-mkconfig grub-mknetdir grub-reboot grub-set-default grub_bios-install grub_efi_i386-install grub_efi_x86_64-install efibootmgr"
+    BINARIES="/bin/grub-bin2h /bin/grub-editenv /bin/grub-fstest /bin/grub-menulst2cfg /bin/grub-mkfont /bin/grub-mkimage /bin/grub-mklayout /bin/grub-mkpasswd-pbkdf2 /bin/grub-mkrelpath /sbin/grub-mkdevicemap /sbin/grub-probe /sbin/grub-setup /bin/grub-kbdcomp /bin/grub-mkrescue /sbin/grub-mkconfig /sbin/grub-mknetdir /sbin/grub-reboot /sbin/grub-set-default /sbin/grub_bios-install /sbin/grub_efi_i386-install /sbin/grub_efi_x86_64-install /usr/sbin/efibootmgr"
     FILES=""
     
     # add config files

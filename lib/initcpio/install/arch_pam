@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="pam_tally unix_chkpwd"
+    BINARIES="/sbin/pam_tally /sbin/unix_chkpwd"
     FILES=""
     SCRIPT=""
     for i in $(echo /usr/share/archboot/pam/etc/*/*); do

@@ -4,7 +4,7 @@ build ()
 {
     MODULES=" $(checked_modules "arch/x86/kernel/cpu/cpufreq")  $(checked_modules "drivers/cpufreq") "
 
-    BINARIES="cpufreq-info cpufreq-set"
+    BINARIES="/usr/bin/cpufreq-info /usr/bin/cpufreq-set"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/cpufreq/etc/conf.d/cpufreq" "/etc/conf.d/cpufreq"

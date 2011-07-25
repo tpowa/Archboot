@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="pcf2vpnc vpnc vpnc-disconnect"
+    BINARIES="/usr/bin/pcf2vpnc /usr/sbin/vpnc /usr/sbin/vpnc-disconnect"
     FILES=""
     SCRIPT=""
     add_file "/etc/rc.d/vpnc"

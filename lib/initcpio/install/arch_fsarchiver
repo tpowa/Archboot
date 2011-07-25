@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="fsarchiver"
+    BINARIES="/usr/sbin/fsarchiver"
     FILES=""
     SCRIPT=""
 }

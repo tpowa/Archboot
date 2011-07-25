@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="hwclock date ntpdate"
+    BINARIES="/sbin/hwclock /bin/date /usr/bin/ntpdate"
     FILES=""
     SCRIPT=""
     for i in $(find /usr/share/zoneinfo ! -type d); do

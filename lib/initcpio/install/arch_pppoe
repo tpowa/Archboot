@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="pppoe pppoe-connect pppoe-relay pppoe-server pppoe-setup pppoe-sniff pppoe-start pppoe-status pppoe-stop"
+    BINARIES="/usr/sbin/pppoe /usr/sbin/pppoe-connect /usr/sbin/pppoe-relay /usr/sbin/pppoe-server /usr/sbin/pppoe-setup /usr/sbin/pppoe-sniff /usr/sbin/pppoe-start /usr/sbin/pppoe-status /usr/sbin/pppoe-stop"
     FILES=""
     SCRIPT=""
     add_full_dir "/usr/lib/rp-pppoe"

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="pacman cleanupdelta makepkg pacman-optimize pkgdelta rankmirrors repo-add repo-remove testdb testpkg vercmp"
+    BINARIES="/usr/bin/pacman /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/repo-remove /usr/bin/testdb /usr/bin/testpkg /usr/bin/vercmp"
     FILES=""
     SCRIPT=""
 

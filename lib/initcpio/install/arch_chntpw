@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="chntpw reged cpnt"
+    BINARIES="/usr/bin/chntpw /usr/bin/reged /usr/bin/cpnt"
     FILES=""
     SCRIPT=""
 }

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="vim"
+    BINARIES="/usr/bin/vim"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/vim/vim73/syntax/syntax.vim"

@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="testdisk photorec"
+    BINARIES="/usr/bin/testdisk /usr/bin/photorec"
     FILES=""
     SCRIPT=""
 }

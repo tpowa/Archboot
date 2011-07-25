@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="kexec"
+    BINARIES="/sbin/kexec"
     FILES=""
     SCRIPT=""
     add_file "/etc/rc.d/kexec"
