@@ -24,13 +24,13 @@ else
 fi
 mount -t tmpfs run /run -o nosuid,noexec,nodev,mode=755,size=10M
 
-echo "modprobe" > /proc/sys/kernel/modprobe
+echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 
 # parse the kernel command line
 parse_cmdline
 
 # if available, start udevd at this stage
-if [ -x udevd ]; then
+if [ -x /sbin/udevd ]; then
     msg ":: Starting udevd..."
     udevd --daemon --resolve-names=never
     udevd_running=1
