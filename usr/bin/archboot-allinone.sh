@@ -237,7 +237,9 @@ _prepare_grub2_uefi_iso_files() {
 	mkfs.vfat -F12 -S 512 -n "grub2_uefi" "${ALLINONE}/efi/grub2/grub2_uefi.bin"
 	
 	## Mount the ${ALLINONE}/efi/grub2/grub2_uefi.bin image at ${grub2_uefi_mp} as loop 
-	modprobe -q loop
+	if ! [ "$(grep ^loop /proc/modules)" ]; then
+		  modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
+	fi
 	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_uefi.bin")"
 	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
 	

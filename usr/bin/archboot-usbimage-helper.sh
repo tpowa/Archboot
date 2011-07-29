@@ -53,7 +53,9 @@ dd if=/dev/zero of="${FSIMG}" bs=512 count="${IMGSZ}"
 mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 
 # mount the filesystem and copy data
-modprobe loop
+if ! [ "$(grep ^loop /proc/modules)" ]; then
+	modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
+fi
 LOOP_DEVICE="$(losetup --show --find "${FSIMG}")"
 mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
 
@@ -68,8 +70,7 @@ then
 	losetup --detach "${LOOP_DEVICE2}"
 	
 	rm -rf "${TMPDIR2}"
-	
-}
+fi
 
 cp -r "${IMGROOT}"/* "${TMPDIR}"
 
