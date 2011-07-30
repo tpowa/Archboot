@@ -10,11 +10,14 @@ DESTDIR="/tmp/install"
 EDITOR=""
 
 # name of the kernel image
-VMLINUZ="vmlinuz26"
+VMLINUZ="vmlinuz-linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
-KERNELPKG="kernel26"
+KERNELPKG="linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
+# name of the initramfs filesystem
+[[ "${KERNELPKG}" = "linux" ]] && INITRAMFS="initramfs-${KERNELPKG}"
+[[ "${KERNELPKG}" = "kernel26-lts" ]] && INITRAMFS="${KERNELPKG}"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -1721,7 +1724,7 @@ autoprepare() {
         [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
         [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
         [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
-        [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
+        [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "linux" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
         [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
@@ -2937,7 +2940,7 @@ select_packages() {
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ kernel26\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ kernel26-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     NEXTITEM="5"
     S_SELECT=1
@@ -3361,9 +3364,9 @@ EOF
     echo "MENU LABEL Arch Linux" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX ${subdir}/${VMLINUZ}" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${INITRAMFS}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=${subdir}/${KERNELPKG}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${INITRAMFS}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
     echo "label fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "TEXT HELP" >> ${TEMPDIR}/${SYSLINUX_CONF}
@@ -3372,9 +3375,9 @@ EOF
     echo "MENU LABEL Arch Linux Fallback" >> ${TEMPDIR}/${SYSLINUX_CONF}
     echo "LINUX ${subdir}/${VMLINUZ}" >> ${TEMPDIR}/${SYSLINUX_CONF}
     if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" || "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]; then
-        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${INITRAMFS}-fallback.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     else
-        echo "append initrd=${subdir}/${KERNELPKG}-fallback.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
+        echo "append initrd=${subdir}/${INITRAMFS}-fallback.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> ${TEMPDIR}/${SYSLINUX_CONF}
     fi
     
     # edit config file
@@ -3491,9 +3494,9 @@ dolilo() {
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/${VMLINUZ}|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/${KERNELPKG}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/${KERNELPKG}.img|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/${KERNELPKG}.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/${INITRAMFS}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
     fi
     sed -i -e '/DEVICE DETAILS/d' ${DESTDIR}/etc/lilo.conf
     sort /tmp/.device-names >> ${DESTDIR}/etc/lilo.conf
@@ -3636,7 +3639,7 @@ dogrub() {
                 else
                     echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
-                echo "initrd ${subdir}/${KERNELPKG}.img" >>${DESTDIR}/boot/grub/menu.lst
+                echo "initrd ${subdir}/${INITRAMFS}.img" >>${DESTDIR}/boot/grub/menu.lst
                 echo "" >>${DESTDIR}/boot/grub/menu.lst
                 # adding fallback/full image
                 NUMBER=$((${NUMBER}+1))
@@ -3648,7 +3651,7 @@ dogrub() {
                 else
                     echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >>${DESTDIR}/boot/grub/menu.lst
                 fi
-                echo "initrd ${subdir}/${KERNELPKG}-fallback.img" >>${DESTDIR}/boot/grub/menu.lst
+                echo "initrd ${subdir}/${INITRAMFS}-fallback.img" >>${DESTDIR}/boot/grub/menu.lst
                 NUMBER=$((${NUMBER}+1))
             done
             ### TODO:
@@ -3873,7 +3876,7 @@ EOF
 menuentry "Arch Linux" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${KERNELPKG}.img
+    initrd ${subdir}/${INITRAMFS}.img
 }
 
 EOF
@@ -3887,7 +3890,7 @@ EOF
 menuentry "Arch Linux Fallback" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${KERNELPKG}-fallback.img
+    initrd ${subdir}/${INITRAMFS}-fallback.img
 }
 
 EOF
