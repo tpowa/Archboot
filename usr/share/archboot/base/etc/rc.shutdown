@@ -6,27 +6,61 @@
 . /etc/rc.conf
 . /etc/rc.d/functions
 
-run_hook shutdown_start
-
 # avoid staircase effect
-/bin/stty onlcr
+stty onlcr
 
 echo " "
 printhl "Initiating Shutdown..."
 echo " "
 
+run_hook shutdown_start
+
 [[ -x /etc/rc.local.shutdown ]] && /etc/rc.local.shutdown
 
-kill_everything shutdown
+stop_all_daemons
+
+run_hook shutdown_prekillall
+
+kill_all
+
+run_hook shutdown_postkillall
 
 # removing psmouse module to fix some reboot issues on newer laptops
 /sbin/modprobe -r psmouse >/dev/null 2>&1
 
+# stop monitoring of lvm2 groups before unmounting filesystems
+[[ $USELVM = [Yy][Ee][Ss] && -x $(type -P lvm) && -d /sys/block ]] &&
+	status "Deactivating monitoring of LVM2 groups" \
+		vgchange --monitor n &>/dev/null
+
 status "Deactivating Swap" /sbin/swapoff -a
 
-stat_busy "Unmounting Filesystems"
-/bin/umount -a -r -t noramfs,notmpfs,nosysfs,noproc,nodevtmpfs -O no_netdev
-stat_done
+# if we don't have devtmpfs support, /dev is mounted as tmpfs, so don't unmount it
+status "Unmounting Filesystems" \
+	umount -a -r -t nodevtmpfs,notmpfs,nosysfs,noproc,nodevpts -O no_netdev
+
+run_hook shutdown_postumount
+
+# Kill non-root encrypted partition mappings
+if [[ -f /etc/crypttab && $CS ]] && grep -q ^[^#] /etc/crypttab; then
+	stat_busy "Deactivating encrypted volumes:"
+		# Maybe someone has LVM on an encrypted block device
+		# executing an extra vgchange is errorless
+		[[ $USELVM = [Yy][Ee][Ss] ]] && vgchange --sysinit -a n &>/dev/null
+		do_lock() {
+			stat_append "${1}.."
+			if $CS remove "$1" &>/dev/null; then
+				stat_append "ok "
+			else
+				stat_append "failed "
+			fi
+		}
+		read_crypttab do_lock
+	stat_done
+fi
+
+[[ $USELVM = [Yy][Ee][Ss] && -x $(type -P lvm) && -d /sys/block ]] &&
+	status "Deactivating LVM2 groups" vgchange --sysinit -a n &>/dev/null
 
 run_hook shutdown_poweroff
 
