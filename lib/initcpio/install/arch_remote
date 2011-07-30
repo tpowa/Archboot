@@ -48,6 +48,7 @@ build ()
     add_file "/usr/share/licenses/libsasl/COPYING"
     add_file "/usr/share/licenses/libldap/LICENSE"
     add_file "/usr/share/licenses/nfsidmap/LICENSE"
+    add_file "/usr/share/licenses/libgssglue/COPYING"
 }
 
 help ()
