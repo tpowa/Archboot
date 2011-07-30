@@ -6,7 +6,7 @@ build ()
     BINARIES="/sbin/udevd /usr/bin/logger"
     FILES="/etc/udev/udev.conf"
     SCRIPT="arch_udev"
-    add_file /lib/modprobe.d/framebuffer_blacklist.conf
+    add_file /lib/modprobe.d/framebuffer_blacklist.conf /etc/modprobe.d/framebuffer_blacklist.conf
     add_file /etc/modprobe.d/usb-load-ehci-first.conf
     add_binary /lib/udev/ata_id
     add_binary /lib/udev/cdrom_id
