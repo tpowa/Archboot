@@ -6,10 +6,10 @@ PKGARG=${3}
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
 # name of the kernel image
-VMLINUZ="vmlinuz26"
+VMLINUZ="vmlinuz-linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
-KERNELPKG="kernel26"
+KERNELPKG="linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
 
 usage() {
@@ -166,7 +166,7 @@ install_packages() {
     fi
 
     # Only install the booted kernel image!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ kernel26\ # #g" -e "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e "s#\ kernel26-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     ${PACMAN} -S ${PACKAGES}
 }
