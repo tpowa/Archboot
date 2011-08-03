@@ -3,9 +3,9 @@
 build ()
 {
     MODULES=""
-    BINARIES="/sbin/hwdetect"
+    BINARIES=""
     FILES=""
-    SCRIPT=""
+    SCRIPT="arch_ide_blacklist"
 }
 
 help ()

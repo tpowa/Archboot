@@ -2,16 +2,24 @@
 
 run_hook ()
 {
-    msg ":: Running hwdetect..."
-	HWDETECT="/sbin/hwdetect --load-modules"
+    msg ":: Echo generate IDE/PATA blacklist..."
 	if grep -qw ide-legacy /proc/cmdline; then
-		HWDETECT="$HWDETECT --ide-legacy"
+		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ata/*); do 
+			echo "blacklist $(basename $i .ko | grep -e '^pata' -e '^ata_generic' '^ata_piix')" >> /etc/modprobe.d/ide-blacklist.conf
+		done
+		msg "Blacklisted IDE modules (new subsystem) for udev:"
+		msg "--------------------------------------"
+		if [ -s /etc/modprobe.d/ide-blacklist.conf ]; then 
+			for i in $(sort -u /etc/modprobe.d/ide-blacklist.conf | sed -e 's/blacklist //g'); do
+				echo -n "$i "
+			done
+			msg ""
+			msg "If you need them, please don't use 'ide-legacy' boot option or load them by hand!"
+		else
+			msg "No modules blacklisted."
+		fi
+		msg "--------------------------------------"
 	else
-		# generating blacklist modules which are not covered by new pata subsystem!
-		#for i in /lib/modules/$(uname -r)/kernel/drivers/ide/*; do 
-		#	for alias in $(/sbin/modinfo $i|grep ^alias\:|cut -d' ' -f11); do 
-		#		[ -z "$(modprobe --show-depends $alias|grep '/ata/'|grep -v 'libata.ko')" ] && echo "$(basename ${i})" | sed -e 's/.ko//g' >> /tmp/.ide-blacklist
-		#	done
 		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
 			echo "blacklist $(basename $i .ko | grep -v ^ide)" >> /etc/modprobe.d/ide-blacklist.conf
 		done
@@ -27,12 +35,5 @@ run_hook ()
 			msg "No modules blacklisted."
 		fi
 		msg "--------------------------------------"
-
 	fi
-	if /usr/bin/vmware-detect; then
-		HWDETECT="$HWDETECT --vmware"
-	fi
-	msg ":: Loading detected kernel modules..."
-	$HWDETECT
-    msg "done."
 }
