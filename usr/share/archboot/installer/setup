@@ -2303,7 +2303,7 @@ select_filesystem() {
     [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
     [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
     [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
-    [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "kernel26" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
+    [[ "$(which mkfs.btrfs 2>/dev/null)" && "${KERNELPKG}" = "linux" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
     [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
     [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
@@ -3494,8 +3494,8 @@ dolilo() {
             sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
         fi
         sed -i "s|image=/boot/vmlinuz26|image=/boot/${VMLINUZ}|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.*fallback.img$|initrd=/boot/${INITRAMFS}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*kernel26.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*linux.*fallback.img$|initrd=/boot/${INITRAMFS}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
+        sed -i "s|initrd=.*linux.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
         sed -i "s|initrd=.*kernel26-lts.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
     fi
     sed -i -e '/DEVICE DETAILS/d' ${DESTDIR}/etc/lilo.conf
