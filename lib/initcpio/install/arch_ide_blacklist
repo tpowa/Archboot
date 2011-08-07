@@ -11,7 +11,7 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook will use hwdetect to load 
-  and detect the needed modules for your system.
+  This hook will blacklist the pata ide subsystem, 
+  if ide-legacy boot parameter is used.
 HELPEOF
 }
