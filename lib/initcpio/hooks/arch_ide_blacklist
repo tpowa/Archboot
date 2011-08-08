@@ -5,7 +5,7 @@ run_hook ()
     msg ":: Echo generate IDE/PATA blacklist..."
 	if grep -qw ide-legacy /proc/cmdline; then
 		for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ata/*); do 
-			echo "blacklist $(basename $i .ko.gz | grep -e '^pata' -e '^ata_generic' -e '^ata_piix' | s)" >> /etc/modprobe.d/ide-blacklist.conf
+			echo "blacklist $(basename $i .ko.gz | grep -e '^pata' -e '^ata_generic' -e '^ata_piix')" >> /etc/modprobe.d/ide-blacklist.conf
 		done
 		msg "Blacklisted IDE modules (new subsystem) for udev:"
 		msg "--------------------------------------"
