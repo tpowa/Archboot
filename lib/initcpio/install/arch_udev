@@ -24,10 +24,10 @@ build ()
     add_binary /lib/udev/usb_id
     add_binary /lib/udev/v4l_id
     # add rule files
-    for i in 50-firmware 50-udev-default \
+    for i in 42-qemu-usb.rules 50-firmware 50-udev-default \
              60-cdrom_id 60-persistent-alsa 60-persistent-input 60-persistent-serial \
              60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
-             75-net-description 75-tty-description 78-sound-card \
+             75-net-description 75-tty-description 75-probe_mtd.rules 78-sound-card \
              80-drivers 81-arch 95-keyboard-force-release 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
