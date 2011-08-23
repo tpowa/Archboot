@@ -1,0 +1,19 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/sbin/smartctl /usr/sbin/smartd /usr/sbin/update-smart-drivedb"
+    FILES=""
+    SCRIPT=""
+    add_file "/usr/share/archboot/etc/conf.d/smartd" "/etc/conf.d/smartd"
+    add_file "/usr/share/archboot/etc/smartd.conf" "/etc/smartd.conf"
+    add_file "/etc/rc.d/smartd"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes smartmontools on an arch boot image.
+HELPEOF
+} 
