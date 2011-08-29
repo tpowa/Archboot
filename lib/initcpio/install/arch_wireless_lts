@@ -30,7 +30,6 @@ build ()
     add_file "/usr/share/licenses/dbus-core/COPYING"
     add_file "/usr/share/licenses/crda/LICENSE"
     add_file "/usr/share/licenses/wireless-regdb/LICENSE"
-    add_file "/usr/share/licenses/python/LICENSE"
     add_file "/usr/share/licenses/rfkill/LICENSE"
 }
 
