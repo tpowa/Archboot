@@ -3,8 +3,8 @@
 build ()
 {
     MODULES=""
-    BINARIES="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd /usr/sbin/adduser /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg /usr/sbin/vigr"
-    FILES=""
+    BINARIES="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg /usr/sbin/vigr"
+    FILES="/usr/sbin/adduser"
     SCRIPT=""
     for i in $(echo /usr/share/archboot/shadow/etc/*/*); do
     	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"

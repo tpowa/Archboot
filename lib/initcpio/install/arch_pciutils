@@ -3,8 +3,8 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/sbin/lspci /usr/sbin/setpci /usr/sbin/update-pciids"
-    FILES=""
+    BINARIES="/usr/sbin/lspci /usr/sbin/setpci"
+    FILES="/usr/sbin/update-pciids"
     SCRIPT=""
     add_file "/usr/share/hwdata/pci.ids"
 }
