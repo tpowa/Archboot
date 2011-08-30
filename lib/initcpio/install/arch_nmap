@@ -7,6 +7,7 @@ build ()
     FILES=""
     SCRIPT=""
     add_fulldir "/usr/share/nmap"
+    add_file "/usr/share/licenses/nmap/LICENSE"
 }
 
 help ()
