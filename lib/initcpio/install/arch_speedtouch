@@ -1,0 +1,21 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/sbin/modem_run /usr/sbin/pppoa2 /usr/sbin/pppoa3"
+    FILES=""
+    SCRIPT=""
+    add_dir "/etc/speedtouch/"
+    add_file "/usr/bin/speedtouch-setup"
+    add_file "/usr/bin/speedtouch-start"
+    add_file "/usr/bin/speedtouch-stop"
+    add_file "/usr/share/speedtouch/boot.v123.bin"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes speedtouch on an arch boot image.
+HELPEOF
+} 
