@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/bin/nmap /usr/bin/ncat /usr/bin/ndiff /usr/bin/nping"
+    FILES=""
+    SCRIPT=""
+    add_fulldir "/usr/share/nmap"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes nmap on an arch boot image.
+HELPEOF
+} 
