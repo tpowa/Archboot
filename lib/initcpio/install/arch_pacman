@@ -24,7 +24,7 @@ syslinux mtools perl gmp krb5 sqlite3 db dbus-core libcap fsarchiver xz librpcse
 libtirpc wipe ddrescue testdisk ifplugd libdaemon wpa_actiond rfkill libgssglue icu gptfdisk \
 btrfs-progs-unstable nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb \
 grub2-bios grub2-common grub2-efi-i386 grub2-efi-x86_64 efibootmgr file eject keyutils yp-tools \
-curl smartmontools"
+curl smartmontools dnsmasq"
 
 
 for i in $DEPENDS; do
