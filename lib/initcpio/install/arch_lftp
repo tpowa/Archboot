@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/bin/lftp /usr/bin/lftpget"
+    FILES=""
+    SCRIPT=""
+    add_file "/usr/share/archboot/dnsmasq/etc/lftp.conf" "/etc/lftp.conf"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes lftp on an arch boot image.
+HELPEOF
+} 

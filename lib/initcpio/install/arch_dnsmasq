@@ -1,0 +1,20 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/sbin/dnsmasq"
+    FILES=""
+    SCRIPT=""
+    add_file "/usr/share/archboot/dnsmasq/etc/dnsmasq.conf" "/etc/dnsmasq.conf"
+    add_file "/etc/rc.d/dnsmasq"
+    add_dir "/var/db"
+    add_dir "/var/lib/misc"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes dnsmasq on an arch boot image.
+HELPEOF
+} 
