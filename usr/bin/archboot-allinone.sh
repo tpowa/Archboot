@@ -95,9 +95,9 @@ _merge_initramfs() {
 	
 	# merge them into one file for each architecture
 	cd  "${CORE}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma -9 >"${CORE}/tmp"/initrd.img
+	find . -print0 | bsdcpio -0oH newc | lzma >"${CORE}/tmp"/initrd.img
 	cd  "${CORE64}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma -9 >"${CORE64}/tmp"/initrd64.img
+	find . -print0 | bsdcpio -0oH newc | lzma >"${CORE64}/tmp"/initrd64.img
 	cd "${WD}/"
 
 }
