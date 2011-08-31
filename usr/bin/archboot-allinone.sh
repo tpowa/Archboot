@@ -351,6 +351,8 @@ _prepare_packages
 
 _prepare_other_files
 
+_merge_initramfs
+
 _prepare_kernel_initramfs_files
 
 _prepare_grub2_uefi_iso_files
