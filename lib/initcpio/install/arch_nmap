@@ -6,7 +6,7 @@ build ()
     BINARIES="/usr/bin/nmap /usr/bin/ncat /usr/bin/ndiff /usr/bin/nping"
     FILES=""
     SCRIPT=""
-    add_fulldir "/usr/share/nmap"
+    add_full_dir "/usr/share/nmap"
     add_file "/usr/share/licenses/nmap/LICENSE"
 }
 

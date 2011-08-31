@@ -6,7 +6,7 @@ build ()
     BINARIES="/usr/bin/weechat"
     FILES=""
     SCRIPT=""
-    add_fulldir "/usr/lib/weechat"
+    add_full_dir "/usr/lib/weechat"
 }
 
 help ()
