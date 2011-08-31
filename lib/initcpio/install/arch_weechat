@@ -1,0 +1,17 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES=""
+    BINARIES="/usr/bin/weechat"
+    FILES=""
+    SCRIPT=""
+    add_fulldir "/usr/lib/weechat"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes weechat on an arch boot image.
+HELPEOF
+} 
