@@ -85,11 +85,13 @@ _merge_initramfs() {
 
 	# extract the initramfs files
 	mkdir  "${CORE}/tmp"/initrd
-	bsdtar xf "${CORE}/tmp"/*/boot/initrd.img "${CORE}/tmp"/initrd
-	bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img "${CORE}/tmp"/initrd
-	mkdir  "${CORE}/tmp"/initrd64
-	bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img "${CORE64}/tmp"/initrd
-	bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img "${CORE64}/tmp"/initrd
+	cd "${CORE}/tmp"/initrd
+	bsdtar xf "${CORE}/tmp"/*/boot/initrd.img
+	bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img
+	mkdir  "${CORE64}/tmp"/initrd
+	cd "${CORE64}/tmp"/initrd
+	bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img
+	bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img
 	
 	# merge them into one file for each architecture
 	cd  "${CORE}/tmp"/initrd

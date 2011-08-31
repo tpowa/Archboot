@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/bin/weechat"
+    BINARIES="/usr/bin/weechat-curses"
     FILES=""
     SCRIPT=""
     add_full_dir "/usr/lib/weechat"
