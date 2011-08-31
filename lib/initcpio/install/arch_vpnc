@@ -6,7 +6,6 @@ build ()
     BINARIES="/usr/bin/pcf2vpnc /usr/sbin/vpnc /usr/sbin/vpnc-disconnect"
     FILES=""
     SCRIPT=""
-    add_file "/etc/rc.d/vpnc"
     add_file "/usr/share/archboot/vpnc/etc/vpnc/default.conf" "/etc/vpnc/default.conf"
     add_file "/usr/share/archboot/vpnc/etc/vpnc/vpnc-script" "/etc/vpnc/vpnc-script"
 
