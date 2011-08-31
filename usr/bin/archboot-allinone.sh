@@ -81,6 +81,25 @@ mkdir "${ALLINONE}/arch"
 mkdir -p "${ALLINONE}/boot/syslinux"
 mkdir -p "${ALLINONE}/packages/"
 
+_merge_initramfs() {
+
+	# extract the initramfs files
+	mkdir  "${CORE}/tmp"/initrd
+	bsdtar xf "${CORE}/tmp"/*/boot/initrd.img "${CORE}/tmp"/initrd
+	bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img "${CORE}/tmp"/initrd
+	mkdir  "${CORE}/tmp"/initrd64
+	bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img "${CORE64}/tmp"/initrd
+	bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img "${CORE64}/tmp"/initrd
+	
+	# merge them into one file for each architecture
+	cd  "${CORE}/tmp"/initrd
+	find . -print0 | bsdcpio -0oH newc | lzma -9 >"${CORE}/tmp"/initrd.img
+	cd  "${CORE64}/tmp"/initrd
+	find . -print0 | bsdcpio -0oH newc | lzma -9 >"${CORE64}/tmp"/initrd64.img
+	cd "${WD}/"
+
+}
+
 _prepare_kernel_initramfs_files() {
 	
 	# place kernels and memtest
@@ -91,10 +110,8 @@ _prepare_kernel_initramfs_files() {
 	mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
 	
 	# place initramfs files
-	mv "${CORE}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd.img"
-	mv "${CORE_LTS}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrdlts.img"
-	mv "${CORE64}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd64.img"
-	mv "${CORE64_LTS}/tmp"/*/boot/initrd.img "${ALLINONE}/boot/initrd64lts.img"
+	mv "${CORE}/tmp"/initrd.img "${ALLINONE}/boot/initrd.img"
+	mv "${CORE64}/tmp"/initrd64.img "${ALLINONE}/boot/initrd64.img"
 	
 }
 
@@ -317,13 +334,13 @@ initrd /boot/initrd64.img
 menuentry "Arch Linux LTS (i686) archboot" {
 set root=(\${archboot})
 linux /boot/vmlts ro \${_kernel_params}
-initrd /boot/initrdlts.img
+initrd /boot/initrd.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
 set root=(\${archboot})
 linux /boot/vm64lts ro \${_kernel_params}
-initrd /boot/initrd64lts.img
+initrd /boot/initrd64.img
 }
 
 EOF

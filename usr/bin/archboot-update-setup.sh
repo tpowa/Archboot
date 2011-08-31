@@ -186,13 +186,13 @@ initrd /boot/initrd64.img
 menuentry "Arch Linux LTS (i686) archboot" {
 set root=(\${archboot})
 linux /boot/vmlts ro \${_kernel_params}
-initrd /boot/initrdlts.img
+initrd /boot/initrd.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
 set root=(\${archboot})
 linux /boot/vm64lts ro \${_kernel_params}
-initrd /boot/initrd64lts.img
+initrd /boot/initrd64.img
 }
 
 EOF
