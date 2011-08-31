@@ -6,8 +6,8 @@ build ()
     BINARIES="/usr/sbin/smartctl /usr/sbin/smartd /usr/sbin/update-smart-drivedb"
     FILES=""
     SCRIPT=""
-    add_file "/usr/share/archboot/etc/conf.d/smartd" "/etc/conf.d/smartd"
-    add_file "/usr/share/archboot/etc/smartd.conf" "/etc/smartd.conf"
+    add_file "/usr/share/archboot/smartmontools/etc/conf.d/smartd" "/etc/conf.d/smartd"
+    add_file "/usr/share/archboot/smartmontools/etc/smartd.conf" "/etc/smartd.conf"
     add_file "/etc/rc.d/smartd"
 }
 
