@@ -1729,7 +1729,7 @@ autoprepare() {
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-        # create 10MB bios_grub partition for grub2 support
+        # create 10 MiB bios_grub partition for grub2 support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
         else
@@ -1737,7 +1737,7 @@ autoprepare() {
         fi
         DISC_SIZE=$((${DISC_SIZE}-${GUID_PART_SIZE}))
         while [[ "${BOOT_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "32" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MiB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MiB" 10 65 "32" 2>${ANSWER} || return 1
             BOOT_PART_SIZE="$(cat ${ANSWER})"
             if [[ "${BOOT_PART_SIZE}" = "" ]]; then
                 DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -1753,7 +1753,7 @@ autoprepare() {
         SWAP_SIZE="256"
         [[ "${DISC_SIZE}" -lt "256" ]] && SWAP_SIZE="${DISC_SIZE}"
         while [[ "${SWAP_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MiB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MiB" 10 65 "${SWAP_SIZE}" 2>${ANSWER} || return 1
             SWAP_PART_SIZE=$(cat ${ANSWER})
             if [[ "${SWAP_PART_SIZE}" = "" || "${SWAP_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1769,7 +1769,7 @@ autoprepare() {
         ROOT_SIZE="7500"
         [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
         while [[ "${ROOT_PART_SET}" = "" ]]; do
-        DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>${ANSWER} || return 1
+        DIALOG --inputbox "Enter the size (MiB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MiB" 10 65 "${ROOT_SIZE}" 2>${ANSWER} || return 1
         ROOT_PART_SIZE=$(cat ${ANSWER})
             if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1777,7 +1777,7 @@ autoprepare() {
                 if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
-                    DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+                    DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MiB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
                 fi
             fi
         done
@@ -1910,16 +1910,12 @@ parted_gpt() {
     if [[ "${GUID_DETECTED}" = "1" ]]; then
         if [[ "${UEFI_x86_64}" = "1" ]] || [[ "${UEFI_i386}" = "1" ]]; then
             if ! [[ "$(parted -s ${DISC} print | grep 'boot')" ]]; then
-            DIALOG --yesno "Setup detected no EFI SYSTEM PARTITION on ${DISC}.\nDo you want to create an EFISYS partition on ${DISC}?" 0 0 && CREATE_EFISYS=1
+                DIALOG --msgbox "You do not seem to have an UEFI SYSTEM PARTITION in ${DISC} . The setup will now exit. Create a >=200 MiB FAT32 UEFI SYSTEM PARTITION and then restart the setup by running /arch/setup .\n\nIf you already have a >=200 MiB FAT32 EFISYS partition, check whether that partition has EF00 gdisk type code set." 0 0
+                exit 1
             fi
         elif ! [[ "$(parted -s ${DISC} print | grep 'bios_grub')" ]]; then
-            DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1MB bios_grub partition for grub2 now on ${DISC}?" 0 0 && CREATE_BIOS_GRUB=1
+            DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1 MiB bios_grub partition for grub2 now on ${DISC}?" 0 0 && CREATE_BIOS_GRUB=1
         fi
-    fi
-    
-    if [[ "${CREATE_EFISYS}" = "1" ]]; then
-        DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 100 to 200 MB FAT32 EFISYS Partition for installing grub2-efi in next step by hand.\n\nparted shell commands:\nmkpartfs <partitionnumber> fat32 <start> <end>\nset <partitionnumber> boot on" 0 0
-        parted ${DISC}
     fi
     
     if [[ "${CREATE_BIOS_GRUB}" = "1" && "${GUID_DETECTED}" = "" ]]; then
@@ -1929,8 +1925,10 @@ parted_gpt() {
         parted -a optimal -s ${DISC} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
         parted -a optimal -s ${DISC} set 1 bios_grub on >${LOG}
     else
-        [[ "${CREATE_BIOS_GRUB}" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1MB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
+        [[ "${CREATE_BIOS_GRUB}" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1 MiB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
     fi
+    
+    ## TODO: GNU Parted 3.0 has all FS related operations removed and individual FS utilities have to be used instead. How can that be accomplished in the installer?
     DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
     clear
     parted ${DISC} print
@@ -4107,7 +4105,7 @@ dogrub2_efibootmgr() {
         
         [[ "${UEFI_SYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         
-    "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+        "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
     fi
     
     chroot_umount

@@ -81,8 +81,8 @@ mkdir "${ALLINONE}/arch"
 mkdir -p "${ALLINONE}/boot/syslinux"
 mkdir -p "${ALLINONE}/packages/"
 
-_merge_initramfs() {
-
+_merge_initramfs_files() {
+	
 	# extract the initramfs files
 	mkdir  "${CORE}/tmp"/initrd
 	cd "${CORE}/tmp"/initrd
@@ -95,11 +95,13 @@ _merge_initramfs() {
 	
 	# merge them into one file for each architecture
 	cd  "${CORE}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma >"${CORE}/tmp"/initrd.img
+	find . -print0 | bsdcpio -0oH newc | lzma > "${CORE}/tmp"/initrd.img
+	
 	cd  "${CORE64}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma >"${CORE64}/tmp"/initrd64.img
+	find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/tmp"/initrd64.img
+	
 	cd "${WD}/"
-
+	
 }
 
 _prepare_kernel_initramfs_files() {
@@ -183,14 +185,14 @@ _prepare_grub2_uefi_x86_64_iso_files() {
 	cat << EOF > "${memdisk_64_dir}/efi/grub2/grub.cfg"
 set _UEFI_ARCH="x86_64"
 
-search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
-set prefix=(\${efi64})/efi/grub2/x86_64-efi
+search --file --no-floppy --set=uefi64 /efi/grub2/x86_64-efi/grub.cfg
+set prefix=(\${uefi64})/efi/grub2/x86_64-efi
 source \${prefix}/grub.cfg
 EOF
 	
 	cat << EOF > "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg"
-search --file --no-floppy --set=efi64 /efi/grub2/x86_64-efi/grub.cfg
-source (\${efi64})/efi/grub2/grub.cfg
+search --file --no-floppy --set=uefi64 /efi/grub2/x86_64-efi/grub.cfg
+source (\${uefi64})/efi/grub2/grub.cfg
 EOF
 	
 	tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
@@ -220,14 +222,14 @@ _prepare_grub2_uefi_i386_iso_files() {
 	cat << EOF > "${memdisk_32_dir}/efi/grub2/grub.cfg"
 set _UEFI_ARCH="i386"
 
-search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
-set prefix=(\${efi32})/efi/grub2/i386-efi
+search --file --no-floppy --set=uefi32 /efi/grub2/i386-efi/grub.cfg
+set prefix=(\${uefi32})/efi/grub2/i386-efi
 source \${prefix}/grub.cfg
 EOF
 	
 	cat << EOF > "${ALLINONE}/efi/grub2/i386-efi/grub.cfg"
-search --file --no-floppy --set=efi32 /efi/grub2/i386-efi/grub.cfg
-source (\${efi32})/efi/grub2/grub.cfg
+search --file --no-floppy --set=uefi32 /efi/grub2/i386-efi/grub.cfg
+source (\${uefi32})/efi/grub2/grub.cfg
 EOF
 	
 	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
@@ -257,7 +259,7 @@ _prepare_grub2_uefi_iso_files() {
 	
 	## Mount the ${ALLINONE}/efi/grub2/grub2_uefi.bin image at ${grub2_uefi_mp} as loop 
 	if ! [ "$(grep ^loop /proc/modules)" ]; then
-		  modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
+		modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 	fi
 	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_uefi.bin")"
 	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
@@ -274,7 +276,7 @@ _prepare_grub2_uefi_iso_files() {
 	umount "${grub2_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	
-	cp /usr/share/grub/{unicode,ascii}.pf2 "${ALLINONE}/efi/grub2/"
+	cp /usr/share/grub/unicode.pf2 "${ALLINONE}/efi/grub2/"
 	
 	mkdir -p "${ALLINONE}/efi/grub2/locale/"
 	
@@ -353,7 +355,7 @@ _prepare_packages
 
 _prepare_other_files
 
-_merge_initramfs
+_merge_initramfs_files
 
 _prepare_kernel_initramfs_files
 
@@ -368,11 +370,12 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL
 ## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE hybrid ISO ..."
 xorriso -as mkisofs \
-        -rock -joliet \
+        -iso-level 3 -rock -joliet \
         -max-iso9660-filenames -omit-period \
         -omit-version-number -allow-leading-dots \
         -relaxed-filenames -allow-lowercase -allow-multidot \
         -volid "ARCHBOOT" \
+        -p "prepared by ${APPNAME}" \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
