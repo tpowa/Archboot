@@ -27,13 +27,10 @@ fi
 
 set -x
 
-## Remove old files and dir
-rm -rf "${archboot_ext}/" || true
+## Remove old files
 rm -f "${WD}/${iso_name}.iso" || true
 echo
 
-## Create a dir to extract the archboot iso
-mkdir -p "${archboot_ext}/"
 cd "${archboot_ext}/"
 echo
 
@@ -78,12 +75,17 @@ EOF
 	
 	"$(which grub-mkimage)" --directory="/usr/lib/grub/x86_64-efi" --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" --format=x86_64-efi ${GRUB2_UEFI_APP_MODULES}
 	
-	mkdir -p "${ALLINONE}/efi/boot/"
+	mkdir -p "${archboot_ext}/efi/boot/"
 	cp "${grub2_uefi_mp}/efi/boot/bootx64.efi" "${archboot_ext}/efi/boot/bootx64.efi"
+	
+	rm -rf "${memdisk_64_dir}/"
+	rm -f "${memdisk_64_img}"
+	echo
 	
 	unset memdisk_64_dir
 	unset memdisk_64_img
 	echo
+	
 }
 
 _replace_grub2_uefi_i386_iso_files() {
@@ -107,7 +109,7 @@ set prefix=(\${uefi32})/efi/grub2/i386-efi
 source \${prefix}/grub.cfg
 EOF
 	
-	cat << EOF > "${ALLINONE}/efi/grub2/i386-efi/grub.cfg"
+	cat << EOF > "${archboot_ext}/efi/grub2/i386-efi/grub.cfg"
 search --file --no-floppy --set=uefi32 /efi/grub2/i386-efi/grub.cfg
 source (\${uefi32})/efi/grub2/grub.cfg
 EOF
@@ -115,6 +117,10 @@ EOF
 	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
 	
 	"$(which grub-mkimage)" --directory="/usr/lib/grub/i386-efi" --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_uefi_mp}/efi/boot/bootia32.efi" ${GRUB2_UEFI_APP_MODULES}
+	
+	rm -rf "${memdisk_32_dir}/"
+	rm -f "${memdisk_32_img}"
+	echo
 	
 	unset memdisk_32_dir
 	unset memdisk_32_img
@@ -143,17 +149,17 @@ _replace_grub2_uefi_iso_files() {
 	rm -f "${archboot_ext}/efi/boot/grub.cfg" || true
 	rm -f "${archboot_ext}/efi/grub2/grub.cfg"
 	
-	cp /usr/share/grub/unicode.pf2 "${ALLINONE}/efi/grub2/"
+	cp /usr/share/grub/unicode.pf2 "${archboot_ext}/efi/grub2/"
 	
-	rm -rf "${ALLINONE}/efi/grub2/locale/"
-	mkdir -p "${ALLINONE}/efi/grub2/locale/"
+	rm -rf "${archboot_ext}/efi/grub2/locale/"
+	mkdir -p "${archboot_ext}/efi/grub2/locale/"
 	
 	## Taken from /sbin/grub-install
 	for dir in "/usr/share/locale"/*
 	do
 		if test -f "${dir}/LC_MESSAGES/grub.mo"
 		then
-			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/efi/grub2/locale/${dir##*/}.mo"
+			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${archboot_ext}/efi/grub2/locale/${dir##*/}.mo"
 			echo
 		fi
 	done
@@ -216,8 +222,12 @@ initrd /boot/initrd64.img
 
 EOF
 	
+	rm -rf "${grub2_uefi_mp}/"
+	echo
+	
 	unset grub2_uefi_mp
 	unset LOOP_DEVICE
+	echo
 	
 }
 
@@ -228,30 +238,78 @@ _replace_arch_setup_initramfs() {
 	
 	cd "${initramfs_ext}/"
 	
-	bsdtar xf "${archboot_ext}/boot/${initramfs_name}.img"
-	echo
+	if [ "${initramfs_name}" == "initrd64" ] || [ "${initramfs_name}" == "initrd64lts" ]
+	then
+		[ -e "${archboot_ext}/boot/initrd64lts.img" ] && bsdtar xf "${archboot_ext}/boot/initrd64lts.img"
+		echo
+		
+		bsdtar xf "${archboot_ext}/boot/initrd64.img"
+		echo
+	fi
 	
-	mv "${initramfs_ext}/arch/setup" "${initramfs_ext}/arch/setup.old"
-	echo
+	if [ "${initramfs_name}" == "initrd" ] || [ "${initramfs_name}" == "initrdlts" ]
+	then
+		[ -e "${archboot_ext}/boot/initrdlts.img" ] && bsdtar xf "${archboot_ext}/boot/initrdlts.img"
+		echo
+		
+		bsdtar xf "${archboot_ext}/boot/initrd.img"
+		echo
+	fi
 	
-	cp "${WD}/setup" "${initramfs_ext}/arch/setup"
-	echo
+	if [ -e "${WD}/setup" ]
+	then
+		mv "${initramfs_ext}/arch/setup" "${initramfs_ext}/arch/setup.old"
+		echo
+		
+		cp "${WD}/setup" "${initramfs_ext}/arch/setup"
+		echo
+	fi
 	
 	chmod +x "${initramfs_ext}/arch/setup"
 	echo
 	
-	cd "${initramfs_ext}/"
-	
-	# Generate the actual initramfs file
-	find . -print0 | bsdcpio -0oH newc | lzma > "${WD}/${initramfs_name}.img"
-	echo
-	
 	cd "${WD}/"
 	
-	rm -f "${archboot_ext}/boot/${initramfs_name}.img"
-	echo
+	## Generate the actual initramfs file
+	if [ "${initramfs_name}" == "initrd64" ] || [ "${initramfs_name}" == "initrd64lts" ]
+	then
+		cd "${initramfs_ext}/"
+		find . -print0 | bsdcpio -0oH newc | lzma > "${WD}/initrd64.img"
+		echo
+		
+		[ -e "${archboot_ext}/boot/initrd64lts.img" ] && rm -f "${archboot_ext}/boot/initrd64lts.img"
+		echo
+		
+		rm -f "${archboot_ext}/boot/initrd64.img"
+		echo
+		
+		cp "${WD}/initrd64.img" "${archboot_ext}/boot/initrd64.img"
+		echo
+		
+		rm -f "${WD}/initrd64.img"
+		echo
+	fi
 	
-	cp "${WD}/${initramfs_name}.img" "${archboot_ext}/boot/${initramfs_name}.img"
+	if [ "${initramfs_name}" == "initrd" ] || [ "${initramfs_name}" == "initrdlts" ]
+	then
+		cd "${initramfs_ext}/"
+		find . -print0 | bsdcpio -0oH newc | lzma > "${WD}/initrd.img"
+		echo
+		
+		[ -e "${archboot_ext}/boot/initrdlts.img" ] && rm -f "${archboot_ext}/boot/initrdlts.img"
+		echo
+		
+		rm -f "${archboot_ext}/boot/initrd.img"
+		echo
+		
+		cp "${WD}/initrd.img" "${archboot_ext}/boot/initrd.img"
+		echo
+		
+		rm -f "${WD}/initrd.img"
+		echo
+	fi
+	
+	rm -rf "${initramfs_ext}/"
 	echo
 	
 	unset initramfs_ext
@@ -290,28 +348,23 @@ if [ "${REPLACE_SETUP}" = "1" ]
 then
 	cd "${WD}/"
 	
-	if [ -e "${WD}/setup" ]
-	then
-		## The old method I tried, mount -o ro -t iso9660 /dev/sr0 /src, mv /arch/setup /arch/setup.old, cp /src/arch/setup /arch/setup, umount /dev/sr0
-		# cp ${WD}/setup ${archboot_ext}/arch/setup
-		
-		## Extracting using bsdtar, replacing /arch/setup and recompressing the iniramfs archive does not work. Archive format not compatible with initramfs format.
-		## Compressing using bsdcpio and using 'newc' archive format works, taken from falconindy's geninit program.
-		
-		initramfs_name="initrd64"
-		_replace_arch_setup_initramfs
-		
-		initramfs_name="initrd"
-		_replace_arch_setup_initramfs
-		
-	fi
+	## The old method I tried, mount -o ro -t iso9660 /dev/sr0 /src, mv /arch/setup /arch/setup.old, cp /src/arch/setup /arch/setup, umount /dev/sr0
+	# cp ${WD}/setup ${archboot_ext}/arch/setup
+	
+	## Extracting using bsdtar, replacing /arch/setup and recompressing the iniramfs archive does not work. Archive format not compatible with initramfs format.
+	## Compressing using bsdcpio and using 'newc' archive format works, taken from falconindy's geninit program.
+	
+	initramfs_name="initrd64"
+	_replace_arch_setup_initramfs
+	
+	initramfs_name="initrd"
+	_replace_arch_setup_initramfs
+	
 	echo
 fi
 
-
 ## Re-create the archboot ISO
 cd "${WD}/"
-echo
 
 ## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating the modified ISO ..."
@@ -328,6 +381,9 @@ xorriso -as mkisofs \
         -eltorito-alt-boot --efi-boot efi/grub2/grub2_uefi.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${WD}/${iso_name}.iso" "${archboot_ext}/" > /dev/null 2>&1
+echo
+
+rm -rf "${archboot_ext}/"
 echo
 
 set +x
