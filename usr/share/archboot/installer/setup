@@ -1236,7 +1236,7 @@ _createraid()
             parted ${RAIDDEVICE}
         else
             DISC=${RAIDDEVICE}
-            parted_gpt
+            check_gpt
         fi
     fi
 }
@@ -1489,7 +1489,7 @@ _createlv()
         done
         while [[ "${LV_SIZE_SET}" = "" ]]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
                 LV_SIZE=$(cat ${ANSWER})
                 if [[ "${LV_SIZE}" = "" ]]; then
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
@@ -1729,13 +1729,15 @@ autoprepare() {
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-        # create 10 MiB bios_grub partition for grub2 support
+        # create 1 MiB bios_grub partition for grub2-bios GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
+            UEFISYS_PART_SIZE="200"
         else
             GUID_PART_SIZE="0"
+            UEFISYS_PART_SIZE="0"
         fi
-        DISC_SIZE=$((${DISC_SIZE}-${GUID_PART_SIZE}))
+        DISC_SIZE=$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))
         while [[ "${BOOT_PART_SET}" = "" ]]; do
             DIALOG --inputbox "Enter the size (MiB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MiB" 10 65 "32" 2>${ANSWER} || return 1
             BOOT_PART_SIZE="$(cat ${ANSWER})"
@@ -1815,20 +1817,23 @@ autoprepare() {
     fi
     # we assume a /dev/hdX format (or /dev/sdX)
     if [[ "${GUIDPARAMETER}" = "yes" ]]; then
-        PART_ROOT="${DEVICE}4"
+        PART_ROOT="${DEVICE}5"
         # GUID(GPT) is only supported by 'parted'
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partitiontable to avoid issues!
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} mklabel GPT >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
+        parted -a optimal -s ${DEVICE} mktable GPT >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
         parted -a optimal -s ${DEVICE} set 1 bios_grub on
-        parted -a optimal -s ${DEVICE} name 1 GRUB2
-        parted -a optimal -s ${DEVICE} mkpart 2 ${GUID_PART_SIZE} $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 3 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 4 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 5 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        parted -a optimal -s ${DEVICE} name 1 BIOS_BOOT_GRUB2
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 2 ${GUID_PART_SIZE} $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} set 2 boot on
+        parted -a optimal -s ${DEVICE} name 2 UEFI_SYSTEM
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 3 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 4 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 5 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart 6 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
     else
         PART_ROOT="${DEVICE}3"
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -1837,12 +1842,12 @@ autoprepare() {
         # clean partitiontable to avoid issues!
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
         # create DOS MBR with parted
-        parted -s ${DEVICE} mklabel msdos >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} toggle 1 boot >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        parted -a optimal -s ${DEVICE} mktable msdos >/dev/null 2>&1
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} set 1 boot on >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
     fi
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
@@ -1898,7 +1903,7 @@ autoprepare() {
     S_MKFSAUTO=1
 }
 
-parted_gpt() {
+check_gpt() {
     
     [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
     
@@ -1908,31 +1913,23 @@ parted_gpt() {
     fi
     
     if [[ "${GUID_DETECTED}" = "1" ]]; then
-        if [[ "${UEFI_x86_64}" = "1" ]] || [[ "${UEFI_i386}" = "1" ]]; then
-            if ! [[ "$(parted -s ${DISC} print | grep 'boot')" ]]; then
-                DIALOG --msgbox "You do not seem to have an UEFI SYSTEM PARTITION in ${DISC} . The setup will now exit. Create a >=200 MiB FAT32 UEFI SYSTEM PARTITION and then restart the setup by running /arch/setup .\n\nIf you already have a >=200 MiB FAT32 EFISYS partition, check whether that partition has EF00 gdisk type code set." 0 0
-                exit 1
+        if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]] then
+            if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
+                DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC} . The setup will put you into cgdisk utility. Create a >=200 MiB partition with type code EF00 .\n\nIf you already have a >=200 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formattted as FAT32." 0 0
             fi
-        elif ! [[ "$(parted -s ${DISC} print | grep 'bios_grub')" ]]; then
-            DIALOG --yesno "Setup detected no bios_grub flag on ${DISC}.\n\nDo you want to create a small 1 MiB bios_grub partition for grub2 now on ${DISC}?" 0 0 && CREATE_BIOS_GRUB=1
+        fi
+        
+        if [[ "${CHECK_BIOS_BOOT_GRUB2}" = "1" ]]; then
+            if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
+                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MiB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0 && CHECK_BIOS_BOOT_GRUB2=1
+            fi
         fi
     fi
     
-    if [[ "${CREATE_BIOS_GRUB}" = "1" && "${GUID_DETECTED}" = "" ]]; then
-        # assume new partitiontable,if no GUID was already there,
-        # no user interaction needed for bios_grub partition, jippie
-        GUID_PART_SIZE="2"
-        parted -a optimal -s ${DISC} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
-        parted -a optimal -s ${DISC} set 1 bios_grub on >${LOG}
-    else
-        [[ "${CREATE_BIOS_GRUB}" = "1" ]] && DIALOG --msgbox "Setup cannot detect how many partitions already exist on ${DISC}.\nPlease create a 1 MiB bios_grub partition for grub2 in next step by hand.\n\nparted shell commands:\nmkpart <partitionnumber> ext2 <start> <start+1>\nset <partitionnumber> bios_grub on" 0 0
-    fi
-    
-    ## TODO: GNU Parted 3.0 has all FS related operations removed and individual FS utilities have to be used instead. How can that be accomplished in the installer?
-    DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+    ## TODO: Does this setup script format the partitions automatically using individual filesystem tools?
+    DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive. \nYou should make a >=200 MiB FAT32 UEFI SYSTEM Partition type code EF00 or 1 MiB no FS BIOS BOOT Partition type code EF02,\n a swap partition and atleast 1 data partition of type code 8300 for the root filesystem. To format the partitions, use the respective filesystem utilities." 18 70
     clear
-    parted ${DISC} print
-    parted ${DISC}
+    cgdisk ${DISC}
     
 }
 
@@ -1967,17 +1964,17 @@ partition() {
         GUID_DETECTED=""
         MSDOS_DETECTED=""
         BIOS_GRUB=""
-        CREATE_BIOS_GRUB=""
+        CHECK_BIOS_BOOT_GRUB2=""
         if ! [[ "${DISC}" = "" ]]; then
             if [[ "${GUIDPARAMETER}" = "yes" ]]; then
-                parted_gpt
+                check_gpt
             else
                 [[ "$(parted ${DISC} print | grep "Partition Table: msdos")" ]] && MSDOS_DETECTED=1
                 if [[ "${MSDOS_DETECTED}" = "" ]] ; then
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on ${DISC}.\nDo you want to create a MS-DOS partition table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
-                    parted -s ${DISC} mklabel msdos >${LOG}
+                    parted -a optimal -s ${DISC} mktable msdos >${LOG}
                 fi
                 # Partition disc
                 DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
@@ -3810,7 +3807,7 @@ EOF
     ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     ## For UEFI systems, no kernel boot messages are displayed if framebuffer is not initialized in grub2. So initialize it.
-    if [[ "${GRUB2_EFI}" = "1" ]]; then
+    if [[ "${GRUB2_UEFI}" = "1" ]]; then
         
         cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
@@ -3947,7 +3944,7 @@ dogrub2_common_after() {
     if [[ "${PART_ROOT}" != "" ]]; then
         if [[ "${GRUB2_BIOS}" = "1" ]]; then
             [[ "${grubdev}" != "" ]] && dogrub2_config
-        elif [[ "${GRUB2_EFI}" = "1" ]]; then
+        elif [[ "${GRUB2_UEFI}" = "1" ]]; then
             dogrub2_config
         fi
     fi
@@ -3957,10 +3954,10 @@ dogrub2_common_after() {
     geteditor  || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
-    cp "${DESTDIR}/usr/share/grub"/{unicode.pf2,ascii.pf2} "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
+    cp "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
     
     GRUB2_BIOS=""
-    GRUB2_EFI=""
+    GRUB2_UEFI=""
     
 }
 
@@ -4050,9 +4047,8 @@ dogrub2_bios() {
     fi
     
     if [[ "$(parted -sl | grep "Partition Table: gpt")" ]]; then
-        if ! [[ "$(parted -sl | grep "bios_grub")" ]]; then
-            DIALOG --defaultno --yesno "Warning:\nSetup detected no bios_grub flagged GUID (gpt) partition.\n\nDo you want to install grub2 to an other device, which contains a msdos partition table?" 0 0 || return 1
-        fi
+        CHECK_BIOS_BOOT_GRUB2="1"
+        check_gpt
     else
         if [[ "${FAIL_COMPLEX}" = "0" ]]; then
             DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
@@ -4083,36 +4079,39 @@ dogrub2_bios() {
     
 }
 
-dogrub2_efibootmgr() {
+dogrub2_uefi_efibootmgr() {
     
-    modprobe -q efivars 2>/dev/null
-    
-    chroot_mount
-    
-    EFIBOOTMGR="efibootmgr"
-    
-    if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]
+    if [[ $(modprobe -q efivars) ]]
     then
-        # Delete old entries of grub2 - needs to run within chroot - command to be checked
-        for bootnum in $(${EFIBOOTMGR} | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
-        do
-            "${EFIBOOTMGR}" --bootnum "${bootnum}" --delete-bootnum
-        done
+        chroot_mount
         
-        DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+        if [ -d "${DESTDIR}/sys/firmware/efi/vars" ] || [ -d "/sys/firmware/efi/vars" ]
+        then
+            # Delete old entries of grub2 - command to be checked
+            for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
+            do
+                efibootmgr --bootnum "${bootnum}" --delete-bootnum
+            done
+            
+            DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+            
+            [[ "${DISC}" = "" ]] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
+            
+            [[ "${UEFI_SYS_PART}" = "" ]] && UEFI_SYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+            
+            efibootmgr --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+        else
+            DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for GRUB2 in UEFI Boot Manager." 0 0
+        fi
         
-        [[ "${DISC}" = "" ]] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-        
-        [[ "${UEFI_SYS_PART}" = "" ]] && EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
-        
-        "${EFIBOOTMGR}" --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
+        chroot_umount
+    else
+        DIALOG --msgbox "efivars kernel module not loaded properly. Manually load it and create a boot entry for GRUB2 in UEFI Boot Manager." 0 0
     fi
-    
-    chroot_umount
     
 }
 
-dogrub2_efi_common() {
+dogrub2_uefi_common() {
     
     dogrub2_common_before
     
@@ -4122,24 +4121,26 @@ dogrub2_efi_common() {
     # reset PACKAGES after installing
     PACKAGES=""
     get_grub2_map
+    
+    CHECK_UEFI_SYS_PART="1"
+    check_gpt
+    
     DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
     
     if [[ "${DISC}" = "" ]]; then
         DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-        EFISYS=""
+        UEFI_SYS_PART=""
     fi
     
-    parted_gpt
-    
     if [[ -d "${DESTDIR}/boot/efi" ]]; then
-        EFISYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
+        UEFI_SYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
     else
         mkdir -p "${DESTDIR}/boot/efi"
-        EFISYS_PART=""
+        UEFI_SYS_PART=""
     fi
     
     if [[ "${UEFI_SYS_PART}" = "" ]]; then
-        EFISYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        UEFI_SYS_PART_NUM=$(sgdisk -p ${DISC} | grep 'EF00' | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
         mount -o rw -t vfat "${DISC}${UEFI_SYS_PART_NUM}" "${DESTDIR}/boot/efi"
     else
         mount -o rw -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
@@ -4147,7 +4148,7 @@ dogrub2_efi_common() {
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/sbin/grub_efi_${UEFI_ARCH}-install" --boot-directory="/boot/efi/efi" --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_efi.log
+    chroot "${DESTDIR}" "/sbin/grub_efi_${UEFI_ARCH}-install" --boot-directory="/boot/efi/efi" --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_uefi.log
     
     GRUB2_UEFI_APP_MODULES="part_gpt part_msdos part_apple fat ext2 reiserfs iso9660 udf hfsplus hfs btrfs nilfs2 xfs ntfs ntfscomp zfs zfsinfo relocator reboot multiboot multiboot2 fshelp xzio gzio memdisk tar lua normal gfxterm chain linux ls cat search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop efi_uga font png jpeg usbms usb_keyboard"
     
@@ -4157,21 +4158,21 @@ dogrub2_efi_common() {
                                           --output="/boot/efi/efi/grub/grub_custom.efi" \
                                           --compression=xz \
                                           --verbose \
-                                          ${GRUB2_UEFI_APP_MODULES} > /tmp/grub2_efi_mkimage.log
+                                          ${GRUB2_UEFI_APP_MODULES} > /tmp/grub2_uefi_mkimage.log
     
     chroot_umount
-    cat /tmp/grub2_efi.log > ${LOG}
-    if ! [[ -s /tmp/grub2_efi.log ]] ; then
+    cat /tmp/grub2_uefi.log > ${LOG}
+    if ! [[ -s /tmp/grub2_uefi.log ]] ; then
         DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
-    dogrub2_efibootmgr
+    dogrub2_uefi_efibootmgr
     
     DIALOG --msgbox "GRUB2 UEFI was successfully installed." 0 0
     
     GRUB2_PREFIX_DIR="/boot/efi/efi/grub/"
-    GRUB2_EFI="1"
+    GRUB2_UEFI="1"
     dogrub2_common_after
     
 }
@@ -4179,14 +4180,14 @@ dogrub2_efi_common() {
 dogrub2_uefi_x86_64() {
     
     UEFI_ARCH="x86_64"
-    dogrub2_efi_common
+    dogrub2_uefi_common
     
 }
 
 dogrub2_uefi_i386() {
     
     UEFI_ARCH="i386"
-    dogrub2_efi_common
+    dogrub2_uefi_common
     
 }
 
