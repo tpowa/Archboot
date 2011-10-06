@@ -1913,7 +1913,7 @@ check_gpt() {
     fi
     
     if [[ "${GUID_DETECTED}" = "1" ]]; then
-        if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]] then
+        if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
                 DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC} . The setup will put you into cgdisk utility. Create a >=200 MiB partition with type code EF00 .\n\nIf you already have a >=200 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formattted as FAT32." 0 0
             fi
