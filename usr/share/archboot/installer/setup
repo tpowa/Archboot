@@ -1489,7 +1489,7 @@ _createlv()
         done
         while [[ "${LV_SIZE_SET}" = "" ]]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
                 LV_SIZE=$(cat ${ANSWER})
                 if [[ "${LV_SIZE}" = "" ]]; then
                     DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
@@ -1729,7 +1729,7 @@ autoprepare() {
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-        # create 1 MiB bios_grub partition for grub2-bios GPT support
+        # create 1 MB bios_grub partition for grub2-bios GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
             UEFISYS_PART_SIZE="200"
@@ -1739,7 +1739,7 @@ autoprepare() {
         fi
         DISC_SIZE=$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))
         while [[ "${BOOT_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MiB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MiB" 10 65 "32" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "32" 2>${ANSWER} || return 1
             BOOT_PART_SIZE="$(cat ${ANSWER})"
             if [[ "${BOOT_PART_SIZE}" = "" ]]; then
                 DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -1755,7 +1755,7 @@ autoprepare() {
         SWAP_SIZE="256"
         [[ "${DISC_SIZE}" -lt "256" ]] && SWAP_SIZE="${DISC_SIZE}"
         while [[ "${SWAP_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MiB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MiB" 10 65 "${SWAP_SIZE}" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>${ANSWER} || return 1
             SWAP_PART_SIZE=$(cat ${ANSWER})
             if [[ "${SWAP_PART_SIZE}" = "" || "${SWAP_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1771,7 +1771,7 @@ autoprepare() {
         ROOT_SIZE="7500"
         [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
         while [[ "${ROOT_PART_SET}" = "" ]]; do
-        DIALOG --inputbox "Enter the size (MiB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MiB" 10 65 "${ROOT_SIZE}" 2>${ANSWER} || return 1
+        DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>${ANSWER} || return 1
         ROOT_PART_SIZE=$(cat ${ANSWER})
             if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1779,7 +1779,7 @@ autoprepare() {
                 if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
-                    DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MiB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+                    DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
                 fi
             fi
         done
@@ -1824,16 +1824,16 @@ autoprepare() {
         # clean partitiontable to avoid issues!
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
         parted -a optimal -s ${DEVICE} mktable GPT >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
         parted -a optimal -s ${DEVICE} set 1 bios_grub on
         parted -a optimal -s ${DEVICE} name 1 BIOS_BOOT_GRUB2
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 2 ${GUID_PART_SIZE} $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 2 ${GUID_PART_SIZE} $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} set 2 boot on
         parted -a optimal -s ${DEVICE} name 2 UEFI_SYSTEM
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 3 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 4 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 5 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart 6 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 3 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 4 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 5 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart 6 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
     else
         PART_ROOT="${DEVICE}3"
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -1843,11 +1843,11 @@ autoprepare() {
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
         # create DOS MBR with parted
         parted -a optimal -s ${DEVICE} mktable msdos >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} set 1 boot on >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
     fi
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
@@ -1915,19 +1915,19 @@ check_gpt() {
     if [[ "${GUID_DETECTED}" = "1" ]]; then
         if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
-                DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC} . The setup will put you into cgdisk utility. Create a >=200 MiB partition with type code EF00 .\n\nIf you already have a >=200 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formattted as FAT32." 0 0
+                DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC} . The setup will put you into cgdisk utility. Create a >=200 MB partition with type code EF00 .\n\nIf you already have a >=200 MB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formattted as FAT32." 0 0
             fi
         fi
         
         if [[ "${CHECK_BIOS_BOOT_GRUB2}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
-                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MiB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0 && CHECK_BIOS_BOOT_GRUB2=1
+                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0 && CHECK_BIOS_BOOT_GRUB2=1
             fi
         fi
     fi
     
     ## TODO: Does this setup script format the partitions automatically using individual filesystem tools?
-    DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive. \nYou should make a >=200 MiB FAT32 UEFI SYSTEM Partition type code EF00 or 1 MiB no FS BIOS BOOT Partition type code EF02,\n a swap partition and atleast 1 data partition of type code 8300 for the root filesystem. To format the partitions, use the respective filesystem utilities." 18 70
+    DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive. \nYou should make a >=200 MB FAT32 UEFI SYSTEM Partition type code EF00 or 1 MB no FS BIOS BOOT Partition type code EF02,\n a swap partition and atleast 1 data partition of type code 8300 for the root filesystem. To format the partitions, use the respective filesystem utilities." 18 70
     clear
     cgdisk ${DISC}
     
