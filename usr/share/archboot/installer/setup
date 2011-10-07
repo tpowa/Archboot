@@ -1236,6 +1236,9 @@ _createraid()
             parted ${RAIDDEVICE}
         else
             DISC=${RAIDDEVICE}
+            RUN_CGDISK="1"
+            CHECK_BIOS_BOOT_GRUB2="1"
+            CHECK_UEFI_SYS_PART="1"
             check_gpt
         fi
     fi
@@ -1909,28 +1912,30 @@ check_gpt() {
     
     if [[ "${GUID_DETECTED}" = "" ]] ; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt ${DISC} >${LOG}
+        sgdisk --mbrtogpt ${DISC} >${LOG} && GUID_DETECTED=1
     fi
     
     if [[ "${GUID_DETECTED}" = "1" ]]; then
         if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
-                DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC} . The setup will put you into cgdisk utility. Create a >=200 MB partition with type code EF00 .\n\nIf you already have a >=200 MB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formattted as FAT32." 0 0
+                DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. Please create a >=200 MB partition with type code EF00 for grub2-efi GPT support.\n\nIf you already have a >=200 MB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formatted as FAT32." 0 0
+                RUN_CGDISK="1"
             fi
         fi
         
         if [[ "${CHECK_BIOS_BOOT_GRUB2}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
-                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0
+                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. Please create a >=1 MB BIOS Boot partition for grub2-bios GPT support." 0 0
+                RUN_CGDISK="1"
             fi
         fi
     fi
     
-    ## TODO: Does this setup script format the partitions automatically using individual filesystem tools?
-    DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive. \nYou should make a >=200 MB FAT32 UEFI SYSTEM Partition type code EF00 or 1 MB no FS BIOS BOOT Partition type code EF02,\n a swap partition and atleast 1 data partition of type code 8300 for the root filesystem. To format the partitions, use the respective filesystem utilities." 18 70
-    clear
-    cgdisk ${DISC}
-    
+    if [[ "${RUN_CGDISK}" = "1" ]]; then
+        DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
+        clear
+        cgdisk ${DISC}
+    fi
 }
 
 partition() {
@@ -1962,10 +1967,11 @@ partition() {
         # Leave our loop if the user is done partitioning
         [[ "${DISC}" = "DONE" ]] && break
         MSDOS_DETECTED=""
-        CHECK_BIOS_BOOT_GRUB2=""
-        CHECK_UEFI_SYS_PART=""
         if ! [[ "${DISC}" = "" ]]; then
             if [[ "${GUIDPARAMETER}" = "yes" ]]; then
+                CHECK_BIOS_BOOT_GRUB2="1"
+                CHECK_UEFI_SYS_PART="1"
+                RUN_CGDISK="1"
                 check_gpt
             else
                 [[ "$(parted ${DISC} print | grep "Partition Table: msdos")" ]] && MSDOS_DETECTED=1
@@ -4047,6 +4053,8 @@ dogrub2_bios() {
     
     if [[ "$(parted -sl | grep "Partition Table: gpt")" ]]; then
         CHECK_BIOS_BOOT_GRUB2="1"
+        CHECK_UEFI_SYS_PART=""
+        RUN_CGDISK=""
         check_gpt
     else
         if [[ "${FAIL_COMPLEX}" = "0" ]]; then
@@ -4122,6 +4130,8 @@ dogrub2_uefi_common() {
     get_grub2_map
     
     CHECK_UEFI_SYS_PART="1"
+    CHECK_BIOS_BOOT_GRUB2=""
+    RUN_CGDISK=""
     check_gpt
     
     DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
