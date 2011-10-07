@@ -1921,7 +1921,7 @@ check_gpt() {
         
         if [[ "${CHECK_BIOS_BOOT_GRUB2}" = "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
-                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0 && CHECK_BIOS_BOOT_GRUB2=1
+                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. The setup will put you into cgdisk utility. Create a >=1 MB BIOS Boot partition for grub2-bios GPT support in ${DISC} ." 0 0
             fi
         fi
     fi
@@ -1963,6 +1963,7 @@ partition() {
         [[ "${DISC}" = "DONE" ]] && break
         MSDOS_DETECTED=""
         CHECK_BIOS_BOOT_GRUB2=""
+        CHECK_UEFI_SYS_PART=""
         if ! [[ "${DISC}" = "" ]]; then
             if [[ "${GUIDPARAMETER}" = "yes" ]]; then
                 check_gpt
