@@ -1837,6 +1837,11 @@ autoprepare() {
         parted -a optimal -s ${DEVICE} mkpart 4 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} mkpart 5 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} mkpart 6 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        # fix partition hexcode
+        sgdisk -t 3:8300 ${DEVICE} >${LOG}
+        sgdisk -t 4:8200 ${DEVICE} >${LOG}
+        sgdisk -t 5:8300 ${DEVICE} >${LOG}
+        sgdisk -t 6:8300 ${DEVICE} >${LOG}
     else
         PART_ROOT="${DEVICE}3"
         # start at sector 1 for 4k drive compatibility and correct alignment
