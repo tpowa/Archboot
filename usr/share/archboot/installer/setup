@@ -1904,7 +1904,7 @@ autoprepare() {
 }
 
 check_gpt() {
-    
+    GUID_DETECTED=""
     [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
     
     if [[ "${GUID_DETECTED}" = "" ]] ; then
@@ -1961,9 +1961,7 @@ partition() {
         fi
         # Leave our loop if the user is done partitioning
         [[ "${DISC}" = "DONE" ]] && break
-        GUID_DETECTED=""
         MSDOS_DETECTED=""
-        BIOS_GRUB=""
         CHECK_BIOS_BOOT_GRUB2=""
         if ! [[ "${DISC}" = "" ]]; then
             if [[ "${GUIDPARAMETER}" = "yes" ]]; then
