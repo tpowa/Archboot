@@ -2,7 +2,7 @@
 
 build ()
 {
-    MODULES=""
+    MODULES="$(checked_modules "/firmware/efivars")"
     BINARIES="/bin/grub-bin2h /bin/grub-editenv /bin/grub-fstest /bin/grub-menulst2cfg /bin/grub-mkfont /bin/grub-mkimage /bin/grub-mklayout /bin/grub-mkpasswd-pbkdf2 /bin/grub-mkrelpath /sbin/grub-mkdevicemap /sbin/grub-probe /sbin/grub-setup /bin/grub-kbdcomp /bin/grub-mkrescue /sbin/grub-mkconfig /sbin/grub-mknetdir /sbin/grub-reboot /sbin/grub-set-default /sbin/grub_bios-install /sbin/grub_efi_i386-install /sbin/grub_efi_x86_64-install /usr/sbin/efibootmgr"
     FILES=""
     
