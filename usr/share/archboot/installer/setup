@@ -1913,22 +1913,22 @@ autoprepare() {
 
 check_gpt() {
     GUID_DETECTED=""
-    [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED=1    
+    [[ "$(parted -s ${DISC} print | grep 'Partition Table: gpt')" ]] && GUID_DETECTED="1"
     
-    if [[ "${GUID_DETECTED}" = "" ]] ; then
+    if [[ "${GUID_DETECTED}" == "" ]]; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt ${DISC} >${LOG} && GUID_DETECTED=1
+        sgdisk --mbrtogpt ${DISC} >${LOG} && GUID_DETECTED="1"
     fi
     
-    if [[ "${GUID_DETECTED}" = "1" ]]; then
-        if [[ "${CHECK_UEFI_SYS_PART}" = "1" ]]; then
+    if [[ "${GUID_DETECTED}" == "1" ]]; then
+        if [[ "${CHECK_UEFI_SYS_PART}" == "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
                 DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. Please create a >=200 MB partition with type code EF00 for grub2-efi GPT support.\n\nIf you already have a >=200 MB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formatted as FAT32." 0 0
                 RUN_CGDISK="1"
             fi
         fi
         
-        if [[ "${CHECK_BIOS_BOOT_GRUB2}" = "1" ]]; then
+        if [[ "${CHECK_BIOS_BOOT_GRUB2}" == "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
                 DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. Please create a >=1 MB BIOS Boot partition for grub2-bios GPT support." 0 0
                 RUN_CGDISK="1"
@@ -1936,10 +1936,9 @@ check_gpt() {
         fi
     fi
     
-    if [[ "${RUN_CGDISK}" = "1" ]]; then
+    if [[ "${RUN_CGDISK}" == "1" ]]; then
         DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
-        clear
-        cgdisk ${DISC}
+        clear && cgdisk ${DISC}
     fi
 }
 
@@ -3777,15 +3776,16 @@ dogrub2_config() {
     ## http://git.kernel.org/?p=linux/hotplug/udev.git;a=commitdiff;h=693b6344e193f5aeca21df5f1c98fd32148006ac;hp=7dc39c9cada5ada1f6dae55d50e25f0d8923d302
     ## udev 172 onwards
     
-    subdir='/boot'
-    [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=''
+    subdir="/boot"
+    
+    [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=""
     
     cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
     head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     rm -f /tmp/.grub.cfg
     
-    NUMBER=0
+    NUMBER="0"
     
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
@@ -3813,11 +3813,11 @@ set locale_dir=\${prefix}/locale
 
 EOF
     
-    [[ "${USE_RAID}" = "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    ! [[ "${RAID_ON_LVM}" = "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     ## For UEFI systems, no kernel boot messages are displayed if framebuffer is not initialized in grub2. So initialize it.
-    if [[ "${GRUB2_UEFI}" = "1" ]]; then
+    if [[ "${GRUB2_UEFI}" == "1" ]]; then
         
         cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
@@ -3828,8 +3828,8 @@ insmod font
 if loadfont \${prefix}/unicode.pf2
 then
     insmod gfxterm
-    set gfxmode=auto
-    set gfxpayload=keep
+    set gfxmode="auto"
+    set gfxpayload="keep"
     terminal_output gfxterm
 fi
 
@@ -3841,23 +3841,19 @@ EOF
     sort /tmp/.device-names >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
-    if [[ "${NAME_SCHEME_PARAMETER}" = "UUID" ]]
-    then
+    if [[ "${NAME_SCHEME_PARAMETER}" == "UUID" ]]; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}"
         _rootpart="/dev/disk/by-uuid/${ROOT_FS_UUID}"
         
-    elif [[ "${NAME_SCHEME_PARAMETER}" = "PARTUUID" ]]
-    then
+    elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}" # GRUB2 does not yet support PARTUUID
         _rootpart="/dev/disk/by-partuuid/${ROOT_GPT_PART_UUID}"
         
-    elif [[ "${NAME_SCHEME_PARAMETER}" = "LABEL" ]]
-    then
+    elif [[ "${NAME_SCHEME_PARAMETER}" == "LABEL" ]]; then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}"
         _rootpart="/dev/disk/by-label/${ROOT_FS_LABEL}"
         
-    elif [[ "${NAME_SCHEME_PARAMETER}" = "PARTLABEL" ]]
-    then
+    elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}" # GRUB2 does not yet support PARTLABEL
         _rootpart="/dev/disk/by-partlabel/${ROOT_GPT_PART_LABEL}"
         
@@ -3908,12 +3904,13 @@ EOF
 
 ## (${NUMBER}) Windows BIOS
 ## Will work only in grub2 bios
-#menuentry \"Windows in BIOS systems\" {
+#menuentry \"Microsoft Windows 7 BIOS-MBR\" {
 #    insmod part_msdos
 #    insmod ntfs
-#    insmod fat
-#    search --file --no-floppy --set=root /bootmgr
-#    chainloader (${root})+1
+#    insmod search_fs_uuid
+#    insmod ntldr
+#    search --fs-uuid --no-floppy --set=root 69B235F6749E84CE
+#    ntldr (${root})/bootmgr
 #}
 
 EOF
@@ -3923,12 +3920,14 @@ EOF
     cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 ## (${NUMBER}) Windows x86_64 UEFI
-## Will work only in grub2 (u)efi x86_64
-#menuentry \"Windows in x86_64 UEFI systems\" {
+## Will work only in grub2 uefi x86_64
+#menuentry \"Microsoft Windows x86_64 UEFI-GPT\" {
 #    insmod part_gpt
 #    insmod fat
-#    search --file --no-floppy --set=root /efi/microsoft/boot/bootmgfw.efi
-#    chainloader (${root})/efi/microsoft/boot/bootmgfw.efi
+#    insmod search_fs_uuid
+#    insmod chain
+#    search --fs-uuid --no-floppy --set=root 1CE5-7F28
+#    chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
 #}
 
 EOF
@@ -3952,16 +3951,16 @@ EOF
 dogrub2_common_after() {    
     
     if [[ "${PART_ROOT}" != "" ]]; then
-        if [[ "${GRUB2_BIOS}" = "1" ]]; then
+        if [[ "${GRUB2_BIOS}" == "1" ]]; then
             [[ "${grubdev}" != "" ]] && dogrub2_config
-        elif [[ "${GRUB2_UEFI}" = "1" ]]; then
+        elif [[ "${GRUB2_UEFI}" == "1" ]]; then
             dogrub2_config
         fi
     fi
     
     # Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
-    geteditor  || return 1
+    geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     cp "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
@@ -3987,16 +3986,16 @@ dogrub2_bios() {
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
         # check if raid, raid partition, dmraid or device devicemapper is used
-        if [[ "$(echo ${bootdev} | grep /dev/md)" || "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
+        if [[ "$(echo ${bootdev} | grep /dev/md)" ]] || [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
             # boot from lvm, raid and dmraid devices is supported
             FAIL_COMPLEX="0"
-            if [[ "$(echo ${bootdev} | grep /dev/md*p)" || "$(cryptsetup status ${bootdev})" ]]; then
+            if [[ "$(echo ${bootdev} | grep /dev/md*p)" ]] || [[ "$(cryptsetup status ${bootdev})" ]]; then
                 # raid with no supperblock 0.90, partitionable raid and encryption
                 # devices are not supported
                 FAIL_COMPLEX="1"
             fi
         fi
-        if [[ "${FAIL_COMPLEX}" = "0" ]]; then
+        if [[ "${FAIL_COMPLEX}" == "0" ]]; then
             grubdev=$(basename ${bootdev})
             complexuuid=$(getuuid ${bootdev})
             # check if mapper is used
@@ -4031,24 +4030,24 @@ dogrub2_bios() {
     # A switch is needed if complex ${bootdev} is used!
     # - It doesn't make sense to present device list, if raid or raid+lvm is used for ${bootdev}.
     # - LVM ${bootdev} needs the MBR of a device and cannot be used itself as ${bootdev}
-    if [[ "${FAIL_COMPLEX}" = "0" ]]; then
+    if [[ "${FAIL_COMPLEX}" == "0" ]]; then
         # use function below if no raid is detected!
-        if [[ "${RAID_ON_LVM}" = "0" ]]; then
+        if [[ "${RAID_ON_LVM}" == "0" ]]; then
             DEVS="$(findbootloaderdisks _)"
-            if [[ "${DEVS}" = "" ]]; then
+            if [[ "${DEVS}" == "" ]]; then
                 DIALOG --msgbox "No hard drives were found" 0 0
                 return 1
             fi
             DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
             bootdev=$(cat ${ANSWER})
         fi
-        if [[ "${USE_RAID}"  = "1" ]]; then
+        if [[ "${USE_RAID}" == "1" ]]; then
             DIALOG --yesno "Setup detected /boot on a raid setup.\n\nContinue installing GRUB2 on ${bootdev}?" 0 0 || return 1
         fi
     else
         DEVS="$(findbootloaderdisks _)"
         DEVS="${DEVS} $(findbootloaderpartitions _)"
-        if [[ "${DEVS}" = "" ]]; then
+        if [[ "${DEVS}" == "" ]]; then
             DIALOG --msgbox "No hard drives were found" 0 0
             return 1
         fi
@@ -4062,12 +4061,12 @@ dogrub2_bios() {
         RUN_CGDISK=""
         check_gpt
     else
-        if [[ "${FAIL_COMPLEX}" = "0" ]]; then
+        if [[ "${FAIL_COMPLEX}" == "0" ]]; then
             DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
         fi
     fi
     
-    if [[ "${FAIL_COMPLEX}" = "1" ]]; then
+    if [[ "${FAIL_COMPLEX}" == "1" ]]; then
         DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- encrypted devices are not supported" 0 0
         return 1
     fi
@@ -4085,7 +4084,7 @@ dogrub2_bios() {
     fi
     DIALOG --msgbox "GRUB2 was successfully installed." 0 0
     
-    GRUB2_PREFIX_DIR=/boot/grub/
+    GRUB2_PREFIX_DIR="/boot/grub/"
     GRUB2_BIOS="1"
     dogrub2_common_after
     
@@ -4093,23 +4092,17 @@ dogrub2_bios() {
 
 dogrub2_uefi_efibootmgr() {
     
-    if [[ $(modprobe -q efivars) ]]
-    then
+    modprobe -q efivars
+    
+    if [[ "$(lsmod | grep efivars)" ]]; then
         chroot_mount
         
-        if [ -d "${DESTDIR}/sys/firmware/efi/vars" ] || [ -d "/sys/firmware/efi/vars" ]
-        then
+        if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]] || [[ -d "/sys/firmware/efi/vars" ]]; then
             # Delete old entries of grub2 - command to be checked
             for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " grub2" | cut -b5-8)
             do
                 efibootmgr --bootnum "${bootnum}" --delete-bootnum
             done
-            
-            DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-            
-            [[ "${DISC}" = "" ]] && DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-            
-            [[ "${UEFI_SYS_PART}" = "" ]] && UEFI_SYS_PART_NUM=$(sgdisk -p ${DISC} | grep "EF00" | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
             
             efibootmgr --create --gpt --disk "${DISC}" --part "${UEFI_SYS_PART_NUM}" --write-signature --label "GRUB2" --loader "\\EFI\\grub\\grub.efi"
         else
@@ -4139,38 +4132,41 @@ dogrub2_uefi_common() {
     RUN_CGDISK=""
     check_gpt
     
-    DISC=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-    
-    if [[ "${DISC}" = "" ]]; then
-        DISC=$(mount | grep ${DESTDIR}/boot | cut -d' ' -f 1 | sed 's/\(.\{8\}\).*/\1/')
-        UEFI_SYS_PART=""
-    fi
+    DISC="$(grub-probe --target=device "${DESTDIR}/boot" | sed 's/\(.\{8\}\).*/\1/')"
     
     if [[ -d "${DESTDIR}/boot/efi" ]]; then
-        UEFI_SYS_PART=$(mount | grep ${DESTDIR}/boot/efi | cut -d' ' -f 1)
+        DISC="$(grub-probe --target=device "${DESTDIR}/boot/efi" | sed 's/\(.\{8\}\).*/\1/')"
+        
+        if [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
+            UEFI_SYS_PART="$(grub-probe --target=device "${DESTDIR}/boot/efi")"
+            UEFI_SYS_PART_NUM="$(echo "${UEFI_SYS_PART}" | sed "s:${DISC}::g")"
+        else
+            UEFI_SYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')"
+            mount -o rw -t vfat "${DISC}${UEFI_SYS_PART_NUM}" "${DESTDIR}/boot/efi"
+            
+            UEFI_SYS_PART="$(grub-probe --target=device "${DESTDIR}/boot/efi")"
+        fi
     else
         mkdir -p "${DESTDIR}/boot/efi"
-        UEFI_SYS_PART=""
-    fi
-    
-    if [[ "${UEFI_SYS_PART}" = "" ]]; then
-        UEFI_SYS_PART_NUM=$(sgdisk -p ${DISC} | grep 'EF00' | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')
+        
+        DISC="$(grub-probe --target=device "${DESTDIR}/boot/efi" | sed 's/\(.\{8\}\).*/\1/')"
+        UEFI_SYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | sed 's/\(.\{4\}\).*/\1/' | sed 's/^ *//;s/ *$//')"
         mount -o rw -t vfat "${DISC}${UEFI_SYS_PART_NUM}" "${DESTDIR}/boot/efi"
-    else
-        mount -o rw -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
+        
+        UEFI_SYS_PART="$(grub-probe --target=device "${DESTDIR}/boot/efi")"
     fi
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/sbin/grub_efi_${UEFI_ARCH}-install" --boot-directory="/boot/efi/efi" --bootloader-id=grub --no-floppy --recheck >> /tmp/grub2_uefi.log
+    chroot "${DESTDIR}" "/sbin/grub_efi_${UEFI_ARCH}-install" --root-directory="/boot/efi" --boot-directory="/boot/efi/efi" --bootloader-id="grub" --no-floppy --recheck >> /tmp/grub2_uefi.log
     
     GRUB2_UEFI_APP_MODULES="part_gpt part_msdos part_apple fat ext2 reiserfs iso9660 udf hfsplus hfs btrfs nilfs2 xfs ntfs ntfscomp zfs zfsinfo relocator reboot multiboot multiboot2 fshelp xzio gzio memdisk tar lua normal gfxterm chain linux ls cat search search_fs_file search_fs_uuid search_label help loopback boot configfile echo lvm efi_gop efi_uga font png jpeg usbms usb_keyboard"
     
     chroot "${DESTDIR}" /bin/grub-mkimage --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
-                                          --format=${UEFI_ARCH}-efi \
+                                          --format="${UEFI_ARCH}-efi" \
                                           --prefix="" \
                                           --output="/boot/efi/efi/grub/grub_custom.efi" \
-                                          --compression=xz \
+                                          --compression="xz" \
                                           --verbose \
                                           ${GRUB2_UEFI_APP_MODULES} > /tmp/grub2_uefi_mkimage.log
     

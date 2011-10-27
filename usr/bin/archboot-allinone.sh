@@ -197,7 +197,7 @@ EOF
 	
 	tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
 	
-	"$(which grub-mkimage)" --directory="/usr/lib/grub/x86_64-efi" --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --format=x86_64-efi --compression=xz --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" ${GRUB2_UEFI_APP_MODULES}
+	"$(which grub-mkimage)" --directory="/usr/lib/grub/x86_64-efi" --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --format="x86_64-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" ${GRUB2_UEFI_APP_MODULES}
 	
 	mkdir -p "${ALLINONE}/efi/boot/"
 	cp "${grub2_uefi_mp}/efi/boot/bootx64.efi" "${ALLINONE}/efi/boot/bootx64.efi"
@@ -234,7 +234,7 @@ EOF
 	
 	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
 	
-	"$(which grub-mkimage)" --directory="/usr/lib/grub/i386-efi" --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format=i386-efi --compression=xz --output="${grub2_uefi_mp}/efi/boot/bootia32.efi" ${GRUB2_UEFI_APP_MODULES}
+	"$(which grub-mkimage)" --directory="/usr/lib/grub/i386-efi" --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format="i386-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootia32.efi" ${GRUB2_UEFI_APP_MODULES}
 	
 	unset memdisk_32_dir
 	unset memdisk_32_img
