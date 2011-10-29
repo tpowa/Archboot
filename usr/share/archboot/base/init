@@ -34,7 +34,7 @@ parse_cmdline
 # if available, start udevd at this stage
 if [ -x /lib/udev/udevd ]; then
     msg ":: Starting udevd..."
-    lib/udev/udevd --daemon --resolve-names=never
+    /lib/udev/udevd --daemon --resolve-names=never
     udevd_running=1
     msg "done."
 else
