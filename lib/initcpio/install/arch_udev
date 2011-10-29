@@ -3,11 +3,12 @@
 build ()
 {
     MODULES=""
-    BINARIES="/sbin/udevd /usr/bin/logger"
+    BINARIES="/usr/bin/logger"
     FILES="/etc/udev/udev.conf"
     SCRIPT="arch_udev"
     add_file /lib/modprobe.d/framebuffer_blacklist.conf /etc/modprobe.d/framebuffer_blacklist.conf
     add_file /etc/modprobe.d/usb-load-ehci-first.conf
+    add_binary /lib/udev/udevd
     add_binary /lib/udev/ata_id
     add_binary /lib/udev/cdrom_id
     add_binary /lib/udev/collect
@@ -16,12 +17,10 @@ build ()
     add_binary /lib/udev/keymap
     add_binary /lib/udev/input_id
     add_file /lib/udev/keyboard-force-release.sh
-    add_binary /lib/udev/path_id
     add_binary /lib/udev/pci-db
     add_binary /lib/udev/scsi_id
     add_binary /lib/udev/udev-acl
     add_binary /lib/udev/usb-db
-    add_binary /lib/udev/usb_id
     add_binary /lib/udev/v4l_id
     # add rule files
     for i in 42-qemu-usb 50-firmware 50-udev-default \
