@@ -15,7 +15,6 @@ build ()
     add_file /lib/udev/findkeyboards
     add_binary /lib/udev/firmware
     add_binary /lib/udev/keymap
-    add_binary /lib/udev/input_id
     add_file /lib/udev/keyboard-force-release.sh
     add_binary /lib/udev/pci-db
     add_binary /lib/udev/scsi_id
