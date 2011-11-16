@@ -4059,6 +4059,7 @@ dogrub2_bios() {
         CHECK_BIOS_BOOT_GRUB2="1"
         CHECK_UEFI_SYS_PART=""
         RUN_CGDISK=""
+        DISC="${bootdev}"
         check_gpt
     else
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
