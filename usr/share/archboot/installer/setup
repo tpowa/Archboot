@@ -264,71 +264,91 @@ _mount_packages_squashfs_images() {
 
 # Check media on install packages
 check_media() {
-    ! [[ "$(cat /proc/mounts | grep /dev/${dev})" ]] && mount /dev/${dev} ${media} >/dev/null 2>&1
+    
+    if [[ ! "${dev}" == "" ]]; then
+        ! [[ "$(cat /proc/self/mounts | grep /dev/${dev})" ]] && mount "/dev/${dev}" "${media}" >/dev/null 2>&1
+    fi
+    
     if [[ -e "${media}/packages/archboot_packages_$(uname -m).squashfs" && -e "${media}/packages/archboot_packages_any.squashfs" ]]; then
-       _mount_packages_squashfs_images
-        SET_MEDIA=1
+        _mount_packages_squashfs_images
+        SET_MEDIA="1"
         break
     else
         umount ${media} >/dev/null 2>&1
+        SET_MEDIA="0"
     fi
+    
 }
 
 # Get cdroms and removable devices
 get_media() {
-    media=/src
-    SET_MEDIA=0
-    #unmount media first, we may have leftovers ...
-    umount ${media}  >/dev/null 2>&1
+    
+    media="/src"
+    SET_MEDIA="0"
+    
+    ## Check whether ${media} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
+    ## This might be the case if the user manually mounted the media before launching this script
+    if [[ "$(mountpoint "${media}")" ]]; then
+        check_media
+    fi
+    
     # ide devices
-    if [[ "${SET_MEDIA}" = "0" ]]; then
+    if [[ "${SET_MEDIA}" == "0" ]]; then
         for dev in $(ls ${block} | egrep '^hd'); do
             if [[ "$(cat ${block}/${dev}/device/media)" = "cdrom" ]]; then
                 check_media
             fi
         done
     fi
-    if [[ "${SET_MEDIA}" = "0" ]]; then
+    
+    if [[ "${SET_MEDIA}" == "0" ]]; then
         # scsi/sata and other devices
         for dev in $(ls ${block} | egrep '^[sv]d|^sr|^scd|^sg'); do
             if [[ "$(cat ${block}/${dev}/device/type)" = "5" ]]; then
                 check_media
             fi
             #check virtio devices
-            if ! [[ -e ${block}/${dev}/device/type ]]; then
+            if ! [[ -e "${block}/${dev}/device/type" ]]; then
                 check_media
             fi
         done
     fi
-    if [[ "${SET_MEDIA}" = "0" ]]; then
+    
+    if [[ "${SET_MEDIA}" == "0" ]]; then
         # usb devices with raw partition
         for dev in $(ls ${block} | egrep '^sd'); do
-            if [[ "$(cat ${block}/${dev}/device/type)" = "0" && "$(cat ${block}/${dev}/removable)" = "1" && ! "$(cat ${block}/${dev}/size)" = "0" ]]; then
+            if [[ "$(cat ${block}/${dev}/device/type)" == "0" && "$(cat ${block}/${dev}/removable)" == "1" && ! "$(cat ${block}/${dev}/size)" == "0" ]]; then
                 check_media
             fi
         done
     fi
-    if [[ "${SET_MEDIA}" = "0" ]]; then
+    
+    if [[ "${SET_MEDIA}" == "0" ]]; then
         # MMC devices with raw partitions
         for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
             check_media
         done
     fi
+    
 }
 
 #check on manual mounted source
 manual_media() {
-    if [[ "${SET_MEDIA}" = "0" ]]; then
-        DIALOG --msgbox "No source media was autodetected, please switch to another VC and manually mount the source media under /src.  If you manually mount to /src, make sure the packages tar archive is available at /src/packages/archboot_packages_$(uname -m).tar .\n\n" 15 55
+    
+    if [[ "${SET_MEDIA}" == "0" ]]; then
+        DIALOG --msgbox "No source media was autodetected, please switch to another Virtual Terminal and manually mount the source media under /src.  If you manually mount to /src, make sure the packages squashfs files /src/packages/archboot_packages_$(uname -m).squashfs and /src/packages/archboot_packages_any.squashfs are available.\n\n" 15 55
     fi
+    
     if [[ ! -e "/src/packages/archboot_packages_$(uname -m).squashfs" ]]; then
         DIALOG --msgbox "$(uname -m) packages squashfs image /src/packages/archboot_packages_$(uname -m).squashfs is missing!" 0 0
         return 1
     fi
+    
     if [[ ! -e "/src/packages/archboot_packages_any.squashfs" ]]; then
         DIALOG --msgbox "'any' packages squashfs image /src/packages/archboot_packages_any.squashfs is missing!" 0 0
         return 1
     fi
+    
 }
 
 # destdir_mounts()
@@ -4128,10 +4148,14 @@ dogrub2_uefi_common() {
     PACKAGES=""
     get_grub2_map
     
-    CHECK_UEFI_SYS_PART="1"
-    CHECK_BIOS_BOOT_GRUB2=""
-    RUN_CGDISK=""
-    check_gpt
+    DISC="$(grub-probe --target=device "${DESTDIR}/" | sed 's/\(.\{8\}\).*/\1/')"
+    
+    if ! [[ "${DISC}" == "" ]]; then
+        CHECK_UEFI_SYS_PART="1"
+        CHECK_BIOS_BOOT_GRUB2=""
+        RUN_CGDISK=""
+        check_gpt
+    fi
     
     DISC="$(grub-probe --target=device "${DESTDIR}/boot" | sed 's/\(.\{8\}\).*/\1/')"
     
