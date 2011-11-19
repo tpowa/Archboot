@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/bin/openconnect"
+    BINARIES="/usr/sbin/openconnect"
     FILES=""
     SCRIPT=""
 }
