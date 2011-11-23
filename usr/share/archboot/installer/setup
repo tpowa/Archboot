@@ -272,7 +272,7 @@ check_media() {
     if [[ -e "${media}/packages/archboot_packages_$(uname -m).squashfs" && -e "${media}/packages/archboot_packages_any.squashfs" ]]; then
         _mount_packages_squashfs_images
         SET_MEDIA="1"
-        break
+        [[ "${AUTOMOUNT}" == "1" ]] && break
     else
         umount ${media} >/dev/null 2>&1
         SET_MEDIA="0"
@@ -285,13 +285,13 @@ get_media() {
     
     media="/src"
     SET_MEDIA="0"
-    
+    AUTOMOUNT="0"
     ## Check whether ${media} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
     ## This might be the case if the user manually mounted the media before launching this script
     if [[ "$(mountpoint "${media}")" ]]; then
         check_media
     fi
-    
+    AUTOMOUNT="1"
     # ide devices
     if [[ "${SET_MEDIA}" == "0" ]]; then
         for dev in $(ls ${block} | egrep '^hd'); do
@@ -300,7 +300,7 @@ get_media() {
             fi
         done
     fi
-    
+
     if [[ "${SET_MEDIA}" == "0" ]]; then
         # scsi/sata and other devices
         for dev in $(ls ${block} | egrep '^[sv]d|^sr|^scd|^sg'); do
@@ -313,7 +313,7 @@ get_media() {
             fi
         done
     fi
-    
+
     if [[ "${SET_MEDIA}" == "0" ]]; then
         # usb devices with raw partition
         for dev in $(ls ${block} | egrep '^sd'); do
@@ -322,7 +322,7 @@ get_media() {
             fi
         done
     fi
-    
+
     if [[ "${SET_MEDIA}" == "0" ]]; then
         # MMC devices with raw partitions
         for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
