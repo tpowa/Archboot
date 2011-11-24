@@ -5,7 +5,6 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 # add sh symlink
 ln -s /bin/bash /bin/sh
 
-mkdir -p /new_root
 mount -t proc proc /proc -o nosuid,noexec,nodev
 mount -t sysfs sys /sys -o nosuid,noexec,nodev
 

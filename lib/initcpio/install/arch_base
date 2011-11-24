@@ -16,7 +16,7 @@ build ()
     add_dir "/var/log"
     add_dir "/addons"
     add_dir "/home"
-    for dir in proc sys dev run; do
+    for dir in new_root proc sys dev run; do
         add_dir "/$dir"
     done
 
