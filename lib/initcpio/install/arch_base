@@ -22,7 +22,7 @@ build ()
 
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
-
+    add_symlink "/etc/mtab" "/proc/self/mounts"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/lib/initcpio/init_functions" "/init_functions"
