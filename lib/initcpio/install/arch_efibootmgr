@@ -1,0 +1,16 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    MODULES="$(checked_modules "/firmware/efivars")"
+    BINARIES="/usr/sbin/efibootmgr"
+    FILES=""
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes efibootmgr on an arch boot image.
+HELPEOF
+}
+
