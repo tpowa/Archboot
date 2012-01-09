@@ -2,17 +2,29 @@
 
 build ()
 {
-    BINARIES="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-kbdcomp /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/bin/grub-mount /usr/bin/grub-script-check /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mkdevicemap /usr/sbin/grub-mknetdir /usr/sbin/grub-probe /usr/sbin/grub-reboot /usr/sbin/grub-set-default /usr/sbin/grub-setup /usr/sbin/grub_bios-install /usr/sbin/grub_efi_x86_64-install"
-    FILES=""
+    BINARIES="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mount /usr/bin/grub-script-check /usr/sbin/grub-mkdevicemap /usr/sbin/grub-probe /usr/sbin/grub-setup"
+    FILES="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/sbin/grub_bios-install /usr/sbin/grub_efi_x86_64-install /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mknetdir /usr/sbin/grub-reboot /usr/sbin/grub-set-default"
     
-    # add config files
-    add_file "/boot/grub/grub.cfg" "/usr/share/grub/grub.cfg.bios.example"
-    add_file "/usr/share/grub/grub.cfg.uefi.example"
+    ## add grub2 config file
+    add_file "/boot/grub/grub.cfg"
     
-    for i in $(find /usr/share/archboot/grub2/etc/* ! -type d); do
-        add_file "$i" "/etc/$(basename $i)"
+    ## add grub-mkconfig helper scripts
+    add_file "/usr/lib/grub/grub-mkconfig_lib"
+    add_file "/usr/lib/grub/update-grub_lib"
+    add_file "/etc/default/grub"
+    
+    for i in $(find /etc/grub.d/* ! -type d); do
+        add_file "$i"
     done
-
+    
+    ## Use grub2-common package grub-mkconfig helper scripts - not Archboot specific ones
+    #
+    # add_file "/usr/share/archboot/grub2/etc/default/grub" "/etc/default/grub"
+    #
+    # for i in $(find /usr/share/archboot/grub2/etc/grub.d/* ! -type d); do
+    #    add_file "$i" "/etc/grub.d/$(basename $i)"
+    # done
+    
     for i in $(find /usr/lib/grub/x86_64-efi ! -type d); do
         add_file "$i"
     done
