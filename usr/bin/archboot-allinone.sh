@@ -1,13 +1,12 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# grub2 uefi related commands copied from grub-mkrescue script from grub2-common package
+# grub2 uefi related commands copied from grub-mkstandalone and grub-mkrescue scripts from grub2-common package
 
 WD="${PWD}/"
 
 APPNAME="$(basename "${0}")"
 
-usage ()
-{
+usage () {
     echo "${APPNAME}: usage"
     echo "CREATE ALLINONE USB/CD IMAGES"
     echo "-----------------------------"
@@ -25,10 +24,10 @@ usage ()
     echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
     echo "  -lts=LTSKERNELNAME  Use LTSKERNELNAME in boot message."
     echo "  -h                  This message."
-    exit 1
+    exit 0
 }
 
-[ "${1}" == "" ] && usage && exit 1
+[[ "${1}" == "" ]] && usage
 
 ALLINONE="/etc/archboot/presets/allinone"
 ALLINONE_LTS="/etc/archboot/presets/allinone-lts"
@@ -53,26 +52,26 @@ while [ $# -gt 0 ]; do
 done
 
 ### check for root
-if ! [ ${UID} -eq 0 ]; then 
+if ! [[ ${UID} -eq 0 ]]; then 
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
 
-if [ "${TARBALL}" == "1" ]; then
+if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${ALLINONE}" -t="core-$(uname -m).tar"
 	"${TARBALL_HELPER}" -c="${ALLINONE_LTS}" -t="core-lts-$(uname -m).tar"
 	exit 0
 fi
 
-if ! [ "${GENERATE}" = "1" ]; then
+if ! [[ "${GENERATE}" == "1" ]]; then
 	usage
 fi
 
 # set defaults, if nothing given
-[ "${KERNEL}" = "" ] && KERNEL="$(uname -r)"
-[ "${LTS_KERNEL}" = "" ] && LTS_KERNEL="$(cat /lib/modules/extramodules-2.6.32-lts/version)"
-[ "${RELEASENAME}" = "" ] && RELEASENAME="2k11-R8"
-[ "${IMAGENAME}" = "" ] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
+[[ "${KERNEL}" == "" ]] && KERNEL="$(uname -r)"
+[[ "${LTS_KERNEL}" == "" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-2.6.32-lts/version)"
+[[ "${RELEASENAME}" == "" ]] && RELEASENAME="2k11-R8"
+[[ "${IMAGENAME}" == "" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 ALLINONE="$(mktemp -d /tmp/allinone.XXX)"
 
@@ -161,7 +160,7 @@ _prepare_other_files() {
 	mv "${CORE}/tmp"/*/arch/archboot.txt "${ALLINONE}/arch/"
 	
 	# copy in clamav db files
-	if [ -d /var/lib/clamav -a -x /usr/bin/freshclam ]; then
+	if [[ -d /var/lib/clamav -a -x /usr/bin/freshclam ]]; then
 		mkdir -p "${ALLINONE}/clamav"
 		rm -f /var/lib/clamav/*
 		freshclam --user=root
@@ -173,78 +172,53 @@ _prepare_other_files() {
 
 _prepare_grub2_uefi_x86_64_iso_files() {
 	
-	mkdir -p "${ALLINONE}/efi/grub2/"
-	cp -r /usr/lib/grub/x86_64-efi "${ALLINONE}/efi/grub2/x86_64-efi"
+	mkdir -p "${ALLINONE}/efi/grub2"
+	mkdir -p "${ALLINONE}/efi/grub2/x86_64-efi"
 	
-	memdisk_64_dir="$(mktemp -d /tmp/grub2_uefi_64_dir.XXX)"
-	memdisk_64_img="$(mktemp /tmp/grub2_uefi_64_img.XXX)"
-	
-	mkdir -p "${memdisk_64_dir}/efi/grub2"
-	
-	## Create memdisk for bootx64.efi
-	cat << EOF > "${memdisk_64_dir}/efi/grub2/grub.cfg"
+	## Create grub.cfg for grub-mkstandalone memdisk for bootx64.efi
+	cat << EOF > "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg"
 set _UEFI_ARCH="x86_64"
 
-search --file --no-floppy --set=uefi64 /efi/grub2/x86_64-efi/grub.cfg
-set prefix=(\${uefi64})/efi/grub2/x86_64-efi
-source \${prefix}/grub.cfg
-EOF
-	
-	cat << EOF > "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg"
-search --file --no-floppy --set=uefi64 /efi/grub2/x86_64-efi/grub.cfg
+insmod usbms
+insmod usb_keyboard
+
+insmod part_gpt
+insmod part_msdos
+
+insmod fat
+insmod iso9660
+insmod udf
+
+insmod ext2
+insmod reiserfs
+insmod ntfs
+insmod hfsplus
+
+search --file --no-floppy --set=uefi64 /efi/grub2/grub.cfg
 source (\${uefi64})/efi/grub2/grub.cfg
+
 EOF
 	
-	tar -C "${memdisk_64_dir}" -cf - efi > "${memdisk_64_img}"
+	mkdir -p "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub"
+	cp "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg" "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub/grub.cfg"
 	
-	"$(which grub-mkimage)" --directory="/usr/lib/grub/x86_64-efi" --memdisk="${memdisk_64_img}" --prefix='(memdisk)/efi/grub2' --format="x86_64-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" ${GRUB2_UEFI_APP_MODULES}
+	__WD="${PWD}/"
+	
+	cd "${ALLINONE}/efi/grub2/x86_64-efi/"
+	
+	grub-mkstandalone --directory="/usr/lib/grub/x86_64-efi" --format="x86_64-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" "boot/grub/grub.cfg"
+	
+	cd "${__WD}/"
+	
+	rm -rf "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub/"
+	rm -rf "${ALLINONE}/efi/grub2/x86_64-efi/boot"
 	
 	mkdir -p "${ALLINONE}/efi/boot/"
 	cp "${grub2_uefi_mp}/efi/boot/bootx64.efi" "${ALLINONE}/efi/boot/bootx64.efi"
 	
-	unset memdisk_64_dir
-	unset memdisk_64_img
-	echo
-	
-}
-
-_prepare_grub2_uefi_i386_iso_files() {
-	
-	mkdir -p "${ALLINONE}/efi/grub2/"
-	cp -r /usr/lib/grub/i386-efi "${ALLINONE}/efi/grub2/i386-efi"
-	
-	memdisk_32_dir="$(mktemp -d /tmp/grub2_uefi_32_dir.XXX)"
-	memdisk_32_img="$(mktemp /tmp/grub2_uefi_32_img.XXX)"
-	
-	mkdir -p "${memdisk_32_dir}/efi/grub2"
-	
-	## Create memdisk for bootia32.efi
-	cat << EOF > "${memdisk_32_dir}/efi/grub2/grub.cfg"
-set _UEFI_ARCH="i386"
-
-search --file --no-floppy --set=uefi32 /efi/grub2/i386-efi/grub.cfg
-set prefix=(\${uefi32})/efi/grub2/i386-efi
-source \${prefix}/grub.cfg
-EOF
-	
-	cat << EOF > "${ALLINONE}/efi/grub2/i386-efi/grub.cfg"
-search --file --no-floppy --set=uefi32 /efi/grub2/i386-efi/grub.cfg
-source (\${uefi32})/efi/grub2/grub.cfg
-EOF
-	
-	tar -C "${memdisk_32_dir}" -cf - efi > "${memdisk_32_img}"
-	
-	"$(which grub-mkimage)" --directory="/usr/lib/grub/i386-efi" --memdisk="${memdisk_32_img}" --prefix='(memdisk)/efi/grub2' --format="i386-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootia32.efi" ${GRUB2_UEFI_APP_MODULES}
-	
-	unset memdisk_32_dir
-	unset memdisk_32_img
-	echo
-	
 }
 
 _prepare_grub2_uefi_iso_files() {
-	
-	GRUB2_UEFI_APP_MODULES="part_gpt part_msdos fat ext2 iso9660 udf hfsplus btrfs nilfs2 xfs reiserfs relocator reboot multiboot2 fshelp normal gfxterm chain linux ls cat memdisk tar search search_fs_file search_fs_uuid search_label help loopback boot configfile echo png efi_gop efi_uga gzio xzio font help lvm usbms usb_keyboard"
 	
 	grub2_uefi_mp="$(mktemp -d /tmp/grub2_uefi_mp.XXX)"
 	
@@ -252,39 +226,34 @@ _prepare_grub2_uefi_iso_files() {
 	mkdir -p "${ALLINONE}/efi/boot"
 	
 	# Create a blank image to be converted to ESP IMG
-	dd if=/dev/zero of="${ALLINONE}/efi/grub2/grub2_uefi.bin" bs=1024 count=3072
+	dd if="/dev/zero" of="${ALLINONE}/efi/grub2/grub2_uefi.bin" bs="1024" count="4096"
 	
 	# Create a FAT12 FS with Volume label "grub2_uefi"
 	mkfs.vfat -F12 -S 512 -n "grub2_uefi" "${ALLINONE}/efi/grub2/grub2_uefi.bin"
 	
 	## Mount the ${ALLINONE}/efi/grub2/grub2_uefi.bin image at ${grub2_uefi_mp} as loop 
-	if ! [ "$(grep ^loop /proc/modules)" ]; then
+	if ! [[ "$(lsmod | grep ^loop)" ]]; then
 		modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 	fi
+	
 	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_uefi.bin")"
 	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
 	
 	mkdir -p "${grub2_uefi_mp}/efi/boot/"
 	
 	_prepare_grub2_uefi_x86_64_iso_files
-	echo
-	
-	# _prepare_grub2_uefi_i386_iso_files
-	echo
 	
 	# umount images and loop
 	umount "${grub2_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	
-	cp /usr/share/grub/unicode.pf2 "${ALLINONE}/efi/grub2/"
+	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/efi/grub2/"
 	
 	mkdir -p "${ALLINONE}/efi/grub2/locale/"
 	
-	## Taken from /sbin/grub-install
-	for dir in "/usr/share/locale"/*
-	do
-		if test -f "${dir}/LC_MESSAGES/grub.mo"
-		then
+	## Taken from /usr/sbin/grub-install
+	for dir in "/usr/share/locale"/*; do
+		if test -f "${dir}/LC_MESSAGES/grub.mo"; then
 			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/efi/grub2/locale/${dir##*/}.mo"
 			echo
 		fi
@@ -294,7 +263,7 @@ _prepare_grub2_uefi_iso_files() {
 	cat << EOF > "${ALLINONE}/efi/grub2/grub.cfg"
 search --file --no-floppy --set=archboot /arch/archboot.txt
 
-set pager=1
+set pager="1"
 set locale_dir=(\${archboot})/efi/grub2/locale
 
 insmod efi_gop
@@ -303,16 +272,16 @@ insmod font
 
 if loadfont (\${archboot})/efi/grub2/unicode.pf2
 then
-   insmod gfxterm
-   set gfxmode="auto"
-   set gfxpayload="keep"
-   terminal_output gfxterm
-
-   set color_normal=light-blue/black
-   set color_highlight=light-cyan/blue
-
-   insmod png
-   background_image (\${archboot})/boot/splash.png
+    insmod gfxterm
+    set gfxmode="auto"
+    set gfxpayload="keep"
+    terminal_output gfxterm
+    
+    set color_normal=light-blue/black
+    set color_highlight=light-cyan/blue
+    
+    insmod png
+    background_image (\${archboot})/boot/splash.png
 fi
 
 insmod fat
@@ -323,28 +292,28 @@ insmod linux
 
 set _kernel_params="add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
 
-menuentry "Arch Linux (i686) archboot" {
-set root=(\${archboot})
-linux /boot/vmlinuz ro \${_kernel_params}
-initrd /boot/initrd.img
-}
-
 menuentry "Arch Linux (x86_64) archboot" {
-set root=(\${archboot})
-linux /boot/vm64 ro \${_kernel_params}
-initrd /boot/initrd64.img
-}
-
-menuentry "Arch Linux LTS (i686) archboot" {
-set root=(\${archboot})
-linux /boot/vmlts ro \${_kernel_params}
-initrd /boot/initrd.img
+    set root=(\${archboot})
+    linux /boot/vm64 ro \${_kernel_params}
+    initrd /boot/initrd64.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
-set root=(\${archboot})
-linux /boot/vm64lts ro \${_kernel_params}
-initrd /boot/initrd64.img
+    set root=(\${archboot})
+    linux /boot/vm64lts ro \${_kernel_params}
+    initrd /boot/initrd64.img
+}
+
+menuentry "Arch Linux (i686) archboot" {
+    set root=(\${archboot})
+    linux /boot/vmlinuz ro \${_kernel_params}
+    initrd /boot/initrd.img
+}
+
+menuentry "Arch Linux LTS (i686) archboot" {
+    set root=(\${archboot})
+    linux /boot/vmlts ro \${_kernel_params}
+    initrd /boot/initrd.img
 }
 
 EOF
@@ -392,17 +361,14 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@
 /usr/bin/archboot-usbimage-helper.sh "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 #create md5sums.txt
-[ -e md5sum.txt ] && rm -f md5sum.txt
+[[ -e md5sum.txt ]] && rm -f md5sum.txt
+
 for i in "${IMAGENAME}.iso" "${IMAGENAME}.img"; do
 	md5sum "${i}" >> md5sum.txt
 done
 
 # cleanup
-rm -rf "${memdisk_64_dir}"
-rm -rf "${memdisk_32_dir}"
 rm -rf "${grub2_uefi_mp}"
-rm -f "${memdisk_64_img}"
-rm -f "${memdisk_32_img}"
 rm -rf "${CORE}"
 rm -rf "${CORE64}"
 rm -rf "${CORE_LTS}"

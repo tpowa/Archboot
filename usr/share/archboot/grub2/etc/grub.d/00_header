@@ -17,7 +17,7 @@ set -e
 # You should have received a copy of the GNU General Public License
 # along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
 
-transform="s,grub,grub,"
+transform="s&^&&"
 
 prefix=/usr
 exec_prefix=${prefix}
@@ -36,7 +36,7 @@ done
 if [ "x${GRUB_DEFAULT}" = "x" ] ; then GRUB_DEFAULT=0 ; fi
 if [ "x${GRUB_DEFAULT}" = "xsaved" ] ; then GRUB_DEFAULT='${saved_entry}' ; fi
 if [ "x${GRUB_TIMEOUT}" = "x" ] ; then GRUB_TIMEOUT=5 ; fi
-if [ "x${GRUB_GFXMODE}" = "x" ] ; then GRUB_GFXMODE=640x480 ; fi
+if [ "x${GRUB_GFXMODE}" = "x" ] ; then GRUB_GFXMODE=auto ; fi
 
 if [ "x${GRUB_DEFAULT_BUTTON}" = "x" ] ; then GRUB_DEFAULT_BUTTON="$GRUB_DEFAULT" ; fi
 if [ "x${GRUB_DEFAULT_BUTTON}" = "xsaved" ] ; then GRUB_DEFAULT_BUTTON='${saved_entry}' ; fi
@@ -140,6 +140,19 @@ if loadfont `make_system_path_relative_to_its_root "${GRUB_FONT_PATH}"` ; then
   set gfxmode=${GRUB_GFXMODE}
   load_video
   insmod gfxterm
+EOF
+
+# Gettext variables and module
+if [ "x${LANG}" != "xC" ] && [ -d "${locale_dir}" ] ; then
+    prepare_grub_to_access_device $(${grub_probe} --target=device ${locale_dir}) | sed -e "s/^/  /"
+  cat << EOF
+  set locale_dir=(\$root)$(make_system_path_relative_to_its_root ${locale_dir})
+  set lang=${grub_lang}
+  insmod gettext
+EOF
+fi
+
+cat <<EOF
 fi
 EOF
 fi
@@ -216,16 +229,6 @@ insmod $reader
 background_image -m stretch `make_system_path_relative_to_its_root "$GRUB_BACKGROUND"`
 EOF
     fi
-fi
-
-# Gettext variables and module
-if [ "x${LANG}" != "xC" ] && [ -d "${locale_dir}" ] ; then
-    prepare_grub_to_access_device $(${grub_probe} --target=device ${locale_dir})
-  cat << EOF
-set locale_dir=(\$root)$(make_system_path_relative_to_its_root ${locale_dir})
-set lang=${grub_lang}
-insmod gettext
-EOF
 fi
 
 make_timeout ()

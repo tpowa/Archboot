@@ -2,23 +2,30 @@
 
 build ()
 {
-    MODULES="$(checked_modules "/firmware/efivars")"
-    BINARIES="/bin/grub-bin2h /bin/grub-editenv /bin/grub-fstest /bin/grub-menulst2cfg /bin/grub-mkfont /bin/grub-mkimage /bin/grub-mklayout /bin/grub-mkpasswd-pbkdf2 /bin/grub-mkrelpath /sbin/grub-mkdevicemap /sbin/grub-probe /sbin/grub-setup /bin/grub-kbdcomp /bin/grub-mkrescue /sbin/grub-mkconfig /sbin/grub-mknetdir /sbin/grub-reboot /sbin/grub-set-default /sbin/grub_bios-install /sbin/grub_efi_i386-install /sbin/grub_efi_x86_64-install /usr/sbin/efibootmgr"
+    BINARIES="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-kbdcomp /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/bin/grub-mount /usr/bin/grub-script-check /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mkdevicemap /usr/sbin/grub-mknetdir /usr/sbin/grub-probe /usr/sbin/grub-reboot /usr/sbin/grub-set-default /usr/sbin/grub-setup /usr/sbin/grub_bios-install /usr/sbin/grub_efi_x86_64-install"
     FILES=""
     
     # add config files
-    add_file "/boot/grub/grub.cfg.example"
+    add_file "/boot/grub/grub.cfg" "/usr/share/grub/grub.cfg.bios.example"
+    add_file "/usr/share/grub/grub.cfg.uefi.example"
+    
     for i in $(find /usr/share/archboot/grub2/etc/* ! -type d); do
         add_file "$i" "/etc/$(basename $i)"
     done
 
-    for i in $(find /usr/lib/grub ! -type d); do
+    for i in $(find /usr/lib/grub/x86_64-efi ! -type d); do
         add_file "$i"
     done
-
-    for i in $(find /usr/share/grub ! -type d); do
+    
+    ## No need to include /usr/lib/grub/i386-efi files in the initramfs image, reduces iso size
+    
+    for i in $(find /usr/lib/grub/i386-pc ! -type d); do
         add_file "$i"
     done
+    
+    ## add grub2 unicode font file
+    add_file "/usr/share/grub/unicode.pf2"
+    
 }
 
 help ()
@@ -27,3 +34,4 @@ cat<<HELPEOF
   This hook includes grub2 on an arch boot image.
 HELPEOF
 }
+

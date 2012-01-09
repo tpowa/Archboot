@@ -23,8 +23,7 @@
 
 APPNAME="$(basename "${0}")"
 
-_usage()
-{
+_usage() {
     echo "usage: ${APPNAME} <imageroot> <imagefile>"
     exit ${1}
 }
@@ -53,14 +52,13 @@ dd if=/dev/zero of="${FSIMG}" bs=512 count="${IMGSZ}"
 mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 
 # mount the filesystem and copy data
-if ! [ "$(grep ^loop /proc/modules)" ]; then
+if ! [[ "$(lsmod | grep ^loop)" ]]; then
 	modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 fi
 LOOP_DEVICE="$(losetup --show --find "${FSIMG}")"
 mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
 
-if [ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]
-then
+if [[ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]]; then
 	
 	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")"
 	mount -o ro,users -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
