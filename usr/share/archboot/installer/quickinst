@@ -5,12 +5,11 @@ PKGARG=${3}
 
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
-# name of the kernel image
-VMLINUZ="vmlinuz-linux"
-[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="linux"
-[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="linux-lts"
+# name of the kernel image
+VMLINUZ="vmlinuz-${KERNELPKG}"
 
 usage() {
     echo "quickinst <install_mode> <destdir> <package_directory|server_url>"

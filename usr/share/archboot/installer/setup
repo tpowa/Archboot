@@ -9,15 +9,13 @@ LOG="/dev/tty7"
 DESTDIR="/tmp/install"
 EDITOR=""
 
-# name of the kernel image
-VMLINUZ="vmlinuz-linux"
-[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && VMLINUZ="vmlinuz26-lts"
 # name of kernel package
 KERNELPKG="linux"
-[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="kernel26-lts"
+[[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="linux-lts"
+# name of the kernel image
+VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
-[[ "${KERNELPKG}" = "linux" ]] && INITRAMFS="initramfs-${KERNELPKG}"
-[[ "${KERNELPKG}" = "kernel26-lts" ]] && INITRAMFS="${KERNELPKG}"
+INITRAMFS="initramfs-${KERNELPKG}"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
