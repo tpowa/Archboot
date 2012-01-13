@@ -127,10 +127,6 @@ install_packages() {
         PACKAGES="$(pacman -Sg base | awk '{print $2}')"
     fi
     # Add packages which are not in core repository
-    if [[ "$(grep -w nvidia-kms /proc/cmdline)" && "${VMLINUZ}" = "kernel26-lts" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w nouveau-drm)" ]] && PACKAGES="${PACKAGES} nouveau-drm-lts"
-        ! [[ "$(echo ${PACKAGES} | grep -w nouveau-firmware)" ]] && PACKAGES="${PACKAGES} nouveau-firmware"
-    fi
     if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
     fi
