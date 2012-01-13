@@ -22,7 +22,7 @@ zd1211-firmware cifs-utils dmraid \
 linux-atm netcfg parted tzdata ntp v86d iw crda wireless-regdb libnl iproute2 dhclient \
 syslinux mtools perl gmp krb5 sqlite3 db dbus-core libcap fsarchiver xz librpcsecgss \
 libtirpc wipe ddrescue testdisk ifplugd libdaemon wpa_actiond rfkill libgssglue icu gptfdisk \
-btrfs-progs-unstable nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb \
+btrfs-progs nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb \
 grub2-common grub2-bios grub2-efi-x86_64 dmidecode efibootmgr file eject keyutils yp-tools \
 curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua weechat \
 gnutls nettle libtasn1 bind rpcbind expat progsreiserfs glib2 freetype2 libssh2 libfetch libedit \
