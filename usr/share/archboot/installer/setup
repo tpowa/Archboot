@@ -2998,7 +2998,7 @@ select_packages() {
     fi
     # Only install the booted kernel image!
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ kernel26-lts\ # #g")"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     NEXTITEM="5"
     S_SELECT=1
