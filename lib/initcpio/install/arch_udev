@@ -24,7 +24,7 @@ build ()
     for i in 42-qemu-usb 50-udev-default \
              60-cdrom_id 60-persistent-alsa 60-persistent-input 60-persistent-serial \
              60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
-             61-accelerometer.rules 70-udev-acl 75-net-description 75-tty-description 75-probe_mtd 78-sound-card \
+             61-accelerometer 70-udev-acl 75-net-description 75-tty-description 75-probe_mtd 78-sound-card \
              80-drivers 95-keyboard-force-release 95-keymap 95-udev-late; do
     	     add_file /lib/udev/rules.d/$i.rules
     done
