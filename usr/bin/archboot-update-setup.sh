@@ -3,7 +3,7 @@
 # Previously the script for creating grub2 uefi bootable isos - moved to all-in-one script
 # Contributed by "Keshav P R" <the.ridikulus.rat aatt geemmayil ddoott ccoomm>
 
-export archboot_ver="2011.11-1"
+export archboot_ver="2012.01-1"
 
 export WD="${PWD}/"
 

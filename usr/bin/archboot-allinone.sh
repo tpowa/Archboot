@@ -69,7 +69,7 @@ fi
 
 # set defaults, if nothing given
 [[ "${KERNEL}" == "" ]] && KERNEL="$(uname -r)"
-[[ "${LTS_KERNEL}" == "" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-2.6.32-lts/version)"
+[[ "${LTS_KERNEL}" == "" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
 [[ "${RELEASENAME}" == "" ]] && RELEASENAME="2k12-R1"
 [[ "${IMAGENAME}" == "" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
@@ -94,10 +94,10 @@ _merge_initramfs_files() {
 	
 	# merge them into one file for each architecture
 	cd  "${CORE}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma > "${CORE}/tmp"/initrd.img
+	find . -print0 | bsdcpio -0oH newc | xz --check=crc32 > "${CORE}/tmp"/initrd.img
 	
 	cd  "${CORE64}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/tmp"/initrd64.img
+	find . -print0 | bsdcpio -0oH newc | xz --check=crc32 > "${CORE64}/tmp"/initrd64.img
 	
 	cd "${WD}/"
 	
