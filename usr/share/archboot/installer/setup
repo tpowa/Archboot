@@ -4701,6 +4701,8 @@ auto_hwdetect() {
                 HWPARAMETER="${HWPARAMETER} --dmraid"
             fi
         fi
+        # check for separate /usr partition
+        [[ $(mount | grep "${DESTDIR}/usr ") ]] && HWPARAMETER="${HWPARAMETER} --shutdown"
         # add persistent net and sound options
         HWPARAMETER="${HWPARAMETER} --net --sound"
         [[ "$(blkid -c=/dev/null -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
