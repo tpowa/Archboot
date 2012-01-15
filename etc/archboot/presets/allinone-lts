@@ -12,7 +12,7 @@ MKINITCPIO_CONFIG="/etc/archboot/allinone-lts.conf"
 VERSION="$(cat /lib/modules/extramodules-3.0-lts/version)"
 
 # kernel image, defaulted to stock arch kernel
-KERNEL="/boot/vmlinuz26-lts"
+KERNEL="/boot/vmlinuz-linux-lts"
 
 # boot message file
 # blank by default arch-bootmessage hook will create it by default
