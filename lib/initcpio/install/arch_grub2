@@ -2,8 +2,8 @@
 
 build ()
 {
-    BINARIES="/bin/grub-editenv /bin/grub-fstest /bin/grub-menulst2cfg /bin/grub-mkfont /bin/grub-mkimage /bin/grub-mklayout /bin/grub-mkpasswd-pbkdf2 /bin/grub-mkrelpath /bin/grub-mount /bin/grub-script-check /sbin/grub-mkdevicemap /sbin/grub-probe /sbin/grub-setup"
-    FILES="/bin/grub-kbdcomp /bin/grub-mkrescue /bin/grub-mkstandalone /sbin/grub_bios-install /sbin/grub_efi_x86_64-install /sbin/grub-install /sbin/grub-mkconfig /sbin/grub-mknetdir /sbin/grub-reboot /sbin/grub-set-default"
+    BINARIES="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mount /usr/bin/grub-script-check /usr/sbin/grub-mkdevicemap /usr/sbin/grub-probe /usr/sbin/grub-setup"
+    FILES="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/sbin/grub_bios-install /usr/sbin/grub_efi_x86_64-install /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mknetdir /usr/sbin/grub-reboot /usr/sbin/grub-set-default"
     
     ## add grub2 config file
     add_file "/boot/grub/grub.cfg"
