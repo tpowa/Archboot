@@ -24,7 +24,6 @@ run_hook ()
   fi
   # load correct module
   if ! [ "$fbmodule" = "" ]; then
-    depmod -a
     msg ":: Loading ${fbmodule}..."
     modprobe -aq $fbmodule >/dev/null 2>&1
   fi
