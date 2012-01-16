@@ -8,6 +8,8 @@ run_hook ()
 			for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ata/*); do 
 				echo "blacklist $(basename $i .ko.gz | grep -e '^pata' -e '^ata_generic' -e '^ata_piix')" >> /etc/modprobe.d/ide-blacklist.conf
 			done
+			#delete blank lines
+			sed -i -e '/blacklist\ $/d' /etc/modprobe.d/ide-blacklist.conf
 			msg "Blacklisted IDE modules (new subsystem) for udev:"
 			msg "--------------------------------------"
 			if [ -s /etc/modprobe.d/ide-blacklist.conf ]; then 
@@ -24,6 +26,8 @@ run_hook ()
 			for i in $(echo /lib/modules/$(uname -r)/kernel/drivers/ide/*); do 
 				echo "blacklist $(basename $i .ko.gz | grep -v ^ide)" >> /etc/modprobe.d/ide-blacklist.conf
 			done
+			#delete blank lines
+			sed -i -e '/blacklist\ $/d' /etc/modprobe.d/ide-blacklist.conf
 			msg "Blacklisted IDE modules (old subsystem) for udev:"
 			msg "--------------------------------------"
 			if [ -s /etc/modprobe.d/ide-blacklist.conf ]; then 
