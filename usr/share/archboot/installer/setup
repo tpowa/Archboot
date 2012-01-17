@@ -3863,7 +3863,7 @@ dogrub2_config() {
     cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
     head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    rm -f /tmp/.grub.cfg
+    rm -f "/tmp/.grub.cfg"
     
     NUMBER="0"
     
@@ -4197,13 +4197,13 @@ do_uefi_efibootmgr() {
         chroot_mount
         
         if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]] || [[ -d "/sys/firmware/efi/vars" ]]; then
-            # Delete old entries of grub2 - command to be checked
-            for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " ${EFIBOOTMGR_LABEL}" | cut -b5-8)
-            do
-                chroot "${DESTDIR}" /usr/sbin/efibootmgr --bootnum "${bootnum}" --delete-bootnum
-            done
+            ## Delete old entries of grub2 - command to be checked - do  not do for now
+            # for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " ${EFIBOOTMGR_LABEL}" | cut -b5-8)
+            # do
+            #    chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --bootnum "${bootnum}" --delete-bootnum
+            # done
             
-            chroot "${DESTDIR}" /usr/sbin/efibootmgr --create --gpt --disk "${EFIBOOTMGR_DISC}" --part "${EFIBOOTMGR_PART_NUM}" --write-signature --label "${EFIBOOTMGR_LABEL}" --loader "\\EFI\\${EFIBOOTMGR_LOADER_DIR}\\${EFIBOOTMGR_LOADER_FILE}.efi"
+            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${EFIBOOTMGR_DISC}" --part "${EFIBOOTMGR_PART_NUM}" --write-signature --label "${EFIBOOTMGR_LABEL}" --loader "\\EFI\\${EFIBOOTMGR_LOADER_DIR}\\${EFIBOOTMGR_LOADER_FILE}.efi"
         else
             DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
         fi
@@ -4253,10 +4253,10 @@ do_efi_bootmgr_setup() {
 
 dogrub2_uefi_efibootmgr() {
     
-    _BOOTMGR_LABEL="GRUB2"
+    _BOOTMGR_LABEL="Arch Linux (GRUB2)"
     _BOOTMGR_DISC="${DISC}"
     _BOOTMGR_PART_NUM="${UEFI_SYS_PART_NUM}"
-    _BOOTMGR_LOADER_DIR="grub"
+    _BOOTMGR_LOADER_DIR="arch"
     _BOOTMGR_LOADER_FILE="grubx64.efi"
     do_efi_bootmgr_setup
     
@@ -4289,7 +4289,11 @@ dogrub2_uefi_common() {
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/usr/sbin/grub_efi_${UEFI_ARCH}-install" --root-directory="/boot/efi" --boot-directory="/boot/efi/efi" --bootloader-id="grub" --no-floppy --recheck >> "/tmp/grub2_uefi.log"
+    chroot "${DESTDIR}" "/usr/sbin/grub_efi_${UEFI_ARCH}-install" \
+        --root-directory="/boot/efi" \
+        --bootloader-id="arch" \
+        --boot-directory="/boot/efi/efi" \
+        --no-floppy --recheck >> "/tmp/grub2_uefi.log"
     
     chroot_umount
     
@@ -4315,7 +4319,7 @@ insmod reiserfs
 insmod ntfs
 insmod hfsplus
 
-search --file --no-floppy --set=grub2_uefi_root /efi/grub/grub_standalone.efi
+search --file --no-floppy --set=grub2_uefi_root /efi/arch/grub_standalone.efi
 
 # set prefix=(\${grub2_uefi_root})/efi/grub/
 source (\${grub2_uefi_root})/efi/grub/grub.cfg
@@ -4330,11 +4334,12 @@ EOF
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
-                                                     --format="${UEFI_ARCH}-efi" \
-                                                     --compression="xz" \
-                                                     --output="/boot/efi/efi/grub/grub_standalone.efi" \
-                                                     "boot/grub/grub.cfg" > "/tmp/grub2_uefi_mkstandalone.log"
+    chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
+        --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
+        --format="${UEFI_ARCH}-efi" \
+        --compression="xz" \
+        --output="/boot/efi/efi/arch/grub_standalone.efi" \
+        "boot/grub/grub.cfg" > "/tmp/grub2_uefi_mkstandalone.log"
     
     chroot_umount
     
