@@ -12,6 +12,7 @@ APPNAME="$(basename "${0}")"
 export archboot_ext="$(mktemp -d /tmp/archboot_ext.XXXXXXXXXX)"
 export iso_name="archboot_${archboot_ver}_mod"
 
+export UPDATE_UEFI_SHELL="1"
 export REPLACE_GRUB2_UEFI="1"
 export REPLACE_SETUP="1"
 
@@ -42,6 +43,51 @@ echo
 
 [[ -e "${WD}/splash.png" ]] && cp "${WD}/splash.png" "${archboot_ext}/boot/splash.png"
 echo
+
+_download_uefi_shell_tianocore() {
+	
+	mkdir -p "${ALLINONE}/efi/boot"
+	
+	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell"
+	
+	mv "${archboot_ext}/efi/boot/shellx64.efi" "${archboot_ext}/efi/boot/shellx64.efi.backup" || true
+	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${archboot_ext}/efi/boot/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
+	[[ -e "${WD}/shellx64.efi" ]] && 
+	echo
+	
+	if [[ ! "$(file "${archboot_ext}/efi/boot/shellx64.efi" | grep 'executable')" ]]; then
+		rm "${archboot_ext}/efi/boot/shellx64.efi" || true
+		
+		if [[ -e "${WD}/shellx64.efi" ]]; then
+			cp "${WD}/shellx64.efi" "${archboot_ext}/efi/boot/shellx64.efi"
+		else
+			mv "${archboot_ext}/efi/boot/shellx64.efi.backup" "${archboot_ext}/efi/boot/shellx64.efi" || true
+		fi
+	else
+		rm "${archboot_ext}/efi/boot/shellx64.efi.backup" || true
+	fi
+	echo
+	
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell"
+	
+	# mv "${archboot_ext}/efi/boot/shellx64_old.efi" "${archboot_ext}/efi/boot/shellx64_old.efi.backup" || true
+	# curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${archboot_ext}/efi/boot/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
+	echo
+	
+	# if [[ ! "$(file "${archboot_ext}/efi/boot/shellx64_old.efi" | grep 'executable')" ]]; then
+	#	rm "${archboot_ext}/efi/boot/shellx64_old.efi" || true
+	#	
+	#	if [[ -e "${WD}/shellx64_old.efi" ]]; then
+	#		cp "${WD}/shellx64_old.efi" "${archboot_ext}/efi/boot/shellx64_old.efi"
+	#	else
+	#		mv "${archboot_ext}/efi/boot/shellx64_old.efi.backup" "${archboot_ext}/efi/boot/shellx64_old.efi" || true
+	#	fi
+	# else
+	#	rm "${archboot_ext}/efi/boot/shellx64_old.efi.backup" || true
+	# fi
+	echo
+	
+}
 
 _replace_grub2_uefi_x86_64_iso_files() {
 	
@@ -74,6 +120,9 @@ insmod ext2
 insmod reiserfs
 insmod ntfs
 insmod hfsplus
+
+insmod linux
+insmod chain
 
 search --file --no-floppy --set=uefi64 /efi/grub2/grub.cfg
 source (\${uefi64})/efi/grub2/grub.cfg
@@ -199,7 +248,7 @@ insmod udf
 insmod search_fs_file
 insmod linux
 
-set _kernel_params="add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
+set _kernel_params="gpt add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
 
 menuentry "Arch Linux (x86_64) archboot" {
     set root=(\${archboot})
@@ -223,6 +272,11 @@ menuentry "Arch Linux LTS (i686) archboot" {
     set root=(\${archboot})
     linux /boot/vmlts ro \${_kernel_params}
     initrd /boot/initrd.img
+}
+
+menuentry "Launch UEFI Shell" {
+    set root=(\${archboot})
+    chainloader /efi/boot/shellx64.efi
 }
 
 EOF
@@ -330,6 +384,8 @@ _download_pkgs() {
 	
 }
 
+[[ "${UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
+
 [[ "${REPLACE_GRUB2_UEFI}" == "1" ]] && _replace_grub2_uefi_iso_files
 
 if [[ "${REPLACE_SETUP}" == "1" ]] && [[ -e "${WD}/setup" ]]; then
@@ -379,5 +435,6 @@ unset archboot_ver
 unset WD
 unset archboot_ext
 unset iso_name
+unset UPDATE_UEFI_SHELL
 unset REPLACE_GRUB2_UEFI
 unset REPLACE_SETUP

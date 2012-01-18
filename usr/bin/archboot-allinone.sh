@@ -170,6 +170,18 @@ _prepare_other_files() {
 	
 }
 
+_download_uefi_shell_tianocore() {
+	
+	mkdir -p "${ALLINONE}/efi/boot"
+	
+	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell"
+	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/boot/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell"
+	# curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/boot/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	
+}
+
 _prepare_grub2_uefi_x86_64_iso_files() {
 	
 	mkdir -p "${ALLINONE}/efi/grub2"
@@ -193,6 +205,9 @@ insmod ext2
 insmod reiserfs
 insmod ntfs
 insmod hfsplus
+
+insmod linux
+insmod chain
 
 search --file --no-floppy --set=uefi64 /efi/grub2/grub.cfg
 source (\${uefi64})/efi/grub2/grub.cfg
@@ -289,8 +304,9 @@ insmod iso9660
 insmod udf
 insmod search_fs_file
 insmod linux
+insmod chain
 
-set _kernel_params="add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
+set _kernel_params="gpt add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
 
 menuentry "Arch Linux (x86_64) archboot" {
     set root=(\${archboot})
@@ -316,6 +332,11 @@ menuentry "Arch Linux LTS (i686) archboot" {
     initrd /boot/initrd.img
 }
 
+menuentry "Launch UEFI Shell" {
+    set root=(\${archboot})
+    chainloader /efi/boot/shellx64.efi
+}
+
 EOF
 	
 }
@@ -327,6 +348,8 @@ _prepare_other_files
 _merge_initramfs_files
 
 _prepare_kernel_initramfs_files
+
+_download_uefi_shell_tianocore
 
 _prepare_grub2_uefi_iso_files
 
