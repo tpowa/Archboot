@@ -172,13 +172,13 @@ _prepare_other_files() {
 
 _download_uefi_shell_tianocore() {
 	
-	mkdir -p "${ALLINONE}/efi/boot"
+	mkdir -p "${ALLINONE}/efi/shell/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/boot/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/boot/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 }
 
@@ -292,11 +292,11 @@ then
     set gfxpayload="keep"
     terminal_output gfxterm
     
-    set color_normal=light-blue/black
-    set color_highlight=light-cyan/blue
+    # set color_normal=light-blue/black
+    # set color_highlight=light-cyan/blue
     
-    insmod png
-    background_image (\${archboot})/boot/splash.png
+    # insmod png
+    # background_image (\${archboot})/boot/syslinux/splash.png
 fi
 
 insmod fat
@@ -334,12 +334,12 @@ menuentry "Arch Linux LTS (i686) archboot" {
 
 menuentry "Launch UEFI Shell 2.0 - For UEFI Spec. >=2.3 systems" {
     set root=(\${archboot})
-    chainloader /efi/boot/shellx64.efi
+    chainloader /efi/shell/shellx64.efi
 }
 
 menuentry "Launch UEFI Shell 1.0 - For UEFI Spec. <2.3 systems" {
     set root=(\${archboot})
-    chainloader /efi/boot/shellx64_old.efi
+    chainloader /efi/shell/shellx64_old.efi
 }
 
 EOF

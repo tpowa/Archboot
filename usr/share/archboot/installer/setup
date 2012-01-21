@@ -4902,7 +4902,7 @@ configure_system() {
 install_bootloader() {
     
     destdir_mounts || return 1
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
     source_set || return 1
@@ -4910,13 +4910,13 @@ install_bootloader() {
     prepare_pacman
     CANCEL=""
     
-    [[ "$(dmesg | grep 'UEFI_ARCH_x86_64')" ]] && UEFI_x86_64="1"
+    [[ "$(grep UEFI_ARCH_x86_64 /proc/cmdline)" ]] && UEFI_x86_64="1"
     
-    [[ "${UEFI_x86_64}" = "1" ]] && DIALOG --yesno "Setup detected that you are using x86_64 (64-bit) UEFI ...\nDo you want to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_uefi_x86_64
+    [[ "${UEFI_x86_64}" == "1" ]] && DIALOG --yesno "Setup has detected that you are using x86_64 (64-bit) UEFI ...\nDo you like to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_uefi_x86_64
     
     DIALOG --menu "Which BIOS/UEFI bootloader would you like to use?" 13 55 7 \
         "EXTLINUX" "EXTLINUX/SYSLINUX" \
-        "GRUB2_BIOS" "GRUB2" \
+        "GRUB2_BIOS" "GRUB2 BIOS" \
         "GRUB2_UEFI_x86_64" "GRUB2 64-bit UEFI" \
         "GRUB2_UEFI_i386" "GRUB2 32-bit UEFI" \
         "GRUB_LEGACY" "GRUB LEGACY" \
