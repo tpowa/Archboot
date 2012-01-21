@@ -245,8 +245,8 @@ activate_special_devices()
 
 _mount_packages_squashfs_images() {
     
-    umount "/packages/core-$(uname -m)"
-    umount "/packages/core-any"
+    umount "/packages/core-$(uname -m)"  >/dev/null 2>&1
+    umount "/packages/core-any"  >/dev/null 2>&1
     rm -rf "/packages/core-$(uname -m)"
     rm -rf "/packages/core-any"
     
