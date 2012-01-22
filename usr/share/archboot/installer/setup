@@ -4324,6 +4324,9 @@ insmod reiserfs
 insmod ntfs
 insmod hfsplus
 
+insmod linux
+insmod chain
+
 search --file --no-floppy --set=grub2_uefi_root /efi/arch/grub_standalone.efi
 
 # set prefix=(\${grub2_uefi_root})/efi/grub/
