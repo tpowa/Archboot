@@ -1,10 +1,13 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# grub2 uefi related commands copied from grub-mkstandalone and grub-mkrescue scripts from grub2-common package
+# grub2-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in extra/grub2-common package
 
 WD="${PWD}/"
 
 APPNAME="$(basename "${0}")"
+
+_DO_x86_64="1"
+_DO_i686="1"
 
 usage () {
     echo "${APPNAME}: usage"
@@ -27,15 +30,15 @@ usage () {
     exit 0
 }
 
-[[ "${1}" == "" ]] && usage
+[[ -z "${1}" ]] && usage
 
-ALLINONE="/etc/archboot/presets/allinone"
-ALLINONE_LTS="/etc/archboot/presets/allinone-lts"
+ALLINONE_PRESET="/etc/archboot/presets/allinone"
+ALLINONE_LTS_PRESET="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
-USBIMAGE_HELPER="/usr/bin/archboot-tarball-helper.sh"
+USBIMAGE_HELPER="/usr/bin/archboot-usbimage-helper.sh"
 
 # change to english locale!
-export LANG=en_US
+export LANG="en_US"
 
 while [ $# -gt 0 ]; do
 	case ${1} in
@@ -58,8 +61,8 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 if [[ "${TARBALL}" == "1" ]]; then
-	"${TARBALL_HELPER}" -c="${ALLINONE}" -t="core-$(uname -m).tar"
-	"${TARBALL_HELPER}" -c="${ALLINONE_LTS}" -t="core-lts-$(uname -m).tar"
+	"${TARBALL_HELPER}" -c="${ALLINONE_PRESET}" -t="core-$(uname -m).tar"
+	"${TARBALL_HELPER}" -c="${ALLINONE_LTS_PRESET}" -t="core-lts-$(uname -m).tar"
 	exit 0
 fi
 
@@ -68,36 +71,41 @@ if ! [[ "${GENERATE}" == "1" ]]; then
 fi
 
 # set defaults, if nothing given
-[[ "${KERNEL}" == "" ]] && KERNEL="$(uname -r)"
-[[ "${LTS_KERNEL}" == "" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
-[[ "${RELEASENAME}" == "" ]] && RELEASENAME="2k12-R1"
-[[ "${IMAGENAME}" == "" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
+[[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
+[[ -z "${LTS_KERNEL}" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k12-R1"
+[[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 ALLINONE="$(mktemp -d /tmp/allinone.XXX)"
 
 # create directories
-mkdir "${ALLINONE}/arch"
+mkdir -p "${ALLINONE}/arch"
 mkdir -p "${ALLINONE}/boot/syslinux"
 mkdir -p "${ALLINONE}/packages/"
 
 _merge_initramfs_files() {
 	
-	# extract the initramfs files
-	mkdir  "${CORE}/tmp"/initrd
-	cd "${CORE}/tmp"/initrd
-	bsdtar xf "${CORE}/tmp"/*/boot/initrd.img
-	bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img
-	mkdir  "${CORE64}/tmp"/initrd
-	cd "${CORE64}/tmp"/initrd
-	bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img
-	bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img
+	if [[ "${_DO_x86_64}" == "1" ]]; then
+		mkdir -p "${CORE64}/tmp/initrd"
+		cd "${CORE64}/tmp/initrd"
+		
+		bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img
+		bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img
+		
+		cd  "${CORE64}/tmp/initrd"
+		find . -print0 | bsdcpio -0oH newc | xz --check=crc32 --lzma2=dict=1MiB > "${CORE64}/tmp/initramfs_x86_64.img"
+	fi
 	
-	# merge them into one file for each architecture
-	cd  "${CORE}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | xz --check=crc32 > "${CORE}/tmp"/initrd.img
-	
-	cd  "${CORE64}/tmp"/initrd
-	find . -print0 | bsdcpio -0oH newc | xz --check=crc32 > "${CORE64}/tmp"/initrd64.img
+	if [[ "${_DO_i686}" == "1" ]]; then
+		mkdir -p "${CORE}/tmp/initrd"
+		cd "${CORE}/tmp/initrd"
+		
+		bsdtar xf "${CORE}/tmp"/*/boot/initrd.img
+		bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img
+		
+		cd  "${CORE}/tmp/initrd"
+		find . -print0 | bsdcpio -0oH newc | xz --check=crc32 --lzma2=dict=1MiB > "${CORE}/tmp/initramfs_i686.img"
+	fi
 	
 	cd "${WD}/"
 	
@@ -105,51 +113,59 @@ _merge_initramfs_files() {
 
 _prepare_kernel_initramfs_files() {
 	
-	# place kernels and memtest
-	mv "${CORE}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz"
-	mv "${CORE64}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vm64"
-	mv "${CORE_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlts"
-	mv "${CORE64_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vm64lts"
-	mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
+	if [[ "${_DO_x86_64}" == "1" ]]; then
+		mv "${CORE64}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_x86_64"
+		mv "${CORE64_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_x86_64_lts"
+		mv "${CORE64}/tmp/initramfs_x86_64.img" "${ALLINONE}/boot/initramfs_x86_64.img"
+	fi
 	
-	# place initramfs files
-	mv "${CORE}/tmp"/initrd.img "${ALLINONE}/boot/initrd.img"
-	mv "${CORE64}/tmp"/initrd64.img "${ALLINONE}/boot/initrd64.img"
+	if [[ "${_DO_i686}" == "1" ]]; then
+		mv "${CORE}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_i686"
+		mv "${CORE_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_i686_lts"
+		mv "${CORE}/tmp/initramfs_i686.img" "${ALLINONE}/boot/initramfs_i686.img"
+	fi
+	
+	mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
 	
 }
 
 _prepare_packages() {
 	
-	# generate temp directories
-	CORE="$(mktemp -d /tmp/core.XXX)"
-	CORE64="$(mktemp -d /tmp/core64.XXX)"
-	CORE_LTS="$(mktemp -d /tmp/core-lts.XXX)"
-	CORE64_LTS="$(mktemp -d /tmp/core64-lts.XXX)"
 	PACKAGES_TEMP_DIR="$(mktemp -d /tmp/pkgs_temp.XXX)"
 	
-	# extract tarballs
-	tar xvf core-i686.tar -C "${CORE}" || exit 1
-	tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
-	tar xvf core-lts-x86_64.tar -C "${CORE64_LTS}" || exit 1
-	tar xvf core-lts-i686.tar -C "${CORE_LTS}" || exit 1
+	if [[ "${_DO_x86_64}" == "1" ]]; then
+		CORE64="$(mktemp -d /tmp/core64.XXX)"
+		CORE64_LTS="$(mktemp -d /tmp/core64-lts.XXX)"
+		
+		tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
+		tar xvf core-lts-x86_64.tar -C "${CORE64_LTS}" || exit 1
+		
+		cp -r "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
+		rm -rf "${CORE64_LTS}/tmp"/*/core-x86_64
+		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
+		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${ALLINONE}/packages/"
+	fi
 	
-	# move in i686 packages
-	cp -r "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
-	rm -rf "${CORE_LTS}/tmp"/*/core-i686
-	mksquashfs "${PACKAGES_TEMP_DIR}"/core-i686/ "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" -comp gzip -all-root
-	
-	# move in x86_64 packages
-	cp -r "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
-	rm -rf "${CORE64_LTS}/tmp"/*/core-x86_64
-	mksquashfs "${PACKAGES_TEMP_DIR}"/core-x86_64/ "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp gzip -all-root
+	if [[ "${_DO_i686}" == "1" ]]; then
+		CORE="$(mktemp -d /tmp/core.XXX)"
+		CORE_LTS="$(mktemp -d /tmp/core-lts.XXX)"
+		
+		tar xvf core-i686.tar -C "${CORE}" || exit 1
+		tar xvf core-lts-i686.tar -C "${CORE_LTS}" || exit 1
+		
+		cp -r "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
+		rm -rf "${CORE_LTS}/tmp"/*/core-i686
+		mksquashfs "${PACKAGES_TEMP_DIR}/core-i686/" "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" -comp xz -noappend -all-root
+		mv "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" "${ALLINONE}/packages/"
+	fi
 	
 	# move in 'any' packages
 	cp -r "${CORE_LTS}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
 	rm -rf "${CORE_LTS}/tmp"/*/core-any
-	mksquashfs "${PACKAGES_TEMP_DIR}"/core-any/ "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp gzip -all-root
+	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
 	
 	cd "${WD}/"
-	mv "${PACKAGES_TEMP_DIR}"/archboot_packages_{i686,x86_64,any}.squashfs "${ALLINONE}/packages/"
+	mv "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" "${ALLINONE}/packages/"
 	
 }
 
@@ -175,22 +191,22 @@ _download_uefi_shell_tianocore() {
 	mkdir -p "${ALLINONE}/efi/shell/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose --ipv4 -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 }
 
-_prepare_grub2_uefi_x86_64_iso_files() {
+_prepare_grub2_uefi_arch_specific_iso_files() {
+	
+	[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
+	[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
 	
 	mkdir -p "${ALLINONE}/efi/grub2"
-	mkdir -p "${ALLINONE}/efi/grub2/x86_64-efi"
 	
-	## Create grub.cfg for grub-mkstandalone memdisk for bootx64.efi
-	cat << EOF > "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg"
-set _UEFI_ARCH="x86_64"
-
+	## Create grub.cfg for grub-mkstandalone memdisk for boot${_SPEC_UEFI_ARCH}.efi
+	cat << EOF > "${ALLINONE}/efi/grub2/grub_standalone_archboot.cfg"
 insmod usbms
 insmod usb_keyboard
 
@@ -209,27 +225,30 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --file --no-floppy --set=uefi64 /efi/grub2/grub.cfg
-source (\${uefi64})/efi/grub2/grub.cfg
+search --file --no-floppy --set=archboot /efi/grub2/grub_archboot.cfg
+source (\${archboot})/efi/grub2/grub_archboot.cfg
 
 EOF
 	
-	mkdir -p "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub"
-	cp "${ALLINONE}/efi/grub2/x86_64-efi/grub.cfg" "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub/grub.cfg"
+	mkdir -p "${ALLINONE}/efi/grub2/boot/grub"
+	cp "${ALLINONE}/efi/grub2/grub_standalone_archboot.cfg" "${ALLINONE}/efi/grub2/boot/grub/grub.cfg"
 	
 	__WD="${PWD}/"
 	
-	cd "${ALLINONE}/efi/grub2/x86_64-efi/"
+	cd "${ALLINONE}/efi/grub2/"
 	
-	grub-mkstandalone --directory="/usr/lib/grub/x86_64-efi" --format="x86_64-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" "boot/grub/grub.cfg"
+	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
 	
 	cd "${__WD}/"
 	
-	rm -rf "${ALLINONE}/efi/grub2/x86_64-efi/boot/grub/"
-	rm -rf "${ALLINONE}/efi/grub2/x86_64-efi/boot"
+	rm -rf "${ALLINONE}/efi/grub2/boot/grub/"
+	rm -rf "${ALLINONE}/efi/grub2/boot"
 	
 	mkdir -p "${ALLINONE}/efi/boot/"
-	cp "${grub2_uefi_mp}/efi/boot/bootx64.efi" "${ALLINONE}/efi/boot/bootx64.efi"
+	cp "${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	
+	unset _UEFI_ARCH
+	unset _SPEC_UEFI_ARCH
 	
 }
 
@@ -252,11 +271,12 @@ _prepare_grub2_uefi_iso_files() {
 	fi
 	
 	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_uefi.bin")"
-	mount -o rw,users -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
+	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
 	
 	mkdir -p "${grub2_uefi_mp}/efi/boot/"
 	
-	_prepare_grub2_uefi_x86_64_iso_files
+	_UEFI_ARCH="x86_64"
+	_prepare_grub2_uefi_arch_specific_iso_files
 	
 	# umount images and loop
 	umount "${grub2_uefi_mp}"
@@ -267,29 +287,48 @@ _prepare_grub2_uefi_iso_files() {
 	mkdir -p "${ALLINONE}/efi/grub2/locale/"
 	
 	## Taken from /usr/sbin/grub-install
-	for dir in "/usr/share/locale"/*; do
-		if test -f "${dir}/LC_MESSAGES/grub.mo"; then
+	#for dir in "/usr/share/locale"/*; do
+	#	if test -f "${dir}/LC_MESSAGES/grub.mo"; then
 			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/efi/grub2/locale/${dir##*/}.mo"
-			echo
-		fi
-	done
+	#		echo
+	#	fi
+	#done
 	
 	## Create the actual grub2 uefi config file
-	cat << EOF > "${ALLINONE}/efi/grub2/grub.cfg"
-search --file --no-floppy --set=archboot /arch/archboot.txt
+	cat << EOF > "${ALLINONE}/efi/grub2/grub_archboot.cfg"
+if [ "\${grub_platform}" == "efi" ]; then
+    set _UEFI_ARCH="\${grub_cpu}"
+    
+    if [ "\${grub_cpu}" == "x86_64" ]; then
+        set _SPEC_UEFI_ARCH="x64"
+    elif [ "\${grub_cpu}" == "i386" ]; then
+        set _SPEC_UEFI_ARCH="ia32"
+    fi
+fi
+
+# search --file --no-floppy --set=archboot /efi/grub2/grub_archboot.cfg
+# search --file --no-floppy --set=archboot /efi/grub2/grub_standalone_archboot.cfg
 
 set pager="1"
+# set debug="all"
+
 set locale_dir=(\${archboot})/efi/grub2/locale
 
-insmod efi_gop
-insmod efi_uga
+if [ "\${grub_platform}" == "efi" ]; then
+    insmod efi_gop
+    insmod efi_uga
+    insmod video_bochs
+    insmod video_cirrus
+fi
+
 insmod font
 
 if loadfont (\${archboot})/efi/grub2/unicode.pf2
 then
     insmod gfxterm
     set gfxmode="auto"
-    set gfxpayload="keep"
+    
+    terminal_input console
     terminal_output gfxterm
     
     # set color_normal=light-blue/black
@@ -306,40 +345,44 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
-set _kernel_params="gpt add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
+set _kernel_params="gpt add_efi_memmap loglevel=7 none=UEFI_ARCH_\${_UEFI_ARCH}"
 
 menuentry "Arch Linux (x86_64) archboot" {
+    set gfxpayload="keep"
     set root=(\${archboot})
-    linux /boot/vm64 ro \${_kernel_params}
-    initrd /boot/initrd64.img
+    linux /boot/vmlinuz_x86_64 \${_kernel_params}
+    initrd /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
+    set gfxpayload="keep"
     set root=(\${archboot})
-    linux /boot/vm64lts ro \${_kernel_params}
-    initrd /boot/initrd64.img
+    linux /boot/vmlinuz_x86_64_lts \${_kernel_params}
+    initrd /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux (i686) archboot" {
+    set gfxpayload="keep"
     set root=(\${archboot})
-    linux /boot/vmlinuz ro \${_kernel_params}
-    initrd /boot/initrd.img
+    linux /boot/vmlinuz_i686 \${_kernel_params}
+    initrd /boot/initramfs_i686.img
 }
 
 menuentry "Arch Linux LTS (i686) archboot" {
+    set gfxpayload="keep"
     set root=(\${archboot})
-    linux /boot/vmlts ro \${_kernel_params}
-    initrd /boot/initrd.img
+    linux /boot/vmlinuz_i686_lts \${_kernel_params}
+    initrd /boot/initramfs_i686.img
 }
 
-menuentry "Launch UEFI Shell 2.0 - For UEFI Spec. >=2.3 systems" {
+menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
     set root=(\${archboot})
-    chainloader /efi/shell/shellx64.efi
+    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
 }
 
-menuentry "Launch UEFI Shell 1.0 - For UEFI Spec. <2.3 systems" {
+menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
     set root=(\${archboot})
-    chainloader /efi/shell/shellx64_old.efi
+    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
 }
 
 EOF
@@ -386,14 +429,11 @@ rm -f "${ALLINONE}/boot/syslinux/isolinux.bin"
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
-/usr/bin/archboot-usbimage-helper.sh "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
+"${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
-#create md5sums.txt
-[[ -e md5sum.txt ]] && rm -f md5sum.txt
-
-for i in "${IMAGENAME}.iso" "${IMAGENAME}.img"; do
-	md5sum "${i}" >> md5sum.txt
-done
+#create sha256sums.txt
+rm -f sha256sums.txt || true
+sha256sum "${IMAGENAME}.iso" "${IMAGENAME}.img" > sha256sums.txt
 
 # cleanup
 rm -rf "${grub2_uefi_mp}"

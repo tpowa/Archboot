@@ -46,7 +46,7 @@ rootsize=$(du -bs ${IMGROOT}|cut -f1)
 IMGSZ=$(( (${rootsize}*102)/100/512 + 1)) # image size in sectors
 
 # create the filesystem image file
-dd if=/dev/zero of="${FSIMG}" bs=512 count="${IMGSZ}"
+dd if=/dev/zero of="${FSIMG}" bs="512" count="${IMGSZ}"
 
 # create a filesystem on the image
 mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
@@ -56,12 +56,12 @@ if ! [[ "$(lsmod | grep ^loop)" ]]; then
 	modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 fi
 LOOP_DEVICE="$(losetup --show --find "${FSIMG}")"
-mount -o rw,users -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
+mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
 
 if [[ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]]; then
 	
 	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")"
-	mount -o ro,users -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
+	mount -o ro -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
 	cp "${TMPDIR2}/bootx64.efi" "${IMGROOT}/efi/boot/bootx64.efi"
 	
 	umount "${TMPDIR2}"
@@ -71,6 +71,9 @@ if [[ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]]; then
 fi
 
 cp -r "${IMGROOT}"/* "${TMPDIR}"
+
+rm -f "${TMPDIR}/boot/syslinux"/*.{com,bin,c32} || true
+cp "/usr/lib/syslinux"/*.{com,bin,c32} "${TMPDIR}/boot/syslinux/"
 
 # unmount filesystem
 umount "${TMPDIR}"

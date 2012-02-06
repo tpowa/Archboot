@@ -3,7 +3,7 @@
 # config file for mkisolinux
 
 # DEFAULT kernel boot options
-KERNEL_BOOT_OPTIONS="rootdelay=10"
+KERNEL_BOOT_OPTIONS="gpt loglevel=7 rootdelay=10"
 
 # mkinitcpio config file, defaulted to stock config file
 MKINITCPIO_CONFIG="/etc/archboot/default.conf"

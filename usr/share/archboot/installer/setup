@@ -1753,7 +1753,8 @@ autoprepare() {
         # create 1 MB bios_grub partition for grub2-bios GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
-            UEFISYS_PART_SIZE="200"
+            GPT_BIOS_GRUB2_PART_SIZE="${GUID_PART_SIZE}"
+            UEFISYS_PART_SIZE="512"
         else
             GUID_PART_SIZE="0"
             UEFISYS_PART_SIZE="0"
@@ -1843,23 +1844,14 @@ autoprepare() {
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} mktable GPT >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 1 1 ${GUID_PART_SIZE} >${LOG}
-        parted -a optimal -s ${DEVICE} set 1 bios_grub on
-        parted -a optimal -s ${DEVICE} name 1 BIOS_BOOT_GRUB2
-        parted -a optimal -s ${DEVICE} mkpart 2 ${GUID_PART_SIZE} $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} set 2 boot on
-        parted -a optimal -s ${DEVICE} name 2 UEFI_SYSTEM
-        parted -a optimal -s ${DEVICE} mkpart 3 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 4 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 5 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart 6 $((${GUID_PART_SIZE}+${UEFISYS_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
-        # fix partition hexcode
-        sgdisk -t 3:8300 ${DEVICE} >${LOG}
-        sgdisk -t 4:8200 ${DEVICE} >${LOG}
-        sgdisk -t 5:8300 ${DEVICE} >${LOG}
-        sgdisk -t 6:8300 ${DEVICE} >${LOG}
+        sgdisk --zap ${DEVICE} >/dev/null 2>&1
+        sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB2_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB2 ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=2:0:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=4:set:2 --change-name=3:LINUX_BOOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:LINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=5:0:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=6:0:0 --typecode= 6:8300 --change-name=6:DATA ${DEVICE} > ${LOG}
+        sgdisk --print ${DEVICE} > ${LOG}
     else
         PART_ROOT="${DEVICE}3"
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -1884,8 +1876,8 @@ autoprepare() {
     # wait until /dev initialized correct devices
     udevadm settle
     # need to mount root first, then do it again for the others
-    part=1
-    [[ "${GUIDPARAMETER}" = "yes" ]] && part=3
+    part=3
+    [[ "${GUIDPARAMETER}" == "yes" ]] && part=5
     for fsspec in ${FSSPECS}; do
         mountpoint=$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)
@@ -1906,7 +1898,7 @@ autoprepare() {
 
     # make other filesystems
     part=1
-    [[ "${GUIDPARAMETER}" = "yes" ]] && part=3
+    [[ "${GUIDPARAMETER}" == "yes" ]] && part=3
     for fsspec in ${FSSPECS}; do
         mountpoint=$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)
@@ -1993,7 +1985,7 @@ check_uefisyspart() {
         fi
         
         if [[ ! "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
-            mount -o rw -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
+            mount -o rw,flush -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
         fi
     fi
     
@@ -3843,19 +3835,26 @@ dogrub2_common_before() {
 
 dogrub2_config() {
 
-    BOOT_FS_UUID=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/boot 2>/dev/null)
-    BOOT_FS=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_FS_LABEL=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/boot 2>/dev/null)
-    BOOT_DRIVE=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=drive ${DESTDIR}/boot 2>/dev/null)
+    BOOT_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=drive "${DESTDIR}/boot" 2>/dev/null)"
     
-    ROOT_FS_UUID=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs_uuid ${DESTDIR}/ 2>/dev/null)
-    ROOT_FS=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/" 2>/dev/null)"
+    ROOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/" 2>/dev/null)"
     
-    ROOT_FS_LABEL=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=fs_label ${DESTDIR}/ 2>/dev/null)
-    ROOT_DEVICE=$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" ${DESTDIR}/usr/sbin/grub-probe --device-map=/tmp/device.map --target=device ${DESTDIR}/ 2>/dev/null)
+    ROOT_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/" 2>/dev/null)"
+    ROOT_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=device "${DESTDIR}/" 2>/dev/null)"
     
-    ## udev 172 onwards
+    if [[ "${GRUB2_UEFI}" == "1" ]]; then
+        UEFISYS_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot/efi" 2>/dev/null)"
+        
+        UEFISYS_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=drive "${DESTDIR}/boot/efi" 2>/dev/null)"
+    fi
+    
+    ## udev 180 onwards
     if [[ "$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_SCHEME ${ROOT_DEVICE})" == 'gpt' ]]; then
         ROOT_GPT_PART_UUID="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_UUID ${ROOT_DEVICE})"
         ROOT_GPT_PART_LABEL="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_NAME ${ROOT_DEVICE})"
@@ -3863,11 +3862,11 @@ dogrub2_config() {
     
     subdir="/boot"
     
-    [[ "${ROOT_FS_UUID}" != "${BOOT_FS_UUID}" ]] && subdir=""
+    ! [[ "${ROOT_FS_UUID}" == "${BOOT_FS_UUID}" ]] && subdir=""
     
     cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) /tmp/.grub.cfg > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) "/tmp/.grub.cfg" > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     rm -f "/tmp/.grub.cfg"
     
     NUMBER="0"
@@ -3876,6 +3875,16 @@ dogrub2_config() {
     ## with totally different configuration.
     
     cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+
+if [ "\${grub_platform}" == "efi" ]; then
+    set _UEFI_ARCH="\${grub_cpu}"
+    
+    if [ "\${grub_cpu}" == "x86_64" ]; then
+        set _SPEC_UEFI_ARCH="x64"
+    elif [ "\${grub_cpu}" == "i386" ]; then
+        set _SPEC_UEFI_ARCH="ia32"
+    fi
+fi
 
 insmod part_gpt
 insmod part_msdos
@@ -3893,7 +3902,9 @@ insmod search_label
 insmod linux
 insmod chain
 
-set pager=1
+set pager="1"
+# set debug="all"
+
 set locale_dir=\${prefix}/locale
 
 EOF
@@ -3901,29 +3912,37 @@ EOF
     [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
-    ## For UEFI systems, no kernel boot messages are displayed if framebuffer is not initialized in grub2. So initialize it.
-    if [[ "${GRUB2_UEFI}" == "1" ]]; then
-        
-        cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
-insmod efi_gop
-insmod efi_uga
+if [ "\${grub_platform}" == "efi" ]; then
+    insmod efi_gop
+    insmod efi_uga
+    insmod video_bochs
+    insmod video_cirrus
+fi
+
+if [ "\${grub_platform}" == "pc" ]; then
+    insmod vbe
+    insmod vga
+    insmod video_bochs
+    insmod video_cirrus
+fi
+
 insmod font
 
 if loadfont \${prefix}/unicode.pf2
 then
     insmod gfxterm
     set gfxmode="auto"
-    set gfxpayload="keep"
+    
+    terminal_input console
     terminal_output gfxterm
 fi
 
 EOF
     
-    fi
-    
     echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    sort /tmp/.device-names >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     if [[ "${NAME_SCHEME_PARAMETER}" == "UUID" ]]; then
@@ -3952,7 +3971,7 @@ EOF
     [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
     [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
 
-    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro add_efi_memmap"
+    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro gpt loglevel=7 pcie_aspm=force add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
@@ -3960,6 +3979,7 @@ EOF
 
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
+    set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
     initrd ${subdir}/${INITRAMFS}.img
@@ -3974,10 +3994,48 @@ EOF
 
 # (${NUMBER}) Arch Linux Fallback
 menuentry "Arch Linux Fallback" {
+    set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
     initrd ${subdir}/${INITRAMFS}-fallback.img
 }
+
+EOF
+    
+    NUMBER=$((${NUMBER}+1))
+    
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+
+## (${NUMBER}) UEFI Shell 2.0
+## Will work only in grub2 uefi
+#menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
+#}
+
+## (${NUMBER}) UEFI Shell 1.0
+## Will work only in grub2 uefi
+#menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
+#}
+
+EOF
+    
+    NUMBER=$((${NUMBER}+1))
+    
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+
+## (${NUMBER}) Windows x86_64 UEFI
+## Will work only in grub2 uefi x86_64
+#menuentry \"Microsoft Windows x86_64 UEFI-GPT\" {
+#    insmod part_gpt
+#    insmod fat
+#    insmod search_fs_uuid
+#    insmod chain
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    chainloader /efi/Microsoft/Boot/bootmgfw.efi
+#}
 
 EOF
     
@@ -3995,24 +4053,7 @@ EOF
 #    insmod search_fs_uuid
 #    insmod ntldr
 #    search --fs-uuid --no-floppy --set=root 69B235F6749E84CE
-#    ntldr (${root})/bootmgr
-#}
-
-EOF
-    
-    NUMBER=$((${NUMBER}+1))
-    
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-
-## (${NUMBER}) Windows x86_64 UEFI
-## Will work only in grub2 uefi x86_64
-#menuentry \"Microsoft Windows x86_64 UEFI-GPT\" {
-#    insmod part_gpt
-#    insmod fat
-#    insmod search_fs_uuid
-#    insmod chain
-#    search --fs-uuid --no-floppy --set=root 1CE5-7F28
-#    chainloader (${root})/efi/Microsoft/Boot/bootmgfw.efi
+#    ntldr /bootmgr
 #}
 
 EOF
@@ -4068,7 +4109,8 @@ dogrub2_bios() {
         PACKAGES=""
     fi
     
-    get_grub2_map
+    ## grub-mkdevicemap removed by upstream - integrated into grub-probe instead
+    # get_grub2_map
     
     # try to auto-configure GRUB2...
     if [[ "${PART_ROOT}" != "" ]]; then
@@ -4194,6 +4236,20 @@ dogrub2_bios() {
     
 }
 
+do_uefi_x86_64() {
+    
+    export UEFI_ARCH="x86_64"
+    export SPEC_UEFI_ARCH="x64"
+    
+}
+
+do_uefi_i386() {
+    
+    export UEFI_ARCH="i386"
+    export SPEC_UEFI_ARCH="ia32"
+    
+}
+
 do_uefi_efibootmgr() {
     
     modprobe -q efivars
@@ -4208,7 +4264,7 @@ do_uefi_efibootmgr() {
             #    chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --bootnum "${bootnum}" --delete-bootnum
             # done
             
-            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${EFIBOOTMGR_DISC}" --part "${EFIBOOTMGR_PART_NUM}" --write-signature --label "${EFIBOOTMGR_LABEL}" --loader "\\EFI\\${EFIBOOTMGR_LOADER_DIR}\\${EFIBOOTMGR_LOADER_FILE}.efi"
+            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${EFIBOOTMGR_DISC}" --part "${EFIBOOTMGR_PART_NUM}" --write-signature --label "${EFIBOOTMGR_LABEL}" --loader "\\EFI\\${EFIBOOTMGR_LOADER_DIR}\\${EFIBOOTMGR_LOADER_FILE}"
         else
             DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
         fi
@@ -4262,7 +4318,7 @@ dogrub2_uefi_efibootmgr() {
     _BOOTMGR_DISC="${DISC}"
     _BOOTMGR_PART_NUM="${UEFI_SYS_PART_NUM}"
     _BOOTMGR_LOADER_DIR="arch"
-    _BOOTMGR_LOADER_FILE="grubx64.efi"
+    _BOOTMGR_LOADER_FILE="grub${SPEC_UEFI_ARCH}.efi"
     do_efi_bootmgr_setup
     
 }
@@ -4297,18 +4353,19 @@ dogrub2_uefi_common() {
     chroot "${DESTDIR}" "/usr/sbin/grub_efi_${UEFI_ARCH}-install" \
         --root-directory="/boot/efi" \
         --bootloader-id="arch" \
-        --boot-directory="/boot/efi/efi" \
-        --no-floppy --recheck >> "/tmp/grub2_uefi.log"
+        --boot-directory="/boot" \
+        --no-floppy --recheck >> "/tmp/grub2_${UEFI_ARCH}_uefi.log"
     
     chroot_umount
     
     mkdir -p "${DESTDIR}/boot/grub"
     
+    BOOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/boot" 2>/dev/null)"
+    
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
     cat << EOF > "${DESTDIR}/boot/grub/grub.cfg"
-set _UEFI_ARCH="${UEFI_ARCH}"
-
 insmod usbms
 insmod usb_keyboard
 
@@ -4318,6 +4375,7 @@ insmod part_msdos
 insmod fat
 insmod iso9660
 insmod udf
+insmod ${BOOT_FS}
 
 insmod ext2
 insmod reiserfs
@@ -4327,14 +4385,19 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --file --no-floppy --set=grub2_uefi_root /efi/arch/grub_standalone.efi
+search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}
 
-# set prefix=(\${grub2_uefi_root})/efi/grub/
-source (\${grub2_uefi_root})/efi/grub/grub.cfg
+if test -f (\${root})/grub/grub.cfg ; then
+    set prefix=(\${root})/grub
+    source (\${root})/grub/grub.cfg
+elif test -f (\${root})/boot/grub/grub.cfg ; then
+    set prefix=(\${root})/boot/grub
+    source (\${root})/boot/grub/grub.cfg
+fi
 
 EOF
     
-    cp "${DESTDIR}/boot/grub/grub.cfg" "/boot/efi/efi/grub/grub_mkstandalone.cfg"
+    cp "${DESTDIR}/boot/grub/grub.cfg" "/boot/efi/efi/arch/grub${SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
@@ -4346,8 +4409,8 @@ EOF
         --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
         --format="${UEFI_ARCH}-efi" \
         --compression="xz" \
-        --output="/boot/efi/efi/arch/grub_standalone.efi" \
-        "boot/grub/grub.cfg" > "/tmp/grub2_uefi_mkstandalone.log"
+        --output="/boot/efi/efi/arch/grub${SPEC_UEFI_ARCH}_standalone.efi" \
+        "boot/grub/grub.cfg" > "/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
     
@@ -4355,18 +4418,18 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub2_uefi.log" > "${LOG}"
+    cat "/tmp/grub2_${UEFI_ARCH}_uefi.log" > "${LOG}"
     
-    if ! [[ -s "/tmp/grub2_uefi.log" ]]; then
+    if ! [[ -s "/tmp/grub2_${UEFI_ARCH}_uefi.log" ]]; then
         DIALOG --msgbox "Error installing GRUB2.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
     dogrub2_uefi_efibootmgr
     
-    DIALOG --msgbox "GRUB2 UEFI was successfully installed." 0 0
+    DIALOG --msgbox "GRUB2 UEFI ${UEFI_ARCH} has been successfully installed." 0 0
     
-    GRUB2_PREFIX_DIR="/boot/efi/efi/grub/"
+    GRUB2_PREFIX_DIR="/boot/grub/"
     GRUB2_UEFI="1"
     dogrub2_common_after
     
@@ -4374,14 +4437,16 @@ EOF
 
 dogrub2_uefi_x86_64() {
     
-    UEFI_ARCH="x86_64"
+    do_uefi_x86_64
+    
     dogrub2_uefi_common
     
 }
 
 dogrub2_uefi_i386() {
     
-    UEFI_ARCH="i386"
+    do_uefi_i386
+    
     dogrub2_uefi_common
     
 }

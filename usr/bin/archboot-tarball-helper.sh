@@ -44,13 +44,13 @@ fi
 
 export RUNPROGRAM="${APPNAME}"
 export BOOTDIRNAME="boot/syslinux"
-export USEKERNEL=${VERSION}
+export USEKERNEL="${VERSION}"
 
 [ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /tmp/bootmessage.XXXX)
 [ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /tmp/optionsbootmessage.XXXX)
 
 # begin script
-mkdir -p ${TEMPDIR}/${BOOTDIRNAME}/
+mkdir -p "${TEMPDIR}/${BOOTDIRNAME}/"
 # prepare syslinux bootloader
 install -m755 /usr/lib/syslinux/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.bin
 for i in /usr/lib/syslinux/*; do

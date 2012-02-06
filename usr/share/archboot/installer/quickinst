@@ -1,9 +1,9 @@
-#! /bin/bash
-MODE=${1}
-DESTDIR=${2}
-PKGARG=${3}
+#!/bin/bash
+MODE="${1}"
+DESTDIR="${2}"
+PKGARG="${3}"
 
-PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
 # name of kernel package
 KERNELPKG="linux"
@@ -21,14 +21,17 @@ usage() {
     echo "e.g. mount -t iso9660 /dev/cdrom /src "
     echo "Then run this script to install all base packages to <destdir>."
     echo
-    if [[ -e /usr/bin/wget ]]; then
+    
+    if [[ -e "/usr/bin/curl" ]]; then
         echo "<install_mode> must be either 'net' or 'media'"
     else
         echo "<install_mode> must be 'media'"
     fi
+    
     echo
     echo "Examples:"
-    if [[ -e /usr/bin/wget ]]; then
+    
+    if [[ -e "/usr/bin/curl" ]]; then
         if [[ "$(uname -m)" = "x86_64" ]]; then
                 echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/x86_64"
                 echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/x86_64"
@@ -38,7 +41,7 @@ usage() {
         fi
     fi
 
-    echo "  quickinst media /mnt /src/core-$(uname -m)/pkg"
+    echo "  quickinst media /mnt /packages/core-$(uname -m)/pkg"
     echo ""
     exit 0
 }
@@ -57,11 +60,12 @@ pacman_conf() {
 Architecture = auto
 SigLevel = Never
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-CacheDir = /src/core-$(uname -m)/pkg
-CacheDir = /src/core-any/pkg
+CacheDir = /packages/core-$(uname -m)/pkg
+CacheDir = /packages/core-any/pkg
 
 [core]
 Server = ${serverurl}
+
 EOF
 }
 
@@ -102,17 +106,17 @@ chroot_mount()
 #
 chroot_umount()
 {
-    umount ${DESTDIR}/proc
-    umount ${DESTDIR}/sys
-    umount ${DESTDIR}/dev
+    umount "${DESTDIR}/proc"
+    umount "${DESTDIR}/sys"
+    umount "${DESTDIR}/dev"
 }
 
 # package_installation
 install_packages() {
     if [[ "${MODE}" = "media" ]]; then
-        PKGFILE=/tmp/.pkglist
-        cp ${PKGARG}/packages.txt ${PKGFILE}
-        if [[ ! -f ${PKGFILE} ]]; then
+        PKGFILE="/tmp/.pkglist"
+        cp "${PKGARG}/packages.txt" "${PKGFILE}"
+        if [[ ! -f "${PKGFILE}" ]]; then
             echo "error: Could not find package list: ${PKGFILE}"
             exit 1
         fi
