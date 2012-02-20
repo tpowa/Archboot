@@ -2,7 +2,7 @@
 
 build ()
 {
-    MODULES=""
+    MODULES="$(checked_modules "/firmware/dmi-sysfs")"
     BINARIES="/usr/sbin/dmidecode /usr/sbin/biosdecode"
     FILES=""
 }

@@ -264,6 +264,7 @@ _update_grub2_uefi_arch_specific_iso_files() {
 	
 	## Create grub.cfg for grub-mkstandalone memdisk for boot${_SPEC_UEFI_ARCH}.efi
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub_standalone_archboot.cfg"
+
 insmod usbms
 insmod usb_keyboard
 
@@ -282,8 +283,8 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --file --no-floppy --set=archboot /efi/grub2/grub_archboot.cfg
-source (\${archboot})/efi/grub2/grub_archboot.cfg
+search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
+source "(\${archboot})/efi/grub2/grub_archboot.cfg"
 
 EOF
 	
@@ -383,23 +384,39 @@ _update_grub2_uefi_iso_files() {
 	# done
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub_archboot.cfg"
+
+set _kernel_params="gpt loglevel=7"
+
 if [ "\${grub_platform}" == "efi" ]; then
     set _UEFI_ARCH="\${grub_cpu}"
     
+    set _kernel_params="\${_kernel_params} add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
+    
     if [ "\${grub_cpu}" == "x86_64" ]; then
         set _SPEC_UEFI_ARCH="x64"
-    elif [ "\${grub_cpu}" == "i386" ]; then
-        set _SPEC_UEFI_ARCH="ia32"
+        
+        set _kernel_x86_64_params="\${_kernel_params}"
+        set _kernel_i686_params="\${_kernel_params} noefi"
     fi
+    
+    if [ "\${grub_cpu}" == "i386" ]; then
+        set _SPEC_UEFI_ARCH="ia32"
+        
+        set _kernel_x86_64_params="\${_kernel_params} noefi"
+        set _kernel_i686_params="\${_kernel_params}"
+    fi
+else
+    set _kernel_x86_64_params="\${_kernel_params}"
+    set _kernel_i686_params="\${_kernel_params}"
 fi
 
-# search --file --no-floppy --set=archboot /efi/grub2/grub_archboot.cfg
-# search --file --no-floppy --set=archboot /efi/grub2/grub_standalone_archboot.cfg
+# search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
+# search --file --no-floppy --set=archboot "/efi/grub2/grub_standalone_archboot.cfg"
 
 set pager="1"
 # set debug="all"
 
-set locale_dir=(\${archboot})/efi/grub2/locale
+set locale_dir="(\${archboot})/efi/grub2/locale"
 
 if [ "\${grub_platform}" == "efi" ]; then
     insmod efi_gop
@@ -410,19 +427,18 @@ fi
 
 insmod font
 
-if loadfont (\${archboot})/efi/grub2/unicode.pf2
-then
+if loadfont "(\${archboot})/efi/grub2/unicode.pf2" ; then
     insmod gfxterm
     set gfxmode="auto"
     
     terminal_input console
     terminal_output gfxterm
     
-    # set color_normal=light-blue/black
-    # set color_highlight=light-cyan/blue
+    # set color_normal="light-blue/black"
+    # set color_highlight="light-cyan/blue"
     
     # insmod png
-    # background_image (\${archboot})/boot/syslinux/splash.png
+    # background_image "(\${archboot})/boot/syslinux/splash.png"
 fi
 
 insmod fat
@@ -432,45 +448,47 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
-set _kernel_params="gpt add_efi_memmap loglevel=7 none=UEFI_ARCH_\${_UEFI_ARCH}"
-
 menuentry "Arch Linux (x86_64) archboot" {
     set gfxpayload="keep"
-    set root=(\${archboot})
-    linux /boot/vmlinuz_x86_64 \${_kernel_params}
+    set root="\${archboot}"
+    linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
     initrd /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux LTS (x86_64) archboot" {
     set gfxpayload="keep"
-    set root=(\${archboot})
-    linux /boot/vmlinuz_x86_64_lts \${_kernel_params}
+    set root="\${archboot}"
+    linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
     initrd /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux (i686) archboot" {
     set gfxpayload="keep"
-    set root=(\${archboot})
-    linux /boot/vmlinuz_i686 \${_kernel_params}
+    set root="\${archboot}"
+    linux /boot/vmlinuz_i686 \${_kernel_i686_params}
     initrd /boot/initramfs_i686.img
 }
 
 menuentry "Arch Linux LTS (i686) archboot" {
     set gfxpayload="keep"
-    set root=(\${archboot})
-    linux /boot/vmlinuz_i686_lts \${_kernel_params}
+    set root="\${archboot}"
+    linux /boot/vmlinuz_i686_lts \${_kernel_i686_params}
     initrd /boot/initramfs_i686.img
 }
 
-menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
-    set root=(\${archboot})
-    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
-}
+if [ "\${grub_platform}" == "efi" ]; then
 
-menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
-    set root=(\${archboot})
-    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
-}
+    menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
+        set root="\${archboot}"
+        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
+    }
+
+    menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
+        set root="\${archboot}"
+        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
+    }
+
+fi
 
 EOF
 	

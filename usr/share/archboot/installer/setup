@@ -751,9 +751,9 @@ remove_grub_dmraid_hack(){
 }
 
 get_grub2_map() {
-    [ -e /tmp/device.map ] && rm /tmp/device.map
+    rm "/tmp/device.map" || true
     DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-mkdevicemap" --no-floppy --device-map="/tmp/device.map" >>/tmp/grub2.log
+    LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-mkdevicemap" --no-floppy --device-map="/tmp/device.map" >> "/tmp/grub2.log"
 }
 
 mapdev() {
@@ -1256,7 +1256,7 @@ _createraid()
             DISC=${RAIDDEVICE}
             RUN_CGDISK="1"
             CHECK_BIOS_BOOT_GRUB2="1"
-            CHECK_UEFI_SYS_PART="1"
+            CHECK_UEFISYS_PART="1"
             check_gpt
         fi
     fi
@@ -1929,7 +1929,7 @@ check_gpt() {
     [[ "$(blkid -c /dev/null -p -i -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
     
     if [[ "${GUID_DETECTED}" == "" ]]; then
-        if [[ "${CHECK_UEFI_SYS_PART}" == "1" ]]; then
+        if [[ "${CHECK_UEFISYS_PART}" == "1" ]]; then
             ## For UEFI systems force gpt conversion
             sgdisk --mbrtogpt ${DISC} > ${LOG} && GUID_DETECTED="1"
         else
@@ -1939,7 +1939,7 @@ check_gpt() {
     fi
     
     if [[ "${GUID_DETECTED}" == "1" ]]; then
-        if [[ "${CHECK_UEFI_SYS_PART}" == "1" ]]; then
+        if [[ "${CHECK_UEFISYS_PART}" == "1" ]]; then
             check_uefisyspart
         fi
         
@@ -1965,27 +1965,27 @@ check_uefisyspart() {
         RUN_CGDISK="1"
     else
         if [[ -d "${DESTDIR}/boot/efi" ]] && [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
-            UEFI_SYS_PART="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
-            DISC="$(echo "${UEFI_SYS_PART}" | sed 's/\(.\{8\}\).*/\1/')"
-            UEFI_SYS_PART_NUM="$(echo "${UEFI_SYS_PART}" | sed "s:${DISC}::g")"
+            UEFISYS_PART="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
+            DISC="$(echo "${UEFISYS_PART}" | sed 's/\(.\{8\}\).*/\1/')"
+            UEFISYS_PART_NUM="$(blkid -p -o value -s PART_ENTRY_NUMBER "${UEFISYS_PART}")"
         else
             [[ ! -d "${DESTDIR}/boot/efi" ]] && mkdir -p "${DESTDIR}/boot/efi"
             
             DISC="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
-            UEFI_SYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
-            UEFI_SYS_PART="${DISC}${UEFI_SYS_PART_NUM}"
+            UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
+            UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         fi
         
-        if [[ "$(blkid -p -i -o value -s TYPE ${UEFI_SYS_PART})" != "vfat" ]]; then
+        if [[ "$(blkid -p -i -o value -s TYPE ${UEFISYS_PART})" != "vfat" ]]; then
             ## Check whether UEFISYS is FAT, otherwise exit (any FAT variant, collectively recognized as vfat in Linux).
             DIALOG --msgbox "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32. Please format it as FAT32 and run /arch/setup ." 0 0 && return 1
-        elif [[ "$(blkid -p -i -o value -s VERSION ${UEFI_SYS_PART})" != "FAT32" ]]; then
+        elif [[ "$(blkid -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
             ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
             DIALOG --msgbox "UEFI SYSTEM PARTIION is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition." 0 0
         fi
         
         if [[ ! "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
-            mount -o rw,flush -t vfat "${UEFI_SYS_PART}" "${DESTDIR}/boot/efi"
+            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/boot/efi"
         fi
     fi
     
@@ -2023,7 +2023,7 @@ partition() {
         if ! [[ "${DISC}" == "" ]]; then
             if [[ "${GUIDPARAMETER}" == "yes" ]]; then
                 CHECK_BIOS_BOOT_GRUB2="1"
-                CHECK_UEFI_SYS_PART="1"
+                CHECK_UEFISYS_PART="1"
                 RUN_CGDISK="1"
                 check_gpt
             else
@@ -3479,7 +3479,7 @@ finish_syslinux () {
 }
 
 # install extlinux bootloader
-doextlinux () {
+dosyslinux_bios () {
     bootdev=""
     SYSLINUX_PACKAGES="syslinux"
     SYSLINUX=EXTLINUX
@@ -3535,7 +3535,7 @@ doextlinux () {
     finish_syslinux
 }
 
-dolilo() {
+dolilo_bios() {
     if [[ ! -f ${DESTDIR}/etc/lilo.conf ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/etc/lilo.conf, installing lilo now ..." 0 0
         PACKAGES="lilo"
@@ -3607,7 +3607,7 @@ dolilo() {
     DIALOG --msgbox "LILO was successfully installed." 0 0
 }
 
-dogrub() {
+dogrub_legacy_bios() {
     if [[ -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
         DIALOG --msgbox "Found ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img, deinstalling grub2 now ..." 0 0
         ${PACMAN} -R grub2-bios grub2-common > ${LOG}
@@ -3835,34 +3835,63 @@ dogrub2_common_before() {
 
 dogrub2_config() {
 
-    BOOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/boot" 2>/dev/null)"
+    ########
     
-    BOOT_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=drive "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    ROOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/" 2>/dev/null)"
-    ROOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
-    ROOT_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/" 2>/dev/null)"
-    ROOT_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=device "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    
+    ########
+    
+    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
+    
+    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
+    
+    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    
+    ########
+    
+    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    ########
     
     if [[ "${GRUB2_UEFI}" == "1" ]]; then
-        UEFISYS_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot/efi" 2>/dev/null)"
         
-        UEFISYS_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_label "${DESTDIR}/boot/efi" 2>/dev/null)"
-        UEFISYS_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=drive "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        
+        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot/efi" 2>/dev/null)"
     fi
+    
+    ########
     
     ## udev 180 onwards
-    if [[ "$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_SCHEME ${ROOT_DEVICE})" == 'gpt' ]]; then
-        ROOT_GPT_PART_UUID="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_UUID ${ROOT_DEVICE})"
-        ROOT_GPT_PART_LABEL="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_NAME ${ROOT_DEVICE})"
+    if [[ "$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
+        ROOT_PART_GPT_UUID="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_UUID ${ROOT_PART_DEVICE})"
+        ROOT_PART_GPT_LABEL="$(blkid -c /dev/null -p -i -o value -s PART_ENTRY_NAME ${ROOT_PART_DEVICE})"
     fi
     
-    subdir="/boot"
+    ########
     
-    ! [[ "${ROOT_FS_UUID}" == "${BOOT_FS_UUID}" ]] && subdir=""
+    if [[ "${ROOT_PART_FS_UUID}" == "${BOOT_PART_FS_UUID}" ]]; then
+        subdir=""
+    else
+        subdir="/boot"
+    fi
+    
+    ########
     
     cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
@@ -3881,10 +3910,16 @@ if [ "\${grub_platform}" == "efi" ]; then
     
     if [ "\${grub_cpu}" == "x86_64" ]; then
         set _SPEC_UEFI_ARCH="x64"
-    elif [ "\${grub_cpu}" == "i386" ]; then
+    fi
+    
+    if [ "\${grub_cpu}" == "i386" ]; then
         set _SPEC_UEFI_ARCH="ia32"
     fi
 fi
+
+EOF
+    
+    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
 insmod part_gpt
 insmod part_msdos
@@ -3892,8 +3927,9 @@ insmod part_msdos
 # Include fat fs module - required for uefi systems.
 insmod fat
 
-insmod ${BOOT_FS}
-insmod ${ROOT_FS}
+insmod ${BOOT_PART_FS}
+insmod ${ROOT_PART_FS}
+insmod ${USR_PART_FS}
 
 insmod search_fs_file
 insmod search_fs_uuid
@@ -3905,7 +3941,7 @@ insmod chain
 set pager="1"
 # set debug="all"
 
-set locale_dir=\${prefix}/locale
+set locale_dir="\${prefix}/locale"
 
 EOF
     
@@ -3930,8 +3966,22 @@ fi
 
 insmod font
 
-if loadfont \${prefix}/unicode.pf2
-then
+search --fs-uuid --no-floppy --set=usr_part ${USR_PART_HINTS_STRING} ${USR_PART_FS_UUID}
+search --fs-uuid --no-floppy --set=root_part ${ROOT_PART_HINTS_STRING} ${ROOT_PART_FS_UUID}
+
+if [ -e "(\${usr_part})/share/grub/unicode.pf2" ]; then
+    set _fontfile="(\${usr_part})/share/grub/unicode.pf2"
+else
+    if [ -e "(\${root_part})/usr/share/grub/unicode.pf2" ]; then
+        set _fontfile="(\${root_part})/usr/share/grub/unicode.pf2"
+    else
+        if [ -e "\${prefix}/unicode.pf2" ]; then
+            set _fontfile="\${prefix}/unicode.pf2"
+        fi
+    fi
+fi
+
+if loadfont "\${_fontfile}" ; then
     insmod gfxterm
     set gfxmode="auto"
     
@@ -3946,30 +3996,30 @@ EOF
     echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
     if [[ "${NAME_SCHEME_PARAMETER}" == "UUID" ]]; then
-        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}"
-        _rootpart="/dev/disk/by-uuid/${ROOT_FS_UUID}"
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
+        _rootpart="/dev/disk/by-uuid/${ROOT_PART_FS_UUID}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
-        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}" # GRUB2 does not yet support PARTUUID
-        _rootpart="/dev/disk/by-partuuid/${ROOT_GPT_PART_UUID}"
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}" # GRUB2 does not yet support PARTUUID
+        _rootpart="/dev/disk/by-partuuid/${ROOT_PART_GPT_UUID}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "LABEL" ]]; then
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}"
-        _rootpart="/dev/disk/by-label/${ROOT_FS_LABEL}"
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
+        _rootpart="/dev/disk/by-label/${ROOT_PART_FS_LABEL}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_FS_LABEL}" # GRUB2 does not yet support PARTLABEL
-        _rootpart="/dev/disk/by-partlabel/${ROOT_GPT_PART_LABEL}"
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}" # GRUB2 does not yet support PARTLABEL
+        _rootpart="/dev/disk/by-partlabel/${ROOT_PART_GPT_LABEL}"
         
     else
-        GRUB_ROOT_DRIVE="set root=${BOOT_DRIVE}"
-        _rootpart="${ROOT_DEVICE}"
+        GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
+        _rootpart="${ROOT_PART_DEVICE}"
         
     fi
     
     # fallback to device if no label or uuid can be detected, eg. luks device
-    [[ -z "${ROOT_FS_LABEL}" ]] && _rootpart="${ROOT_DEVICE}"
-    [[ -z "${ROOT_FS_UUID}" ]] &&  _rootpart="${ROOT_DEVICE}"
+    [[ -z "${ROOT_PART_FS_LABEL}" ]] && _rootpart="${ROOT_PART_DEVICE}"
+    [[ -z "${ROOT_PART_FS_UUID}" ]] &&  _rootpart="${ROOT_PART_DEVICE}"
 
     LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro gpt loglevel=7 pcie_aspm=force add_efi_memmap"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
@@ -4009,14 +4059,14 @@ EOF
 ## (${NUMBER}) UEFI Shell 2.0
 ## Will work only in grub2 uefi
 #menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
-#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
 #    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
 #}
 
 ## (${NUMBER}) UEFI Shell 1.0
 ## Will work only in grub2 uefi
 #menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
-#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
 #    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
 #}
 
@@ -4033,7 +4083,7 @@ EOF
 #    insmod fat
 #    insmod search_fs_uuid
 #    insmod chain
-#    search --fs-uuid --no-floppy --set=root ${UEFISYS_FS_UUID}
+#    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
 #    chainloader /efi/Microsoft/Boot/bootmgfw.efi
 #}
 
@@ -4058,15 +4108,15 @@ EOF
 
 EOF
     
-    unset BOOT_FS_UUID
-    unset BOOT_FS
-    unset BOOT_FS_LABEL
-    unset BOOT_DRIVE
+    unset BOOT_PART_FS_UUID
+    unset BOOT_PART_FS
+    unset BOOT_PART_FS_LABEL
+    unset BOOT_PART_DRIVE
     
-    unset ROOT_FS_UUID
-    unset ROOT_FS
-    unset ROOT_FS_LABEL
-    unset ROOT_DEVICE
+    unset ROOT_PART_FS_UUID
+    unset ROOT_PART_FS
+    unset ROOT_PART_FS_LABEL
+    unset ROOT_PART_DEVICE
     
     unset GRUB_ROOT_DRIVE
     unset LINUX_UNMOD_COMMAND
@@ -4200,7 +4250,7 @@ dogrub2_bios() {
     
     if [[ "$(blkid -c /dev/null -p -i -o value -s PTTYPE ${bootdev})" == "gpt" ]]; then
         CHECK_BIOS_BOOT_GRUB2="1"
-        CHECK_UEFI_SYS_PART=""
+        CHECK_UEFISYS_PART=""
         RUN_CGDISK=""
         DISC="${bootdev}"
         check_gpt
@@ -4259,30 +4309,32 @@ do_uefi_efibootmgr() {
         
         if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]] || [[ -d "/sys/firmware/efi/vars" ]]; then
             ## Delete old entries of grub2 - command to be checked - do  not do for now
-            # for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " ${EFIBOOTMGR_LABEL}" | cut -b5-8)
+            # for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " ${_EFIBOOTMGR_LABEL}" | cut -b5-8)
             # do
             #    chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --bootnum "${bootnum}" --delete-bootnum
             # done
             
-            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${EFIBOOTMGR_DISC}" --part "${EFIBOOTMGR_PART_NUM}" --write-signature --label "${EFIBOOTMGR_LABEL}" --loader "\\EFI\\${EFIBOOTMGR_LOADER_DIR}\\${EFIBOOTMGR_LOADER_FILE}"
+            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label "${_EFIBOOTMGR_LABEL}" --loader "\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}"
         else
-            DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
+            DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
         fi
         
         chroot_umount
     else
-        DIALOG --msgbox "efivars kernel module was not loaded properly. Manually load it and create a boot entry for ${EFIBOOTMGR_LABEL} in UEFI Boot Manager using efibootmgr." 0 0
+        DIALOG --msgbox "efivars kernel module was not loaded properly. Manually load it and create a boot entry for ${_EFIBOOTMGR_LABEL} in UEFI Boot Manager using efibootmgr." 0 0
     fi
     
-    unset EFIBOOTMGR_LABEL
-    unset EFIBOOTMGR_DISC
-    unset EFIBOOTMGR_PART_NUM
-    unset EFIBOOTMGR_LOADER_DIR
-    unset EFIBOOTMGR_LOADER_FILE
+    unset _EFIBOOTMGR_LABEL
+    unset _EFIBOOTMGR_DISC
+    unset _EFIBOOTMGR_PART_NUM
+    unset _EFIBOOTMGR_LOADER_DIR
+    unset _EFIBOOTMGR_LOADER_FILE
     
 }
 
 do_apple_efi_hfs_bless() {
+    
+    modprobe -r efivars || true
     
     ## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
     ## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
@@ -4292,15 +4344,15 @@ do_apple_efi_hfs_bless() {
 
 do_efi_bootmgr_setup() {
     
-    if [[ "$(dmidecode -s system-manufacturer)" == 'Apple Inc.' ]] || [[ "$(dmidecode -s system-manufacturer)" == 'Apple Computer, Inc.' ]]; then
+    if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         do_apple_efi_hfs_bless
     else
         ## For all the non-Mac UEFI systems
-        EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
-        EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
-        EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
-        EFIBOOTMGR_LOADER_DIR="${_BOOTMGR_LOADER_DIR}"
-        EFIBOOTMGR_LOADER_FILE="${_BOOTMGR_LOADER_FILE}"
+        _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
+        _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
+        _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
+        _EFIBOOTMGR_LOADER_DIR="${_BOOTMGR_LOADER_DIR}"
+        _EFIBOOTMGR_LOADER_FILE="${_BOOTMGR_LOADER_FILE}"
         do_uefi_efibootmgr
     fi
     
@@ -4312,12 +4364,20 @@ do_efi_bootmgr_setup() {
     
 }
 
+doelilo_uefi_x86_64() {
+    
+    do_uefi_x86_64
+    
+    DIALOG --msgbox "TODO: Elilo x86_64 UEFI Bootloader Setup" 0 0
+    
+}
+
 dogrub2_uefi_efibootmgr() {
     
     _BOOTMGR_LABEL="Arch Linux (GRUB2)"
     _BOOTMGR_DISC="${DISC}"
-    _BOOTMGR_PART_NUM="${UEFI_SYS_PART_NUM}"
-    _BOOTMGR_LOADER_DIR="arch"
+    _BOOTMGR_PART_NUM="${UEFISYS_PART_NUM}"
+    _BOOTMGR_LOADER_DIR="arch_grub"
     _BOOTMGR_LOADER_FILE="grub${SPEC_UEFI_ARCH}.efi"
     do_efi_bootmgr_setup
     
@@ -4330,19 +4390,19 @@ dogrub2_uefi_common() {
     DIALOG --msgbox "Installing grub2-efi-${UEFI_ARCH} now ..." 0 0
     PACKAGES="grub2-efi-${UEFI_ARCH} grub2-common dosfstools"
     
-    if [[ "$(dmidecode -s system-manufacturer)" != "Apple Inc." ]] && [[ "$(dmidecode -s system-manufacturer)" != "Apple Computer, Inc." ]]; then
+    if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" != "Apple Inc." ]] && [[ "$(cat "/sys/class/dmi/id/sys_vendor")" != "Apple Computer, Inc." ]]; then
         PACKAGES="${PACKAGES} efibootmgr"
     fi
     
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
-    get_grub2_map
+    # get_grub2_map
     
     DISC="$(grub-probe --target=device "${DESTDIR}/" | sed 's/\(.\{8\}\).*/\1/')"
     
     if ! [[ "${DISC}" == "" ]]; then
-        CHECK_UEFI_SYS_PART="1"
+        CHECK_UEFISYS_PART="1"
         CHECK_BIOS_BOOT_GRUB2=""
         RUN_CGDISK=""
         check_gpt
@@ -4352,7 +4412,7 @@ dogrub2_uefi_common() {
     
     chroot "${DESTDIR}" "/usr/sbin/grub_efi_${UEFI_ARCH}-install" \
         --root-directory="/boot/efi" \
-        --bootloader-id="arch" \
+        --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
         --no-floppy --recheck >> "/tmp/grub2_${UEFI_ARCH}_uefi.log"
     
@@ -4360,12 +4420,15 @@ dogrub2_uefi_common() {
     
     mkdir -p "${DESTDIR}/boot/grub"
     
-    BOOT_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs_uuid "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target=fs "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
     cat << EOF > "${DESTDIR}/boot/grub/grub.cfg"
+
 insmod usbms
 insmod usb_keyboard
 
@@ -4375,7 +4438,7 @@ insmod part_msdos
 insmod fat
 insmod iso9660
 insmod udf
-insmod ${BOOT_FS}
+insmod ${BOOT_PART_FS}
 
 insmod ext2
 insmod reiserfs
@@ -4385,19 +4448,21 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --fs-uuid --no-floppy --set=root ${BOOT_FS_UUID}
+search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}
 
-if test -f (\${root})/grub/grub.cfg ; then
-    set prefix=(\${root})/grub
-    source (\${root})/grub/grub.cfg
-elif test -f (\${root})/boot/grub/grub.cfg ; then
-    set prefix=(\${root})/boot/grub
-    source (\${root})/boot/grub/grub.cfg
+if [ -f "(\${root})/grub/grub.cfg" ]; then
+    set prefix="(\${root})/grub"
+    source "(\${root})/grub/grub.cfg"
+else
+    if [ -f "(\${root})/boot/grub/grub.cfg" ]; then
+        set prefix="(\${root})/boot/grub"
+        source "(\${root})/boot/grub/grub.cfg"
+    fi
 fi
 
 EOF
     
-    cp "${DESTDIR}/boot/grub/grub.cfg" "/boot/efi/efi/arch/grub${SPEC_UEFI_ARCH}_standalone.cfg"
+    cp "${DESTDIR}/boot/grub/grub.cfg" "/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
@@ -4409,7 +4474,7 @@ EOF
         --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
         --format="${UEFI_ARCH}-efi" \
         --compression="xz" \
-        --output="/boot/efi/efi/arch/grub${SPEC_UEFI_ARCH}_standalone.efi" \
+        --output="/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.efi" \
         "boot/grub/grub.cfg" > "/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
@@ -4967,6 +5032,44 @@ configure_system() {
     fi
 }
 
+install_bootloader_uefi_x86_64() {
+    
+    DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
+        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" \
+        "ELILO" "x86_64 UEFI version of LILO" 2>${ANSWER} || CANCEL=1
+    case $(cat ${ANSWER}) in
+        "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
+        "ELILO") doelilo_uefi_x86_64 ;;
+    esac
+    
+}
+
+install_bootloader_uefi_i386() {
+    
+    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 1 \
+        "GRUB2_UEFI_i386" "GRUB2 i386 UEFI" 2>${ANSWER} || CANCEL=1
+    case $(cat ${ANSWER}) in
+        "GRUB2_UEFI_i386") dogrub2_uefi_i386 ;;
+    esac
+    
+}
+
+install_bootloader_bios() {
+    
+    DIALOG --menu "Which BIOS bootloader would you like to use?" 13 55 4 \
+        "SYSLINUX" "SYSLINUX/EXTLINUX" \
+        "GRUB2_BIOS" "GRUB2 BIOS" \
+        "GRUB_LEGACY" "GRUB LEGACY" \
+        "LILO" "LILO" 2>${ANSWER} || CANCEL=1
+    case $(cat ${ANSWER}) in
+        "SYSLINUX") dosyslinux_bios ;;
+        "GRUB2_BIOS") dogrub2_bios ;;
+        "GRUB_LEGACY") dogrub_legacy_bios ;;
+        "LILO") dolilo_bios ;;
+    esac
+    
+}
+
 install_bootloader() {
     
     destdir_mounts || return 1
@@ -4982,21 +5085,16 @@ install_bootloader() {
     
     [[ "${UEFI_x86_64}" == "1" ]] && DIALOG --yesno "Setup has detected that you are using x86_64 (64-bit) UEFI ...\nDo you like to install grub2-efi-x86_64 as the bootloader?" 0 0 && dogrub2_uefi_x86_64
     
-    DIALOG --menu "Which BIOS/UEFI bootloader would you like to use?" 13 55 7 \
-        "EXTLINUX" "EXTLINUX/SYSLINUX" \
-        "GRUB2_BIOS" "GRUB2 BIOS" \
-        "GRUB2_UEFI_x86_64" "GRUB2 64-bit UEFI" \
-        "GRUB2_UEFI_i386" "GRUB2 32-bit UEFI" \
-        "GRUB_LEGACY" "GRUB LEGACY" \
-        "LILO" "LILO" 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "x86_64 UEFI or i386 UEFI or BIOS?" 13 55 3 \
+        "UEFI_x86_64" "x86_64 UEFI" \
+        "UEFI_i386" "i386 UEFI" \
+        "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "EXTLINUX") doextlinux ;;
-        "GRUB2_BIOS") dogrub2_bios ;;
-        "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
-        "GRUB2_UEFI_i386") dogrub2_uefi_i386 ;;
-        "GRUB_LEGACY") dogrub ;;
-        "LILO") dolilo ;;
+        "UEFI_x86_64") install_bootloader_uefi_x86_64 ;;
+        "UEFI_i386") install_bootloader_uefi_i386 ;;
+        "BIOS") install_bootloader_bios ;;
     esac
+    
     if [[ "${CANCEL}" = "1" ]]; then
         NEXTITEM="7"
     else

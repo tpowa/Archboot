@@ -17,15 +17,14 @@ set -e
 # You should have received a copy of the GNU General Public License
 # along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
 
-prefix=/usr
-exec_prefix=${prefix}
-bindir=/usr/bin
-libdir=${exec_prefix}/lib
-datarootdir=/usr/share
-. ${libdir}/grub/grub-mkconfig_lib
+prefix="/usr"
+exec_prefix="${prefix}"
+datarootdir="/usr/share"
+
+. "${datarootdir}/grub/grub-mkconfig_lib"
 
 export TEXTDOMAIN=grub
-export TEXTDOMAINDIR=${datarootdir}/locale
+export TEXTDOMAINDIR="${datarootdir}/locale"
 
 CLASS="--class gnu-linux --class gnu --class os --class xen"
 
@@ -143,7 +142,7 @@ while [ "x${xen_list}" != "x" ] ; do
     echo "submenu \"Xen ${xen_version}\" {"
     while [ "x$list" != "x" ] ; do
 	linux=`version_find_latest $list`
-	echo "Found linux image: $linux" >&2
+	gettext_printf "Found linux image: %s\n" "$linux" >&2
 	basename=`basename $linux`
 	dirname=`dirname $linux`
 	rel_dirname=`make_system_path_relative_to_its_root $dirname`
@@ -163,7 +162,7 @@ while [ "x${xen_list}" != "x" ] ; do
 	    fi
 	done
 	if test -n "${initrd}" ; then
-	    echo "Found initrd image: ${dirname}/${initrd}" >&2
+	    gettext_printf "Found initrd image: %s\n" "${dirname}/${initrd}" >&2
 	else
     # "UUID=" magic is parsed by initrds.  Since there's no initrd, it can't work here.
 	    linux_root_device_thisversion=${GRUB_DEVICE}
