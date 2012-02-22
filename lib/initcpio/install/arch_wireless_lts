@@ -22,6 +22,7 @@ build ()
 	add_file "$i"
     done
     # crda support
+    add_file "/etc/rc.d/wireless-regdom"
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless-regdom" "/etc/conf.d/wireless-regdom"
     add_file "/lib/udev/rules.d/85-regulatory.rules"
     add_file "/usr/lib/crda/regulatory.bin"
