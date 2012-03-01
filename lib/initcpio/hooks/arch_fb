@@ -10,8 +10,6 @@ run_hook ()
           msg ":: Switching to $fb kms mode..."
           echo "options $fb modeset=1" >> /etc/modprobe.d/modprobe.conf
           fbmodule="$fb"
-        else
-          echo "blacklist $fb" >> /etc/modprobe.d/framebuffer_blacklist.conf
         fi
       done
     done
