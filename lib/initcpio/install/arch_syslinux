@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/bin/syslinux /sbin/extlinux /usr/bin/mtools /usr/bin/mcopy /usr/bin/mattrib"
+    BINARIES="/usr/bin/syslinux /usr/sbin/extlinux /usr/bin/mtools /usr/bin/mcopy /usr/bin/mattrib"
     FILES=""
     SCRIPT=""
     for i in /usr/lib/syslinux/*; do
