@@ -3337,7 +3337,7 @@ abort_nilfs_bootpart() {
 
 # install syslinux and run preparation
 prepare_syslinux() {
-    if ! [[ -e "${DESTDIR}/sbin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
+    if ! [[ -e "${DESTDIR}/usr/sbin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
         DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
         PACKAGES="${SYSLINUX_PACKAGES}"
         run_pacman
