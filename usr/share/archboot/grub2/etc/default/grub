@@ -8,7 +8,7 @@ GRUB_CMDLINE_LINUX=""
 GRUB_PRELOAD_MODULES="part_gpt part_msdos"
 
 # Uncomment to enable Hidden Menu, and optionally hide the timeout count
-GRUB_HIDDEN_TIMEOUT=5
+#GRUB_HIDDEN_TIMEOUT=5
 #GRUB_HIDDEN_TIMEOUT_QUIET=true
 
 # Uncomment to use basic console
@@ -34,8 +34,8 @@ GRUB_DISABLE_RECOVERY=true
 
 # Uncomment and set to the desired menu colors.  Used by normal and wallpaper 
 # modes only.  Entries specified as foreground/background.
-GRUB_COLOR_NORMAL="light-blue/black"
-GRUB_COLOR_HIGHLIGHT="light-cyan/blue"
+#GRUB_COLOR_NORMAL="light-blue/black"
+#GRUB_COLOR_HIGHLIGHT="light-cyan/blue"
 
 # Uncomment one of them for the gfx desired, a image background or a gfxtheme
 #GRUB_BACKGROUND="/path/to/wallpaper"

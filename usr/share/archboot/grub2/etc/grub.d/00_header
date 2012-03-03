@@ -22,7 +22,6 @@ transform="s&^&&"
 prefix="/usr"
 exec_prefix="${prefix}"
 datarootdir="/usr/share"
-locale_dir=`echo ${GRUB_PREFIX}/locale | sed ${transform}`
 grub_lang=`echo $LANG | cut -d . -f 1`
 
 . "${datarootdir}/grub/grub-mkconfig_lib"
@@ -83,28 +82,21 @@ if [ -n "${GRUB_VIDEO_BACKEND}" ]; then
   insmod ${GRUB_VIDEO_BACKEND}
 EOF
 else
-    # Insert all available backends; GRUB will use the most appropriate.
-    have_video=0;
-    for modinfo in $(ls "${GRUB_PREFIX}"/*/modinfo.sh) ; do
-        . "${modinfo}"
-        cat <<EOF
-  if [ "\${grub_platform}" == "${grub_modinfo_platform}" ]; then
-EOF
-        video_lst="$(echo ${modinfo} | sed 's|modinfo.sh||g')/video.lst"
-        for backend in $(cat "${video_lst}"); do
-            have_video=1;
-            cat <<EOF
-    insmod ${backend}
-EOF
-        done
-    cat <<EOF
+# If all_video.mod isn't available load all modules available
+# with versions prior to introduction of all_video.mod
+cat <<EOF
+  if [ x\$feature_all_video_module = xy ]; then
+    insmod all_video
+  else
+    insmod efi_gop
+    insmod efi_uga
+    insmod ieee1275_fb
+    insmod vbe
+    insmod vga
+    insmod video_bochs
+    insmod video_cirrus
   fi
-  
 EOF
-    done
-    if [ x$have_video = x0 ]; then
-	echo "true"
-    fi
 fi
 cat <<EOF
 }
@@ -131,10 +123,6 @@ for x in ${GRUB_TERMINAL_INPUT} ${GRUB_TERMINAL_OUTPUT}; do
 done
 
 if [ "x$serial" = x1 ]; then
-    if ! test -e "${GRUB_PREFIX}/serial.mod" ; then
-	gettext "Serial terminal not available on this platform." >&2 ; echo >&2; exit 1
-    fi
-
     if [ "x${GRUB_SERIAL_COMMAND}" = "x" ] ; then
 	grub_warn "$(gettext "Requested serial terminal but GRUB_SERIAL_COMMAND is unspecified. Default parameters will be used.")"
 	GRUB_SERIAL_COMMAND=serial
@@ -143,21 +131,55 @@ if [ "x$serial" = x1 ]; then
 fi
 
 if [ "x$gfxterm" = x1 ]; then
-    # Make the font accessible
-    prepare_grub_to_access_device `${grub_probe} --target=device "${GRUB_FONT_PATH}"`
+    if [ -n "$GRUB_FONT" ] ; then
+       # Make the font accessible
+       prepare_grub_to_access_device `${grub_probe} --target=device "${GRUB_FONT}"`
+    cat << EOF
+if loadfont `make_system_path_relative_to_its_root "${GRUB_FONT}"` ; then
+EOF
+    else
+	for dir in "${pkgdatadir}" "`echo '//boot/grub' | sed "s,//*,/,g"`" /usr/share/grub ; do
+	    for basename in unicode unifont ascii; do
+		path="${dir}/${basename}.pf2"
+		if is_path_readable_by_grub "${path}" > /dev/null ; then
+		    font_path="${path}"
+		else
+		    continue
+		fi
+		break 2
+	    done
+	done
+	if [ -n "${font_path}" ] ; then
+    cat << EOF
+if [ x\$feature_default_font_path = xy ] ; then
+   font=unicode
+else
+EOF
+                # Make the font accessible
+		prepare_grub_to_access_device `${grub_probe} --target=device "${font_path}"`
+    cat << EOF
+    font="`make_system_path_relative_to_its_root "${font_path}"`"
+fi
+
+if loadfont \$font ; then
+EOF
+	    else
+    cat << EOF
+if loadfont unicode ; then
+EOF
+	    fi
+	fi
 
     cat << EOF
-if loadfont `make_system_path_relative_to_its_root "${GRUB_FONT_PATH}"` ; then
   set gfxmode=${GRUB_GFXMODE}
   load_video
   insmod gfxterm
 EOF
 
 # Gettext variables and module
-if [ "x${LANG}" != "xC" ] && [ -d "${locale_dir}" ] ; then
-    prepare_grub_to_access_device $(${grub_probe} --target=device ${locale_dir}) | sed -e "s/^/  /"
+if [ "x${LANG}" != "xC" ] ; then
   cat << EOF
-  set locale_dir=(\$root)$(make_system_path_relative_to_its_root ${locale_dir})
+  set locale_dir=\$prefix/locale
   set lang=${grub_lang}
   insmod gettext
 EOF
@@ -225,6 +247,7 @@ EOF
 	    
 	cat << EOF
 set theme=(\$root)`make_system_path_relative_to_its_root $GRUB_THEME`
+export theme
 EOF
     elif [ "x$GRUB_BACKGROUND" != x ] && [ -f "$GRUB_BACKGROUND" ] \
 	    && is_path_readable_by_grub "$GRUB_BACKGROUND"; then

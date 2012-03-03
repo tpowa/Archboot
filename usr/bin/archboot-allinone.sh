@@ -283,7 +283,8 @@ _prepare_grub2_uefi_iso_files() {
 	umount "${grub2_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	
-	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/efi/grub2/"
+	mkdir -p "${ALLINONE}/efi/grub2/fonts"
+	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/efi/grub2/fonts/"
 	
 	mkdir -p "${ALLINONE}/efi/grub2/locale/"
 	
@@ -331,16 +332,20 @@ set pager="1"
 
 set locale_dir="(\${archboot})/efi/grub2/locale"
 
-if [ "\${grub_platform}" == "efi" ]; then
+if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
+    insmod all_video
+else
     insmod efi_gop
     insmod efi_uga
+    # insmod vbe
+    # insmod vga
     insmod video_bochs
     insmod video_cirrus
 fi
 
 insmod font
 
-if loadfont "(\${archboot})/efi/grub2/unicode.pf2" ; then
+if loadfont "(\${archboot})/efi/grub2/fonts/unicode.pf2" ; then
     insmod gfxterm
     set gfxmode="auto"
     

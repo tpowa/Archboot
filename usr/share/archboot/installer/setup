@@ -3950,14 +3950,11 @@ EOF
     
     cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
 
-if [ "\${grub_platform}" == "efi" ]; then
+if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
+    insmod all_video
+else
     insmod efi_gop
     insmod efi_uga
-    insmod video_bochs
-    insmod video_cirrus
-fi
-
-if [ "\${grub_platform}" == "pc" ]; then
     insmod vbe
     insmod vga
     insmod video_bochs
@@ -3976,7 +3973,7 @@ else
         set _fontfile="(\${root_part})/usr/share/grub/unicode.pf2"
     else
         if [ -e "\${prefix}/unicode.pf2" ]; then
-            set _fontfile="\${prefix}/unicode.pf2"
+            set _fontfile="\${prefix}/fonts/unicode.pf2"
         fi
     fi
 fi
@@ -4269,7 +4266,15 @@ dogrub2_bios() {
     # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
     freeze_xfs
     chroot_mount
-    chroot "${DESTDIR}" /usr/sbin/grub_bios-install --boot-directory="/boot" --no-floppy --recheck "${bootdev}" >> /tmp/grub2.log
+    
+    chroot "${DESTDIR}" "/usr/sbin/grub-install" \
+        --directory="/usr/lib/grub/i386-pc" \
+        --target="i386-pc" \
+        --boot-directory="/boot" \
+        --no-floppy \
+        --recheck \
+        "${bootdev}" >> "/tmp/grub2_bios.log"
+    
     chroot_umount
     cat /tmp/grub2.log > "${LOG}"
     
@@ -4410,11 +4415,14 @@ dogrub2_uefi_common() {
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/usr/sbin/grub_efi_${UEFI_ARCH}-install" \
+    chroot "${DESTDIR}" "/usr/sbin/grub-install" \
+        --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
+        --target="${UEFI_ARCH}-efi" \
         --root-directory="/boot/efi" \
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
-        --no-floppy --recheck >> "/tmp/grub2_${UEFI_ARCH}_uefi.log"
+        --no-floppy \
+        --recheck >> "/tmp/grub2_uefi_${UEFI_ARCH}.log"
     
     chroot_umount
     
@@ -4483,9 +4491,9 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub2_${UEFI_ARCH}_uefi.log" > "${LOG}"
+    cat "/tmp/grub2_uefi_${UEFI_ARCH}.log" > "${LOG}"
     
-    if ! [[ -s "/tmp/grub2_${UEFI_ARCH}_uefi.log" ]]; then
+    if ! [[ -s "/tmp/grub2_uefi_${UEFI_ARCH}.log" ]]; then
         DIALOG --msgbox "Error installing GRUB2.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
