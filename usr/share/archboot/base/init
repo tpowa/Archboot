@@ -64,6 +64,11 @@ if [ "${break}" = "y" ] || [ "${break}" = "premount" ]; then
     launch_interactive_shell
 fi
 
+rootdev=$(resolve_device "$root") && root=$rootdev
+unset rootdev
+
+fsck_root
+
 if [ "${root}" = "" -a "${ip}" = "" ]; then
     # enter install environment
     exec /sbin/init
@@ -90,10 +95,12 @@ else
     fi
 
     # mount /usr if it exists
-    if [ -f /new_root/etc/fstab ]; then
-        if usr_source=$(findmnt -nero source -s/new_root/etc/fstab /usr); then
-            mountopts=$(findmnt -nero options -s/new_root/etc/fstab /usr)
+    realtab=/new_root/etc/fstab
+    if [ -f "$realtab" ]; then
+        if usr_source=$(findmnt -snero source --tab-file="$realtab" /usr); then
+            mountopts=$(findmnt -snero options --tab-file="$realtab" /usr)
             fsck_device "$usr_source"
+            msg ":: mounting '$usr_source' on /usr"
             mount "$usr_source" /new_root/usr -o "$mountopts"
         fi
     fi
