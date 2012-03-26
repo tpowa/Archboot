@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# grub2-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in extra/grub2-common package
+# grub-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in extra/grub2-common package
 
 WD="${PWD}/"
 
@@ -198,15 +198,15 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_prepare_grub2_uefi_arch_specific_iso_files() {
+_prepare_grub_uefi_arch_specific_iso_files() {
 	
 	[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
 	[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
 	
-	mkdir -p "${ALLINONE}/efi/grub2"
+	mkdir -p "${ALLINONE}/boot/grub"
 	
 	## Create grub.cfg for grub-mkstandalone memdisk for boot${_SPEC_UEFI_ARCH}.efi
-	cat << EOF > "${ALLINONE}/efi/grub2/grub_standalone_archboot.cfg"
+	cat << EOF > "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg"
 
 insmod usbms
 insmod usb_keyboard
@@ -226,78 +226,76 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
-source "(\${archboot})/efi/grub2/grub_archboot.cfg"
+search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
+source "(\${archboot})/boot/grub/grub_archboot.cfg"
 
 EOF
 	
-	mkdir -p "${ALLINONE}/efi/grub2/boot/grub"
-	cp "${ALLINONE}/efi/grub2/grub_standalone_archboot.cfg" "${ALLINONE}/efi/grub2/boot/grub/grub.cfg"
+	cp "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg" "${ALLINONE}/boot/grub/grub.cfg"
 	
 	__WD="${PWD}/"
 	
-	cd "${ALLINONE}/efi/grub2/"
+	cd "${ALLINONE}/"
 	
-	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
+	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
 	
 	cd "${__WD}/"
 	
-	rm -rf "${ALLINONE}/efi/grub2/boot/grub/"
-	rm -rf "${ALLINONE}/efi/grub2/boot"
+	rm -f "${ALLINONE}/boot/grub/grub.cfg"
 	
 	mkdir -p "${ALLINONE}/efi/boot/"
-	cp "${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
 	unset _UEFI_ARCH
 	unset _SPEC_UEFI_ARCH
 	
 }
 
-_prepare_grub2_uefi_iso_files() {
+_prepare_grub_uefi_iso_files() {
 	
-	grub2_uefi_mp="$(mktemp -d /tmp/grub2_uefi_mp.XXX)"
+	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
 	
-	mkdir -p "${ALLINONE}/efi/grub2"
+	mkdir -p "${ALLINONE}/boot/grub"
 	mkdir -p "${ALLINONE}/efi/boot"
 	
 	# Create a blank image to be converted to ESP IMG
-	dd if="/dev/zero" of="${ALLINONE}/efi/grub2/grub2_uefi.bin" bs="1024" count="4096"
+	dd if="/dev/zero" of="${ALLINONE}/boot/grub/grub_uefi_x86_64.bin" bs="1024" count="4096"
 	
-	# Create a FAT12 FS with Volume label "grub2_uefi"
-	mkfs.vfat -F12 -S 512 -n "grub2_uefi" "${ALLINONE}/efi/grub2/grub2_uefi.bin"
+	# Create a FAT12 FS with Volume label "grub_uefi"
+	mkfs.vfat -F12 -S 512 -n "grub_uefi" "${ALLINONE}/boot/grub/grub_uefi_x86_64.bin"
 	
-	## Mount the ${ALLINONE}/efi/grub2/grub2_uefi.bin image at ${grub2_uefi_mp} as loop 
+	## Mount the ${ALLINONE}/boot/grub/grub_uefi_x86_64.bin image at ${grub_uefi_mp} as loop 
 	if ! [[ "$(lsmod | grep ^loop)" ]]; then
 		modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 	fi
 	
-	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/efi/grub2/grub2_uefi.bin")"
-	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
+	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/boot/grub/grub_uefi_x86_64.bin")"
+	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub_uefi_mp}"
 	
-	mkdir -p "${grub2_uefi_mp}/efi/boot/"
+	mkdir -p "${grub_uefi_mp}/efi/boot/"
 	
 	_UEFI_ARCH="x86_64"
-	_prepare_grub2_uefi_arch_specific_iso_files
+	_prepare_grub_uefi_arch_specific_iso_files
 	
 	# umount images and loop
-	umount "${grub2_uefi_mp}"
+	umount "${grub_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	
-	mkdir -p "${ALLINONE}/efi/grub2/fonts"
-	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/efi/grub2/fonts/"
+	mkdir -p "${ALLINONE}/boot/grub/fonts"
+	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/boot/grub/fonts/"
 	
-	mkdir -p "${ALLINONE}/efi/grub2/locale/"
+	mkdir -p "${ALLINONE}/boot/grub/locale/"
 	
 	## Taken from /usr/sbin/grub-install
 	#for dir in "/usr/share/locale"/*; do
 	#	if test -f "${dir}/LC_MESSAGES/grub.mo"; then
-			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/efi/grub2/locale/${dir##*/}.mo"
+			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/boot/grub/locale/${dir##*/}.mo"
 	#		echo
 	#	fi
 	#done
 	
-	## Create the actual grub2 uefi config file
-	cat << EOF > "${ALLINONE}/efi/grub2/grub_archboot.cfg"
+	## Create the actual grub uefi config file
+	cat << EOF > "${ALLINONE}/boot/grub/grub_archboot.cfg"
 
 set _kernel_params="gpt loglevel=7"
 
@@ -324,28 +322,34 @@ else
     set _kernel_i686_params="\${_kernel_params}"
 fi
 
-# search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
-# search --file --no-floppy --set=archboot "/efi/grub2/grub_standalone_archboot.cfg"
+# search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
+# search --file --no-floppy --set=archboot "/boot/grub/grub_standalone_archboot.cfg"
 
 set pager="1"
 # set debug="all"
 
-set locale_dir="(\${archboot})/efi/grub2/locale"
+set locale_dir="(\${archboot})/boot/grub/locale"
 
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
 else
-    insmod efi_gop
-    insmod efi_uga
-    # insmod vbe
-    # insmod vga
+    if [ "\${grub_platform}" == "efi" ]; then
+        insmod efi_gop
+        insmod efi_uga
+    fi
+    
+    if [ "\${grub_platform}" == "pc" ]; then
+        insmod vbe
+        insmod vga
+    fi
+    
     insmod video_bochs
     insmod video_cirrus
 fi
 
 insmod font
 
-if loadfont "(\${archboot})/efi/grub2/fonts/unicode.pf2" ; then
+if loadfont "(\${archboot})/boot/grub/fonts/unicode.pf2" ; then
     insmod gfxterm
     set gfxmode="auto"
     
@@ -366,19 +370,23 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
-menuentry "Arch Linux (x86_64) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
-    initrd /boot/initramfs_x86_64.img
-}
+if [ cpuid -l ]; then
 
-menuentry "Arch Linux LTS (x86_64) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
-    initrd /boot/initramfs_x86_64.img
-}
+    menuentry "Arch Linux (x86_64) archboot" {
+        set gfxpayload="keep"
+        set root="\${archboot}"
+        linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
+        initrd /boot/initramfs_x86_64.img
+    }
+
+    menuentry "Arch Linux LTS (x86_64) archboot" {
+        set gfxpayload="keep"
+        set root="\${archboot}"
+        linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
+        initrd /boot/initramfs_x86_64.img
+    }
+
+fi
 
 menuentry "Arch Linux (i686) archboot" {
     set gfxpayload="keep"
@@ -422,7 +430,7 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_prepare_grub2_uefi_iso_files
+_prepare_grub_uefi_iso_files
 
 # place syslinux files
 mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
@@ -442,7 +450,7 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -eltorito-alt-boot --efi-boot efi/grub2/grub2_uefi.bin -no-emul-boot \
+        -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" > /dev/null 2>&1
 
@@ -459,7 +467,7 @@ rm -f sha256sums.txt || true
 sha256sum "${IMAGENAME}.iso" "${IMAGENAME}.img" > sha256sums.txt
 
 # cleanup
-rm -rf "${grub2_uefi_mp}"
+rm -rf "${grub_uefi_mp}"
 rm -rf "${CORE}"
 rm -rf "${CORE64}"
 rm -rf "${CORE_LTS}"

@@ -4271,9 +4271,9 @@ dogrub2_bios() {
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
         --boot-directory="/boot" \
-        --no-floppy \
         --recheck \
-        "${bootdev}" >> "/tmp/grub2_bios.log"
+        --debug \
+        "${bootdev}" 1>"/tmp/grub2_bios_install.log" 2>&1
     
     chroot_umount
     cat /tmp/grub2.log > "${LOG}"
@@ -4369,11 +4369,11 @@ do_efi_bootmgr_setup() {
     
 }
 
-doelilo_uefi_x86_64() {
+dorefind_uefi_x86_64() {
     
     do_uefi_x86_64
     
-    DIALOG --msgbox "TODO: Elilo x86_64 UEFI Bootloader Setup" 0 0
+    DIALOG --msgbox "TODO: rEFInd x86_64 UEFI Boot Manager Setup" 0 0
     
 }
 
@@ -4421,8 +4421,8 @@ dogrub2_uefi_common() {
         --root-directory="/boot/efi" \
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
-        --no-floppy \
-        --recheck >> "/tmp/grub2_uefi_${UEFI_ARCH}.log"
+        --recheck \
+        --debug 1>"/tmp/grub2_uefi_${UEFI_ARCH}_install.log" 2>&1
     
     chroot_umount
     
@@ -4483,7 +4483,7 @@ EOF
         --format="${UEFI_ARCH}-efi" \
         --compression="xz" \
         --output="/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" > "/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log"
+        "boot/grub/grub.cfg" 1>"/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log" 2>&1
     
     chroot_umount
     
@@ -4491,9 +4491,9 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub2_uefi_${UEFI_ARCH}.log" > "${LOG}"
+    cat "/tmp/grub2_uefi_${UEFI_ARCH}_install.log" >> "${LOG}"
     
-    if ! [[ -s "/tmp/grub2_uefi_${UEFI_ARCH}.log" ]]; then
+    if ! [[ -s "/tmp/grub2_uefi_${UEFI_ARCH}_install.log" ]]; then
         DIALOG --msgbox "Error installing GRUB2.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
@@ -5043,11 +5043,11 @@ configure_system() {
 install_bootloader_uefi_x86_64() {
     
     DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
-        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" \
-        "ELILO" "x86_64 UEFI version of LILO" 2>${ANSWER} || CANCEL=1
+        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" 2>${ANSWER} || CANCEL=1
+        # "rEFInd" "rEFInd x86_64" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
-        "ELILO") doelilo_uefi_x86_64 ;;
+        # "rEFInd") dorefind_uefi_x86_64 ;;
     esac
     
 }

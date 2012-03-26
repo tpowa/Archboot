@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Script for updating existing Archboot iso with newer UEFI shell, GRUB2 UEFI, and/or /arch/setup script in the initramfs files
+# Script for updating existing Archboot iso with newer UEFI shell, GRUB UEFI, and/or /arch/setup script in the initramfs files
 # Contributed by "Keshav P R" <the.ridikulus.rat aatt geemmayil ddoott ccoomm>
 
 _UPDATE_SYSLINUX="1"
 _UPDATE_UEFI_SHELL="1"
-_UPDATE_GRUB2_UEFI="1"
+_UPDATE_GRUB_UEFI="1"
 _UPDATE_SETUP="1"
 
 _REMOVE_i686="1"
@@ -247,23 +247,23 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_update_grub2_uefi_arch_specific_iso_files() {
+_update_grub_uefi_arch_specific_iso_files() {
 	
 	[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
 	[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
 	
-	rm -f "${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
+	rm -f "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
 	echo
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/${_UEFI_ARCH}-efi" || true
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/${_UEFI_ARCH}-efi" || true
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub"
 	echo
 	
 	## Create grub.cfg for grub-mkstandalone memdisk for boot${_SPEC_UEFI_ARCH}.efi
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub_standalone_archboot.cfg"
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_standalone_archboot.cfg"
 
 insmod usbms
 insmod usb_keyboard
@@ -283,30 +283,27 @@ insmod hfsplus
 insmod linux
 insmod chain
 
-search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
-source "(\${archboot})/efi/grub2/grub_archboot.cfg"
+search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
+source "(\${archboot})/boot/grub/grub_archboot.cfg"
 
 EOF
 	
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/boot/grub"
-	cp "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub_standalone_archboot.cfg" "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/boot/grub/grub.cfg"
-	echo
+	cp "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_standalone_archboot.cfg" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg"
 	
 	__ARCHBOOT_ISO_WD="${PWD}/"
 	
-	cd "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/"
+	cd "${_ARCHBOOT_ISO_EXT_DIR}/"
 	
-	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub2_uefi_mp}/efi/boot/bootx64.efi" "boot/grub/grub.cfg"
+	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub_uefi_mp}/efi/boot/bootx64.efi" "boot/grub/grub.cfg"
 	
 	cd "${__ARCHBOOT_ISO_WD}/"
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/boot/grub/"
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/boot"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg"
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/"
-	cp "${grub2_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
 	echo
 	
@@ -315,76 +312,77 @@ EOF
 	
 }
 
-_update_grub2_uefi_iso_files() {
+_update_grub_uefi_iso_files() {
 	
-	grub2_uefi_mp="$(mktemp -d /tmp/grub2_uefi_mp.XXX)"
+	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
 	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub" || true
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2" || true
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub"
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot"
 	echo
 	
 	# Create a blank image to be converted to ESP IMG
-	dd if="/dev/zero" of="${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub2_uefi.bin" bs="1024" count="4096"
+	dd if="/dev/zero" of="${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_uefi_x86_64.bin" bs="1024" count="4096"
 	
-	# Create a FAT12 FS with Volume label "grub2_uefi"
-	mkfs.vfat -F12 -S 512 -n "grub2_uefi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub2_uefi.bin"
+	# Create a FAT12 FS with Volume label "grub_uefi"
+	mkfs.vfat -F12 -S 512 -n "grub_uefi" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_uefi_x86_64.bin"
 	echo
 	
-	## Mount the ${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub2_uefi.bin image at ${grub2_uefi_mp} as loop 
+	## Mount the ${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_uefi_x86_64.bin image at ${grub_uefi_mp} as loop 
 	if ! [[ "$(lsmod | grep ^loop)" ]]; then
 		modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 		echo
 	fi
 	
-	LOOP_DEVICE="$(losetup --show --find "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub2_uefi.bin")"
-	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub2_uefi_mp}"
+	LOOP_DEVICE="$(losetup --show --find "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_uefi_x86_64.bin")"
+	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub_uefi_mp}"
 	echo
 	
-	mkdir -p "${grub2_uefi_mp}/efi/boot/"
+	mkdir -p "${grub_uefi_mp}/efi/boot/"
 	echo
 	
 	_UEFI_ARCH="x86_64"
-	_update_grub2_uefi_arch_specific_iso_files
+	_update_grub_uefi_arch_specific_iso_files
 	echo
 	
 	# umount images and loop
-	umount "${grub2_uefi_mp}"
+	umount "${grub_uefi_mp}"
 	losetup --detach "${LOOP_DEVICE}"
 	echo
 	
-	rm -rf "${grub2_uefi_mp}/"
+	rm -rf "${grub_uefi_mp}/"
 	echo
 	
-	unset grub2_uefi_mp
+	unset grub_uefi_mp
 	unset LOOP_DEVICE
 	echo
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/grub.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2//efi/grub2/grub_archboot.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2//efi/grub2/grub_standalone_archboot.cfg" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub//boot/grub/grub_archboot.cfg" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub//boot/grub/grub_standalone_archboot.cfg" || true
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/fonts/"
-	cp "/usr/share/grub/unicode.pf2" "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/fonts/"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
+	cp "/usr/share/grub/unicode.pf2" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
 	echo
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/locale/" || true
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/locale/"
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/locale/" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/locale/"
 	echo
 	
 	## Taken from /usr/sbin/grub-install
 	# for dir in "/usr/share/locale"/*; do
 		# if test -f "${dir}/LC_MESSAGES/grub.mo"; then
-			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/locale/${dir##*/}.mo"
+			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/locale/${dir##*/}.mo"
 			echo
 		# fi
 	# done
 	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2/grub_archboot.cfg"
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
 
 set _kernel_params="gpt loglevel=7"
 
@@ -411,28 +409,34 @@ else
     set _kernel_i686_params="\${_kernel_params}"
 fi
 
-# search --file --no-floppy --set=archboot "/efi/grub2/grub_archboot.cfg"
-# search --file --no-floppy --set=archboot "/efi/grub2/grub_standalone_archboot.cfg"
+# search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
+# search --file --no-floppy --set=archboot "/boot/grub/grub_standalone_archboot.cfg"
 
 set pager="1"
 # set debug="all"
 
-set locale_dir="(\${archboot})/efi/grub2/locale"
+set locale_dir="(\${archboot})/boot/grub/locale"
 
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
 else
-    insmod efi_gop
-    insmod efi_uga
-    # insmod vbe
-    # insmod vga
+    if [ "\${grub_platform}" == "efi" ]; then
+        insmod efi_gop
+        insmod efi_uga
+    fi
+    
+    if [ "\${grub_platform}" == "pc" ]; then
+        insmod vbe
+        insmod vga
+    fi
+    
     insmod video_bochs
     insmod video_cirrus
 fi
 
 insmod font
 
-if loadfont "(\${archboot})/efi/grub2/fonts/unicode.pf2" ; then
+if loadfont "(\${archboot})/boot/grub/fonts/unicode.pf2" ; then
     insmod gfxterm
     set gfxmode="auto"
     
@@ -453,19 +457,23 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
-menuentry "Arch Linux (x86_64) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
-    initrd /boot/initramfs_x86_64.img
-}
+if [ cpuid -l ]; then
 
-menuentry "Arch Linux LTS (x86_64) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
-    initrd /boot/initramfs_x86_64.img
-}
+    menuentry "Arch Linux (x86_64) archboot" {
+        set gfxpayload="keep"
+        set root="\${archboot}"
+        linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
+        initrd /boot/initramfs_x86_64.img
+    }
+
+    menuentry "Arch Linux LTS (x86_64) archboot" {
+        set gfxpayload="keep"
+        set root="\${archboot}"
+        linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
+        initrd /boot/initramfs_x86_64.img
+    }
+
+fi
 
 menuentry "Arch Linux (i686) archboot" {
     set gfxpayload="keep"
@@ -586,7 +594,7 @@ _rename_old_files
 
 [[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
 
-[[ "${_UPDATE_GRUB2_UEFI}" == "1" ]] && _update_grub2_uefi_iso_files
+[[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_iso_files
 
 [[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
 
@@ -625,7 +633,7 @@ xorriso -as mkisofs \
 	-eltorito-boot boot/syslinux/isolinux.bin \
 	-eltorito-catalog boot/syslinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
-	-eltorito-alt-boot --efi-boot efi/grub2/grub2_uefi.bin -no-emul-boot \
+	-eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
 	-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" > /dev/null 2>&1
 echo
@@ -648,7 +656,7 @@ fi
 
 unset _UPDATE_SYSLINUX
 unset _UPDATE_UEFI_SHELL
-unset _UPDATE_GRUB2_UEFI
+unset _UPDATE_GRUB_UEFI
 unset _UPDATE_SETUP
 unset _REMOVE_i686
 unset _REMOVE_x86_64

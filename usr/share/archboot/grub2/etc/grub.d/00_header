@@ -24,6 +24,9 @@ exec_prefix="${prefix}"
 datarootdir="/usr/share"
 grub_lang=`echo $LANG | cut -d . -f 1`
 
+export TEXTDOMAIN=grub
+export TEXTDOMAINDIR="${datarootdir}/locale"
+
 . "${datarootdir}/grub/grub-mkconfig_lib"
 
 # Do this as early as possible, since other commands might depend on it.
@@ -60,6 +63,15 @@ set default="${GRUB_DEFAULT}"
 EOF
 fi
 cat <<EOF
+
+if [ x"\${feature_menuentry_id}" = xy ]; then
+  menuentry_id_option="--id"
+else
+  menuentry_id_option=""
+fi
+
+export menuentry_id_option
+
 if [ "\${prev_saved_entry}" ]; then
   set saved_entry="\${prev_saved_entry}"
   save_env saved_entry
