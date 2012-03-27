@@ -14,7 +14,7 @@ syslog-ng sysvinit tar util-linux which wireless_tools xfsprogs dnsutils hdparm 
 inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links \
 dosfstools udev initscripts filesystem linux-lts glibc linux-api-headers xinetd links pacman \
 pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib elfutils gpm sysfsutils libgcrypt \
-libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo iptables capi4k-utils ntfs-3g \
+libgpg-error popt kexec-tools ppp libpcap rp-pppoe lilo iptables ntfs-3g \
 isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter wpa_supplicant gzip rsync libarchive \
 device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot fuse libusb-compat vim \
 vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
@@ -26,7 +26,7 @@ nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb grub2-co
 grub2-efi-x86_64 efibootmgr file eject keyutils yp-tools smartmontools curl dnsmasq \
 lftp openconnect libproxy libxml2 speedtouch tcpdump nmap lua weechat gnutls nettle libtasn1 bind rpcbind \
 expat progsreiserfs glib2 freetype2 libssh2 libfetch libedit talloc eventlog idnkit libjpeg-turbo \
-pth gnupg libksba libassuan pinentry dirmngr gnupg2 gpgme"
+pth gnupg libksba libassuan pinentry dirmngr gpgme"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
