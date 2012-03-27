@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/sbin/dnsmasq"
+    BINARIES="/usr/bin/dnsmasq"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/dnsmasq/etc/dnsmasq.conf" "/etc/dnsmasq.conf"
