@@ -4,7 +4,7 @@ build ()
 {
     MODULES=" $(checked_modules "/drivers/isdn/") "
 
-    BINARIES="/sbin/hisaxctrl /sbin/icnctrl /sbin/imon /sbin/imontty /sbin/ipppd /sbin/ipppstats /sbin/isdnctrl /sbin/isdnlog /sbin/mkzonedb /sbin/pcbitctl /usr/bin/isdnconf /usr/bin/isdnrate /usr/bin/isdnrep"
+    BINARIES="/usr/sbin/hisaxctrl /usr/sbin/icnctrl /usr/sbin/imon /sbin/imontty /usr/sbin/ipppd /usr/sbin/ipppstats /usr/sbin/isdnctrl /usr/sbin/isdnlog /usr/sbin/mkzonedb /usr/sbin/pcbitctl /usr/bin/isdnconf /usr/bin/isdnrate /usr/bin/isdnrep /usr/bin/capiinfo /usr/sbin/rcapid /usr/sbin/capiinit /usr/sbin/avmcapictrl"
     FILES=""
     SCRIPT=""
     add_file "/usr/share/archboot/isdn/etc/isdn/callerid.conf" "/etc/isdn/callerid.conf"
