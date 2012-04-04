@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/bin/net-auto-wired /usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu /usr/bin/netcfg2 /usr/bin/netcfg"
+    BINARIES="/usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu /usr/bin/netcfg2 /usr/bin/wifi-menu /usr/bin/netcfg"
     FILES=""
     SCRIPT=""
     add_full_dir "/usr/lib/network/"
