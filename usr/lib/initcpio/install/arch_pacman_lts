@@ -19,7 +19,7 @@ isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter wpa_supplicant gzip rsy
 device-mapper cracklib nfs-utils nfsidmap readline acl attr pcre cpio archboot fuse libusb-compat vim \
 vim-runtime lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses \
 zd1211-firmware cifs-utils dmraid linux-atm netcfg parted tzdata ntp \
-v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl gmp krb5 sqlite3 db \
+v86d iw crda wireless-regdb libnl iproute2 dhclient syslinux mtools perl gmp krb5 sqlite db \
 dbus-core libcap fsarchiver xz librpcsecgss libtirpc wipe ddrescue testdisk ifplugd \
 libdaemon wpa_actiond rfkill libgssglue icu gptfdisk btrfs-progs \
 nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw libusb grub2-common grub2-bios \
