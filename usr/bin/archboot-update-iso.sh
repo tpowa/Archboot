@@ -32,7 +32,7 @@ if [[ -z "${1}" ]]; then
 	echo
 	echo "Example: ${_BASENAME} /home/user/Desktop/archlinux-2012.01-1-archboot.iso"
 	echo
-	echo "Updated iso will be saves at /home/user/Desktop/archlinux-2012.01-1-archboot_updated.iso "
+	echo "Updated iso will be saved at /home/user/Desktop/archlinux-2012.01-1-archboot_updated.iso "
 	echo "(for example)."
 	echo
 	echo "This script should be run as root user."
@@ -201,48 +201,53 @@ EOF
 
 _download_uefi_shell_tianocore() {
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/"
+	
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" || true
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" || true
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/" || true
+	echo
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI x86_64 "Full Shell" - For Spec. Ver. >=2.3 systems
 	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi.backup" || true
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi.backup" || true
 	echo
 	
 	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64.efi" ]]; then
-		cp "${_ARCHBOOT_ISO_WD}/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi"
+		cp "${_ARCHBOOT_ISO_WD}/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi"
 		echo
 	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
 		echo
 		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" | grep 'executable')" ]]; then
-			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi" || true
+		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" | grep 'executable')" ]]; then
+			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" || true
 		fi
 	fi
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64.efi.backup" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi.backup" || true
 	echo
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI x86_64 "Full Shell" - For Spec. Ver. <2.3 systems
 	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi.backup" || true
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi.backup" || true
 	echo
 	
 	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" ]]; then
-		cp "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi"
+		cp "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi"
 		echo
 	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
 		echo
 		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" | grep 'executable')" ]]; then
-			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi" || true
+		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" | grep 'executable')" ]]; then
+			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" || true
 		fi
 	fi
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/shell/shellx64_old.efi.backup" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi.backup" || true
 	echo
 	
 }
@@ -493,12 +498,12 @@ if [ "\${grub_platform}" == "efi" ]; then
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
+        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
     }
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
+        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
     }
 
 fi
@@ -629,13 +634,13 @@ xorriso -as mkisofs \
 	-omit-version-number -allow-leading-dots \
 	-relaxed-filenames -allow-lowercase -allow-multidot \
 	-volid "ARCHBOOT" \
-	-p "prepared by ${_BASENAME}" \
+	-preparer "prepared by ${_BASENAME}" \
 	-eltorito-boot boot/syslinux/isolinux.bin \
 	-eltorito-catalog boot/syslinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
 	-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
-	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" > /dev/null 2>&1
+	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
 
 rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/"

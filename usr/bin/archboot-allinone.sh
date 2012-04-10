@@ -4,13 +4,13 @@
 
 WD="${PWD}/"
 
-APPNAME="$(basename "${0}")"
+_BASENAME="$(basename "${0}")"
 
 _DO_x86_64="1"
 _DO_i686="1"
 
 usage () {
-    echo "${APPNAME}: usage"
+    echo "${_BASENAME}: usage"
     echo "CREATE ALLINONE USB/CD IMAGES"
     echo "-----------------------------"
     echo "Run in archboot x86_64 chroot first ..."
@@ -18,7 +18,7 @@ usage () {
     echo "Run in archboot 686 chroot then ..."
     echo "create-allinone.sh -t"
     echo "Copy the generated tarballs to your favorite directory and run:"
-    echo "${APPNAME} -g <any other option>"
+    echo "${_BASENAME} -g <any other option>"
     echo ""
     echo "PARAMETERS:"
     echo "  -g                  Start generation of images."
@@ -188,13 +188,13 @@ _prepare_other_files() {
 
 _download_uefi_shell_tianocore() {
 	
-	mkdir -p "${ALLINONE}/efi/shell/"
+	mkdir -p "${ALLINONE}/efi/tools/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/shell/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 }
 
@@ -406,12 +406,12 @@ if [ "\${grub_platform}" == "efi" ]; then
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
+        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
     }
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
+        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
     }
 
 fi
@@ -446,13 +446,13 @@ xorriso -as mkisofs \
         -omit-version-number -allow-leading-dots \
         -relaxed-filenames -allow-lowercase -allow-multidot \
         -volid "ARCHBOOT" \
-        -p "prepared by ${APPNAME}" \
+        -preparer "prepared by ${_BASENAME}" \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
-        -output "${IMAGENAME}.iso" "${ALLINONE}/" > /dev/null 2>&1
+        -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
 # cleanup isolinux and migrate to syslinux
 echo "Generating ALLINONE IMG ..."

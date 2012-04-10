@@ -3953,10 +3953,16 @@ EOF
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
 else
-    insmod efi_gop
-    insmod efi_uga
-    insmod vbe
-    insmod vga
+    if [ "\${grub_platform}" == "efi" ]; then
+        insmod efi_gop
+        insmod efi_uga
+    fi
+    
+    if [ "\${grub_platform}" == "pc" ]; then
+        insmod vbe
+        insmod vga
+    fi
+    
     insmod video_bochs
     insmod video_cirrus
 fi
@@ -3972,7 +3978,7 @@ else
     if [ -e "(\${root_part})/usr/share/grub/unicode.pf2" ]; then
         set _fontfile="(\${root_part})/usr/share/grub/unicode.pf2"
     else
-        if [ -e "\${prefix}/unicode.pf2" ]; then
+        if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
             set _fontfile="\${prefix}/fonts/unicode.pf2"
         fi
     fi
@@ -4057,14 +4063,14 @@ EOF
 ## Will work only in grub2 uefi
 #menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
 #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-#    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}.efi
+#    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
 #}
 
 ## (${NUMBER}) UEFI Shell 1.0
 ## Will work only in grub2 uefi
 #menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
 #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-#    chainloader /efi/shell/shell\${_SPEC_UEFI_ARCH}_old.efi
+#    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
 #}
 
 EOF
@@ -4121,12 +4127,11 @@ EOF
     
 }
 
-dogrub2_common_after() {    
+dogrub2_common_after() {
     
     if [[ "${PART_ROOT}" != "" ]]; then
-        if [[ "${GRUB2_BIOS}" == "1" ]]; then
-            [[ "${grubdev}" != "" ]] && dogrub2_config
-            
+        if [[ "${GRUB2_BIOS}" == "1" ]] && [[ "${grubdev}" != "" ]]; then
+            dogrub2_config
         elif [[ "${GRUB2_UEFI}" == "1" ]]; then
             dogrub2_config
         fi
@@ -4273,21 +4278,21 @@ dogrub2_bios() {
         --boot-directory="/boot" \
         --recheck \
         --debug \
-        "${bootdev}" 1>"/tmp/grub2_bios_install.log" 2>&1
+        "${bootdev}" &>"/tmp/grub2_bios_install.log"
     
     chroot_umount
-    cat /tmp/grub2.log > "${LOG}"
+    # cat /tmp/grub2.log > "${LOG}"
     
-    if ! [[ -s /tmp/grub2.log ]]; then
-        DIALOG --msgbox "Error installing GRUB2.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
+    if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
+        DIALOG --msgbox "GRUB2 BIOS has been successfully installed." 0 0
+        
+        GRUB2_PREFIX_DIR="/boot/grub/"
+        GRUB2_BIOS="1"
+        dogrub2_common_after
+    else
+        DIALOG --msgbox "Error installing GRUB2 BIOS.\n\nProbably you need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
-    
-    DIALOG --msgbox "GRUB2 was successfully installed." 0 0
-    
-    GRUB2_PREFIX_DIR="/boot/grub/"
-    GRUB2_BIOS="1"
-    dogrub2_common_after
     
 }
 
@@ -4312,16 +4317,25 @@ do_uefi_efibootmgr() {
     if [[ "$(lsmod | grep ^efivars)" ]]; then
         chroot_mount
         
-        if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]] || [[ -d "/sys/firmware/efi/vars" ]]; then
-            ## Delete old entries of grub2 - command to be checked - do  not do for now
-            # for bootnum in $(efibootmgr | grep '^Boot[0-9]' | fgrep -i " ${_EFIBOOTMGR_LABEL}" | cut -b5-8)
-            # do
-            #    chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --bootnum "${bootnum}" --delete-bootnum
-            # done
+        if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]; then
+            cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
+#!/usr/bin/env bash
+
+for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i '${_EFIBOOTMGR_LABEL}' | cut -b5-8) ; do
+    efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
+done
+
+echo
+efibootmgr --verbose --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label '${_EFIBOOTMGR_LABEL}' --loader '\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}'
+echo
+
+EFIBEOF
             
-            chroot "${DESTDIR}" "/usr/sbin/efibootmgr" --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label "${_EFIBOOTMGR_LABEL}" --loader "\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}"
+            chmod a+x "${DESTDIR}/efibootmgr_run.sh"
+            chroot "${DESTDIR}" "/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
+            mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
         else
-            DIALOG --msgbox "/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
+            DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
         fi
         
         chroot_umount
@@ -4339,7 +4353,7 @@ do_uefi_efibootmgr() {
 
 do_apple_efi_hfs_bless() {
     
-    modprobe -r efivars || true
+    modprobe -q -r efivars || true
     
     ## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
     ## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
@@ -4347,7 +4361,7 @@ do_apple_efi_hfs_bless() {
     
 }
 
-do_efi_bootmgr_setup() {
+do_uefi_bootmgr_setup() {
     
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         do_apple_efi_hfs_bless
@@ -4377,14 +4391,14 @@ dorefind_uefi_x86_64() {
     
 }
 
-dogrub2_uefi_efibootmgr() {
+dogrub2_uefi_bootmgr() {
     
     _BOOTMGR_LABEL="Arch Linux (GRUB2)"
     _BOOTMGR_DISC="${DISC}"
     _BOOTMGR_PART_NUM="${UEFISYS_PART_NUM}"
     _BOOTMGR_LOADER_DIR="arch_grub"
     _BOOTMGR_LOADER_FILE="grub${SPEC_UEFI_ARCH}.efi"
-    do_efi_bootmgr_setup
+    do_uefi_bootmgr_setup
     
 }
 
@@ -4422,7 +4436,7 @@ dogrub2_uefi_common() {
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
         --recheck \
-        --debug 1>"/tmp/grub2_uefi_${UEFI_ARCH}_install.log" 2>&1
+        --debug &>"/tmp/grub2_uefi_${UEFI_ARCH}_install.log"
     
     chroot_umount
     
@@ -4470,7 +4484,7 @@ fi
 
 EOF
     
-    cp "${DESTDIR}/boot/grub/grub.cfg" "/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
+    cp "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
@@ -4483,7 +4497,7 @@ EOF
         --format="${UEFI_ARCH}-efi" \
         --compression="xz" \
         --output="/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" 1>"/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log" 2>&1
+        "boot/grub/grub.cfg" &>"/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
     
@@ -4493,18 +4507,18 @@ EOF
     
     cat "/tmp/grub2_uefi_${UEFI_ARCH}_install.log" >> "${LOG}"
     
-    if ! [[ -s "/tmp/grub2_uefi_${UEFI_ARCH}_install.log" ]]; then
-        DIALOG --msgbox "Error installing GRUB2.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+    if [[ -e "${DESTDIR}/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${UEFI_ARCH}-efi/core.efi" ]]; then
+        dogrub2_uefi_bootmgr
+        
+        DIALOG --msgbox "GRUB2 UEFI ${UEFI_ARCH} has been successfully installed." 0 0
+        
+        GRUB2_PREFIX_DIR="/boot/grub/"
+        GRUB2_UEFI="1"
+        dogrub2_common_after
+    else
+        DIALOG --msgbox "Error installing GRUB2 UEFI ${UEFI_ARCH}.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
-    
-    dogrub2_uefi_efibootmgr
-    
-    DIALOG --msgbox "GRUB2 UEFI ${UEFI_ARCH} has been successfully installed." 0 0
-    
-    GRUB2_PREFIX_DIR="/boot/grub/"
-    GRUB2_UEFI="1"
-    dogrub2_common_after
     
 }
 
