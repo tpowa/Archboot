@@ -40,7 +40,9 @@ add_dir "/var/log"
 add_file "/usr/share/archboot/pacman/etc/pacman.conf" "/etc/pacman.conf"
 [ "$(uname -m)" = "x86_64" ] && add_file "/usr/share/archboot/pacman/etc/makepkg.conf.x86_64" "/etc/makepkg.conf"
 [ "$(uname -m)" = "i686" ] && add_file "/usr/share/archboot/pacman/etc/makepkg.conf.i686" "/etc/makepkg.conf"
-add_file "/etc/bash_completion.d/pacman"
+add_file "/usr/share/bash-completion/completions/makepkg"
+add_file "/usr/share/bash-completion/completions/pacman"
+add_file "/usr/share/bash-completion/completions/pacman-key"
 add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
 }
 
