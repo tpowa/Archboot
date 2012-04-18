@@ -8,14 +8,14 @@ build ()
     FILES=""
     SCRIPT=""
     # ipw2100 support
-    add_file "/lib/firmware/ipw2100-1.3-i.fw"
-    add_file "/lib/firmware/ipw2100-1.3-p.fw"
-    add_file "/lib/firmware/ipw2100-1.3.fw"
+    add_file "/usr/lib/firmware/ipw2100-1.3-i.fw"
+    add_file "/usr/lib/firmware/ipw2100-1.3-p.fw"
+    add_file "/usr/lib/firmware/ipw2100-1.3.fw"
     add_file "/usr/share/licenses/ipw2100-fw/LICENSE"
     # ipw2200 support
-    add_file "/lib/firmware/ipw2200-bss.fw"
-    add_file "/lib/firmware/ipw2200-ibss.fw"
-    add_file "/lib/firmware/ipw2200-sniffer.fw"
+    add_file "/usr/lib/firmware/ipw2200-bss.fw"
+    add_file "/usr/lib/firmware/ipw2200-ibss.fw"
+    add_file "/usr/lib/firmware/ipw2200-sniffer.fw"
     add_file "/usr/share/licenses/ipw2200-fw/LICENSE"
 }
 
