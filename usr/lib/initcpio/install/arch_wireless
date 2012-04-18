@@ -16,9 +16,9 @@ build ()
     # add rfkill
     add_file "/usr/share/archboot/wireless/etc/conf.d/rfkill" "/etc/conf.d/rfkill"
     add_file "/etc/rc.d/rfkill"
-    add_file "/lib/udev/rules.d/60-rfkill.rules"
+    add_file "/usr/lib/udev/rules.d/60-rfkill.rules"
     # add zd1211 firmware files
-    for i in /lib/firmware/zd1211/* ; do
+    for i in /usr/lib/firmware/zd1211/* ; do
 	add_file "$i"
     done
     # crda support
