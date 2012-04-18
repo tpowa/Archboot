@@ -3,7 +3,7 @@
 build ()
 {
     MODULES=""
-    BINARIES="/usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu /usr/bin/netcfg2 /usr/bin/wifi-menu /usr/bin/netcfg"
+    BINARIES="/usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu /usr/bin/netcfg-daemon /usr/bin/wifi-menu /usr/bin/netcfg"
     FILES=""
     SCRIPT=""
     add_full_dir "/usr/lib/network/"
@@ -15,8 +15,10 @@ build ()
     add_file "/etc/rc.d/net-rename"
     add_file "/etc/rc.d/net-auto-wired"
     add_file "/etc/rc.d/net-auto-wireless"
+    add_file "/etc/rc.d/functions.d/net-set-variable"
     add_file "/usr/share/archboot/netcfg/etc/iftab" "/etc/iftab"
     add_file "/etc/ifplugd/netcfg.action"
+    add_file "/usr/share/archboot/netcfg/etc/conf.d/netcfg" "etc/conf.d/netcfg"
     # fix licenses
     add_file "/usr/share/licenses/netcfg/LICENSE"
 }
