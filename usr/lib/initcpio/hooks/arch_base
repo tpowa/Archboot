@@ -3,11 +3,8 @@
 run_hook ()
 {
   # fixing some symlinks
-  ln -s /usr/sbin/chroot /bin/chroot
   # fix x86_64 symlink on x86_64
   [ "$(uname -r)" = "x86_64" ] && ln -s /usr/bin/setarch /usr/bin/x86_64
-  # fix depmod link
-  ln -s /sbin/depmod /bin/depmod
   # fix permission on /var/lock
   chmod 1777 /var/lock
   # fix vi symlink
