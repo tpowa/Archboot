@@ -4727,7 +4727,7 @@ run_mkinitcpio() {
     ( \
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
-    chroot ${DESTDIR} /sbin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
+    chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running
     ) &
