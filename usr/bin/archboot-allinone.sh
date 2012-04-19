@@ -93,7 +93,7 @@ _merge_initramfs_files() {
 		bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img
 		
 		cd  "${CORE64}/tmp/initrd"
-		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/tmp/initramfs_x86_64.img"
+		find . -print0 | bsdcpio -0oH newc | xz --check=crc32 --lzma2=dict=1MiB > "${CORE64}/tmp/initramfs_x86_64.img"
 	fi
 	
 	if [[ "${_DO_i686}" == "1" ]]; then
@@ -104,7 +104,7 @@ _merge_initramfs_files() {
 		bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img
 		
 		cd  "${CORE}/tmp/initrd"
-		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE}/tmp/initramfs_i686.img"
+		find . -print0 | bsdcpio -0oH newc | xz --check=crc32 --lzma2=dict=1MiB > "${CORE}/tmp/initramfs_i686.img"
 	fi
 	
 	cd "${WD}/"
