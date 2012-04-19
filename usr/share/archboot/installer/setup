@@ -3498,7 +3498,7 @@ dorefind_uefi_common() {
         [[ "${_rootpart}" == "" ]] && _rootpart="${ROOT_PART_DEVICE}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro gpt loglevel=7 pcie_aspm=force initrd=\\EFI\\arch\\${INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         cat << REFINDEOF > "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf"
@@ -4231,7 +4231,7 @@ EOF
     [[ -z "${ROOT_PART_FS_LABEL}" ]] && _rootpart="${ROOT_PART_DEVICE}"
     [[ -z "${ROOT_PART_FS_UUID}" ]] &&  _rootpart="${ROOT_PART_DEVICE}"
 
-    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro gpt loglevel=7 pcie_aspm=force"
+    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
