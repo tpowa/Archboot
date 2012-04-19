@@ -1892,8 +1892,8 @@ autoprepare() {
     # wait until /dev initialized correct devices
     udevadm settle
     # need to mount root first, then do it again for the others
-    part=3
-    [[ "${GUIDPARAMETER}" == "yes" ]] && part=5
+    part=1
+    [[ "${GUIDPARAMETER}" == "yes" ]] && part=3
     for fsspec in ${FSSPECS}; do
         mountpoint=$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)
         fstype=$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)
