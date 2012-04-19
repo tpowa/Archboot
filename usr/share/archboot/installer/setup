@@ -135,7 +135,6 @@ getfstype()
 {
     echo "$(${_BLKID} -s TYPE -o value ${1})"
 }
-}
 
 # getfsuuid()
 # converts /dev devices to FSUUIDs
