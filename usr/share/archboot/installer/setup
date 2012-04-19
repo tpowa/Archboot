@@ -4093,9 +4093,9 @@ dogrub2_config() {
     ########
     
     if [[ "${ROOT_PART_FS_UUID}" == "${BOOT_PART_FS_UUID}" ]]; then
-        subdir=""
-    else
         subdir="/boot"
+    else
+        subdir=""
     fi
     
     ########
