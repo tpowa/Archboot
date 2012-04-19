@@ -28,6 +28,7 @@ build ()
     add_file "/usr/lib/ssh/ssh-keysign"
     add_file "/etc/rc.d/rpcbind"
     add_file "/etc/rc.d/sshd"
+    add_file "/etc/rc.d/functions.d/sshd-close-sessions"
     add_file "/etc/rc.d/xinetd"
     add_file "/etc/rc.d/rsyncd"
     add_dir  "/var/empty"
