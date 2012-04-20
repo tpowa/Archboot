@@ -766,16 +766,9 @@ remove_grub_dmraid_hack(){
     done
 }
 
-get_grub2_map() {
-    rm "/tmp/device.map" || true
-    DIALOG --infobox "Generating GRUB2 device map...\nThis could take a while.\n\n Please be patient." 0 0
-    LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-mkdevicemap" --no-floppy --device-map="/tmp/device.map" >> "/tmp/grub2.log"
-}
-
 mapdev() {
     partition_flag=0
     device_found=0
-    [[ "${GRUB_LEGACY}" == "" ]] && devs=$(cat /tmp/device.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     [[ "${GRUB_LEGACY}" == "1" ]] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     # check if we use hd sd  or vd device
     if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/hd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
@@ -4368,9 +4361,6 @@ dogrub2_bios() {
         PACKAGES=""
     fi
     
-    ## grub-mkdevicemap removed by upstream - integrated into grub-probe instead
-    # get_grub2_map
-    
     # try to auto-configure GRUB2...
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
@@ -4524,7 +4514,6 @@ dogrub2_uefi_common() {
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
-    # get_grub2_map
     
     DISC="$(grub-probe --target=device "${DESTDIR}/" | sed 's/\(.\{8\}\).*/\1/')"
     
@@ -4941,6 +4930,7 @@ auto_hwdetect() {
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
     HWDETECTFILES=""
+    HWKVER==
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on ide-legacy boot parameter
@@ -4954,9 +4944,9 @@ auto_hwdetect() {
              FBPARAMETER="--uvesafb"
              HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
         fi
-        [[ "$(grep -q "radeon" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep -q "i915" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep -q "nouveau" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "radeon" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "i915" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "nouveau" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
         if [[ "$(lsmod | grep ^usb_storage)" ]]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --usb"
@@ -4980,8 +4970,9 @@ auto_hwdetect() {
         # add persistent net and sound options
         HWPARAMETER="${HWPARAMETER} --net --sound"
         [[ "$(${_BLKID} -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
-        HWDETECTMODULES="$(echo $(hwdetect ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
-        HWDETECTHOOKS="$(hwdetect --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
+        read _ HWKVER < <(file -Lb "${DESTDIR}/boot/${VMLINUZ}" | grep -o 'version [^ ]\+')
+        HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
+        HWDETECTHOOKS="$(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
@@ -4995,13 +4986,9 @@ auto_hwdetect() {
 
 auto_fb() {
     UVESAFB=""
-    if [[ "$(grep -w ati-kms /proc/cmdline)" || "$(grep -w intel-kms /proc/cmdline)" || "$(grep -w nvidia-kms /proc/cmdline)" ]]; then
-        # clean modprobe.conf file from options first
-        sed -i -e '/options/d' ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [[ "$(grep nouveau ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [[ "$(grep i915 ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-        ! [[ "$(grep radeon ${DESTDIR}/etc/modprobe.d/modprobe.conf)" ]] && grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-    fi
+    # clean modprobe.conf file from options first
+    sed -i -e '/options/d' ${DESTDIR}/etc/modprobe.d/modprobe.conf
+    grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
     if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d && "$(grep -w uvesafb /proc/cmdline)" ]]; then
         UVESAFB="$(grep ^[a-z] /etc/modprobe.d/uvesafb.conf)" 
         sed -i -e "s#options.*#${UVESAFB}#g" ${DESTDIR}/etc/modprobe.d/uvesafb.conf
