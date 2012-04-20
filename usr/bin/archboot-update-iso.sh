@@ -552,7 +552,7 @@ _update_arch_setup_initramfs() {
 		
 		cd "${_initramfs_ext}/"
 		
-		find . -print0 | bsdcpio -0oH newc | xz --check=crc32 --lzma2=dict=1MiB > "${_ARCHBOOT_ISO_WD}/${_initramfs_name}.img"
+		find . -print0 | bsdcpio -0oH newc | lzma > "${_ARCHBOOT_ISO_WD}/${_initramfs_name}.img"
 		echo
 		
 		rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/${_initramfs_name}.img" || true
