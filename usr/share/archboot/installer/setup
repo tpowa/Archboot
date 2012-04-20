@@ -2683,8 +2683,8 @@ _mkfs() {
         fi
     fi
     # add to .device-names for config files
-    local _uuid="$(getfsuuid ${_device})"
-    local _label="$(getfslabel ${_device})"
+    local _fsuuid="$(getfsuuid ${_device})"
+    local _fslabel="$(getfslabel ${_device})"
     echo "# DEVICE DETAILS: ${_device} UUID=${_fsuuid} LABEL=${_fslabel}" >> /tmp/.device-names
     # add to temp fstab
     if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
