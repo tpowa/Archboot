@@ -5102,7 +5102,7 @@ configure_system() {
             HOOK_ERROR=""
             ${EDITOR} ${DESTDIR}${FILE}
             for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do
-                [[ -e ${DESTDIR}/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
+                [[ -e ${DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
             done
             if [[ "${HOOK_ERROR}" = "1" ]]; then
                 DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
