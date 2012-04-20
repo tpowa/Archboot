@@ -4954,9 +4954,9 @@ auto_hwdetect() {
              FBPARAMETER="--uvesafb"
              HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
         fi
-        ! [[ "$(grep "radeon$" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        ! [[ "$(grep "i915" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        ! [[ "$(grep "nouveau" /etc/modprobe.d/framebuffer_blacklist.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "radeon" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "i915" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
+        [[ "$(grep "nouveau" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
         if [[ "$(lsmod | grep ^usb_storage)" ]]; then
             DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --usb"
@@ -4981,7 +4981,7 @@ auto_hwdetect() {
         HWPARAMETER="${HWPARAMETER} --net --sound"
         [[ "$(${_BLKID} -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         HWDETECTMODULES="$(echo $(hwdetect ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
-        HWDETECTHOOKS="$(hwdetect --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
+        HWDETECTHOOKS="$(hwdetect --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
