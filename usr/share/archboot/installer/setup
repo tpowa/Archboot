@@ -1859,7 +1859,7 @@ autoprepare() {
         sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=4:set:2 --change-name=3:LINUX_BOOT ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:LINUX_SWAP ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=5:0:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=6:0:0 --typecode= 6:8300 --change-name=6:DATA ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:DATA ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
         PART_ROOT="${DEVICE}3"
