@@ -3453,18 +3453,23 @@ dorefind_uefi_common() {
         run_pacman
         PACKAGES=""
         
-        _REFIND_VER="0.2.7"
-        
-        wget -O "/tmp/refind-bin-${_REFIND_VER}.zip" "http://downloads.sourceforge.net/refind/refind-bin-${_REFIND_VER}.zip"
-        bsdtar -C "/tmp" -xf "/tmp/refind-bin-${_REFIND_VER}.zip"
+        rm -rf "/tmp"/refind-bin* || true
+        curl -L "http://sourceforge.net/projects/refind/files/latest/download" -o "/tmp/refind-bin.zip"
+        bsdtar -C "/tmp" -xf "/tmp/refind-bin.zip"
+        mv "/tmp"/refind-bin-* "/tmp/refind-bin-dir"
         
         install -d "${DESTDIR}/boot/efi/efi/arch/refind"
-        install -D -m0644 "/tmp/refind-bin-${_REFIND_VER}/refind/refind_${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/efi/arch/refind/refind${SPEC_UEFI_ARCH}.efi"
-        install -D -m0644 "/tmp/refind-bin-${_REFIND_VER}/refind/refind.conf-sample" "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        cp -r "/tmp/refind-bin-${_REFIND_VER}/refind/icons" "${DESTDIR}/boot/efi/efi/arch/refind/icons"
+        install -D -m0644 "/tmp/refind-bin-dir/refind/refind_${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/efi/arch/refind/refind${SPEC_UEFI_ARCH}.efi"
+        install -D -m0644 "/tmp/refind-bin-dir/refind/refind.conf-sample" "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+        cp -r "/tmp/refind-bin-dir/refind/icons" "${DESTDIR}/boot/efi/efi/arch/refind/icons"
+        cp -r "/tmp/refind-bin-dir/docs" "${DESTDIR}/boot/efi/efi/arch/refind/docs"
+        install -D -m0644 "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/efi/arch/refind/docs"/
         
+        sed 's|^timeout 20|timeout 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
         sed 's|^#showtools shell, about, reboot|showtools shell,about,exit,shutdown,reboot|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+        sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+        sed 's|^#scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+        sed 's|^#max_tags 0|max_tags 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
         
         # install -D -m0644 "${DESTDIR}/boot/efi/efi/arch/refind/refind_linux.conf" "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf" || true
         
@@ -3486,7 +3491,7 @@ dorefind_uefi_common() {
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="/dev/disk/by-partuuid/${ROOT_PART_GPT_GUID}"
         [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="/dev/disk/by-partlabel/${ROOT_PART_GPT_LABEL}"
-        [[ "${_rootpart}" == "" ]] && _rootpart="${ROOT_PART_DEVICE}"
+        [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
         _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${INITRAMFS}.img"
@@ -4215,9 +4220,10 @@ EOF
     fi
     
     # fallback to device if no label or uuid can be detected, eg. luks device
-    [[ -z "${ROOT_PART_FS_LABEL}" ]] && _rootpart="${ROOT_PART_DEVICE}"
-    [[ -z "${ROOT_PART_FS_UUID}" ]] &&  _rootpart="${ROOT_PART_DEVICE}"
-
+    if [[ -z "${ROOT_PART_FS_UUID}" ]] && [[ -z "${ROOT_PART_FS_LABEL}" ]]; then
+        _rootpart="${ROOT_PART_DEVICE}"
+    fi
+    
     LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     

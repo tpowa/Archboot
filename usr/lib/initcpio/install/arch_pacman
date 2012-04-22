@@ -26,7 +26,7 @@ btrfs-progs nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw lib
 grub2-common grub2-bios grub2-efi-x86_64 efibootmgr file eject keyutils yp-tools \
 curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua weechat \
 gnutls nettle libtasn1 bind rpcbind expat progsreiserfs glib2 freetype2 libssh2 libfetch libedit \
-talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme"
+talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns dnssec-anchors"
 
 
 for i in $DEPENDS; do
