@@ -4373,6 +4373,30 @@ dogrub2_bios() {
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
             grubdev=$(basename ${bootdev})
             complexuuid=$(getfsuuid ${bootdev})
+            # check if mapper is used
+            if  [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
+                RAID_ON_LVM="0"
+                
+                #check if mapper contains a md device!
+                for devpath in $(pvs -o pv_name --noheading); do
+                    if [[ "$(echo ${devpath} | grep -v /dev/md*p | grep /dev/md)" ]]; then
+                        detectedvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
+                        
+                        if [[ "$(echo /dev/mapper/${detectedvolumegroup}-* | grep ${bootdev})" ]]; then
+                            # change bootdev to md device!
+                            bootdev=$(pvs -o pv_name --noheading ${devpath})
+                            RAID_ON_LVM="1"
+                            break
+                        fi
+                    fi
+                done
+            fi
+            
+            #check if raid is used
+            USE_RAID=""
+            if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
+                USE_RAID="1"
+            fi
         else
             # use normal device
             grubdev=$(mapdev ${bootdev})
