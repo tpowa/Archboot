@@ -35,6 +35,8 @@ build ()
     add_file "/usr/share/archboot/net/etc/iproute2/rt_realms" "/etc/iproute2/rt_realms"
     add_file "/usr/share/archboot/net/etc/iproute2/rt_scopes" "/etc/iproute2/rt_scopes"
     add_file "/usr/share/archboot/net/etc/iproute2/rt_tables" "/etc/iproute2/rt_tables"
+    # add dnssec-anchors
+    add_file "/etc/trusted-key.key"
     # add dhclient support
     add_file "/sbin/dhclient-script"
     add_dir "/var/lib/dhclient"
@@ -52,6 +54,7 @@ build ()
     add_file "/usr/share/licenses/openssh/LICENCE"
     add_file "/usr/share/licenses/openssl/LICENSE"
     add_file "/usr/share/licenses/sqlite/license.txt"
+    add_file "/usr/share/licenses/dnssec-anchors/LICENSE"
 }
 
 help ()
