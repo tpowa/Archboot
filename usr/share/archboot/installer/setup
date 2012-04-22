@@ -1193,8 +1193,6 @@ _raid()
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>${ANSWER} || return 1
             PARTIY=$(cat ${ANSWER})
         fi
-        METADATA="default"
-        DIALOG --yesno "Do you want to use the old 0.90 METADATA(superblock) format?\n\nThis will ensure compatibility with bootloaders.It is recommended to use this, in order to allow bootloaders to boot from such devices.\n\nIf you don't boot from your raid device,\nyou can safely select 'no' and use the default metadata superblock format." 0 0 && METADATA="0.90"
         # show all devices with sizes
         DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -1226,7 +1224,7 @@ _raid()
             fi
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "${i}\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "${i}\n";done)\n\nMETADATA(superblock) FORMAT:${METADATA}" 0 0 && MDFINISH="DONE"
+        DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "${i}\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "${i}\n";done)" 0 0 && MDFINISH="DONE"
     done
     _createraid
 }
@@ -1242,7 +1240,7 @@ _createraid()
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
-    RAIDOPTIONS="--force --run --level=${LEVEL} --metadata=${METADATA}"
+    RAIDOPTIONS="--force --run --level=${LEVEL}
     [[ "$(echo ${RAIDDEVICE} | grep /md_d[0-9])" ]] && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
     ! [[ "${RAID_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --raid-devices=${RAID_DEVICES}"
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
@@ -4371,8 +4369,7 @@ dogrub2_bios() {
             FAIL_COMPLEX="0"
             
             if [[ "$(echo ${bootdev} | grep /dev/md*p)" ]] || [[ "$(cryptsetup status ${bootdev})" ]]; then
-                # raid with no supperblock 0.90, partitionable raid and encryption
-                # devices are not supported
+                # partitionable raid and encryption devices are not supported
                 FAIL_COMPLEX="1"
             fi
         fi
@@ -4403,8 +4400,6 @@ dogrub2_bios() {
             USE_RAID=""
             
             if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
-                # check if raid superblock is 0.90 format, if not fail
-                [[ "$(mdadm -Q --detail ${bootdev} | grep 'Version : 0.90')" ]] || FAIL_COMPLEX="1"
                 USE_RAID="1"
             fi
         else
@@ -4460,7 +4455,7 @@ dogrub2_bios() {
     fi
     
     if [[ "${FAIL_COMPLEX}" == "1" ]]; then
-        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid device (/dev/mdX) has no 0.90 superblock format\n- raid partition device (/dev/md_dX) are not supported\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- raid partition device (/dev/md_dX) are not supported\n- encrypted devices are not supported" 0 0
         return 1
     fi
     
