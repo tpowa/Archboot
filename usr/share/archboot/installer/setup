@@ -3455,7 +3455,7 @@ dorefind_uefi_common() {
         run_pacman
         PACKAGES=""
         
-        _REFIND_VER="0.2.6"
+        _REFIND_VER="0.2.7"
         
         wget -O "/tmp/refind-bin-${_REFIND_VER}.zip" "http://downloads.sourceforge.net/refind/refind-bin-${_REFIND_VER}.zip"
         bsdtar -C "/tmp" -xf "/tmp/refind-bin-${_REFIND_VER}.zip"
