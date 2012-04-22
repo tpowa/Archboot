@@ -1240,7 +1240,7 @@ _createraid()
     RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
     SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
     # generate options for mdadm
-    RAIDOPTIONS="--force --run --level=${LEVEL}
+    RAIDOPTIONS="--force --run --level=${LEVEL}"
     [[ "$(echo ${RAIDDEVICE} | grep /md_d[0-9])" ]] && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
     ! [[ "${RAID_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --raid-devices=${RAID_DEVICES}"
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
