@@ -3468,6 +3468,7 @@ dorefind_uefi_common() {
         install -D -m0644 "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/efi/arch/refind/docs"/
         
         sed 's|^timeout 20|timeout 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+        sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
         sed 's|^#showtools shell, about, reboot|showtools shell,about,exit,shutdown,reboot|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
         sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
         sed 's|^#scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
