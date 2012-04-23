@@ -1850,17 +1850,20 @@ autoprepare() {
     # we assume a /dev/hdX format (or /dev/sdX)
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         PART_ROOT="${DEVICE}5"
-        # GUID(GPT) is only supported by 'parted'
+        # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
-        # clean partitiontable to avoid issues!
-        sgdisk --zap ${DEVICE} >/dev/null 2>&1
+        # clean partition table to avoid issues!
+        sgdisk --zap ${DEVICE} &>/dev/null
+        # create fresh GPT
+        sgdisk --clear ${DEVICE} &>/dev/null
+        wipefs -a ${DEVICE} &>/dev/null
         sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB2_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB2 ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=2:0:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=4:set:2 --change-name=3:LINUX_BOOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:LINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=5:0:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:DATA ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:LINUX_DATA ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
         PART_ROOT="${DEVICE}3"
@@ -1869,6 +1872,7 @@ autoprepare() {
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partitiontable to avoid issues!
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
+        wipefs -a ${DEVICE} &>/dev/null
         # create DOS MBR with parted
         parted -a optimal -s ${DEVICE} mktable msdos >/dev/null 2>&1
         parted -a optimal -s ${DEVICE} mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
@@ -2043,6 +2047,7 @@ partition() {
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on ${DISC}.\nDo you want to create a MS-DOS partition table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
+                    wipefs -a ${DEVICE} /dev/null 2>&1
                     parted -a optimal -s ${DISC} mktable msdos >${LOG}
                 fi
                 # Partition disc
