@@ -8,7 +8,7 @@ LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/tmp/install"
 EDITOR=""
-_BLKID="blkid -c /dev/null -p -i"
+_BLKID="blkid -c /dev/null"
 
 # name of kernel package
 KERNELPKG="linux"
@@ -133,7 +133,7 @@ chroot_umount()
 
 getfstype()
 {
-    echo "$(${_BLKID} -s TYPE -o value ${1})"
+    echo "$(${_BLKID} -p -i -s TYPE -o value ${1})"
 }
 
 # getfsuuid()
@@ -145,7 +145,7 @@ getfstype()
 # returns:    nothing
 getfsuuid()
 {
-    echo "$(${_BLKID} -s UUID -o value ${1})"
+    echo "$(${_BLKID} -p -i -s UUID -o value ${1})"
 }
 
 # parameters: device file
@@ -154,17 +154,17 @@ getfsuuid()
 # returns:    nothing
 getfslabel()
 {
-    echo "$(${_BLKID} -s LABEL -o value ${1})"
+    echo "$(${_BLKID} -p -i -s LABEL -o value ${1})"
 }
 
 getpartuuid()
 {
-    echo "$(${_BLKID} -s PART_ENTRY_UUID -o value ${1})"
+    echo "$(${_BLKID} -p -i -s PART_ENTRY_UUID -o value ${1})"
 }
 
 getpartlabel()
 {
-    echo "$(${_BLKID} -s PART_ENTRY_NAME -o value ${1})"
+    echo "$(${_BLKID} -p -i -s PART_ENTRY_NAME -o value ${1})"
 }
 
 # list eth devices with mac adress
@@ -450,14 +450,14 @@ additional_blockdevices_partitions() {
                     #- part of raid device
                     #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
                     #- part of lvm2 device
-                    #  $(${_BLKID} -o value -s TYPE /dev/${part} | grep "LVM2_member")
+                    #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")
                     #- part of luks device
-                    #  $(${_BLKID} -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
+                    #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
                     #- extended partition on device
                     #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
                     #- bios_grub partitions
                     # $(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")
-                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                         echo "/dev/${part}"
                         [[ "${1}" ]] && echo ${1}
                     fi
@@ -473,14 +473,14 @@ additional_blockdevices_partitions() {
                 #- part of raid device
                 #  $(cat /proc/mdstat 2>/dev/null | grep ${i})
                 #- part of lvm2 device
-                #  $(${_BLKID} -o value -s TYPE /dev/${i} | grep "LVM2_member")
+                #  $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "LVM2_member")
                 #- part of luks device
-                #  $(${_BLKID} -o value -s TYPE /dev/${i} | grep "crypto_LUKS")
+                #  $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "crypto_LUKS")
                 #- extended partition on device
                 #  $(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g" 2>/dev/null | grep "5")
                 #- bios_grub partitions
                 # $(echo ${i} | grep "[a-z]$(parted /dev/${dev} print | grep bios_grub | cut -d " " -f 2)$")
-                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${i})" || "$(${_BLKID} -o value -s TYPE /dev/${i} | grep "LVM2_member")" || $(${_BLKID} -o value -s TYPE /dev/${i} | grep "crypto_LUKS") || "$(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" || "$(echo ${i} | grep "[a-z]$(parted /dev/${dev} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${i})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "LVM2_member")" || $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "crypto_LUKS") || "$(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" || "$(echo ${i} | grep "[a-z]$(parted /dev/${dev} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                     echo "/dev/${i}"
                     [[ "${1}" ]] && echo ${1}
                 fi
@@ -494,7 +494,7 @@ raid_devices() {
     for devpath in $(ls ${block} 2>/dev/null | egrep '^md'); do
         if ! [[ "$(ls ${block}/${devpath} 2>/dev/null | egrep ${devpath}p)" ]]; then 
             # exlude md partitions which are part of lvm or luks
-            if ! [[ "$(${_BLKID} /dev/${devpath} | grep "TYPE=\"LVM2_member\"")" || "$(${_BLKID} /dev/${devpath} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
+            if ! [[ "$(${_BLKID} -p -i /dev/${devpath} | grep "TYPE=\"LVM2_member\"")" || "$(${_BLKID} -p -i /dev/${devpath} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
                     echo "/dev/${devpath}"
                     [[ "${1}" ]] && echo ${1}
             fi
@@ -521,7 +521,7 @@ partitionable_raid_devices_partitions() {
         for i in $(ls ${block}/${dev} 2>/dev/null | egrep ${dev}p); do 
             if [[ -d "${block}/${dev}/${i}" ]]; then
                 # exlude md partitions which are part of lvm or luks
-                if ! [[ "$(${_BLKID} /dev/${i} | grep "TYPE=\"LVM2_member\"")" || ! "$(${_BLKID} /dev/${i} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
+                if ! [[ "$(${_BLKID} -p -i /dev/${i} | grep "TYPE=\"LVM2_member\"")" || ! "$(${_BLKID} -p -i /dev/${i} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
                     echo "/dev/${i}"
                     [[ "${1}" ]] && echo ${1}
                 fi
@@ -548,15 +548,15 @@ dmraid_devices() {
 # - remove part ot raid
 check_dm_devices() {
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
+        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
         partofcrypt="${partofcrypt} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
+        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
         partoflvm="${partoflvm} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
+        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
         partofraid="${partofraid} ${k}"
     done
 }
@@ -608,16 +608,16 @@ default_partition_check() {
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
             #- part of lvm2 device
-            #  $(${_BLKID} -o value -s TYPE /dev/${part} | grep "LVM2_member")
+            #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")
             #- part of luks device
-            #  $(${_BLKID} -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
+            #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
             #- extended partition
             #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device and mmc device
             #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")
-            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted /dev/${disk} print | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                 if [[ -d ${block}/${disk}/${part} ]]; then
                     echo "/dev/${part}"
                     [[ "${1}" ]] && echo ${1}
@@ -858,7 +858,8 @@ set_guid() {
     ## Lenono BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
     ## Lenono BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\nNOTE: BIOS-GPT boot may not work in some Lenovo systems (irrespective of the bootloader used). " 0 0 && GUIDPARAMETER="yes"
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\nNOTE: BIOS-GPT boot may not work in some Lenovo systems (irrespective of the 
+bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
 # Get a list of available disks for use in the "Available disks" dialogs. This
@@ -1935,7 +1936,7 @@ check_gpt() {
     DISC="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
     
     GUID_DETECTED=""
-    [[ "$(${_BLKID} -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
     
     if [[ "${GUID_DETECTED}" == "" ]]; then
         if [[ "${CHECK_UEFISYS_PART}" == "1" ]]; then
@@ -1976,7 +1977,7 @@ check_uefisyspart() {
         if [[ -d "${DESTDIR}/boot/efi" ]] && [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
             UEFISYS_PART="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
             DISC="$(echo "${UEFISYS_PART}" | sed 's/\(.\{8\}\).*/\1/')"
-            UEFISYS_PART_NUM="$(${_BLKID} -o value -s PART_ENTRY_NUMBER "${UEFISYS_PART}")"
+            UEFISYS_PART_NUM="$(${_BLKID} -p -i -o value -s PART_ENTRY_NUMBER "${UEFISYS_PART}")"
         else
             [[ ! -d "${DESTDIR}/boot/efi" ]] && mkdir -p "${DESTDIR}/boot/efi"
             
@@ -1985,10 +1986,10 @@ check_uefisyspart() {
             UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         fi
         
-        if [[ "$(${_BLKID} -o value -s TYPE ${UEFISYS_PART})" != "vfat" ]]; then
+        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" != "vfat" ]]; then
             ## Check whether UEFISYS is FAT, otherwise exit (any FAT variant, collectively recognized as vfat in Linux).
             DIALOG --msgbox "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32. Please format it as FAT32 and run /arch/setup ." 0 0 && return 1
-        elif [[ "$(${_BLKID} -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
+        elif [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
             ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
             DIALOG --msgbox "UEFI SYSTEM PARTIION is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition." 0 0
         fi
@@ -2036,7 +2037,7 @@ partition() {
                 RUN_CGDISK="1"
                 check_gpt
             else
-                [[ "$(${_BLKID} -o value -s PTTYPE ${DISC})" == "dos" ]] && MSDOS_DETECTED="1"
+                [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "dos" ]] && MSDOS_DETECTED="1"
                 
                 if [[ "${MSDOS_DETECTED}" == "" ]]; then
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on ${DISC}.\nDo you want to create a MS-DOS partition table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
@@ -2090,7 +2091,7 @@ find_btrfs_raid_devices() {
 find_btrfs_raid_bootloader_devices() {
     btrfs_scan
     BTRFS_COUNT=1
-    if [[ "$(${_BLKID} ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
+    if [[ "$(${_BLKID} -p -i  ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
         BTRFS_DEVICES=""
         for i in $(btrfs filesystem show ${bootdev} | cut -d " " -f 11); do
             BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
@@ -2114,7 +2115,7 @@ find_btrfs_subvolume() {
 
 find_btrfs_bootloader_subvolume() {
     BTRFS_SUBVOLUME_COUNT=1
-    if [[ "$(${_BLKID} ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
+    if [[ "$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
         BTRFS_SUBVOLUMES=""
         PART="${bootdev}"
         mount_btrfs
@@ -2403,7 +2404,7 @@ check_mkfs_values() {
     [[ "${BTRFS_LEVEL}" = "" ]] && BTRFS_LEVEL="NONE"
     [[ "${BTRFS_SUBVOLUME}" = "" ]] && BTRFS_SUBVOLUME="NONE"
     [[ "${DOSUBVOLUME}" = "" ]] && DOSUBVOLUME="no"
-    [[ "${LABEL_NAME}" = "" && -n "$(${_BLKID} -o value -s LABEL ${PART})" ]] && LABEL_NAME="$(${_BLKID} -o value -s LABEL ${PART})"
+    [[ "${LABEL_NAME}" = "" && -n "$(${_BLKID} -p -i -o value -s LABEL ${PART})" ]] && LABEL_NAME="$(${_BLKID} -p -i -o value -s LABEL ${PART})"
     [[ "${LABEL_NAME}" = "" ]] && LABEL_NAME="NONE"
 }
 
@@ -2417,7 +2418,7 @@ create_filesystem() {
     if [[ "${DOMKFS}" = "yes" ]]; then
         while [[ "${LABEL_NAME}" = "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_BLKID} -o value -s LABEL ${PART})" 2>${ANSWER} || return 1
+            "$(${_BLKID} -p -i -o value -s LABEL ${PART})" 2>${ANSWER} || return 1
             LABEL_NAME=$(cat ${ANSWER})
             if grep ":${LABEL_NAME}$" /tmp/.parts; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
@@ -2475,7 +2476,7 @@ mountpoints() {
             PART=$(cat ${ANSWER})
             PART_ROOT=${PART}
             # Select root filesystem type
-            FSTYPE="$(${_BLKID} -o value -s TYPE ${PART})"
+            FSTYPE="$(${_BLKID} -p -i -o value -s TYPE ${PART})"
             DOMKFS="no"
             # clear values first!
             clear_btrfs_values
@@ -2501,7 +2502,7 @@ mountpoints() {
                 DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
                 PART=$(cat ${ANSWER})
                 if [[ "${PART}" != "DONE" ]]; then
-                    FSTYPE="$(${_BLKID} -o value -s TYPE ${PART})"
+                    FSTYPE="$(${_BLKID} -p -i  -o value -s TYPE ${PART})"
                     DOMKFS="no"
                     # clear values first!
                     clear_btrfs_values
@@ -3276,9 +3277,9 @@ getcryptsetup() {
         #avoid clash with dmraid here
         if [[ "$(cryptsetup status $(basename ${PART_ROOT}))" ]]; then
             if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(${_BLKID} -s UUID -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(${_BLKID} -p -i -s UUID -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                CRYPTDEVICE="/dev/disk/by-label/$(echo $(${_BLKID} -s LABEL -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="/dev/disk/by-label/$(echo $(${_BLKID} -p -i -s LABEL -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             else
                 CRYPTDEVICE="$(echo $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g'))"    
             fi
@@ -3327,7 +3328,7 @@ check_bootpart() {
 
 # check for btrfs bootpart and abort if detected
 abort_btrfs_bootpart() {
-        FSTYPE="$(${_BLKID} ${bootdev} -o value -s TYPE)"
+        FSTYPE="$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)"
         if [[ "${FSTYPE}" = "btrfs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot on it." 0 0
             return 1
@@ -3336,7 +3337,7 @@ abort_btrfs_bootpart() {
 
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
-        FSTYPE="$(${_BLKID} ${bootdev} -o value -s TYPE)"
+        FSTYPE="$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)"
         if [[ "${FSTYPE}" = "nilfs2" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
@@ -3513,7 +3514,7 @@ REFINDEOF
         "${EDITOR}" "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf"
         
         _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
-        UEFISYS_PART_NUM="$(${_BLKID} -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
+        UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
         
         _BOOTMGR_LABEL="Arch Linux (rEFInd)"
         _BOOTMGR_DISC="${_DISC}"
@@ -3572,7 +3573,7 @@ common_syslinux() {
     
     # check if GPT/GUID is used
     GUID_DETECTED=""
-    [[ "$(${_BLKID} value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "$(${_BLKID} -p -i value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
     
     PARTITION_NUMBER=$(echo ${bootdev} | sed -e 's#.*[a-z]##g')
     if [[ "${GUID_DETECTED}" == '1' ]]; then
@@ -3664,7 +3665,7 @@ finish_syslinux () {
     
     # check if GPT/GUID is used
     GUID_DETECTED=""
-    [[ "$(${_BLKID} -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
     
     if [[ "${GUID_DETECTED}" == '1' ]]; then
         cat "${GPTMBR}" > "${ROOTDEV}"
@@ -3699,7 +3700,7 @@ dosyslinux_bios () {
     abort_nilfs_bootpart || return 1
     
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
-    FSTYPE="$(${_BLKID} -o value -s TYPE ${bootdev})"
+    FSTYPE="$(${_BLKID} -p -i -o value -s TYPE ${bootdev})"
     if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 , btrfs or vfat partition with /boot on it." 0 0
         return 1
@@ -3756,7 +3757,7 @@ dolilo_bios() {
     check_bootpart
     
     # check on GUID (gpt)
-    if [[ "$(${_BLKID} -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
+    if [[ "$(${_BLKID} -p -i -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
         DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
     fi
     
@@ -3861,7 +3862,7 @@ dogrub_legacy_bios() {
         check_bootpart
         
         # check on GUID (gpt)
-        if [[ "$(${_BLKID} -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
+        if [[ "$(${_BLKID} -p -i -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
             DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
         fi
         
@@ -4080,9 +4081,9 @@ dogrub2_config() {
     ########
     
     ## udev 180 onwards
-    if [[ "$(${_BLKID} -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
-        ROOT_PART_GPT_GUID="$(${_BLKID} -o value -s PART_ENTRY_UUID ${ROOT_PART_DEVICE})"
-        ROOT_PART_GPT_LABEL="$(${_BLKID} -o value -s PART_ENTRY_NAME ${ROOT_PART_DEVICE})"
+    if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
+        ROOT_PART_GPT_GUID="$(${_BLKID} -p -i -o value -s PART_ENTRY_UUID ${ROOT_PART_DEVICE})"
+        ROOT_PART_GPT_LABEL="$(${_BLKID} -p -i -o value -s PART_ENTRY_NAME ${ROOT_PART_DEVICE})"
     fi
     
     ########
@@ -4438,7 +4439,7 @@ dogrub2_bios() {
         bootdev=$(cat ${ANSWER})
     fi
     
-    if [[ "$(${_BLKID} -o value -s PTTYPE ${bootdev})" == "gpt" ]]; then
+    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${bootdev})" == "gpt" ]]; then
         CHECK_BIOS_BOOT_GRUB2="1"
         CHECK_UEFISYS_PART=""
         RUN_CGDISK=""
@@ -4959,7 +4960,7 @@ auto_hwdetect() {
         [[ $(mount | grep "${DESTDIR}/usr ") ]] && HWPARAMETER="${HWPARAMETER} --shutdown"
         # add persistent net and sound options
         HWPARAMETER="${HWPARAMETER} --net --sound"
-        [[ "$(${_BLKID} -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
+        [[ "$(${_BLKID} -p -i -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         read _ HWKVER < <(file -Lb "${DESTDIR}/boot/${VMLINUZ}" | grep -o 'version [^ ]\+')
         HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
