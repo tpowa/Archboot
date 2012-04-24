@@ -3570,7 +3570,7 @@ common_syslinux() {
     
     # check if GPT/GUID is used
     GUID_DETECTED=""
-    [[ "$(${_BLKID} -p -i value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
     
     PARTITION_NUMBER=$(echo ${bootdev} | sed -e 's#.*[a-z]##g')
     if [[ "${GUID_DETECTED}" == '1' ]]; then
