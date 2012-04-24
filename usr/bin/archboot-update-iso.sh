@@ -2,13 +2,13 @@
 # Script for updating existing Archboot iso with newer UEFI shell, GRUB UEFI, and/or /arch/setup script in the initramfs files
 # Contributed by "Keshav P R" <the.ridikulus.rat aatt geemmayil ddoott ccoomm>
 
-_UPDATE_SYSLINUX="1"
-_UPDATE_UEFI_SHELL="1"
-_UPDATE_GRUB_UEFI="1"
-_UPDATE_SETUP="1"
+[[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="1"
+[[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
 
-_REMOVE_i686="1"
-_REMOVE_x86_64="0"
+[[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
+[[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
+[[ -z "${_UPDATE_GRUB_UEFI}" ]] && _UPDATE_GRUB_UEFI="1"
+[[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 
 #############################
 
@@ -21,8 +21,23 @@ _ARCHBOOT_ISO_OLD_NAME="$(basename "${_ARCHBOOT_ISO_OLD_PATH}" | sed 's|\.iso||g
 
 _ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
 
-_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}_updated"
+#############################
+
+if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-dual"
+fi
+
+if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-x86_64"
+fi
+
+if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-i686"
+fi
+
 _ARCHBOOT_ISO_UPDATED_PATH="${_ARCHBOOT_ISO_WD}/${_ARCHBOOT_ISO_UPDATED_NAME}.iso"
+
+#############################
 
 echo
 
@@ -56,7 +71,7 @@ cd "${_ARCHBOOT_ISO_EXT_DIR}/"
 echo
 
 ## Extract the archboot iso using bsdtar
-bsdtar xf "${_ARCHBOOT_ISO_OLD_PATH}"
+bsdtar -C "${_ARCHBOOT_ISO_EXT_DIR}/" -xf "${_ARCHBOOT_ISO_OLD_PATH}"
 # 7z x "${_ARCHBOOT_ISO_OLD_PATH}"
 echo
 
@@ -88,6 +103,7 @@ _update_syslinux_iso_files() {
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg" || true
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
+
 SERIAL 0 38400
 DEFAULT vesamenu.c32
 PROMPT 0
@@ -127,6 +143,11 @@ For troubleshooting and other options press F2 key.
 ENDTEXT
 MENU LABEL Help
 
+EOF
+	
+	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
+
 LABEL arch64
 TEXT HELP
 Boot the Arch Linux (x86_64) archboot medium. 
@@ -147,6 +168,12 @@ LINUX /boot/vmlinuz_x86_64_lts
 APPEND gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_x86_64.img
 
+EOF
+	fi
+	
+	if [[ "${_REMOVE_i686}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
+
 LABEL arch32
 TEXT HELP
 Boot the Arch Linux (i686) archboot medium. 
@@ -166,6 +193,11 @@ MENU LABEL Boot Arch Linux LTS (i686)
 LINUX /boot/vmlinuz_i686_lts
 APPEND gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_i686.img
+
+EOF
+	fi
+	
+	cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
 
 LABEL existing
 TEXT HELP
@@ -193,9 +225,21 @@ LABEL poweroff
 MENU LABEL Power Off
 COMBOOT poweroff.com
 
+EOF
+	
+	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
+
+ONTIMEOUT arch64
+
+EOF
+	elif [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
+
 ONTIMEOUT arch32
 
 EOF
+	fi
 	
 }
 
@@ -462,6 +506,11 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
+EOF
+
+	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
+
 if [ cpuid -l ]; then
 
     menuentry "Arch Linux (x86_64) archboot" {
@@ -480,6 +529,12 @@ if [ cpuid -l ]; then
 
 fi
 
+EOF
+	fi
+	
+	if [[ "${_REMOVE_i686}" != "1" ]]; then
+		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
+
 menuentry "Arch Linux (i686) archboot" {
     set gfxpayload="keep"
     set root="\${archboot}"
@@ -493,6 +548,11 @@ menuentry "Arch Linux LTS (i686) archboot" {
     linux /boot/vmlinuz_i686_lts \${_kernel_i686_params}
     initrd /boot/initramfs_i686.img
 }
+
+EOF
+	fi
+	
+	cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
 
@@ -595,24 +655,18 @@ _download_pkgs() {
 
 _rename_old_files
 
+[[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
+
+[[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
+
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
 
 [[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
 
 [[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_iso_files
 
-[[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
-
-[[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
-
 if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	cd "${_ARCHBOOT_ISO_WD}/"
-	
-	## The old method I tried, mount -o ro -t iso9660 /dev/sr0 /src, mv /arch/setup /arch/setup.old, cp /src/arch/setup /arch/setup, umount /dev/sr0
-	# cp ${_ARCHBOOT_ISO_WD}/setup ${_ARCHBOOT_ISO_EXT_DIR}/arch/setup
-	
-	## Extracting using bsdtar, replacing /arch/setup and recompressing the iniramfs archive does not work. Archive format not compatible with initramfs format.
-	## Compressing using bsdcpio and using 'newc' archive format works, taken from falconindy's geninit program.
 	
 	_initramfs_name="initramfs_x86_64"
 	_update_arch_setup_initramfs
@@ -623,7 +677,6 @@ if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	echo
 fi
 
-## Re-create the archboot ISO
 cd "${_ARCHBOOT_ISO_WD}/"
 
 ## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
@@ -643,14 +696,14 @@ xorriso -as mkisofs \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
 
-rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/"
-echo
-
 set +x
 
 if [[ -e "${_ARCHBOOT_ISO_UPDATED_PATH}" ]]; then
 	echo
 	echo "Updated iso has been saved at ${_ARCHBOOT_ISO_UPDATED_PATH} ."
+	echo
+	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/"
 	echo
 else
 	echo
@@ -659,12 +712,13 @@ else
 	echo
 fi
 
+
+unset _REMOVE_i686
+unset _REMOVE_x86_64
 unset _UPDATE_SYSLINUX
 unset _UPDATE_UEFI_SHELL
 unset _UPDATE_GRUB_UEFI
 unset _UPDATE_SETUP
-unset _REMOVE_i686
-unset _REMOVE_x86_64
 unset _ARCHBOOT_ISO_OLD_PATH
 unset _ARCHBOOT_ISO_WD
 unset _ARCHBOOT_ISO_OLD_NAME

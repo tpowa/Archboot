@@ -1265,8 +1265,8 @@ _createraid()
         else
             DISC=${RAIDDEVICE}
             RUN_CGDISK="1"
-            CHECK_BIOS_BOOT_GRUB2="1"
-            CHECK_UEFISYS_PART="1"
+            CHECK_BIOS_BOOT_GRUB2=""
+            CHECK_UEFISYS_PART=""
             check_gpt
         fi
     fi
@@ -1855,9 +1855,12 @@ autoprepare() {
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partition table to avoid issues!
         sgdisk --zap ${DEVICE} &>/dev/null
+        # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
+        dd if=/dev/zero of=${DEVICE} bs=512 count=2048 &>/dev/null
+        wipefs -a ${DEVICE} &>/dev/null
         # create fresh GPT
         sgdisk --clear ${DEVICE} &>/dev/null
-        wipefs -a ${DEVICE} &>/dev/null
+        # create actual partitions
         sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB2_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB2 ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=2:0:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
@@ -1966,28 +1969,40 @@ check_gpt() {
 ## check and mount UEFI SYSTEM PARTITION at /boot/efi
 check_uefisyspart() {
     
-    if ! [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
-        DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. Please create a >=512 MiB FAT32 partition with gdisk type code EF00 .\n\nIf you already have a >=512 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formatted as FAT32." 0 0
-        RUN_CGDISK="1"
-    else
-        if [[ -d "${DESTDIR}/boot/efi" ]] && [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
+    [[ ! -d "${DESTDIR}/boot/efi" ]] && mkdir -p "${DESTDIR}/boot/efi"
+    
+    if [[ ! "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
+        DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. You will now be put into cgdisk. Please create a >=512 MiB FAT32 partition with gdisk type code EF00 .\n\nIf you already have a >=512 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formatted as FAT32." 0 0
+        clear && cgdisk ${DISC}
+        RUN_CGDISK=""
+    fi
+    
+    if [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
+        UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
+        
+        if [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
             UEFISYS_PART="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
             DISC="$(echo "${UEFISYS_PART}" | sed 's/\(.\{8\}\).*/\1/')"
-            UEFISYS_PART_NUM="$(${_BLKID} -p -i -o value -s PART_ENTRY_NUMBER "${UEFISYS_PART}")"
         else
-            [[ ! -d "${DESTDIR}/boot/efi" ]] && mkdir -p "${DESTDIR}/boot/efi"
-            
             DISC="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
-            UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
             UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         fi
         
-        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" != "vfat" ]]; then
+        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
+            if [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
+                ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
+                DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want the partition to be formatted as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
+            fi
+        else
             ## Check whether UEFISYS is FAT, otherwise exit (any FAT variant, collectively recognized as vfat in Linux).
-            DIALOG --msgbox "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32. Please format it as FAT32 and run /arch/setup ." 0 0 && return 1
-        elif [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
-            ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
-            DIALOG --msgbox "UEFI SYSTEM PARTIION is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition." 0 0
+            DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want the partition to be formatted as FAT32?" 0 0 || return 1
+            _FORMAT_UEFISYS_FAT32="1"
+        fi
+        
+        if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
+            umount "${DESTDIR}/boot/efi" &> /dev/null
+            umount "${UEFISYS_PART}" &> /dev/null
+            mkfs.vfat -F32 -n "UEFISYS" "${UEFISYS_PART}"
         fi
         
         if [[ ! "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
@@ -2028,8 +2043,8 @@ partition() {
         MSDOS_DETECTED=""
         if ! [[ "${DISC}" == "" ]]; then
             if [[ "${GUIDPARAMETER}" == "yes" ]]; then
-                CHECK_BIOS_BOOT_GRUB2="1"
-                CHECK_UEFISYS_PART="1"
+                CHECK_BIOS_BOOT_GRUB2=""
+                CHECK_UEFISYS_PART=""
                 RUN_CGDISK="1"
                 check_gpt
             else
@@ -5140,23 +5155,23 @@ configure_system() {
 install_bootloader_uefi_x86_64() {
     
     DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
-        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" \
-        "rEFInd_x86_64" "rEFInd x86_64 (supports only x86_64 EFISTUB kernels)" 2>${ANSWER} || CANCEL=1
+        "rEFInd_UEFI_x86_64" "rEFInd x86_64 (supports only x86_64 EFISTUB kernels)" \
+        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
+        "rEFInd_UEFI_x86_64") dorefind_uefi_x86_64 ;;
         "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
-        "rEFInd_x86_64") dorefind_uefi_x86_64 ;;
     esac
     
 }
 
 install_bootloader_uefi_i386() {
     
-    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 1 \
-        "GRUB2_UEFI_i386" "GRUB2 i386 UEFI" \
-        "rEFInd_i386" "rEFInd i386 (supports only ix86 EFISTUB kernels)" 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 2 \
+        "rEFInd_UEFI_i386" "rEFInd i386 (supports only ix86 EFISTUB kernels)" \
+        "GRUB2_UEFI_i386" "GRUB2 i386 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
+        "rEFInd_UEFI_i386") dorefind_uefi_i386 ;;
         "GRUB2_UEFI_i386") dogrub2_uefi_i386 ;;
-        "rEFInd_i386") dorefind_uefi_i386 ;;
     esac
     
 }
@@ -5164,15 +5179,15 @@ install_bootloader_uefi_i386() {
 install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
-        "SYSLINUX" "SYSLINUX/EXTLINUX" \
+        "SYSLINUX_BIOS" "SYSLINUX/EXTLINUX" \
         "GRUB2_BIOS" "GRUB2 BIOS" \
-        "GRUB_LEGACY" "GRUB LEGACY" \
-        "LILO" "LILO" 2>${ANSWER} || CANCEL=1
+        "GRUB_LEGACY_BIOS" "GRUB LEGACY" \
+        "LILO_BIOS" "LILO" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "SYSLINUX") dosyslinux_bios ;;
+        "SYSLINUX_BIOS") dosyslinux_bios ;;
         "GRUB2_BIOS") dogrub2_bios ;;
-        "GRUB_LEGACY") dogrub_legacy_bios ;;
-        "LILO") dolilo_bios ;;
+        "GRUB_LEGACY_BIOS") dogrub_legacy_bios ;;
+        "LILO_BIOS") dolilo_bios ;;
     esac
     
 }
