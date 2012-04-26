@@ -2,13 +2,19 @@
 # Script for updating existing Archboot iso with newer UEFI shell, GRUB UEFI, and/or /arch/setup script in the initramfs files
 # Contributed by "Keshav P R" <the.ridikulus.rat aatt geemmayil ddoott ccoomm>
 
-[[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="1"
+[[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
 
-[[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
-[[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
-[[ -z "${_UPDATE_GRUB_UEFI}" ]] && _UPDATE_GRUB_UEFI="1"
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
+[[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
+
+[[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
+[[ -z "${_UPDATE_SYSLINUX_CONFIG}" ]] && _UPDATE_SYSLINUX_CONFIG="1"
+[[ -z "${_UPDATE_GRUB_UEFI}" ]] && _UPDATE_GRUB_UEFI="1"
+[[ -z "${_UPDATE_GRUB_UEFI_CONFIG}" ]] && _UPDATE_GRUB_UEFI_CONFIG="1"
+
+[[ "${_UPDATE_SYSLINUX}" == "1" ]] && _UPDATE_SYSLINUX_CONFIG="1"
+[[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _UPDATE_GRUB_UEFI_CONFIG="1"
 
 #############################
 
@@ -24,15 +30,15 @@ _ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
 #############################
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-dual"
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-dual"
 fi
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-x86_64"
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
 fi
 
 if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-i686"
+	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-i686"
 fi
 
 _ARCHBOOT_ISO_UPDATED_PATH="${_ARCHBOOT_ISO_WD}/${_ARCHBOOT_ISO_UPDATED_NAME}.iso"
@@ -99,6 +105,10 @@ _update_syslinux_iso_files() {
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux"/*.{com,bin,c32} || true
 	cp "/usr/lib/syslinux"/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
+	
+}
+
+_update_syslinux_iso_config() {
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg" || true
 	
@@ -366,7 +376,6 @@ _update_grub_uefi_iso_files() {
 	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub" || true
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/efi/grub2" || true
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub"
@@ -409,12 +418,6 @@ _update_grub_uefi_iso_files() {
 	unset LOOP_DEVICE
 	echo
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/grub.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub//boot/grub/grub_archboot.cfg" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub//boot/grub/grub_standalone_archboot.cfg" || true
-	echo
-	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
 	cp "/usr/share/grub/unicode.pf2" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
 	echo
@@ -430,6 +433,12 @@ _update_grub_uefi_iso_files() {
 			echo
 		# fi
 	# done
+	
+}
+
+_update_grub_uefi_iso_config() {
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg" || true
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
 
@@ -507,7 +516,7 @@ insmod linux
 insmod chain
 
 EOF
-
+	
 	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
 		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_archboot.cfg"
 
@@ -659,12 +668,6 @@ _rename_old_files
 
 [[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
 
-[[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
-
-[[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
-
-[[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_iso_files
-
 if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	cd "${_ARCHBOOT_ISO_WD}/"
 	
@@ -676,6 +679,16 @@ if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	
 	echo
 fi
+
+[[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
+
+[[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
+
+[[ "${_UPDATE_SYSLINUX_CONFIG}" == "1" ]] && _update_syslinux_iso_config
+
+[[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_iso_files
+
+[[ "${_UPDATE_GRUB_UEFI_CONFIG}" == "1" ]] && _update_grub_uefi_iso_config
 
 cd "${_ARCHBOOT_ISO_WD}/"
 
@@ -715,10 +728,12 @@ fi
 
 unset _REMOVE_i686
 unset _REMOVE_x86_64
-unset _UPDATE_SYSLINUX
-unset _UPDATE_UEFI_SHELL
-unset _UPDATE_GRUB_UEFI
 unset _UPDATE_SETUP
+unset _UPDATE_UEFI_SHELL
+unset _UPDATE_SYSLINUX
+unset _UPDATE_SYSLINUX_CONFIG
+unset _UPDATE_GRUB_UEFI
+unset _UPDATE_GRUB_UEFI_CONFIG
 unset _ARCHBOOT_ISO_OLD_PATH
 unset _ARCHBOOT_ISO_WD
 unset _ARCHBOOT_ISO_OLD_NAME

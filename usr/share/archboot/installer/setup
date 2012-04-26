@@ -302,7 +302,7 @@ get_media() {
     AUTOMOUNT="0"
     ## Check whether ${media} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
     ## This might be the case if the user manually mounted the media before launching this script
-    if [[ "$(mountpoint "${media}")" ]]; then
+    if [[ "$(mountpoint -q "${media}")" ]]; then
         check_media
     fi
     AUTOMOUNT="1"
@@ -1825,9 +1825,6 @@ autoprepare() {
     DIALOG --defaultno --yesno "${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
     || return 1
     DEVICE=${DISC}
-    # default filesystem specs (the + is bootable flag)
-    #  <mountpoint>:<partsize>:<fstype>[:+]:labelname
-    FSSPECS="/boot:${BOOT_PART_SIZE}:ext2:+:BOOT_ARCH swap:${SWAP_PART_SIZE}:swap::SWAP_ARCH /:${ROOT_PART_SIZE}:${FSTYPE}::ROOT_ARCH /home:*:${FSTYPE}::HOME_ARCH"
 
     # validate DEVICE
     if [[ ! -b "${DEVICE}" ]]; then
@@ -1866,7 +1863,7 @@ autoprepare() {
         sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=5:0:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:LINUX_DATA ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:ARCHLINUX_HOME ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
         PART_ROOT="${DEVICE}3"
@@ -1892,46 +1889,34 @@ autoprepare() {
     printk on
     # wait until /dev initialized correct devices
     udevadm settle
-    # need to mount root first, then do it again for the others
-    part=1
-    [[ "${GUIDPARAMETER}" == "yes" ]] && part=3
-    for fsspec in ${FSSPECS}; do
-        mountpoint=$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)
-        fstype=$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)
-        labelname=$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)
-        fsoptions="NONE"
-        btrfsdevices="${DEVICE}${part}"
-        btrfsssd="NONE"
-        btrfscompress="NONE"
-        btrfssubvolume="NONE"
-        btrfslevel="NONE"
-        dosubvolume="no"
-        if echo ${mountpoint} | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
-            DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
-        fi
-        part=$((${part} + 1))
-    done
 
-    # make other filesystems
-    part=1
-    [[ "${GUIDPARAMETER}" == "yes" ]] && part=3
+    # default filesystem specs (the + is bootable flag)
+    #  <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
+    FSSPECS="3:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 1:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 4:/home:*:${FSTYPE}:::HOME_ARCH 2:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
+
+    if [[ "${GUIDPARAMETER}" == "yes" ]]; then
+        FSSPECS="5:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 3:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 2:/boot/efi:512:vfat:-F32::ESP 6:/home:*:${FSTYPE}:::HOME_ARCH 4:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
+    fi
+
+    # make and mount filesystems
     for fsspec in ${FSSPECS}; do
-        mountpoint=$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)
-        fstype=$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)
-        labelname=$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)
-        fsoptions="NONE"
+        part="$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
+        mountpoint="$(echo ${fsspec} | tr -d ' ' | cut -f2 -d:)"
+        fstype="$(echo ${fsspec} | tr -d ' ' | cut -f4 -d:)"
+        fsoptions="$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)"
+        [[ "${fsoptions}" == "" ]] && fsoptions="NONE"
+        labelname="$(echo ${fsspec} | tr -d ' ' | cut -f7 -d:)"
         btrfsdevices="${DEVICE}${part}"
         btrfsssd="NONE"
         btrfscompress="NONE"
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
+        # if echo "${mountpoint}" | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
         if [[ "$(echo ${mountpoint} | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
             DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}" 0 0
-            _mkfs yes ${DEVICE}${part} "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
+            _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
         fi
-        part=$((${part} + 1))
     done
 
     DIALOG --msgbox "Auto-prepare was successful" 0 0
@@ -1969,45 +1954,51 @@ check_gpt() {
 ## check and mount UEFI SYSTEM PARTITION at /boot/efi
 check_uefisyspart() {
     
-    [[ ! -d "${DESTDIR}/boot/efi" ]] && mkdir -p "${DESTDIR}/boot/efi"
+    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" != "gpt" ]]; then
+        DIALOG --msgbox "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\nSetup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
+        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
+    fi
     
     if [[ ! "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
-        DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. You will now be put into cgdisk. Please create a >=512 MiB FAT32 partition with gdisk type code EF00 .\n\nIf you already have a >=512 MiB UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code and is formatted as FAT32." 0 0
-        clear && cgdisk ${DISC}
+        DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. You will now be put into cgdisk. Please create a >=512 MiB partition with gdisk type code EF00 .\nWhen prompted (later) to format as FAT32, say Yes.\nIf you already have a >=512 MiB FAT32 UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code." 0 0
+        clear && cgdisk "${DISC}"
         RUN_CGDISK=""
     fi
     
     if [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
-        
-        if [[ "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
-            UEFISYS_PART="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
-            DISC="$(echo "${UEFISYS_PART}" | sed 's/\(.\{8\}\).*/\1/')"
-        else
-            DISC="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
-            UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
-        fi
+        UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
         if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
             if [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
                 ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
-                DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want the partition to be formatted as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
+                DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
             fi
         else
-            ## Check whether UEFISYS is FAT, otherwise exit (any FAT variant, collectively recognized as vfat in Linux).
-            DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want the partition to be formatted as FAT32?" 0 0 || return 1
-            _FORMAT_UEFISYS_FAT32="1"
+            ## Check whether UEFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
+            DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
+        
+        umount "${DESTDIR}/boot/efi" &> /dev/null
+        umount "${UEFISYS_PART}" &> /dev/null
+        rm -rf "${DESTDIR}/boot/efi"
         
         if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
-            umount "${DESTDIR}/boot/efi" &> /dev/null
-            umount "${UEFISYS_PART}" &> /dev/null
-            mkfs.vfat -F32 -n "UEFISYS" "${UEFISYS_PART}"
+            mkfs.vfat -F32 -n "ESP" "${UEFISYS_PART}"
         fi
         
-        if [[ ! "$(mountpoint "${DESTDIR}/boot/efi")" ]]; then
-            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/boot/efi"
+        mkdir -p "${DESTDIR}/boot/efi"
+        mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/boot/efi"
+        
+        ## Fix (possible) case-sensitivity issues
+        if [[ -d "${DESTDIR}/boot/efi/EFI" ]] && [[ ! -d "${DESTDIR}/boot/efi/efi" ]]; then
+            mv "${DESTDIR}/boot/efi/EFI" "${DESTDIR}/boot/efi/efi"
         fi
+        
+        [[ ! -d "${DESTDIR}/boot/efi/efi" ]] && mkdir -p "${DESTDIR}/boot/efi/efi"
+    else
+        DIALOG --msgbox "Setup did not find any UEFI SYSTEM PARTITION in ${DISC}. Please create a >=512MiB FAT32 partition with gdisk type code EFOO and try again." 0 0
+        return 1
     fi
     
 }
@@ -3445,8 +3436,11 @@ do_uefi_bootmgr_setup() {
 
 dorefind_uefi_common() {
     
-    if [[ "$(uname -m)" != "${UEFI_ARCH}" ]]; then
-        DIALOG --msgbox "EFISTUB support requires Kernel and UEFI arch to be same, and requires CONFIG_EFI_STUB enabled >=3.3 kernel." 0 0
+    [[ "$(uname -m)" == "x86_64" ]] && __CARCH="x86_64"
+    [[ "$(uname -m)" == "i686" ]] && __CARCH="i386"
+    
+    if [[ "${__CARCH}" != "${UEFI_ARCH}" ]]; then
+        DIALOG --msgbox "EFISTUB support requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
     elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
         DIALOG --msgbox "LTS kernel does not support EFISTUB. Please install CONFIG_EFI_STUB enabled kernel and try again." 0 0
     else
@@ -3455,15 +3449,16 @@ dorefind_uefi_common() {
         
         DISC="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
         
-        if ! [[ "${DISC}" == "" ]]; then
+        if [[ "${DISC}" != "" ]]; then
             CHECK_UEFISYS_PART="1"
             CHECK_BIOS_BOOT_GRUB2=""
             RUN_CGDISK=""
-            check_gpt
+            # check_gpt
+            check_uefisyspart
         fi
         
         DIALOG --msgbox "Installing rEFInd-${UEFI_ARCH} now ..." 0 0
-        # PACKAGES="rEFInd-${UEFI_ARCH} dosfstools"
+        # PACKAGES="rEFInd-${UEFI_ARCH} dosfstools efibootmgr"
         PACKAGES="dosfstools efibootmgr"
         run_pacman
         PACKAGES=""
@@ -4509,23 +4504,24 @@ dogrub2_uefi_bootmgr() {
 
 dogrub2_uefi_common() {
     
+    DISC="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
+    
+    if [[ "${DISC}" != "" ]]; then
+        CHECK_UEFISYS_PART="1"
+        CHECK_BIOS_BOOT_GRUB2=""
+        RUN_CGDISK=""
+        # check_gpt
+        check_uefisyspart
+    fi
+    
     dogrub2_common_before
     
     DIALOG --msgbox "Installing grub2-efi-${UEFI_ARCH} now ..." 0 0
-    PACKAGES="grub2-efi-${UEFI_ARCH} grub2-common dosfstools"
+    PACKAGES="grub2-efi-${UEFI_ARCH} grub2-common dosfstools efibootmgr"
     
     run_pacman
     # reset PACKAGES after installing
     PACKAGES=""
-    
-    DISC="$(grub-probe --target=device "${DESTDIR}/" | sed 's/\(.\{8\}\).*/\1/')"
-    
-    if ! [[ "${DISC}" == "" ]]; then
-        CHECK_UEFISYS_PART="1"
-        CHECK_BIOS_BOOT_GRUB2=""
-        RUN_CGDISK=""
-        check_gpt
-    fi
     
     chroot_mount
     

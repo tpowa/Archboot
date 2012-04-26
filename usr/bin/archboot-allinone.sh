@@ -2,32 +2,32 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # grub-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in extra/grub2-common package
 
-WD="${PWD}/"
+[[ -z "${_DO_x86_64}" ]] && _DO_x86_64="1"
+[[ -z "${_DO_i686}" ]] && _DO_i686="1"
+
+[[ -z "${WD}" ]] && WD="${PWD}/"
 
 _BASENAME="$(basename "${0}")"
 
-_DO_x86_64="1"
-_DO_i686="1"
-
 usage () {
-    echo "${_BASENAME}: usage"
-    echo "CREATE ALLINONE USB/CD IMAGES"
-    echo "-----------------------------"
-    echo "Run in archboot x86_64 chroot first ..."
-    echo "create-allinone.sh -t"
-    echo "Run in archboot 686 chroot then ..."
-    echo "create-allinone.sh -t"
-    echo "Copy the generated tarballs to your favorite directory and run:"
-    echo "${_BASENAME} -g <any other option>"
-    echo ""
-    echo "PARAMETERS:"
-    echo "  -g                  Start generation of images."
-    echo "  -i=IMAGENAME        Your IMAGENAME."
-    echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
-    echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
-    echo "  -lts=LTSKERNELNAME  Use LTSKERNELNAME in boot message."
-    echo "  -h                  This message."
-    exit 0
+	echo "${_BASENAME}: usage"
+	echo "CREATE ALLINONE USB/CD IMAGES"
+	echo "-----------------------------"
+	echo "Run in archboot x86_64 chroot first ..."
+	echo "create-allinone.sh -t"
+	echo "Run in archboot 686 chroot then ..."
+	echo "create-allinone.sh -t"
+	echo "Copy the generated tarballs to your favorite directory and run:"
+	echo "${_BASENAME} -g <any other option>"
+	echo ""
+	echo "PARAMETERS:"
+	echo "  -g                  Start generation of images."
+	echo "  -i=IMAGENAME        Your IMAGENAME."
+	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
+	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
+	echo "  -lts=LTSKERNELNAME  Use LTSKERNELNAME in boot message."
+	echo "  -h                  This message."
+	exit 0
 }
 
 [[ -z "${1}" ]] && usage
@@ -36,6 +36,7 @@ ALLINONE_PRESET="/etc/archboot/presets/allinone"
 ALLINONE_LTS_PRESET="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 USBIMAGE_HELPER="/usr/bin/archboot-usbimage-helper.sh"
+UPDATEISO_HELPER="/usr/bin/archboot-update-iso.sh"
 
 # change to english locale!
 export LANG="en_US"
@@ -75,6 +76,20 @@ fi
 [[ -z "${LTS_KERNEL}" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="2k12-R2"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
+
+IMAGENAME_OLD="${IMAGENAME}"
+
+if [[ "${_DO_x86_64}" == "1" ]] && [[ "${_DO_i686}" == "1" ]]; then
+	IMAGENAME="${IMAGENAME}-dual"
+fi
+
+if [[ "${_DO_x86_64}" == "1" ]] && [[ "${_DO_i686}" != "1" ]]; then
+	IMAGENAME="${IMAGENAME}-x86_64"
+fi
+
+if [[ "${_DO_x86_64}" != "1" ]] && [[ "${_DO_i686}" == "1" ]]; then
+	IMAGENAME="${IMAGENAME}-i686"
+fi
 
 ALLINONE="$(mktemp -d /tmp/allinone.XXX)"
 
@@ -370,6 +385,11 @@ insmod search_fs_file
 insmod linux
 insmod chain
 
+EOF
+	
+	if [[ "${_DO_x86_64}" == "1" ]]; then
+		cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
+
 if [ cpuid -l ]; then
 
     menuentry "Arch Linux (x86_64) archboot" {
@@ -388,6 +408,12 @@ if [ cpuid -l ]; then
 
 fi
 
+EOF
+	fi
+	
+	if [[ "${_DO_i686}" == "1" ]]; then
+		cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
+
 menuentry "Arch Linux (i686) archboot" {
     set gfxpayload="keep"
     set root="\${archboot}"
@@ -401,6 +427,11 @@ menuentry "Arch Linux LTS (i686) archboot" {
     linux /boot/vmlinuz_i686_lts \${_kernel_i686_params}
     initrd /boot/initramfs_i686.img
 }
+
+EOF
+	fi
+	
+	cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
 
@@ -438,6 +469,8 @@ mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
+cd "${WD}/"
+
 ## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE hybrid ISO ..."
 xorriso -as mkisofs \
@@ -454,17 +487,35 @@ xorriso -as mkisofs \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
-# cleanup isolinux and migrate to syslinux
-echo "Generating ALLINONE IMG ..."
-rm -f "${ALLINONE}/boot/syslinux/isolinux.bin"
-# Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
+## cleanup isolinux and migrate to syslinux
+# echo "Generating ALLINONE IMG ..."
+# rm -f "${ALLINONE}/boot/syslinux/isolinux.bin"
 
-"${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
+## Change parameters in boot.msg
+# sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/SYSLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
-#create sha256sums.txt
-rm -f sha256sums.txt || true
-sha256sum "${IMAGENAME}.iso" "${IMAGENAME}.img" > sha256sums.txt
+# "${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
+
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
+fi
+
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
+fi
+
+## create sha256sums.txt
+cd "${WD}/"
+rm -f "${WD}/sha256sums.txt" || true
+sha256sum *.iso *.img > "${WD}/sha256sums.txt"
+
+_UPDATE_SYSLINUX="0" _UPDATE_UEFI_SHELL="0" _UPDATE_GRUB_UEFI="0" _UPDATE_SETUP="0" _REMOVE_i686="1" _REMOVE_x86_64="0" /usr/bin/archboot-update-iso.sh "${WD}/${IMAGENAME}.iso"
+
+_UPDATE_SYSLINUX="0" _UPDATE_UEFI_SHELL="0" _UPDATE_GRUB_UEFI="0" _UPDATE_SETUP="0" _REMOVE_i686="0" _REMOVE_x86_64="1" /usr/bin/archboot-update-iso.sh "${WD}/${IMAGENAME}.iso"
+
+mv "${WD}/${IMAGENAME}.iso" "${WD}/${IMAGENAME}-dual.iso"
 
 # cleanup
 rm -rf "${grub_uefi_mp}"
