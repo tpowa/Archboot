@@ -5,6 +5,8 @@ ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation"
 # use the first VT not dedicated to a running console
 LOG="/dev/tty7"
+# where the Archboot media (ISO/CD/USB) should be mounted
+_MEDIA="/src"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/tmp/install"
 EDITOR=""
@@ -271,8 +273,11 @@ _mount_packages_squashfs_images() {
     
     modprobe -q loop
     modprobe -q squashfs
-    mount -o ro,loop -t squashfs "/src/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
-    mount -o ro,loop -t squashfs "/src/packages/archboot_packages_any.squashfs" "/packages/core-any"
+    mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
+    mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_any.squashfs" "/packages/core-any"
+    
+    # mkdir -p /tmp/TMP_ARCHBOOT_ROOT
+    # tar -C /tmp/TMP_ARCHBOOT_ROOT -xf "/packages/core-$(uname -m)/pkg"/libarchive-*-$(uname -m).pkg.tar.xz
     
 }
 
@@ -280,15 +285,15 @@ _mount_packages_squashfs_images() {
 check_media() {
     
     if [[ ! "${dev}" == "" ]]; then
-        ! [[ "$(cat /proc/self/mounts | grep /dev/${dev})" ]] && mount "/dev/${dev}" "${media}" >/dev/null 2>&1
+        ! [[ "$(cat /proc/self/mounts | grep /dev/${dev})" ]] && mount "/dev/${dev}" "${_MEDIA}" >/dev/null 2>&1
     fi
     
-    if [[ -e "${media}/packages/archboot_packages_$(uname -m).squashfs" && -e "${media}/packages/archboot_packages_any.squashfs" ]]; then
+    if [[ -e "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" && -e "${_MEDIA}/packages/archboot_packages_any.squashfs" ]]; then
         _mount_packages_squashfs_images
         SET_MEDIA="1"
         [[ "${AUTOMOUNT}" == "1" ]] && break
     else
-        umount "${media}" >/dev/null 2>&1
+        umount "${_MEDIA}" >/dev/null 2>&1
         SET_MEDIA="0"
     fi
     
@@ -297,12 +302,12 @@ check_media() {
 # Get cdroms and removable devices
 get_media() {
     
-    media="/src"
+    # _MEDIA="/src"
     SET_MEDIA="0"
     AUTOMOUNT="0"
-    ## Check whether ${media} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
+    ## Check whether ${_MEDIA} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
     ## This might be the case if the user manually mounted the media before launching this script
-    if [[ "$(mountpoint -q "${media}")" ]]; then
+    if [[ "$(mountpoint -q "${_MEDIA}")" ]]; then
         check_media
     fi
     AUTOMOUNT="1"
@@ -350,16 +355,16 @@ get_media() {
 manual_media() {
     
     if [[ "${SET_MEDIA}" == "0" ]]; then
-        DIALOG --msgbox "No source media was autodetected, please switch to another Virtual Terminal and manually mount the source media under /src.  If you manually mount to /src, make sure the packages squashfs files /src/packages/archboot_packages_$(uname -m).squashfs and /src/packages/archboot_packages_any.squashfs are available.\n\n" 15 55
+        DIALOG --msgbox "No source media was autodetected, please switch to another Virtual Terminal and manually mount the source media under ${_MEDIA} .  If you manually mount to ${_MEDIA} , make sure the packages squashfs files ${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs and ${_MEDIA}/packages/archboot_packages_any.squashfs are available.\n\n" 15 55
     fi
     
-    if [[ ! -e "/src/packages/archboot_packages_$(uname -m).squashfs" ]]; then
-        DIALOG --msgbox "$(uname -m) packages squashfs image /src/packages/archboot_packages_$(uname -m).squashfs is missing!" 0 0
+    if [[ ! -e "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" ]]; then
+        DIALOG --msgbox "$(uname -m) packages squashfs image ${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs is missing!" 0 0
         return 1
     fi
     
-    if [[ ! -e "/src/packages/archboot_packages_any.squashfs" ]]; then
-        DIALOG --msgbox "'any' packages squashfs image /src/packages/archboot_packages_any.squashfs is missing!" 0 0
+    if [[ ! -e "${_MEDIA}/packages/archboot_packages_any.squashfs" ]]; then
+        DIALOG --msgbox "'any' packages squashfs image ${_MEDIA}/packages/archboot_packages_any.squashfs is missing!" 0 0
         return 1
     fi
     
@@ -1887,18 +1892,20 @@ autoprepare() {
         return 1
     fi
     printk on
-    # wait until /dev initialized correct devices
+    ## wait until /dev initialized correct devices
     udevadm settle
 
-    # default filesystem specs (the + is bootable flag)
-    #  <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
+    ## FSSPECS - default filesystem specs (the + is bootable flag)
+    ## <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
+    ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
+    ## Make sure the "root" partition is defined first in the FSSPECS list
     FSSPECS="3:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 1:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 4:/home:*:${FSTYPE}:::HOME_ARCH 2:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
 
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         FSSPECS="5:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 3:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 2:/boot/efi:512:vfat:-F32::ESP 6:/home:*:${FSTYPE}:::HOME_ARCH 4:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
     fi
 
-    # make and mount filesystems
+    ## make and mount filesystems
     for fsspec in ${FSSPECS}; do
         part="$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
         mountpoint="$(echo ${fsspec} | tr -d ' ' | cut -f2 -d:)"
@@ -1913,10 +1920,10 @@ autoprepare() {
         btrfslevel="NONE"
         dosubvolume="no"
         # if echo "${mountpoint}" | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
-        if [[ "$(echo ${mountpoint} | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
-            DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}" 0 0
-            _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
-        fi
+        # if [[ "$(echo ${mountpoint} | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
+        DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part} with FSLABEL ${labelname} . Mountpoint is ${mountpoint} ." 0 0
+        _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
+        # fi
     done
 
     DIALOG --msgbox "Auto-prepare was successful" 0 0
@@ -3434,13 +3441,13 @@ do_uefi_bootmgr_setup() {
     
 }
 
-dorefind_uefi_common() {
+doefistub_uefi_common() {
     
     [[ "$(uname -m)" == "x86_64" ]] && __CARCH="x86_64"
     [[ "$(uname -m)" == "i686" ]] && __CARCH="i386"
     
     if [[ "${__CARCH}" != "${UEFI_ARCH}" ]]; then
-        DIALOG --msgbox "EFISTUB support requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
+        DIALOG --msgbox "EFISTUB requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
     elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
         DIALOG --msgbox "LTS kernel does not support EFISTUB. Please install CONFIG_EFI_STUB enabled kernel and try again." 0 0
     else
@@ -3457,32 +3464,9 @@ dorefind_uefi_common() {
             check_uefisyspart
         fi
         
-        DIALOG --msgbox "Installing rEFInd-${UEFI_ARCH} now ..." 0 0
-        # PACKAGES="rEFInd-${UEFI_ARCH} dosfstools efibootmgr"
         PACKAGES="dosfstools efibootmgr"
         run_pacman
         PACKAGES=""
-        
-        rm -rf "/tmp"/refind-bin* || true
-        curl -L "http://sourceforge.net/projects/refind/files/latest/download" -o "/tmp/refind-bin.zip"
-        bsdtar -C "/tmp" -xf "/tmp/refind-bin.zip"
-        mv "/tmp"/refind-bin-* "/tmp/refind-bin-dir"
-        
-        install -d "${DESTDIR}/boot/efi/efi/arch/refind"
-        install -D -m0644 "/tmp/refind-bin-dir/refind/refind_${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/efi/arch/refind/refind${SPEC_UEFI_ARCH}.efi"
-        install -D -m0644 "/tmp/refind-bin-dir/refind/refind.conf-sample" "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        cp -r "/tmp/refind-bin-dir/refind/icons" "${DESTDIR}/boot/efi/efi/arch/refind/icons"
-        cp -r "/tmp/refind-bin-dir/docs" "${DESTDIR}/boot/efi/efi/arch/refind/docs"
-        install -D -m0644 "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/efi/arch/refind/docs"/
-        
-        sed 's|^timeout 20|timeout 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^#showtools shell, about, reboot|showtools shell,about,exit,shutdown,reboot|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^#scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        sed 's|^#max_tags 0|max_tags 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        
-        # install -D -m0644 "${DESTDIR}/boot/efi/efi/arch/refind/refind_linux.conf" "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf" || true
         
         _bootdev="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}')"
         _rootdev="$(df -T "${DESTDIR}/" | tail -n +2 | awk '{print $1}')"
@@ -3505,21 +3489,93 @@ dorefind_uefi_common() {
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\efi\\arch\\${INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
+        
+        mkdir -p "${DESTDIR}/boot/efi/efi/arch"
+        
+        cat << CONFEOF > "${DESTDIR}/boot/efi/efi/arch/linux.conf"
+${_PARAMETERS_MOD}
+CONFEOF
         
         cat << REFINDEOF > "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf"
 "Boot with Defaults" "${_PARAMETERS_MOD}"
 REFINDEOF
-    
-        install -D -m0644 "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/efi/arch/${VMLINUZ}.efi"
-        install -D -m0644 "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/efi/arch/${INITRAMFS}.img"
         
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf .  After you save your changes and exit the editor." 0 0
+        rm -f "${DESTDIR}/boot/efi/efi/arch/${VMLINUZ}.efi"
+        rm -f "${DESTDIR}/boot/efi/efi/arch/${INITRAMFS}.img"
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/efi/arch/${VMLINUZ}.efi"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/efi/arch/${INITRAMFS}.img"
+        
+        if [[ -e "${DESTDIR}/boot/efi/efi/arch/${VMLINUZ}.efi" ]] && [[ -e "${DESTDIR}/boot/efi/efi/arch/${INITRAMFS}.img" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to /boot/efi/efi/arch/${VMLINUZ}.efi and /boot/efi/efi/arch/${INITRAMFS}.img respectively. Make sure to update those files everytime /boot/${VMLINUZ} and /boot/${INITRAMFS}.img are updated during the Kernel package update(s)." 0 0
+            
+            DIALOG --msgbox "You will now be put into the editor to edit linux.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
+            geteditor || return 1
+            "${EDITOR}" "${DESTDIR}/boot/efi/efi/arch/linux.conf"
+            "${EDITOR}" "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf"
+            
+            _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
+            UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
+            
+            _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+            _BOOTMGR_DISC="${_DISC}"
+            _BOOTMGR_PART_NUM="${UEFISYS_PART_NUM}"
+            _BOOTMGR_LOADER_DIR="arch"
+            _BOOTMGR_LOADER_FILE="${VMLINUZ}.efi"
+            # do_uefi_bootmgr_setup
+        else
+            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in /boot/efi." 0 0
+        fi
+    fi
+    
+}
+
+dorefind_uefi_common() {
+    
+    DIALOG --msgbox "Setting up rEFInd-${UEFI_ARCH} now ..." 0 0
+    # PACKAGES="rEFInd-${UEFI_ARCH} dosfstools efibootmgr"
+    PACKAGES="libarchive"
+    run_pacman
+    PACKAGES=""
+    
+    rm -rf "/tmp"/refind-bin-* || true
+    rm -f "/tmp"/refind-bin-*.zip || true
+    
+    if [[ -e "/tmp/refind-bin.zip" ]]; then
+        _REFIND_ZIP="/tmp/refind-bin.zip"
+    elif [[ -e "${_MEDIA}/packages/refind-bin.zip" ]]; then
+        _REFIND_ZIP="${_MEDIA}/packages/refind-bin.zip"
+    else
+        curl -L "http://sourceforge.net/projects/refind/files/latest/download" -o "/tmp/refind-bin.zip"
+        _REFIND_ZIP="/tmp/refind-bin.zip"
+    fi
+    
+    LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/bsdtar" -C "/tmp" -xf "${_REFIND_ZIP}"
+    mv "/tmp"/refind-bin-* "/tmp/refind-bin-dir"
+    
+    mkdir -p "${DESTDIR}/boot/efi/efi/arch/refind"
+    cp -f "/tmp/refind-bin-dir/refind/refind_${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/efi/arch/refind/refind${SPEC_UEFI_ARCH}.efi"
+    cp -f "/tmp/refind-bin-dir/refind/refind.conf-sample" "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    cp -rf "/tmp/refind-bin-dir/refind/icons" "${DESTDIR}/boot/efi/efi/arch/refind/icons"
+    cp -rf "/tmp/refind-bin-dir/docs" "${DESTDIR}/boot/efi/efi/arch/refind/docs"
+    cp -f "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/efi/arch/refind/docs"/
+    
+    sed 's|^timeout 20|timeout 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    sed 's|^#showtools shell, about, reboot|showtools shell,about,exit,shutdown,reboot|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    sed 's|^#scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    sed 's|^#max_tags 0|max_tags 0|g' -i "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
+    
+    if [[ -e "${DESTDIR}/boot/efi/efi/arch/refind/refind${SPEC_UEFI_ARCH}.efi" ]]; then
+        DIALOG --msgbox "rEFInd-${UEFI_ARCH} setup successfully." 0 0
+        
+        DIALOG --msgbox "You will now be put into the editor to edit refind.conf . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/boot/efi/efi/arch/refind/refind.conf"
-        "${EDITOR}" "${DESTDIR}/boot/efi/efi/arch/refind_linux.conf"
         
+        _uefisysdev="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
         _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
         UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
         
@@ -3529,13 +3585,31 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="arch\\refind"
         _BOOTMGR_LOADER_FILE="refind${SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
+    else
+        DIALOG --msgbox "Error setting up rEFInd-${UEFI_ARCH}." 0 0
     fi
+    
+}
+
+do_efistub_uefi_x86_64() {
+    
+    do_uefi_x86_64
+    
+    doefistub_uefi_common
+    
+}
+
+do_efistub_uefi_i686() {
+    
+    do_uefi_i386
+    
+    doefistub_uefi_common
     
 }
 
 dorefind_uefi_x86_64() {
     
-    do_uefi_x86_64
+    do_efistub_uefi_x86_64
     
     dorefind_uefi_common
     
@@ -3543,7 +3617,7 @@ dorefind_uefi_x86_64() {
 
 dorefind_uefi_i386() {
     
-    do_uefi_i386
+    do_efistub_uefi_i686
     
     dorefind_uefi_common
     
@@ -3661,8 +3735,8 @@ EOF
     # install syslinux
     DIALOG --infobox "Installing the ${SYSLINUX} bootloader..." 0 0
     ! [[ -d "${DESTDIR}/boot/${SYSLINUX_DIR}" ]] && mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}"
-    cp "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
-    cp "${DESTDIR}/usr/lib/syslinux"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
+    cp -f "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
+    cp -f "${DESTDIR}/usr/lib/syslinux"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
 }
 
 # finish_syslinux
@@ -3686,7 +3760,7 @@ finish_syslinux () {
         return 1
     fi
     
-    [[ -f "/src/boot/syslinux/splash.png" ]] && cp /src/boot/syslinux/splash.png "${DESTDIR}/boot/${SYSLINUX_DIR}"
+    [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     chroot_umount
     
     DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
@@ -4047,42 +4121,42 @@ dogrub2_config() {
 
     ########
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    ########
-    
-    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    
+    ########
+    
+    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB2_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot/efi" 2>/dev/null)"
         
-        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot/efi" 2>/dev/null)"
-        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot/efi" 2>/dev/null)"
         
-        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot/efi" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot/efi" 2>/dev/null)"
     fi
     
     ########
@@ -4103,7 +4177,7 @@ dogrub2_config() {
     
     ########
     
-    cp "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
+    cp -f "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
     head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) "/tmp/.grub.cfg" > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     rm -f "/tmp/.grub.cfg"
@@ -4349,11 +4423,11 @@ dogrub2_common_after() {
     fi
     
     # Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes and exit the editor, you can install GRUB2." 0 0
+    DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
     
-    cp "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
+    cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB2_PREFIX_DIR}/"
     
     GRUB2_BIOS=""
     GRUB2_UEFI=""
@@ -4538,10 +4612,10 @@ dogrub2_uefi_common() {
     
     mkdir -p "${DESTDIR}/boot/grub"
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/lib:${DESTDIR}/usr/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
@@ -4580,7 +4654,7 @@ fi
 
 EOF
     
-    cp "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
+    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/efi/efi/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
@@ -5257,7 +5331,7 @@ mainmenu() {
             install_bootloader ;;
         "8")
             if [[ "${S_SRC}" = "1" && "${MODE}" = "media" ]]; then
-                umount /src >/dev/null 2>&1
+                umount "${_MEDIA}" >/dev/null 2>&1
             fi
             [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear

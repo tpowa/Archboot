@@ -155,7 +155,7 @@ _prepare_packages() {
 		tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
 		tar xvf core-lts-x86_64.tar -C "${CORE64_LTS}" || exit 1
 		
-		cp -r "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
+		cp -rf "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
 		rm -rf "${CORE64_LTS}/tmp"/*/core-x86_64
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
 		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${ALLINONE}/packages/"
@@ -168,14 +168,14 @@ _prepare_packages() {
 		tar xvf core-i686.tar -C "${CORE}" || exit 1
 		tar xvf core-lts-i686.tar -C "${CORE_LTS}" || exit 1
 		
-		cp -r "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
+		cp -rf "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
 		rm -rf "${CORE_LTS}/tmp"/*/core-i686
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-i686/" "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" -comp xz -noappend -all-root
 		mv "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" "${ALLINONE}/packages/"
 	fi
 	
 	# move in 'any' packages
-	cp -r "${CORE_LTS}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
+	cp -rf "${CORE_LTS}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
 	rm -rf "${CORE_LTS}/tmp"/*/core-any
 	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
 	
@@ -213,6 +213,15 @@ _download_uefi_shell_tianocore() {
 	
 }
 
+_download_uefi_refind_sourceforge() {
+	
+	mkdir -p "${ALLINONE}/packages/"
+	
+	## Download latest rEFInd bin archive from sourceforge
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/packages/refind-bin.zip" -L "http://sourceforge.net/projects/refind/files/latest/download"
+	
+}
+
 _prepare_grub_uefi_arch_specific_iso_files() {
 	
 	[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
@@ -246,7 +255,7 @@ source "(\${archboot})/boot/grub/grub_archboot.cfg"
 
 EOF
 	
-	cp "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg" "${ALLINONE}/boot/grub/grub.cfg"
+	cp -f "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg" "${ALLINONE}/boot/grub/grub.cfg"
 	
 	__WD="${PWD}/"
 	
@@ -259,7 +268,7 @@ EOF
 	rm -f "${ALLINONE}/boot/grub/grub.cfg"
 	
 	mkdir -p "${ALLINONE}/efi/boot/"
-	cp "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
 	unset _UEFI_ARCH
 	unset _SPEC_UEFI_ARCH
@@ -297,7 +306,7 @@ _prepare_grub_uefi_iso_files() {
 	losetup --detach "${LOOP_DEVICE}"
 	
 	mkdir -p "${ALLINONE}/boot/grub/fonts"
-	cp "/usr/share/grub/unicode.pf2" "${ALLINONE}/boot/grub/fonts/"
+	cp -f "/usr/share/grub/unicode.pf2" "${ALLINONE}/boot/grub/fonts/"
 	
 	mkdir -p "${ALLINONE}/boot/grub/locale/"
 	
@@ -461,6 +470,8 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
+_download_uefi_refind_sourceforge
+
 _prepare_grub_uefi_iso_files
 
 # place syslinux files
@@ -497,12 +508,12 @@ xorriso -as mkisofs \
 # "${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
-	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
@@ -510,12 +521,6 @@ fi
 cd "${WD}/"
 rm -f "${WD}/sha256sums.txt" || true
 sha256sum *.iso *.img > "${WD}/sha256sums.txt"
-
-_UPDATE_SYSLINUX="0" _UPDATE_UEFI_SHELL="0" _UPDATE_GRUB_UEFI="0" _UPDATE_SETUP="0" _REMOVE_i686="1" _REMOVE_x86_64="0" /usr/bin/archboot-update-iso.sh "${WD}/${IMAGENAME}.iso"
-
-_UPDATE_SYSLINUX="0" _UPDATE_UEFI_SHELL="0" _UPDATE_GRUB_UEFI="0" _UPDATE_SETUP="0" _REMOVE_i686="0" _REMOVE_x86_64="1" /usr/bin/archboot-update-iso.sh "${WD}/${IMAGENAME}.iso"
-
-mv "${WD}/${IMAGENAME}.iso" "${WD}/${IMAGENAME}-dual.iso"
 
 # cleanup
 rm -rf "${grub_uefi_mp}"

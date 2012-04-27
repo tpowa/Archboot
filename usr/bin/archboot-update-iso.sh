@@ -7,6 +7,7 @@
 
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
+[[ -z "${_UPDATE_UEFI_REFIND}" ]] && _UPDATE_UEFI_REFIND="1"
 
 [[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
 [[ -z "${_UPDATE_SYSLINUX_CONFIG}" ]] && _UPDATE_SYSLINUX_CONFIG="1"
@@ -84,7 +85,7 @@ echo
 rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/[BOOT]/" || true
 echo
 
-[[ -e "${_ARCHBOOT_ISO_WD}/splash.png" ]] && cp "${_ARCHBOOT_ISO_WD}/splash.png" "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/splash.png"
+[[ -e "${_ARCHBOOT_ISO_WD}/splash.png" ]] && cp -f "${_ARCHBOOT_ISO_WD}/splash.png" "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/splash.png"
 echo
 
 _rename_old_files() {
@@ -104,7 +105,7 @@ _rename_old_files() {
 _update_syslinux_iso_files() {
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux"/*.{com,bin,c32} || true
-	cp "/usr/lib/syslinux"/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
+	cp -f "/usr/lib/syslinux"/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
 	
 }
 
@@ -268,7 +269,7 @@ _download_uefi_shell_tianocore() {
 	echo
 	
 	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64.efi" ]]; then
-		cp "${_ARCHBOOT_ISO_WD}/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi"
+		cp -f "${_ARCHBOOT_ISO_WD}/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi"
 		echo
 	else
 		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
@@ -289,7 +290,7 @@ _download_uefi_shell_tianocore() {
 	echo
 	
 	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" ]]; then
-		cp "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi"
+		cp -f "${_ARCHBOOT_ISO_WD}/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi"
 		echo
 	else
 		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
@@ -303,6 +304,18 @@ _download_uefi_shell_tianocore() {
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/efi/tools/shellx64_old.efi.backup" || true
 	echo
+	
+}
+
+_update_uefi_refind_sourceforge() {
+	
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/packages/" || true
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/packages/refind-bin.zip" || true
+	echo
+	
+	## Download latest rEFInd bin archive from sourceforge
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/packages/refind-bin.zip" -L "http://sourceforge.net/projects/refind/files/latest/download"
 	
 }
 
@@ -349,7 +362,7 @@ EOF
 	
 	echo
 	
-	cp "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_standalone_archboot.cfg" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg"
+	cp -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub_standalone_archboot.cfg" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg"
 	
 	__ARCHBOOT_ISO_WD="${PWD}/"
 	
@@ -362,7 +375,7 @@ EOF
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/grub.cfg"
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/"
-	cp "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
 	echo
 	
@@ -419,7 +432,7 @@ _update_grub_uefi_iso_files() {
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
-	cp "/usr/share/grub/unicode.pf2" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
+	cp -f "/usr/share/grub/unicode.pf2" "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/fonts/"
 	echo
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/boot/grub/locale/" || true
@@ -671,16 +684,29 @@ _rename_old_files
 if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	cd "${_ARCHBOOT_ISO_WD}/"
 	
-	_initramfs_name="initramfs_x86_64"
-	_update_arch_setup_initramfs
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/arch/" || true
 	
-	_initramfs_name="initramfs_i686"
-	_update_arch_setup_initramfs
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/arch/setup" || true
+	cp -f "${_ARCHBOOT_ISO_WD}/setup" "${_ARCHBOOT_ISO_EXT_DIR}/arch/setup"
+	
+	echo
+	
+	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
+		_initramfs_name="initramfs_x86_64"
+		_update_arch_setup_initramfs
+	fi
+	
+	if [[ "${_REMOVE_i686}" != "1" ]]; then
+		_initramfs_name="initramfs_i686"
+		_update_arch_setup_initramfs
+	fi
 	
 	echo
 fi
 
 [[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
+
+[[ "${_UPDATE_UEFI_REFIND}" == "1" ]] && _update_uefi_refind_sourceforge
 
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
 
@@ -730,6 +756,7 @@ unset _REMOVE_i686
 unset _REMOVE_x86_64
 unset _UPDATE_SETUP
 unset _UPDATE_UEFI_SHELL
+unset _UPDATE_UEFI_REFIND
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG
 unset _UPDATE_GRUB_UEFI
