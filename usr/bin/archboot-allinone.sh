@@ -203,13 +203,13 @@ _prepare_other_files() {
 
 _download_uefi_shell_tianocore() {
 	
-	mkdir -p "${ALLINONE}/efi/tools/"
+	mkdir -p "${ALLINONE}/EFI/tools/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/efi/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 }
 
@@ -261,14 +261,14 @@ EOF
 	
 	cd "${ALLINONE}/"
 	
-	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
+	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub_uefi_mp}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
 	
 	cd "${__WD}/"
 	
 	rm -f "${ALLINONE}/boot/grub/grub.cfg"
 	
-	mkdir -p "${ALLINONE}/efi/boot/"
-	cp -f "${grub_uefi_mp}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/efi/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	mkdir -p "${ALLINONE}/EFI/boot/"
+	cp -f "${grub_uefi_mp}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
 	unset _UEFI_ARCH
 	unset _SPEC_UEFI_ARCH
@@ -280,7 +280,7 @@ _prepare_grub_uefi_iso_files() {
 	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
 	
 	mkdir -p "${ALLINONE}/boot/grub"
-	mkdir -p "${ALLINONE}/efi/boot"
+	mkdir -p "${ALLINONE}/EFI/boot"
 	
 	# Create a blank image to be converted to ESP IMG
 	dd if="/dev/zero" of="${ALLINONE}/boot/grub/grub_uefi_x86_64.bin" bs="1024" count="4096"
@@ -296,7 +296,7 @@ _prepare_grub_uefi_iso_files() {
 	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/boot/grub/grub_uefi_x86_64.bin")"
 	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub_uefi_mp}"
 	
-	mkdir -p "${grub_uefi_mp}/efi/boot/"
+	mkdir -p "${grub_uefi_mp}/EFI/boot/"
 	
 	_UEFI_ARCH="x86_64"
 	_prepare_grub_uefi_arch_specific_iso_files
@@ -446,12 +446,12 @@ if [ "\${grub_platform}" == "efi" ]; then
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
+        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}.efi
     }
 
     menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
         set root="\${archboot}"
-        chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
+        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
     }
 
 fi
