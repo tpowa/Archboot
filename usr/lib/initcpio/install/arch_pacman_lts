@@ -9,7 +9,7 @@ build ()
 
 DEPENDS="initscripts wget bash coreutils cryptsetup dialog \
 e2fsprogs findutils gawk grep iputils jfsutils less lvm2 mdadm kmod nano \
-ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps psmisc reiserfsprogs sed snarf \
+ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps-ng psmisc reiserfsprogs sed snarf \
 syslog-ng sysvinit tar util-linux which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
 inetutils openssh hwdetect shadow bridge-utils ifenslave cpufrequtils links \
 dosfstools udev initscripts filesystem linux-lts glibc linux-api-headers xinetd links pacman \
