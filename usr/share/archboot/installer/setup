@@ -1528,7 +1528,10 @@ _createlv()
             DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
                 LV_SIZE=$(cat ${ANSWER})
                 if [[ "${LV_SIZE}" = "" ]]; then
-                    DIALOG --yesno "Would you like to create Logical Volume with free space left?" 0 0 && LV_ALL="1"
+                    DIALOG --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && LV_ALL="1"
+                    if ! [[ "${LV_ALL}" = "1" ]]; then
+                         LV_SIZE=0
+                    fi
                 fi
                 if [[ "${LV_SIZE}" = "0" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
