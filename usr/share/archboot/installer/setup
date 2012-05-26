@@ -3823,26 +3823,31 @@ finish_syslinux () {
     MBR="${DESTDIR}/usr/lib/syslinux/mbr.bin"
     GPTMBR="${DESTDIR}/usr/lib/syslinux/gptmbr.bin"
     
-    # check if GPT/GUID is used
-    GUID_DETECTED=""
-    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    CHECKDEV=$(echo ${ROOTDEV} | sed 's|/dev/||g')
     
-    if [[ "${GUID_DETECTED}" == '1' ]]; then
-        cat "${GPTMBR}" > "${ROOTDEV}"
-    else
-        cat "${MBR}" > "${ROOTDEV}"
-    fi
-    
-    if [[ $? -gt 0 ]]; then
-        chroot_umount
-        DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
-        return 1
+    ## Install MBR boot code only if the selected ROOTDEV is a DISC and not a partition
+    if [[ -e "${block}/${CHECKDEV}" ]]; then
+        ## check if GPT/GUID is used
+        GUID_DETECTED=""
+        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+        
+        if [[ "${GUID_DETECTED}" == '1' ]]; then
+            cat "${GPTMBR}" > "${ROOTDEV}"
+        else
+            cat "${MBR}" > "${ROOTDEV}"
+        fi
     fi
     
     [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     chroot_umount
     
-    DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
+    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" ]]; then
+        DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
+    else
+        DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
+        chroot_umount
+        return 1
+    fi
 }
 
 # install extlinux bootloader
@@ -4586,7 +4591,9 @@ dogrub2_bios() {
         bootdev=$(cat ${ANSWER})
     else
         DEVS="$(findbootloaderdisks _)"
-        DEVS="${DEVS} $(findbootloaderpartitions _)"
+        
+        ## grub2-bios install to partition is not supported
+        # DEVS="${DEVS} $(findbootloaderpartitions _)"
         
         if [[ "${DEVS}" == "" ]]; then
             DIALOG --msgbox "No hard drives were found" 0 0
