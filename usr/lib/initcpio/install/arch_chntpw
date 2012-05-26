@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/chntpw /usr/bin/reged /usr/bin/cpnt"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/bin/chntpw /usr/bin/reged /usr/bin/cpnt"
+    for i in $apps; do
+        add_binary $i
+    done
 }
 
 help ()

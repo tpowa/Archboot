@@ -1,15 +1,13 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES=""
-    FILES=""
-    SCRIPT="arch_addons"
     ! [ -d ${TEMPDIR}/packages ] && mkdir ${TEMPDIR}/packages
     ! [ -d ${TEMPDIR}/config ] && mkdir ${TEMPDIR}/config
     cp -r /etc/archboot/packages/* ${TEMPDIR}/packages
     cp -r /etc/archboot/config/* ${TEMPDIR}/config
+    add_runscript
 }
 
 help ()
