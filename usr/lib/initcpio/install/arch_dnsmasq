@@ -1,11 +1,9 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/dnsmasq"
-    FILES=""
-    SCRIPT=""
+    add_binary "/usr/bin/dnsmasq"
     add_file "/usr/share/archboot/dnsmasq/etc/dnsmasq.conf" "/etc/dnsmasq.conf"
     add_file "/etc/rc.d/dnsmasq"
     add_dir "/var/db"

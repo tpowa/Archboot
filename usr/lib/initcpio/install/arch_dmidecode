@@ -1,10 +1,11 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES="$(checked_modules "/firmware/dmi-sysfs")"
-    BINARIES="/usr/sbin/dmidecode /usr/sbin/biosdecode"
-    FILES=""
+    add_checked_modules '/firmware/dmi-sysfs'
+    add_binary "/usr/sbin/dmidecode"
+    add_binary "/usr/sbin/biosdecode"
 }
 
 help ()

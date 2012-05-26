@@ -1,11 +1,11 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "md/dm-*") "
-    BINARIES="/sbin/dmsetup /sbin/dmeventd"
-    FILES=""
-    SCRIPT=""
+    add_checked_modules 'md/dm-*'
+    add_binary "/sbin/dmsetup"
+    add_binary "/sbin/dmeventd"
     add_dir "/dev/mapper"
     # add udev rules
     add_file "/usr/lib/udev/rules.d/10-dm.rules"

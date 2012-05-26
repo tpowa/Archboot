@@ -1,10 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES="$(checked_modules "/firmware/efivars")"
-    BINARIES="/usr/sbin/efibootmgr"
-    FILES=""
+    add_checked_modules '/firmware/efivars'
+    add_binary "/usr/sbin/efibootmgr"
 }
 
 help ()

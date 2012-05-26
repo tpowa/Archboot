@@ -1,12 +1,13 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "arch/x86/kernel/cpu/cpufreq")  $(checked_modules "drivers/cpufreq") "
-
-    BINARIES="/usr/bin/cpufreq-info /usr/bin/cpufreq-set"
-    FILES=""
-    SCRIPT=""
+    add_checked_modules 'arch/x86/kernel/cpu/cpufreq' 'drivers/cpufreq'
+    apps="/usr/bin/cpufreq-info /usr/bin/cpufreq-set"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_file "/usr/share/archboot/cpufreq/etc/conf.d/cpufreq" "/etc/conf.d/cpufreq"
     add_file "/etc/rc.d/cpufreq"
 }

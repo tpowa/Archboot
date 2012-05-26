@@ -1,9 +1,8 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    SCRIPT=
-    BINARIES=
     ### check for root
     if ! [ $UID -eq 0 ]; then 
         echo "ERROR: Please run as root user!"

@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="clamscan freshclam"
-    FILES=""
-    SCRIPT="arch_clamav"
+    add_binary "/usr/bin/clamscan"
+    add_binary "usr/bin/freshclam"
     # add /var directories
     add_dir "/var/run/clamav"
     add_dir "/var/lib/"
@@ -15,6 +14,7 @@ build ()
     for i in $(pacman -Ql clamav | cut -d ' ' -f2 | grep /usr/lib/libclamunrar); do
       add_file "$i"
     done
+    add_runscript
 }
 
 help ()

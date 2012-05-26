@@ -1,11 +1,9 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/ddrescue"
-    FILES=""
-    SCRIPT=""
+    addbinary "/usr/bin/ddrescue"
 }
 
 help ()
