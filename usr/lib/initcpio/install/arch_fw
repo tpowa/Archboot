@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_checked_modules '/firewire/' 'firewire-sbp2' 'sr_mod' 'sd_mod'
+    add_checked_modules '/firewire/|firewire-sbp2|sr_mod|sd_mod'
 }
 
 help ()

@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_checked_modules '/drivers/atm' '/drivers/usb/atm'
+    add_checked_modules '/drivers/atm|/drivers/usb/atm'
     apps="/usr/bin/aread /usr/bin/atmdiag /usr/bin/atmdump /usr/bin/awrite /usr/bin/saaldump /usr/bin/sonetdiag /usr/bin/ttcp_atm /usr/sbin/atmaddr /usr/sbin/atmarp /usr/sbin/atmarpd /usr/sbin/atmloop /usr/sbin/atmsigd /usr/sbin/atmtcp /usr/sbin/bus /usr/sbin/enitune /usr/sbin/esi /usr/sbin/ilmid /usr/sbin/lecs /usr/sbin/les /usr/sbin/mpcd /usr/sbin/zeppelin /usr/sbin/zntune"
     for i in $apps; do
         add_binary "$i"

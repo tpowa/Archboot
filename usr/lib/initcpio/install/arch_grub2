@@ -8,7 +8,7 @@ build ()
         add_binary "$i"
     done
     appfiles="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mknetdir /usr/sbin/grub-reboot /usr/sbin/grub-set-default"
-    for i in $appfiles do
+    for i in $appfiles; do
         add_file "$i"
     done    
     ## add grub2 config file

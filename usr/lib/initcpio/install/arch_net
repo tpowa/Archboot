@@ -14,7 +14,7 @@ build ()
         add_binary "$i"
     done
     appfiles="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr"
-    for i in $appfiles do
+    for i in $appfiles; do
         add_file "$i"
     done    
     add_file "/sbin/dhcpcd"
