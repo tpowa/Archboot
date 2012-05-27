@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/sbin/pppoe /usr/sbin/pppoe-connect /usr/sbin/pppoe-relay /usr/sbin/pppoe-server /usr/sbin/pppoe-setup /usr/sbin/pppoe-sniff /usr/sbin/pppoe-start /usr/sbin/pppoe-status /usr/sbin/pppoe-stop"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/sbin/pppoe /usr/sbin/pppoe-connect /usr/sbin/pppoe-relay /usr/sbin/pppoe-server /usr/sbin/pppoe-setup /usr/sbin/pppoe-sniff /usr/sbin/pppoe-start /usr/sbin/pppoe-status /usr/sbin/pppoe-stop"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_full_dir "/usr/lib/rp-pppoe"
     add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-masq" "/etc/ppp/firewall-masq"
     add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-standalone" "/etc/ppp/firewall-standalone"

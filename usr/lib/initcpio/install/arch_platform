@@ -1,13 +1,9 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "/platform/") "
-
-    MODULES=$(echo ${MODULES}) #trim whitespace
-    BINARIES=""
-    FILES=""
-    SCRIPT=""
+    add_checked_modules '/platform/'
 }
 
 help ()

@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/poff /usr/bin/pon /usr/sbin/chat /usr/sbin/plog /usr/sbin/pppd /usr/sbin/pppdump /usr/sbin/pppoe-discovery /usr/sbin/pppstats"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/bin/poff /usr/bin/pon /usr/sbin/chat /usr/sbin/plog /usr/sbin/pppd /usr/sbin/pppdump /usr/sbin/pppoe-discovery /usr/sbin/pppstats"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_full_dir "/usr/lib/pppd"
     add_dir "/etc/ppp/peers"
     add_file "/usr/share/archboot/ppp/etc/ppp/chap-secrets" "/etc/ppp/chap-secrets"
