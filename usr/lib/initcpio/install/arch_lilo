@@ -1,11 +1,9 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/sbin/lilo"
-    FILES=""
-    SCRIPT=""
+    add_binary "/sbin/lilo"
     add_file "/usr/share/archboot/lilo/etc/lilo.conf" "/etc/lilo.conf"
     # fix licenses
     add_file "/usr/share/licenses/lilo/LICENSE"

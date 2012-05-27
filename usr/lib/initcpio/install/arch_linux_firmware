@@ -1,11 +1,8 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES=""
-    FILES=""
-    SCRIPT=""
     # add firmware files and licenses
     for i in $(pacman -Ql linux-firmware | cut -d ' ' -f2 | grep -v /$); do
         add_file "$i"

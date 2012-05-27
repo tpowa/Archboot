@@ -1,18 +1,18 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "drivers/md/*" | grep -v "dm-") "
-    BINARIES="/sbin/mdassemble /sbin/mdadm /sbin/mdmon"
-    FILES=""
-    SCRIPT="arch_mdadm"
+    add_checked_modules -f 'dm-' 'drivers/md/*'
+    add_binary "/sbin/mdassemble" 
+    add_binary "/sbin/mdadm" 
+    add_binary "/sbin/mdmon"
     # check if a custom mdadm.conf exists
     if grep -q ^ARRAY /etc/mdadm.conf; then
         echo "Custom /etc/mdadm.conf file will be used in initramfs for assembling arrays."
         add_file "/etc/mdadm.conf"
     fi
-    # add udev rule file
-    # add_file "/lib/udev/rules.d/64-md-raid.rules"
+    add_runscript
 }
 
 help ()

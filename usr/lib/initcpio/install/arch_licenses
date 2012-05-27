@@ -1,14 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES=""
-    FILES=""
-    SCRIPT="arch_licenses"
     for i in $(find /usr/share/licenses/common ! -type d -type f); do
         add_file $i
     done
+    add_runscript
 }
 
 help ()
