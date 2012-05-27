@@ -1,16 +1,18 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES="$(checked_modules "/drivers/net/wireless/") $(checked_modules "/net/wireless/") $(checked_modules "/net/ieee80211/") $(checked_modules "/net/mac80211/")"
+    add_checked_modules '/drivers/net/wireless/' '/net/wireless/' '/net/ieee80211/' '/net/mac80211/'
     # add staging wireless here
     STAGING="rtl8187se rtl8192e rtl8192u rtl8712 vt6655 vt6656 winbond wlan-ng"
     for i in $STAGING; do
-        MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
+        add_checked_modules "/drivers/staging/$i"
     done
-    BINARIES="/usr/sbin/iwconfig /usr/sbin/iwevent /usr/sbin/iwgetid /usr/sbin/iwlist /usr/sbin/iwpriv /usr/sbin/iwspy /usr/sbin/ifrename /usr/bin/b43-fwcutter /usr/sbin/wpa_cli /usr/sbin/wpa_passphrase /usr/sbin/wpa_supplicant /usr/sbin/iw /sbin/crda /sbin/regdbdump /usr/sbin/wpa_actiond /usr/sbin/rfkill"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/sbin/iwconfig /usr/sbin/iwevent /usr/sbin/iwgetid /usr/sbin/iwlist /usr/sbin/iwpriv /usr/sbin/iwspy /usr/sbin/ifrename /usr/bin/b43-fwcutter /usr/sbin/wpa_cli /usr/sbin/wpa_passphrase /usr/sbin/wpa_supplicant /usr/sbin/iw /sbin/crda /sbin/regdbdump /usr/sbin/wpa_actiond /usr/sbin/rfkill"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
     add_file "/usr/share/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
     # add rfkill

@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/sbin/hwclock /bin/date /usr/bin/ntpdate"
-    FILES=""
-    SCRIPT=""
+    add_binary "/sbin/hwclock"
+    add_binary "/bin/date /usr/bin/ntpdate"
     for i in $(find /usr/share/zoneinfo ! -type d); do
         add_file $i
     done

@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/testdisk /usr/bin/photorec"
-    FILES=""
-    SCRIPT=""
+    add_binary "/usr/bin/testdisk"
+    add_binary "/usr/bin/photorec"
 }
 
 help ()

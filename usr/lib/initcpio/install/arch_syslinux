@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/syslinux /usr/sbin/extlinux /usr/bin/mtools /usr/bin/mcopy /usr/bin/mattrib"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/bin/syslinux /usr/sbin/extlinux /usr/bin/mtools /usr/bin/mcopy /usr/bin/mattrib"
+    for i in $apps; do
+        add_binary "$i"
+    done
     for i in /usr/lib/syslinux/*; do
         [ -f $i ] && add_file "$i"
     done

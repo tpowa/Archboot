@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/bin/logger"
-    FILES="/etc/udev/udev.conf"
-    SCRIPT="arch_udev"
+    add_binary "/usr/bin/logger"
+    add_file "/etc/udev/udev.conf"
     add_file /usr/lib/modprobe.d/usb-load-ehci-first.conf
     add_binary /lib/udev/udevd
     add_binary /usr/lib/udev/accelerometer
@@ -33,6 +32,7 @@ build ()
     for i in /usr/lib/udev/keymaps/*/*; do
         [ -f $i ] && add_file "$i"
     done
+    add_runscript
 }
 
 help ()
