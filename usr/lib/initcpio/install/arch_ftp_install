@@ -1,3 +1,4 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
@@ -24,8 +25,6 @@ build ()
 	sleep 5
     fi
 
-    SCRIPT=
-    BINARIES=
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_FTP $(uname -m)" >> ${ISONAME}
 }

@@ -1,12 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "drivers/video/" | grep 'fb')  $(checked_modules "drivers/char/agp") i915 radeon nouveau "
-    BINARIES="/sbin/v86d"
-    FILES=""
-    SCRIPT="arch_fb"
+    add_checked_modules 'drivers/video/' 'drivers/char/agp' 'i915' 'radeon' 'nouveau'
+    add_binary "/sbin/v86d"
     add_file "/usr/share/archboot/fb/etc/modprobe.d/uvesafb.conf" "/etc/modprobe.d/uvesafb.conf"
+    add_runscripts
 }
 
 help ()

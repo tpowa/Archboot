@@ -1,10 +1,16 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    BINARIES="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mount /usr/bin/grub-ntldr-img /usr/bin/grub-script-check /usr/sbin/grub-bios-setup /usr/sbin/grub-ofpathname /usr/sbin/grub-probe"
-    FILES="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mknetdir /usr/sbin/grub-reboot /usr/sbin/grub-set-default"
-    
+    apps="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath /usr/bin/grub-mount /usr/bin/grub-ntldr-img /usr/bin/grub-script-check /usr/sbin/grub-bios-setup /usr/sbin/grub-ofpathname /usr/sbin/grub-probe"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    appfiles="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/sbin/grub-install /usr/sbin/grub-mkconfig /usr/sbin/grub-mknetdir /usr/sbin/grub-reboot /usr/sbin/grub-set-default"
+    for i in $appfiles do
+        add_file "$i"
+    done    
     ## add grub2 config file
     add_file "/boot/grub/grub.cfg"
     
@@ -15,14 +21,6 @@ build ()
     for i in $(find /etc/grub.d/* ! -type d); do
         add_file "$i"
     done
-    
-    ## Use grub2-common package grub-mkconfig helper scripts - not Archboot specific ones
-    #
-    # add_file "/usr/share/archboot/grub2/etc/default/grub" "/etc/default/grub"
-    #
-    # for i in $(find /usr/share/archboot/grub2/etc/grub.d/* ! -type d); do
-    #    add_file "$i" "/etc/grub.d/$(basename $i)"
-    # done
     
     for i in $(find /usr/lib/grub/x86_64-efi ! -type d); do
         add_file "$i"

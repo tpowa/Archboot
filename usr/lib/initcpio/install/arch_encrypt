@@ -1,13 +1,13 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(all_modules "/crypto/" | grep -v "aes.ko" ) cryptoloop"
-    BINARIES="/sbin/cryptsetup"
-    FILES=""
-    SCRIPT="arch_encrypt"
+    add_all_modules -f 'aes.ko' '/crypto/' 'cryptoloop'
+    add_binary "/sbin/cryptsetup"
     # fix licenses
     add_file "/usr/share/licenses/popt/LICENSE"
+    add_runscript
 }
 
 help ()
