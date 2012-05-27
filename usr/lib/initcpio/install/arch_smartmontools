@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/sbin/smartctl /usr/sbin/smartd /usr/sbin/update-smart-drivedb"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/sbin/smartctl /usr/sbin/smartd /usr/sbin/update-smart-drivedb"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_file "/usr/share/archboot/smartmontools/etc/conf.d/smartd" "/etc/conf.d/smartd"
     add_file "/usr/share/archboot/smartmontools/etc/smartd.conf" "/etc/smartd.conf"
     add_file "/etc/rc.d/smartd"

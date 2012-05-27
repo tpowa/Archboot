@@ -1,12 +1,13 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "/drivers/net/") "
-
-    BINARIES="/usr/bin/findssl.sh /usr/bin/scp /usr/bin/sftp /usr/bin/ssh-add /usr/bin/ssh-agent /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/sbin/sshd /usr/sbin/xinetd /usr/sbin/telnetd /usr/bin/rsync /usr/sbin/exportfs /usr/sbin/nfsstat /usr/sbin/rpc.idmapd /usr/sbin/rpc.mountd /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpcdebug /usr/sbin/showmount /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/slogin /usr/bin/screen /usr/bin/rpcbind /usr/bin/rpcinfo /usr/sbin/gss_clnt_send_err /usr/sbin/gss_destroy_creds /usr/sbin/rpc.gssd /usr/sbin/rpc.svcgssd /bin/mountpoint"
-    FILES=""
-    SCRIPT="arch_remote"
+    add_checked_modules '/drivers/net/'
+    apps="/usr/bin/findssl.sh /usr/bin/scp /usr/bin/sftp /usr/bin/ssh-add /usr/bin/ssh-agent /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/sbin/sshd /usr/sbin/xinetd /usr/sbin/telnetd /usr/bin/rsync /usr/sbin/exportfs /usr/sbin/nfsstat /usr/sbin/rpc.idmapd /usr/sbin/rpc.mountd /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpcdebug /usr/sbin/showmount /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/slogin /usr/bin/screen /usr/bin/rpcbind /usr/bin/rpcinfo /usr/sbin/gss_clnt_send_err /usr/sbin/gss_destroy_creds /usr/sbin/rpc.gssd /usr/sbin/rpc.svcgssd /bin/mountpoint"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_file "/usr/share/archboot/remote/etc/screenrc" "/etc/screenrc"
     add_file "/usr/share/archboot/remote/etc/xinetd.conf" "/etc/xinetd.conf"
     add_file "/usr/share/archboot/remote/etc/xinetd.d/servers" "/etc/xinetd.d/servers"
@@ -51,6 +52,8 @@ build ()
     add_file "/usr/share/licenses/libldap/LICENSE"
     add_file "/usr/share/licenses/nfsidmap/LICENSE"
     add_file "/usr/share/licenses/libgssglue/COPYING"
+
+    add_runscript
 }
 
 help ()

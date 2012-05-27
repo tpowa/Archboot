@@ -1,11 +1,12 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/sbin/modem_run /usr/sbin/pppoa2 /usr/sbin/pppoa3"
-    FILES=""
-    SCRIPT=""
+    apps="/usr/sbin/modem_run /usr/sbin/pppoa2 /usr/sbin/pppoa3"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_dir "/etc/speedtouch/"
     add_file "/usr/bin/speedtouch-setup"
     add_file "/usr/bin/speedtouch-start"
