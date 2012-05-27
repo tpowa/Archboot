@@ -1,11 +1,8 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES=""
-    FILES=""
-    SCRIPT=""
     add_file /usr/bin/loadkeys /bin/loadkeys
     add_file /usr/bin/dumpkeys /bin/dumpkeys
     add_file /usr/bin/kbd_mode /bin/kdb_mode

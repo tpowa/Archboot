@@ -1,11 +1,9 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/sbin/kexec"
-    FILES=""
-    SCRIPT=""
+    add_binary "/sbin/kexec"
     add_file "/etc/rc.d/kexec"
     add_file "/usr/share/archboot/kexec/etc/conf.d/kexec" "/etc/conf.d/kexec"
 }

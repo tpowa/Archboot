@@ -1,12 +1,8 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-
-    BINARIES=""
-    FILES=""
-    SCRIPT=""
     # ipw2100 support
     add_file "/usr/lib/firmware/ipw2100-1.3-i.fw"
     add_file "/usr/lib/firmware/ipw2100-1.3-p.fw"

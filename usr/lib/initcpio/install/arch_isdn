@@ -1,12 +1,13 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "/drivers/isdn/") "
-
-    BINARIES="/usr/sbin/hisaxctrl /usr/sbin/icnctrl /usr/sbin/imon /usr/sbin/imontty /usr/sbin/ipppd /usr/sbin/ipppstats /usr/sbin/isdnctrl /usr/sbin/isdnlog /usr/sbin/mkzonedb /usr/sbin/pcbitctl /usr/bin/isdnconf /usr/bin/isdnrate /usr/bin/isdnrep /usr/bin/capiinfo /usr/sbin/rcapid /usr/sbin/capiinit /usr/sbin/avmcapictrl"
-    FILES=""
-    SCRIPT=""
+    add_checked_modules '/drivers/isdn/'
+    apps="/usr/sbin/hisaxctrl /usr/sbin/icnctrl /usr/sbin/imon /usr/sbin/imontty /usr/sbin/ipppd /usr/sbin/ipppstats /usr/sbin/isdnctrl /usr/sbin/isdnlog /usr/sbin/mkzonedb /usr/sbin/pcbitctl /usr/bin/isdnconf /usr/bin/isdnrate /usr/bin/isdnrep /usr/bin/capiinfo /usr/sbin/rcapid /usr/sbin/capiinit /usr/sbin/avmcapictrl"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_file "/usr/share/archboot/isdn/etc/isdn/callerid.conf" "/etc/isdn/callerid.conf"
     add_file "/usr/share/archboot/isdn/etc/isdn/isdn.conf" "/etc/isdn/isdn.conf"
     add_file "/usr/share/archboot/isdn/etc/isdn/isdnlog.isdnctrl0.options" "/etc/isdn/isdnlog.isdnctrl0.options"
