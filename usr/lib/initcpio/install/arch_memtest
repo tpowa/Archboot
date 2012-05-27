@@ -1,10 +1,8 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    BINARIES=""
-    FILES=""
-    SCRIPT=""
     [ ${RUNPROGRAM}  = "mkisolinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
     [ ${RUNPROGRAM}  = "archboot-tarball-helper.sh" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
     [ ${RUNPROGRAM}  = "mksyslinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"

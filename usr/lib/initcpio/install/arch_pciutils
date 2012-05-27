@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/usr/sbin/lspci /usr/sbin/setpci"
-    FILES="/usr/sbin/update-pciids"
-    SCRIPT=""
+    add_binary "/usr/sbin/lspci" 
+    add_binary "/usr/sbin/setpci"
     add_file "/usr/share/hwdata/pci.ids"
 }
 

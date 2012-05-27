@@ -1,16 +1,22 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=" $(checked_modules "/drivers/net/" | grep -ve "wireless") "
+    add_checked_modules -f 'wireless' '/drivers/net/'
     # add staging modules
     STAGING="et131x"
     for i in $STAGING; do
-        MODULES="$MODULES $(checked_modules "/drivers/staging/$i")"
+        add_checked_modules "/drivers/staging/$i"
     done
-    BINARIES="/bin/dnsdomainname /usr/bin/domainname /bin/netstat /usr/bin/nisdomainname /usr/bin/ypdomainname /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp /sbin/slattach /bin/ping /bin/ping6 /bin/traceroute /bin/traceroute6 /usr/sbin/arping /usr/sbin/clockdiff /usr/sbin/rarpd /usr/sbin/rdisc /usr/sbin/tftpd /usr/sbin/tracepath /usr/sbin/tracepath6 /sbin/route /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd /usr/sbin/ctstat /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/ip /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct /usr/sbin/rtmon /usr/sbin/rtstat /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd /usr/sbin/ifplugstatus"
-    FILES="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr"
-    SCRIPT=""
+    apps="/bin/dnsdomainname /usr/bin/domainname /bin/netstat /usr/bin/nisdomainname /usr/bin/ypdomainname /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp /sbin/slattach /bin/ping /bin/ping6 /bin/traceroute /bin/traceroute6 /usr/sbin/arping /usr/sbin/clockdiff /usr/sbin/rarpd /usr/sbin/rdisc /usr/sbin/tftpd /usr/sbin/tracepath /usr/sbin/tracepath6 /sbin/route /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd /usr/sbin/ctstat /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/ip /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct /usr/sbin/rtmon /usr/sbin/rtstat /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd /usr/sbin/ifplugstatus"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    appfiles="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr"
+    for i in $appfiles do
+        add_file "$i"
+    done    
     add_file "/sbin/dhcpcd"
     add_file "/sbin/ifenslave"
     add_file "/usr/sbin/brctl"

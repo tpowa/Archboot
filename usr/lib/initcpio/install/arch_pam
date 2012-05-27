@@ -1,11 +1,10 @@
+#!/bin/bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
-    MODULES=""
-    BINARIES="/sbin/pam_tally /sbin/unix_chkpwd"
-    FILES=""
-    SCRIPT=""
+    add_binary "/sbin/pam_tally" 
+    add_binary "/sbin/unix_chkpwd"
     for i in $(echo /usr/share/archboot/pam/etc/*/*); do
     	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/pam/etc|/etc|g')"
     done
