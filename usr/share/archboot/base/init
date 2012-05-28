@@ -1,7 +1,11 @@
 #!/bin/bash
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
+if [ -x /usr/bin/systemd-timestamp ]; then
+    RD_TIMESTAMP=$(systemd-timestamp)
+fi
 . /init_functions
+
 # add sh symlink
 ln -s /bin/bash /bin/sh
 
@@ -94,5 +98,9 @@ else
         udevadm info --cleanup-db
     fi
 
-    exec env -i "TERM=$TERM" /sbin/switch_root /new_root $init "$@"
+    exec env -i \
+        "TERM=$TERM" \
+        "RD_TIMESTAMP=$RD_TIMESTAMP" \
+        /usr/bin/switch_root /new_root $init "$@"
+
 fi
