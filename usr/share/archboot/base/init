@@ -1,5 +1,6 @@
 #!/bin/bash
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
+udevd_running=0
 
 if [ -x /usr/bin/systemd-timestamp ]; then
     RD_TIMESTAMP=$(systemd-timestamp)
@@ -18,16 +19,6 @@ mkdir -m755 /run/initramfs
 
 # parse the kernel command line
 parse_cmdline
-
-# if available, start udevd at this stage
-if [ -x /usr/lib/udev/udevd ]; then
-    msg ":: Starting udevd..."
-    /usr/lib/udev/udevd --daemon --resolve-names=never
-    udevd_running=1
-    msg "done."
-else
-    udevd_running=0
-fi
 
 for d in ${disablehooks//,/ }; do
     [ -e "/hooks/$d" ] && chmod 644 "/hooks/$d"
@@ -90,12 +81,6 @@ else
     if [ "${break}" = "postmount" ]; then
         echo ":: Post-mount break requested, type 'exit' to resume operation"
         launch_interactive_shell
-    fi
-
-    # Stop udevd if is running
-    if [ "${udevd_running}" -eq 1 ]; then
-        udevadm control --exit
-        udevadm info --cleanup-db
     fi
 
     exec env -i \
