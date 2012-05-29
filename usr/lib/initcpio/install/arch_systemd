@@ -1,0 +1,43 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    #dbus-core files
+    apps="/usr/bin/dbus-cleanup-sockets /usr/bin/dbus-daemon /usr/bin/dbus-monitor /usr/bin/dbus-send /usr/bin/dbus-uuidgen"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    add_file "/etc/rc.d/dbus"
+    add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
+    add_dir "/var/lib/dbus"
+    add_full_dir "/etc/dbus-1"
+    add_full_dir "/usr/share/dbus-1"
+    #systemd files
+    apps="/bin/systemd /usr/bin/journalctl /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    add_dir "/etc/tmpfiles.d"
+    add_dir "/etc/modules-load.d"
+    add_file "/etc/os-release"
+    add_full_dir "/etc/systemd"
+    add_full_dir "/etc/xdg"
+    add_full_dir "/usr/lib/systemd"
+    add_full_dir "/usr/share/systemd"
+    add_full_dir "/usr/share/polkit-1"
+    add_full_dir "/usr/lib/tmpfiles.d"
+    add_full_dir "/usr/lib/modules-load.d"
+    add_dir "/var/lib/systemd"
+    add_file "/usr/share/archboot/systemd/etc/locale.conf" "/etc/locale.conf"
+    add_file "/usr/share/archboot/systemd/etc/timezone.conf" "/etc/timezone.conf"
+    add_file "/usr/share/archboot/systemd/etc/vconsole.conf" "/etc/vconsole.conf"
+    add_file "/usr/share/archboot/systemd/etc/hostname" "/etc/hostname"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes systemd support on an arch boot image.
+HELPEOF
+} 
