@@ -8,7 +8,7 @@ LOG="/dev/tty7"
 # where the Archboot media (ISO/CD/USB) should be mounted
 _MEDIA="/src"
 # don't use /mnt because it's intended to mount other things there!
-DESTDIR="/tmp/install"
+DESTDIR="/install"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 
