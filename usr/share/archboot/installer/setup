@@ -829,7 +829,7 @@ printk()
 
 getdest() {
     [[ "${DESTDIR}" ]] && return 0
-    DIALOG --inputbox "Enter the destination directory where your target system is mounted" 8 65 "/tmp/install" 2>${ANSWER} || return 1
+    DIALOG --inputbox "Enter the destination directory where your target system is mounted" 8 65 "/install" 2>${ANSWER} || return 1
     DESTDIR=$(cat ${ANSWER})
 }
 

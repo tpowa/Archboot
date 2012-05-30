@@ -3,7 +3,7 @@
 #
 
 # Path to kernel, default to stock arch kernel
-KPATH="/tmp/install/boot/vmlinuz-linux"
+KPATH="/install/boot/vmlinuz-linux"
 
 # Root partition
 # The default attempts to autodetect
@@ -13,4 +13,4 @@ ROOTPART="$(mount | grep "on /mnt type" | cut -d' ' -f 1)"
 KPARAM="ro"
 
 # Path to initrd image, default to stock arch kernel
-INITRD="/tmp/install/boot/initramfs-linux.img"
+INITRD="/install/boot/initramfs-linux.img"
