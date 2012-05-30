@@ -6,7 +6,7 @@ build ()
     add_binary "/usr/bin/logger"
     add_file "/etc/udev/udev.conf"
     add_file /usr/lib/modprobe.d/usb-load-ehci-first.conf
-    add_binary /usr/lib/udev/udevd
+    add_binary /usr/bin/udevd
     add_binary /usr/lib/udev/accelerometer
     add_binary /usr/lib/udev/ata_id
     add_binary /usr/lib/udev/cdrom_id

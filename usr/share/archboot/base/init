@@ -49,14 +49,14 @@ unset rootdev
 
 fsck_root
 
+init=${init:-/sbin/init}
 if [ "${root}" = "" -a "${ip}" = "" ]; then
     # enter install environment
-    exec /sbin/init
+    exec $init
 else
     # Mount root at /new_root
     ${mount_handler:-default_mount_handler} /new_root
 
-    init=${init:-/sbin/init}
     if [ "$(stat -c %D /)" = "$(stat -c %D /new_root)" ]; then
         # Nothing got mounted on /new_root. This is the end, we don't know what to do anymore
         # We fall back into a shell, but the shell has now PID 1
