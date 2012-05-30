@@ -12,17 +12,20 @@ build ()
     add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
     add_dir "/var/lib/dbus"
     add_full_dir "/etc/dbus-1"
+    add_dir "/etc/dbus-1/session.d"
+    add_dir "/etc/dbus-1/systemd.d"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="/bin/systemd /usr/bin/journalctl /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
+    apps="/usr/bin/systemd-ask-password /usr/bin/systemd-tmpfiles /usr/bin/systemd-tty-ask-password-agent /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /bin/systemd /usr/bin/journalctl /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
     for i in $apps; do
         add_binary "$i"
     done
     add_dir "/etc/tmpfiles.d"
     add_dir "/etc/modules-load.d"
+    add_dir "/etc/binfmt.d/"
+    add_dir "/etc/sysctl.d/"
     add_file "/etc/os-release"
     ### add_full_dir cannot handle emtpy dirs
-    add_dir "/etc/dbus-1/session.d"
     add_dir "/etc/systemd/system/local-fs.target.wants"
     add_dir "/etc/systemd/system/sysinit.target.wants"
     add_dir "/etc/systemd/user"
@@ -38,7 +41,11 @@ build ()
     add_full_dir "/usr/share/polkit-1"
     add_full_dir "/usr/lib/tmpfiles.d"
     add_full_dir "/usr/lib/modules-load.d"
+    for i in /usr/lib/libsystemd*; do
+        add_file "$i"
+    done
     add_dir "/var/lib/systemd"
+    add_file "/usr/lib/security/pam_systemd.so"
     add_file "/usr/share/archboot/systemd/etc/locale.conf" "/etc/locale.conf"
     add_file "/usr/share/archboot/systemd/etc/timezone.conf" "/etc/timezone.conf"
     add_file "/usr/share/archboot/systemd/etc/vconsole.conf" "/etc/vconsole.conf"
