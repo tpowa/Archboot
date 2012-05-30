@@ -50,6 +50,7 @@ build ()
     add_file "/usr/share/archboot/systemd/etc/timezone.conf" "/etc/timezone.conf"
     add_file "/usr/share/archboot/systemd/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/systemd/etc/hostname" "/etc/hostname"
+    add_file "/usr/share/archboot/systemd/etc/systemd/system/getty\@.service" "/etc/systemd/system/getty\@.service"
 }
 
 help ()
