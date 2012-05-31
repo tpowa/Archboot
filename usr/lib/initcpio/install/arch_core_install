@@ -111,7 +111,7 @@ build ()
     ### HACK add grub2 and syslinux packages to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
-    for i in grub2-common grub2-bios grub2-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5  perl-digest-sha1; do
+    for i in grub2-common grub2-bios grub2-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5 perl-digest-sha1; do
         pacman -Sw --noconfirm $i
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
         pkgarch="$(echo $(pacman -Si $i | grep -m 1 Architecture | cut -d ":" -f 2))"
