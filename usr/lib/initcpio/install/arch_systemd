@@ -52,6 +52,7 @@ build ()
     add_file "/usr/share/archboot/systemd/etc/hostname" "/etc/hostname"
     add_file "/usr/share/archboot/systemd/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
     add_file "/usr/share/archboot/systemd/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
+    add_file "/usr/share/archboot/systemd/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
 }
 
 help ()
