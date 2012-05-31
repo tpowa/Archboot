@@ -4,7 +4,7 @@
 build ()
 {
     add_binary "/usr/bin/clamscan"
-    add_binary "usr/bin/freshclam"
+    add_binary "/usr/bin/freshclam"
     # add /var directories
     add_dir "/var/run/clamav"
     add_dir "/var/lib/"
