@@ -103,9 +103,9 @@ build ()
         fi
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
-    ### HACK put udev-compat and kernel26-docs to support category!
-    sed -i -e 's#base/udev-compat#support/udev-compat#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    sed -i -e 's#base/kernel26-docs#support/kernel26-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+    rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db
+    ### HACK put linux-docs to support category!
+    sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK add grub2 and syslinux packages to image, with separate extra db file
@@ -124,6 +124,7 @@ build ()
         fi        
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz.old
+    rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
