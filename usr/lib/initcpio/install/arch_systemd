@@ -53,6 +53,8 @@ build ()
     add_file "/usr/share/archboot/systemd/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
     add_file "/usr/share/archboot/systemd/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
     add_file "/usr/share/archboot/systemd/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
+    add_file "/usr/share/archboot/systemd/etc/systemd/system/getty.target.wants/getty\@tty1.service" \
+             "/etc/systemd/system/getty.target.wants/getty\@tty1.service"
 }
 
 help ()
