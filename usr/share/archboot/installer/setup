@@ -3032,7 +3032,7 @@ select_packages() {
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     # remove not needed initscripts and sysvinit package with systemd and add compat package
-    if [ "${SYSTEMD}" = "1" ]; then
+    if [[ "${SYSTEMD}" = "1" ]]; then
         PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e  "s#\ sysvinit\ # #g")"
         PACKAGES="${PACKAGES} systemd-sysvcompat"
     fi
@@ -5142,21 +5142,42 @@ auto_fb() {
 }
 
 auto_parameters() {
-    if [[ -s /tmp/.keymap ]]; then
-        DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
-        sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
-    fi
-    if [[ -s /tmp/.font ]]; then
-        DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in rc.conf ..." 0 0
-        sed -i -e "s/^CONSOLEFONT=.*/CONSOLEFONT=\"$(cat /tmp/.font | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
-    fi
-    if [[ -s  /tmp/.hardwareclock ]]; then
-        DIALOG --infobox "Setting the hardwareclock: $(cat /tmp/.hardwareclock | sed -e 's/\..*//g') in rc.conf ..." 0 0
-        sed -i -e "s/^HARDWARECLOCK=.*/HARDWARECLOCK=\"$(cat /tmp/.hardwareclock | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
-    fi
-    if [[ -s  /tmp/.timezone ]]; then
-        DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf ..." 0 0
-        sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
+    if [[ "${SYSTEMD}" = "1" ]]; then
+        if [[ ! -f ${DESTDIR}/etc/timezone ]]; then
+            : >${DESTDIR}/etc/timezone
+            if [[ -s  /tmp/.timezone ]]; then
+                DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in timezone ..." 0 0
+                echo $(cat /tmp/.timezone | sed -e 's/\..*//g') > ${DESTDIR}/etc/timezone
+            fi
+        fi
+        if [[ ! -f ${DESTDIR}/etc/vconsole ]]; then
+            : >${DESTDIR}/etc/vconsole
+            if [[ -s /tmp/.keymap ]]; then
+                DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in vconsole ..." 0 0
+                echo KEYMAP=$(cat /tmp/.keymap | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole
+            fi
+            if [[ -s /tmp/.font ]]; then
+                DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in vconsole ..." 0 0
+                echo FONT=$(cat /tmp/.font | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole
+            fi
+        fi
+    else
+        if [[ -s /tmp/.keymap ]]; then
+            DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
+            sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+        fi
+        if [[ -s /tmp/.font ]]; then
+            DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in rc.conf ..." 0 0
+            sed -i -e "s/^CONSOLEFONT=.*/CONSOLEFONT=\"$(cat /tmp/.font | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+        fi
+        if [[ -s  /tmp/.hardwareclock ]]; then
+            DIALOG --infobox "Setting the hardwareclock: $(cat /tmp/.hardwareclock | sed -e 's/\..*//g') in rc.conf ..." 0 0
+            sed -i -e "s/^HARDWARECLOCK=.*/HARDWARECLOCK=\"$(cat /tmp/.hardwareclock | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
+        fi
+        if [[ -s  /tmp/.timezone ]]; then
+            DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in rc.conf ..." 0 0
+            sed -i -e "s#^TIMEZONE=.*#TIMEZONE=\"$(cat /tmp/.timezone | sed -e 's/\..*//g')\"#g" ${DESTDIR}/etc/rc.conf
+        fi
     fi
 }
 
@@ -5171,7 +5192,11 @@ auto_luks() {
 
 auto_timesetting() {
     TIMEZONE=""
-    eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
+    if [[ "${SYSTEMD}" = "1" ]]; then
+        TIMEZONE="$(cat ${DESTDIR}/etc/timezone)"
+    else
+        eval $(grep "^TIMEZONE" ${DESTDIR}/etc/rc.conf)
+    fi
     if [[ "${TIMEZONE}" != "" && -e ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} ]]; then
         cp ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} ${DESTDIR}/etc/localtime
         cp ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} /etc/localtime
@@ -5214,20 +5239,37 @@ configure_system() {
         else
             DEFAULT=""
         fi
-        DIALOG ${DEFAULT} --menu "Configuration" 20 80 15 \
-            "/etc/rc.conf"                  "System Config" \
-            "/etc/fstab"                    "Filesystem Mountpoints" \
-            "/etc/mkinitcpio.conf"          "Initramfs Config" \
-            "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
-            "/etc/resolv.conf"              "DNS Servers" \
-            "/etc/hosts"                    "Network Hosts" \
-            "/etc/locale.gen"               "Glibc Locales" \
-            "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
-            "/etc/pacman.conf"              "Pacman Config File" \
-            "Root-Password"                 "Set the root password" \
-            "Return"                        "Return to Main Menu" 2>${ANSWER} || break
+        if [[ "${SYSTEMD}" = "1" ]]; then
+            DIALOG ${DEFAULT} --menu "Configuration" 23 80 18 \
+                "/etc/hostname"                 "System Hostname" \
+                "/etc/vconsole.conf"            "Virtual Console" \
+                "/etc/locale"                   "Locale Setting" \
+                "/etc/timezone"                 "Timezone Setting" \
+                "/etc/fstab"                    "Filesystem Mountpoints" \
+                "/etc/mkinitcpio.conf"          "Initramfs Config" \
+                "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+                "/etc/resolv.conf"              "DNS Servers" \
+                "/etc/hosts"                    "Network Hosts" \
+                "/etc/locale.gen"               "Glibc Locales" \
+                "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
+                "/etc/pacman.conf"              "Pacman Config File" \
+                "Root-Password"                 "Set the root password" \
+                "Return"                        "Return to Main Menu" 2>${ANSWER} || break
+        else
+            DIALOG ${DEFAULT} --menu "Configuration" 20 80 15 \
+                "/etc/rc.conf"                  "System Config" \
+                "/etc/fstab"                    "Filesystem Mountpoints" \
+                "/etc/mkinitcpio.conf"          "Initramfs Config" \
+                "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+                "/etc/resolv.conf"              "DNS Servers" \
+                "/etc/hosts"                    "Network Hosts" \
+                "/etc/locale.gen"               "Glibc Locales" \
+                "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
+                "/etc/pacman.conf"              "Pacman Config File" \
+                "Root-Password"                 "Set the root password" \
+                "Return"                        "Return to Main Menu" 2>${ANSWER} || break
+        fi
         FILE="$(cat ${ANSWER})"
-
         if [[ "${FILE}" = "Return" || -z "${FILE}" ]]; then       # exit
             S_CONFIG=1
             break
