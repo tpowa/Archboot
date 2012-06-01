@@ -5162,7 +5162,7 @@ auto_parameters() {
             fi
         fi
     else
-        if [[ -s /tmp/.keymap ]]; then
+        if [[ -s /tmpif [[ "${SYSTEMD}" = "1" ]]; then/.keymap ]]; then
             DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
             sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
         fi
@@ -5216,6 +5216,17 @@ auto_ftpmirror() {
     fi
 }
 
+auto_systemd () {
+    if [[ "${SYSTEMD}" = "1" ]]; then
+        if [[ ! -f ${DESTDIR}/etc/hostname ]]; then
+            echo "myhostname" > ${DESTDIR}/etc/hostname
+        fi
+        if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
+            echo "LANG=en_US.utf8" > ${DESTDIR}/etc/locale.conf
+            echo "LC_COLLATE=C" >> ${DESTDIR}/etc/locale.conf
+        fi
+}
+
 configure_system() {
     destdir_mounts || return 1
     ## PREPROCESSING ##
@@ -5225,6 +5236,7 @@ configure_system() {
         auto_network
         auto_parameters
         auto_fb
+        auto_systemd
         auto_hwdetect
     fi
     ## END PREPROCESS ##
@@ -5243,7 +5255,7 @@ configure_system() {
             DIALOG ${DEFAULT} --menu "Configuration" 23 80 18 \
                 "/etc/hostname"                 "System Hostname" \
                 "/etc/vconsole.conf"            "Virtual Console" \
-                "/etc/locale"                   "Locale Setting" \
+                "/etc/locale.conf"              "Locale Setting" \
                 "/etc/timezone"                 "Timezone Setting" \
                 "/etc/fstab"                    "Filesystem Mountpoints" \
                 "/etc/mkinitcpio.conf"          "Initramfs Config" \
