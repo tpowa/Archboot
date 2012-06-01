@@ -3073,7 +3073,6 @@ install_packages() {
     auto_fstab
     auto_mdadm
     auto_luks
-    auto_locale
     # tear down the chroot environment
     chroot_umount
 }
@@ -3108,17 +3107,6 @@ auto_fstab(){
             sort /tmp/.fstab >>${DESTDIR}/etc/fstab
         fi
     fi
-}
-
-# auto_locale()
-# enable glibc locales from rc.conf and build initial locale DB
-auto_locale()
-{
-    for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
-        sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
-    done
-    DIALOG --infobox "Generating glibc base locales..." 4 40
-    chroot ${DESTDIR} locale-gen >/dev/null 2>&1
 }
 
 # auto_mdadm()
