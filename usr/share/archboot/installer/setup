@@ -5077,7 +5077,7 @@ auto_hwdetect() {
     HWDETECTHOOKS=""
     HWDETECTFILES=""
     HWKVER==
-    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/rc.conf' and '/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on ide-legacy boot parameter
         [[ "$(grep -w ide-legacy /proc/cmdline)" ]] && HWPARAMETER="${HWPARAMETER} --ide-legacy"
