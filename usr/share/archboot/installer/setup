@@ -20,6 +20,8 @@ VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
 
+# detect systemd running
+[[ "$(cat /proc/cmdline | grep -w init=/bin/systemd)" ]] && SYSTEMD="1"
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 # downloader
@@ -3029,6 +3031,11 @@ select_packages() {
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
+    # remove not needed initscripts and sysvinit package with systemd and add compat package
+    if [ "${SYSTEMD}" = "1" ]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e  "s#\ sysvinit\ # #g")"
+        PACKAGES="${PACKAGES} systemd-sysvcompat"
+    fi
     NEXTITEM="5"
     S_SELECT=1
 }
