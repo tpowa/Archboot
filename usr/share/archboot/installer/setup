@@ -5315,7 +5315,7 @@ configure_system() {
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then          # non-file
             if [[ "${SYSTEMD}" = "1" ]]; then
                 # enable glibc locales from locale.conf
-                    for i in $(grep "^LANG" ${DESTDIR}/etc/locale.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
+                    for i in $(grep "^LANG" ${DESTDIR}/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
                         sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
                     done
             else
