@@ -2822,7 +2822,9 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-
+    ### Ugly hack to fix /var/run /run symlinks for systemd
+    [[ ! -d "${DESTDIR}/run" ]] && mkdir -m 755 -p "${DESTDIR}/run"
+    [[ ! -h "${DESTDIR}/var/run" ]] && ln -sf /run "${DESTDIR}/var/run"
     DIALOG --infobox "Refreshing package database..." 6 45
     ${PACMAN} -Sy >${LOG} 2>&1 || return 1
     if [[ $? -ne 0 ]]; then
