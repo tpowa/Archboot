@@ -5150,15 +5150,15 @@ auto_parameters() {
                 echo $(cat /tmp/.timezone | sed -e 's/\..*//g') > ${DESTDIR}/etc/timezone
             fi
         fi
-        if [[ ! -f ${DESTDIR}/etc/vconsole ]]; then
-            : >${DESTDIR}/etc/vconsole
+        if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
+            : >${DESTDIR}/etc/vconsole.conf
             if [[ -s /tmp/.keymap ]]; then
-                DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in vconsole ..." 0 0
+                DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in vconsole.conf ..." 0 0
                 echo KEYMAP=$(cat /tmp/.keymap | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole
             fi
             if [[ -s /tmp/.font ]]; then
-                DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in vconsole ..." 0 0
-                echo FONT=$(cat /tmp/.font | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole
+                DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in vconsole.conf ..." 0 0
+                echo FONT=$(cat /tmp/.font | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole.conf
             fi
         fi
     else
