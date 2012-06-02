@@ -5313,10 +5313,17 @@ configure_system() {
                 DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
             fi
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then          # non-file
-            # enable glibc locales from rc.conf
-                for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
-                    sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
-                done
+            if [[ "${SYSTEMD}" = "1" ]]; then
+                # enable glibc locales from locale.conf
+                    for i in $(grep "^LANG" ${DESTDIR}/etc/locale.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
+                        sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
+                    done
+            else
+                # enable glibc locales from rc.conf
+                    for i in $(grep "^LOCALE" ${DESTDIR}/etc/rc.conf | sed -e 's/.*="//g' -e's/\..*//g'); do
+                        sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
+                    done
+            fi
             ${EDITOR} ${DESTDIR}${FILE}
         elif [[ "${FILE}" = "Root-Password" ]]; then            # non-file
             PASSWORD=""
