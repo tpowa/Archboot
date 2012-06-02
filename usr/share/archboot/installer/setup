@@ -5222,7 +5222,7 @@ auto_systemd () {
             echo "myhostname" > ${DESTDIR}/etc/hostname
         fi
         if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
-            echo "LANG=en_US.utf8" > ${DESTDIR}/etc/locale.conf
+            echo "LANG=en_US.UTF-8" > ${DESTDIR}/etc/locale.conf
             echo "LC_COLLATE=C" >> ${DESTDIR}/etc/locale.conf
         fi
     fi
