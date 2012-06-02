@@ -103,7 +103,6 @@ build ()
         fi
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz.old
-    rm  ${TEMPDIR}/core-$(uname -m)/pkg/core.db
     ### HACK put linux-docs to support category!
     sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
@@ -124,7 +123,6 @@ build ()
         fi        
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz.old
-    rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db
     # generate iso title name
     [ "${RUNPROGRAM}" = "mkisolinux" ] && echo "Arch_Linux_CORE $(uname -m)" >> ${ISONAME}
 }
