@@ -3,7 +3,10 @@
 
 build ()
 {
-    apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/repo-elephant /usr/bin/repo-remove /usr/bin/testdb /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl"
+    apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
+          /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta \
+          /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/repo-elephant /usr/bin/repo-remove /usr/bin/testdb \
+          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg /usr/sbin/haveged"
     for i in $apps; do
         add_binary "$i"
     done
@@ -28,7 +31,7 @@ grub2-efi-x86_64 efibootmgr file eject keyutils yp-tools smartmontools curl dnsm
 lftp openconnect libproxy libxml2 speedtouch tcpdump nmap lua weechat gnutls nettle libtasn1 bind rpcbind \
 expat progsreiserfs glib2 freetype2 libssh2 libedit talloc eventlog idnkit libjpeg-turbo \
 pth gnupg libksba libassuan pinentry dirmngr gpgme ldns dnssec-anchors hwids libsystemd systemd \
-systemd-arch-units dmidecode"
+systemd-arch-units dmidecode archlinux-keyring haveged"
 
 for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
@@ -45,6 +48,7 @@ add_file "/usr/share/bash-completion/completions/makepkg"
 add_file "/usr/share/bash-completion/completions/pacman"
 add_file "/usr/share/bash-completion/completions/pacman-key"
 add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
+add_full_dir "/usr/share/pacman/keyrings"
 }
 
 help ()
