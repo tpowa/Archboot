@@ -63,6 +63,9 @@ build ()
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
     pacman -Sy
     pacman -Sw --noconfirm ${PACKAGES}
+    for i in $(pacman -Sp ${PACKAGES}); do
+        wget -N --directory-prefix /var/cache/pacman/pkg/ $i.sig
+    done
     # collect the packages
     mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
     mkdir -p ${TEMPDIR}/core-any/pkg/
@@ -112,6 +115,7 @@ build ()
     LANG=US
     for i in grub2-common grub2-bios grub2-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5 perl-digest-sha1; do
         pacman -Sw --noconfirm $i
+        wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman -Sp $i).sig
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
         pkgarch="$(echo $(pacman -Si $i | grep -m 1 Architecture | cut -d ":" -f 2))"
         if [ "${pkgarch}" = 'any' ]; then
