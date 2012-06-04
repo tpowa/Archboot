@@ -10,6 +10,8 @@ KERNELPKG="linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="linux-lts"
 # name of the kernel image
 VMLINUZ="vmlinuz-${KERNELPKG}"
+# detect systemd running
+[[ "$(cat /proc/cmdline | grep -w init=/bin/systemd)" ]] && SYSTEMD="1"
 
 usage() {
     echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
@@ -58,7 +60,7 @@ pacman_conf() {
     cat << EOF > /tmp/pacman.conf
 [options]
 Architecture = auto
-SigLevel = Never
+SigLevel = PackageRequired
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
@@ -78,6 +80,20 @@ pacman_conf_extra() {
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
+# pacman needs a masterkey before checking signed packages
+prepare_pacman_keychain() {
+    # Generate initial keychain, use haveged then no user interaction is required
+    if  [[ -f /var/run/haveged.pid ]]; then
+        kill $(cat /var/run/$prog.pid)
+        rm /var/run/haveged.pid
+    fi
+    haveged
+    pacman-key --init
+    yes "" | pacman-key --populate archlinux
+    kill $(cat /var/run/$prog.pid)
+    rm /var/run/haveged.pid
+}
+
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
@@ -85,6 +101,11 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+    ### Ugly hack to fix /var/run /var/lock /run symlinks for systemd
+    [[ ! -d "${DESTDIR}/run" ]] && mkdir -m 755 -p "${DESTDIR}/run"
+    [[ ! -h "${DESTDIR}/var/run" ]] && ln -sf /run "${DESTDIR}/var/run"
+    [[ ! -h "${DESTDIR}/var/lock" ]] && ln -sf /run/lock "${DESTDIR}/var/lock"
+    prepare_pacman_keychain
     ${PACMAN} -Sy
 }
 
@@ -168,6 +189,13 @@ install_packages() {
     # Only install the booted kernel image!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
+    # remove not needed initscripts and sysvinit package with systemd and add compat package
+    if [[ "${SYSTEMD}" = "1" ]]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e  "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g")"
+        PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
+    else
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
+    fi
     ${PACMAN} -S ${PACKAGES}
 }
 

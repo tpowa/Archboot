@@ -2802,7 +2802,7 @@ pacman_conf() {
     cat << EOF > /tmp/pacman.conf
 [options]
 Architecture = auto
-SigLevel = Never
+SigLevel = PackageRequired
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
@@ -2815,6 +2815,21 @@ Server = ${serverurl}
 EOF
 }
 
+# pacman needs a masterkey before checking signed packages
+prepare_pacman_keychain() {
+    # Generate initial keychain, use haveged then no user interaction is required
+    if  [[ -f /var/run/haveged.pid ]]; then
+        kill $(cat /var/run/$prog.pid)
+        rm /var/run/haveged.pid
+    fi
+    haveged
+    DIALOG --infobox "Running pacman-key ..." 6 45
+    pacman-key --init
+    yes "" | pacman-key --populate archlinux
+    kill $(cat /var/run/$prog.pid)
+    rm /var/run/haveged.pid
+}
+
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
@@ -2822,9 +2837,11 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-    ### Ugly hack to fix /var/run /run symlinks for systemd
+    ### Ugly hack to fix /var/run /var/lock /run symlinks for systemd
     [[ ! -d "${DESTDIR}/run" ]] && mkdir -m 755 -p "${DESTDIR}/run"
     [[ ! -h "${DESTDIR}/var/run" ]] && ln -sf /run "${DESTDIR}/var/run"
+    [[ ! -h "${DESTDIR}/var/lock" ]] && ln -sf /run/lock "${DESTDIR}/var/lock"
+    prepare_pacman_keychain
     DIALOG --infobox "Refreshing package database..." 6 45
     ${PACMAN} -Sy >${LOG} 2>&1 || return 1
     if [[ $? -ne 0 ]]; then
@@ -3037,6 +3054,8 @@ select_packages() {
     if [[ "${SYSTEMD}" = "1" ]]; then
         PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e  "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g")"
         PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
+    else
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
     fi
     NEXTITEM="5"
     S_SELECT=1
