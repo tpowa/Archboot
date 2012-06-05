@@ -101,10 +101,6 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-    ### Ugly hack to fix /var/run /var/lock /run symlinks for systemd
-    [[ ! -d "${DESTDIR}/run" ]] && mkdir -m 755 -p "${DESTDIR}/run"
-    [[ ! -h "${DESTDIR}/var/run" ]] && ln -sf /run "${DESTDIR}/var/run"
-    [[ ! -h "${DESTDIR}/var/lock" ]] && ln -sf /run/lock "${DESTDIR}/var/lock"
     prepare_pacman_keychain
     ${PACMAN} -Sy
 }
