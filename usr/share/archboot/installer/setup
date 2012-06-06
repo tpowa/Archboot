@@ -1926,7 +1926,7 @@ autoprepare() {
         dosubvolume="no"
         # if echo "${mountpoint}" | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
         # if [[ "$(echo ${mountpoint} | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
-        DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part} with FSLABEL ${labelname} . Mountpoint is ${mountpoint} ." 0 0
+        DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}\nwith FSLABEL ${labelname} .\nMountpoint is ${mountpoint} ." 0 0
         _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
         # fi
     done
@@ -2575,7 +2575,7 @@ mountpoints() {
             if [[ "${FSTYPE}" = "swap" ]]; then
                 DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
             else
-                DIALOG --infobox "Creating ${FSTYPE} on ${PART}, mounting to ${DESTDIR}${MP}" 0 0
+                DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP}" 0 0
             fi
             _mkfs yes ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} ${BTRFS_SSD} || return 1
         else
