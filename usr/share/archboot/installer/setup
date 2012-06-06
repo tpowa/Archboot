@@ -2958,7 +2958,8 @@ select_packages() {
             for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
                                                           -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
                                                           -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
-                                                          -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice" -e "^pulseaudio" | sort); do
+                                                          -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice"\
+                                                          -e "^pulseaudio" -e "^calligra" -e "^kde-telepathy" -e "^haskell" | sort); do
                 _catlist="${_catlist} ${i} - OFF"
             done
             local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"        
