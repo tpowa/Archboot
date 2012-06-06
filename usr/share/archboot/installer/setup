@@ -2819,15 +2819,17 @@ EOF
 prepare_pacman_keychain() {
     # Generate initial keychain, use haveged then no user interaction is required
     if  [[ -f /var/run/haveged.pid ]]; then
-        kill $(cat /var/run/$prog.pid)
-        rm /var/run/haveged.pid
+        kill $(cat /var/run/haveged.pid)
     fi
     haveged
-    DIALOG --infobox "Running pacman-key ..." 6 45
-    pacman-key --init
-    yes "" | pacman-key --populate archlinux
-    kill $(cat /var/run/$prog.pid)
-    rm /var/run/haveged.pid
+    pacman-key --init >/dev/null 2>&1
+    ### HACK: fix accept of master keys!
+    sed -i -e 's#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#g' \
+    /usr/bin/pacman-key
+    pacman-key --populate archlinux >/dev/null 2>&1
+    sed -i -e 's#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#g' \
+    /usr/bin/pacman-key
+    kill $(cat /var/run/haveged.pid)
 }
 
 # configures pacman and syncs db on destination system
