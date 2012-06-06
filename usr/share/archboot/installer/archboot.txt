@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 16th 2011
+   June, 6th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -66,8 +66,8 @@ Introduction
    * It supports (u)efi booting via grub2.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
-   * Initial module loading and hardware detection is done
-     by the hwdetect script.
+   * hwdetect script is used for preconfiguration
+   * systemd is supported
    * It doesn't mount anything during boot process.
    * It uses a different setup script and not the aif installer.
 
@@ -84,6 +84,7 @@ Introduction
      and encrypted devices
    * Filesystem support: ext2/3/4,btrfs,nilfs2, reiserfs,xfs,jfs,ntfs-3g,vfat
    * Package selection support
+   * signed package installation
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
@@ -137,6 +138,9 @@ Archboot bootparameters
       - Place external addon packages in /packages directory of your external 
         device.
       - Place external configs in /config directory of your external device.
+
+   * init=/bin/systemd
+      - Activates systemd for booting and installation (experimental)
 
   What are the video and framebuffer options?
 
