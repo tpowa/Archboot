@@ -3605,12 +3605,13 @@ do_efistub_uefi_i686() {
 
 dorefind_uefi_common() {
     
-    DIALOG --msgbox "Setting up rEFInd-${UEFI_ARCH} now ..." 0 0
-    # if [[ "${UEFI_ARCH}" == "x86_64" ]]; then
-        # PACKAGES="rEFInd-${UEFI_ARCH}"
-        # run_pacman
-        # PACKAGES=""
-    # fi
+    DIALOG --msgbox "Setting up rEFInd UEFI ${UEFI_ARCH} now ..." 0 0
+    
+    if [[ "${UEFI_ARCH}" == "x86_64" ]]; then
+        PACKAGES="refind-efi-${UEFI_ARCH}"
+        run_pacman
+        PACKAGES=""
+    fi
     
     if [[ -e "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" ]]; then
         _REFIND_SUBDIR="arch/refind"
@@ -3624,7 +3625,7 @@ dorefind_uefi_common() {
         elif [[ -e "${_MEDIA}/packages/refind-bin.zip" ]]; then
             _REFIND_ZIP="${_MEDIA}/packages/refind-bin.zip"
         else
-            DIALOG --msgbox "refind-bin.zip file not found. Setup needs to download that file to setup rEFInd-${UEFI_ARCH}. You will now be asked to configure the network." 0 0
+            DIALOG --msgbox "refind-bin.zip file not found. This file should be downloaded first, to setup rEFInd. You will now be asked to configure the network." 0 0
             donetwork
             
             curl -L "http://sourceforge.net/projects/refind/files/latest/download" -o "/tmp/refind-bin.zip"
@@ -3632,7 +3633,7 @@ dorefind_uefi_common() {
             if [[ -e "/tmp/refind-bin.zip" ]]; then
                 _REFIND_ZIP="/tmp/refind-bin.zip"
             else
-                DIALOG --msgbox "Couldn't download refind-bin.zip . Cannot setup rEFInd-${UEFI_ARCH}. Any issues with net connectivity?" 0 0 && return 1
+                DIALOG --msgbox "Setup could not download refind-bin.zip . Any issues with net connectivity?" 0 0 && return 1
             fi
         fi
         
@@ -3657,17 +3658,16 @@ dorefind_uefi_common() {
         cp -rf "/tmp/refind-bin-dir/refind/icons" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/icons"
         cp -rf "/tmp/refind-bin-dir/docs" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/docs"
         cp -f "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/docs"/
-        
-        
     fi
     
     _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind.conf"
     
     sed 's|^timeout 20|timeout 0|g' -i "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#showtools shell, about, reboot|showtools shell,about,exit,shutdown,reboot|g' -i "${_REFIND_CONFIG}"
+    sed 's|^#showtools shell, about, reboot|showtools shell, about, exit, shutdown, reboot|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical|scanfor internal,external,optical,manual|g' -i "${_REFIND_CONFIG}"
+    sed 's|^#dont_scan_dirs EFI/boot|dont_scan_dirs EFI/boot|g' -i "${_REFIND_CONFIG}"
     sed 's|^#max_tags 0|max_tags 0|g' -i "${_REFIND_CONFIG}"
     
     if [[ -e "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi" ]]; then
@@ -3676,13 +3676,13 @@ dorefind_uefi_common() {
         _BOOTMGR_LOADER_FILE="refind${SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "rEFInd-${UEFI_ARCH} setup successfully." 0 0
+        DIALOG --msgbox "rEFInd UEFI ${UEFI_ARCH} has been setup successfully." 0 0
         
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
@@ -3696,7 +3696,7 @@ dorefind_uefi_common() {
             cp -rf "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
         fi
     else
-        DIALOG --msgbox "Error setting up rEFInd-${UEFI_ARCH}." 0 0
+        DIALOG --msgbox "Error setting up rEFInd UEFI ${UEFI_ARCH}." 0 0
     fi
     
 }
@@ -4537,7 +4537,7 @@ dogrub2_bios() {
     
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub2-bios now ..." 0 0
-        PACKAGES="grub2-bios grub2-common"
+        PACKAGES="grub2-common grub2-bios"
         run_pacman
         # reset PACKAGES after installing
         PACKAGES=""
@@ -4670,7 +4670,7 @@ dogrub2_uefi_common() {
     dogrub2_common_before
     
     DIALOG --msgbox "Installing grub2-efi-${UEFI_ARCH} now ..." 0 0
-    PACKAGES="grub2-efi-${UEFI_ARCH} grub2-common"
+    PACKAGES="grub2-common grub2-efi-${UEFI_ARCH}"
     
     run_pacman
     # reset PACKAGES after installing
@@ -4769,7 +4769,7 @@ EOF
         dogrub2_config
         GRUB2_UEFI=""
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
