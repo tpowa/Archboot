@@ -3,7 +3,13 @@
 
 build ()
 {
-    apps="/sbin/lvm /sbin/fsadm /sbin/lvmdump /sbin/vgcfgbackup /sbin/vgcfgrestore /sbin/vgchange /sbin/vgck /sbin/vgconvert /sbin/vgcreate /sbin/vgdisplay /sbin/vgexport /sbin/vgextend /sbin/vgimport /sbin/vgmerge /sbin/vgmknodes /sbin/vgreduce /sbin/vgremove /sbin/vgrename /sbin/vgs /sbin/vgscan /sbin/vgsplit /sbin/pvchange /sbin/pvck /sbin/pvcreate /sbin/pvdisplay /sbin/pvmove /sbin/pvremove /sbin/pvresize /sbin/pvs /sbin/pvscan /sbin/lvchange /sbin/lvconvert /sbin/lvcreate /sbin/lvdisplay /sbin/lvextend /sbin/lvmchange /sbin/lvmdiskscan /sbin/lvmsadc /sbin/lvmsar /sbin/lvreduce /sbin/lvremove /sbin/lvrename /sbin/lvresize /sbin/lvs /sbin/lvscan"
+    apps="/sbin/lvm /sbin/fsadm /sbin/lvmdump /sbin/vgcfgbackup /sbin/vgcfgrestore /sbin/vgchange \
+          /sbin/vgck /sbin/vgconvert /sbin/vgcreate /sbin/vgdisplay /sbin/vgexport /sbin/vgextend /sbin/vgimport \
+	  /sbin/vgmerge /sbin/vgmknodes /sbin/vgreduce /sbin/vgremove /sbin/vgrename /sbin/vgs /sbin/vgscan \
+	  /sbin/vgsplit /sbin/pvchange /sbin/pvck /sbin/pvcreate /sbin/pvdisplay /sbin/pvmove /sbin/pvremove \
+	  /sbin/pvresize /sbin/pvs /sbin/pvscan /sbin/lvchange /sbin/lvconvert /sbin/lvcreate /sbin/lvdisplay \
+	  /sbin/lvextend /sbin/lvmchange /sbin/lvmdiskscan /sbin/lvmsadc /sbin/lvmsar /sbin/lvreduce /sbin/lvremove \
+	  /sbin/lvrename /sbin/lvresize /sbin/lvs /sbin/lvscan"
     for i in $apps; do
         add_binary "$i"
     done

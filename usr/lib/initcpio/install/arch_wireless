@@ -9,7 +9,9 @@ build ()
     for i in $STAGING; do
         add_checked_modules "/drivers/staging/$i"
     done
-    apps="/usr/sbin/iwconfig /usr/sbin/iwevent /usr/sbin/iwgetid /usr/sbin/iwlist /usr/sbin/iwpriv /usr/sbin/iwspy /usr/sbin/ifrename /usr/bin/b43-fwcutter /usr/sbin/wpa_cli /usr/sbin/wpa_passphrase /usr/sbin/wpa_supplicant /usr/sbin/iw /sbin/crda /sbin/regdbdump /usr/sbin/wpa_actiond /usr/sbin/rfkill"
+    apps="/usr/sbin/iwconfig /usr/sbin/iwevent /usr/sbin/iwgetid /usr/sbin/iwlist /usr/sbin/iwpriv \
+          /usr/sbin/iwspy /usr/sbin/ifrename /usr/bin/b43-fwcutter /usr/sbin/wpa_cli /usr/sbin/wpa_passphrase \
+	  /usr/sbin/wpa_supplicant /usr/sbin/iw /sbin/crda /sbin/regdbdump /usr/sbin/wpa_actiond /usr/sbin/rfkill"
     for i in $apps; do
         add_binary "$i"
     done

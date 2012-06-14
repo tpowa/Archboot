@@ -3,7 +3,8 @@
 
 build ()
 {
-    apps="/usr/bin/poff /usr/bin/pon /usr/sbin/chat /usr/sbin/plog /usr/sbin/pppd /usr/sbin/pppdump /usr/sbin/pppoe-discovery /usr/sbin/pppstats"
+    apps="/usr/bin/poff /usr/bin/pon /usr/sbin/chat /usr/sbin/plog /usr/sbin/pppd /usr/sbin/pppdump \
+          /usr/sbin/pppoe-discovery /usr/sbin/pppstats"
     for i in $apps; do
         add_binary "$i"
     done

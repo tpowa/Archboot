@@ -3,7 +3,8 @@
 
 build ()
 {
-    apps="/usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu /usr/bin/netcfg-daemon /usr/bin/wifi-menu /usr/bin/netcfg"
+    apps="/usr/bin/netcfg-wpa_actiond /usr/bin/netcfg-wpa_actiond-action /usr/bin/netcfg-menu \
+          /usr/bin/netcfg-daemon /usr/bin/wifi-menu /usr/bin/netcfg"
     for i in $apps; do
         add_binary "$i"
     done
