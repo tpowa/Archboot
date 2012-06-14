@@ -5182,7 +5182,7 @@ auto_parameters() {
             fi
         fi
     else
-        if [[ -s /tmp/.keymap ]]; then/ ]]; then
+        if [[ -s /tmp/.keymap ]]; then
             DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in rc.conf ..." 0 0
             sed -i -e "s/^KEYMAP=.*/KEYMAP=\"$(cat /tmp/.keymap | sed -e 's/\..*//g')\"/g" ${DESTDIR}/etc/rc.conf
         fi
