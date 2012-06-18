@@ -8,7 +8,6 @@ build ()
     add_dir "/media"
     add_dir "/tmp"
     add_dir "/install"
-    add_dir "/var/run"
     add_dir "/var/lock"
     add_dir "/var/log"
     add_dir "/addons"
@@ -21,7 +20,8 @@ build ()
     add_symlink /sbin usr/bin
     add_symlink /bin usr/bin
     add_symlink /usr/sbin bin
-
+    add_symlink /var/run run
+    
     apps="/usr/bin/getent /sbin/init /sbin/agetty /bin/mount /bin/umount /usr/bin/basename /bin/du /usr/bin/clear \
           /usr/bin/env /usr/bin/head /usr/bin/id /usr/bin/md5sum /usr/bin/nano /usr/bin/nc /usr/bin/printf /usr/bin/tail \
 	  /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
