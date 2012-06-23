@@ -33,7 +33,7 @@ build ()
 	  /bin/hostname /bin/kill /usr/bin/killall /sbin/killall5 /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
 	  /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
 	  /bin/true /usr/bin/mktemp /usr/sbin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
-	  /bin/su /bin/cat /bin/cpio /bin/dd /bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
+	  /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
 	  /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
 	  /usr/bin/reset /sbin/swapoff /sbin/halt /sbin/telinit /usr/bin/awk /usr/bin/dir /sbin/reboot /sbin/poweroff \
 	  /bin/pidof /usr/bin/nc /usr/bin/lzcat /usr/bin/lzma /usr/bin/lzmadec /usr/bin/unlzma /usr/bin/unxz /usr/bin/xz \
@@ -54,7 +54,7 @@ build ()
         add_binary "$i"
     done
     appfiles="/usr/lib/libkmod.so /usr/bin/lsmod /sbin/depmod /usr/bin/insmod /usr/bin/modinfo /sbin/modprobe \
-              /usr/bin/rmmod /usr/bin/update-patterndb /bin/gunzip /bin/zcat /usr/bin/lzcmp /usr/bin/lzdiff \
+              /usr/bin/rmmod /usr/bin/update-patterndb /usr/bin/gunzip /usr/bin/zcat /usr/bin/lzcmp /usr/bin/lzdiff \
               /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore"
     for i in $appfiles; do
         add_file "$i"
