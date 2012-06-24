@@ -53,7 +53,6 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_GRUB=0        # using grub
 S_GRUB2=0       # using grub2
 
 # menu item tracker- autoselect the next item
@@ -673,7 +672,7 @@ findbootloaderpartitions() {
     fi
 }
 
-# freeze and unfreeze xfs, as hack for grub/grub2 installing
+# freeze and unfreeze xfs, as hack for grub2 installing
 freeze_xfs() {
     sync
     if [[ -x /usr/sbin/xfs_freeze ]]; then
@@ -688,95 +687,9 @@ freeze_xfs() {
     fi
 }
 
-get_grub_map() {
-    rm /tmp/dev.map
-    DIALOG --infobox "Generating GRUB device map...\nThis could take a while.\n\n Please be patient." 0 0
-    ${DESTDIR}/sbin/grub --no-floppy --device-map /tmp/dev.map >/tmp/grub.log 2>&1 <<EOF
-quit
-EOF
-}
-
-# dmraid needs manual mapping
-get_grub_dmraid_map() {
-    USE_DMRAID="1"
-    rm /tmp/dev.map
-    majorhd=0
-    for i in $(dmraid -s -c); do
-        echo "(hd${majorhd}) /dev/mapper/${i}" >> /tmp/dev.map
-        majorhd="$((${majorhd}+1))"
-    done
-}
-
-# virtio devices need manual mapping
-get_grub_virtio_map() {
-    rm /tmp/dev.map
-    majorhd=0
-    #add virtio devices
-    for i in $(ls -d ${block}/vd[a-z]); do
-        echo "(hd${majorhd}) /dev/$(basename ${i})" >> /tmp/dev.map
-        majorhd="$((${majorhd}+1))"
-    done
-}
-
-# virtio devices need manual mapping
-get_grub_mmcblk_map() {
-    rm /tmp/dev.map
-    majorhd=0
-    #add virtio devices
-    for i in $(ls -d ${block}/mmcblk*); do
-        echo "(hd${majorhd}) /dev/$(basename ${i})" >> /tmp/dev.map
-        majorhd="$((${majorhd}+1))"
-    done
-}
-
-# extra devices need manual mapping
-get_grub_extra_devices_map() {
-    rm /tmp/dev.map
-    majorhd=0
-    #add extra devices
-    for k in ${EXTRA_CONTROLLER}; do
-        for i in $(ls -d ${block}/${k}*); do
-            echo "(hd${majorhd}) /dev/${k}/$(echo $(basename ${i}) | sed -e 's#\!##g')" >> /tmp/dev.map
-            majorhd="$((${majorhd}+1))"
-        done
-    done
-}
-
-#get geometry of device for grub installation
-get_chs() {
-    realdev=""
-    checkdev=""
-    # we need the real device for geometry check!
-    realdev="$(echo ${bootdev} | sed -e 's#,.*)#)#g')"
-    checkdev="$(grep ${realdev} /tmp/dev.map | sed -e 's#.*\ ##g')"
-    CYLINDERS="$(sfdisk -G ${checkdev} | cut -d " " -f2)"
-    HEADS="$(sfdisk -G ${checkdev} | cut -d " " -f4)"
-    SECTORS="$(sfdisk -G ${checkdev} | cut -d " " -f6)"
-}
-
-# we need symlinks for grub installation!
-grub_dmraid_hack() {
-    for i in $(dmraid_partitions); do
-        if ! [[ "${i}" = "" ]]; then
-            rm -f $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
-            ln -s ${i} $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
-        fi
-    done
-}
-
-# remove created symlinks
-remove_grub_dmraid_hack(){
-    for i in $(dmraid_partitions); do
-        if ! [[ "${i}" = "" ]]; then
-            rm -f $(echo ${i} | sed -n -e "s/\(.*\)p/\1/p")
-        fi
-    done
-}
-
 mapdev() {
     partition_flag=0
     device_found=0
-    [[ "${GRUB_LEGACY}" == "1" ]] && devs=$(cat /tmp/dev.map | grep -v /dev/fd | sed 's/ *\t/ /' | sed ':a;$!N;$!ba;s/\n/ /g')
     # check if we use hd sd  or vd device
     if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/hd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
         linuxdevice=$(echo ${1} | sed -e 's#p[0-9].*$##')
@@ -786,14 +699,12 @@ mapdev() {
     if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/hd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
         if [[ "$(echo ${1} | egrep 'p[0-9].*$')" ]]; then
             pnum=$(echo ${1} | sed -e 's#.*p##g')
-            [[ "${GRUB_LEGACY}" = "1" ]] && pnum=$((${pnum}-1))
             partition_flag=1
         fi
     else
         if [[ "$(echo ${1} | egrep '[0-9]$')" ]]; then
             # /dev/hdXY
             pnum=$(echo ${1} | cut -b9-)
-            [[ "${GRUB_LEGACY}" = "1" ]] && pnum=$((${pnum}-1))
             partition_flag=1
         fi
     fi
@@ -3510,7 +3421,6 @@ doefistub_uefi_common() {
         grubdev=""
         complexuuid=""
         FAIL_COMPLEX=""
-        GRUB_LEGACY=""
         USE_DMRAID=""
         RAID_ON_LVM=""
         common_bootloader_checks
@@ -3994,204 +3904,6 @@ dolilo_bios() {
     DIALOG --msgbox "LILO was successfully installed." 0 0
 }
 
-dogrub_legacy_bios() {
-    if [[ -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --msgbox "Found ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img, deinstalling grub2 now ..." 0 0
-        ${PACMAN} -R grub2-bios grub2-common > ${LOG}
-    fi
-    if [[ ! -f "${DESTDIR}/boot/grub/menu.lst" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/boot/grub/menu.lst, installing grub now ..." 0 0
-        PACKAGES="grub"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
-    fi
-    grubdev=""
-    _grubdev=""
-    bootdev=""
-    grubdev=""
-    redundant=""
-    common_bootloader_checks
-    get_grub_map
-    FAIL_RAID=""
-    FAIL_DM=""
-    GRUB_LEGACY="1"
-    USE_DMRAID=""
-    #checks for custom dev.map filesystem
-    if ! [[ "$(dmraid -r | grep ^no )" ]]; then
-        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && get_grub_dmraid_map
-    fi
-    if  [[ "$(ls ${block}/vd[a-z] 2>/dev/null)" ]]; then
-        DIALOG --yesno "Setup detected virtio devices.\nDo you want to install grub on this device?" 0 0 && get_grub_virtio_map
-    fi
-    if  [[ "$(ls ${block}/mmcblk* 2>/dev/null)" ]]; then
-        DIALOG --yesno "Setup detected mmcblk devices.\nDo you want to install grub on this device?" 0 0 && get_grub_mmcblk_map
-    fi
-    for i in ${EXTRA_CONTROLLER}; do
-        if [[ "$(ls ${block}/${i}* 2>/dev/null)" ]]; then
-                    DIALOG --yesno "Setup detected ${i} devices.\nDo you want to install grub on this device?" 0 0 && get_grub_extra_devices_map
-        fi
-    done
-    
-    if [[ "${PART_ROOT}" = "" ]]; then
-        DIALOG --inputbox "Enter the full path to your root device" 8 65 "/dev/sda3" 2>${ANSWER} || return 1
-        PART_ROOT=$(cat ${ANSWER})
-    fi
-    # try to auto-configure GRUB...
-    if [[ "${PART_ROOT}" != "" ]]; then
-        check_bootpart
-        
-        # check on GUID (gpt)
-        if [[ "$(${_BLKID} -p -i -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
-            DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nGrub doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install grub to an other device, which contains a msdos partition table?" 0 0 || return 1
-        fi
-        
-        abort_btrfs_bootpart || return 1
-        abort_nilfs_bootpart || return 1
-        # check if raid device, devicemapper or dmraid is used  on /boot partition
-        if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
-            if [[ "$(mdadm --detail ${bootdev} | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
-                # get redundant devices
-                for i in $(mdadm --detail ${bootdev} | grep "\ /dev/" | sed -e 's#.* /#/#g'); do
-                    _grubdev="${_grubdev} $(mapdev ${i})"
-                done
-                redundant="1"
-            else
-                # none raid1 devices are not bootable with grub, let it fail!
-                FAIL_RAID="1"
-            fi
-            if [[ "$(echo ${bootdev} | grep /dev/md*p)" ]]; then
-                # partitionable raid is not supported by grub!
-                FAIL_RAID="1"
-            fi
-        elif  [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
-                if ! [[ "$(dmsetup info ${bootdev} | grep 'DMRAID')" ]]; then
-                    FAIL_DM="1"
-                else
-                    FAIL_DM=""
-                    _grubdev=$(mapdev ${bootdev})
-                fi
-        else
-            # use normal device
-            _grubdev=$(mapdev ${bootdev})
-        fi
-        if [[ "${FAIL_RAID}" = "1" ]]; then
-                DIALOG --msgbox "Error: Grub cannot boot from none raid1 devices or partitionable raid devices!" 0 0
-                return 1
-        fi
-        if [[ "${FAIL_DM}" = "1" ]]; then
-                DIALOG --msgbox "Error: Grub cannot boot from your created device mapper devices!" 0 0
-                return 1
-        fi
-        if [[ "${_grubdev}" != "" ]]; then
-            cp ${DESTDIR}/boot/grub/menu.lst /tmp/.menu.lst
-            # remove the default entries by truncating the file at our little tag (#-*)
-            head -n $(cat /tmp/.menu.lst | grep -n '#-\*' | cut -d: -f 1) /tmp/.menu.lst >${DESTDIR}/boot/grub/menu.lst
-            rm -f /tmp/.menu.lst
-            # keep the file from being completely bogus
-            if [[ "${_grubdev}" = "DEVICE NOT FOUND" ]]; then
-                DIALOG --msgbox "Your root boot device could not be autodetected by setup.  Ensure you adjust the 'root (hd0,0)' line in your GRUB config accordingly." 0 0
-                _grubdev="(hd0,0)"
-            fi
-            NUMBER=0
-            # create default grub entries
-            sort /tmp/.device-names >> "${DESTDIR}/boot/grub/menu.lst"
-            for grubdev in ${_grubdev}; do
-                echo "" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "# (${NUMBER}) Arch Linux" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "title  Arch Linux" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "root   ${grubdev}" >> "${DESTDIR}/boot/grub/menu.lst"
-                if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" || "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >> "${DESTDIR}/boot/grub/menu.lst"
-                else
-                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >> "${DESTDIR}/boot/grub/menu.lst"
-                fi
-                echo "initrd ${subdir}/${INITRAMFS}.img" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "" >> "${DESTDIR}/boot/grub/menu.lst"
-                # adding fallback/full image
-                NUMBER=$((${NUMBER}+1))
-                echo "# (${NUMBER}) Arch Linux" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "title  Arch Linux Fallback" >> "${DESTDIR}/boot/grub/menu.lst"
-                echo "root   ${grubdev}" >> "${DESTDIR}/boot/grub/menu.lst"
-                if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" || "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                    echo "kernel ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >> "${DESTDIR}/boot/grub/menu.lst"
-                else
-                    echo "kernel ${subdir}/${VMLINUZ} root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#   # #g' | sed -e 's#  # #g' >> "${DESTDIR}/boot/grub/menu.lst"
-                fi
-                echo "initrd ${subdir}/${INITRAMFS}-fallback.img" >> "${DESTDIR}/boot/grub/menu.lst"
-                NUMBER=$((${NUMBER}+1))
-            done
-            ### TODO:
-            # Is it possible to detect a windows installation?
-            echo "" >> "${DESTDIR}/boot/grub/menu.lst"
-            echo "# (${NUMBER}) Windows" >> "${DESTDIR}/boot/grub/menu.lst"
-            echo "#title Windows" >> "${DESTDIR}/boot/grub/menu.lst"
-            echo "#rootnoverify (hd0,0)" >> "${DESTDIR}/boot/grub/menu.lst"
-            echo "#makeactive" >> "${DESTDIR}/boot/grub/menu.lst"
-            echo "#chainloader +1" >> "${DESTDIR}/boot/grub/menu.lst"
-        fi
-    fi
-
-    DIALOG --msgbox "Before installing GRUB, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, you can install GRUB." 0 0
-    geteditor || return 1
-    "${EDITOR}" "${DESTDIR}/boot/grub/menu.lst"
-
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="${DEVS} $(findbootloaderpartitions _)"
-    if [[ "${DEVS}" = "" ]]; then
-        DIALOG --msgbox "No hard drives were found" 0 0
-        return 1
-    fi
-    S_GRUB=""
-    while [[ "${S_GRUB}" = "" ]]; do
-        DIALOG --menu "Select the boot device where the GRUB bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-        ROOTDEV=$(cat ${ANSWER})
-        DIALOG --infobox "Installing the GRUB bootloader..." 0 0
-        cp -a ${DESTDIR}/usr/lib/grub/i386-pc/* ${DESTDIR}/boot/grub/
-        # freeze xfs filesystems to enable grub installation on xfs filesystems
-        freeze_xfs
-        bootpart=${bootdev}
-        if [[ "$(echo ${bootpart} | grep /dev/md)" ]]; then
-            bootpart=$(mdadm --detail ${bootpart} | grep ${ROOTDEV} | sed -e 's#.* /#/#g')
-        fi
-        bootpart=$(mapdev ${bootpart})
-        bootdev=$(mapdev ${ROOTDEV})
-        if [[ "${bootpart}" = "" ]]; then
-            DIALOG --msgbox "Error: Missing/Invalid root device: ${bootpart}" 0 0
-            return 1
-        fi
-        if [[ "${bootpart}" = "DEVICE NOT FOUND" || "${bootdev}" = "DEVICE NOT FOUND" ]]; then
-            DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
-            return 1
-        fi
-        get_chs
-        ### HACK:we need a dmraid hack here! http://bugs.gentoo.org/show_bug.cgi?id=275566
-        grub_dmraid_hack
-        ${DESTDIR}/sbin/grub --device-map=/tmp/dev.map --no-floppy --batch >>/tmp/grub.log 2>&1 <<EOF
-geometry ${realdev} ${CYLINDERS} ${HEADS} ${SECTORS}
-root ${bootpart}
-setup ${bootdev}
-quit
-EOF
-        ### HACK:remove symlinks again! http://bugs.gentoo.org/show_bug.cgi?id=275566
-        remove_grub_dmraid_hack
-        cat /tmp/grub.log >${LOG}
-        if grep "Error [0-9]*: " /tmp/grub.log >/dev/null; then
-            DIALOG --msgbox "Error installing GRUB. (see ${LOG} for output)" 0 0
-            return 1
-        fi
-        # copy device map file
-        cp -f /tmp/dev.map ${DESTDIR}/boot/grub/device.map
-        DIALOG --msgbox "GRUB was successfully installed." 0 0
-        S_GRUB=1
-        if [[ "$(${_BLKID} | grep TYPE=\"linux_raid_member\")" ]]; then
-            if [[ "${redundant}" = "1" ]]; then
-                DIALOG --defaultno --yesno "Setup detected a redundant software raid device.\nDo you want to install grub additionally to an other hard disk?" 0 0 && S_GRUB=""
-            fi
-        fi
-    done
-}
-
 dogrub2_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub2 restrictions:
@@ -4206,7 +3918,6 @@ dogrub2_common_before() {
     grubdev=""
     complexuuid=""
     FAIL_COMPLEX=""
-    GRUB_LEGACY=""
     USE_DMRAID=""
     RAID_ON_LVM=""
     common_bootloader_checks
@@ -5414,12 +5125,10 @@ install_bootloader_bios() {
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
         "SYSLINUX_BIOS" "SYSLINUX/EXTLINUX" \
         "GRUB2_BIOS" "GRUB2 BIOS" \
-        "GRUB_LEGACY_BIOS" "GRUB LEGACY" \
         "LILO_BIOS" "LILO" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "SYSLINUX_BIOS") dosyslinux_bios ;;
         "GRUB2_BIOS") dogrub2_bios ;;
-        "GRUB_LEGACY_BIOS") dogrub_legacy_bios ;;
         "LILO_BIOS") dolilo_bios ;;
     esac
     
