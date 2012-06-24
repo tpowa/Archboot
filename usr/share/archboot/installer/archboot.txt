@@ -89,7 +89,7 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub, grub2, lilo, extlinux/syslinux, grub2-efi, rEFInd bootloader support
+   * grub2, lilo, extlinux/syslinux, grub2-efi, rEFInd bootloader support
 
 Archboot bootparameters
 
