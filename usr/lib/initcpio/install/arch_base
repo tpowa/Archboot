@@ -20,7 +20,7 @@ build ()
     add_symlink /sbin usr/bin
     add_symlink /bin usr/bin
     add_symlink /usr/sbin bin
-    add_symlink /var/run run
+    add_symlink /run var/run
     
     apps="/usr/bin/getent /sbin/init /sbin/agetty /bin/mount /bin/umount /usr/bin/basename /bin/du /usr/bin/clear \
           /usr/bin/env /usr/bin/head /usr/bin/id /usr/bin/md5sum /usr/bin/nano /usr/bin/nc /usr/bin/printf /usr/bin/tail \
