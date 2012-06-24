@@ -5,8 +5,6 @@ run_hook ()
   # fixing some symlinks
   # fix x86_64 symlink on x86_64
   [ "$(uname -r)" = "x86_64" ] && ln -s /usr/bin/setarch /usr/bin/x86_64
-  # fix permission on /var/lock
-  chmod 1777 /var/lock
   # fix vi symlink
   ln -s /usr/bin/vim /usr/bin/vi
 }
