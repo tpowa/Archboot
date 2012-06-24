@@ -4651,6 +4651,9 @@ dogrub2_bios() {
     
     chroot_umount
     
+    mkdir -p "${DESTDIR}/boot/grub/locale"
+    cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
+     
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         DIALOG --msgbox "GRUB2 BIOS has been successfully installed." 0 0
         
@@ -4689,7 +4692,8 @@ dogrub2_uefi_common() {
     
     chroot_umount
     
-    mkdir -p "${DESTDIR}/boot/grub"
+    mkdir -p "${DESTDIR}/boot/grub/locale"
+    cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
     BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
     BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
