@@ -60,7 +60,7 @@ mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
 
 if [[ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]]; then
 	
-	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/efi/grub2/grub2_efi.bin")"
+	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/boot/grub/grub_uefi_x86_64.bin")"
 	mount -o ro -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
 	cp -f "${TMPDIR2}/bootx64.efi" "${IMGROOT}/efi/boot/bootx64.efi"
 	

@@ -63,7 +63,7 @@ Introduction
 
    * It provides the long time support kernel as installation option.
    * It runs a modified Arch Linux system in initramfs.
-   * It supports (u)efi booting via grub2.
+   * It supports uefi booting via grub-efi-x86_64.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
    * hwdetect script is used for preconfiguration
@@ -89,7 +89,8 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub2, lilo, extlinux/syslinux, grub2-efi, rEFInd bootloader support
+   * grub-bios (formerly grub2-bios), lilo, extlinux/syslinux, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64 bootloader support
+     (grub-legacy support has been removed)
 
 Archboot bootparameters
 
@@ -246,7 +247,7 @@ Common Installation Procedure
    sure the correct device is about to be partitioned!
 
    You will be asked if you want to use GUID (gpt) partition table.
-   If you have no clue for what you will need it or plan to use grub2,
+   If you have no clue for what you will need it or plan to use grub(2),
    it's save to answer no.
 
    You will be asked if you want to use UUID for device name scheme.
@@ -261,7 +262,7 @@ Common Installation Procedure
   Partition Hard Drives
 
    You will be asked if you want to use GUID (gpt) partition table.
-   If you have no clue for what you will need it or plan to use grub2,
+   If you have no clue for what you will need it or plan to use grub(2),
    it's save to answer no.
 
    You should select the disk(s) you want to partition, and
@@ -486,7 +487,7 @@ Common Installation Procedure
   Install Bootloader
 
    Choose the bootloader you want to use, if you are unsure which one to use
-   choose grub2 bootloader.
+   choose grub-bios bootloader.
 
   Exit Install
 

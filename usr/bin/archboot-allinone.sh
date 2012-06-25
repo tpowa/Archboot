@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# grub-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in extra/grub2-common package
+# grub-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in core/grub-common package
 
 [[ -z "${_DO_x86_64}" ]] && _DO_x86_64="1"
 [[ -z "${_DO_i686}" ]] && _DO_i686="1"

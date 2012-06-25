@@ -53,7 +53,7 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_GRUB2=0       # using grub2
+S_GRUB=0       # using grub(2)
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
@@ -672,7 +672,7 @@ findbootloaderpartitions() {
     fi
 }
 
-# freeze and unfreeze xfs, as hack for grub2 installing
+# freeze and unfreeze xfs, as hack for grub(2) installing
 freeze_xfs() {
     sync
     if [[ -x /usr/sbin/xfs_freeze ]]; then
@@ -776,7 +776,7 @@ set_guid() {
     ## Lenono BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
     ## Lenono BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB2 setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
@@ -1183,7 +1183,7 @@ _createraid()
         else
             DISC=${RAIDDEVICE}
             RUN_CGDISK="1"
-            CHECK_BIOS_BOOT_GRUB2=""
+            CHECK_BIOS_BOOT_GRUB=""
             CHECK_UEFISYS_PART=""
             check_gpt
         fi
@@ -1681,10 +1681,10 @@ autoprepare() {
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-        # create 1 MB bios_grub partition for grub2-bios GPT support
+        # create 1 MB bios_grub partition for grub-bios GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
-            GPT_BIOS_GRUB2_PART_SIZE="${GUID_PART_SIZE}"
+            GPT_BIOS_GRUB_PART_SIZE="${GUID_PART_SIZE}"
             UEFISYS_PART_SIZE="512"
         else
             GUID_PART_SIZE="0"
@@ -1779,7 +1779,7 @@ autoprepare() {
         # create fresh GPT
         sgdisk --clear ${DEVICE} &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB2_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB2 ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=2:0:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
@@ -1860,9 +1860,9 @@ check_gpt() {
             check_uefisyspart
         fi
         
-        if [[ "${CHECK_BIOS_BOOT_GRUB2}" == "1" ]]; then
+        if [[ "${CHECK_BIOS_BOOT_GRUB}" == "1" ]]; then
             if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
-                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. Please create a >=1 MB BIOS Boot partition for grub2-bios GPT support." 0 0
+                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. Please create a >=1 MB BIOS Boot partition for grub-bios GPT support." 0 0
                 RUN_CGDISK="1"
             fi
         fi
@@ -1965,7 +1965,7 @@ partition() {
         MSDOS_DETECTED=""
         if ! [[ "${DISC}" == "" ]]; then
             if [[ "${GUIDPARAMETER}" == "yes" ]]; then
-                CHECK_BIOS_BOOT_GRUB2=""
+                CHECK_BIOS_BOOT_GRUB=""
                 CHECK_UEFISYS_PART=""
                 RUN_CGDISK="1"
                 check_gpt
@@ -3297,7 +3297,7 @@ do_uefi_common() {
     
     if [[ "${DISC}" != "" ]]; then
         CHECK_UEFISYS_PART="1"
-        CHECK_BIOS_BOOT_GRUB2=""
+        CHECK_BIOS_BOOT_GRUB=""
         RUN_CGDISK=""
         # check_gpt
         check_uefisyspart
@@ -3904,10 +3904,10 @@ dolilo_bios() {
     DIALOG --msgbox "LILO was successfully installed." 0 0
 }
 
-dogrub2_common_before() {
+dogrub_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
-    ### Grub2 restrictions:
-    # - Encryption is not recommended for grub2 /boot!
+    ### Grub(2) restrictions:
+    # - Encryption is not recommended for grub(2) /boot!
     
     bootdev=""
     grubdev=""
@@ -3922,7 +3922,7 @@ dogrub2_common_before() {
     fi
 }
 
-dogrub2_config() {
+dogrub_config() {
 
     ########
     
@@ -3955,7 +3955,7 @@ dogrub2_config() {
     
     ########
     
-    if [[ "${GRUB2_UEFI}" == "1" ]]; then
+    if [[ "${GRUB_UEFI}" == "1" ]]; then
         UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot/efi" 2>/dev/null)"
         
         UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot/efi" 2>/dev/null)"
@@ -3982,9 +3982,9 @@ dogrub2_config() {
     
     ########
     
-    cp -f "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
+    cp -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
     # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) "/tmp/.grub.cfg" > "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) "/tmp/.grub.cfg" > "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     rm -f "/tmp/.grub.cfg"
     
     NUMBER="0"
@@ -3992,7 +3992,7 @@ dogrub2_config() {
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
     set _UEFI_ARCH="\${grub_cpu}"
@@ -4008,7 +4008,7 @@ fi
 
 EOF
     
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 insmod part_gpt
 insmod part_msdos
@@ -4034,10 +4034,10 @@ set locale_dir="\${prefix}/locale"
 
 EOF
     
-    [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
@@ -4083,16 +4083,16 @@ fi
 
 EOF
     
-    echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
-    echo "" >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     
     if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
         _rootpart="UUID=${ROOT_PART_FS_UUID}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
-        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}" # GRUB2 does not yet support PARTUUID
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}" # GRUB(2) does not yet support PARTUUID
         _rootpart="/dev/disk/by-partuuid/${ROOT_PART_GPT_GUID}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
@@ -4100,7 +4100,7 @@ EOF
         _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}" # GRUB2 does not yet support PARTLABEL
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}" # GRUB(2) does not yet support PARTLABEL
         _rootpart="/dev/disk/by-partlabel/${ROOT_PART_GPT_LABEL}"
         
     else
@@ -4118,7 +4118,7 @@ EOF
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
@@ -4133,7 +4133,7 @@ EOF
     NUMBER=$((${NUMBER}+1))
     
     ## create kernel fallback entry
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 # (${NUMBER}) Arch Linux Fallback
 menuentry "Arch Linux Fallback" {
@@ -4147,19 +4147,19 @@ EOF
     
     NUMBER=$((${NUMBER}+1))
     
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
     
     ## UEFI Shell 2.0
-    ## Will work only in grub2 uefi
+    ## Will work only in grub(2) uefi
     #menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
     #    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
     #}
     
     ## UEFI Shell 1.0
-    ## Will work only in grub2 uefi
+    ## Will work only in grub(2) uefi
     #menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
     #    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
@@ -4171,12 +4171,12 @@ EOF
     
     NUMBER=$((${NUMBER}+1))
     
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
     
     ## Windows x86_64 UEFI
-    ## Will work only in grub2 uefi x86_64
+    ## Will work only in grub(2) uefi x86_64
     #menuentry \"Microsoft Windows x86_64 UEFI-GPT\" {
     #    insmod part_gpt
     #    insmod fat
@@ -4194,12 +4194,12 @@ EOF
     
     ## TODO: Detect actual Windows installation if any
     ## create example file for windows
-    cat << EOF >> "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ "\${grub_platform}" == "pc" ]; then
     
     ## Windows BIOS
-    ## Will work only in grub2 bios
+    ## Will work only in grub(2) bios
     #menuentry \"Microsoft Windows 7 BIOS-MBR\" {
     #    insmod part_msdos
     #    insmod ntfs
@@ -4214,12 +4214,12 @@ fi
 EOF
     
     ## copy unicode.pf2 font file
-    cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB2_PREFIX_DIR}/fonts/unicode.pf2"
+    cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB_PREFIX_DIR}/fonts/unicode.pf2"
     
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub2 configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
+    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
     geteditor || return 1
-    "${EDITOR}" "${DESTDIR}/${GRUB2_PREFIX_DIR}/grub.cfg"
+    "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     
     unset BOOT_PART_FS_UUID
     unset BOOT_PART_FS
@@ -4237,19 +4237,19 @@ EOF
     
 }
 
-dogrub2_bios() {
+dogrub_bios() {
     
-    dogrub2_common_before
+    dogrub_common_before
     
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub2-bios now ..." 0 0
-        PACKAGES="grub2-common grub2-bios"
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub-bios now ..." 0 0
+        PACKAGES="grub-common grub-bios"
         run_pacman
         # reset PACKAGES after installing
         PACKAGES=""
     fi
     
-    # try to auto-configure GRUB2...
+    # try to auto-configure GRUB(2)...
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
         
@@ -4308,12 +4308,12 @@ dogrub2_bios() {
             return 1
         fi
         
-        DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
         bootdev=$(cat ${ANSWER})
     else
         DEVS="$(findbootloaderdisks _)"
         
-        ## grub2-bios install to partition is not supported
+        ## grub-bios install to partition is not supported
         # DEVS="${DEVS} $(findbootloaderpartitions _)"
         
         if [[ "${DEVS}" == "" ]]; then
@@ -4321,29 +4321,29 @@ dogrub2_bios() {
             return 1
         fi
         
-        DIALOG --menu "Select the boot device where the GRUB2 bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
         bootdev=$(cat ${ANSWER})
     fi
     
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${bootdev})" == "gpt" ]]; then
-        CHECK_BIOS_BOOT_GRUB2="1"
+        CHECK_BIOS_BOOT_GRUB="1"
         CHECK_UEFISYS_PART=""
         RUN_CGDISK=""
         DISC="${bootdev}"
         check_gpt
     else
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
-            DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub2 has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub2 to a msdos partition table?" 0 0 || return 1
+            DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub(2) has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub(2) to a msdos partition table?" 0 0 || return 1
         fi
     fi
     
     if [[ "${FAIL_COMPLEX}" == "1" ]]; then
-        DIALOG --msgbox "Error:\nGrub2 cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\nGrub(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
     
-    DIALOG --infobox "Installing the GRUB2 BIOS bootloader..." 0 0
-    # freeze and unfreeze xfs filesystems to enable grub2 installation on xfs filesystems
+    DIALOG --infobox "Installing the GRUB(2) BIOS bootloader..." 0 0
+    # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
     
@@ -4353,7 +4353,7 @@ dogrub2_bios() {
         --boot-directory="/boot" \
         --recheck \
         --debug \
-        "${bootdev}" &>"/tmp/grub2_bios_install.log"
+        "${bootdev}" &>"/tmp/grub_bios_install.log"
     
     chroot_umount
     
@@ -4361,25 +4361,25 @@ dogrub2_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
      
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --msgbox "GRUB2 BIOS has been successfully installed." 0 0
+        DIALOG --msgbox "GRUB(2) BIOS has been successfully installed." 0 0
         
-        GRUB2_PREFIX_DIR="/boot/grub/"
-        GRUB2_BIOS="1"
-        dogrub2_config
-        GRUB2_BIOS=""
+        GRUB_PREFIX_DIR="/boot/grub/"
+        GRUB_BIOS="1"
+        dogrub_config
+        GRUB_BIOS=""
     else
-        DIALOG --msgbox "Error installing GRUB2 BIOS.\nCheck /tmp/grub2_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
 }
 
-dogrub2_uefi_common() {
+dogrub_uefi_common() {
     
-    dogrub2_common_before
+    dogrub_common_before
     
-    DIALOG --msgbox "Installing grub2-efi-${UEFI_ARCH} now ..." 0 0
-    PACKAGES="grub2-common grub2-efi-${UEFI_ARCH}"
+    DIALOG --msgbox "Installing grub-efi-${UEFI_ARCH} now ..." 0 0
+    PACKAGES="grub-common grub-efi-${UEFI_ARCH}"
     
     run_pacman
     # reset PACKAGES after installing
@@ -4394,7 +4394,7 @@ dogrub2_uefi_common() {
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
         --recheck \
-        --debug &>"/tmp/grub2_uefi_${UEFI_ARCH}_install.log"
+        --debug &>"/tmp/grub_uefi_${UEFI_ARCH}_install.log"
     
     chroot_umount
     
@@ -4456,7 +4456,7 @@ EOF
         --format="${UEFI_ARCH}-efi" \
         --compression="xz" \
         --output="/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" &>"/tmp/grub2_${UEFI_ARCH}_uefi_mkstandalone.log"
+        "boot/grub/grub.cfg" &>"/tmp/grub_${UEFI_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
     
@@ -4464,20 +4464,20 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub2_uefi_${UEFI_ARCH}_install.log" >> "${LOG}"
+    cat "/tmp/grub_uefi_${UEFI_ARCH}_install.log" >> "${LOG}"
     
     if [[ -e "${DESTDIR}/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${UEFI_ARCH}-efi/core.efi" ]]; then
-        _BOOTMGR_LABEL="Arch Linux (GRUB2)"
+        _BOOTMGR_LABEL="Arch Linux (GRUB)"
         _BOOTMGR_LOADER_DIR="arch_grub"
         _BOOTMGR_LOADER_FILE="grub${SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB2 UEFI ${UEFI_ARCH} has been successfully installed." 0 0
+        DIALOG --msgbox "GRUB(2) UEFI ${UEFI_ARCH} has been successfully installed." 0 0
         
-        GRUB2_PREFIX_DIR="/boot/grub/"
-        GRUB2_UEFI="1"
-        dogrub2_config
-        GRUB2_UEFI=""
+        GRUB_PREFIX_DIR="/boot/grub/"
+        GRUB_UEFI="1"
+        dogrub_config
+        GRUB_UEFI=""
         
         DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
@@ -4489,25 +4489,25 @@ EOF
             cp -f "${DESTDIR}/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error installing GRUB2 UEFI ${UEFI_ARCH}.\nCheck /tmp/grub2_uefi_${UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB UEFI ${UEFI_ARCH}.\nCheck /tmp/grub_uefi_${UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
 }
 
-dogrub2_uefi_x86_64() {
+dogrub_uefi_x86_64() {
     
     do_uefi_x86_64
     
-    dogrub2_uefi_common
+    dogrub_uefi_common
     
 }
 
-dogrub2_uefi_i386() {
+dogrub_uefi_i386() {
     
     do_uefi_i386
     
-    dogrub2_uefi_common
+    dogrub_uefi_common
     
 }
 
@@ -5095,10 +5095,10 @@ install_bootloader_uefi_x86_64() {
     
     DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
         "rEFInd_UEFI_x86_64" "rEFInd x86_64 (supports only x86_64 EFISTUB kernels)" \
-        "GRUB2_UEFI_x86_64" "GRUB2 x86_64 UEFI" 2>${ANSWER} || CANCEL=1
+        "GRUB_UEFI_x86_64" "GRUB(2) x86_64 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "rEFInd_UEFI_x86_64") dorefind_uefi_x86_64 ;;
-        "GRUB2_UEFI_x86_64") dogrub2_uefi_x86_64 ;;
+        "GRUB_UEFI_x86_64") dogrub_uefi_x86_64 ;;
     esac
     
 }
@@ -5107,10 +5107,10 @@ install_bootloader_uefi_i386() {
     
     DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 2 \
         "rEFInd_UEFI_i386" "rEFInd i386 (supports only ix86 EFISTUB kernels)" \
-        "GRUB2_UEFI_i386" "GRUB2 i386 UEFI" 2>${ANSWER} || CANCEL=1
+        "GRUB_UEFI_i386" "GRUB(2) i386 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "rEFInd_UEFI_i386") dorefind_uefi_i386 ;;
-        "GRUB2_UEFI_i386") dogrub2_uefi_i386 ;;
+        "GRUB_UEFI_i386") dogrub_uefi_i386 ;;
     esac
     
 }
@@ -5119,11 +5119,11 @@ install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
         "SYSLINUX_BIOS" "SYSLINUX/EXTLINUX" \
-        "GRUB2_BIOS" "GRUB2 BIOS" \
+        "GRUB_BIOS" "GRUB(2) BIOS" \
         "LILO_BIOS" "LILO" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "SYSLINUX_BIOS") dosyslinux_bios ;;
-        "GRUB2_BIOS") dogrub2_bios ;;
+        "GRUB_BIOS") dogrub_bios ;;
         "LILO_BIOS") dolilo_bios ;;
     esac
     

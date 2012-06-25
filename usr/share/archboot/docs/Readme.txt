@@ -56,7 +56,7 @@ Setup features (latest version):
 - Auto/Preconfiguration of KMS/framebuffers
 - Configuration of basic system files
 - Setting root password
-- grub, grub2, lilo, extlinux and syslinux bootloader support
+- grub-bios, lilo, extlinux/syslinux, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64 bootloader support
 
 Bugs:
 - If you find a bug, please mail the archboot developer directly.

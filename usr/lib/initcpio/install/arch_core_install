@@ -110,10 +110,10 @@ build ()
     sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add grub2 and syslinux packages to image, with separate extra db file
+    ### HACK add grub(2) and syslinux packages to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
-    for i in grub2-common grub2-bios grub2-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5 perl-digest-sha1 refind-efi-x86_64; do
+    for i in grub-common grub-bios grub-efi-x86_64 refind-efi-x86_64 efibootmgr freetype2 syslinux mtools perl-passwd-md5 perl-digest-sha1 ; do
         pacman -Sw --noconfirm $i
         wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman -Sp $i).sig
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
