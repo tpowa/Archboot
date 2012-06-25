@@ -3908,11 +3908,6 @@ dogrub2_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub2 restrictions:
     # - Encryption is not recommended for grub2 /boot!
-
-    if [[ -f "${DESTDIR}/boot/grub/menu.lst" ]]; then
-        DIALOG --msgbox "Found ${DESTDIR}/boot/grub/menu.lst, uninstalling grub now ..." 0 0
-        ${PACMAN} -R grub > ${LOG}
-    fi
     
     bootdev=""
     grubdev=""
