@@ -1,8 +1,7 @@
 Showstoppers for next release:
-None
+- wait for new grub packages
 
 New features:
-- added full grub2 efi support (many thanks to skodabenz for this)
 
 Removed features:
 
@@ -11,12 +10,6 @@ Kernel changes:
 hwdetect changes:
 
 setup changes:
-- move syslinux and extlinux in one bootloader point
-- some dmraid fixes
-- add new grub2/grub2-efi package support
-- allow nilfs2 for grub2
-- install filesystem package, for detected filesystems
-- install dmraid package, if dmraid device is detected
 
 quickinst changes:
 
