@@ -78,11 +78,11 @@ build ()
                     if  [ "${epoch}" = "" ]; then
                         cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || return 1
                     else
                         cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.* || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || return 1
                      fi
                 done
             else
@@ -90,11 +90,11 @@ build ()
                     if  [ "${epoch}" = "" ]; then
                         cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || return 1
                     else
                         cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || return 1
                     fi
                 done
             fi
@@ -120,10 +120,10 @@ build ()
         pkgarch="$(echo $(pacman -Si $i | grep -m 1 Architecture | cut -d ":" -f 2))"
         if [ "${pkgarch}" = 'any' ]; then
             cp /var/cache/pacman/pkg/$i-${pkgver}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
-            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.* || return 1
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.[a-z]z || return 1
         else
             cp /var/cache/pacman/pkg/$i-${pkgver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
-            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.* || return 1
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.[a-z]z || return 1
         fi        
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz.old
