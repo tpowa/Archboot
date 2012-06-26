@@ -7,10 +7,6 @@ build ()
     add_binary "/sbin/dmsetup"
     add_binary "/sbin/dmeventd"
     add_dir "/dev/mapper"
-    # add udev rules
-    add_file "/usr/lib/udev/rules.d/10-dm.rules"
-    add_file "/usr/lib/udev/rules.d/13-dm-disk.rules"
-    add_file "/usr/lib/udev/rules.d/95-dm-notify.rules"
 }
 
 help ()

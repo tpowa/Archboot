@@ -13,7 +13,6 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/usr/lib/udev/rules.d/11-dm-lvm.rules"
     add_dir "/etc/lvm/backup/"
     add_dir "/etc/lvm/archive/"
     add_file "/usr/share/archboot/lvm2/etc/lvm/lvm.conf" "/etc/lvm/lvm.conf"

@@ -20,7 +20,6 @@ build ()
     # add rfkill
     add_file "/usr/share/archboot/wireless/etc/conf.d/rfkill" "/etc/conf.d/rfkill"
     add_file "/etc/rc.d/rfkill"
-    add_file "/usr/lib/udev/rules.d/60-rfkill.rules"
     # add zd1211 firmware files
     for i in /usr/lib/firmware/zd1211/* ; do
 	add_file "$i"
@@ -28,7 +27,6 @@ build ()
     # crda support
     add_file "/etc/rc.d/wireless-regdom"
     add_file "/usr/share/archboot/wireless/etc/conf.d/wireless-regdom" "/etc/conf.d/wireless-regdom"
-    add_file "/usr/lib/udev/rules.d/85-regulatory.rules"
     add_file "/usr/lib/crda/regulatory.bin"
     # fixing licenses
     add_file "/usr/share/licenses/expat/COPYING"
