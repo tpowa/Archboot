@@ -31,7 +31,7 @@ curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump 
 gnutls nettle libtasn1 bind rpcbind expat progsreiserfs glib2 freetype2 libssh2 libedit \
 talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \
 dnssec-anchors hwids libsystemd systemd systemd-arch-units dmidecode archlinux-keyring haveged \
-pambase traceroute arch-wiki-lite"
+pambase traceroute arch-wiki-lite amd-ucode intel-ucode"
 
 
 for i in $DEPENDS; do
