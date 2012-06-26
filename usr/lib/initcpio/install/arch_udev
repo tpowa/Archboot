@@ -7,31 +7,8 @@ build ()
     add_file "/etc/udev/udev.conf"
     add_file /usr/lib/modprobe.d/usb-load-ehci-first.conf
     add_binary /usr/bin/udevd
-    add_binary /usr/lib/udev/accelerometer
-    add_binary /usr/lib/udev/ata_id
-    add_binary /usr/lib/udev/cdrom_id
-    add_binary /usr/lib/udev/collect
-    add_file /usr/lib/udev/findkeyboards
-    add_binary /usr/lib/udev/keymap
-    add_file /usr/lib/udev/keyboard-force-release.sh
-    add_binary /usr/lib/udev/mtd_probe
-    add_binary /usr/lib/udev/scsi_id
-    add_binary /usr/lib/udev/v4l_id
     # add rule files
-    for i in 50-udev-default \
-             60-cdrom_id 60-persistent-alsa 60-persistent-input 60-persistent-serial \
-             60-persistent-storage-tape 60-persistent-storage 60-persistent-v4l \
-             61-accelerometer 75-net-description 75-tty-description 75-probe_mtd 78-sound-card \
-             80-drivers 95-keyboard-force-release 95-keymap 95-udev-late; do
-    	     add_file /usr/lib/udev/rules.d/$i.rules
-    done
-    # add keymap files
-    for i in /usr/lib/udev/keymaps/*; do
-        [ -f $i ] && add_file "$i"
-    done
-    for i in /usr/lib/udev/keymaps/*/*; do
-        [ -f $i ] && add_file "$i"
-    done
+    add_full_dir /usr/lib/udev
     add_runscript
 }
 
