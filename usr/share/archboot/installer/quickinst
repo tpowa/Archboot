@@ -61,6 +61,7 @@ pacman_conf() {
 [options]
 Architecture = auto
 SigLevel = PackageRequired
+CheckSpace
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
