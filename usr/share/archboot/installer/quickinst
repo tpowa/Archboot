@@ -80,23 +80,6 @@ pacman_conf_extra() {
     echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
-# pacman needs a masterkey before checking signed packages
-prepare_pacman_keychain() {
-    # Generate initial keychain, use haveged then no user interaction is required
-    if  [[ -f /var/run/haveged.pid ]]; then
-        kill $(cat /var/run/haveged.pid)
-    fi
-    haveged
-    pacman-key --init >/dev/null 2>&1
-    ### HACK: fix accept of master keys!
-    sed -i -e 's#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#g' \
-    /usr/bin/pacman-key
-    pacman-key --populate archlinux >/dev/null 2>&1
-    sed -i -e 's#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#g' \
-    /usr/bin/pacman-key
-    kill $(cat /var/run/haveged.pid)
-}
-
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
@@ -104,7 +87,6 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
-    prepare_pacman_keychain
     ${PACMAN} -Sy
 }
 
