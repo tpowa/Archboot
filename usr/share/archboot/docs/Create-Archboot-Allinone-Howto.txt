@@ -9,16 +9,12 @@ Requirements:
 Create archboot chroots:
   # install archboot
   pacman -S archboot
-  # mount recent archboot image file as loop device
-  mount -o loop <imagefile> <imagepath>
   # create x86_64 chroot
   mkdir <x86_64_chroot>
-  /usr/share/archboot/installer/quickinst media <x86_64_chroot> <imagepath>/core-i686/pkg
+  pacman --root "<x86_64_chroot>" -Sg base --noconfirm --noprogressbar
   # create i686 chroot
   mkdir <i686_chroot>
-  /usr/share/archboot/installer/quickinst media <i686_chroot> <imagepath>/core-x86_64/pkg
-  # unmount iso file
-  umount <imagepath>
+  linux32 pacman --root "<i686_chroot>" -Sg base --noconfirm --noprogressbar
 
 Enter archboot chroot like this:
   mount -o bind /dev <chrootpath>/dev
