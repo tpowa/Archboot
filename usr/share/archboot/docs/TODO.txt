@@ -1,5 +1,4 @@
 Showstoppers for next release:
-- wait for new grub packages
 
 New features:
 
