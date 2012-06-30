@@ -26,15 +26,8 @@ build ()
         add_file "$i"
     done
     
-    for i in $(find /usr/lib/grub/x86_64-efi ! -type d); do
-        add_file "$i"
-    done
-    
-    ## No need to include /usr/lib/grub/i386-efi files in the initramfs image, reduces iso size
-    
-    for i in $(find /usr/lib/grub/i386-pc ! -type d); do
-        add_file "$i"
-    done
+    # add bios,i386-efi and x86_64-efi files
+    add_full_dir /usr/lib/grub
     
     ## add grub(2) unicode font file
     add_file "/usr/share/grub/unicode.pf2"
