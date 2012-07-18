@@ -12,11 +12,15 @@ build ()
     add_file "${DOCS}.gz" "/arch/archboot.txt.gz" 
     add_dir "/src" 
     cp /usr/share/archboot/installer/archboot.txt ${TEMPDIR}/arch/archboot.txt
+    add_file "/usr/bin/genfstab"
+    add_file "/usr/bin/arch-chroot"
+    add_file "/usr/bin/pacstrap"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes the archboot installer on an arch boot image.
+  This hook includes the archboot installer and arch-install-scripts 
+  on an arch boot image.
 HELPEOF
 }
