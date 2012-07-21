@@ -21,6 +21,9 @@ run_hook sysinit_start
 [[ -d /sys/class/net/lo ]] && \
     status "Bringing up loopback interface" /sbin/ifconfig lo 127.0.0.1 up
 
+if [[ -s /etc/hostname ]]; then
+	HOSTNAME=$(< /etc/hostname)
+fi
 if [[ $HOSTNAME ]]; then
 	stat_busy "Setting Hostname: $HOSTNAME"
 		echo $HOSTNAME > /proc/sys/kernel/hostname
