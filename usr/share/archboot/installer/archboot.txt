@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 25th 2012
+   Jujy, 24th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -69,7 +69,8 @@ Introduction
    * hwdetect script is used for preconfiguration
    * systemd is supported
    * It doesn't mount anything during boot process.
-   * It uses a different setup script and not the aif installer.
+   * It contains [core] repository on media.
+   * It uses provides a different setup script.
 
   What are the Archboot Setup features?
 
@@ -89,8 +90,8 @@ Introduction
      mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub-bios (formerly grub2-bios), lilo, extlinux/syslinux, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64 bootloader support
-     (grub-legacy support has been removed)
+   * grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64
+     lilo, extlinux/syslinux, bootloader support
 
 Archboot bootparameters
 
