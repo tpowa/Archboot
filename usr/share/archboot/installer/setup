@@ -3045,21 +3045,7 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
-
-    DIALOG --yesno "Do you want to use the previous network settings in rc.conf and resolv.conf?\nIf you used Proxy settings, they will be written to /etc/profile.d/proxy.sh" 0 0 || return 1
-    sed -i -e "s#^interface=.*#interface=${INTERFACE}#g" ${DESTDIR}/etc/rc.conf
-    if [[ "${S_DHCP}" != "1" ]]; then
-        sed -i -e "s#^address=.*#address=${IPADDR}#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^netmask=.*#netmask=${SUBNET}#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^broadcast=.*#broadcast=${BROADCAST}#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^gateway=.*#gateway=${GW}#g" ${DESTDIR}/etc/rc.conf
-        echo "nameserver ${DNS}" >> ${DESTDIR}/etc/resolv.conf
-    else
-        sed -i -e "s#^address=.*#address=#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^netmask=.*#netmask=#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^broadcast=.*#broadcast=#g" ${DESTDIR}/etc/rc.conf
-        sed -i -e "s#^gateway=.*#gateway=#g" ${DESTDIR}/etc/rc.conf
-    fi
+    ### TODO implement sane netcfg support!
     if [[ "${PROXY_HTTP}" != "" ]]; then
         echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
