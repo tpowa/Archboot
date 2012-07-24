@@ -4781,7 +4781,7 @@ auto_hwdetect() {
         # check on ide-legacy boot parameter
         [[ "$(grep -w ide-legacy /proc/cmdline)" ]] && HWPARAMETER="${HWPARAMETER} --ide-legacy"
         # check on used keymap
-        ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/rc.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
+        ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
         # check on usb input
         [[ "$(lsmod | grep ^hid)" ]] && HWPARAMETER="${HWPARAMETER} --usbinput"
         # check on framebuffer modules and kms
