@@ -170,9 +170,9 @@ getpartlabel()
     echo "$(${_BLKID} -p -i -s PART_ENTRY_NAME -o value ${1})"
 }
 
-# list eth devices with mac adress
+# list all net devices with mac adress
 net_interfaces() {
-    for i in $(ls /sys/class/net | grep eth); do 
+    for i in $(ls /sys/class/net); do 
         echo "$i $(cat /sys/class/net/$i/address)"
     done
 }
@@ -3062,111 +3062,104 @@ auto_network()
 # args: none
 # returns: 1 on failure
 donetwork() {
-    INTERFACE=
-    S_DHCP=
-    ifaces=$(net_interfaces)
-    if [[ "${ifaces}" = "" ]]; then
-        DIALOG --yesno "Cannot find any ethernet interfaces. You probably haven't loaded\nyour network module yet.  You have two options:\n\n  1) Probe for not detectable module now. (very old hardware)\n  2) Switch to another VC (ALT-F2) and load your module\n     with the modprobe command, then switch back here (ALT-F1)\n     and continue.\n\nIf you know which module you need, you should do Step 2 and\nselect NO below.  If you don't know which module you need,\nchoose Step 1 by selecting YES below.\n\nProbe for network module?" 18 70
+    ### TODO: add simple netcfg routine here!
+    NETPARAMETERS=""
+    while [[ "${NETPARAMETERS}" = "" ]]; do
+        # select network interface
+        INTERFACE=
+        S_DHCP=
+        ifaces=$(net_interfaces)
+        while [[ "${INTERFACE}" = "" ]]; do
+            DIALOG --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>${ANSWER}
+            case $? in
+                1) return 1 ;;
+                0) INTERFACE=$(cat ${ANSWER}) ;;
+            esac
+        done
+        # wireless switch
+        CONNECTION=""
+        WLAN_HIDDEN=""
+        WLAN_ESSID=""
+        WLAN_SECURITY=""
+        WLAN_KEY=""
+        DIALOG --defaultno --yesno "Is your network device wireless?" 0 0
         if [[ $? -eq 0 ]]; then
-            net_notdetectable
+            CONNECTION="wireless"
+            DIALOG --inputbox "Enter your ESSID" 16 65 "" 2>${ANSWER} || return 1
+            WLAN_ESSID=$(cat ${ANSWER})
+            DIALOG --defaultno --yesno "Is your wireless network hidden?" 0 0
+            [[ $? -eq 0 ]] && WLAN_HIDDEN="yes"
+            DIALOG --yesno "Is your wireless network encrypted?" 0 0
+            if [[ $? -eq 0 ]]; then
+                while [[ "${WLAN_SECURITY}" = "" ]]; do
+                DIALOG --ok-label "Select" --menu "Select encryption type" 14 55 7 \
+                    "wep" "WEP encryption" \
+                    "wpa" "WPA encryption" 2>${ANSWER}
+                    case $? in
+                        1) return 1 ;;
+                        0) WLAN_SECURITY=$(cat ${ANSWER}) ;;
+                    esac
+                done
+                DIALOG --inputbox "Enter your KEY" 16 65 "" 2>${ANSWER} || return 1
+                WLAN_KEY=$(cat ${ANSWER})
+            else
+                WLAN_SECURITY="open"
+            fi
+        else
+            CONNECTION="ethernet"
         fi
-        ifaces=$(net_interfaces)
-        if [[ "${ifaces}" = "" ]]; then
-            DIALOG --msgbox "No network interfaces available." 0 0
-            return 1
-        fi
-    fi
-    while [[ "${INTERFACE}" = "" ]]; do
-        DIALOG --msgbox "Available Ethernet Interfaces:\n$(net_interfaces)\n\nIf your ethernet interface is not listed,\n1) Probe for the correct module now.\n2) Switch to another VC (ALT-F2) and load your module with\n   the modprobe command, then switch back here (ALT-F1)\n" 0 0
-        ifaces=$(net_interfaces)
-        DIALOG --extra-button --extra-label "Probe" --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>${ANSWER}
-        case $? in
-            1) return 1 ;;
-            0) INTERFACE=$(cat ${ANSWER}) ;;
-            *) net_notdetectable ;;
-        esac
-    done
-    # bring down everything, which could grab and affect the interface!
-    if [[ -f /var/run/dhcpcd-${INTERFACE}.pid ]]; then
-        dhcpcd -k ${INTERFACE} >${LOG} 2>&1
-        sleep  1
-    fi
-    if  [[ -f /var/run/dhclient.pid ]]; then
-        dhclient -x
-        [[ -f /var/run/dhclient.pid ]] && rm /var/run/dhclient.pid
-        sleep 1
-    fi
-    ip route del default >${LOG} 2>&1
-    ip addr flush dev ${INTERFACE} >${LOG} 2>&1
-    ip link set dev ${INTERFACE} down >${LOG} 2>&1
-    [[ -e /etc/resolv.conf ]] && rm /etc/resolv.conf >${LOG} 2>&1
-    DIALOG --yesno "Do you want to use DHCP?" 0 0
-    if [[ $? -eq 0 ]]; then
-        DIALOG --infobox "Please wait.  Polling for DHCP server on ${INTERFACE}..." 10 65
-        dhcpcd ${INTERFACE} >${LOG} 2>&1
-        if [[ $? -ne 0 ]]; then
-            DIALOG --infobox "Failed to run dhcpcd.  See ${LOG} for details. dhclient as fallback will be called in 5 seconds." 0 0
-            sleep 5 
-            DIALOG --infobox "Please wait.  Polling for DHCP server on ${INTERFACE} with dhclient..." 0 0
-            dhclient ${INTERFACE} >${LOG} 2>&1
-        fi
-        if [[ ! $(ip addr show ${INTERFACE} | grep 'inet') ]]; then
-            DIALOG --msgbox "DHCP request failed." 0 0 || return 1
-        fi
-        S_DHCP=1
-    else
-        NETPARAMETERS=""
-        while [[ "${NETPARAMETERS}" = "" ]]; do
+        # dhcp switch
+        IP=""
+        DIALOG --yesno "Do you want to use DHCP?" 0 0
+        if [[ $? -eq 0 ]]; then
+            IP="dhcp"
+            S_DHCP=1
+        else
+            IP="static"
             DIALOG --inputbox "Enter your IP address" 8 65 "192.168.0.2" 2>${ANSWER} || return 1
             IPADDR=$(cat ${ANSWER})
             DIALOG --inputbox "Enter your netmask" 8 65 "255.255.255.0" 2>${ANSWER} || return 1
             SUBNET=$(cat ${ANSWER})
             DIALOG --inputbox "Enter your broadcast" 8 65 "192.168.0.255" 2>${ANSWER} || return 1
             BROADCAST=$(cat ${ANSWER})
-            DIALOG --inputbox "Enter your gateway (optional)" 8 65 "192.168.0.1" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter your gateway" 8 65 "192.168.0.1" 2>${ANSWER} || return 1
             GW=$(cat ${ANSWER})
             DIALOG --inputbox "Enter your DNS server IP" 8 65 "192.168.0.1" 2>${ANSWER} || return 1
             DNS=$(cat ${ANSWER})
-            DIALOG --inputbox "Enter your HTTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 16 65 "" 2>${ANSWER} || return 1
-            PROXY_HTTP=$(cat ${ANSWER})
-            DIALOG --inputbox "Enter your FTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 16 65 "" 2>${ANSWER} || return 1
-            PROXY_FTP=$(cat ${ANSWER})
-            DIALOG --yesno "Are these settings correct?\n\nIP address:         ${IPADDR}\nNetmask:            ${SUBNET}\nGateway (optional): ${GW}\nDNS server:         ${DNS}\nHTTP proxy server:  ${PROXY_HTTP}\nFTP proxy server:   ${PROXY_FTP}" 0 0
-            case $? in
-                1) ;;
-                0) NETPARAMETERS="1" ;;
-            esac
-        done
-        ip link set dev ${INTERFACE} up
-        echo "running: ip addr add ${IPADDR}/${SUBNET} broadcast ${BROADCAST:-+} dev ${INTERFACE}" >${LOG}
-        ip addr add ${IPADDR}/${SUBNET} broadcast ${BROADCAST:-+} dev ${INTERFACE} >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup ${INTERFACE} interface." 0 0 || return 1
-        if [[ "${GW}" != "" ]]; then
-            ip route add default via ${GW} >${LOG} 2>&1 || DIALOG --msgbox "Failed to setup your gateway." 0 0 || return 1
         fi
-        if [[ "${PROXY_HTTP}" = "" ]]; then
-            unset http_proxy
-        else
-            export http_proxy=${PROXY_HTTP}
-        fi
-        if [[ "${PROXY_FTP}" = "" ]]; then
-            unset ftp_proxy
-        else
-            export ftp_proxy=${PROXY_FTP}
-        fi
-        echo "nameserver ${DNS}" >/etc/resolv.conf
+        DIALOG --yesno "Are these settings correct?\n\nInterface:         ${INTERFACE}\nConnection:         ${CONNECTION}\nESSID:         ${WLAN_ESSID}\nHidden:         ${WLAN_HIDDEN}\nEncryption:         ${WLAN_SECURITY}\nKey:         ${WLAN_KEY}\nDHCP or static:         ${IP}\nIP address:         ${IPADDR}\nNetmask:            ${SUBNET}\nGateway: ${GW}\nDNS server:         ${DNS}" 0 0
+        case $? in
+            1) ;;
+            0) NETPARAMETERS="1" ;;
+        esac
+    done
+    # profile name
+    NETWORK_PROFILE=""
+    DIALOG --inputbox "Enter your network profile name" 16 65 "${INTERFACE}-${CONNECTION}" 2>${ANSWER} || return 1
+    NETWORK_PROFILE=$(cat ${ANSWER})
+    ### write profile
+    echo "CONNECTION=\'${CONNECTION}\'" >/etc/network.d/${NETWORK_PROFILE}
+    echo "INTERFACE=\'${INTERFACE}\'"  >>/etc/network.d/${NETWORK_PROFILE}
+    # run netcfg
+    netcfg -u ${NETWORK_PROFILE}
+    # http/ftp proxy settings
+    DIALOG --inputbox "Enter your HTTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 16 65 "" 2>${ANSWER} || return 1
+    PROXY_HTTP=$(cat ${ANSWER})
+    DIALOG --inputbox "Enter your FTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 16 65 "" 2>${ANSWER} || return 1
+    PROXY_FTP=$(cat ${ANSWER})
+    if [[ "${PROXY_HTTP}" = "" ]]; then
+        unset http_proxy
+    else
+        export http_proxy=${PROXY_HTTP}
     fi
-    ### Missing Proxy Configuration
+    if [[ "${PROXY_FTP}" = "" ]]; then
+        unset ftp_proxy
+    else
+        export ftp_proxy=${PROXY_FTP}
+    fi
     DIALOG --msgbox "The network is configured." 8 30
     NEXTITEM="1"
     S_NET=1
-}
-
-net_notdetectable() {
-    # modules with no modalias exported! status kernel 2.6.18
-    NOTDETECTABLE="hp ne de4x5 wd cs89x0 eepro smc9194 seeq8005 ni52 ni65 ac3200 smc-ultra at1700 hp-plus depca eexpress 82596 de600 eth16i de620 lance ewrk3 e2100 lp486e 3c501 3c503 3c505 3c507 3c509 3c515 myri10ge"
-    for mod in ${NOTDETECTABLE}; do
-        modprobe ${mod} >/dev/null 2>&1
-    done
 }
 
 getrootfstype() {
