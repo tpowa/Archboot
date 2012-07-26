@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   Jujy, 24th 2012
+   July, 26th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -28,18 +28,19 @@ Table Of Contents
     4. Common Installation Procedure
          1. Running Setup
          2. Set Keyboard And Console Font
-         3. Set Time And Date
-         4. Prepare Hard Drive
+         3. Set up Network
+         4. Set Time And Date
+         5. Prepare Hard Drive
              1. Auto-Prepare
              2. Partition Hard Drives
              3. Create Software Raid, Lvm2 or Luks encryption
              4. Set Filesystem Mountpoints
-         5. Select Source
-         6. Select Packages
-         7. Install Packages
-         8. Configure System
-         9. Install Bootloader
-         10. Exit Install
+         6. Select Source
+         7. Select Packages
+         8. Install Packages
+         9. Configure System
+         10. Install Bootloader
+         11. Exit Install
     5. System Configuration
     6. Useful links
 
@@ -224,6 +225,10 @@ Common Installation Procedure
    Use this menu to change your keyboard to your desired keymap 
    and console font.
 
+  Set up Network
+
+   Use this menu to configure your network.
+
   Set Time And Date
  
    Use this menu to change time and date of your running system.
@@ -342,37 +347,6 @@ Common Installation Procedure
    when using the FTP/HTTP installation. If you  can't use a CD-ROM, USB device
    or any other medium you could mount at this stage, this is the only viable
    method of installing Arch Linux.
-
-  Setup Network (FTP/HTTP method)
-
-   Setup Network will allow you to install and configure your network device.
-   Wireless drivers are available in install environment, but you have to
-   configure those devices with the standard Linux tools by hand, 
-   or the Arch Linux way by using the netcfg scripts.
-   You can skip setup network then and go straight ahead to selecting mirror.
-   
-   A list of all currently available network devices is presented to you.
-   If no ethernet device is available yet, or the one you wish to use is
-   missing, either hit OK and go on to probe for it, or switch to another
-   console and load the module manually.
-
-   If you still can't configure your network card, make sure it's physically
-   been properly installed, and that it is supported by the Linux kernel.
-
-   When the correct module is loaded, and your desired network card is
-   listed, you should Select the ethernet device you want to configure
-   and you will be given the option to configure your network with DHCP.
-   If your network uses DHCP, hit YES and let the installer do the rest.
-   If you select NO, you will be asked to enter the networking information
-   manually. Either way, your network should be successfully configured,
-   and if you're of the skeptical kind, you may check connectivity using
-   standard tools like ping on another console.
-
-   As automatisms are not perfect, you may not be able to successfully
-   use the installer to set up your network. In these rare cases, don't
-   bother, and set up you network device manually in one of the consoles.
-   All the installer needs is a transparent connection to the FTP/HTTP server
-   you are going to select later during the installation.
 
   Choose Mirror (FTP/HTTP method)
 
