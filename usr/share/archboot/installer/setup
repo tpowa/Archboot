@@ -3045,7 +3045,7 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
-    ### TODO implement sane netcfg support!
+    cp /etc/network.d/* ${DESTDIR}/etc/network.d/ 2>/dev/null
     if [[ "${PROXY_HTTP}" != "" ]]; then
         echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
