@@ -3158,7 +3158,7 @@ donetwork() {
         echo "DNS=('${DNS}')" >>${NETWORK_PROFILE}
     fi
     # run netcfg
-    netcfg -u $(basename ${NETWORK_PROFILE}) >${LOG}
+    netcfg -r $(basename ${NETWORK_PROFILE}) >${LOG}
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error occured while running netcfg. (see ${LOG} for output)" 0 0
         return 1
