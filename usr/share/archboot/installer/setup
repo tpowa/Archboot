@@ -3082,19 +3082,19 @@ donetwork() {
         WLAN_ESSID=""
         WLAN_SECURITY=""
         WLAN_KEY=""
-        DIALOG --defaultno --yesno "Is your network device wireless?" 0 0
+        DIALOG --defaultno --yesno "Is your network device wireless?" 5 40
         if [[ $? -eq 0 ]]; then
             CONNECTION="wireless"
-            DIALOG --defaultno --yesno "Is your wireless ESSID hexadecimal?" 0 0
+            DIALOG --defaultno --yesno "Is your wireless ESSID hexadecimal?" 5 40
             [[ $? -eq 0 ]] && WLAN_HEX="yes"
-            DIALOG --inputbox "Enter your ESSID" 16 65 "MyNetwork" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter your ESSID" 7 40 "MyNetwork" 2>${ANSWER} || return 1
             WLAN_ESSID=$(cat ${ANSWER})
-            DIALOG --defaultno --yesno "Is your wireless network hidden?" 0 0
+            DIALOG --defaultno --yesno "Is your wireless network hidden?" 5 40
             [[ $? -eq 0 ]] && WLAN_HIDDEN="yes"
-            DIALOG --yesno "Is your wireless network encrypted?" 0 0
+            DIALOG --yesno "Is your wireless network encrypted?" 5 40
             if [[ $? -eq 0 ]]; then
                 while [[ "${WLAN_SECURITY}" = "" ]]; do
-                DIALOG --ok-label "Select" --menu "Select encryption type" 14 55 7 \
+                DIALOG --ok-label "Select" --menu "Select encryption type" 9 40 7 \
                     "wep" "WEP encryption" \
                     "wpa" "WPA encryption" 2>${ANSWER}
                     case $? in
@@ -3102,7 +3102,7 @@ donetwork() {
                         0) WLAN_SECURITY=$(cat ${ANSWER}) ;;
                     esac
                 done
-                DIALOG --inputbox "Enter your KEY" 16 65 "WirelessKey" 2>${ANSWER} || return 1
+                DIALOG --inputbox "Enter your KEY" 5 40 "WirelessKey" 2>${ANSWER} || return 1
                 WLAN_KEY=$(cat ${ANSWER})
             else
                 WLAN_SECURITY="open"
@@ -3112,23 +3112,23 @@ donetwork() {
         fi
         # dhcp switch
         IP=""
-        DIALOG --yesno "Do you want to use DHCP?" 0 0
+        DIALOG --yesno "Do you want to use DHCP?" 5 40
         if [[ $? -eq 0 ]]; then
             IP="dhcp"
             DHCLIENT=""
-            DIALOG --defaultno --yesno "Do you want to use dhclient instead of dhcpcd?" 0 0
+            DIALOG --defaultno --yesno "Do you want to use dhclient instead of dhcpcd?" 5 55
             [[ $? -eq 0 ]] && DHCLIENT="yes"
             S_DHCP=1
         else
             IP="static"
-            DIALOG --inputbox "Enter your IP address" 8 65 "192.168.1.23" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter your IP address" 5 40 "192.168.1.23" 2>${ANSWER} || return 1
             IPADDR=$(cat ${ANSWER})
-            DIALOG --inputbox "Enter your gateway" 8 65 "192.168.1.1" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter your gateway" 5 40 "192.168.1.1" 2>${ANSWER} || return 1
             GW=$(cat ${ANSWER})
-            DIALOG --inputbox "Enter your DNS server IP" 8 65 "192.168.1.1" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter your DNS server IP" 5 40 "192.168.1.1" 2>${ANSWER} || return 1
             DNS=$(cat ${ANSWER})
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:         ${INTERFACE}\nConnection:         ${CONNECTION}\nESSID_HEX:         ${WLAN_HEX}\nESSID:         ${WLAN_ESSID}\nHidden:         ${WLAN_HIDDEN}\nEncryption:         ${WLAN_SECURITY}\nKey:         ${WLAN_KEY}\nDHCP or static:         ${IP}\nDHCLIENT:         ${DHCLIENT}\nIP address:         ${IPADDR}\nGateway: ${GW}\nDNS server:         ${DNS}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID in hexadecimal: ${WLAN_HEX}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nUse dhclient:   ${DHCLIENT}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
