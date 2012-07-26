@@ -1990,7 +1990,7 @@ partition() {
     done
     # update dmraid
     _dmraid_update
-    NEXTITEM="3"
+    NEXTITEM="4"
     S_PART=1
 }
 
@@ -2501,7 +2501,7 @@ mountpoints() {
     done
 
     DIALOG --msgbox "Partitions were successfully mounted." 0 0
-    NEXTITEM="5"
+    NEXTITEM="6"
     S_MKFS=1
 }
 
@@ -2669,7 +2669,7 @@ getsource() {
         #in order to cache packages from media check on it first!
         get_media
         select_mirror || return 1
-        NEXTITEM="2"
+        NEXTITEM="3"
     fi
     S_SRC=1
 }
@@ -2950,7 +2950,7 @@ select_packages() {
     else
         PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
     fi
-    NEXTITEM="5"
+    NEXTITEM="6"
     S_SELECT=1
 }
 
@@ -2978,7 +2978,7 @@ install_packages() {
     DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
     run_pacman
     S_INSTALL=1
-    NEXTITEM="6"
+    NEXTITEM="7"
     chroot_mount
     # automagic time!
     # any automatic configuration should go here
@@ -3179,7 +3179,7 @@ donetwork() {
         export ftp_proxy=${PROXY_FTP}
     fi
     DIALOG --msgbox "The network is configured." 8 30
-    NEXTITEM="1"
+    NEXTITEM="2"
     S_NET=1
 }
 
@@ -4528,13 +4528,11 @@ select_source() {
             fi
             CANCEL=""
             DIALOG ${DEFAULT} --menu "FTP Installation" 10 35 3 \
-            "0" "Set up Network" \
             "1" "Choose Mirror" \
             "2" "Return to Main Menu" 2>${ANSWER} || CANCEL="1"
 
             case "$(cat ${ANSWER})" in
-            "0")
-                donetwork ;;
+
             "1")
                 getsource || return 1
                 ;;
@@ -4544,15 +4542,15 @@ select_source() {
         done
     fi
     if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="3"
-    else
         NEXTITEM="4"
+    else
+        NEXTITEM="5"
     fi
 }
 
 set_clock() {
     if [[ -e /usr/bin/tz ]]; then
-        tz --setup && NEXTITEM="2"
+        tz --setup && NEXTITEM="3"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
@@ -4560,7 +4558,7 @@ set_clock() {
 
 set_keyboard() {
     if [[ -e /usr/bin/km ]]; then
-        km --setup && NEXTITEM="1"
+        km --setup && NEXTITEM="2"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
     fi
@@ -5025,7 +5023,7 @@ configure_system() {
         # /etc/locale.gen
         chroot ${DESTDIR} locale-gen >/dev/null 2>&1
         ## END POSTPROCESSING ##
-        NEXTITEM="7"
+        NEXTITEM="8"
     fi
 }
 
@@ -5093,9 +5091,9 @@ install_bootloader() {
     esac
     
     if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="7"
-    else
         NEXTITEM="8"
+    else
+        NEXTITEM="9"
     fi
 }
 
@@ -5106,35 +5104,38 @@ mainmenu() {
         DEFAULT=""
     fi
     dialog ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
-    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
+    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 18 58 14 \
     "0" "Set Keyboard And Console Font" \
-    "1" "Set Time And Date" \
-    "2" "Prepare Hard Drive" \
-    "3" "Select Source" \
-    "4" "Select Packages" \
-    "5" "Install Packages" \
-    "6" "Configure System" \
-    "7" "Install Bootloader" \
-    "8" "Exit Install" 2>${ANSWER}
+    "1" "Set up Network" \
+    "2" "Set Time And Date" \
+    "3" "Prepare Hard Drive" \
+    "4" "Select Source" \
+    "5" "Select Packages" \
+    "6" "Install Packages" \
+    "7" "Configure System" \
+    "8" "Install Bootloader" \
+    "9" "Exit Install" 2>${ANSWER}
     NEXTITEM="$(cat ${ANSWER})"
     case $(cat ${ANSWER}) in
         "0")
             set_keyboard ;;
         "1")
-            set_clock ;;
+            donetwork ;;
         "2")
-            prepare_harddrive ;;
+            set_clock ;;
         "3")
-            select_source ;;
+            prepare_harddrive ;;
         "4")
-            select_packages ;;
+            select_source ;;
         "5")
-            install_packages ;;
+            select_packages ;;
         "6")
-            configure_system ;;
+            install_packages ;;
         "7")
-            install_bootloader ;;
+            configure_system ;;
         "8")
+            install_bootloader ;;
+        "9")
             if [[ "${S_SRC}" = "1" && "${MODE}" = "media" ]]; then
                 umount "${_MEDIA}" >/dev/null 2>&1
             fi
