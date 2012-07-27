@@ -3049,7 +3049,7 @@ auto_network()
     cp /etc/network.d/* ${DESTDIR}/etc/network.d/ 2>/dev/null
     # add netcfg profiles to /etc/conf.d/netcfg
     NETWORK_PROFILES=""
-    for i in $(echo /etc/network.d/*; do
+    for i in $(echo /etc/network.d/*); do
          [[ -f $i ]] && NETWORK_PROFILES="${NETWORK_PROFILES} $(basename $i)"
     done
     sed -i -e "s#NETWORKS=.*#NETWORKS=\(${NETWORK_PROFILES}\)#g" ${DESTDIR}/etc/conf.d/netcfg
