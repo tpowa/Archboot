@@ -1505,8 +1505,8 @@ _enter_luks_passphrase () {
         LUKSPASS2=$(cat ${ANSWER})
         if [[ "${LUKSPASS}" = "${LUKSPASS2}" ]]; then
             LUKSPASSPHRASE=${LUKSPASS}
-            echo ${LUKSPASSPHRASE} > /tmp/.passphrase
-            LUKSPASSPHRASE=/tmp/.passphrase
+            echo ${LUKSPASSPHRASE} > /tmp/passphrase-${LUKSDEVICE}
+            LUKSPASSPHRASE=/tmp/passphrase-${LUKSDEVICE}
         else
              DIALOG --msgbox "Passphrases didn't match, please enter again." 0 0
         fi
@@ -1524,10 +1524,8 @@ _opening_luks() {
             _enter_luks_passphrase || return 1
         fi
     done
-    LUKSPASSPHRASE="$(cat ${LUKSPASSPHRASE})"
-    DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/crypttab?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
-    echo ${LUKSDEVICE} ${PART} ${LUKSPASSPHRASE} >> /tmp/.crypttab
-    [[ -e /tmp/.passphrase ]] && rm /tmp/.passphrase
+    DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/$(basename ${LUKSPASSPHRASE})?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
+    echo ${LUKSDEVICE} ${PART} /etc/$(basename ${LUKSPASSPHRASE}) >> /tmp/.crypttab
 }
 
 # help for luks
@@ -4881,6 +4879,8 @@ auto_luks() {
         # add to temp crypttab
         sed -i -e "/^$(basename ${PART_ROOT}) /d" /tmp/.crypttab
         cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
+        chmod 600 /tmp/passphrase-* 2>/dev/null
+        cp /tmp/passphrase-* ${DESTDIR}/etc/ 2>/dev/null
     fi
 }
 
