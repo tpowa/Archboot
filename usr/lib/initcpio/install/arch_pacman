@@ -6,7 +6,7 @@ build ()
     apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
           /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta \
           /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/repo-elephant /usr/bin/repo-remove /usr/bin/testdb \
-          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg /usr/sbin/haveged"
+          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg /usr/bin/gpg-agent /usr/sbin/haveged"
     for i in $apps; do
         add_binary "$i"
     done
