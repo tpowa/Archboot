@@ -3045,7 +3045,21 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
+    # copy netcfg profiles
     cp /etc/network.d/* ${DESTDIR}/etc/network.d/ 2>/dev/null
+    # add netcfg profiles to /etc/conf.d/netcfg
+    NETWORK_PROFILES=""
+    for i in $(echo /etc/network.d/*; do
+         [[ -f $i ]] && NETWORK_PROFILES="${NETWORK_PROFILES} $(basename $i)"
+    done
+    sed -i -e "s#NETWORKS=.*#NETWORKS=\(${NETWORK_PROFILES}\)#g" ${DESTDIR}/etc/conf.d/netcfg
+    # launch netcfg on boot
+    if [[ "${SYSTEMD}" = "1" ]]; then
+        chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
+    else
+        sed -i -e "s# network # \!network netcfg #g" ${DESTDIR}/etc/rc.conf
+    fi
+    # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
         echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
         chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
