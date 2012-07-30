@@ -6,19 +6,11 @@ build ()
     ### setting up base structure
     add_dir "/mnt"
     add_dir "/media"
-    add_dir "/tmp"
     add_dir "/install"
     add_dir "/var/log"
     add_dir "/addons"
     add_dir "/home"
-    for dir in new_root proc sys dev run usr/bin; do
-        add_dir "/$dir"
-    done
 
-    add_symlink /lib usr/lib
-    add_symlink /sbin usr/bin
-    add_symlink /bin usr/bin
-    add_symlink /usr/sbin bin
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
