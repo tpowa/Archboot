@@ -5,7 +5,7 @@ build ()
 {
     add_full_dir "/usr/lib/firmware/intel-ucode"
     # fix license files
-    add_file "usr/share/licenses/intel-ucode/LICENSE"
+    add_file "/usr/share/licenses/intel-ucode/LICENSE"
 }
 
 help ()
