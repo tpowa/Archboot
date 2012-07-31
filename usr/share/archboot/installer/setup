@@ -4637,9 +4637,9 @@ prepare_harddrive() {
         esac
     done
     if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="2"
-    else
         NEXTITEM="3"
+    else
+        NEXTITEM="4"
     fi
 }
 
