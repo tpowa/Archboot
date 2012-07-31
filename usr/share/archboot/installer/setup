@@ -2824,7 +2824,7 @@ select_packages() {
             if [[ "${SELECTALL}" = "yes" ]]; then
                 tag="ON"
             fi
-            for i in $(grep "${category}/" ${PKGS} | sed -e 's|^[a-z0-9-]*/||g' -e "s|.pkg.tar.*$||g" -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g'); do
+            for i in $(grep "${category}/" ${PKGS} | sed -e 's|^[a-z0-9-]*/||g' -e "s|pkg.tar.*$||g" -e 's/-i686\.//g' -e 's/-x86_64\.//g' -e 's/-any\.//g'); do
               pkgname=${i%-*-*}
               pkgdesc $pkgname
               CHKLIST+=("${pkgname}" "(${category})" ${tag} "${PKGDESC}")
