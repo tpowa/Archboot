@@ -7,4 +7,6 @@ run_hook ()
   [ "$(uname -r)" = "x86_64" ] && ln -s /usr/bin/setarch /usr/bin/x86_64
   # fix vi symlink
   ln -s /usr/bin/vim /usr/bin/vi
+  # disable motd from login, pam does show motd already
+  touch /root/.hushlogin
 }
