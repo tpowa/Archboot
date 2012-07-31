@@ -131,12 +131,18 @@ PASS_WARN_AGE	7
 #
 UID_MIN			 1000
 UID_MAX			60000
+# System accounts
+SYS_UID_MIN		  500
+SYS_UID_MAX		  999
 
 #
 # Min/max values for automatic gid selection in groupadd
 #
-GID_MIN			  100
+GID_MIN			 1000
 GID_MAX			60000
+# System accounts
+SYS_GID_MIN		  500
+SYS_GID_MAX		  999
 
 #
 # Max number of login retries if password is bad
@@ -179,27 +185,6 @@ DEFAULT_HOME	yes
 # the user to be removed (passed as the first argument).
 #
 #USERDEL_CMD	/usr/sbin/userdel_local
-
-#
-# When prompting for password without echo, getpass() can optionally
-# display a random number (in the range 1 to GETPASS_ASTERISKS) of '*'
-# characters for each character typed.  This feature is designed to
-# confuse people looking over your shoulder when you enter a password :-).
-# Also, the new getpass() accepts both Backspace (8) and Delete (127)
-# keys to delete previous character (to cope with different terminal
-# types), Control-U to delete all characters, and beeps when there are
-# no more characters to delete, or too many characters entered.
-#
-# Setting GETPASS_ASTERISKS to 1 results in more traditional behaviour -
-# exactly one '*' displayed for each character typed.
-#
-# Setting GETPASS_ASTERISKS to 0 disables the '*' characters (Backspace,
-# Delete, Control-U and beep continue to work as described above).
-#
-# Setting GETPASS_ASTERISKS to -1 reverts to the traditional getpass()
-# without any new features.  This is the default.
-#
-#GETPASS_ASTERISKS 1
 
 #
 # Enable setting of the umask group bits to be the same as owner bits
