@@ -13,15 +13,15 @@ id:2:initdefault:
 rc::sysinit:/etc/rc.sysinit
 rh:06:wait:/etc/rc.shutdown
 
-#c0:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 9600 ttyS0 linux
-c1:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty1 linux
-c2:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty2 linux
-c3:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty3 linux
-c4:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty4 linux
-c5:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty5 linux
-c6:2:respawn:/sbin/agetty -8 -n -l /etc/login.sh 38400 tty6 linux
+#c0:2:respawn:/sbin/agetty -8 -a root -s 9600 ttyS0 linux
+c1:2:respawn:/sbin/agetty -8 -a root -s 38400 tty1 linux
+c2:2:respawn:/sbin/agetty -8 -a root -s 38400 tty2 linux
+c3:2:respawn:/sbin/agetty -8 -a root -s 38400 tty3 linux
+c4:2:respawn:/sbin/agetty -8 -a root -s 38400 tty4 linux
+c5:2:respawn:/sbin/agetty -8 -a root -s 38400 tty5 linux
+c6:2:respawn:/sbin/agetty -8 -a root -s 38400 tty6 linux
 # Hypervisor Virtual Console for Xen and KVM
-#h0:2345:respawn:/sbin/agetty -8 38400 hvc0 linux
+#h0:2345:respawn:/sbin/agetty -8 -a root -s 38400 hvc0 linux
 
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
 

@@ -20,7 +20,7 @@ IgnoreOnIsolate=yes
 
 [Service]
 Environment=TERM=vt102
-ExecStart=-/sbin/agetty -n -l /etc/login.sh -s %I 115200,38400,9600
+ExecStart=-/sbin/agetty -a root -s %I 115200,38400,9600
 Type=idle
 Restart=always
 RestartSec=0
