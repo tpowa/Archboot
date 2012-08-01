@@ -2878,7 +2878,7 @@ select_packages() {
             echo "Processing "${pkgname}" ..." 2>&1 >> /tmp/package-process.log
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
-            if [[ "${_catlist/"\"${pkgcat}\""/XXXX}" != "${_catlist}" ]]; then
+            if [[ "${_catlist/"${pkgcat}"/XXXX}" != "${_catlist}" ]]; then
                 _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
             else
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
@@ -2891,7 +2891,7 @@ select_packages() {
             echo "Processing "${pkgname} ..." " 2>&1 >> /tmp/package-process.log
             # check if this package is in a selected group
             # slightly ugly but sorting later requires newlines in the variable
-            if [[ "${_catlist/"\"${pkgcat}\""/XXXX}" != "${_catlist}" ]]; then
+            if [[ "${_catlist/"${pkgcat}"/XXXX}" != "${_catlist}" ]]; then
                 _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
             else
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
