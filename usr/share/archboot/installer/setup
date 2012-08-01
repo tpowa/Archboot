@@ -2667,7 +2667,7 @@ getsource() {
         #in order to cache packages from media check on it first!
         get_media
         select_mirror || return 1
-        NEXTITEM="3"
+        NEXTITEM="2"
     fi
     S_SRC=1
 }
