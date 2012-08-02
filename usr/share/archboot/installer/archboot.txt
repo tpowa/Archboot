@@ -71,7 +71,7 @@ Introduction
    * systemd is supported
    * It doesn't mount anything during boot process.
    * It contains [core] repository on media.
-   * It provides a own setup and quickinst script.
+   * It provides an ineteractive setup and quickinst script.
 
   What are the Archboot Setup features?
 
