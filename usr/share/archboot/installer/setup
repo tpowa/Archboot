@@ -4572,7 +4572,7 @@ set_clock() {
 
 set_keyboard() {
     if [[ -e /usr/bin/km ]]; then
-        km --setup && NEXTITEM="2"
+        km --setup && NEXTITEM="1"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
     fi
