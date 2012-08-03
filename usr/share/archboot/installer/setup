@@ -3057,7 +3057,7 @@ auto_network()
     if [[ "${SYSTEMD}" = "1" ]]; then
         chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
     else
-        sed -i -e "s# network # \!network netcfg #g" ${DESTDIR}/etc/rc.conf
+        sed -i -e "s# network # \!network net-profiles #g" ${DESTDIR}/etc/rc.conf
     fi
     # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
