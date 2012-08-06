@@ -3126,10 +3126,10 @@ donetwork() {
         fi
         # dhcp switch
         IP=""
+        DHCLIENT=""
         DIALOG --yesno "Do you want to use DHCP?" 5 40
         if [[ $? -eq 0 ]]; then
             IP="dhcp"
-            DHCLIENT=""
             DIALOG --defaultno --yesno "Do you want to use dhclient instead of dhcpcd?" 5 55
             [[ $? -eq 0 ]] && DHCLIENT="yes"
             S_DHCP=1
