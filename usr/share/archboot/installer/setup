@@ -5096,9 +5096,20 @@ install_bootloader() {
     prepare_pacman
     CANCEL=""
     
-    [[ "$(grep UEFI_ARCH_x86_64 /proc/cmdline)" ]] && UEFI_x86_64="1"
+    _DIRECT="0"
     
-    [[ "${UEFI_x86_64}" == "1" ]] && DIALOG --yesno "Setup has detected that you are using x86_64 (64-bit) UEFI ...\nDo you like to install a x86_64 UEFI bootloader?" 0 0 && install_bootloader_uefi_x86_64
+    [[ "$(grep UEFI_ARCH_x86_64 /proc/cmdline)" ]] && _UEFI_x86_64="1"
+    
+    [[ "${_UEFI_x86_64}" == "1" ]] && DIALOG --yesno "Setup has detected that you are using x86_64 (64-bit) UEFI ...\nDo you like to install a x86_64 UEFI bootloader?" 0 0 && install_bootloader_uefi_x86_64 && _DIRECT="1"
+    
+    if [[ "${_DIRECT}" == "1" ]]; then
+        DIALOG --yesno "Do you want to install another bootloader?" 0 0 && install_bootloader_menu && _DIRECT="0"
+    else
+        install_bootloader_menu
+    fi
+}
+
+install_bootloader_menu() {
     
     DIALOG --menu "What is your boot system type?" 10 40 3 \
         "BIOS" "BIOS" \
