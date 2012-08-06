@@ -4906,6 +4906,8 @@ auto_timesetting() {
     fi
     if [[ ! -f ${DESTDIR}/etc/adjtime ]]; then
         echo "0.0 0 0.0" > ${DESTDIR}/etc/adjtime
+        echo "0" >> ${DESTDIR}/etc/adjtime
+        [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>${DESTDIR}/etc/adjtime
     fi
 }
 

@@ -18,7 +18,7 @@ abort()
     [[ -e /tmp/.hardwareclock ]] && rm -f /tmp/.hardwareclock
     [[ -e /tmp/.tz ]] && rm -f /tmp/.tz
     [[ -e /etc/localtime ]] && rm -f /etc/localtime
-    [[ -e /var/lib/hwclock/adjtime ]] && rm -f /var/lib/hwclock/adjtime
+    [[ -e /etc/adjtime ]] && rm -f /etc/adjtime
     [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
     clear
     exit 1
@@ -40,12 +40,13 @@ if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
     echo UTC > /tmp/.hardwareclock
 else
     HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --localtime"
-    echo localtime > /tmp/.hardwareclock
+    echo LOCAL > /tmp/.hardwareclock
 fi
 
-[[ ! -d /var/lib/hwclock ]] && mkdir -p /var/lib/hwclock
-if [[ ! -f /var/lib/hwclock/adjtime ]]; then
-    echo "0.0 0 0.0" > /var/lib/hwclock/adjtime
+if [[ ! -f /etc/adjtime ]]; then
+    echo "0.0 0 0.0" > /etc/adjtime
+    echo "0" >> /etc/adjtime
+    [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>/etc/adjtime
 fi
 hwclock ${HWCLOCK_PARAMS}
 }
