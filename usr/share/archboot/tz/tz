@@ -35,8 +35,14 @@ DIALOG() {
 }
 
 dohwclock() {
-HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --utc"
-echo UTC > /tmp/.hardwareclock
+if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
+    HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --utc"
+    echo UTC > /tmp/.hardwareclock
+else
+    HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --localtime"
+    echo localtime > /tmp/.hardwareclock
+fi
+
 [[ ! -d /var/lib/hwclock ]] && mkdir -p /var/lib/hwclock
 if [[ ! -f /var/lib/hwclock/adjtime ]]; then
     echo "0.0 0 0.0" > /var/lib/hwclock/adjtime
@@ -79,11 +85,13 @@ done
 dotimeset() {
 SET_TIME=""
 USE_NTPDATE=""
+HARDWARECLOCK=""
 if [[ ! -s /tmp/.timezone ]]; then
     DIALOG --msgbox "Error:\nYou have to select a region and timezone first." 0 0
     S_NEXTITEM="1"
     dotimezone || return 1
 fi
+DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC confuses it." 15 65 && HARDWARECLOCK="UTC"
 DIALOG --infobox "Syncing hardwareclock to systemclock ..." 0 0
 HWCLOCK_PARAMS="--hctosys"
 dohwclock
