@@ -16,6 +16,9 @@ build ()
     add_dir "/etc/lvm/backup/"
     add_dir "/etc/lvm/archive/"
     add_file "/usr/share/archboot/lvm2/etc/lvm/lvm.conf" "/etc/lvm/lvm.conf"
+    for i in /usr/lib/liblvm*; do
+        add_file "$i"
+    done
     add_runscript
 }
 

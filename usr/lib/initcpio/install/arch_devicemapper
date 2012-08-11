@@ -7,6 +7,10 @@ build ()
     add_binary "/sbin/dmsetup"
     add_binary "/sbin/dmeventd"
     add_dir "/dev/mapper"
+    add_full_dir "/usr/lib/device-mapper"
+    for i in /usr/lib/libdevmapper*; do
+        add_file "$i"
+    done
 }
 
 help ()
