@@ -2467,6 +2467,7 @@ mountpoints() {
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
         set_device_name_scheme || return 1
     fi
+    printk off
     for line in $(cat /tmp/.parts); do
         PART=$(echo ${line} | cut -d: -f 1)
         FSTYPE=$(echo ${line} | cut -d: -f 2)
@@ -2497,7 +2498,7 @@ mountpoints() {
         fi
         sleep 1
     done
-
+    printk on
     DIALOG --msgbox "Partitions were successfully mounted." 0 0
     NEXTITEM="5"
     S_MKFS=1
