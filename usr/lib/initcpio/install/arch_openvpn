@@ -7,7 +7,7 @@ build ()
     add_dir "/etc/openvpn"
     add_file "/etc/rc.d/openvpn"
     add_file "/etc/rc.d/openvpn-tapdev"
-    add_file "/usr/share/archboot/openvpn/etc/conf.d/openvpn-tapdev" "/etc/conf.d/openvpn-tapdev"
+    add_file "/etc/conf.d/openvpn-tapdev"
     # add examples
     for i in /usr/share/openvpn/examples/*; do
         add_file "$i"
