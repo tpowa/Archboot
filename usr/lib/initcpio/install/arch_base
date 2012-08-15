@@ -59,7 +59,7 @@ build ()
     ### add system config files
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols rc.local request-key.conf resolv.conf securetty \
-		 services sysctl.conf vimrc conf.d/syslog-ng modprobe.d/modprobe.conf"
+		 services sysctl.conf vimrc conf.d/syslog-ng"
     for i in $systemfiles
         add_file "/etc/$i"
     done
