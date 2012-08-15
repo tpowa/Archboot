@@ -1,0 +1,17 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_binary "/bin/zsh"
+    add_full_dir "/etc/zsh"
+    add_full_dir "/usr/share/zsh"
+    add_full_dir "/usr/lib/zsh"
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook includes zsh shell.
+HELPEOF
+}
