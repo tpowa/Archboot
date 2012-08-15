@@ -6,7 +6,6 @@ build ()
     add_binary "/usr/bin/clamscan"
     add_binary "/usr/bin/freshclam"
     # add /var directories
-    add_dir "/var/lib/"
     add_dir "/var/log/clamav"
     add_file "/usr/share/archboot/clamav/etc/clamav/freshclam.conf" "/etc/clamav/freshclam.conf"
     # add unrar support
