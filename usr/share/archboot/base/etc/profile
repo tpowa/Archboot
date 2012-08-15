@@ -1,27 +1,23 @@
-#
 # /etc/profile
-#
-
-PATH="/bin:/usr/bin:/sbin:/usr/sbin"
-export PATH
-
-INPUTRC="/etc/inputrc"
-LESS="-R"
-
-# Some readline stuff that is fairly common
-HISTSIZE=1000
-HISTCONTROL="erasedups"
-
-export HISTSIZE HISTCONTROL INPUTRC LESS
 
 #Set our umask
 umask 022
 
-export PS1='[Arch Linux: \W]\$ '
-export PS2='> '
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+export PATH
 
-alias ls='ls --color=auto'
-alias dir='dir --color=auto'
+# Load profiles from /etc/profile.d
+if test -d /etc/profile.d/; then
+        for profile in /etc/profile.d/*.sh; do
+                test -r "$profile" && . "$profile"
+        done
+        unset profile
+fi
+
+# Source global bash config
+if test "$PS1" && test "$BASH" && test -r /etc/bash.bashrc; then
+        . /etc/bash.bashrc
+fi
 
 cd /
 echo "Hit ENTER to enter the bash shell ..."

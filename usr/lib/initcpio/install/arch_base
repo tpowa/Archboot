@@ -56,11 +56,18 @@ build ()
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
     add_full_dir "/usr/lib/zsh"
+    ### add system config files
+    systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
+                 nanorc nsswitch.conf protocols rc.local request-key.conf resolv.conf securetty \
+		 services sysctl.conf vimrc conf.d/syslog-ng modprobe.d/modprobe.conf"
+    for i in $systemfiles
+        add_file "/etc/$i"
+    done
+    ### add profile.d files
+    add_full_dir "/etc/profile.d"
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
     add_symlink "/etc/mtab" "/proc/self/mounts"
-    # Add an empty fstab to avoid mount warning when -o remount is used
-    >"$BUILDROOT/etc/fstab"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/usr/lib/initcpio/init_functions" "/init_functions"
