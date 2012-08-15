@@ -4,17 +4,16 @@
 build ()
 {
     add_checked_modules 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
-    apps="/usr/bin/cpufreq-info /usr/bin/cpufreq-set"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_file "/usr/share/archboot/cpufreq/etc/conf.d/cpufreq" "/etc/conf.d/cpufreq"
-    add_file "/etc/rc.d/cpufreq"
+    add_binary "/usr/bin/cpupower"
+    add_file "/usr/bin/cpufreq-bench_plot.sh"
+    add_file "/etc/conf.d/cpupower"
+    add_file "/etc/rc.d/cpupower"
+    add_file "/etc/cpufreq-bench.conf"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes cpufreq tools on an arch boot image.
+  This hook includes cpupower tools on an arch boot image.
 HELPEOF
 } 
