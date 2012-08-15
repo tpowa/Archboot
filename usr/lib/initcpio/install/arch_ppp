@@ -9,14 +9,7 @@ build ()
         add_binary "$i"
     done
     add_full_dir "/usr/lib/pppd"
-    add_dir "/etc/ppp/peers"
-    add_file "/usr/share/archboot/ppp/etc/ppp/chap-secrets" "/etc/ppp/chap-secrets"
-    add_file "/usr/share/archboot/ppp/etc/ppp/ip-down" "/etc/ppp/ip-down"
-    add_file "/usr/share/archboot/ppp/etc/ppp/ip-up" "/etc/ppp/ip-up"
-    add_file "/usr/share/archboot/ppp/etc/ppp/options" "/etc/ppp/options"
-    add_file "/usr/share/archboot/ppp/etc/ppp/pap-secrets" "/etc/ppp/pap-secrets"
-    add_file "/usr/share/archboot/ppp/etc/ppp/ip-down.d/00-dns.sh" "/etc/ppp/ip-down.d/00-dns.sh"
-    add_file "/usr/share/archboot/ppp/etc/ppp/ip-up.d/00-dns.sh" "/etc/ppp/ip-up.d/00-dns.sh"
+    add_full_dir "/etc/ppp"
     add_file "/etc/rc.d/ppp"
     # fix license files
     add_file "/usr/share/licenses/libpcap/LICENSE"
