@@ -5,10 +5,10 @@ build ()
 {
     add_binary "/sbin/pam_tally" 
     add_binary "/sbin/unix_chkpwd"
-    for i in $(echo /usr/share/archboot/pam/etc/*/*); do
-    	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/pam/etc|/etc|g')"
-    done
-    add_file "/usr/share/archboot/pam/etc/environment" "/etc/environment"
+    add_full_dir "/etc/security"
+    add_full_dir "/etc/default"
+    add_full_dir "/etc/pam.d"
+    add_file "/etc/environment"
     for i in $(echo /usr/lib/security/pam_*.so); do
     	add_file "$i"
     done
