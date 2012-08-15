@@ -34,7 +34,7 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
-    add_file "/usr/share/archboot/filesystem/etc/nilfs_cleanerd.conf" "/etc/nilfs_cleanerd.conf"
+    add_file "/etc/nilfs_cleanerd.conf"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
