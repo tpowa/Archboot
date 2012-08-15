@@ -11,12 +11,12 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/usr/share/archboot/isdn/etc/isdn/callerid.conf" "/etc/isdn/callerid.conf"
-    add_file "/usr/share/archboot/isdn/etc/isdn/isdn.conf" "/etc/isdn/isdn.conf"
-    add_file "/usr/share/archboot/isdn/etc/isdn/isdnlog.isdnctrl0.options" "/etc/isdn/isdnlog.isdnctrl0.options"
-    add_file "/usr/share/archboot/isdn/etc/isdn/isdnlog.users" "/etc/isdn/isdnlog.users"
-    add_file "/usr/share/archboot/isdn/etc/isdn/rate.conf" "/etc/isdn/rate.conf"
-    add_file "/usr/share/archboot/isdn/etc/isdn/stop" "/etc/isdn/stop"
+    add_file "/etc/isdn/callerid.conf"
+    add_file "/etc/isdn/isdn.conf"
+    add_file "/etc/isdn/isdnlog.isdnctrl0.options"
+    add_file "/etc/isdn/isdnlog.users"
+    add_file "/etc/isdn/rate.conf"
+    add_file "/etc/isdn/stop"
 }
 
 help ()
