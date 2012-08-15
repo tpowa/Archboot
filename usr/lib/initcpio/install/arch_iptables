@@ -11,10 +11,9 @@ build ()
     done
     add_file "/etc/rc.d/iptables"
     add_file "/etc/rc.d/ip6tables"
-    add_file "/usr/share/archboot/iptables/etc/conf.d/iptables" "/etc/conf.d/iptables"
-    add_file "/usr/share/archboot/iptables/etc/iptables/empty.rules" "/etc/iptables/empty.rules"
-    add_file "/usr/share/archboot/iptables/etc/iptables/simple_firewall.rules" "/etc/iptables/simple_firewall.rules"
-
+    add_file "/etc/conf.d/iptables"
+    add_file "/etc/iptables/empty.rules"
+    add_file "/etc/iptables/simple_firewall.rules"
 }
 
 help ()
