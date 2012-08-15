@@ -9,7 +9,7 @@ build ()
         add_binary "$i"
     done
     add_dir "/etc/ppp/peers/plugins"
-    add_file "/usr/share/archboot/linux_atm/etc/atmsigd.conf" "/etc/atmsigd.conf"
+    add_file "/etc/atmsigd.conf"
 }
 
 help ()
