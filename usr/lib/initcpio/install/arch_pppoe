@@ -10,10 +10,7 @@ build ()
         add_binary "$i"
     done
     add_full_dir "/usr/lib/rp-pppoe"
-    add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-masq" "/etc/ppp/firewall-masq"
-    add_file "/usr/share/archboot/pppoe/etc/ppp/firewall-standalone" "/etc/ppp/firewall-standalone"
-    add_file "/usr/share/archboot/pppoe/etc/ppp/pppoe-server-options" "/etc/ppp/pppoe-server-options"
-    add_file "/usr/share/archboot/pppoe/etc/ppp/pppoe.conf" "/etc/ppp/pppoe.conf"
+    add_full_dir "/etc/ppp"
     add_file "/etc/rc.d/adsl"
 }
 
