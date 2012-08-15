@@ -41,7 +41,7 @@ build ()
 	  /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
 	  /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
 	  /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /usr/bin/volname /bin/keyctl /sbin/request-key \
-	  /usr/bin/kmod"
+	  /usr/bin/kmod /bin/zsh"
     for i in $apps; do
         add_binary "$i"
     done
@@ -52,6 +52,10 @@ build ()
         add_file "$i"
     done
 
+    ### add zsh files
+    add_full_dir "/etc/zsh"
+    add_full_dir "/usr/share/zsh"
+    add_full_dir "/usr/lib/zsh"
     ### adding needed programs from running system
     add_file "${CONFIG}" "/config"
     add_symlink "/etc/mtab" "/proc/self/mounts"
