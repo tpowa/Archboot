@@ -13,12 +13,7 @@ build ()
         add_binary "$i"
     done
     add_file "/usr/sbin/adduser"
-    for i in $(echo /usr/share/archboot/shadow/etc/*/*); do
-    	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"
-    done
-    for i in $(echo /usr/share/archboot/shadow/etc/*.defs); do
-    	add_file "$i" "$(echo $i | sed -e 's|/usr/share/archboot/shadow/etc|/etc|g')"
-    done
+    add_file "/etc/login.defs"
 }
 
 help ()
