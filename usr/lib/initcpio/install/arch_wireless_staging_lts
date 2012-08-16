@@ -1,0 +1,18 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # add staging wireless here
+    STAGING="brcm80211 rtl8192e rtl8187se rtl8192u rtl8712 vt6655 vt6656 winbond wlan-ng"
+    for i in $STAGING; do
+        add_checked_modules "/drivers/staging/$i"
+    done 
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes lts staging wireless on an arch boot image.
+HELPEOF
+}
