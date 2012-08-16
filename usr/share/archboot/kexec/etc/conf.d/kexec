@@ -7,7 +7,7 @@ KPATH="/install/boot/vmlinuz-linux"
 
 # Root partition
 # The default attempts to autodetect
-ROOTPART="$(mount | grep "on /mnt type" | cut -d' ' -f 1)"
+ROOTPART="$(mount | grep "on /install type" | cut -d' ' -f 1)"
 
 # Additional kernel parameters
 KPARAM="ro"
