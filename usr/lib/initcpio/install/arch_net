@@ -27,8 +27,6 @@ build ()
     add_file "/sbin/dhcpcd"
     add_file "/sbin/ifenslave"
     add_file "/usr/sbin/brctl"
-    add_file "/etc/rc.d/network"
-    add_file "/etc/rc.d/netfs"
     add_file "/etc/conf.d/dhcpcd"
     add_file "/etc/conf.d/bonding"
     add_file "/etc/conf.d/bridges"
@@ -55,7 +53,6 @@ build ()
     add_dir "/var/lib/dhclient"
     add_dir "/var/state/dhcp"
     # add ifplugd support
-    add_file "/etc/rc.d/ifplugd"
     add_file "/etc/ifplugd/ifplugd.action"
     add_file "/etc/ifplugd/ifplugd.conf"
     # fixing licenses

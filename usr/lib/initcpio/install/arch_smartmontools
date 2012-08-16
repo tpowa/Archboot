@@ -9,7 +9,6 @@ build ()
     done
     add_file "/etc/conf.d/smartd"
     add_file "/etc/smartd.conf"
-    add_file "/etc/rc.d/smartd"
 }
 
 help ()

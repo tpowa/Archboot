@@ -7,7 +7,6 @@ build ()
     add_binary "/usr/bin/cpupower"
     add_file "/usr/bin/cpufreq-bench_plot.sh"
     add_file "/etc/conf.d/cpupower"
-    add_file "/etc/rc.d/cpupower"
     add_file "/etc/cpufreq-bench.conf"
 }
 

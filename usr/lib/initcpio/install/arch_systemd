@@ -8,7 +8,6 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/etc/rc.d/dbus"
     add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
     add_dir "/var/lib/dbus"
     add_full_dir "/etc/dbus-1"

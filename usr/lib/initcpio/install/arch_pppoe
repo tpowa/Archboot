@@ -10,7 +10,6 @@ build ()
         add_binary "$i"
     done
     add_full_dir "/usr/lib/rp-pppoe"
-    add_file "/etc/rc.d/adsl"
 }
 
 help ()
