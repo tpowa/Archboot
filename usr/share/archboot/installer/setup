@@ -53,7 +53,6 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_GRUB=0       # using grub(2)
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
