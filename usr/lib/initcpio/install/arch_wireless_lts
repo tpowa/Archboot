@@ -15,10 +15,10 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/usr/share/archboot/wireless/etc/conf.d/wireless" "/etc/conf.d/wireless"
-    add_file "/usr/share/archboot/wireless/etc/wpa_supplicant.conf" "/etc/wpa_supplicant.conf"
+    add_file "/etc/conf.d/wireless"
+    add_file "/etc/wpa_supplicant.conf"
     # add rfkill
-    add_file "/usr/share/archboot/wireless/etc/conf.d/rfkill" "/etc/conf.d/rfkill"
+    add_file "/etc/conf.d/rfkill"
     add_file "/etc/rc.d/rfkill"
     # add zd1211 firmware files
     for i in /usr/lib/firmware/zd1211/* ; do
@@ -26,7 +26,7 @@ build ()
     done
     # crda support
     add_file "/etc/rc.d/wireless-regdom"
-    add_file "/usr/share/archboot/wireless/etc/conf.d/wireless-regdom" "/etc/conf.d/wireless-regdom"
+    add_file "/etc/conf.d/wireless-regdom"
     add_file "/usr/lib/crda/regulatory.bin"
     # fixing licenses
     add_file "/usr/share/licenses/expat/COPYING"
