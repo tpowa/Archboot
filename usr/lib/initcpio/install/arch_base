@@ -17,8 +17,8 @@ build ()
     apps="/usr/bin/getent /sbin/init /sbin/agetty /bin/mount /bin/umount /usr/bin/basename /usr/bin/du /usr/bin/clear \
           /usr/bin/env /usr/bin/head /usr/bin/id /usr/bin/md5sum /usr/bin/nano /usr/bin/nc /usr/bin/printf /usr/bin/tail \
 	  /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
-	  /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes /usr/sbin/syslog-ng /usr/sbin/syslog-ng-ctl \
-	  /usr/bin/loggen /usr/bin/pdbtool /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
+	  /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes \
+	  /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
 	  /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/sbin/parted /usr/sbin/partprobe \
 	  /usr/bin/gawk /bin/cp /bin/mv /sbin/shutdown /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
 	  /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
@@ -46,7 +46,7 @@ build ()
         add_binary "$i"
     done
     appfiles="/usr/lib/libkmod.so /usr/bin/lsmod /sbin/depmod /usr/bin/insmod /usr/bin/modinfo /sbin/modprobe \
-              /usr/bin/rmmod /usr/bin/update-patterndb /usr/bin/gunzip /usr/bin/zcat /usr/bin/lzcmp /usr/bin/lzdiff \
+              /usr/bin/rmmod /usr/bin/gunzip /usr/bin/zcat /usr/bin/lzcmp /usr/bin/lzdiff \
               /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore"
     for i in $appfiles; do
         add_file "$i"
@@ -63,12 +63,10 @@ build ()
     add_file "/usr/share/terminfo/l/linux"
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/usr/lib/initcpio/init_functions" "/init_functions"
-    add_file "/usr/sbin/rc.d"
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nanorc nsswitch.conf protocols rc.local request-key.conf resolv.conf securetty \
-		 services sysctl.conf vimrc conf.d/syslog-ng rc.d/syslog-ng rc.d/hwclock \
-		 rc.d/functions"
+                 nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
+		 services sysctl.conf vimrc"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
@@ -92,12 +90,6 @@ build ()
     add_file "/usr/share/file/magic.mgc"
     add_file "/usr/share/misc/magic.mgc"
 
-    ### fix syslog-ng
-    for i in /usr/lib/syslog-ng/*; do
-      add_file "$i"
-    done
-    add_dir "/var/lib/syslog-ng/"
-    add_dir "/etc/syslog-ng/patterndb.d"
     ### fix licenses
     add_file "/usr/share/licenses/file/COPYING"
     add_file "/usr/share/licenses/bzip2/LICENSE"
