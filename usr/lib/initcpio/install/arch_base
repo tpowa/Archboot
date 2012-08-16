@@ -52,29 +52,26 @@ build ()
         add_file "$i"
     done
 
-    ### add zsh files
+    ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
     add_full_dir "/usr/lib/zsh"
-    ### add system config files
-    systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nanorc nsswitch.conf protocols rc.local request-key.conf resolv.conf securetty \
-		 services sysctl.conf vimrc conf.d/syslog-ng"
-    for i in $systemfiles
-        add_file "/etc/$i"
-    done
-    ### add profile.d files
-    add_full_dir "/etc/profile.d"
-    ### adding needed programs from running system
+
+    ### adding needed files from running system
     add_file "${CONFIG}" "/config"
     add_symlink "/etc/mtab" "/proc/self/mounts"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/usr/share/archboot/base/init" "/init"
     add_file "/usr/lib/initcpio/init_functions" "/init_functions"
-    add_file "/etc/rc.d/functions"
     add_file "/usr/sbin/rc.d"
-    add_file "/etc/rc.d/syslog-ng"
-    add_file "/etc/rc.d/hwclock"
+    add_full_dir "/etc/profile.d"
+    systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
+                 nanorc nsswitch.conf protocols rc.local request-key.conf resolv.conf securetty \
+		 services sysctl.conf vimrc conf.d/syslog-ng rc.d/syslog-ng rc.d/hwclock \
+		 rc.d/functions"
+    for i in $systemfiles; do
+        add_file "/etc/$i"
+    done
 
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
