@@ -7,8 +7,8 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/usr/share/archboot/smartmontools/etc/conf.d/smartd" "/etc/conf.d/smartd"
-    add_file "/usr/share/archboot/smartmontools/etc/smartd.conf" "/etc/smartd.conf"
+    add_file "/etc/conf.d/smartd"
+    add_file "/etc/smartd.conf"
     add_file "/etc/rc.d/smartd"
 }
 
