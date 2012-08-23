@@ -21,7 +21,6 @@ build ()
     add_file "/etc/xinetd.d/telnet"
     add_file "/etc/ssh/ssh_config"
     add_file "/etc/ssh/sshd_config"
-    add_file "/etc/conf.d/sshd"
     add_file "/etc/ssh/moduli"
     add_file "/etc/rsyncd.conf"
     add_file "/etc/xinetd.d/rsync"
