@@ -9,7 +9,6 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/etc/conf.d/iptables"
     add_file "/etc/iptables/empty.rules"
     add_file "/etc/iptables/simple_firewall.rules"
 }
