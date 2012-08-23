@@ -10,10 +10,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/etc/conf.d/wireless"
     add_file "/etc/wpa_supplicant.conf"
-    # add rfkill
-    add_file "/etc/conf.d/rfkill"
     # add zd1211 firmware files
     for i in /usr/lib/firmware/zd1211/* ; do
 	add_file "$i"
