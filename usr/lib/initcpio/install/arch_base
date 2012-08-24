@@ -27,7 +27,7 @@ build ()
 	  /bin/true /usr/bin/mktemp /usr/sbin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
 	  /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
 	  /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
-	  /usr/bin/dir /usr/bin/lzmadec   /usr/bin/xz \  
+	  /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz \
 	  /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
 	  /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
 	  /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
@@ -40,7 +40,7 @@ build ()
 	  /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
 	  /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
 	  /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /usr/bin/volname /bin/keyctl /sbin/request-key \
-	  /usr/bin/kmod /bin/zsh"
+	  /usr/bin/kmod /bin/zsh /usr/bin/hostname"
     for i in $apps; do
         add_binary "$i"
     done
@@ -49,7 +49,7 @@ build ()
         add_file "$i"
     done
     symlinks="/sbin/depmod /usr/bin/awk /sbin/halt /sbin/telinit /sbin/shutdown /sbin/runlevel /sbin/reboot \
-              /sbin/poweroff /sbin/init /bin/hostname /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
+              /sbin/poweroff /sbin/init /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
               /usr/bin/lzma /usr/bin/modinfo /sbin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod /sbin/swapoff \
