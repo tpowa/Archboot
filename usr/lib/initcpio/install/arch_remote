@@ -28,7 +28,6 @@ build ()
     for i in $(find /usr/share/terminfo/ ! -type d); do
     	add_file "$i"
     done
-    add_file "/etc/conf.d/rsyncd"
     add_file "/usr/lib/ssh/sftp-server"
     add_file "/usr/lib/ssh/ssh-keysign"
     add_file "/usr/lib/ssh/ssh-pkcs11-helper"
