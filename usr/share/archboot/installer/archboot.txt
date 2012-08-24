@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 26th 2012
+   August, 24th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -68,16 +68,17 @@ Introduction
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
    * hwdetect script is used for preconfiguration
-   * systemd is supported
+   * systemd boot environment
    * It doesn't mount anything during boot process.
    * It contains [core] repository on media.
-   * It provides an ineteractive setup and quickinst script.
+   * It provides an interactive setup and quickinst script.
 
   What are the Archboot Setup features?
 
    * Media and Network installation mode
    * Changing keymap and consolefont
    * Changing time and date
+   * Setup network with netcfg
    * Preparing harddisk, like auto-prepare, partitioning,
      GUID (gpt) support, 4k sector drive support etc.
    * Creation of software raid/raid partitions, lvm2 devices and 
@@ -88,7 +89,7 @@ Introduction
    * Package selection support
    * signed package installation
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
-     mkinitcpio.conf, rc.conf, crypttab and mdadm.conf
+     mkinitcpio.conf, rc.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
    * grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64
@@ -141,9 +142,6 @@ Archboot bootparameters
       - Place external addon packages in /packages directory of your external 
         device.
       - Place external configs in /config directory of your external device.
-
-   * init=/bin/systemd
-      - Activates systemd for booting and installation (experimental)
 
   What are the video and framebuffer options?
 
