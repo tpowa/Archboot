@@ -8,9 +8,14 @@ build ()
 	  /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems \
 	  /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd \
 	  /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd \
-	  /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg /usr/sbin/vigr"
+	  /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg"
     for i in $apps; do
         add_binary "$i"
+    done
+    symlinks="/usr/sbin/vigr"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/usr/sbin/adduser"
     add_file "/etc/login.defs"
