@@ -22,13 +22,13 @@ build ()
 	  /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/sbin/parted /usr/sbin/partprobe \
 	  /usr/bin/gawk /bin/cp /bin/mv /sbin/shutdown /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
 	  /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
-	  /bin/hostname /bin/kill /usr/bin/killall /sbin/killall5 /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
+	  /bin/hostname /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
 	  /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
 	  /bin/true /usr/bin/mktemp /usr/sbin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
 	  /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
 	  /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
 	  /usr/bin/reset /sbin/swapoff /sbin/halt /sbin/telinit /usr/bin/awk /usr/bin/dir /sbin/reboot /sbin/poweroff \
-	  /bin/pidof /usr/bin/nc /usr/bin/lzcat /usr/bin/lzma /usr/bin/lzmadec /usr/bin/unlzma /usr/bin/unxz /usr/bin/xz \
+	  /usr/bin/nc /usr/bin/lzcat /usr/bin/lzma /usr/bin/lzmadec /usr/bin/unlzma /usr/bin/unxz /usr/bin/xz \
 	  /usr/bin/xzcat /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
 	  /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
 	  /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
