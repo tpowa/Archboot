@@ -16,7 +16,7 @@ build ()
              ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps-ng psmisc reiserfsprogs sed snarf \
              sysvinit tar util-linux which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
              inetutils openssh hwdetect shadow bridge-utils ifenslave cpupower links \
-             dosfstools systemd-tools initscripts filesystem linux linux-lts glibc linux-api-headers \
+             dosfstools systemd-tools filesystem linux linux-lts glibc linux-api-headers \
              xinetd links pacman pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib \
              elfutils gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap rp-pppoe \
              lilo iptables ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
