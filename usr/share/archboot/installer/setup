@@ -20,8 +20,6 @@ VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
 
-# detect systemd running
-[[ "$(cat /proc/cmdline | grep -w init=/bin/systemd)" ]] && SYSTEMD="1"
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 # downloader
@@ -53,6 +51,7 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
+S_SYSTEMD=0     # set systemd mode
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
@@ -772,8 +771,8 @@ set_device_name_scheme() {
 
 # set GUID (gpt) usage
 set_guid() {
-    ## Lenono BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
-    ## Lenono BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
+    ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
+    ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
     DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
@@ -2672,6 +2671,15 @@ getsource() {
     S_SRC=1
 }
 
+# set_systemd()
+# check if systemd installation mode is set, if not run select_systemd!
+set_systemd(){
+    if ! [[ "${S_SYSTEMD}" = "1" ]]; then
+        DIALOG --defaultno --yesno "Do you want to enable systemd installation mode support?\n\n This is an experimental feature at the moment." 0 0 && SYSTEMD="1"
+    fi
+    S_SYSTEMD=1
+}
+
 # select_mirror()
 # Prompt user for preferred mirror and set ${SYNC_URL}
 #
@@ -2795,8 +2803,10 @@ run_pacman(){
 # returns: 1 on error
 select_packages() {
     source_set || return 1
+    set_systemd
     pacman_conf
     prepare_pacman
+    
     # Archboot setup media Mode uses packages.txt!
     if [[ "${MODE}" = "media" ]]; then
         DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
@@ -4952,6 +4962,7 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
+        set_systemd
         auto_ftpmirror
         auto_network
         auto_parameters

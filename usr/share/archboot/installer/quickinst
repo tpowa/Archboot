@@ -2,6 +2,7 @@
 MODE="${1}"
 DESTDIR="${2}"
 PKGARG="${3}"
+SYSTEMD="${4}"
 
 PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
@@ -10,11 +11,9 @@ KERNELPKG="linux"
 [[ "$(cat /proc/cmdline | grep -w BOOT_IMAGE=.*lts)" ]] && KERNELPKG="linux-lts"
 # name of the kernel image
 VMLINUZ="vmlinuz-${KERNELPKG}"
-# detect systemd running
-[[ "$(cat /proc/cmdline | grep -w init=/bin/systemd)" ]] && SYSTEMD="1"
 
 usage() {
-    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
+    echo "quickinst <install_mode> <destdir> <package_directory|server_url> <systemd>"
     echo
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
@@ -23,7 +22,8 @@ usage() {
     echo "e.g. mount -t iso9660 /dev/cdrom /src "
     echo "Then run this script to install all base packages to <destdir>."
     echo
-    
+    echo "To enable systemd installation support, use 1 as last argument."
+    echo
     if [[ -e "/usr/bin/curl" ]]; then
         echo "<install_mode> must be either 'net' or 'media'"
     else
