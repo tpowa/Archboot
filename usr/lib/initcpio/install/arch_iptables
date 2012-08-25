@@ -4,10 +4,15 @@
 build ()
 {
     add_checked_modules '/net/ipv6|/net/ipv4|/net/netfilter|/net/bridge/'
-    apps="/usr/sbin/ip6tables /usr/sbin/ip6tables-restore /usr/sbin/ip6tables-save /usr/sbin/iptables \
-          /usr/sbin/iptables-restore /usr/sbin/iptables-save /usr/bin/iptables-xml"
+    apps="/usr/sbin/xtables-multi"
     for i in $apps; do
         add_binary "$i"
+    done
+  symlinks="/usr/sbin/ip6tables /usr/sbin/ip6tables-restore /usr/sbin/ip6tables-save /usr/sbin/iptables \
+            /usr/sbin/iptables-restore /usr/sbin/iptables-save /usr/bin/iptables-xml"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/etc/iptables/empty.rules"
     add_file "/etc/iptables/simple_firewall.rules"
