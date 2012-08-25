@@ -23,6 +23,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
+    add_symlink "/bin/systemd" "../lib/systemd/systemd"
     add_dir "/etc/tmpfiles.d"
     add_dir "/etc/modules-load.d"
     add_dir "/etc/binfmt.d/"

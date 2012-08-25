@@ -3,10 +3,7 @@
 
 build ()
 {
-    for i in $(find /usr/share/licenses/common ! -type d -type f); do
-        add_file $i
-    done
-    add_runscript
+    add_full_dir "/usr/share/licenses/common"
 }
 
 help ()

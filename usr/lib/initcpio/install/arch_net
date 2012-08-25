@@ -16,7 +16,7 @@ build ()
 	  /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd \
 	  /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct \
 	  /usr/sbin/rtmon  /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd \
-	  /usr/sbin/ifplugstatus"
+	  /usr/sbin/ifplugstatus /sbin/ip /usr/bin/ping /usr/bin/ping6"
     for i in $apps; do
         add_binary "$i"
     done
@@ -24,7 +24,7 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/usr/sbin/ctstat /usr/sbin/rtstat /usr/sbin/ip /bin/ping /bin/ping6"
+    symlinks="/usr/sbin/ctstat /usr/sbin/rtstat"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
