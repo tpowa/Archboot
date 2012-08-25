@@ -6,7 +6,11 @@ build ()
     add_binary "/usr/bin/logger"
     add_file "/etc/udev/udev.conf"
     add_file /usr/lib/modprobe.d/usb-load-ehci-first.conf
-    add_binary /usr/bin/udevd
+    symlinks="/usr/bin/udevd"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+    done
     # add rule files
     add_full_dir /usr/lib/udev
     add_runscript

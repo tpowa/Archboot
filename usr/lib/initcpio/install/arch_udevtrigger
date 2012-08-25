@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/sbin/udevadm"
+    add_binary "/usr/bin/udevadm"
     add_runscript
 }
 
