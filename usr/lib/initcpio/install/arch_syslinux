@@ -3,9 +3,14 @@
 
 build ()
 {
-    apps="/usr/bin/syslinux /usr/sbin/extlinux /usr/bin/mtools /usr/bin/mcopy /usr/bin/mattrib"
+    apps="/usr/bin/syslinux /usr/sbin/extlinux /usr/bin/mtools"
     for i in $apps; do
         add_binary "$i"
+    done
+    symlinks="/usr/bin/mcopy /usr/bin/mattrib"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     for i in /usr/lib/syslinux/*; do
         [ -f $i ] && add_file "$i"
