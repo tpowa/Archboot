@@ -11,38 +11,32 @@ build ()
     done
     apps="/bin/dnsdomainname /usr/bin/domainname /bin/netstat /usr/bin/nisdomainname /usr/bin/ypdomainname \
           /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp \
-	  /sbin/slattach /bin/ping /bin/ping6 /usr/bin/traceroute /usr/sbin/arping /usr/sbin/clockdiff \
+	  /sbin/slattach /usr/bin/traceroute /usr/sbin/arping /usr/sbin/clockdiff \
 	  /usr/sbin/rarpd /usr/sbin/rdisc /usr/sbin/tftpd /usr/sbin/tracepath /usr/sbin/tracepath6 /sbin/route \
 	  /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd \
-	  /usr/sbin/ctstat /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/ip /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct \
-	  /usr/sbin/rtmon /usr/sbin/rtstat /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd \
+	  /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct \
+	  /usr/sbin/rtmon  /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/sbin/ifplugd \
 	  /usr/sbin/ifplugstatus"
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr"
+    appfiles="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr /sbin/dhcpcd /sbin/ifenslave /usr/sbin/brctl"
     for i in $appfiles; do
         add_file "$i"
-    done    
-    add_file "/sbin/dhcpcd"
-    add_file "/sbin/ifenslave"
-    add_file "/usr/sbin/brctl"
+    done
+    symlinks="/usr/sbin/ctstat /usr/sbin/rtstat /usr/sbin/ip /bin/ping /bin/ping6"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+    done
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
     done
     add_file "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
-    add_file "/usr/lib/tc/q_atm.so"
-    add_file "/usr/share/tc/experimental.dist"
-    add_file "/usr/share/tc/normal.dist"
-    add_file "/usr/share/tc/pareto.dist"
-    add_file "/usr/share/tc/paretonormal.dist"
-    add_file "/etc/iproute2/ematch_map"
-    add_file "/etc/iproute2/rt_dsfield"
-    add_file "/etc/iproute2/rt_protos"
-    add_file "/etc/iproute2/rt_realms"
-    add_file "/etc/iproute2/rt_scopes"
-    add_file "/etc/iproute2/rt_tables"
+    add_full_dir "/usr/lib/tc"
+    add_full_dir "/usr/share/tc"
+    add_full_dir "/etc/iproute2"
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add dhclient support
@@ -50,8 +44,7 @@ build ()
     add_dir "/var/lib/dhclient"
     add_dir "/var/state/dhcp"
     # add ifplugd support
-    add_file "/etc/ifplugd/ifplugd.action"
-    add_file "/etc/ifplugd/ifplugd.conf"
+    add_full_dir "/etc/ifplugd"
     # fixing licenses
     add_file "/usr/share/licenses/db/LICENSE"
     add_file "/usr/share/licenses/dhcpcd/LICENSE"
