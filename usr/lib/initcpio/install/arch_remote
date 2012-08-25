@@ -8,11 +8,16 @@ build ()
           /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/sbin/sshd /usr/sbin/xinetd \
 	  /usr/sbin/telnetd /usr/bin/rsync /usr/sbin/exportfs /usr/sbin/nfsstat /usr/sbin/rpc.idmapd \
 	  /usr/sbin/rpc.mountd /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpcdebug /usr/sbin/showmount \
-	  /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/slogin /usr/bin/screen /usr/bin/rpcbind \
+	  /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/rpcbind \
 	  /usr/bin/rpcinfo /usr/sbin/gss_clnt_send_err /usr/sbin/gss_destroy_creds /usr/sbin/rpc.gssd \
 	  /usr/sbin/rpc.svcgssd /bin/mountpoint"
     for i in $apps; do
         add_binary "$i"
+    done
+    symlinks="/usr/bin/screen /usr/bin/slogin"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/etc/screenrc"
     add_file "/etc/xinetd.conf"
