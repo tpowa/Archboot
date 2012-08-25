@@ -14,11 +14,9 @@ build ()
 	  /sbin/mkfs.xfs /sbin/xfs_repair /usr/sbin/xfs_copy /usr/sbin/xfs_db /usr/sbin/xfs_growfs /usr/sbin/xfs_io \
 	  /usr/sbin/xfs_logprint /usr/sbin/xfs_mdrestore /usr/sbin/xfs_quota /usr/sbin/xfs_rtcp /sbin/mkdosfs /sbin/dosfsck \
 	  /sbin/dosfslabel /usr/bin/lowntfs-3g /usr/bin/ntfs-3g /sbin/mount.nfs /usr/bin/mount.cifs \
-	  /usr/sbin/cifs.upcall /sbin/mkfs.reiserfs /sbin/fsck.reiserfs /sbin/fsck.ext2 /sbin/fsck.ext3 /sbin/fsck.ext4 \
+	  /usr/sbin/cifs.upcall  /sbin/fsck.ext2 /sbin/fsck.ext3 /sbin/fsck.ext4 \
 	  /sbin/fsck.ext4dev /sbin/e2label /sbin/tune2fs /sbin/mkfs.ext3 /sbin/mkfs.ext4 /sbin/mke2fs /sbin/fsck.jfs \
-	  /sbin/mkfs.jfs /sbin/mkfs.vfat /sbin/mkfs.msdos /sbin/fsck.msdos /sbin/fsck.vfat /usr/bin/mkfs.ntfs \
-	  /usr/bin/mount.ntfs /usr/bin/mount.ntfs-3g /usr/bin/mount.lowntfs-3g /sbin/mount.nfs4 /sbin/umount.nfs \
-	  /sbin/umount.nfs4 /sbin/wipefs /sbin/blockdev /usr/bin/btrfs /usr/bin/btrfs-convert /usr/bin/btrfs-debug-tree \
+	  /sbin/mkfs.jfs /sbin/wipefs /sbin/blockdev /usr/bin/btrfs /usr/bin/btrfs-convert /usr/bin/btrfs-debug-tree \   
 	  /usr/bin/btrfs-find-root /usr/bin/btrfs-image /usr/bin/btrfs-map-logical  /usr/bin/btrfs-restore \
 	  /usr/bin/btrfs-show /usr/bin/btrfs-vol /usr/bin/btrfs-zero-log /usr/bin/btrfsck /usr/bin/btrfsctl \
 	  /usr/bin/btrfstune /usr/bin/mkfs.btrfs /sbin/mkfs.nilfs2 /sbin/mount.nilfs2 /sbin/nilfs_cleanerd \
@@ -33,6 +31,13 @@ build ()
 	      /usr/sbin/xfs_ncheck" 
     for i in $appfiles; do
         add_file "$i"
+    done
+    symlinks="/sbin/fsck.msdos /sbin/fsck.vfat /sbin/fsck.reiserfs /sbin/mkfs.vfat /sbin/mkfs.msdos \
+              /usr/bin/mkfs.ntfs /sbin/mkfs.reiserfs /sbin/mount.nfs4 /usr/bin/mount.ntfs /usr/bin/mount.lowntfs-3g \
+              /usr/bin/mount.ntfs-3g /sbin/umount.nfs /sbin/umount.nfs4"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/etc/nilfs_cleanerd.conf"
     # fix licenses
