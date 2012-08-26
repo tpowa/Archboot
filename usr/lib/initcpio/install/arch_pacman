@@ -20,7 +20,7 @@ build ()
              ncurses net-tools gnu-netcat ntfsprogs pcmciautils procps-ng psmisc reiserfsprogs sed snarf \
              tar util-linux which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
              inetutils openssh hwdetect shadow bridge-utils ifenslave cpupower links \
-             dosfstools systemd-tools filesystem linux linux-lts glibc linux-api-headers \
+             dosfstools filesystem linux linux-lts glibc linux-api-headers \
              xinetd links pacman pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib \
              elfutils gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap rp-pppoe \
              lilo iptables ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
@@ -35,7 +35,7 @@ build ()
              curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua weechat \
              gnutls nettle libtasn1 bind rpcbind expat progsreiserfs glib2 freetype2 libssh2 libedit \
              talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \
-	     dnssec-anchors hwids libsystemd systemd systemd-arch-units dmidecode archlinux-keyring haveged \
+	     dnssec-anchors hwids systemd systemd-arch-units dmidecode archlinux-keyring haveged \
 	     pambase traceroute arch-wiki-lite amd-ucode intel-ucode arch-install-scripts zsh gdbm \
 	     grml-zsh-config"
     for i in $DEPENDS; do
