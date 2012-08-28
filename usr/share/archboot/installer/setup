@@ -1776,11 +1776,11 @@ autoprepare() {
         sgdisk --clear ${DEVICE} &>/dev/null
         # create actual partitions
         sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=2:0:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=3:0:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=4:0:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=5:0:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=6:0:0 --typecode=6:8300 --change-name=6:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=2:+1M:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=3:+1M:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=4:+1M:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=5:+1M:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=6:+1M:0 --typecode=6:8300 --change-name=6:ARCHLINUX_HOME ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
         PART_ROOT="${DEVICE}3"
@@ -1791,12 +1791,12 @@ autoprepare() {
         dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
         wipefs -a ${DEVICE} &>/dev/null
         # create DOS MBR with parted
-        parted -a optimal -s ${DEVICE} mktable msdos >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} set 1 boot on >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mktable msdos >/dev/null 2>&1
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB set 1 boot on >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+1)) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+1)) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+2)) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+2)) >${LOG}
+        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+3)) 100% >${LOG}
     fi
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
