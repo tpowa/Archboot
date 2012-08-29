@@ -283,16 +283,36 @@ _mount_packages_squashfs_images() {
 # Check media on install packages
 check_media() {
     
-    if [[ ! "${dev}" == "" ]]; then
+    if [[ -n "${_iso_loop_dev}" ]] && [[ -n "${_iso_loop_path}" ]]; then
+        if [[ "$(cat /proc/self/mounts | grep "${_iso_loop_dev}")" ]]; then
+            _iso_loop_dev_mp="$(findmnt "${_iso_loop_dev}" | tail -n +2 | awk '{print $1}')"
+        else
+            _iso_loop_dev_mp="/iso_loop_dev"
+            mkdir -p "${_iso_loop_dev_mp}"
+            mount "${_iso_loop_dev}" "${_iso_loop_dev_mp}"
+        fi
+        
+        if [[ -e "${_iso_loop_dev_mp}/${_iso_loop_path}" ]]; then
+            modprobe -q loop
+            _ISO_LOOP_DEVICE="$(losetup --show --find "${_iso_loop_dev_mp}/${_iso_loop_path}")"
+            
+            umount "${_MEDIA}" &>/dev/null
+            mount -o ro,users -t iso9660 "${_ISO_LOOP_DEVICE}" "${_MEDIA}"
+        else
+            unset _iso_loop_dev
+            unset _iso_loop_path
+        fi
+    elif [[ ! "${dev}" == "" ]]; then
         ! [[ "$(cat /proc/self/mounts | grep /dev/${dev})" ]] && mount "/dev/${dev}" "${_MEDIA}" >/dev/null 2>&1
     fi
+    
     
     if [[ -e "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" && -e "${_MEDIA}/packages/archboot_packages_any.squashfs" ]]; then
         _mount_packages_squashfs_images
         SET_MEDIA="1"
         [[ "${AUTOMOUNT}" == "1" ]] && break
     else
-        umount "${_MEDIA}" >/dev/null 2>&1
+        umount "${_MEDIA}" &>/dev/null
         SET_MEDIA="0"
     fi
     
@@ -304,12 +324,32 @@ get_media() {
     # _MEDIA="/src"
     SET_MEDIA="0"
     AUTOMOUNT="0"
+    
     ## Check whether ${_MEDIA} is a mountpoint, if so check whether it contains the archboot packages squashfs files.
     ## This might be the case if the user manually mounted the media before launching this script
     if [[ "$(mountpoint -q "${_MEDIA}")" ]]; then
         check_media
     fi
+    
+    ## Check whether Archboot iso has been booted in grub(2)'s loopback mode
+    for param in $(cat /proc/cmdline) ; do
+        if [[ "$(echo "${param}" | grep 'iso_loop_dev=')" ]]; then
+            _iso_loop_dev="$(echo ${param} | sed "s|iso_loop_dev=||g")"
+        fi
+        
+        if [[ "$(echo "${param}" | grep 'iso_loop_path=')" ]]; then
+            _iso_loop_path="$(echo "${param}" | sed 's|iso_loop_path=||g')"
+        fi
+        
+        if [[ -n "${_iso_loop_dev}" ]] && [[ -n "${_iso_loop_path}" ]]; then
+            break
+        fi
+    done
+    
+    
+    
     AUTOMOUNT="1"
+    
     # ide devices
     if [[ "${SET_MEDIA}" == "0" ]]; then
         for dev in $(ls ${block} | egrep '^hd'); do
@@ -763,8 +803,8 @@ geteditor() {
 # set device name scheme
 set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
-    NAME_SCHEME_LEVELS="FSUUID /dev/disk/by-uuid/<uuid> FSLABEL /dev/disk/by-label/<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is UUID)." 11 50 5 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
+    NAME_SCHEME_LEVELS="PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel> FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
+    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is PARTUUID)." 11 50 5 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -3247,9 +3287,9 @@ getcryptsetup() {
         #avoid clash with dmraid here
         if [[ "$(cryptsetup status $(basename ${PART_ROOT}))" ]]; then
             if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                CRYPTDEVICE="/dev/disk/by-uuid/$(echo $(${_BLKID} -p -i -s UUID -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="UUID=$(echo $(${_BLKID} -p -i -s UUID -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                CRYPTDEVICE="/dev/disk/by-label/$(echo $(${_BLKID} -p -i -s LABEL -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="LABEL=$(echo $(${_BLKID} -p -i -s LABEL -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             else
                 CRYPTDEVICE="$(echo $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g'))"    
             fi
@@ -3263,7 +3303,7 @@ getrootfsuuid() {
     _rootpart="${PART_ROOT}"
     _fsuuid="$(getfsuuid ${PART_ROOT})"
     if [[ -n "${_fsuuid}" ]]; then
-        _rootpart="/dev/disk/by-uuid/${_fsuuid}"
+        _rootpart="UUID=${_fsuuid}"
     fi
 }
 
@@ -3271,7 +3311,7 @@ getrootfslabel() {
     _rootpart="${PART_ROOT}"
     _fslabel="$(getfslabel ${PART_ROOT})"
     if [[ -n "${_fslabel}" ]]; then
-        _rootpart="/dev/disk/by-label/${_fslabel}"
+        _rootpart="LABEL=${_fslabel}"
     fi
 }
 
@@ -3465,9 +3505,9 @@ doefistub_uefi_common() {
         UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
         
         [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
-        [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="/dev/disk/by-partuuid/${ROOT_PART_GPT_GUID}"
+        [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
         [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
-        [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="/dev/disk/by-partlabel/${ROOT_PART_GPT_LABEL}"
+        [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
@@ -4116,7 +4156,7 @@ EOF
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}" # GRUB(2) does not yet support PARTUUID
-        _rootpart="/dev/disk/by-partuuid/${ROOT_PART_GPT_GUID}"
+        _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
@@ -4124,7 +4164,7 @@ EOF
         
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}" # GRUB(2) does not yet support PARTLABEL
-        _rootpart="/dev/disk/by-partlabel/${ROOT_PART_GPT_LABEL}"
+        _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
         
     else
         GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
