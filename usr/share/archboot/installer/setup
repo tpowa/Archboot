@@ -803,8 +803,19 @@ geteditor() {
 # set device name scheme
 set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
-    NAME_SCHEME_LEVELS="FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is FSUUID)." 13 50 7 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
+    NAME_SCHEME_LEVELS=""
+    MENU_DESC_TEXT=""
+    
+    ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
+    ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
+    
+    if [[ "${GUID_DETECTED}" == "1" ]]; then
+        NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
+        MENU_DESC_TEXT="PARTUUID and PARTLABEL are specific to GPT disks. In GPT disks, PARTUUID is recommended. In MBR/msdos disks,"
+    fi
+    
+    NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
+    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 13 50 7 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
 }
