@@ -26,8 +26,11 @@ build ()
         add_file "$i"
     done
     
-    # add bios,i386-efi and x86_64-efi files
-    add_full_dir /usr/lib/grub
+    # add bios and x86_64-efi files
+    # i386 efi is very rare. They are only used in old Macs, 
+    # in which the kernel itself has issues booting in EFI mode
+    add_full_dir /usr/lib/grub/i386-pc  
+    add_full_dir /usr/lib/grub/x86_64-efi
     
     ## add grub(2) unicode font file
     add_file "/usr/share/grub/unicode.pf2"
