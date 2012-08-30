@@ -362,12 +362,13 @@ get_media() {
     if [[ "${SET_MEDIA}" == "0" ]]; then
         # scsi/sata and other devices
         for dev in $(ls ${block} | egrep '^[sv]d|^sr|^scd|^sg'); do
-            if [[ "$(cat ${block}/${dev}/device/type)" = "5" ]]; then
-                check_media
-            fi
-            #check virtio devices
             if ! [[ -e "${block}/${dev}/device/type" ]]; then
+                #check virtio devices
                 check_media
+            else
+                if [[ "$(cat ${block}/${dev}/device/type)" = "5" ]]; then
+                    check_media
+                fi
             fi
         done
     fi
