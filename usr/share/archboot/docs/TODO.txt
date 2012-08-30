@@ -13,7 +13,6 @@ setup changes:
 quickinst changes:
 
 Planned Features:
-- boot archboot iso via grub(2)'s loopback support
 - Chroot installation
 - Keymap changing during boot
 
