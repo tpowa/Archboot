@@ -803,8 +803,8 @@ geteditor() {
 # set device name scheme
 set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
-    NAME_SCHEME_LEVELS="PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel> FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is PARTUUID)." 13 50 7 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
+    NAME_SCHEME_LEVELS="FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
+    DIALOG --menu "Select the device name scheme you want to use in config files (recommended is FSUUID)." 13 50 7 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
 }
