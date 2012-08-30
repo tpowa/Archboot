@@ -887,8 +887,9 @@ _umountall()
 {
     DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
     swapoff -a >/dev/null 2>&1
-    umount $(mount | grep -v "${DESTDIR} " | grep "${DESTDIR}" | sed 's|\ .*||g') >/dev/null 2>&1
-    umount $(mount | grep "${DESTDIR} " | sed 's|\ .*||g') >/dev/null 2>&1
+    for i in $(findmnt --list --submounts ${DESTDIR} -o TARGET -n | tac); do
+        umount $i
+    done
 }
 
 # Disable all software raid devices
