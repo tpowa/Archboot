@@ -24,7 +24,7 @@ build ()
 	  /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
 	  /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
 	  /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
-	  /bin/true /usr/bin/mktemp /usr/sbin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
+	  /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
 	  /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
 	  /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
 	  /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz /usr/bin/last /usr/bin/wall /usr/bin/mesg /usr/bin/utmpdump \
@@ -39,7 +39,7 @@ build ()
 	  /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
 	  /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
 	  /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
-	  /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /usr/bin/volname /bin/keyctl /sbin/request-key \
+	  /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
 	  /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd /sbin/fstab-decode"
     for i in $apps; do
         add_binary "$i"
