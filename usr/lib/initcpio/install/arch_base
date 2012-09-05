@@ -32,7 +32,7 @@ build ()
 	  /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
 	  /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
 	  /usr/bin/column /usr/bin/cytune /usr/bin/fallocate /usr/bin/flock /usr/bin/getopt /usr/bin/hexdump \
-	  /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize  \
+	  /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize  /sbin/swapoff \
 	  /usr/bin/logger /usr/bin/look /usr/bin/lscpu /usr/bin/mcookie /usr/bin/namei /usr/bin/pg \
 	  /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
 	  /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
@@ -52,7 +52,7 @@ build ()
               /sbin/poweroff /sbin/init /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
-              /usr/bin/lzma /usr/bin/modinfo /sbin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod /sbin/swapoff \
+              /usr/bin/lzma /usr/bin/modinfo /sbin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
               /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
