@@ -711,6 +711,14 @@ findbootloaderpartitions() {
     fi
 }
 
+# find any gpt/guid formatted disks
+find_gpt() {
+    GUID_DETECTED=""
+    for i in $(finddisks); do
+        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${i})" == "gpt" ]] && GUID_DETECTED="1"
+    done
+}
+
 # freeze and unfreeze xfs, as hack for grub(2) installing
 freeze_xfs() {
     sync
@@ -812,11 +820,11 @@ set_device_name_scheme() {
     
     if [[ "${GUID_DETECTED}" == "1" ]]; then
         NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
-        MENU_DESC_TEXT="PARTUUID and PARTLABEL are specific to GPT disks. In GPT disks, PARTUUID is recommended. In MBR/msdos disks,"
+        MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
     
     NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 13 50 7 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
+    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -826,7 +834,7 @@ set_guid() {
     ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
     ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID etc.,\n  which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
@@ -1811,9 +1819,6 @@ autoprepare() {
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        set_device_name_scheme || return 1
-    fi
     # we assume a /dev/hdX format (or /dev/sdX)
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         PART_ROOT="${DEVICE}5"
@@ -1860,6 +1865,10 @@ autoprepare() {
     ## wait until /dev initialized correct devices
     udevadm settle
 
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+        find_gpt
+        set_device_name_scheme || return 1
+    fi
     ## FSSPECS - default filesystem specs (the + is bootable flag)
     ## <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
@@ -2516,6 +2525,7 @@ mountpoints() {
     # disable swap and all mounted partitions
     _umountall
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+        find_gpt
         set_device_name_scheme || return 1
     fi
     printk off
@@ -5169,6 +5179,7 @@ install_bootloader() {
     
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+        find_gpt
         set_device_name_scheme || return 1
     fi
     source_set || return 1
