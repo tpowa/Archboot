@@ -814,7 +814,8 @@ set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS=""
     MENU_DESC_TEXT=""
-    
+    # check if gpt/guid formatted disks are there
+    find_gpt
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
     
@@ -1866,7 +1867,6 @@ autoprepare() {
     udevadm settle
 
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        find_gpt
         set_device_name_scheme || return 1
     fi
     ## FSSPECS - default filesystem specs (the + is bootable flag)
@@ -2525,7 +2525,6 @@ mountpoints() {
     # disable swap and all mounted partitions
     _umountall
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
-        find_gpt
         set_device_name_scheme || return 1
     fi
     printk off
@@ -5179,7 +5178,6 @@ install_bootloader() {
     
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        find_gpt
         set_device_name_scheme || return 1
     fi
     source_set || return 1
