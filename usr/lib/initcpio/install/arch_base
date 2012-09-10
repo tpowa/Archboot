@@ -16,32 +16,32 @@ build ()
     
     apps="/usr/bin/getent /sbin/agetty /bin/mount /bin/umount /usr/bin/basename /usr/bin/du /usr/bin/clear \
           /usr/bin/env /usr/bin/head /usr/bin/id /usr/bin/md5sum /usr/bin/nano /usr/bin/printf /usr/bin/tail \
-	  /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
-	  /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes /sbin/killall5 \
-	  /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
-	  /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/sbin/parted /usr/sbin/partprobe \
-	  /usr/bin/gawk /bin/cp /bin/mv /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
-	  /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
-	  /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
-	  /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
-	  /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
-	  /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
-	  /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
-	  /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz /usr/bin/last /usr/bin/wall /usr/bin/mesg /usr/bin/utmpdump \
-	  /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
-	  /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
-	  /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
-	  /usr/bin/column /usr/bin/cytune /usr/bin/fallocate /usr/bin/flock /usr/bin/getopt /usr/bin/hexdump \
-	  /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize  /sbin/swapoff \
-	  /usr/bin/logger /usr/bin/look /usr/bin/lscpu /usr/bin/mcookie /usr/bin/namei /usr/bin/pg \
-	  /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
-	  /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
-	  /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
-	  /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
-	  /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
-	  /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
-	  /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
-	  /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode"
+          /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
+          /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes /sbin/killall5 \
+          /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
+          /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/sbin/parted /usr/sbin/partprobe \
+          /usr/bin/gawk /bin/cp /bin/mv /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
+          /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
+          /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
+          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
+          /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
+          /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
+          /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
+          /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz /usr/bin/last /usr/bin/wall /usr/bin/mesg /usr/bin/utmpdump \
+          /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
+          /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
+          /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
+          /usr/bin/column /usr/bin/cytune /usr/bin/fallocate /usr/bin/flock /usr/bin/getopt /usr/bin/hexdump \
+          /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize  /sbin/swapoff \
+          /usr/bin/logger /usr/bin/look /usr/bin/lscpu /usr/bin/mcookie /usr/bin/namei /usr/bin/pg \
+          /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
+          /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
+          /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
+          /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
+          /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
+          /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
+          /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
+          /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode"
     for i in $apps; do
         add_binary "$i"
     done
@@ -73,7 +73,7 @@ build ()
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
-		 services sysctl.conf vimrc"
+                 services sysctl.conf vimrc"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
@@ -92,6 +92,83 @@ build ()
 
     ### add copy-mountpoint.sh
     add_file "/usr/bin/copy-mountpoint.sh"
+
+    ### add pam
+    add_binary "/sbin/pam_tally" 
+    add_binary "/sbin/unix_chkpwd"
+    add_full_dir "/etc/security"
+    add_full_dir "/etc/default"
+    add_full_dir "/etc/pam.d"
+    add_file "/etc/environment"
+    add_full_dir "/usr/lib/security"
+    #fix cracklib support!
+    add_file /usr/lib/libcrack.so.2
+
+    ### add shadow
+    apps="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh \
+          /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd \
+          /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems \
+          /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd \
+          /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd \
+          /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    symlinks="/usr/sbin/vigr"
+    for i in $symlinks; do
+        add_binary "$(which $(basename $(readlink "$i")))"
+        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+    done
+    add_file "/usr/sbin/adduser"
+    add_file "/etc/login.defs"
+
+    ### add systemd
+    #dbus-core files
+    apps="/usr/bin/dbus-cleanup-sockets /usr/bin/dbus-daemon /usr/bin/dbus-monitor /usr/bin/dbus-send /usr/bin/dbus-uuidgen"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
+    add_dir "/var/lib/dbus"
+    add_full_dir "/etc/dbus-1"
+    add_dir "/etc/dbus-1/session.d"
+    add_dir "/etc/dbus-1/systemd.d"
+    add_full_dir "/usr/share/dbus-1"
+    #systemd files
+    apps="/usr/bin/systemd-ask-password /usr/bin/systemd-tmpfiles /usr/bin/systemd-tty-ask-password-agent \
+          /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /bin/systemd /usr/bin/journalctl \
+	  /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat \
+	  /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
+	  /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    add_symlink "/bin/systemd" "../lib/systemd/systemd"
+    add_dir "/etc/tmpfiles.d"
+    add_dir "/etc/modules-load.d"
+    add_dir "/etc/binfmt.d/"
+    add_dir "/etc/sysctl.d/"
+    add_file "/etc/os-release"
+    add_full_dir "/etc/systemd"
+    add_full_dir "/etc/xdg"
+    add_full_dir "/usr/lib/systemd"
+    add_full_dir "/usr/share/systemd"
+    add_full_dir "/usr/share/polkit-1"
+    add_full_dir "/usr/lib/tmpfiles.d"
+    add_full_dir "/usr/lib/modules-load.d"
+    for i in /usr/lib/libsystemd*; do
+        add_file "$i"
+    done
+    add_dir "/var/lib/systemd"
+    add_file "/usr/lib/security/pam_systemd.so"
+    add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
+    add_file "/usr/share/archboot/base/etc/timezone.conf" "/etc/timezone.conf"
+    add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
+    add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
+             "/etc/systemd/system/getty.target.wants/getty@tty1.service"
 
     ### fix file
     add_file "/usr/share/file/magic.mgc"
@@ -116,7 +193,7 @@ help ()
 {
 cat <<HELPEOF
   This hook sets up all initial directories and installs base, kmod,
-  klibc utilities and libraries for a arch boot image. 
+  pam, shadow, systemd utilities and libraries for a arch boot image. 
   DO NOT remove this one unless you know what you're doing.
 HELPEOF
 }
