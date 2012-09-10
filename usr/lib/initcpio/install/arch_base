@@ -137,9 +137,9 @@ build ()
     #systemd files
     apps="/usr/bin/systemd-ask-password /usr/bin/systemd-tmpfiles /usr/bin/systemd-tty-ask-password-agent \
           /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /bin/systemd /usr/bin/journalctl \
-	  /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat \
-	  /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
-	  /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
+          /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat \
+          /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
+          /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
     for i in $apps; do
         add_binary "$i"
     done
