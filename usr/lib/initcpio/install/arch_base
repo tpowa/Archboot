@@ -160,7 +160,6 @@ build ()
         add_file "$i"
     done
     add_dir "/var/lib/systemd"
-    add_file "/usr/lib/security/pam_systemd.so"
     add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
     add_file "/usr/share/archboot/base/etc/timezone.conf" "/etc/timezone.conf"
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
@@ -169,6 +168,15 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
              "/etc/systemd/system/getty.target.wants/getty@tty1.service"
+
+    ### add udev
+    add_binary "/usr/bin/logger"
+    add_binary "/usr/bin/udevadm"
+    add_file "/etc/udev/udev.conf"
+    add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
+    add_symlink "/usr/bin/udevd" "../lib/systemd/systemd-udevd"
+    # add rule files
+    add_full_dir "/usr/lib/udevd"
 
     ### fix file
     add_file "/usr/share/file/magic.mgc"
@@ -193,7 +201,7 @@ help ()
 {
 cat <<HELPEOF
   This hook sets up all initial directories and installs base, kmod,
-  pam, shadow, systemd utilities and libraries for a arch boot image. 
+  pam, shadow, systemd, udev utilities and libraries for a arch boot image.
   DO NOT remove this one unless you know what you're doing.
 HELPEOF
 }
