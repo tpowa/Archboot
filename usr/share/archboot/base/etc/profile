@@ -24,6 +24,6 @@ echo "Hit ENTER to enter the bash shell ..."
 read
 clear
 if ! [ -e /tmp/.setup ]; then
-	[ $(which /arch/setup 2> /dev/null) ] && /arch/setup
+	[ -e /arch/setup ] && /arch/setup
 fi
 # End of file

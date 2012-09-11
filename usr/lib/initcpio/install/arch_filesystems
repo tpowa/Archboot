@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_checked_modules '/kernel/fs|loop'
+    add_checked_modules '/kernel/fs'
     apps="/sbin/mkswap /sbin/debugreiserfs /sbin/mkreiserfs /sbin/reiserfsck /sbin/reiserfstune \
           /sbin/resize_reiserfs /sbin/badblocks /sbin/blkid /sbin/debugfs /sbin/dumpe2fs /sbin/e2fsck \
 	  /sbin/e2image /sbin/e2undo /sbin/findfs /sbin/fsck /sbin/logsave /sbin/mkfs.ext2 /sbin/resize2fs \
@@ -13,7 +13,7 @@ build ()
 	  /sbin/jfs_debugfs /sbin/jfs_fsck /sbin/jfs_fscklog /sbin/jfs_logdump /sbin/jfs_mkfs /sbin/jfs_tune \
 	  /sbin/mkfs.xfs /sbin/xfs_repair /usr/sbin/xfs_copy /usr/sbin/xfs_db /usr/sbin/xfs_growfs /usr/sbin/xfs_io \
 	  /usr/sbin/xfs_logprint /usr/sbin/xfs_mdrestore /usr/sbin/xfs_quota /usr/sbin/xfs_rtcp /sbin/mkdosfs /sbin/dosfsck \
-	  /sbin/dosfslabel /usr/bin/lowntfs-3g /usr/bin/ntfs-3g /sbin/mount.nfs /usr/bin/mount.cifs \
+	  /sbin/dosfslabel /usr/bin/lowntfs-3g /usr/bin/ntfs-3g /usr/bin/mount.cifs \
 	  /usr/sbin/cifs.upcall /sbin/fsck.ext2 /sbin/fsck.ext3 /sbin/fsck.ext4 \
 	  /sbin/fsck.ext4dev /sbin/e2label /sbin/tune2fs /sbin/mkfs.ext3 /sbin/mkfs.ext4 /sbin/mke2fs /sbin/fsck.jfs \
 	  /sbin/mkfs.jfs /sbin/wipefs /sbin/blockdev /usr/bin/btrfs /usr/bin/btrfs-convert /usr/bin/btrfs-debug-tree \

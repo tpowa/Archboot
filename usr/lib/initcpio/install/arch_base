@@ -23,7 +23,7 @@ build ()
           /usr/bin/gawk /bin/cp /bin/mv /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
           /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
           /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
-          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/vim /sbin/hdparm \
+          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /sbin/hdparm \
           /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
           /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
           /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
@@ -73,7 +73,7 @@ build ()
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
-                 services sysctl.conf vimrc"
+                 services sysctl.conf"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
@@ -123,6 +123,14 @@ build ()
     add_file "/etc/login.defs"
 
     ### add systemd
+    # add systemd kernel modules
+    add_checked_modules 'nfs|autofs4|loop'
+    apps="/sbin/mount.nfs /usr/bin/setfont /usr/bin/loadkeys"
+    for i in $apps; do
+        add_binary "$i"
+    done
+
+
     #dbus-core files
     apps="/usr/bin/dbus-cleanup-sockets /usr/bin/dbus-daemon /usr/bin/dbus-monitor /usr/bin/dbus-send /usr/bin/dbus-uuidgen"
     for i in $apps; do
@@ -190,7 +198,7 @@ build ()
     add_file "/usr/share/licenses/pcre/LICENSE"
     add_file "/usr/share/licenses/shadow/LICENSE"
     add_file "/usr/share/licenses/sdparm/LICENSE"
-    add_file "/usr/share/licenses/vim/license.txt"
+    
     add_file "/usr/share/licenses/zlib/LICENSE"
     add_file "/usr/share/licenses/iana-etc/LICENSE"
 
