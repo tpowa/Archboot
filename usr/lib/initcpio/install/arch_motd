@@ -9,10 +9,7 @@ build ()
     echo "--------------------------------------------" >> ${MOTD}
     echo "Consoles:" >> ${MOTD}
     echo "  - Virtual consoles 1-6 are active." >> ${MOTD}
-    echo "  - To change virtual console use ALT + F(1-7 or 12)" >> ${MOTD}
-    echo "Logging:" >> ${MOTD}
-    echo "  - vc7 is used for setup logging." >> ${MOTD}
-    echo "  - vc12 is used for kernel logging." >> ${MOTD}
+    echo "  - To change virtual console use ALT + F(1-6)" >> ${MOTD}
     echo "Device node problems (eg. usbsticks or external harddrives):" >> ${MOTD}
     echo "  - Please unplug and replug your device to get the correct node in /dev/." >> ${MOTD}
 if [ "$(echo $HOOKS | grep arch_keymap)" ]; then
@@ -27,6 +24,7 @@ if [ "$(echo $HOOKS | grep arch_installer)" ]; then
     echo "Normal Setup:" >> ${MOTD}
     echo "  - On first login /arch/setup is launched automatically." >> ${MOTD}
     echo "  - Please run '/arch/setup' again to install Arch Linux if you left setup." >> ${MOTD}
+    echo "  - vc7 is used for setup logging." >> ${MOTD}
     echo "For Experts:" >> ${MOTD}
     echo "  - Use '/arch/quickinst' to install and bypass the setup routine." >> ${MOTD}
     echo "Documentation:" >> ${MOTD}
