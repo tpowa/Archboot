@@ -814,8 +814,10 @@ set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS=""
     MENU_DESC_TEXT=""
+    
     # check if gpt/guid formatted disks are there
     find_gpt
+    
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
     
@@ -3510,6 +3512,9 @@ doefistub_uefi_common() {
         RAID_ON_LVM=""
         common_bootloader_checks
         
+        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
+        _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
+        
         _bootdev="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}')"
         _rootdev="$(df -T "${DESTDIR}/" | tail -n +2 | awk '{print $1}')"
         _uefisysdev="$(df -T "${DESTDIR}/boot/efi" | tail -n +2 | awk '{print $1}')"
@@ -3533,7 +3538,7 @@ doefistub_uefi_common() {
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         mkdir -p "${DESTDIR}/boot/efi/EFI/arch"
@@ -3543,28 +3548,75 @@ ${_PARAMETERS_MOD}
 CONFEOF
         
         cat << REFINDEOF > "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
-"Boot with Defaults" "${_PARAMETERS_MOD}"
+"Boot with Defaults"              "${_PARAMETERS_MOD}"
+"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
 REFINDEOF
         
-        rm -f "${DESTDIR}/boot/efi/EFI/arch/${VMLINUZ}.efi"
-        rm -f "${DESTDIR}/boot/efi/EFI/arch/${INITRAMFS}.img"
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/EFI/arch/${VMLINUZ}.efi"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/EFI/arch/${INITRAMFS}.img"
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi"
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
         
-        if [[ -e "${DESTDIR}/boot/efi/EFI/arch/${VMLINUZ}.efi" ]] && [[ -e "${DESTDIR}/boot/efi/EFI/arch/${INITRAMFS}.img" ]]; then
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+
+[Path]
+PathChanged=/boot/${INITRAMFS}-fallback.img
+Unit=efistub_copy.service
+
+[Install]
+WantedBy=multi-user.target
+CONFEOF
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+
+[Service]
+Type=oneshot
+ExecStart=/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi
+ExecStart=/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
+ExecStart=/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+CONFEOF
+        
+        chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
+        
+        if [[ "${SYSTEMD}" != "1" ]]; then
+            PACKAGES="incron"
+            run_pacman
+            PACKAGES=""
+            
+            cat << CONFEOF > "${DESTDIR}/usr/local/bin/efistub_copy.sh"
+/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi
+/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
+/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+CONFEOF
+            
+            cat << CONFEOF > "${DESTDIR}/etc/incron.d/efistub_copy.conf"
+/boot/${INITRAMFS}-fallback.img IN_CLOSE_WRITE /usr/local/bin/efistub_copy.sh
+CONFEOF
+            
+            DIALOG --msgbox "Add incrond to the DAEMONS list in /etc/rc.conf ." 0 0
+        fi
+        
+        if [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi" ]] && [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
             # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
             # _BOOTMGR_LOADER_DIR="arch"
-            # _BOOTMGR_LOADER_FILE="${VMLINUZ}.efi"
+            # _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}.efi"
             # do_uefi_bootmgr_setup
             
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to /boot/efi/EFI/arch/${VMLINUZ}.efi and /boot/efi/EFI/arch/${INITRAMFS}.img respectively. Make sure to update those files everytime /boot/${VMLINUZ} and /boot/${INITRAMFS}.img are updated during the Kernel package update(s)." 0 0
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi and /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
             
             DIALOG --msgbox "You will now be put into the editor to edit linux.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
             geteditor || return 1
             "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
             "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
             
-            # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${VMLINUZ}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+            # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
             
             # if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
                 # mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
@@ -3572,7 +3624,7 @@ REFINDEOF
                 # rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
                 # rm -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
                 
-                # cp -f "${DESTDIR}/boot/efi/EFI/arch/${VMLINUZ}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+                # cp -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
                 # cp -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf" "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
             # fi
         else
