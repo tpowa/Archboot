@@ -110,7 +110,7 @@ build ()
     sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add grub(2) and syslinux packages to image, with separate extra db file
+    ### HACK add refind and syslinux dependencies to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
     for i in refind-efi-x86_64 efibootmgr freetype2 mtools perl-passwd-md5 perl-digest-sha1 ; do
