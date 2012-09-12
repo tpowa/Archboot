@@ -25,7 +25,7 @@ build ()
              talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \
 	     dnssec-anchors hwids systemd systemd-arch-units dmidecode archlinux-keyring haveged \
 	     pambase traceroute arch-wiki-lite amd-ucode intel-ucode arch-install-scripts zsh gdbm \
-	     grml-zsh-config sysvinit-tools xl2tpd"
+	     grml-zsh-config sysvinit-tools xl2tpd wvdial usb_modeswitch"
     for i in $DEPENDS; do
 	for k in  $(echo /var/lib/pacman/local/$i-[0-9]*-[0-9]*); do
 		[ -e "$k/install" ] && add_file "$k/install"
