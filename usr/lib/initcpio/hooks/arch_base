@@ -7,19 +7,40 @@ run_earlyhook() {
 
 run_hook ()
 {
-  # fixing some symlinks
   # fix x86_64 symlink on x86_64
   [ "$(uname -r)" = "x86_64" ] && ln -s /usr/bin/setarch /usr/bin/x86_64
+
   # disable motd from login, pam does show motd already
   touch /root/.hushlogin
+
   # these static devices are created for convenience, to autoload the modules if necessary
   # /dev/loop0
   mknod -m 0660 /dev/loop0 b 7 0
+
   # trigger udev events
   msg ":: Triggering uevents..."
   udevadm trigger --action=add --type=subsystems
   udevadm trigger --action=add --type=devices
   udevadm settle
+
+  # Generate initial keychain, use haveged then no user interaction is required
+  if  [[ -f /var/run/haveged.pid ]]; then
+      kill $(cat /var/run/haveged.pid)
+      msg ":: haveged stopped."
+    fi
+  msg ":: Starting haveged..."
+  haveged
+  msg ":: Running pacman-key..."
+  pacman-key --init >/dev/null 2>&1
+  ### HACK: fix accept of master keys!
+  sed -i -e 's#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#g' \
+  /usr/bin/pacman-key
+  pacman-key --populate archlinux >/dev/null 2>&1
+  sed -i -e 's#"${GPG_PACMAN\[\@\]}" --batch --yes --quiet --lsign-key "${key_id}"#"${GPG_PACMAN\[\@\]}" --quiet --lsign-key "${key_id}"#g' \
+  /usr/bin/pacman-key
+  msg ":: pacman-key finished."
+  kill $(cat /var/run/haveged.pid)
+  msg ":: haveged stopped."
 }
 
 run_cleanuphook() {
