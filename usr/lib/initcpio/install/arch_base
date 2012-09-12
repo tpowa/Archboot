@@ -199,6 +199,8 @@ build ()
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
+    add_dir "/var/cache/pacman/pkg"
+    add_dir "/var/lib/pacman"
     add_file "/usr/share/archboot/pacman/etc/pacman.conf" "/etc/pacman.conf"
     [ "$(uname -m)" = "x86_64" ] && add_file "/usr/share/archboot/pacman/etc/makepkg.conf.x86_64" "/etc/makepkg.conf"
     [ "$(uname -m)" = "i686" ] && add_file "/usr/share/archboot/pacman/etc/makepkg.conf.i686" "/etc/makepkg.conf"
