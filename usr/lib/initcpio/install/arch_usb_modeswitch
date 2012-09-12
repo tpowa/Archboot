@@ -1,0 +1,20 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_binary "/usr/sbin/usb_modeswitch"
+    add_binary "/usr/sbin/usb_modeswitch_dispatcher"
+    add_file "/etc/usb_modeswitch.conf"
+    add_full_dir "/etc/usb_modeswitch.d"
+    add_file "/etc/usb_modeswitch.setup"
+    add_full_dir "/usr/share/usb_modeswitch"
+    add_dir "/var/lib/usb_modeswitch"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes usb_modeswitch on an arch boot image.
+HELPEOF
+} 
