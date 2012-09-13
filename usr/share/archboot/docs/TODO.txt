@@ -16,7 +16,6 @@ Planned Features:
 - Chroot installation
 - Keymap changing during boot
 - Add gummiboot uefi boot manager for EFISTUB kernels - alternative for rEFInd
-- Add iso booting using syslinux's memdisk - needs changes in setup script (might be similar to grub's loopback support)
 
 Long term setup goals:
 - Add automatic installation (perhaps not possible with archboot setup)
