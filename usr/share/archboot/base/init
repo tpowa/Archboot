@@ -52,16 +52,18 @@ unset rootdev
 
 fsck_root
 
+# Mount root at /new_root
+${mount_handler:-default_mount_handler} /new_root
+
+run_hookfunctions 'run_latehook' 'late hook' $LATEHOOKS
+run_hookfunctions 'run_cleanuphook' 'cleanup hook' $CLEANUPHOOKS
+
 init=${init:-/sbin/init}
 if [ "${root}" = "" -a "${ip}" = "" ]; then
     # enter install environment
     exec $init
 else
-    # Mount root at /new_root
-    ${mount_handler:-default_mount_handler} /new_root
 
-    run_hookfunctions 'run_latehook' 'late hook' $LATEHOOKS
-    run_hookfunctions 'run_cleanuphook' 'cleanup hook' $CLEANUPHOOKS
 
     if [ "$(stat -c %D /)" = "$(stat -c %D /new_root)" ]; then
         # Nothing got mounted on /new_root. This is the end, we don't know what to do anymore
