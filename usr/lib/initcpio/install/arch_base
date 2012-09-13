@@ -184,7 +184,7 @@ build ()
     add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
     add_symlink "/usr/bin/udevd" "../lib/systemd/systemd-udevd"
     # add rule files
-    add_full_dir "/usr/lib/udevd"
+    add_full_dir "/usr/lib/udev"
 
     ### add pacman
     apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
