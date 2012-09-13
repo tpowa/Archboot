@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August, 24th 2012
+   September, 13th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -60,7 +60,7 @@ Introduction
      http://projects.archlinux.org/?p=archboot.git;a=summary
    * It is developed by tpowa.
 
-  What is the difference to the official install media?
+  What is the difference to the archiso install media?
 
    * It provides the long time support kernel as installation option.
    * It runs a modified Arch Linux system in initramfs.
@@ -86,6 +86,7 @@ Introduction
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
      and encrypted devices
    * Filesystem support: ext2/3/4,btrfs,nilfs2, reiserfs,xfs,jfs,ntfs-3g,vfat
+   * grub loopback and memdisk support
    * Package selection support
    * signed package installation
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
