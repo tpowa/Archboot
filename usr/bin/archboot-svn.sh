@@ -4,7 +4,7 @@ SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE=""
 DEVEL=""
 SUPPORT=""
-SUPPORT_ADDITION="dmidecode gnu-netcat dosfstools ntfs-3g_ntfsprogs fuse dhclient v86d grub"
+SUPPORT_ADDITION="dmidecode gnu-netcat dosfstools ntfs-3g_ntfsprogs fuse dhcp v86d grub"
 # generate base
 for i in $(pacman -Sg base | sed -e "s/base//g"); do 
 	BASE="$BASE $(echo $i)"
