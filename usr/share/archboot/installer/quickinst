@@ -164,7 +164,7 @@ install_packages() {
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep vfat)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
     fi
-    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
+    if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
     # add always netcfg, the only network package which supports systemd and rc.conf which was removed from base!
