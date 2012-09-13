@@ -2980,7 +2980,7 @@ select_packages() {
     if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
     fi
-    if [[ -e /var/state/dhcp/dhclient.leases ]]; then
+    if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
     # Add filesystem packages
