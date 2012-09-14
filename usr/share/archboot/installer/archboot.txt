@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   September, 13th 2012
+   September, 14th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -62,16 +62,16 @@ Introduction
 
   What is the difference to the archiso install media?
 
-   * It provides the long time support kernel as installation option.
-   * It runs a modified Arch Linux system in initramfs.
+   * It provides an additional interactive setup and quickinst script.
+   * It contains [core] repository on media.
+   * It provides the long time support kernel as boot and installation option.
    * It supports uefi booting via grub-efi-x86_64.
+   * It is a systemd live environment.
+   * hwdetect script is used for preconfiguration
+   * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
-   * hwdetect script is used for preconfiguration
-   * systemd boot environment
    * It doesn't mount anything during boot process.
-   * It contains [core] repository on media.
-   * It provides an interactive setup and quickinst script.
 
   What are the Archboot Setup features?
 
@@ -86,9 +86,10 @@ Introduction
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
      and encrypted devices
    * Filesystem support: ext2/3/4,btrfs,nilfs2, reiserfs,xfs,jfs,ntfs-3g,vfat
-   * grub loopback and memdisk support
+   * Name scheme support: PARTUUID, PARTLABEL, FSUUID, FSLABEL and KERNEL
+   * Mount support of grub loopback and memdisk installation media
    * Package selection support
-   * signed package installation
+   * Signed package installation
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
      mkinitcpio.conf, rc.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
