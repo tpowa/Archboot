@@ -3507,8 +3507,18 @@ doefistub_uefi_common() {
     if [[ "${__CARCH}" != "${UEFI_ARCH}" ]]; then
         DIALOG --msgbox "EFISTUB requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
     elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
-        DIALOG --msgbox "LTS kernel does not support EFISTUB. Please install CONFIG_EFI_STUB enabled kernel and try again." 0 0
+        _EFILINUX="1"
+        
+        PACKAGES="efilinux-efi-${UEFI_ARCH}"
+        run_pacman
+        PACKAGES=""
+        
+        _CONTINUE="1"
     else
+        _CONTINUE="1"
+    fi
+    
+    if [[ "${_CONTINUE}" == "1" ]]; then
         bootdev=""
         grubdev=""
         complexuuid=""
@@ -3517,8 +3527,66 @@ doefistub_uefi_common() {
         RAID_ON_LVM=""
         common_bootloader_checks
         
-        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
+        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
+        [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
         _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
+        
+        mkdir -p "${DESTDIR}/boot/efi/EFI/arch"
+        
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}"
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        
+        #######################
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+
+[Path]
+PathChanged=/boot/${INITRAMFS}-fallback.img
+Unit=efistub_copy.service
+
+[Install]
+WantedBy=multi-user.target
+CONFEOF
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+
+[Service]
+Type=oneshot
+ExecStart=/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}
+ExecStart=/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
+ExecStart=/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+CONFEOF
+        
+        chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
+        
+        if [[ "${SYSTEMD}" != "1" ]]; then
+            PACKAGES="incron"
+            run_pacman
+            PACKAGES=""
+            
+            cat << CONFEOF > "${DESTDIR}/usr/local/bin/efistub_copy.sh"
+/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}
+/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
+/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+CONFEOF
+            
+            cat << CONFEOF > "${DESTDIR}/etc/incron.d/efistub_copy.conf"
+/boot/${INITRAMFS}-fallback.img IN_CLOSE_WRITE /usr/local/bin/efistub_copy.sh
+CONFEOF
+            
+            DIALOG --msgbox "Add incrond to the DAEMONS list in /etc/rc.conf ." 0 0
+        fi
+        
+        ###########################
         
         _bootdev="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}')"
         _rootdev="$(df -T "${DESTDIR}/" | tail -n +2 | awk '{print $1}')"
@@ -3546,92 +3614,57 @@ doefistub_uefi_common() {
         _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
-        mkdir -p "${DESTDIR}/boot/efi/EFI/arch"
+        if [[ "${_EFILINUX}" == "1" ]]; then
+            cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg"
+-f \\EFI\\arch\\${_EFISTUB_KERNEL} ${_PARAMETERS_MOD}
+CONFEOF
+        fi
         
         cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
 ${_PARAMETERS_MOD}
 CONFEOF
         
-        cat << REFINDEOF > "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
-"Boot with Defaults"              "${_PARAMETERS_MOD}"
-"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
-REFINDEOF
+        ###################################
         
-        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi"
-        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-        
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-        
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
-
-[Path]
-PathChanged=/boot/${INITRAMFS}-fallback.img
-Unit=efistub_copy.service
-
-[Install]
-WantedBy=multi-user.target
-CONFEOF
-        
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
-
-[Service]
-Type=oneshot
-ExecStart=/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi
-ExecStart=/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
-ExecStart=/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-CONFEOF
-        
-        chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
-        
-        if [[ "${SYSTEMD}" != "1" ]]; then
-            PACKAGES="incron"
-            run_pacman
-            PACKAGES=""
+        if [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to /boot/efi/EFI/arch/${_EFISTUB_KERNEL} and /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
             
-            cat << CONFEOF > "${DESTDIR}/usr/local/bin/efistub_copy.sh"
-/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi
-/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
-/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-CONFEOF
-            
-            cat << CONFEOF > "${DESTDIR}/etc/incron.d/efistub_copy.conf"
-/boot/${INITRAMFS}-fallback.img IN_CLOSE_WRITE /usr/local/bin/efistub_copy.sh
-CONFEOF
-            
-            DIALOG --msgbox "Add incrond to the DAEMONS list in /etc/rc.conf ." 0 0
-        fi
-        
-        if [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi" ]] && [[ -e "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
-            # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-            # _BOOTMGR_LOADER_DIR="arch"
-            # _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}.efi"
-            # do_uefi_bootmgr_setup
-            
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi and /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
-            
-            DIALOG --msgbox "You will now be put into the editor to edit linux.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
-            geteditor || return 1
-            "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
-            "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
-            
-            # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
-            
-            # if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-                # mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
+            if [[ "${_EFILINUX}" == "1" ]]; then
+                DIALOG --msgbox "You will now be put into the editor to edit efilinux.cfg . After you save your changes, exit the editor." 0 0
+                geteditor || return 1
+                "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg"
+            else
+                # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+                # _BOOTMGR_LOADER_DIR="arch"
+                # _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
+                # do_uefi_bootmgr_setup
                 
-                # rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
-                # rm -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
+                DIALOG --msgbox "You will now be put into the editor to edit linux.conf . After you save your changes, exit the editor." 0 0
+                geteditor || return 1
+                "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
                 
-                # cp -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
-                # cp -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf" "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
-            # fi
+                # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${_EFISTUB_KERNEL} to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+                
+                # if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+                    # mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
+                    
+                    # rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+                    # rm -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
+                    
+                    # cp -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+                    # cp -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf" "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
+                # fi
+            fi
+            
+            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for EFISTUB kernels?" 13 55 3 \
+                "GUMMIBOOT_UEFI_${UEFI_ARCH}" "Simple Text Mode ${UEFI_ARCH} UEFI Boot Manager" \
+                "rEFInd_UEFI_${UEFI_ARCH}" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
+                "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
+            case $(cat ${ANSWER}) in
+                "GUMMIBOOT_UEFI_${UEFI_ARCH}") dogummiboot_uefi_common ;;
+                "rEFInd_UEFI_${UEFI_ARCH}") dorefind_uefi_common ;;
+                "NONE") return 0 ;;
+            esac
         else
             DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in /boot/efi." 0 0
         fi
@@ -3655,64 +3688,97 @@ do_efistub_uefi_i686() {
     
 }
 
+dogummiboot_uefi_common() {
+    
+    DIALOG --msgbox "Setting up gummiboot-efi-${UEFI_ARCH} now ..." 0 0
+    
+    PACKAGES="gummiboot-efi-${UEFI_ARCH}"
+    run_pacman
+    PACKAGES=""
+    
+    if [[ "${_EFILINUX}" == "1" ]]; then
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts.conf"
+title   Arch Linux LTS via EFILINUX
+efi     /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
+options $(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg")
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-fallback.conf"
+title   Arch Linux LTS via EFILINUX  - fallback initramfs
+efi     /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
+options $(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/loader.conf"
+timeout 3
+default archlinux-core-lts
+GUMEOF
+        
+    else
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core.conf"
+title   Arch Linux
+linux   /EFI/arch/${_EFISTUB_KERNEL}
+initrd  /EFI/arch/${_EFISTUB_INITRAMFS}.img
+options ${_PARAMETERS_MOD}
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-fallback.conf"
+title   Arch Linux fallback initramfs
+linux   /EFI/arch/${_EFISTUB_KERNEL}
+initrd  /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+options ${_PARAMETERS_MOD}
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/loader.conf"
+timeout 3
+default archlinux-core
+GUMEOF
+        
+    fi
+    
+    if [[ -e "${DESTDIR}/boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi" ]]; then
+        _BOOTMGR_LABEL="Arch Linux (gummiboot)"
+        _BOOTMGR_LOADER_DIR="arch//gummiboot"
+        _BOOTMGR_LOADER_FILE="gummiboot${SPEC_UEFI_ARCH}.efi"
+        do_uefi_bootmgr_setup
+        
+        DIALOG --msgbox "gummiboot-efi-${UEFI_ARCH} has been setup successfully." 0 0
+        
+        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
+        geteditor || return 1
+        
+        if [[ "${_EFILINUX}" == "1" ]]; then
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts.conf"
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-fallback.conf"
+        else
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core.conf"
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-fallback.conf"
+        fi
+        
+        "${EDITOR}" "${DESTDIR}/boot/efi/loader/loader.conf"
+        
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+            mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
+            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+        fi
+    else
+        DIALOG --msgbox "Error setting up gummiboot-efi-${UEFI_ARCH}." 0 0
+    fi
+    
+}
+
 dorefind_uefi_common() {
     
-    DIALOG --msgbox "Setting up rEFInd UEFI ${UEFI_ARCH} now ..." 0 0
+    DIALOG --msgbox "Setting up refind-efi-${UEFI_ARCH} now ..." 0 0
     
-    if [[ "${UEFI_ARCH}" == "x86_64" ]]; then
-        PACKAGES="refind-efi-${UEFI_ARCH}"
-        run_pacman
-        PACKAGES=""
-    fi
+    PACKAGES="refind-efi-${UEFI_ARCH}"
+    run_pacman
+    PACKAGES=""
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" ]]; then
-        _REFIND_SUBDIR="arch/refind"
-        _REFIND_SUBDIR_UEFI="arch\\refind"
-    else
-        rm -rf "/tmp"/refind-bin-* || true
-        rm -f "/tmp"/refind-bin-*.zip || true
-        
-        if [[ -e "/tmp/refind-bin.zip" ]]; then
-            _REFIND_ZIP="/tmp/refind-bin.zip"
-        elif [[ -e "${_MEDIA}/packages/refind-bin.zip" ]]; then
-            _REFIND_ZIP="${_MEDIA}/packages/refind-bin.zip"
-        else
-            DIALOG --msgbox "refind-bin.zip file not found. This file should be downloaded first, to setup rEFInd. You will now be asked to configure the network." 0 0
-            donetwork
-            
-            curl -L "http://sourceforge.net/projects/refind/files/latest/download" -o "/tmp/refind-bin.zip"
-            
-            if [[ -e "/tmp/refind-bin.zip" ]]; then
-                _REFIND_ZIP="/tmp/refind-bin.zip"
-            else
-                DIALOG --msgbox "Setup could not download refind-bin.zip . Any issues with net connectivity?" 0 0 && return 1
-            fi
-        fi
-        
-        if [[ -e "/usr/bin/bsdtar" ]]; then
-            bsdtar -C "/tmp" -xf "${_REFIND_ZIP}"
-        else
-            PACKAGES="libarchive"
-            run_pacman
-            PACKAGES=""
-            
-            LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/bsdtar" -C "/tmp" -xf "${_REFIND_ZIP}"
-        fi
-        
-        mv "/tmp"/refind-bin-* "/tmp/refind-bin-dir"
-        
-        _REFIND_SUBDIR="arch_refind"
-        _REFIND_SUBDIR_UEFI="arch_refind"
-        
-        mkdir -p "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}"
-        cp -f "/tmp/refind-bin-dir/refind/refind_${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi"
-        cp -f "/tmp/refind-bin-dir/refind/refind.conf-sample" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind.conf"
-        cp -rf "/tmp/refind-bin-dir/refind/icons" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/icons"
-        cp -rf "/tmp/refind-bin-dir/docs" "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/docs"
-        cp -f "/tmp/refind-bin-dir"/*.txt "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/docs"/
-    fi
-    
-    _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind.conf"
+    _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/arch/refind/refind.conf"
     
     sed 's|^timeout 20|timeout 0|g' -i "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
@@ -3722,19 +3788,45 @@ dorefind_uefi_common() {
     sed 's|^#dont_scan_dirs EFI/boot|dont_scan_dirs EFI/boot|g' -i "${_REFIND_CONFIG}"
     sed 's|^#max_tags 0|max_tags 0|g' -i "${_REFIND_CONFIG}"
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ "${_EFILINUX}" == "1" ]]; then
+        cat << REFINDEOF >> "${DESTDIR}/boot/efi/EFI/arch/refind/refind.conf"
+
+menuentry "Arch Linux LTS via EFILINUX" {
+	icon /EFI/arch/refind/icons/os_arch.icns
+	loader /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
+	options "$(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg")"
+}
+
+menuentry "Arch Linux LTS via EFILINUX - fallback initramfs" {
+	icon /EFI/arch/refind/icons/os_arch.icns
+	loader /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
+	options "$(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+}
+
+REFINDEOF
+        
+    else
+        cat << REFINDEOF > "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
+"Boot with Defaults"              "${_PARAMETERS_MOD}"
+"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+REFINDEOF
+        
+    fi
+    
+    if [[ -e "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (rEFInd)"
-        _BOOTMGR_LOADER_DIR="${_REFIND_SUBDIR_UEFI}"
+        _BOOTMGR_LOADER_DIR="arch//refind"
         _BOOTMGR_LOADER_FILE="refind${SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "rEFInd UEFI ${UEFI_ARCH} has been setup successfully." 0 0
+        DIALOG --msgbox "refind-efi-${UEFI_ARCH} has been setup successfully." 0 0
         
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf . After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit refind.conf (and maybe refind_linux.conf) . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
+        [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
@@ -3743,29 +3835,13 @@ dorefind_uefi_common() {
             rm -f "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
             rm -rf "${DESTDIR}/boot/efi/EFI/boot/icons"
             
-            cp -f "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/refind${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
-            cp -rf "${DESTDIR}/boot/efi/EFI/${_REFIND_SUBDIR}/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
+            cp -rf "${DESTDIR}/boot/efi/EFI/arch/refind/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
         fi
     else
-        DIALOG --msgbox "Error setting up rEFInd UEFI ${UEFI_ARCH}." 0 0
+        DIALOG --msgbox "Error setting up refind-efi-${UEFI_ARCH}." 0 0
     fi
-    
-}
-
-dorefind_uefi_x86_64() {
-    
-    do_efistub_uefi_x86_64
-    
-    dorefind_uefi_common
-    
-}
-
-dorefind_uefi_i386() {
-    
-    do_efistub_uefi_i686
-    
-    dorefind_uefi_common
     
 }
 
@@ -5196,10 +5272,10 @@ configure_system() {
 install_bootloader_uefi_x86_64() {
     
     DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
-        "rEFInd_UEFI_x86_64" "rEFInd x86_64 (supports only x86_64 EFISTUB kernels)" \
+        "EFISTUB_x86_64" "Only x86_64 Kernels" \
         "GRUB_UEFI_x86_64" "GRUB(2) x86_64 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "rEFInd_UEFI_x86_64") dorefind_uefi_x86_64 ;;
+        "EFISTUB_x86_64") do_efistub_uefi_x86_64 ;;
         "GRUB_UEFI_x86_64") dogrub_uefi_x86_64 ;;
     esac
     
@@ -5208,10 +5284,10 @@ install_bootloader_uefi_x86_64() {
 install_bootloader_uefi_i386() {
     
     DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 2 \
-        "rEFInd_UEFI_i386" "rEFInd i386 (supports only ix86 EFISTUB kernels)" \
+        "EFISTUB_i686" "Only i686 Kernels" \
         "GRUB_UEFI_i386" "GRUB(2) i386 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "rEFInd_UEFI_i386") dorefind_uefi_i386 ;;
+        "EFISTUB_i686") do_efistub_uefi_i686 ;;
         "GRUB_UEFI_i386") dogrub_uefi_i386 ;;
     esac
     

@@ -9,6 +9,11 @@
 
 _BASENAME="$(basename "${0}")"
 
+[[ -z "${_UEFI_ARCH}" ]] && _UEFI_ARCH="x86_64"
+
+[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
+[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
+
 usage () {
 	echo "${_BASENAME}: usage"
 	echo "CREATE ALLINONE USB/CD IMAGES"
@@ -206,14 +211,14 @@ _download_uefi_shell_tianocore() {
 	mkdir -p "${ALLINONE}/EFI/tools/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v2.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_old.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v1.efi" "https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 }
 
-_download_uefi_refind_sourceforge() {
+_download_uefi_refind_bin_sourceforge() {
 	
 	mkdir -p "${ALLINONE}/packages/"
 	
@@ -222,10 +227,45 @@ _download_uefi_refind_sourceforge() {
 	
 }
 
-_prepare_grub_uefi_arch_specific_iso_files() {
+_prepare_uefi_gummiboot_USB_files() {
 	
-	[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
-	[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
+	mkdir -p "${ALLINONE}/EFI/boot"
+	cp -f "/boot/efi/EFI/arch/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/boot/efi/EFI/arch/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
+	
+	mkdir -p "${ALLINONE}/loader/entries/"
+	
+	cat << EOF > "${ALLINONE}/loader/entries/loader.conf"
+timeout 3
+default archboot-${_UEFI_ARCH}
+EOF
+	
+	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}.conf"
+title   Arch Linux (${_UEFI_ARCH}) archboot
+linux   /boot/vmlinuz_${_UEFI_ARCH}
+initrd  /boot/initramfs_${_UEFI_ARCH}.img
+options gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+EOF
+	
+	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts.conf"
+title   Arch Linux LTS (${_UEFI_ARCH}) archboot
+efi     /EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi
+options -f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
+EOF
+	
+	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
+title   UEFI ${_UEFI_ARCH} Shell v2 - For Spec. Ver. >=2.3 systems
+efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
+EOF
+	
+	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
+title   UEFI ${_UEFI_ARCH} Shell v1 - For Spec. Ver. <2.3 systems
+efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+EOF
+	
+}
+
+_prepare_grub_uefi_arch_specific_CD_files() {
 	
 	mkdir -p "${ALLINONE}/boot/grub"
 	
@@ -267,20 +307,13 @@ EOF
 	
 	rm -f "${ALLINONE}/boot/grub/grub.cfg"
 	
-	mkdir -p "${ALLINONE}/EFI/boot/"
-	cp -f "${grub_uefi_mp}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	
-	unset _UEFI_ARCH
-	unset _SPEC_UEFI_ARCH
-	
 }
 
-_prepare_grub_uefi_iso_files() {
+_prepare_grub_uefi_CD_files() {
 	
 	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
 	
 	mkdir -p "${ALLINONE}/boot/grub"
-	mkdir -p "${ALLINONE}/EFI/boot"
 	
 	# Create a blank image to be converted to ESP IMG
 	dd if="/dev/zero" of="${ALLINONE}/boot/grub/grub_uefi_x86_64.bin" bs="1024" count="4096"
@@ -298,8 +331,7 @@ _prepare_grub_uefi_iso_files() {
 	
 	mkdir -p "${grub_uefi_mp}/EFI/boot/"
 	
-	_UEFI_ARCH="x86_64"
-	_prepare_grub_uefi_arch_specific_iso_files
+	_prepare_grub_uefi_arch_specific_CD_files
 	
 	# umount images and loop
 	umount "${grub_uefi_mp}"
@@ -444,14 +476,14 @@ EOF
 
 if [ "\${grub_platform}" == "efi" ]; then
 
-    menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
+    menuentry "UEFI \${_UEFI_ARCH} Shell v2 - For Spec. Ver. >=2.3 systems" {
         set root="\${archboot}"
-        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}.efi
+        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
     }
 
-    menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
+    menuentry "UEFI \${_UEFI_ARCH} Shell v1 - For Spec. Ver. <2.3 systems" {
         set root="\${archboot}"
-        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
+        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v1.efi
     }
 
 fi
@@ -470,9 +502,14 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_download_uefi_refind_sourceforge
+# _download_uefi_refind_bin_sourceforge
 
-_prepare_grub_uefi_iso_files
+_prepare_uefi_gummiboot_USB_files
+
+_prepare_grub_uefi_CD_files
+
+unset _UEFI_ARCH
+unset _SPEC_UEFI_ARCH
 
 # place syslinux files
 mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
@@ -508,12 +545,12 @@ xorriso -as mkisofs \
 # "${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND_BIN="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
-	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND_BIN="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
