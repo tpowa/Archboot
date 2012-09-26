@@ -19,6 +19,6 @@ for i in base devel support; do
     mkdir $i
     svn co -N ${SVNSETUP} $i
 done
-cd base; svn up $BASE; cd ..
-cd devel; svn up $DEVEL; cd ..
-cd support; svn up $SUPPORT; cd .. 
+cd base; for i in $BASE; do svn up $i; sleep 2; done; cd ..
+cd devel; for i in $DEVEL; do svn up $i; sleep 2; done;  cd ..
+cd support; for i in $SUPPORT; do svn up $i; sleep 2; done; cd ..
