@@ -1,0 +1,16 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_file "/usr/lib/refind/refindx64.efi"
+    add_file "/usr/lib/refind/refind.conf"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes refind-efi-x86_64 on an arch boot image.
+HELPEOF
+}
+

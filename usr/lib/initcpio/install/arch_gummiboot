@@ -1,0 +1,15 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_file "/usr/lib/gummiboot/gummibootx64.efi"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes gummiboot-efi-x86_64 on an arch boot image.
+HELPEOF
+}
+

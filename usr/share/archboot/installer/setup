@@ -3403,8 +3403,8 @@ do_uefi_common() {
 
 do_uefi_x86_64() {
     
-    export UEFI_ARCH="x86_64"
-    export SPEC_UEFI_ARCH="x64"
+    export _UEFI_ARCH="x86_64"
+    export _SPEC_UEFI_ARCH="x64"
     
     do_uefi_common
     
@@ -3412,8 +3412,8 @@ do_uefi_x86_64() {
 
 do_uefi_i386() {
     
-    export UEFI_ARCH="i386"
-    export SPEC_UEFI_ARCH="ia32"
+    export _UEFI_ARCH="i386"
+    export _SPEC_UEFI_ARCH="ia32"
     
     do_uefi_common
     
@@ -3504,15 +3504,17 @@ doefistub_uefi_common() {
     [[ "$(uname -m)" == "x86_64" ]] && __CARCH="x86_64"
     [[ "$(uname -m)" == "i686" ]] && __CARCH="i386"
     
-    if [[ "${__CARCH}" != "${UEFI_ARCH}" ]]; then
+    if [[ "${__CARCH}" != "${_UEFI_ARCH}" ]]; then
         DIALOG --msgbox "EFISTUB requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
     elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
-        _EFILINUX="1"
-        
-        PACKAGES="efilinux-efi-${UEFI_ARCH}"
+        PACKAGES="efilinux-efi"
         run_pacman
         PACKAGES=""
         
+        mkdir -p "${DESTDIR}/boot/efi/EFI/efilinux/"
+        cp -f "${DESTDIR}/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
+        
+        _EFILINUX="1"
         _CONTINUE="1"
     else
         _CONTINUE="1"
@@ -3531,7 +3533,7 @@ doefistub_uefi_common() {
         [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
         _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
         
-        mkdir -p "${DESTDIR}/boot/efi/EFI/arch"
+        mkdir -p "${DESTDIR}/boot/efi/EFI/arch/"
         
         rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img"
@@ -3615,14 +3617,14 @@ CONFEOF
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         if [[ "${_EFILINUX}" == "1" ]]; then
-            cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg"
+            cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg"
 -f \\EFI\\arch\\${_EFISTUB_KERNEL} ${_PARAMETERS_MOD}
 CONFEOF
         fi
         
-        cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
-${_PARAMETERS_MOD}
-CONFEOF
+        # cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
+# ${_PARAMETERS_MOD}
+# CONFEOF
         
         ###################################
         
@@ -3632,26 +3634,26 @@ CONFEOF
             if [[ "${_EFILINUX}" == "1" ]]; then
                 DIALOG --msgbox "You will now be put into the editor to edit efilinux.cfg . After you save your changes, exit the editor." 0 0
                 geteditor || return 1
-                "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg"
-            else
+                "${EDITOR}" "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg"
+            # else
                 # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
                 # _BOOTMGR_LOADER_DIR="arch"
                 # _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
                 # do_uefi_bootmgr_setup
                 
-                DIALOG --msgbox "You will now be put into the editor to edit linux.conf . After you save your changes, exit the editor." 0 0
-                geteditor || return 1
-                "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
+                # DIALOG --msgbox "You will now be put into the editor to edit linux.conf . After you save your changes, exit the editor." 0 0
+                # geteditor || return 1
+                # "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/linux.conf"
                 
-                # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${_EFISTUB_KERNEL} to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+                # DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/${_EFISTUB_KERNEL} to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
                 
                 # if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
                     # mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
                     
-                    # rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+                    # rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
                     # rm -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
                     
-                    # cp -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+                    # cp -f "${DESTDIR}/boot/efi/EFI/arch/${_EFISTUB_KERNEL}" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
                     # cp -f "${DESTDIR}/boot/efi/EFI/boot/linux.conf" "${DESTDIR}/boot/efi/EFI/boot/linux.conf"
                 # fi
             fi
@@ -3690,23 +3692,26 @@ do_efistub_uefi_i686() {
 
 dogummiboot_uefi_common() {
     
-    DIALOG --msgbox "Setting up gummiboot-efi-${UEFI_ARCH} now ..." 0 0
+    DIALOG --msgbox "Setting up gummiboot-efi now ..." 0 0
     
-    PACKAGES="gummiboot-efi-${UEFI_ARCH}"
+    PACKAGES="gummiboot-efi"
     run_pacman
     PACKAGES=""
+    
+    mkdir -p "${DESTDIR}/boot/efi/EFI/gummiboot/"
+    cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
     
     if [[ "${_EFILINUX}" == "1" ]]; then
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts.conf"
 title   Arch Linux LTS via EFILINUX
-efi     /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
-options $(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg")
+efi     /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+options $(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg")
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-fallback.conf"
 title   Arch Linux LTS via EFILINUX  - fallback initramfs
-efi     /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
-options $(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
+efi     /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+options $(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/loader.conf"
@@ -3736,13 +3741,13 @@ GUMEOF
         
     fi
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${DESTDIR}/boot/efi/EFIgummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (gummiboot)"
-        _BOOTMGR_LOADER_DIR="arch//gummiboot"
-        _BOOTMGR_LOADER_FILE="gummiboot${SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="gummiboot"
+        _BOOTMGR_LOADER_FILE="gummiboot${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "gummiboot-efi-${UEFI_ARCH} has been setup successfully." 0 0
+        DIALOG --msgbox "gummiboot-efi has been setup successfully." 0 0
         
         DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
         geteditor || return 1
@@ -3757,28 +3762,32 @@ GUMEOF
         
         "${EDITOR}" "${DESTDIR}/boot/efi/loader/loader.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
-            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
-            cp -f "${DESTDIR}/boot/efi/EFI/arch/gummiboot/gummiboot${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error setting up gummiboot-efi-${UEFI_ARCH}." 0 0
+        DIALOG --msgbox "Error setting up gummiboot-efi." 0 0
     fi
     
 }
 
 dorefind_uefi_common() {
     
-    DIALOG --msgbox "Setting up refind-efi-${UEFI_ARCH} now ..." 0 0
+    DIALOG --msgbox "Setting up refind-efi now ..." 0 0
     
-    PACKAGES="refind-efi-${UEFI_ARCH}"
+    PACKAGES="refind-efi"
     run_pacman
     PACKAGES=""
     
-    _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/arch/refind/refind.conf"
+    mkdir -p "${DESTDIR}/boot/efi/EFI/refind/"
+    cp -f "${DESTDIR}/usr/lib/refind/refind${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+    cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/boot/efi/EFI/refind/icons"
+    
+    _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/refind/refind.conf"
     
     sed 's|^timeout 20|timeout 0|g' -i "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
@@ -3789,18 +3798,18 @@ dorefind_uefi_common() {
     sed 's|^#max_tags 0|max_tags 0|g' -i "${_REFIND_CONFIG}"
     
     if [[ "${_EFILINUX}" == "1" ]]; then
-        cat << REFINDEOF >> "${DESTDIR}/boot/efi/EFI/arch/refind/refind.conf"
+        cat << REFINDEOF >> "${_REFIND_CONFIG}"
 
 menuentry "Arch Linux LTS via EFILINUX" {
-	icon /EFI/arch/refind/icons/os_arch.icns
-	loader /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
-	options "$(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg")"
+	icon /EFI/refind/icons/os_arch.icns
+	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+	options "$(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg")"
 }
 
 menuentry "Arch Linux LTS via EFILINUX - fallback initramfs" {
-	icon /EFI/arch/refind/icons/os_arch.icns
-	loader /EFI/arch/efilinux/efilinux${SPEC_UEFI_ARCH}.efi
-	options "$(cat "${DESTDIR}/boot/efi/EFI/arch/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+	icon /EFI/refind/icons/os_arch.icns
+	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+	options "$(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
 }
 
 REFINDEOF
@@ -3813,34 +3822,34 @@ REFINDEOF
         
     fi
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (rEFInd)"
-        _BOOTMGR_LOADER_DIR="arch//refind"
-        _BOOTMGR_LOADER_FILE="refind${SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="refind"
+        _BOOTMGR_LOADER_FILE="refind${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "refind-efi-${UEFI_ARCH} has been setup successfully." 0 0
+        DIALOG --msgbox "refind-efi has been setup successfully." 0 0
         
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf (and maybe refind_linux.conf) . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
             
-            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             rm -f "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
             rm -rf "${DESTDIR}/boot/efi/EFI/boot/icons"
             
-            cp -f "${DESTDIR}/boot/efi/EFI/arch/refind/refind${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
-            cp -rf "${DESTDIR}/boot/efi/EFI/arch/refind/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
+            cp -rf "${DESTDIR}/boot/efi/EFI/refind/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
         fi
     else
-        DIALOG --msgbox "Error setting up refind-efi-${UEFI_ARCH}." 0 0
+        DIALOG --msgbox "Error setting up refind-efi." 0 0
     fi
     
 }
@@ -4200,17 +4209,13 @@ dogrub_config() {
     
     ########
     
-    cp -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg" "/tmp/.grub.cfg"
-    # remove the default entries by truncating the file at our little tag (set default)
-    head -n $(cat /tmp/.grub.cfg | grep -n 'set default' | cut -d: -f 1) "/tmp/.grub.cfg" > "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
-    rm -f "/tmp/.grub.cfg"
-    
-    NUMBER="0"
+    ## Move old config file, if any
+    mv "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg.bak" || true
     
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF > "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 if [ "\${grub_platform}" == "efi" ]; then
     set _UEFI_ARCH="\${grub_cpu}"
@@ -4336,6 +4341,9 @@ EOF
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
+    
+    NUMBER="0"
+    
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
 
 # (${NUMBER}) Arch Linux
@@ -4596,8 +4604,8 @@ dogrub_uefi_common() {
     
     dogrub_common_before
     
-    DIALOG --msgbox "Installing grub-efi-${UEFI_ARCH} now ..." 0 0
-    PACKAGES="grub-common grub-efi-${UEFI_ARCH}"
+    DIALOG --msgbox "Installing grub-efi-${_UEFI_ARCH} now ..." 0 0
+    PACKAGES="grub-common grub-efi-${_UEFI_ARCH}"
     
     run_pacman
     # reset PACKAGES after installing
@@ -4606,13 +4614,13 @@ dogrub_uefi_common() {
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/sbin/grub-install" \
-        --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
-        --target="${UEFI_ARCH}-efi" \
+        --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" \
+        --target="${_UEFI_ARCH}-efi" \
         --efi-directory="/boot/efi" \
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
         --recheck \
-        --debug &>"/tmp/grub_uefi_${UEFI_ARCH}_install.log"
+        --debug &>"/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     
     chroot_umount
     
@@ -4661,7 +4669,7 @@ fi
 
 EOF
     
-    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.cfg"
+    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/efi/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
@@ -4670,11 +4678,11 @@ EOF
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
-        --directory="/usr/lib/grub/${UEFI_ARCH}-efi" \
-        --format="${UEFI_ARCH}-efi" \
+        --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" \
+        --format="${_UEFI_ARCH}-efi" \
         --compression="xz" \
-        --output="/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" &>"/tmp/grub_${UEFI_ARCH}_uefi_mkstandalone.log"
+        --output="/boot/efi/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
+        "boot/grub/grub.cfg" &>"/tmp/grub_${_UEFI_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
     
@@ -4682,32 +4690,32 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub_uefi_${UEFI_ARCH}_install.log" >> "${LOG}"
+    cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${UEFI_ARCH}-efi/core.efi" ]]; then
+    if [[ -e "${DESTDIR}/boot/efi/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (GRUB)"
         _BOOTMGR_LOADER_DIR="arch_grub"
-        _BOOTMGR_LOADER_FILE="grub${SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_FILE="grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) UEFI ${UEFI_ARCH} has been successfully installed." 0 0
+        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} has been successfully installed." 0 0
         
         GRUB_PREFIX_DIR="/boot/grub/"
         GRUB_UEFI="1"
         dogrub_config
         GRUB_UEFI=""
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
             
-            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             
-            cp -f "${DESTDIR}/boot/efi/EFI/arch_grub/grub${SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error installing GRUB UEFI ${UEFI_ARCH}.\nCheck /tmp/grub_uefi_${UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     

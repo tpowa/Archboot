@@ -7,13 +7,12 @@
 
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
-[[ -z "${_UPDATE_UEFI_REFIND_BIN}" ]] && _UPDATE_UEFI_REFIND_BIN="1"
 [[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
 
 [[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
 [[ -z "${_UPDATE_SYSLINUX_CONFIG}" ]] && _UPDATE_SYSLINUX_CONFIG="1"
-[[ -z "${_UPDATE_GRUB_UEFI}" ]] && _UPDATE_GRUB_UEFI="1"
-[[ -z "${_UPDATE_GRUB_UEFI_CONFIG}" ]] && _UPDATE_GRUB_UEFI_CONFIG="1"
+# [[ -z "${_UPDATE_GRUB_UEFI}" ]] && _UPDATE_GRUB_UEFI="1"
+# [[ -z "${_UPDATE_GRUB_UEFI_CONFIG}" ]] && _UPDATE_GRUB_UEFI_CONFIG="1"
 
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _UPDATE_SYSLINUX_CONFIG="1"
 [[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _UPDATE_GRUB_UEFI_CONFIG="1"
@@ -97,20 +96,6 @@ echo
 
 [[ -e "${_ARCHBOOT_ISO_WD}/splash.png" ]] && cp -f "${_ARCHBOOT_ISO_WD}/splash.png" "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/splash.png"
 echo
-
-_rename_old_files() {
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{vmlts,vmlinuz_i686_lts} || true
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{vmlinuz,vmlinuz_i686} || true
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{initrd.img,initramfs_i686.img} || true
-	echo
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{vm64lts,vmlinuz_x86_64_lts} || true
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{vm64,vmlinuz_x86_64} || true
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/boot"/{initrd64.img,initramfs_x86_64.img} || true
-	echo
-	
-}
 
 _update_syslinux_iso_files() {
 	
@@ -270,6 +255,7 @@ _download_uefi_shell_tianocore() {
 	
 	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" || true
 	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_old.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" || true
+	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/shell/" || true
 	echo
 	
@@ -317,18 +303,6 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_update_uefi_refind_bin_sourceforge() {
-	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/packages/" || true
-	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/packages/refind-bin.zip" || true
-	echo
-	
-	## Download latest rEFInd bin archive from sourceforge
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/packages/refind-bin.zip" -L "http://sourceforge.net/projects/refind/files/latest/download"
-	
-}
-
 _update_uefi_gummiboot_USB_files() {
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/" || true
@@ -336,8 +310,8 @@ _update_uefi_gummiboot_USB_files() {
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	cp -f "/boot/efi/EFI/arch/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	cp -f "/boot/efi/EFI/arch/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/"
@@ -350,7 +324,7 @@ EOF
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}.conf"
-title   Arch Linux (${_UEFI_ARCH}) archboot
+title   Arch Linux ${_UEFI_ARCH} archboot
 linux   /boot/vmlinuz_${_UEFI_ARCH}
 initrd  /boot/initramfs_${_UEFI_ARCH}.img
 options gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
@@ -358,20 +332,20 @@ EOF
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts.conf"
-title   Arch Linux LTS (${_UEFI_ARCH}) archboot
+title   Arch Linux LTS ${_UEFI_ARCH} archboot
 efi     /EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi
 options -f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
-title   UEFI ${_UEFI_ARCH} Shell v2 - For Spec. Ver. >=2.3 systems
+title   UEFI ${_UEFI_ARCH} Shell v2
 efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
 EOF
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
-title   UEFI ${_UEFI_ARCH} Shell v1 - For Spec. Ver. <2.3 systems
+title   UEFI ${_UEFI_ARCH} Shell v1
 efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
 EOF
 	echo
@@ -725,8 +699,6 @@ _download_pkgs() {
 	
 }
 
-_rename_old_files
-
 [[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
 
 [[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
@@ -756,21 +728,19 @@ fi
 
 [[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
 
-# [[ "${_UPDATE_UEFI_REFIND_BIN}" == "1" ]] && _update_uefi_refind_bin_sourceforge
-
 [[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
 
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
 
 [[ "${_UPDATE_SYSLINUX_CONFIG}" == "1" ]] && _update_syslinux_iso_config
 
-[[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_CD_files
+# [[ "${_UPDATE_GRUB_UEFI}" == "1" ]] && _update_grub_uefi_CD_files
 
-[[ "${_UPDATE_GRUB_UEFI_CONFIG}" == "1" ]] && _update_grub_uefi_CD_config
+# [[ "${_UPDATE_GRUB_UEFI_CONFIG}" == "1" ]] && _update_grub_uefi_CD_config
 
 cd "${_ARCHBOOT_ISO_WD}/"
 
-## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating the modified ISO ..."
 xorriso -as mkisofs \
 	-iso-level 3 -rock -joliet \
@@ -782,10 +752,12 @@ xorriso -as mkisofs \
 	-eltorito-boot boot/syslinux/isolinux.bin \
 	-eltorito-catalog boot/syslinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
-	-eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
 	-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
+
+## Add below line to above xorriso if UEFI CD support is required
+# -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
 
 set +x
 
@@ -813,8 +785,8 @@ unset _UPDATE_UEFI_REFIND_BIN
 unset _UPDATE_UEFI_GUMMIBOOT
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG
-unset _UPDATE_GRUB_UEFI
-unset _UPDATE_GRUB_UEFI_CONFIG
+# unset _UPDATE_GRUB_UEFI
+# unset _UPDATE_GRUB_UEFI_CONFIG
 unset _ARCHBOOT_ISO_OLD_PATH
 unset _ARCHBOOT_ISO_WD
 unset _ARCHBOOT_ISO_OLD_NAME

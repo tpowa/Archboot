@@ -218,20 +218,11 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_download_uefi_refind_bin_sourceforge() {
-	
-	mkdir -p "${ALLINONE}/packages/"
-	
-	## Download latest rEFInd bin archive from sourceforge
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/packages/refind-bin.zip" -L "http://sourceforge.net/projects/refind/files/latest/download"
-	
-}
-
 _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/boot/efi/EFI/arch/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	cp -f "/boot/efi/EFI/arch/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
 	mkdir -p "${ALLINONE}/loader/entries/"
 	
@@ -241,25 +232,25 @@ default archboot-${_UEFI_ARCH}
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}.conf"
-title   Arch Linux (${_UEFI_ARCH}) archboot
+title   Arch Linux ${_UEFI_ARCH} archboot
 linux   /boot/vmlinuz_${_UEFI_ARCH}
 initrd  /boot/initramfs_${_UEFI_ARCH}.img
 options gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts.conf"
-title   Arch Linux LTS (${_UEFI_ARCH}) archboot
+title   Arch Linux LTS ${_UEFI_ARCH} archboot
 efi     /EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi
 options -f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
-title   UEFI ${_UEFI_ARCH} Shell v2 - For Spec. Ver. >=2.3 systems
+title   UEFI ${_UEFI_ARCH} Shell v2
 efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
-title   UEFI ${_UEFI_ARCH} Shell v1 - For Spec. Ver. <2.3 systems
+title   UEFI ${_UEFI_ARCH} Shell v1
 efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
 EOF
 	
@@ -502,11 +493,9 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-# _download_uefi_refind_bin_sourceforge
-
 _prepare_uefi_gummiboot_USB_files
 
-_prepare_grub_uefi_CD_files
+# _prepare_grub_uefi_CD_files
 
 unset _UEFI_ARCH
 unset _SPEC_UEFI_ARCH
@@ -519,7 +508,7 @@ sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL
 
 cd "${WD}/"
 
-## Generate the BIOS+UEFI+ISOHYBRID ISO image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE hybrid ISO ..."
 xorriso -as mkisofs \
         -iso-level 3 -rock -joliet \
@@ -531,9 +520,11 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
+
+## Add below line to above xorriso if UEFI CD support is required
+# -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
 
 ## cleanup isolinux and migrate to syslinux
 # echo "Generating ALLINONE IMG ..."
@@ -545,12 +536,12 @@ xorriso -as mkisofs \
 # "${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND_BIN="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
-	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND_BIN="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" _UPDATE_GRUB_UEFI="0" _UPDATE_GRUB_UEFI_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
@@ -560,7 +551,7 @@ rm -f "${WD}/sha256sums.txt" || true
 sha256sum *.iso *.img > "${WD}/sha256sums.txt"
 
 # cleanup
-rm -rf "${grub_uefi_mp}"
+# rm -rf "${grub_uefi_mp}"
 rm -rf "${CORE}"
 rm -rf "${CORE64}"
 rm -rf "${CORE_LTS}"
