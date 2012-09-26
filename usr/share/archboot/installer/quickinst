@@ -179,6 +179,9 @@ install_packages() {
     else
         PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
     fi
+    ### HACK: circular depends are in base, install filesystem first!
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
+    PACKAGES="filesystem ${PACKAGES}"
     ${PACMAN} -S ${PACKAGES}
 }
 
