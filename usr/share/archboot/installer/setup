@@ -3024,7 +3024,7 @@ select_packages() {
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     # remove not needed initscripts and sysvinit package with systemd and add compat package
     if [[ "${SYSTEMD}" = "1" ]]; then
-        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e  "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
         PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
     else
         PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
