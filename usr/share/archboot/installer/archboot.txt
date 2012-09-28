@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   September, 14th 2012
+   September, 28th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -14,8 +14,9 @@ Table Of Contents
     1. Introduction
          1. What is Arch Linux?
          2. What is Archboot
-         3. What is the difference to the official install media?
-         4. What are the Archboot Setup features?
+         3. What is the difference to the archiso install media?
+         4. What are the supported boot modes of Archboot media?
+         5. What are the Archboot Setup features?
     2. Archboot bootparameters
          1. What are general boot parameters?
          2. What are the video and framebuffer options?
@@ -59,20 +60,29 @@ Introduction
    * Git repository: 
      http://projects.archlinux.org/?p=archboot.git;a=summary
    * It is developed by tpowa.
-
+   
   What is the difference to the archiso install media?
 
    * It provides an additional interactive setup and quickinst script.
    * It contains [core] repository on media.
    * It provides the long time support kernel as boot and installation option.
-   * It supports uefi booting via grub-efi-x86_64.
    * It is a systemd live environment.
-   * hwdetect script is used for preconfiguration
    * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
    * It doesn't mount anything during boot process.
 
+  What are the supported boot modes of Archboot media?
+   * It supports BIOS booting with syslinux.
+   * It supports UEFI booting with gummiboot and EFISTUB,
+     for booting LTS kernels with efilinux-efi .
+     (only UEFI USB is supported, UEFI CD booting support is not supported!)
+   * It supports grub's iso loopback support.
+     variables used (below for example):
+     iso_loop_dev=UUID=XXXX
+     iso_loop_path=/blah/archboot.iso
+   * It supports booting using syslinux's memdisk (only in BIOS mode).
+     
   What are the Archboot Setup features?
 
    * Media and Network installation mode
@@ -90,12 +100,13 @@ Introduction
    * Mount support of grub loopback and memdisk installation media
    * Package selection support
    * Signed package installation
+   * hwdetect script is used for preconfiguration
    * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
      mkinitcpio.conf, rc.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
    * grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64
-     lilo, extlinux/syslinux, bootloader support
+     gummiboot, efilinux-efi, lilo, extlinux/syslinux, bootloader support
 
 Archboot bootparameters
 
@@ -118,6 +129,7 @@ Archboot bootparameters
       - Usage:
         root=/dev/<your-root-of-installed-system>
         root=/dev/sda3
+
    * lvmwait=
       - Using parameter followed by a comma-separated list of device names can
         be given on the command line.
