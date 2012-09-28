@@ -15,7 +15,6 @@ quickinst changes:
 Planned Features:
 - Chroot installation
 - Keymap changing during boot
-- Add gummiboot uefi boot manager for EFISTUB kernels - alternative for rEFInd
 
 Long term setup goals:
 - Add automatic installation (perhaps not possible with archboot setup)
