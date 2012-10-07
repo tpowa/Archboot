@@ -41,7 +41,7 @@ build ()
           /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
           /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
           /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
-          /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode"
+          /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode /usr/bin/zless /usr/bin/zgrep /usr/bin/fold"
     for i in $apps; do
         add_binary "$i"
     done
