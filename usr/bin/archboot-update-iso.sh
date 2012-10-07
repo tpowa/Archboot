@@ -317,7 +317,7 @@ _update_uefi_gummiboot_USB_files() {
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/"
 	echo
 	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/loader.conf"
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/loader.conf"
 timeout 3
 default archboot-${_UEFI_ARCH}
 EOF

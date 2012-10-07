@@ -226,7 +226,7 @@ _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/loader/entries/"
 	
-	cat << EOF > "${ALLINONE}/loader/entries/loader.conf"
+	cat << EOF > "${ALLINONE}/loader/loader.conf"
 timeout 3
 default archboot-${_UEFI_ARCH}
 EOF
