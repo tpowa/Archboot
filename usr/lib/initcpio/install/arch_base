@@ -63,6 +63,9 @@ build ()
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
     add_full_dir "/usr/lib/zsh"
+    
+    ### add en_US.utf8 locale
+    add_file "/usr/lib/locale/locale-archive"
 
     ### adding needed files from running system
     add_file "${CONFIG}" "/config"
