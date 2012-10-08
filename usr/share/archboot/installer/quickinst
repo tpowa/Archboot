@@ -172,12 +172,13 @@ install_packages() {
     # Only install the booted kernel image!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
-    # remove not needed initscripts and sysvinit package with systemd and add compat package
+    ### HACK
+    # until repository cleanup has been done, manually add systemd or initscripts components
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
     if [[ "${SYSTEMD}" = "1" ]]; then
-        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
         PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
     else
-        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
+        PACKAGES="${PACKAGES} initscripts sysvinit"
     fi
     ${PACMAN} -S ${PACKAGES}
 }
