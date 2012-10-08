@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   September, 28th 2012
+   October, 8th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -31,9 +31,9 @@ Table Of Contents
          2. Set Keyboard And Console Font
          3. Set up Network
          4. Set Time And Date
-         5. Prepare Hard Drive
+         5. Prepare Storage Drive
              1. Auto-Prepare
-             2. Partition Hard Drives
+             2. Partition Storage Drives
              3. Create Software Raid, Lvm2 or Luks encryption
              4. Set Filesystem Mountpoints
          6. Select Source
@@ -89,7 +89,7 @@ Introduction
    * Changing keymap and consolefont
    * Changing time and date
    * Setup network with netcfg
-   * Preparing harddisk, like auto-prepare, partitioning,
+   * Preparing storage disk, like auto-prepare, partitioning,
      GUID (gpt) support, 4k sector drive support etc.
    * Creation of software raid/raid partitions, lvm2 devices and 
      luks encrypted devices
@@ -245,13 +245,13 @@ Common Installation Procedure
  
    Use this menu to change time and date of your running system.
 
-  Prepare Hard Drive
+  Prepare Storage Drive
 
-   Prepare Hard Drive will lead you into a submenu offering two
+   Prepare Storage Drive will lead you into a submenu offering two
    alternatives of preparing your target drive for installation.
 
    The first choice is Auto-Prepare, which will automatically partition
-   your hard drive into a /boot, swap, and root partition, and then
+   your storage drive into a /boot, swap, and root partition, and then
    create filesystems on all three. These partitions will also be
    automatically mounted in the proper place. To be exact, this option
    will create:
@@ -260,7 +260,7 @@ Common Installation Procedure
      * a root partition 
      * a /home partition with the remaining space
 
-   AUTO-PREPARE WILL ERASE ALL DATA ON THE CHOSEN HARD DRIVE!
+   AUTO-PREPARE WILL ERASE ALL DATA ON THE CHOSEN STORAGE DRIVE!
    Read the warning presented by the installer very carefully, and make
    sure the correct device is about to be partitioned!
 
@@ -273,11 +273,11 @@ Common Installation Procedure
    name switching of devices.
 
    If you prefer to do the partitioning manually, use the other two
-   options, Partition Hard Drives and Set Filesystem Mountpoints to
+   options, Partition Storage Drives and Set Filesystem Mountpoints to
    prepare the target media according to your specifications as outlined
    below. Then Return to Main Menu after a successful preparation.
 
-  Partition Hard Drives
+  Partition Storage Drives
 
    You will be asked if you want to use GUID (gpt) partition table.
    If you have no clue for what you will need it or plan to use grub(2),
@@ -436,7 +436,7 @@ Common Installation Procedure
   Install Packages
 
    Install Packages will now install pacman and any other packages you
-   selected with resolved dependencies onto your hard disk. Don't be
+   selected with resolved dependencies onto your storage disk. Don't be
    surprised if more packages are installed than you selected! Those
    packages are dependencies for your selection, and the installer will
    not explicitly ask for permission to install these extra packages, as

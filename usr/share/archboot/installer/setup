@@ -842,7 +842,7 @@ set_guid() {
     ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
     ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
+    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
@@ -1266,13 +1266,13 @@ LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
 abstract your storage space and have \"virtual partitions\" which are easier\n
 to modify.\n\nThe basic building block of LVM are:\n
 - Physical volume (PV):\n
-  Partition on hard disk (or even hard disk itself or loopback file) on\n
+  Partition on storage disk (or even storage disk itself or loopback file) on\n
   which you can have virtual groups. It has a special header and is\n
   divided into physical extents. Think of physical volumes as big building\n
-  blocks which can be used to build your hard drive.\n
+  blocks which can be used to build your storage drive.\n
 - Volume group (VG):\n 
   Group of physical volumes that are used as storage volume (as one disk).\n
-  They contain logical volumes. Think of volume groups as hard drives.\n 
+  They contain logical volumes. Think of volume groups as storage drives.\n 
 - Logical volume(LV):\n
   A \"virtual/logical partition\" that resides in a volume group and is\n 
   composed of physical extents. Think of logical volumes as normal\n
@@ -1602,9 +1602,9 @@ DIALOG --msgbox "LUKS ENCRYPTION SUMMARY:\n
 -----------------------------\n\n
 Encryption is useful for two (related) reasons.\n
 Firstly, it prevents anyone with physical access to your computer,\n
-and your hard drive in particular, from getting the data from it\n
+and your storage drive in particular, from getting the data from it\n
 (unless they have your passphrase/key).\n
-Secondly, it allows you to wipe the data on your hard drive with\n
+Secondly, it allows you to wipe the data on your storage drive with\n
 far more confidence in the event of you selling or discarding\n
 your drive.\n
 Basically, it supplements the access control mechanisms of the operating\n
@@ -1719,7 +1719,7 @@ autoprepare() {
     DISCS=$(default_blockdevices)
     if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the hard drive to use" 14 55 7 $(default_blockdevices _) 2>${ANSWER} || return 1
+        DIALOG --menu "Select the storage drive to use" 14 55 7 $(default_blockdevices _) 2>${ANSWER} || return 1
         DISC=$(cat ${ANSWER})
     else
         DISC=${DISCS}
@@ -1934,7 +1934,7 @@ check_gpt() {
     fi
     
     if [[ "${RUN_CGDISK}" == "1" ]]; then
-        DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your hard drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
+        DIALOG --msgbox "Now you'll be put into cgdisk where you can partition your storage drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
         clear && cgdisk ${DISC}
     fi
 }
@@ -2045,7 +2045,7 @@ partition() {
                     parted -a optimal -s ${DISC} mktable msdos >${LOG}
                 fi
                 # Partition disc
-                DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your hard drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
+                DIALOG --msgbox "Now you'll be put into the parted shell where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need.\n\nShort command list:\n- 'help' to get help text\n- 'print' to show  partition table\n- 'mkpart' for new partition\n- 'rm' for deleting a partition\n- 'quit' to leave parted\n\nNOTE: parted may tell you to reboot after creating partitions.  If you need to reboot, just re-enter this install program, skip this step and go on." 18 70
                 clear
                 ## Use parted for correct alignment, cfdisk does not align correct!
                 parted ${DISC} print
@@ -3874,7 +3874,7 @@ common_syslinux() {
     DEVS="${DEVS} $(findbootloaderpartitions _)"
     
     if [[ "${DEVS}" == "" ]]; then
-        DIALOG --msgbox "No hard drives were found" 0 0
+        DIALOG --msgbox "No storage drives were found" 0 0
         return 1
     fi
     
@@ -4101,7 +4101,7 @@ dolilo_bios() {
     DEVS="${DEVS} $(findbootloaderpartitions _)"
     
     if [[ "${DEVS}" = "" ]]; then
-        DIALOG --msgbox "No hard drives were found" 0 0
+        DIALOG --msgbox "No storage drives were found" 0 0
         return 1
     fi
     
@@ -4531,7 +4531,7 @@ dogrub_bios() {
         DEVS="$(findbootloaderdisks _)"
         
         if [[ "${DEVS}" == "" ]]; then
-            DIALOG --msgbox "No hard drives were found" 0 0
+            DIALOG --msgbox "No storage drives were found" 0 0
             return 1
         fi
         
@@ -4544,7 +4544,7 @@ dogrub_bios() {
         # DEVS="${DEVS} $(findbootloaderpartitions _)"
         
         if [[ "${DEVS}" == "" ]]; then
-            DIALOG --msgbox "No hard drives were found" 0 0
+            DIALOG --msgbox "No storage drives were found" 0 0
             return 1
         fi
         
@@ -4829,7 +4829,7 @@ run_mkinitcpio() {
     chroot_umount
 }
 
-prepare_harddrive() {
+prepare_storagedrive() {
     S_MKFSAUTO=0
     S_MKFS=0
     DONE=0
@@ -4841,9 +4841,9 @@ prepare_harddrive() {
             DEFAULT=""
         fi
         CANCEL=""
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Prepare Hard Drive" 12 60 5 \
-            "1" "Auto-Prepare (erases the ENTIRE hard drive)" \
-            "2" "Partition Hard Drives" \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
+            "1" "Auto-Prepare (erases the ENTIRE storage drive)" \
+            "2" "Partition Storage Drives" \
             "3" "Create Software Raid, Lvm2 and Luks encryption" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>${ANSWER} || CANCEL="1"
@@ -5032,7 +5032,7 @@ auto_hwdetect() {
     HWDETECTHOOKS=""
     HWDETECTFILES=""
     HWKVER==
-    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your hard disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on ide-legacy boot parameter
         [[ "$(grep -w ide-legacy /proc/cmdline)" ]] && HWPARAMETER="${HWPARAMETER} --ide-legacy"
@@ -5370,7 +5370,7 @@ mainmenu() {
     "0" "Set Keyboard And Console Font" \
     "1" "Set up Network" \
     "2" "Set Time And Date" \
-    "3" "Prepare Hard Drive" \
+    "3" "Prepare Storage Drive" \
     "4" "Select Source" \
     "5" "Select Packages" \
     "6" "Install Packages" \
@@ -5386,7 +5386,7 @@ mainmenu() {
         "2")
             set_clock ;;
         "3")
-            prepare_harddrive ;;
+            prepare_storagedrive ;;
         "4")
             select_source ;;
         "5")
