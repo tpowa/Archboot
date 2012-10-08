@@ -2686,7 +2686,16 @@ _mkfs() {
     # add to .device-names for config files
     local _fsuuid="$(getfsuuid ${_device})"
     local _fslabel="$(getfslabel ${_device})"
-    echo "# DEVICE DETAILS: ${_device} UUID=${_fsuuid} LABEL=${_fslabel}" >> /tmp/.device-names
+    
+    if [[ "${GUID_DETECTED}" == "1" ]]; then
+        local _partuuid="$(getpartuuid ${_device})"
+        local _partlabel="$(getpartlabel ${_device})"
+        
+        echo "# DEVICE DETAILS: ${_device} PARTUUID=${_partuuid} PARTLABEL=${_partlabel} UUID=${_fsuuid} LABEL=${_fslabel}" >> /tmp/.device-names
+    else
+        echo "# DEVICE DETAILS: ${_device} UUID=${_fsuuid} LABEL=${_fslabel}" >> /tmp/.device-names
+    fi
+    
     # add to temp fstab
     if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_fsuuid}" ]]; then
@@ -2696,7 +2705,20 @@ _mkfs() {
         if [[ -n "${_fslabel}" ]]; then
             _device="LABEL=${_fslabel}"
         fi
+    else
+        if [[ "${GUID_DETECTED}" == "1" ]]; then
+           if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
+               if [[ -n "${_partuuid}" ]]; then
+                   _device="PARTUUID=${_partuuid}"
+               fi
+           elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
+               if [[ -n "${_partlabel}" ]]; then
+                   _device="PARTLABEL=${_partlabel}"
+               fi
+           fi 
+        fi
     fi
+    
     if [[ "${_fstype}" = "btrfs" && -n "${_btrfsmountoptions}" ]]; then
         echo -n "${_device} ${_mountpoint} ${_fstype} defaults,${_btrfsmountoptions} 0 " >>/tmp/.fstab
     else
@@ -3329,6 +3351,22 @@ getcryptsetup() {
     fi
 }
 
+getrootpartuuid() {
+    _rootpart="${PART_ROOT}"
+    _partuuid="$(getpartuuid ${PART_ROOT})"
+    if [[ -n "${_partuuid}" ]]; then
+        _rootpart="PARTUUID=${_partuuid}"
+    fi
+}
+
+getrootpartlabel() {
+    _rootpart="${PART_ROOT}"
+    _partlabel="$(getpartlabel ${PART_ROOT})"
+    if [[ -n "${_partlabel}" ]]; then
+        _rootpart="PARTLABEL=${_partlabel}"
+    fi
+}
+
 getrootfsuuid() {
     _rootpart="${PART_ROOT}"
     _fsuuid="$(getfsuuid ${PART_ROOT})"
@@ -3352,6 +3390,12 @@ common_bootloader_checks() {
     getraidarrays
     getcryptsetup
     getrootflags
+    
+    if [[ "${GUID_DETECTED}" == "1" ]]; then
+        [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && getrootpartuuid
+        [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && getrootpartlabel
+    fi
+    
     [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && getrootfsuuid
     [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
 }
