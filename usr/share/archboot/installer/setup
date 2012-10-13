@@ -51,7 +51,7 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_SYSTEMD=0     # set systemd mode
+S_INITSCRIPTS=0     # set initscripts mode
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
@@ -2764,13 +2764,13 @@ getsource() {
     S_SRC=1
 }
 
-# set_systemd()
-# check if systemd installation mode is set, if not run select_systemd!
-set_systemd(){
-    if ! [[ "${S_SYSTEMD}" = "1" ]]; then
-        DIALOG --defaultno --yesno "Do you want to enable systemd installation mode support?\n\n This is an experimental feature at the moment." 0 0 && SYSTEMD="1"
+# set_initscripts()
+# check if initscripts installation mode is set, if not run select_systemd!
+set_initscripts(){
+    if ! [[ "${S_INITSCRIPTS}" = "1" ]]; then
+        DIALOG --defaultno --yesno "Do you want to enable deprecated initscripts installation mode support?" 0 0 && INITSCRIPTS="1"
     fi
-    S_SYSTEMD=1
+    S_INITSCRIPTS=1
 }
 
 # select_mirror()
@@ -2896,7 +2896,7 @@ run_pacman(){
 # returns: 1 on error
 select_packages() {
     source_set || return 1
-    set_systemd
+    set_initscripts
     pacman_conf
     prepare_pacman
     
@@ -3046,13 +3046,13 @@ select_packages() {
     ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
-    ### HACK
-    # until repository cleanup has been done, manually add systemd or initscripts components
+    ### HACK:
+    # manually add systemd or initscripts components
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
-    if [[ "${SYSTEMD}" = "1" ]]; then
-        PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
-    else
+    if [[ "${INITSCRIPTS}" = "1" ]]; then
         PACKAGES="${PACKAGES} initscripts sysvinit"
+    else
+       PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
     fi
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
@@ -3162,10 +3162,10 @@ auto_network()
     done
     sed -i -e "s#NETWORKS=.*#NETWORKS=\(${NETWORK_PROFILES}\)#g" ${DESTDIR}/etc/conf.d/netcfg
     # launch netcfg on boot
-    if [[ "${SYSTEMD}" = "1" ]]; then
-        chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
-    else
+    if [[ "${INITSCRIPTS}" = "1" ]]; then
         sed -i -e "s# network # \!network net-profiles #g" ${DESTDIR}/etc/rc.conf
+    else
+        chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
     fi
     # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
@@ -3620,7 +3620,7 @@ CONFEOF
         
         chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
         
-        if [[ "${SYSTEMD}" != "1" ]]; then
+        if [[ "${INITSCRIPTS}" = "1" ]]; then
             PACKAGES="incron"
             run_pacman
             PACKAGES=""
@@ -5216,7 +5216,7 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
-        set_systemd
+        set_initscripts
         auto_ftpmirror
         auto_network
         auto_parameters
@@ -5257,10 +5257,10 @@ configure_system() {
             S_CONFIG=1
             break
         elif [[ "${FILE}" = "/etc/rc.conf" ]]; then    # non-file
-            if [[ "${SYSTEMD}" = "1" ]]; then
-                DIALOG --msgbox "You use systemd. This file has no function on systemd systems." 18 70
-            else
+            if [[ "${INITSCRIPTS}" = "1" ]]; then
                 ${EDITOR} ${DESTDIR}${FILE}
+            else
+                DIALOG --msgbox "You use systemd. This file has no function on systemd systems." 18 70
             fi
         elif [[ "${FILE}" = "/etc/hostname" ]]; then    # non-file
             # if user edited /etc/hostname, add the hostname to /etc/hosts if it's not already there.
