@@ -169,8 +169,6 @@ install_packages() {
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
-    # add always netcfg, the only network package which supports systemd and rc.conf which was removed from base!
-    ! [[ "$(echo ${PACKAGES} | grep -w netcfg)" ]] && PACKAGES="${PACKAGES} netcfg"
     # Only install the booted kernel image!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e "s#\ linux-lts\ # #g")"
     PACKAGES="${KERNELPKG} ${PACKAGES}"
