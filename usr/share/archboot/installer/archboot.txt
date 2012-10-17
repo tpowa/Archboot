@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   October, 8th 2012
+   October, 17th 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -66,7 +66,6 @@ Introduction
    * It provides an additional interactive setup and quickinst script.
    * It contains [core] repository on media.
    * It provides the long time support kernel as boot and installation option.
-   * It is a systemd live environment.
    * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
