@@ -5259,19 +5259,7 @@ configure_system() {
                 ${EDITOR} ${DESTDIR}${FILE}
             else
                 DIALOG --msgbox "You use systemd. This file has no function on systemd systems." 18 70
-            fi
-        elif [[ "${FILE}" = "/etc/hostname" ]]; then    # non-file
-            # if user edited /etc/hostname, add the hostname to /etc/hosts if it's not already there.
-            # note that if the user edits rc.conf several times to change the hostname more then once, 
-            # we will add them all to /etc/hosts.  this is not perfect, but to avoid this, too much code would be required 
-            # (feel free to prove me wrong :))
-            # we could maybe do this just once after the user is really done here, but then he doesn't get 
-            # to see the updated file while being in this menu...
-            ${EDITOR} ${DESTDIR}${FILE}
-            HOSTNAME=$(cat ${DESTDIR}${FILE})
-            if ! [[ "$(grep '127\.0\.0\.1' ${DESTDIR}/etc/hosts | grep -q "${HOSTNAME}")" ]]; then
-                sed -i "s/127\.0\.0\.1.*/& ${HOSTNAME}/" ${DESTDIR}/etc/hosts
-            fi              
+            fi           
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then    # non-file
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- USB keyboard users should add 'usbinput' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
