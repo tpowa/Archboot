@@ -3478,12 +3478,12 @@ do_uefi_efibootmgr() {
             cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
-for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i '${_EFIBOOTMGR_LABEL}' | cut -b5-8) ; do
+for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
     efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
 done
 
 echo
-efibootmgr --verbose --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label '${_EFIBOOTMGR_LABEL}' --loader '\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}'
+efibootmgr --verbose --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label "${_EFIBOOTMGR_LABEL}" --loader \'\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}\'
 echo
 
 EFIBEOF
@@ -3666,7 +3666,7 @@ CONFEOF
         
         if [[ "${_EFILINUX}" == "1" ]]; then
             cat << CONFEOF > "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg"
--f \\EFI\\arch\\${_EFISTUB_KERNEL} ${_PARAMETERS_MOD}
+-f \\EFI\\arch\\${_EFISTUB_KERNEL} ${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
         fi
         
@@ -3750,41 +3750,39 @@ dogummiboot_uefi_common() {
     cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
     
     if [[ "${_EFILINUX}" == "1" ]]; then
-        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts.conf"
-title   Arch Linux LTS via EFILINUX
-efi     /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-options $(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg")
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-main.conf"
+title    Arch Linux LTS via EFILINUX
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-fallback.conf"
-title   Arch Linux LTS via EFILINUX  - fallback initramfs
-efi     /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-options $(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
+title    Arch Linux LTS via EFILINUX - fallback initramfs
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/loader.conf"
-timeout 3
-default archlinux-core-lts
+timeout 5
+default archlinux-core-lts-main
 GUMEOF
         
     else
-        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core.conf"
-title   Arch Linux
-linux   /EFI/arch/${_EFISTUB_KERNEL}
-initrd  /EFI/arch/${_EFISTUB_INITRAMFS}.img
-options ${_PARAMETERS_MOD}
+        cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-main.conf"
+title    Arch Linux
+linux    /EFI/arch/${_EFISTUB_KERNEL}
+initrd   /EFI/arch/${_EFISTUB_INITRAMFS}.img
+options  ${_PARAMETERS_MOD}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/entries/archlinux-core-fallback.conf"
-title   Arch Linux fallback initramfs
-linux   /EFI/arch/${_EFISTUB_KERNEL}
-initrd  /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-options ${_PARAMETERS_MOD}
+title    Arch Linux fallback initramfs
+linux    /EFI/arch/${_EFISTUB_KERNEL}
+initrd   /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+options  ${_PARAMETERS_MOD}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/boot/efi/loader/loader.conf"
-timeout 3
-default archlinux-core
+timeout 5
+default archlinux-core-main
 GUMEOF
         
     fi
@@ -3801,10 +3799,10 @@ GUMEOF
         geteditor || return 1
         
         if [[ "${_EFILINUX}" == "1" ]]; then
-            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts.conf"
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-main.conf"
             "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-lts-fallback.conf"
         else
-            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core.conf"
+            "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-main.conf"
             "${EDITOR}" "${DESTDIR}/boot/efi/loader/entries/archlinux-core-fallback.conf"
         fi
         
@@ -3852,13 +3850,11 @@ dorefind_uefi_common() {
 menuentry "Arch Linux LTS via EFILINUX" {
 	icon /EFI/refind/icons/os_arch.icns
 	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-	options "$(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg")"
 }
 
 menuentry "Arch Linux LTS via EFILINUX - fallback initramfs" {
 	icon /EFI/refind/icons/os_arch.icns
 	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-	options "$(cat "${DESTDIR}/boot/efi/EFI/efilinux/efilinux.cfg") initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
 }
 
 REFINDEOF

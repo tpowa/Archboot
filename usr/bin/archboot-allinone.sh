@@ -222,26 +222,31 @@ _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
 	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi"
+	
+	mkdir -p "${ALLINONE}/EFI/efilinux"
+	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
 	mkdir -p "${ALLINONE}/loader/entries/"
 	
 	cat << EOF > "${ALLINONE}/loader/loader.conf"
-timeout 3
-default archboot-${_UEFI_ARCH}
+timeout 5
+default archboot-${_UEFI_ARCH}-core
 EOF
 	
-	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}.conf"
-title   Arch Linux ${_UEFI_ARCH} archboot
-linux   /boot/vmlinuz_${_UEFI_ARCH}
-initrd  /boot/initramfs_${_UEFI_ARCH}.img
-options gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-core.conf"
+title    Arch Linux ${_UEFI_ARCH} Archboot
+linux    /boot/vmlinuz_${_UEFI_ARCH}
+initrd   /boot/initramfs_${_UEFI_ARCH}.img
+options  gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts.conf"
-title   Arch Linux LTS ${_UEFI_ARCH} archboot
-efi     /EFI/boot/efilinux${_SPEC_UEFI_ARCH}.efi
-options -f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
+title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+EOF
+	
+	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux.cfg"
+-f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
 	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
