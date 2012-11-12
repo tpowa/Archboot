@@ -218,45 +218,81 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_prepare_uefi_gummiboot_USB_files() {
+_prepare_uefi_rEFInd_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/refind/refind${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/boot/icons"
+	
+	mkdir -p "${ALLINONE}/EFI/tools"
+	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
 	
 	mkdir -p "${ALLINONE}/EFI/efilinux"
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
-	mkdir -p "${ALLINONE}/loader/entries/"
+	# mkdir -p "${ALLINONE}/loader/entries/"
 	
-	cat << EOF > "${ALLINONE}/loader/loader.conf"
+	cat << EOF > "${ALLINONE}/EFI/boot/refind.conf"
 timeout 5
-default archboot-${_UEFI_ARCH}-core
+
+hideui singleuser
+
+textonly
+#resolution 1024 768
+
+use_graphics_for osx
+
+showtools about,reboot,shutdown,exit
+
+scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}
+
+scanfor manual,internal,external,optical
+
+scan_delay 1
+
+#also_scan_dirs boot
+
+dont_scan_dirs EFI/boot
+
+#scan_all_linux_kernels
+
+max_tags 0
+
+default_selection "Arch Linux ${_UEFI_ARCH} Archboot"
+
+menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
+	icon /EFI/refind/icons/os_arch.icns
+	loader /boot/vmlinuz_${_UEFI_ARCH}
+	initrd /boot/initramfs_${_UEFI_ARCH}.img
+	ostype Linux
+	graphics off
+	options "gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+}
+
+menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
+	icon /EFI/refind/icons/os_arch.icns
+	loader /EFI/efilinux/efilinuxx64.efi
+	initrd /boot/initramfs_${_UEFI_ARCH}.img
+	ostype Linux
+	graphics off
+	options "-f \boot\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+}
+
+menuentry "UEFI ${_UEFI_ARCH} Shell v2" {
+	icon /EFI/refind/icons/tool_shell.icns
+	loader /EFI/tools/shellx64_v2.efi
+	graphics off
+}
+
+menuentry "UEFI ${_UEFI_ARCH} Shell v1" {
+	icon /EFI/refind/icons/tool_shell.icns
+	loader /EFI/tools/shellx64_v1.efi
+	graphics off
+}
 EOF
 	
-	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-core.conf"
-title    Arch Linux ${_UEFI_ARCH} Archboot
-linux    /boot/vmlinuz_${_UEFI_ARCH}
-initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
-EOF
-	
-	cat << EOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts.conf"
-title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-EOF
-	
-	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux.cfg"
--f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
-EOF
-	
-	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
-title   UEFI ${_UEFI_ARCH} Shell v2
-efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
-EOF
-	
-	cat << EOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
-title   UEFI ${_UEFI_ARCH} Shell v1
-efi     /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_.cfg_"
+-f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
 }
@@ -498,7 +534,7 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_prepare_uefi_gummiboot_USB_files
+_prepare_uefi_rEFInd_USB_files
 
 # _prepare_grub_uefi_CD_files
 
@@ -541,12 +577,12 @@ xorriso -as mkisofs \
 # "${USBIMAGE_HELPER}" "${ALLINONE}" "${IMAGENAME}.img" > /dev/null 2>&1
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
-	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_GUMMIBOOT="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
