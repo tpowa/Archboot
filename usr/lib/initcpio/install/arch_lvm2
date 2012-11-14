@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/sbin/lvm /sbin/lvmdump /sbin/lvmconf /sbin/vgimportclone /sbin/fsadm"
+    apps="/sbin/lvm /sbin/lvmdump /sbin/lvmconf /sbin/vgimportclone /sbin/fsadm /sbin/lvmetad"
     for i in $apps; do
         add_binary "$i"
     done
