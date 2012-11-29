@@ -1,6 +1,8 @@
 #!/bin/bash
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 udevd_running=0
+mount_handler=default_mount_handler
+init=/sbin/init
 
 if [ -x /usr/bin/systemd-timestamp ]; then
     RD_TIMESTAMP=$(systemd-timestamp)
@@ -31,12 +33,8 @@ done
 
 run_hookfunctions 'run_earlyhook' 'early hook' $EARLYHOOKS
 
-[ -n "${earlymodules//[[:space:]]}" ] && modprobe -qab ${earlymodules//,/ }
-[ -n "${MODULES//[[:space:]]}" ] && modprobe -qab $MODULES
-
-# If rootdelay is empty or not a non-negative integer, set it to 10
-if [ -z "${rootdelay}" ] || ! [ ${rootdelay} -ge 0 ]; then
-    rootdelay=10
+if [ -n "$earlymodules$MODULES" ]; then
+    modprobe -qab ${earlymodules//,/ } $MODULES
 fi
 
 run_hookfunctions 'run_hook' 'hook' $HOOKS
@@ -55,13 +53,12 @@ fsck_root
 run_hookfunctions 'run_latehook' 'late hook' $LATEHOOKS
 run_hookfunctions 'run_cleanuphook' 'cleanup hook' $CLEANUPHOOKS
 
-init=${init:-/sbin/init}
 if [ "${root}" = "" -a "${ip}" = "" ]; then
     # enter install environment
     exec $init
 else
     # Mount root at /new_root
-    ${mount_handler:-default_mount_handler} /new_root
+    "$mount_handler" /new_root
     if [ "$(stat -c %D /)" = "$(stat -c %D /new_root)" ]; then
         # Nothing got mounted on /new_root. This is the end, we don't know what to do anymore
         # We fall back into a shell, but the shell has now PID 1
