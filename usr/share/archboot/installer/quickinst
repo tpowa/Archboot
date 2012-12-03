@@ -142,9 +142,6 @@ install_packages() {
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
-    if [[ "$(blkid -c /dev/null -o value -s TYPE | grep ntfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
-    fi
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep btrfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w btrfs-progs)" ]] && PACKAGES="${PACKAGES} btrfs-progs"
     fi
