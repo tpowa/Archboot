@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   November, 11th 2012
+   December, 3rd 2012
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -136,10 +136,6 @@ Archboot bootparameters
       - Usage:
         advanced=hook1,hook2,hook3
         advanced=arch_encrypt,arch_mdadm
-
-   * ide-legacy
-      - This will turn on the old IDE subsystem. This is only needed,
-        if your system doesn't support the new PATA subsystem.
 
    * arch-addons
       - You want to load external addon packages or configs 

@@ -5086,8 +5086,6 @@ auto_hwdetect() {
     HWKVER==
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
-        # check on ide-legacy boot parameter
-        [[ "$(grep -w ide-legacy /proc/cmdline)" ]] && HWPARAMETER="${HWPARAMETER} --ide-legacy"
         # check on used keymap
         ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
         # check on usb input
@@ -5101,12 +5099,6 @@ auto_hwdetect() {
         [[ "$(grep "i915" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [[ "$(grep "nouveau" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
         [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
-        if [[ "$(lsmod | grep ^usb_storage)" ]]; then
-            DIALOG --defaultno --yesno "Setup detected usb storage driver...\nDo you need support for booting from usb devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --usb"
-        fi
-        if [[ "$(lsmod | grep ^sbp2)" ]]; then
-            DIALOG --defaultno --yesno "Setup detected firewire storage driver...\nDo you need support for booting from firewire devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --fw"
-        fi
         if [[ "$(lsmod | grep ^pcmcia)" ]]; then
             DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --pcmcia"
         fi
