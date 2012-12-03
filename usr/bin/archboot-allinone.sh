@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# grub-uefi related commands have been copied from grub-mkstandalone and grub-mkrescue scripts in core/grub-common package
 
 [[ -z "${_DO_x86_64}" ]] && _DO_x86_64="1"
 [[ -z "${_DO_i686}" ]] && _DO_i686="1"
@@ -230,14 +229,13 @@ _prepare_uefi_rEFInd_USB_files() {
 	mkdir -p "${ALLINONE}/EFI/efilinux"
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
-	# mkdir -p "${ALLINONE}/loader/entries/"
-	
 	cat << EOF > "${ALLINONE}/EFI/boot/refind.conf"
 timeout 5
 
 hideui singleuser
 
 textonly
+
 #resolution 1024 768
 
 use_graphics_for osx
@@ -261,265 +259,38 @@ max_tags 0
 default_selection "Arch Linux ${_UEFI_ARCH} Archboot"
 
 menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
-	icon /EFI/refind/icons/os_arch.icns
-	loader /boot/vmlinuz_${_UEFI_ARCH}
-	initrd /boot/initramfs_${_UEFI_ARCH}.img
-	ostype Linux
-	graphics off
-	options "gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+    icon /EFI/refind/icons/os_arch.icns
+    loader /boot/vmlinuz_${_UEFI_ARCH}
+    initrd /boot/initramfs_${_UEFI_ARCH}.img
+    options "gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+    ostype Linux
+    graphics off
 }
 
 menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
-	icon /EFI/refind/icons/os_arch.icns
-	loader /EFI/efilinux/efilinuxx64.efi
-	initrd /boot/initramfs_${_UEFI_ARCH}.img
-	ostype Linux
-	graphics off
-	options "-f \boot\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+    icon /EFI/refind/icons/os_arch.icns
+    loader /EFI/efilinux/efilinuxx64.efi
+    initrd /boot/initramfs_${_UEFI_ARCH}.img
+    options "-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
+    ostype Linux
+    graphics off
 }
 
 menuentry "UEFI ${_UEFI_ARCH} Shell v2" {
-	icon /EFI/refind/icons/tool_shell.icns
-	loader /EFI/tools/shellx64_v2.efi
-	graphics off
+    icon /EFI/refind/icons/tool_shell.icns
+    loader /EFI/tools/shellx64_v2.efi
+    graphics off
 }
 
 menuentry "UEFI ${_UEFI_ARCH} Shell v1" {
-	icon /EFI/refind/icons/tool_shell.icns
-	loader /EFI/tools/shellx64_v1.efi
-	graphics off
+    icon /EFI/refind/icons/tool_shell.icns
+    loader /EFI/tools/shellx64_v1.efi
+    graphics off
 }
 EOF
 	
-	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_.cfg_"
--f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 pci=nocrs add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
-EOF
-	
-}
-
-_prepare_grub_uefi_arch_specific_CD_files() {
-	
-	mkdir -p "${ALLINONE}/boot/grub"
-	
-	## Create grub.cfg for grub-mkstandalone memdisk for boot${_SPEC_UEFI_ARCH}.efi
-	cat << EOF > "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg"
-
-insmod usbms
-insmod usb_keyboard
-
-insmod part_gpt
-insmod part_msdos
-
-insmod fat
-insmod iso9660
-insmod udf
-
-insmod ext2
-insmod reiserfs
-insmod ntfs
-insmod hfsplus
-
-insmod linux
-insmod chain
-
-search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
-source "(\${archboot})/boot/grub/grub_archboot.cfg"
-
-EOF
-	
-	cp -f "${ALLINONE}/boot/grub/grub_standalone_archboot.cfg" "${ALLINONE}/boot/grub/grub.cfg"
-	
-	__WD="${PWD}/"
-	
-	cd "${ALLINONE}/"
-	
-	grub-mkstandalone --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" --format="${_UEFI_ARCH}-efi" --compression="xz" --output="${grub_uefi_mp}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg"
-	
-	cd "${__WD}/"
-	
-	rm -f "${ALLINONE}/boot/grub/grub.cfg"
-	
-}
-
-_prepare_grub_uefi_CD_files() {
-	
-	grub_uefi_mp="$(mktemp -d /tmp/grub_uefi_mp.XXX)"
-	
-	mkdir -p "${ALLINONE}/boot/grub"
-	
-	# Create a blank image to be converted to ESP IMG
-	dd if="/dev/zero" of="${ALLINONE}/boot/grub/grub_uefi_x86_64.bin" bs="1024" count="4096"
-	
-	# Create a FAT12 FS with Volume label "grub_uefi"
-	mkfs.vfat -F12 -S 512 -n "grub_uefi" "${ALLINONE}/boot/grub/grub_uefi_x86_64.bin"
-	
-	## Mount the ${ALLINONE}/boot/grub/grub_uefi_x86_64.bin image at ${grub_uefi_mp} as loop 
-	if ! [[ "$(lsmod | grep ^loop)" ]]; then
-		modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
-	fi
-	
-	LOOP_DEVICE="$(losetup --show --find "${ALLINONE}/boot/grub/grub_uefi_x86_64.bin")"
-	mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${grub_uefi_mp}"
-	
-	mkdir -p "${grub_uefi_mp}/EFI/boot/"
-	
-	_prepare_grub_uefi_arch_specific_CD_files
-	
-	# umount images and loop
-	umount "${grub_uefi_mp}"
-	losetup --detach "${LOOP_DEVICE}"
-	
-	mkdir -p "${ALLINONE}/boot/grub/fonts"
-	cp -f "/usr/share/grub/unicode.pf2" "${ALLINONE}/boot/grub/fonts/"
-	
-	mkdir -p "${ALLINONE}/boot/grub/locale/"
-	
-	## Taken from /usr/sbin/grub-install
-	#for dir in "/usr/share/locale"/*; do
-	#	if test -f "${dir}/LC_MESSAGES/grub.mo"; then
-			# cp -f "${dir}/LC_MESSAGES/grub.mo" "${ALLINONE}/boot/grub/locale/${dir##*/}.mo"
-	#		echo
-	#	fi
-	#done
-	
-	## Create the actual grub uefi config file
-	cat << EOF > "${ALLINONE}/boot/grub/grub_archboot.cfg"
-
-set _kernel_params="gpt loglevel=7"
-
-if [ "\${grub_platform}" == "efi" ]; then
-    set _UEFI_ARCH="\${grub_cpu}"
-    
-    set _kernel_params="\${_kernel_params} add_efi_memmap none=UEFI_ARCH_\${_UEFI_ARCH}"
-    
-    if [ "\${grub_cpu}" == "x86_64" ]; then
-        set _SPEC_UEFI_ARCH="x64"
-        
-        set _kernel_x86_64_params="\${_kernel_params}"
-        set _kernel_i686_params="\${_kernel_params} noefi"
-    fi
-    
-    if [ "\${grub_cpu}" == "i386" ]; then
-        set _SPEC_UEFI_ARCH="ia32"
-        
-        set _kernel_x86_64_params="\${_kernel_params} noefi"
-        set _kernel_i686_params="\${_kernel_params}"
-    fi
-else
-    set _kernel_x86_64_params="\${_kernel_params}"
-    set _kernel_i686_params="\${_kernel_params}"
-fi
-
-# search --file --no-floppy --set=archboot "/boot/grub/grub_archboot.cfg"
-# search --file --no-floppy --set=archboot "/boot/grub/grub_standalone_archboot.cfg"
-
-set pager="1"
-# set debug="all"
-
-set locale_dir="(\${archboot})/boot/grub/locale"
-
-if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
-    insmod all_video
-else
-    if [ "\${grub_platform}" == "efi" ]; then
-        insmod efi_gop
-        insmod efi_uga
-    fi
-    
-    if [ "\${grub_platform}" == "pc" ]; then
-        insmod vbe
-        insmod vga
-    fi
-    
-    insmod video_bochs
-    insmod video_cirrus
-fi
-
-insmod font
-
-if loadfont "(\${archboot})/boot/grub/fonts/unicode.pf2" ; then
-    insmod gfxterm
-    set gfxmode="auto"
-    
-    terminal_input console
-    terminal_output gfxterm
-    
-    # set color_normal="light-blue/black"
-    # set color_highlight="light-cyan/blue"
-    
-    # insmod png
-    # background_image "(\${archboot})/boot/syslinux/splash.png"
-fi
-
-insmod fat
-insmod iso9660
-insmod udf
-insmod search_fs_file
-insmod linux
-insmod chain
-
-EOF
-	
-	if [[ "${_DO_x86_64}" == "1" ]]; then
-		cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
-
-if [ cpuid -l ]; then
-
-    menuentry "Arch Linux (x86_64) archboot" {
-        set gfxpayload="keep"
-        set root="\${archboot}"
-        linux /boot/vmlinuz_x86_64 \${_kernel_x86_64_params}
-        initrd /boot/initramfs_x86_64.img
-    }
-
-    menuentry "Arch Linux LTS (x86_64) archboot" {
-        set gfxpayload="keep"
-        set root="\${archboot}"
-        linux /boot/vmlinuz_x86_64_lts \${_kernel_x86_64_params}
-        initrd /boot/initramfs_x86_64.img
-    }
-
-fi
-
-EOF
-	fi
-	
-	if [[ "${_DO_i686}" == "1" ]]; then
-		cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
-
-menuentry "Arch Linux (i686) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_i686 \${_kernel_i686_params}
-    initrd /boot/initramfs_i686.img
-}
-
-menuentry "Arch Linux LTS (i686) archboot" {
-    set gfxpayload="keep"
-    set root="\${archboot}"
-    linux /boot/vmlinuz_i686_lts \${_kernel_i686_params}
-    initrd /boot/initramfs_i686.img
-}
-
-EOF
-	fi
-	
-	cat << EOF >> "${ALLINONE}/boot/grub/grub_archboot.cfg"
-
-if [ "\${grub_platform}" == "efi" ]; then
-
-    menuentry "UEFI \${_UEFI_ARCH} Shell v2 - For Spec. Ver. >=2.3 systems" {
-        set root="\${archboot}"
-        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
-    }
-
-    menuentry "UEFI \${_UEFI_ARCH} Shell v1 - For Spec. Ver. <2.3 systems" {
-        set root="\${archboot}"
-        chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v1.efi
-    }
-
-fi
-
+	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_._cfg_"
+-f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
 }
@@ -535,8 +306,6 @@ _prepare_kernel_initramfs_files
 _download_uefi_shell_tianocore
 
 _prepare_uefi_rEFInd_USB_files
-
-# _prepare_grub_uefi_CD_files
 
 unset _UEFI_ARCH
 unset _SPEC_UEFI_ARCH
@@ -564,9 +333,6 @@ xorriso -as mkisofs \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
-## Add below line to above xorriso if UEFI CD support is required
-# -eltorito-alt-boot --efi-boot boot/grub/grub_uefi_x86_64.bin -no-emul-boot \
-
 ## cleanup isolinux and migrate to syslinux
 # echo "Generating ALLINONE IMG ..."
 # rm -f "${ALLINONE}/boot/syslinux/isolinux.bin"
@@ -592,7 +358,6 @@ rm -f "${WD}/sha256sums.txt" || true
 sha256sum *.iso *.img > "${WD}/sha256sums.txt"
 
 # cleanup
-# rm -rf "${grub_uefi_mp}"
 rm -rf "${CORE}"
 rm -rf "${CORE64}"
 rm -rf "${CORE_LTS}"

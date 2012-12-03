@@ -55,20 +55,9 @@ mkfs.vfat -S 512 -F32 -n "ARCHBOOT" "${FSIMG}"
 if ! [[ "$(lsmod | grep ^loop)" ]]; then
 	modprobe -q loop || echo "Your hostsystem has a different kernel version installed, please load loop module first on hostsystem!"
 fi
+
 LOOP_DEVICE="$(losetup --show --find "${FSIMG}")"
 mount -o rw,flush -t vfat "${LOOP_DEVICE}" "${TMPDIR}"
-
-if [[ ! -e "${IMGROOT}/efi/boot/bootx64.efi" ]]; then
-	
-	LOOP_DEVICE2="$(losetup --show --find "${IMGROOT}/boot/grub/grub_uefi_x86_64.bin")"
-	mount -o ro -t vfat "${LOOP_DEVICE2}" "${TMPDIR2}"
-	cp -f "${TMPDIR2}/bootx64.efi" "${IMGROOT}/efi/boot/bootx64.efi"
-	
-	umount "${TMPDIR2}"
-	losetup --detach "${LOOP_DEVICE2}"
-	
-	rm -rf "${TMPDIR2}"
-fi
 
 cp -rf "${IMGROOT}"/* "${TMPDIR}"
 

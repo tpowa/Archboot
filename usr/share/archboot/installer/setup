@@ -3661,7 +3661,7 @@ CONFEOF
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro pci=nocrs add_efi_memmap initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} add_efi_memmap initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         if [[ "${_EFILINUX}" == "1" ]]; then
@@ -3856,13 +3856,13 @@ dorefind_uefi_common() {
         cat << REFINDEOF >> "${_REFIND_CONFIG}"
 
 menuentry "Arch Linux LTS via EFILINUX" {
-	icon /EFI/refind/icons/os_arch.icns
-	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+    icon /EFI/refind/icons/os_arch.icns
+    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 }
 
 menuentry "Arch Linux LTS via EFILINUX - fallback initramfs" {
-	icon /EFI/refind/icons/os_arch.icns
-	loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+    icon /EFI/refind/icons/os_arch.icns
+    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 }
 
 REFINDEOF
