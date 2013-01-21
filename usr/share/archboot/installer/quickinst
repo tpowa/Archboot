@@ -237,8 +237,7 @@ echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/${KERNELPKG}-fallback
 echo "to fit your needs. After that run:"
 echo "# mkinitcpio -p ${KERNELPKG}"
 echo
-echo "Then exit your chroot shell, edit ${DESTDIR}/etc/fstab and"
-echo "${DESTDIR}/etc/rc.conf, and reboot!"
+echo "Then exit your chroot shell, edit ${DESTDIR}/etc/fstab and reboot!"
 echo
 exit 0
 
