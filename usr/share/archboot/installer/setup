@@ -5084,7 +5084,7 @@ auto_hwdetect() {
     HWDETECTHOOKS=""
     HWDETECTFILES=""
     HWKVER==
-    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers, network and sound devices.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on used keymap
         ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
@@ -5110,8 +5110,6 @@ auto_hwdetect() {
         fi
         # check for separate /usr partition
         [[ $(mount | grep "${DESTDIR}/usr ") ]] && HWPARAMETER="${HWPARAMETER} --shutdown"
-        # add persistent net and sound options
-        HWPARAMETER="${HWPARAMETER} --net --sound"
         [[ "$(${_BLKID} -p -i -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         read _ HWKVER < <(file -Lb "${DESTDIR}/boot/${VMLINUZ}" | grep -o 'version [^ ]\+')
         HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
@@ -5119,11 +5117,6 @@ auto_hwdetect() {
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
-        # add persistent files
-        [[ -e "${DESTDIR}/etc/udev/rules.d/network_persistent.rules" ]] && rm ${DESTDIR}/etc/udev/rules.d/network_persistent.rules
-        [[ -s "/tmp/network_persistent.rules" ]] && cp /tmp/network_persistent.rules ${DESTDIR}/etc/udev/rules.d/network_persistent.rules
-        [[ -e "${DESTDIR}/etc/modprobe.d/sound_persistent.conf" ]] && rm ${DESTDIR}/etc/modprobe.d/sound_persistent.conf
-        [[ -s "/tmp/sound_persistent.conf" ]] && cp /tmp/sound_persistent.conf ${DESTDIR}/etc/modprobe.d/sound_persistent.conf
     fi
 }
 
