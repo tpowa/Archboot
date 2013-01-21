@@ -14,7 +14,7 @@ build ()
         add_file "$i"
     done
     # add plugins
-    for i in /usr/lib/openvpn/*; do
+    for i in /usr/lib/openvpn/plugins/*; do
         add_file "$i"
     done
     # fix licenses

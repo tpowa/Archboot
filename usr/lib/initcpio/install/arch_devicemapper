@@ -4,8 +4,8 @@
 build ()
 {
     add_checked_modules 'md/dm-*'
-    add_binary "/sbin/dmsetup"
-    add_binary "/sbin/dmeventd"
+    add_binary "/usr/sbin/dmsetup"
+    add_binary "/usr/sbin/dmeventd"
     add_dir "/dev/mapper"
     add_full_dir "/usr/lib/device-mapper"
     for i in /usr/lib/libdevmapper*; do

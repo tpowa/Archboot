@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_file "/usr/lib/refind/refindx64.efi"
+    add_file "/usr/lib/refind/refind_x64.efi"
     add_file "/usr/lib/refind/config/refind.conf"
 }
 

@@ -32,7 +32,7 @@ build ()
           /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
           /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
           /usr/bin/column /usr/bin/cytune /usr/bin/fallocate /usr/bin/flock /usr/bin/getopt /usr/bin/hexdump \
-          /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize  /sbin/swapoff \
+          /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize /sbin/swapoff \
           /usr/bin/logger /usr/bin/look /usr/bin/lscpu /usr/bin/mcookie /usr/bin/namei /usr/bin/pg \
           /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
           /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
@@ -68,7 +68,6 @@ build ()
     add_file "/usr/lib/locale/locale-archive"
 
     ### adding needed files from running system
-    add_file "${CONFIG}" "/config"
     add_symlink "/etc/mtab" "/proc/self/mounts"
     add_file "/usr/share/terminfo/l/linux"
     add_file "/usr/share/archboot/base/init" "/init"
@@ -111,7 +110,7 @@ build ()
     apps="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh \
           /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd \
           /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems \
-          /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv /usr/sbin/logoutd \
+          /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv \
           /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd \
           /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg"
     for i in $apps; do
@@ -122,7 +121,6 @@ build ()
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
-    add_file "/usr/sbin/adduser"
     add_file "/etc/login.defs"
 
     ### add systemd
@@ -133,8 +131,7 @@ build ()
         add_binary "$i"
     done
 
-
-    #dbus-core files
+    #dbus files
     apps="/usr/bin/dbus-cleanup-sockets /usr/bin/dbus-daemon /usr/bin/dbus-monitor /usr/bin/dbus-send /usr/bin/dbus-uuidgen"
     for i in $apps; do
         add_binary "$i"
@@ -221,10 +218,10 @@ build ()
     add_file "/usr/share/licenses/ncurses/license.txt"
     add_file "/usr/share/licenses/pcre/LICENSE"
     add_file "/usr/share/licenses/shadow/LICENSE"
-    add_file "/usr/share/licenses/sdparm/LICENSE"
-    
+    add_file "/usr/share/licenses/sdparm/LICENSE" 
     add_file "/usr/share/licenses/zlib/LICENSE"
     add_file "/usr/share/licenses/iana-etc/LICENSE"
+    add_file "/usr/share/licenses/dbus/COPYING"
 
     add_runscript
 }
