@@ -23,7 +23,7 @@ build ()
              yp-tools curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua \
              weechat gnutls nettle libtasn1 bind rpcbind expat progsreiserfs glib2 freetype2 libssh2 libedit \
              talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \
-	     dnssec-anchors hwids systemd systemd-arch-units dmidecode archlinux-keyring haveged \
+	     dnssec-anchors hwids systemd dmidecode archlinux-keyring haveged \
 	     pambase traceroute arch-wiki-lite amd-ucode intel-ucode arch-install-scripts zsh gdbm \
 	     grml-zsh-config sysvinit-tools xl2tpd wvdial usb_modeswitch"
     for i in $DEPENDS; do
