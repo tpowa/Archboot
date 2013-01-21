@@ -5088,8 +5088,6 @@ auto_hwdetect() {
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on used keymap
         ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
-        # check on usb input
-        [[ "$(lsmod | grep ^hid)" ]] && HWPARAMETER="${HWPARAMETER} --usbinput"
         # check on framebuffer modules and kms
         if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d && "$(grep -w uvesafb /proc/cmdline)" ]]; then
              FBPARAMETER="--uvesafb"
