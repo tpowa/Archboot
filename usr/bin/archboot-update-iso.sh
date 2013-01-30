@@ -298,8 +298,9 @@ _update_uefi_rEFInd_USB_files() {
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	cp -f "/usr/lib/refind/refind${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	# cp -rf "/usr/share/refind/icons" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/icons"
+	# cp -rf "/usr/share/refind/fonts" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/fonts"
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools"
@@ -313,21 +314,17 @@ _update_uefi_rEFInd_USB_files() {
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/refind.conf"
 timeout 5
 
-hideui singleuser
-
 textonly
 
-#resolution 1024 768
+resolution 1024 768
 
-use_graphics_for osx
-
-showtools about,reboot,shutdown,exit
+showtools mok_tool,about,reboot,shutdown,exit
 
 scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}
 
 scanfor manual,internal,external,optical
 
-scan_delay 1
+scan_delay 0
 
 #also_scan_dirs boot
 

@@ -220,8 +220,9 @@ _download_uefi_shell_tianocore() {
 _prepare_uefi_rEFInd_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/usr/lib/refind/refind${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/boot/icons"
+	# cp -rf "/usr/share/refind/fonts" "${ALLINONE}/EFI/boot/fonts"
 	
 	mkdir -p "${ALLINONE}/EFI/tools"
 	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
@@ -232,21 +233,17 @@ _prepare_uefi_rEFInd_USB_files() {
 	cat << EOF > "${ALLINONE}/EFI/boot/refind.conf"
 timeout 5
 
-hideui singleuser
-
 textonly
 
-#resolution 1024 768
+resolution 1024 768
 
-use_graphics_for osx
-
-showtools about,reboot,shutdown,exit
+showtools mok_tool,about,reboot,shutdown,exit
 
 scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}
 
 scanfor manual,internal,external,optical
 
-scan_delay 1
+scan_delay 0
 
 #also_scan_dirs boot
 

@@ -3830,8 +3830,9 @@ dorefind_uefi_common() {
     PACKAGES=""
     
     mkdir -p "${DESTDIR}/boot/efi/EFI/refind/"
-    cp -f "${DESTDIR}/usr/lib/refind/refind${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+    cp -f "${DESTDIR}/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/boot/efi/EFI/refind/icons"
+    cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/boot/efi/EFI/refind/fonts"
     
     mkdir -p "${DESTDIR}/boot/efi/EFI/tools/"
     cp -rf "${DESTDIR}/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/boot/efi/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
@@ -3839,28 +3840,15 @@ dorefind_uefi_common() {
     _REFIND_CONFIG="${DESTDIR}/boot/efi/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/lib/refind/config/refind.conf" "${_REFIND_CONFIG}"
 
-    sed 's|^timeout 20|timeout 5|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#hideui singleuser|hideui singleuser|g' -i "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#use_graphics_for osx,linux|use_graphics_for osx|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#showtools shell, about, reboot|showtools shell,about,reboot,shutdown,exit|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#scan_delay 5|scan_delay 1|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#also_scan_dirs boot,EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#dont_scan_dirs EFI/boot|dont_scan_dirs EFI/boot|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#max_tags 0|max_tags 0|g' -i "${_REFIND_CONFIG}"
+    sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
     
     if [[ "${_EFILINUX}" == "1" ]]; then
         cat << REFINDEOF >> "${_REFIND_CONFIG}"
 
 menuentry "Arch Linux LTS via EFILINUX" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-}
-
-menuentry "Arch Linux LTS via EFILINUX - fallback initramfs" {
     icon /EFI/refind/icons/os_arch.icns
     loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 }
@@ -3875,10 +3863,10 @@ REFINDEOF
         
     fi
     
-    if [[ -e "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${DESTDIR}/boot/efi/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (rEFInd)"
         _BOOTMGR_LOADER_DIR="refind"
-        _BOOTMGR_LOADER_FILE="refind${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_FILE="refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "refind-efi has been setup successfully." 0 0
@@ -3888,7 +3876,7 @@ REFINDEOF
         "${EDITOR}" "${_REFIND_CONFIG}"
         [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${DESTDIR}/boot/efi/EFI/arch/refind_linux.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy /boot/efi/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to /boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/boot/efi/EFI/boot"
@@ -3897,7 +3885,7 @@ REFINDEOF
             rm -f "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
             rm -rf "${DESTDIR}/boot/efi/EFI/boot/icons"
             
-            cp -f "${DESTDIR}/boot/efi/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/boot/efi/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/boot/efi/EFI/boot/refind.conf"
             cp -rf "${DESTDIR}/boot/efi/EFI/refind/icons" "${DESTDIR}/boot/efi/EFI/boot/icons"
         fi
