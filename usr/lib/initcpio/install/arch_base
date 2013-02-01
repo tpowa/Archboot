@@ -208,8 +208,7 @@ build ()
     add_full_dir "/usr/share/pacman/keyrings"
 
     ### fix file
-    add_file "/usr/share/file/magic.mgc"
-    add_file "/usr/share/misc/magic.mgc"
+    add_file "/usr/share/file/misc/magic.mgc"
 
     ### fix licenses
     add_file "/usr/share/licenses/file/COPYING"
