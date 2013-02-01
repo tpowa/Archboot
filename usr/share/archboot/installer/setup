@@ -3468,14 +3468,10 @@ do_uefi_i386() {
 }
 
 do_uefi_efibootmgr() {
-    
-    modprobe -q efivars
-    
-    if [[ "$(lsmod | grep ^efivars)" ]]; then
-        chroot_mount
+    chroot_mount
         
-        if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]; then
-            cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
+    if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]; then
+        cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
 for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
@@ -3488,17 +3484,14 @@ echo
 
 EFIBEOF
             
-            chmod a+x "${DESTDIR}/efibootmgr_run.sh"
-            chroot "${DESTDIR}" "/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
-            mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
-        else
-            DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode, manually load efivars kernel module and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
-        fi
-        
-        chroot_umount
+        chmod a+x "${DESTDIR}/efibootmgr_run.sh"
+        chroot "${DESTDIR}" "/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
+        mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
     else
-        DIALOG --msgbox "efivars kernel module was not loaded properly. Manually load it and create a boot entry for DISC ${_EFIBOOTMGR_DISC} , PART ${_EFIBOOTMGR_PART_NUM} and LOADER \\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE} , in UEFI Boot Manager using efibootmgr." 0 0
+        DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
     fi
+        
+    chroot_umount
     
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
@@ -3509,8 +3502,6 @@ EFIBEOF
 }
 
 do_apple_efi_hfs_bless() {
-    
-    modprobe -q -r efivars || true
     
     ## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
     ## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
