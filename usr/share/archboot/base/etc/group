@@ -18,6 +18,7 @@ locate:x:21:
 rfkill:x:24:
 smmsp:x:25:
 http:x:33:
+named:x:40:
 games:x:50:
 lock:x:54:
 uuidd:x:68:
