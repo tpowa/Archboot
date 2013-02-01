@@ -2,7 +2,6 @@
 MODE="${1}"
 DESTDIR="${2}"
 PKGARG="${3}"
-INITSCRIPTS="${4}"
 
 PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
@@ -13,7 +12,7 @@ KERNELPKG="linux"
 VMLINUZ="vmlinuz-${KERNELPKG}"
 
 usage() {
-    echo "quickinst <install_mode> <destdir> <package_directory|server_url> <initscripts>"
+    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
     echo
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
@@ -21,8 +20,6 @@ usage() {
     echo "First make sure you have all your filesystems mounted under <destdir>."
     echo "e.g. mount -t iso9660 /dev/cdrom /src "
     echo "Then run this script to install all base packages to <destdir>."
-    echo
-    echo "To enable deprecated initscripts installation support, use 1 as last argument."
     echo
     if [[ -e "/usr/bin/curl" ]]; then
         echo "<install_mode> must be either 'net' or 'media'"
@@ -171,12 +168,7 @@ install_packages() {
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     ### HACK
     # manually add systemd or initscripts components
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
-    if [[ "${INITSCRIPTS}" = "1" ]]; then
-        PACKAGES="${PACKAGES} initscripts sysvinit"
-    else
-        PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
-    fi
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ sysvinit\ # #g")"
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
