@@ -51,7 +51,6 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_SELECT=0      # package selection
 S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
-S_INITSCRIPTS=0     # set initscripts mode
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
@@ -2764,15 +2763,6 @@ getsource() {
     S_SRC=1
 }
 
-# set_initscripts()
-# check if initscripts installation mode is set, if not run select_systemd!
-set_initscripts(){
-    if ! [[ "${S_INITSCRIPTS}" = "1" ]]; then
-        DIALOG --defaultno --yesno "Do you want to enable deprecated initscripts installation mode support?" 0 0 && INITSCRIPTS="1"
-    fi
-    S_INITSCRIPTS=1
-}
-
 # select_mirror()
 # Prompt user for preferred mirror and set ${SYNC_URL}
 #
@@ -2896,7 +2886,6 @@ run_pacman(){
 # returns: 1 on error
 select_packages() {
     source_set || return 1
-    set_initscripts
     pacman_conf
     prepare_pacman
     
@@ -3046,12 +3035,7 @@ select_packages() {
     PACKAGES="${KERNELPKG} ${PACKAGES}"
     ### HACK:
     # manually add systemd or initscripts components
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ initscripts\ # #g" -e "s#\ sysvinit\ # #g" -e "s#\ systemd\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
-    if [[ "${INITSCRIPTS}" = "1" ]]; then
-        PACKAGES="${PACKAGES} initscripts sysvinit"
-    else
-       PACKAGES="${PACKAGES} systemd systemd-sysvcompat"
-    fi
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ sysvinit\ # #g")"
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
@@ -3160,11 +3144,7 @@ auto_network()
     done
     sed -i -e "s#NETWORKS=.*#NETWORKS=\(${NETWORK_PROFILES}\)#g" ${DESTDIR}/etc/conf.d/netcfg
     # launch netcfg on boot
-    if [[ "${INITSCRIPTS}" = "1" ]]; then
-        sed -i -e "s# network # \!network net-profiles #g" ${DESTDIR}/etc/rc.conf
-    else
-        chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
-    fi
+    chroot ${DESTDIR} /usr/bin/systemctl enable netcfg.service
     # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
         echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
@@ -3608,25 +3588,7 @@ ExecStart=/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFIST
 CONFEOF
         
         chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
-        
-        if [[ "${INITSCRIPTS}" = "1" ]]; then
-            PACKAGES="incron"
-            run_pacman
-            PACKAGES=""
-            
-            cat << CONFEOF > "${DESTDIR}/usr/local/bin/efistub_copy.sh"
-/bin/cp -f /boot/${VMLINUZ} /boot/efi/EFI/arch/${_EFISTUB_KERNEL}
-/bin/cp -f /boot/${INITRAMFS}.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}.img
-/bin/cp -f /boot/${INITRAMFS}-fallback.img /boot/efi/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-CONFEOF
-            
-            cat << CONFEOF > "${DESTDIR}/etc/incron.d/efistub_copy.conf"
-/boot/${INITRAMFS}-fallback.img IN_CLOSE_WRITE /usr/local/bin/efistub_copy.sh
-CONFEOF
-            
-            DIALOG --msgbox "Add incrond to the DAEMONS list in /etc/rc.conf ." 0 0
-        fi
-        
+                
         ###########################
         
         _bootdev="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}')"
@@ -5181,7 +5143,6 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
-        set_initscripts
         auto_ftpmirror
         auto_network
         auto_parameters
@@ -5202,7 +5163,6 @@ configure_system() {
             DEFAULT=""
         fi
         DIALOG ${DEFAULT} --menu "Configuration" 21 80 16 \
-            "/etc/rc.conf"                  "System Config" \
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
@@ -5220,13 +5180,7 @@ configure_system() {
         FILE="$(cat ${ANSWER})"
         if [[ "${FILE}" = "Return" || -z "${FILE}" ]]; then       # exit
             S_CONFIG=1
-            break
-        elif [[ "${FILE}" = "/etc/rc.conf" ]]; then    # non-file
-            if [[ "${INITSCRIPTS}" = "1" ]]; then
-                ${EDITOR} ${DESTDIR}${FILE}
-            else
-                DIALOG --msgbox "You use systemd. This file has no function on systemd systems." 18 70
-            fi           
+            break           
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then    # non-file
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
