@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   February, 1st 2013
+   February, 22nd 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -87,7 +87,7 @@ Introduction
    * Media and Network installation mode
    * Changing keymap and consolefont
    * Changing time and date
-   * Setup network with netcfg
+   * Setup network with netctl
    * Preparing storage disk, like auto-prepare, partitioning,
      GUID (gpt) support, 4k sector drive support etc.
    * Creation of software raid/raid partitions, lvm2 devices and 
