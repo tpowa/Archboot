@@ -3259,7 +3259,7 @@ donetwork() {
     fi
     echo "IP=${IP}" >>${NETWORK_PROFILE}
     if [[ "${IP}" = "dhcp" ]]; then
-        [[ "${DHCLIENT}" = "yes" ]] && echo "DHCLIENT=yes" >>${NETWORK_PROFILE}
+        [[ "${DHCLIENT}" = "yes" ]] && echo "DHCPClient=dhclient" >>${NETWORK_PROFILE}
     else
         echo "Address='${IPADDR}'" >>${NETWORK_PROFILE}
         echo "Gateway='${GW}'" >>${NETWORK_PROFILE}
