@@ -3686,9 +3686,9 @@ do_efistub_uefi_i686() {
 
 dogummiboot_uefi_common() {
     
-    DIALOG --msgbox "Setting up gummiboot-efi now ..." 0 0
+    DIALOG --msgbox "Setting up gummiboot now ..." 0 0
     
-    PACKAGES="gummiboot-efi"
+    PACKAGES="gummiboot"
     run_pacman
     PACKAGES=""
     
@@ -3762,7 +3762,7 @@ GUMEOF
             cp -f "${DESTDIR}/boot/efi/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/boot/efi/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error setting up gummiboot-efi." 0 0
+        DIALOG --msgbox "Error setting up gummiboot." 0 0
     fi
     
 }
