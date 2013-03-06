@@ -3,7 +3,8 @@
 
 build ()
 {
-    add_file "/usr/lib/gummiboot/gummibootx64.efi"
+    add_binary "/usr/bin/gummiboot"
+    add_full_dir "/usr/lib/gummiboot"
 }
 
 help ()
