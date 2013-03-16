@@ -7,6 +7,7 @@
 
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
+[[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
 [[ -z "${_UPDATE_UEFI_REFIND}" ]] && _UPDATE_UEFI_REFIND="1"
 
 [[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
@@ -290,28 +291,80 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_update_uefi_rEFInd_USB_files() {
+_update_uefi_gummiboot_USB_files() {
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/" || true
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}" || true
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/" || true
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	# cp -rf "/usr/share/refind/icons" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/icons"
-	# cp -rf "/usr/share/refind/fonts" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/fonts"
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries"
+	echo
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/loader.conf"
+timeout 5
+default archboot-${_UEFI_ARCH}-main
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-main.conf"
+title    Arch Linux ${_UEFI_ARCH} Archboot
+linux    /boot/vmlinuz_${_UEFI_ARCH}
+initrd   /boot/initramfs_${_UEFI_ARCH}.img
+options  gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux.conf"
+title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
+linux    /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+initrd   /boot/initramfs_${_UEFI_ARCH}.img
+options  -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
+title    UEFI Shell ${_UEFI_ARCH} v2
+efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
+title    UEFI Shell ${_UEFI_ARCH} v1
+efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/refind-${_UEFI_ARCH}-gummiboot.conf"
+title    rEFInd ${_UEFI_ARCH}
+efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
+GUMEOF
+	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux"
+	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
+	echo
+	
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux_._cfg_"
+-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
+EOF
+	echo
+	
+}
+
+_update_uefi_rEFInd_USB_files() {
+	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/" || true
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}" || true
+	echo
+	
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind"
+	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+	# cp -rf "/usr/share/refind/icons" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/icons" || true
+	# cp -rf "/usr/share/refind/fonts" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/fonts" || true
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools"
 	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux"
-	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
-	echo
-	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/refind.conf"
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind.conf"
 timeout 5
 
 textonly
@@ -347,29 +400,24 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
 
 menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
     icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinuxx64.efi
+    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
     initrd /boot/initramfs_${_UEFI_ARCH}.img
     options "-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
     ostype Linux
     graphics off
 }
 
-menuentry "UEFI ${_UEFI_ARCH} Shell v2" {
+menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
     icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shellx64_v2.efi
+    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
     graphics off
 }
 
-menuentry "UEFI ${_UEFI_ARCH} Shell v1" {
+menuentry "UEFI Shell ${_UEFI_ARCH} v1" {
     icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shellx64_v1.efi
+    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
     graphics off
 }
-EOF
-	echo
-	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux_._cfg_"
--f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	echo
 	
@@ -478,6 +526,8 @@ fi
 
 [[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
 
+[[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
+
 [[ "${_UPDATE_UEFI_REFIND}" == "1" ]] && _update_uefi_rEFInd_USB_files
 
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
@@ -524,7 +574,7 @@ unset _REMOVE_i686
 unset _REMOVE_x86_64
 unset _UPDATE_SETUP
 unset _UPDATE_UEFI_SHELL
-unset _UPDATE_UEFI_REFIND_BIN
+unset _UPDATE_UEFI_GUMMIBOOT
 unset _UPDATE_UEFI_REFIND
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG

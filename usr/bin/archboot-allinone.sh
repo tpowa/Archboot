@@ -217,20 +217,67 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_prepare_uefi_rEFInd_USB_files() {
+_prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/boot/icons"
-	# cp -rf "/usr/share/refind/fonts" "${ALLINONE}/EFI/boot/fonts"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
 	
-	mkdir -p "${ALLINONE}/EFI/tools"
-	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+	mkdir -p "${ALLINONE}/loader/entries"
+	
+	cat << GUMEOF > "${ALLINONE}/loader/loader.conf"
+timeout 5
+default archboot-${_UEFI_ARCH}-main
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-main.conf"
+title    Arch Linux ${_UEFI_ARCH} Archboot
+linux    /boot/vmlinuz_${_UEFI_ARCH}
+initrd   /boot/initramfs_${_UEFI_ARCH}.img
+options  gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux.conf"
+title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
+linux    /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+initrd   /boot/initramfs_${_UEFI_ARCH}.img
+options  -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
+title    UEFI Shell ${_UEFI_ARCH} v2
+efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
+title    UEFI Shell ${_UEFI_ARCH} v1
+efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/refind-${_UEFI_ARCH}-gummiboot.conf"
+title    rEFInd ${_UEFI_ARCH}
+efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
+GUMEOF
 	
 	mkdir -p "${ALLINONE}/EFI/efilinux"
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
-	cat << EOF > "${ALLINONE}/EFI/boot/refind.conf"
+	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_._cfg_"
+-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
+EOF
+	
+}
+
+_prepare_uefi_rEFInd_USB_files() {
+	
+	mkdir -p "${ALLINONE}/EFI/refind"
+	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/refind/icons" || true
+	# cp -rf "/usr/share/refind/fonts" "${ALLINONE}/EFI/refind/fonts" || true
+	
+	mkdir -p "${ALLINONE}/EFI/tools"
+	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+	
+	cat << EOF > "${ALLINONE}/EFI/refind/refind.conf"
 timeout 5
 
 textonly
@@ -266,28 +313,24 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
 
 menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
     icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinuxx64.efi
+    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
     initrd /boot/initramfs_${_UEFI_ARCH}.img
     options "-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
     ostype Linux
     graphics off
 }
 
-menuentry "UEFI ${_UEFI_ARCH} Shell v2" {
+menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
     icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shellx64_v2.efi
+    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
     graphics off
 }
 
-menuentry "UEFI ${_UEFI_ARCH} Shell v1" {
+menuentry "UEFI Shell ${_UEFI_ARCH} v1" {
     icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shellx64_v1.efi
+    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
     graphics off
 }
-EOF
-	
-	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_._cfg_"
--f \\boot\\vmlinuz_x86_64_lts gpt loglevel=7 add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
 }
@@ -301,6 +344,8 @@ _merge_initramfs_files
 _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
+
+prepare_uefi_gummiboot_USB_files
 
 _prepare_uefi_rEFInd_USB_files
 
