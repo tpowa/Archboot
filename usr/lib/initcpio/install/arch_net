@@ -13,7 +13,7 @@ build ()
           /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp \
 	  /sbin/slattach /usr/bin/traceroute /usr/sbin/arping /usr/sbin/clockdiff \
 	  /usr/sbin/rarpd /usr/sbin/rdisc /usr/sbin/tftpd /usr/sbin/tracepath /usr/sbin/tracepath6 /sbin/route \
-	  /usr/bin/nsupdate /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd \
+	  /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd \
 	  /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct \
 	  /usr/sbin/rtmon  /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/bin/ifplugd \
 	  /usr/bin/ifplugstatus /sbin/ip /usr/bin/ping /usr/bin/ping6"
