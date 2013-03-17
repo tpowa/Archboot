@@ -15,7 +15,7 @@ build ()
              wpa_supplicant gzip rsync libarchive device-mapper cracklib nfs-utils nfsidmap \
              readline acl attr pcre cpio archboot fuse libusb-compat libusbx vim vim-runtime \
              lzo2 libsasl libldap libevent gpm sdparm pptpclient licenses zd1211-firmware cifs-utils dmraid \
-             linux-atm netctl parted tzdata ntp v86d iw crda wireless-regdb libnl iproute2 dhclient \
+             linux-atm netctl openresolv parted tzdata ntp v86d iw crda wireless-regdb libnl iproute2 dhclient \
              syslinux mtools perl gmp krb5 sqlite db dbus libcap fsarchiver xz librpcsecgss \
              libtirpc wipe ddrescue testdisk ifplugd libdaemon wpa_actiond rfkill libgssglue icu gptfdisk \
              btrfs-progs nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw \
