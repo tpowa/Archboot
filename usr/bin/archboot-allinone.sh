@@ -345,7 +345,7 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-prepare_uefi_gummiboot_USB_files
+_prepare_uefi_gummiboot_USB_files
 
 _prepare_uefi_rEFInd_USB_files
 
