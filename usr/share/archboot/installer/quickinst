@@ -172,8 +172,10 @@ install_packages() {
     PACKAGES="${PACKAGES} systemd-sysvcompat"
     ### HACK:
     # replace netcfg with netctl
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netcfg\ # #g" -e "s#\ netctl\ # #g")"
-    PACKAGES="${PACKAGES} netctl"
+    if [[ $($PACMAN -Ss netctl) ]]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netcfg\ # #g" -e "s#\ netctl\ # #g")"
+        PACKAGES="${PACKAGES} netctl"
+    fi
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
