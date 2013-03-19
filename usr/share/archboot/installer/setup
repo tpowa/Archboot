@@ -12,7 +12,7 @@ DESTDIR="/install"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 
-_UEFISYS_MOUNTPOINT="/boot/efi"
+UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
 KERNELPKG="linux"
