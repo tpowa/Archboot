@@ -3040,9 +3040,11 @@ select_packages() {
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ sysvinit\ # #g" -e "s#\ systemd-sysvcompat\ # #g")"
     PACKAGES="${PACKAGES} systemd-sysvcompat"
     ### HACK:
-    # replace netcfg with netctl
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netcfg\ # #g" -e "s#\ netctl\ # #g")"
-    PACKAGES="${PACKAGES} netctl"
+    # replace netcfg with netctl if available in the repositories
+    if [[ $($PACMAN -Ss netctl) ]]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netcfg\ # #g" -e "s#\ netctl\ # #g")"
+        PACKAGES="${PACKAGES} netctl"
+    fi
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
