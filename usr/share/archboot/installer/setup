@@ -3219,7 +3219,7 @@ donetwork() {
                         0) WLAN_SECURITY=$(cat ${ANSWER}) ;;
                     esac
                 done
-                DIALOG --inputbox "for i in $(echo /etc/netctl/*); doEnter your KEY" 5 40 "WirelessKey" 2>${ANSWER} || return 1
+                DIALOG --inputbox "Enter your KEY" 5 40 "WirelessKey" 2>${ANSWER} || return 1
                 WLAN_KEY=$(cat ${ANSWER})
             else
                 WLAN_SECURITY="none"
