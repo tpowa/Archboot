@@ -4547,7 +4547,7 @@ dogrub_bios() {
             return 1
         fi
         
-        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed (usually the MBR  and not a partition)." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
         bootdev=$(cat ${ANSWER})
     fi
     
