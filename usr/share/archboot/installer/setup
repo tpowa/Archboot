@@ -2757,7 +2757,6 @@ getsource() {
         #in order to cache packages from media check on it first!
         get_media
         select_mirror || return 1
-        NEXTITEM="2"
     fi
     S_SRC=1
 }
@@ -4738,7 +4737,7 @@ dogrub_uefi_i386() {
 }
 
 select_source() {
-    NEXTITEM="3"
+    NEXTITEM="4"
     if ! [[ "$(which ${DLPROG})" ]]; then
         DIALOG --menu "Please select an installation source" 10 45 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" 2>${ANSWER} || return 1
@@ -4761,34 +4760,13 @@ select_source() {
         TITLE="Arch Linux CDROM, USBSTICK or OTHER SOURCE Installation"
         getsource || return 1
     else
-        DEFAULT=
+        if [[ ${S_NET} -eq 0 ]]; then
+            donetwork
+        fi
         TITLE="Arch Linux FTP/HTTP Installation"
-        while true; do
-            if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
-            else
-            DEFAULT=""
-            fi
-            CANCEL=""
-            DIALOG ${DEFAULT} --menu "FTP Installation" 10 35 3 \
-            "1" "Choose Mirror" \
-            "2" "Return to Main Menu" 2>${ANSWER} || CANCEL="1"
-
-            case "$(cat ${ANSWER})" in
-
-            "1")
-                getsource || return 1
-                ;;
-             *)
-                break ;;
-            esac
-        done
     fi
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="4"
-    else
-        NEXTITEM="5"
-    fi
+    getsource || return 1
+    NEXTITEM="5"
 }
 
 set_clock() {
