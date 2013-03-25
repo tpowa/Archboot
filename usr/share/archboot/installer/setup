@@ -16,7 +16,7 @@ UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
 KERNELPKG="linux"
-[[ "$(cat /proc/cmdline | grep -w /boot/.*lts)" ]] && KERNELPKG="linux-lts"
+[[ "$(uname -r | grep lts)" ]] && KERNELPKG="linux-lts"
 # name of the kernel image
 VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
