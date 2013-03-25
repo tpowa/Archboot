@@ -3145,7 +3145,7 @@ auto_network()
         return 1
     fi
     # copy netctl profiles
-    cp /etc/netctl/* ${DESTDIR}/etc/netctl/ 2>/dev/null
+    [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* ${DESTDIR}/etc/netctl/ 2>/dev/null
     # enable netctl profiles
     for i in $(echo /etc/netctl/*); do
          [[ -f $i ]] && chroot ${DESTDIR} /usr/bin/netctl enable $(basename $i)
