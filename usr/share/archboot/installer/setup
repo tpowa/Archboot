@@ -1903,11 +1903,8 @@ autoprepare() {
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
-        # if echo "${mountpoint}" | tr -d ' ' | grep '^/$' 2>&1 >/dev/null; then
-        # if [[ "$(echo ${mountpoint} | tr -d ' ' | grep '^/$' | wc -l)" -eq 0 ]]; then
         DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}\nwith FSLABEL ${labelname} ,\nmounting to ${DESTDIR}${mountpoint}" 0 0
         _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
-        # fi
     done
 
     DIALOG --msgbox "Auto-prepare was successful" 0 0
