@@ -3276,7 +3276,7 @@ donetwork() {
     # run netctl
     netctl start $(basename ${NETWORK_PROFILE}) >${LOG}
     if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error occured while running netctl. (see ${LOG} for output)" 0 0
+        DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
     fi
     # http/ftp proxy settings
