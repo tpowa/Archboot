@@ -139,15 +139,14 @@ build ()
     add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
     add_dir "/var/lib/dbus"
     add_full_dir "/etc/dbus-1"
-    add_dir "/etc/dbus-1/session.d"
-    add_dir "/etc/dbus-1/systemd.d"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="/usr/bin/systemd-ask-password /usr/bin/systemd-tmpfiles /usr/bin/systemd-tty-ask-password-agent \
-          /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /bin/systemd /usr/bin/journalctl \
-          /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-cat \
-          /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
-          /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge"
+    apps="/usr/bin/bootctl /usr/bin/hostnamectl /usr/bin/journalctl /usr/bin/kernel-install /usr/bin/localectl \
+          /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-ask-password \
+          /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-coredumpctl \
+          /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
+          /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge /usr/bin/systemd-tmpfiles \
+          /usr/bin/systemd-tty-ask-password-agent /usr/bin/timedatectl /bin/systemd"
     for i in $apps; do
         add_binary "$i"
     done
