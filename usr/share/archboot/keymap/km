@@ -40,7 +40,7 @@ error_kmset()
 dokeymap() {
     echo "Scanning for keymaps..."
     KEYMAPS=
-    for i in $(find ${BASEDIR}/keymaps -follow -name "*.gz" | sed 's|^.*/||g' | sort); do
+    for i in $(localectl list-keymaps --no-pager); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
@@ -53,8 +53,7 @@ dokeymap() {
     echo ${keymap} > /tmp/.keymap
     if [[ "${keymap}" ]]; then
         DIALOG --infobox "Loading keymap: ${keymap}" 0 0
-        #loadkeys -q ${BASEDIR}/keymaps/${keymap}
-        loadkeys -q ${keymap} > /dev/null 2>&1 || error_kmset 
+        localectl set-keymap ${keymap} || error_kmset 
     fi
 S_NEXTITEM=2
 }
