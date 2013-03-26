@@ -2921,7 +2921,8 @@ select_packages() {
             done
             tag="OFF"
         done
-        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}" || return 1
+        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}"
+        [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
     # ftp install routine
     else
@@ -2989,7 +2990,8 @@ select_packages() {
         done < <(${PACMAN} -Si ${_pkgtmp} | \
         awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -f -k 2)
         kill $(cat ${ANSWER})
-        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}" || return 1
+        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}"
+        [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
     fi
     # Add packages which are not in core repository
