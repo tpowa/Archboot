@@ -52,30 +52,19 @@ hwclock ${HWCLOCK_PARAMS}
 }
 
 dotimezone () {
-REGIONS=""
 SET_ZONE=""
-for i in $(grep ^[A-Z] ${BASEDIR}/zone.tab | cut -f 3 | sed -e 's#/.*##g'| sort -u); do
-    REGIONS="${REGIONS} ${i} -"
-done
 while ! [[ "${SET_ZONE}" = "1" ]]; do
-    SET_REGION=""
-    DIALOG --menu "Please Select A Region:" 22 60 16 ${REGIONS} 2>${ANSWER} && SET_REGION="1"
-    region=$(cat ${ANSWER})
-    if [[ "${SET_REGION}" = "1" ]]; then
-        ZONES=""
-        for i in $(grep ^[A-Z] ${BASEDIR}/zone.tab | grep ${region}/ | cut -f 3 | sed -e "s#${region}/##g"| sort -u); do
-            ZONES="${ZONES} ${i} -"
-        done
-        DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
-        zone=$(cat ${ANSWER})
-        if [[ "${SET_ZONE}" = "1" ]]; then
-            DIALOG --infobox "Setting Timezone to ${region}/${zone} ..." 0 0
-            echo ${region}/${zone} > /tmp/.timezone
-            [[ -e /etc/localtime ]] && rm -f /etc/localtime
-            cp ${BASEDIR}/${region}/${zone} /etc/localtime
-            dohwclock
-            S_NEXTITEM="2"
-        fi
+    ZONES=""
+    for i in $(timedatectl --no-pager list-timezones); do
+        ZONES="${ZONES} ${i} -"
+    done
+    DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
+    zone=$(cat ${ANSWER})
+    if [[ "${SET_ZONE}" = "1" ]]; then
+        DIALOG --infobox "Setting Timezone to ${zone} ..." 0 0
+        echo ${zone} > /tmp/.timezone
+        timedatectl set-timezone ${zone}
+        S_NEXTITEM="2"
     else
         S_NEXTITEM="1"
         break
@@ -88,7 +77,7 @@ SET_TIME=""
 USE_NTPDATE=""
 HARDWARECLOCK=""
 if [[ ! -s /tmp/.timezone ]]; then
-    DIALOG --msgbox "Error:\nYou have to select a region and timezone first." 0 0
+    DIALOG --msgbox "Error:\nYou have to select timezone first." 0 0
     S_NEXTITEM="1"
     dotimezone || return 1
 fi
@@ -142,7 +131,7 @@ mainmenu() {
     fi
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
-        "1" "Select Region and Timezone" \
+        "1" "Select Timezone" \
         "2" "Set Time and Date" \
         "3" "${EXIT}" 2>${ANSWER}
     case $(cat ${ANSWER}) in
