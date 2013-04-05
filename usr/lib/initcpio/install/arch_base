@@ -188,12 +188,12 @@ build ()
     ### add pacman
     apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
           /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta \
-          /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/testdb \
+          /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/testdb /usr/bin/repo-elephant \
           /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg-agent /usr/sbin/haveged"
     for i in $apps; do
         add_binary "$i"
     done
-    symlinks="/usr/bin/gpg /usr/bin/repo-elephant /usr/bin/repo-remove"
+    symlinks="/usr/bin/gpg /usr/bin/repo-remove"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
