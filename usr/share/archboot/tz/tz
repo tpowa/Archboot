@@ -35,20 +35,23 @@ DIALOG() {
 }
 
 dohwclock() {
-if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
-    HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --utc"
-    echo UTC > /tmp/.hardwareclock
-else
-    HWCLOCK_PARAMS="${HWCLOCK_PARAMS} --localtime"
-    echo LOCAL > /tmp/.hardwareclock
-fi
-
 if [[ ! -f /etc/adjtime ]]; then
     echo "0.0 0 0.0" > /etc/adjtime
     echo "0" >> /etc/adjtime
-    [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>/etc/adjtime
+    [[ "${HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
+    [[ "${HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
 fi
-hwclock ${HWCLOCK_PARAMS}
+if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
+    timedatectl set-local-rtc 0
+    DATE_PROGRAM=$(timedatectl)
+    # for setup script
+    echo UTC > /tmp/.hardwareclock
+else
+    timedatectl set-local-rtc 1
+    DATE_PROGRAM=$(date)
+    # for setup script
+    echo LOCAL > /tmp/.hardwareclock
+fi
 }
 
 dotimezone () {
@@ -76,16 +79,15 @@ dotimeset() {
 SET_TIME=""
 USE_NTPDATE=""
 HARDWARECLOCK=""
+DATE_PROGRAM=""
 if [[ ! -s /tmp/.timezone ]]; then
     DIALOG --msgbox "Error:\nYou have to select timezone first." 0 0
     S_NEXTITEM="1"
     dotimezone || return 1
 fi
 DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC confuses it." 15 65 && HARDWARECLOCK="UTC"
-DIALOG --infobox "Syncing hardwareclock to systemclock ..." 0 0
-HWCLOCK_PARAMS="--hctosys"
 dohwclock
-DIALOG --yesno "Your current time and date is:\n$(date)\n\nDo you want to change it?" 0 0 && SET_TIME="1"
+DIALOG --cr-wrap --yesno "Your current time and date is:\n${DATE_PROGRAM}\n\nDo you want to change it?" 0 0 && SET_TIME="1"
 if [[ "${SET_TIME}" = "1" ]]; then
     [[ $(which ntpdate) ]] &&  DIALOG --defaultno --yesno "'ntpdate' was detected on your system.\n\nDo you want to use 'ntpdate' for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 0 0 && USE_NTPDATE="1"
     if [[ "${USE_NTPDATE}" = "1" ]]; then
@@ -94,7 +96,7 @@ if [[ "${SET_TIME}" = "1" ]]; then
             S_NEXTITEM="2" 
             return 1
         fi
-        DIALOG --msgbox "Synced clock with internet pool successfully.\n\nYour current time is now:\n$(date)" 0 0
+        DIALOG --cr-wrap --msgbox "Synced clock with internet pool successfully.\n\nYour current time is now:\n${DATE_PROGRAM}" 0 0
     else
         # display and ask to set date/time
         CANCEL=""
@@ -113,11 +115,8 @@ if [[ "${SET_TIME}" = "1" ]]; then
         # save the time
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         local _datetime="$(echo "${_date}" "${_time}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
-        date -s "${_datetime}"
-        DIALOG --infobox "Syncing systemclock to hardwareclock ..." 0 0
-        HWCLOCK_PARAMS="--systohc"
-        dohwclock
-        DIALOG --msgbox "Your current time is now:\n$(date)" 0 0
+        timedatectl set-time "${_datetime}"
+        DIALOG --cr-wrap --msgbox "Your current time is now:\n${DATE_PROGRAM}" 0 0
     fi
 fi
 S_NEXTITEM="3"
@@ -156,17 +155,6 @@ mainmenu() {
 
 if [[ ! -d ${BASEDIR} ]]; then
     echo "Cannot load timezone data, as none were found in ${BASEDIR}" >&2
-    exit 1
-fi
-
-if [[ ! $(which hwclock) ]]; then
-    echo "'hwclock' binary not found!" >&2
-    exit 1
-fi
-
-
-if [[ ! $(which date) ]]; then
-    echo "'date' binary not found!" >&2
     exit 1
 fi
 

@@ -6,6 +6,7 @@ build ()
     add_binary "/sbin/hwclock"
     add_binary "/bin/date"
     add_binary "/usr/bin/ntpdate"
+    add_binary "/usr/bin/ntpd"
     for i in $(find /usr/share/zoneinfo ! -type d); do
         add_file $i
     done
