@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   February, 22nd 2013
+   May, 7th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -94,7 +94,8 @@ Introduction
      luks encrypted devices
    * Supports standard linux,raid/raid_partitions,dmraid,lvm2
      and encrypted devices
-   * Filesystem support: ext2/3/4,btrfs,nilfs2, reiserfs,xfs,jfs,ntfs-3g,vfat
+   * Filesystem support: ext2/3/4,btrfs,nilfs2,f2fs,reiserfs,
+     xfs,jfs,ntfs-3g,vfat
    * Name scheme support: PARTUUID, PARTLABEL, FSUUID, FSLABEL and KERNEL
    * Mount support of grub loopback and memdisk installation media
    * Package selection support
@@ -104,8 +105,8 @@ Introduction
      mkinitcpio.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64
-     gummiboot, efilinux-efi, lilo, extlinux/syslinux, bootloader support
+   * Bootloader support: grub-bios, grub-efi-x86_64, grub-efi-i386,
+     refind-efi-x86_64, gummiboot, efilinux-efi, lilo, extlinux/syslinux
 
 Archboot bootparameters
 
@@ -461,7 +462,7 @@ Common Installation Procedure
   Install Bootloader
 
    Choose the bootloader you want to use, if you are unsure which one to use
-   choose grub-bios bootloader.
+   choose grub bootloader.
 
   Exit Install
 
