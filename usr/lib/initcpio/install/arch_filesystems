@@ -22,7 +22,7 @@ build ()
 	  /usr/bin/btrfstune /usr/bin/mkfs.btrfs /sbin/mkfs.nilfs2 /sbin/mount.nilfs2 /sbin/nilfs_cleanerd \
 	  /sbin/umount.nilfs2 /usr/bin/chcp /usr/bin/dumpseg /usr/bin/lscp /usr/bin/lssu /usr/bin/mkcp /usr/bin/rmcp \
 	  /sbin/fsck.cramfs /sbin/fsck.minix /sbin/fsfreeze /sbin/fstrim /sbin/mkfs.bfs /sbin/mkfs.cramfs \
-	  /sbin/mkfs.minix"
+	  /sbin/mkfs.minix /usr/bin/mkfs.f2fs"
     for i in $apps; do
         add_binary "$i"
     done
