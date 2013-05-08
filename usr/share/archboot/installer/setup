@@ -46,7 +46,6 @@ EXTRA_CONTROLLER="rd cciss ida"
 # install stages
 S_SRC=0         # choose install medium
 S_NET=0         # network configuration
-S_CLOCK=0       # clock and timezone
 S_PART=0        # partitioning
 S_MKFS=0        # formatting
 S_MKFSAUTO=0    # auto fs part/formatting
@@ -5076,13 +5075,6 @@ auto_fb() {
 }
 
 auto_parameters() {
-    if [[ ! -f ${DESTDIR}/etc/timezone ]]; then
-        : >${DESTDIR}/etc/timezone
-        if [[ -s  /tmp/.timezone ]]; then
-            DIALOG --infobox "Setting the timezone: $(cat /tmp/.timezone | sed -e 's/\..*//g') in timezone ..." 0 0
-            echo $(cat /tmp/.timezone | sed -e 's/\..*//g') > ${DESTDIR}/etc/timezone
-        fi
-    fi
     if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
         : >${DESTDIR}/etc/vconsole.conf
         if [[ -s /tmp/.keymap ]]; then
@@ -5108,10 +5100,8 @@ auto_luks() {
 }
 
 auto_timesetting() {
-    TIMEZONE="$(cat ${DESTDIR}/etc/timezone)"
-    if [[ "${TIMEZONE}" != "" && -e ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} ]]; then
-        cp ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} ${DESTDIR}/etc/localtime
-        cp ${DESTDIR}/usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+    if [[ -e /etc/localtime && ! -e ${DESTDIR}/etc/localtime ]]; then
+        cp -a /etc/localtime ${DESTDIR}/etc/localtime
     fi
     if [[ ! -f ${DESTDIR}/etc/adjtime ]]; then
         echo "0.0 0 0.0" > ${DESTDIR}/etc/adjtime
@@ -5168,7 +5158,6 @@ configure_system() {
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
-            "/etc/timezone"                 "Timezone Setting" \
             "/etc/fstab"                    "Filesystem Mountpoints" \
             "/etc/mkinitcpio.conf"          "Initramfs Config" \
             "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
