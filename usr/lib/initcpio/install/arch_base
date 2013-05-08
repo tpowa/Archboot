@@ -37,7 +37,7 @@ build ()
           /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
           /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
           /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
-          /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/tunelp /usr/sbin/uuidd \
+          /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/uuidd \
           /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
           /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
           /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
@@ -168,7 +168,6 @@ build ()
     done
     add_dir "/var/lib/systemd"
     add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
-    add_file "/usr/share/archboot/base/etc/timezone.conf" "/etc/timezone.conf"
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
