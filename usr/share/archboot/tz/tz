@@ -77,7 +77,7 @@ done
 
 dotimeset() {
 SET_TIME=""
-USE_NTPDATE=""
+USE_NTPD=""
 HARDWARECLOCK=""
 DATE_PROGRAM=""
 if [[ ! -s /tmp/.timezone ]]; then
@@ -89,9 +89,9 @@ DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UT
 dohwclock
 DIALOG --cr-wrap --yesno "Your current time and date is:\n${DATE_PROGRAM}\n\nDo you want to change it?" 0 0 && SET_TIME="1"
 if [[ "${SET_TIME}" = "1" ]]; then
-    [[ $(which ntpdate) ]] &&  DIALOG --defaultno --yesno "'ntpdate' was detected on your system.\n\nDo you want to use 'ntpdate' for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 0 0 && USE_NTPDATE="1"
-    if [[ "${USE_NTPDATE}" = "1" ]]; then
-        if [[ ! $(ntpdate pool.ntp.org) ]]; then 
+    [[ $(which ntpd) ]] &&  DIALOG --defaultno --yesno "'ntpd' was detected on your system.\n\nDo you want to use 'ntpd' for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 0 0 && USE_NTPD="1"
+    if [[ "${USE_NTPD}" = "1" ]]; then
+        if [[ ! $(timedatectl set-ntp 1) ]]; then 
             DIALOG --msgbox "An error has occured, time was not changed!" 0 0
             S_NEXTITEM="2" 
             return 1
