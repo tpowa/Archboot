@@ -22,6 +22,7 @@ games:x:50:
 lock:x:54:
 uuidd:x:68:
 dbus:x:81:
+ntp:x:87:
 network:x:90:
 video:x:91:
 audio:x:92:
