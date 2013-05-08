@@ -7,7 +7,7 @@ build ()
     add_binary "/bin/date"
     add_binary "/usr/bin/ntpdate"
     add_binary "/usr/bin/ntpd"
-    add_file "/etc/ntpd.conf"
+    add_file "/etc/ntp.conf"
     for i in $(find /usr/share/zoneinfo ! -type d); do
         add_file $i
     done
