@@ -3,8 +3,8 @@
 
 build ()
 {
-    add_binary "/usr/sbin/lspci" 
-    add_binary "/usr/sbin/setpci"
+    add_binary "/usr/bin/lspci" 
+    add_binary "/usr/bin/setpci"
     add_file "/usr/share/hwdata/pci.ids"
 }
 
