@@ -4556,7 +4556,7 @@ dogrub_uefi_common() {
     
     chroot_mount
     
-    chroot "${DESTDIR}" "/usr/sbin/grub-install" \
+    chroot "${DESTDIR}" "/usr/bin/grub-install" \
         --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" \
         --target="${_UEFI_ARCH}-efi" \
         --efi-directory="${UEFISYS_MOUNTPOINT}" \
