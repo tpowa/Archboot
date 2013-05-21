@@ -3,9 +3,9 @@
 
 build ()
 {
-    apps="/usr/sbin/pppoe /usr/sbin/pppoe-connect /usr/sbin/pppoe-relay /usr/sbin/pppoe-server \
-          /usr/sbin/pppoe-setup /usr/sbin/pppoe-sniff /usr/sbin/pppoe-start /usr/sbin/pppoe-status \
-	  /usr/sbin/pppoe-stop"
+    apps="/usr/bin/pppoe /usr/bin/pppoe-connect /usr/bin/pppoe-relay /usr/bin/pppoe-server \
+          /usr/bin/pppoe-setup /usr/bin/pppoe-sniff /usr/bin/pppoe-start /usr/bin/pppoe-status \
+	  /usr/bin/pppoe-stop"
     for i in $apps; do
         add_binary "$i"
     done
