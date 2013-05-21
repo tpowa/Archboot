@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_file "/sbin/hwdetect"
+    add_file "/usr/bin/hwdetect"
 }
 
 help ()
