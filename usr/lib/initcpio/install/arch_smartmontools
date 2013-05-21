@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/sbin/smartctl /usr/sbin/smartd /usr/sbin/update-smart-drivedb"
+    apps="/usr/bin/smartctl /usr/bin/smartd /usr/bin/update-smart-drivedb"
     for i in $apps; do
         add_binary "$i"
     done
