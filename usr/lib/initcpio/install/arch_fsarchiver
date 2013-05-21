@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/sbin/fsarchiver"
+    add_binary "/usr/bin/fsarchiver"
 }
 
 help ()
