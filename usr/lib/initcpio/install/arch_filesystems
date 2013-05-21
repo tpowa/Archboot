@@ -7,17 +7,17 @@ build ()
     apps="/sbin/mkswap /sbin/debugreiserfs /sbin/mkreiserfs /sbin/reiserfsck /sbin/reiserfstune \
           /sbin/resize_reiserfs /sbin/badblocks /sbin/blkid /sbin/debugfs /sbin/dumpe2fs /sbin/e2fsck \
 	  /sbin/e2image /sbin/e2undo /sbin/findfs /sbin/fsck /sbin/logsave /sbin/mkfs.ext2 /sbin/resize2fs \
-	  /usr/bin/chattr /usr/bin/lsattr /usr/sbin/e2freefrag /usr/sbin/filefrag /usr/sbin/mkntfs \
-	  /usr/sbin/ntfscp /usr/sbin/ntfsclone /usr/sbin/ntfslabel /usr/sbin/ntfsresize /usr/sbin/ntfsundelete \
+	  /usr/bin/chattr /usr/bin/lsattr /usr/sbin/e2freefrag /usr/sbin/filefrag /usr/bin/mkntfs \
+	  /usr/bin/ntfscp /usr/bin/ntfsclone /usr/bin/ntfslabel /usr/bin/ntfsresize /usr/bin/ntfsundelete \
 	  /usr/bin/ntfscat /usr/bin/ntfscluster /usr/bin/ntfscmp /usr/bin/ntfsfix /usr/bin/ntfsinfo /usr/bin/ntfsls \
-	  /sbin/jfs_debugfs /sbin/jfs_fsck /sbin/jfs_fscklog /sbin/jfs_logdump /sbin/jfs_mkfs /sbin/jfs_tune \
-	  /sbin/mkfs.xfs /sbin/xfs_repair /usr/sbin/xfs_copy /usr/sbin/xfs_db /usr/sbin/xfs_growfs /usr/sbin/xfs_io \
-	  /usr/sbin/xfs_logprint /usr/sbin/xfs_mdrestore /usr/sbin/xfs_quota /usr/sbin/xfs_rtcp /sbin/mkdosfs /sbin/dosfsck \
+	  /usr/bin/jfs_debugfs /usr/bin/jfs_fsck /usr/bin/jfs_fscklog /usr/bin/jfs_logdump /usr/bin/jfs_mkfs /usr/bin/jfs_tune \
+	  /usr/bin/mkfs.xfs /usr/bin/xfs_repair /usr/bin/xfs_copy /usr/bin/xfs_db /usr/bin/xfs_growfs /usr/bin/xfs_io \
+	  /usr/bin/xfs_logprint /usr/bin/xfs_mdrestore /usr/bin/xfs_quota /usr/bin/xfs_rtcp /usr/bin/mkdosfs /usr/bin/dosfsck \
 	  /sbin/dosfslabel /usr/bin/lowntfs-3g /usr/bin/ntfs-3g /usr/bin/mount.cifs \
-	  /usr/sbin/cifs.upcall /sbin/fsck.ext2 /sbin/fsck.ext3 /sbin/fsck.ext4 \
-	  /sbin/fsck.ext4dev /sbin/e2label /sbin/tune2fs /sbin/mkfs.ext3 /sbin/mkfs.ext4 /sbin/mke2fs /sbin/fsck.jfs \
-	  /sbin/mkfs.jfs /sbin/wipefs /sbin/blockdev /usr/bin/btrfs /usr/bin/btrfs-convert /usr/bin/btrfs-debug-tree \
-	  /usr/bin/btrfs-find-root /usr/bin/btrfs-image /usr/bin/btrfs-map-logical /usr/bin/btrfs-restore \
+	  /usr/bin/cifs.upcall /sbin/fsck.ext2 /sbin/fsck.ext3 /sbin/fsck.ext4 \
+	  /sbin/fsck.ext4dev /sbin/e2label /sbin/tune2fs /sbin/mkfs.ext3 /sbin/mkfs.ext4 /sbin/mke2fs /usr/bin/fsck.jfs \
+	  /usr/bin/mkfs.jfs /sbin/wipefs /sbin/blockdev /usr/bin/btrfs /usr/bin/btrfs-convert /usr/bin/btrfs-debug-tree \
+	  /usr/bin/btrfs-find-root /usr/bin/btrfs-image /usr/bin/btrfs-map-logical /usr/bin/btrfs-show-super \
 	  /usr/bin/btrfs-show /usr/bin/btrfs-vol /usr/bin/btrfs-zero-log /usr/bin/btrfsck /usr/bin/btrfsctl \
 	  /usr/bin/btrfstune /usr/bin/mkfs.btrfs /sbin/mkfs.nilfs2 /sbin/mount.nilfs2 /sbin/nilfs_cleanerd \
 	  /sbin/umount.nilfs2 /usr/bin/chcp /usr/bin/dumpseg /usr/bin/lscp /usr/bin/lssu /usr/bin/mkcp /usr/bin/rmcp \
@@ -26,15 +26,15 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/bin/compile_et /usr/bin/mk_cmds /sbin/fsck.xfs /usr/sbin/xfs_admin /usr/sbin/xfs_bmap \
-              /usr/sbin/xfs_check /usr/sbin/xfs_freeze /usr/sbin/xfs_info /usr/sbin/xfs_metadump /usr/sbin/xfs_mkfile \
-	      /usr/sbin/xfs_ncheck" 
+    appfiles="/usr/bin/compile_et /usr/bin/mk_cmds /usr/bin/fsck.xfs /usr/bin/xfs_admin /usr/bin/xfs_bmap \
+              /usr/bin/xfs_check /usr/bin/xfs_freeze /usr/bin/xfs_info /usr/bin/xfs_metadump /usr/bin/xfs_mkfile \
+	      /usr/bin/xfs_ncheck" 
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/sbin/fsck.msdos /sbin/fsck.vfat /sbin/fsck.reiserfs /sbin/mkfs.vfat /sbin/mkfs.msdos \
-              /usr/bin/mkfs.ntfs /sbin/mkfs.reiserfs /sbin/mount.nfs4 /usr/bin/mount.ntfs /usr/bin/mount.lowntfs-3g \
-              /usr/bin/mount.ntfs-3g /sbin/umount.nfs /sbin/umount.nfs4"
+    symlinks="/usr/bin/fsck.msdos /usr/bin/fsck.vfat /usr/bin/fsck.reiserfs /usr/bin/mkfs.vfat /usr/bin/mkfs.msdos \
+              /usr/bin/mkfs.ntfs /usr/bin/mkfs.reiserfs /usr/bin/mount.nfs4 /usr/bin/mount.ntfs /usr/bin/mount.lowntfs-3g \
+              /usr/bin/mount.ntfs-3g /usr/bin/umount.nfs /usr/bin/umount.nfs4"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
