@@ -181,9 +181,9 @@ net_interfaces() {
 # activate dmraid devices
 activate_dmraid()
 {
-    if [[ -e /sbin/dmraid ]]; then
+    if [[ -e /usr/bin/dmraid ]]; then
         DIALOG --infobox "Activating dmraid arrays..." 0 0
-        /sbin/dmraid -ay -I -Z >/dev/null 2>&1
+        dmraid -ay -I -Z >/dev/null 2>&1
     fi
 }
 
@@ -192,13 +192,13 @@ activate_dmraid()
 activate_lvm2()
 {
     ACTIVATE_LVM2=""
-    if [[ -e /sbin/lvm ]]; then
+    if [[ -e /usr/sbin/lvm ]]; then
         OLD_LVM2_GROUPS=${LVM2_GROUPS}
         OLD_LVM2_VOLUMES=${LVM2_VOLUMES}
         DIALOG --infobox "Scanning logical volumes..." 0 0
-        /sbin/lvm vgscan --ignorelockingfailure >/dev/null 2>&1
+        lvm vgscan --ignorelockingfailure >/dev/null 2>&1
         DIALOG --infobox "Activating logical volumes..." 0 0
-        /sbin/lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
+        lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
         LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
         [[ "${OLD_LVM2_GROUPS}" = "${LVM2_GROUPS}" && "${OLD_LVM2_GROUPS}" = "${LVM2_GROUPS}" ]] && ACTIVATE_LVM2="no"
@@ -210,9 +210,9 @@ activate_lvm2()
 activate_raid()
 {
     ACTIVATE_RAID=""
-    if [[ -e /sbin/mdadm ]]; then
+    if [[ -e /usr/bin/mdadm ]]; then
         DIALOG --infobox "Activating RAID arrays..." 0 0
-        /sbin/mdadm --assemble --scan >/dev/null 2>&1 || ACTIVATE_RAID="no"
+        mdadm --assemble --scan >/dev/null 2>&1 || ACTIVATE_RAID="no"
     fi
 }
 
@@ -221,7 +221,7 @@ activate_raid()
 activate_luks()
 {
     ACTIVATE_LUKS=""
-    if [[ -e /sbin/cryptsetup ]]; then
+    if [[ -e /usr/sbin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
         if [[ "$(${_BLKID} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
             for PART in $(${_BLKID} | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
@@ -729,14 +729,14 @@ find_gpt() {
 # freeze and unfreeze xfs, as hack for grub(2) installing
 freeze_xfs() {
     sync
-    if [[ -x /usr/sbin/xfs_freeze ]]; then
+    if [[ -x /usr/bin/xfs_freeze ]]; then
         if [[ "$(cat /proc/mounts | grep "${DESTDIR}/boot " | grep " xfs ")" ]]; then
-            /usr/sbin/xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
-            /usr/sbin/xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
+            xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
+            xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
         fi
         if [[ "$(cat /proc/mounts | grep "${DESTDIR} " | grep " xfs ")" ]]; then
-            /usr/sbin/xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
-            /usr/sbin/xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
+            xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
+            xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
         fi
     fi
 }
@@ -3869,7 +3869,7 @@ REFINDEOF
 
 # install syslinux and run preparation
 prepare_syslinux() {
-    if ! [[ -e "${DESTDIR}/usr/sbin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
+    if ! [[ -e "${DESTDIR}/usr/bin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
         DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
         PACKAGES="${SYSLINUX_PACKAGES}"
         run_pacman
@@ -4073,79 +4073,6 @@ dosyslinux_bios () {
     finish_syslinux
 }
 
-dolilo_bios() {
-    if [[ ! -f ${DESTDIR}/etc/lilo.conf ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/etc/lilo.conf, installing lilo now ..." 0 0
-        PACKAGES="lilo"
-        run_pacman
-        # reset PACKAGES after installing
-        PACKAGES=""
-    fi
-    
-    USE_DMRAID=""
-    common_bootloader_checks
-    
-    check_bootpart
-    
-    # check on GUID (gpt)
-    if [[ "$(${_BLKID} -p -i -o value -s PART_ENTRY_SCHEME ${bootdev})" == "gpt" ]]; then
-        DIALOG --defaultno --yesno "Warning:\nSetup detected GUID (gpt) partition table.\n\nLilo doesn't support booting from GUID (gpt) partition table.\n\nDo you want to install lilo to an other device, which contains a msdos partition table?" 0 0 || return 1
-    fi
-    
-    abort_btrfs_bootpart || return 1
-    abort_nilfs_bootpart || return 1
-    abort_f2fs_bootpart || return 1
-    
-    # Try to auto-configure LILO...
-    if ! [[ "${PART_ROOT}" = "" ]]; then
-        if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" || "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-            sed -i "s|.*root=.*$|append=\"root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
-        else
-            sed -i "s|.*root=.*$|append=\"root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro\"|g" ${DESTDIR}/etc/lilo.conf
-        fi
-        sed -i "s|image=/boot/vmlinuz-.*|image=/boot/${VMLINUZ}|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*linux.*fallback.img$|initrd=/boot/${INITRAMFS}-fallback.img|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*linux.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
-        sed -i "s|initrd=.*linux-lts.img$|initrd=/boot/${INITRAMFS}.img|g" ${DESTDIR}/etc/lilo.conf
-    fi
-    
-    sed -i -e '/DEVICE DETAILS/d' ${DESTDIR}/etc/lilo.conf
-    sort /tmp/.device-names >> ${DESTDIR}/etc/lilo.conf
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="${DEVS} $(findbootloaderpartitions _)"
-    
-    if [[ "${DEVS}" = "" ]]; then
-        DIALOG --msgbox "No storage drives were found" 0 0
-        return 1
-    fi
-    
-    DIALOG --menu "Select the boot device where the LILO bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-    ROOTDEV=$(cat ${ANSWER})
-    sed -i "s|boot=.*$|boot=${ROOTDEV}|g" ${DESTDIR}/etc/lilo.conf
-    
-    # HACK: if virtio device is used
-    if [[ "$(echo ${ROOTDEV} | grep /dev/vd)" ]]; then
-        sed -i "s|.*disk=.*$|disk=${ROOTDEV} bios=0x80 max-partitions=7|g" ${DESTDIR}/etc/lilo.conf
-    else
-        sed -i "s|^disk=.*$|# disk=${ROOTDEV} bios=0x80|g" ${DESTDIR}/etc/lilo.conf
-    fi
-    
-    DIALOG --msgbox "Before installing LILO, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, LILO will be installed." 0 0
-    geteditor || return 1
-    ${EDITOR} ${DESTDIR}/etc/lilo.conf
-    DIALOG --infobox "Installing the LILO bootloader..." 0 0
-    chroot_mount
-    chroot ${DESTDIR} /sbin/lilo >${LOG} 2>&1
-    
-    if [[ $? -gt 0 ]]; then
-        chroot_umount
-        DIALOG --msgbox "Error installing LILO. (see ${LOG} for output)" 0 0
-        return 1
-    fi
-    chroot_umount
-    DIALOG --msgbox "LILO was successfully installed." 0 0
-}
-
 dogrub_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub(2) restrictions:
@@ -4169,42 +4096,42 @@ dogrub_config() {
 
     ########
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    ########
-    
-    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    
+    ########
+    
+    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
         
-        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_label" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="drive" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
         
-        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
     
     ########
@@ -4589,7 +4516,7 @@ dogrub_bios() {
     freeze_xfs
     chroot_mount
     
-    chroot "${DESTDIR}" "/usr/sbin/grub-install" \
+    chroot "${DESTDIR}" "/usr/bin/grub-install" \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
         --boot-directory="/boot" \
@@ -4643,10 +4570,10 @@ dogrub_uefi_common() {
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/sbin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
@@ -5254,12 +5181,10 @@ install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
         "SYSLINUX_BIOS" "SYSLINUX/EXTLINUX" \
-        "GRUB_BIOS" "GRUB(2) BIOS" \
-        "LILO_BIOS" "LILO" 2>${ANSWER} || CANCEL=1
+        "GRUB_BIOS" "GRUB(2) BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "SYSLINUX_BIOS") dosyslinux_bios ;;
         "GRUB_BIOS") dogrub_bios ;;
-        "LILO_BIOS") dolilo_bios ;;
     esac
     
 }

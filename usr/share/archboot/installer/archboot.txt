@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   May, 7th 2013
+   May, 21st 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -106,7 +106,7 @@ Introduction
    * Configuration of basic system files
    * Setting root password
    * Bootloader support: grub-bios, grub-efi-x86_64, grub-efi-i386,
-     refind-efi-x86_64, gummiboot, efilinux-efi, lilo, extlinux/syslinux
+     refind-efi-x86_64, gummiboot, efilinux-efi, extlinux/syslinux
 
 Archboot bootparameters
 
