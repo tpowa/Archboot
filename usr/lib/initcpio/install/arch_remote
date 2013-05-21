@@ -5,12 +5,12 @@ build ()
 {
     add_checked_modules '/drivers/net/'
     apps="/usr/bin/findssl.sh /usr/bin/scp /usr/bin/sftp /usr/bin/ssh-add /usr/bin/ssh-agent \
-          /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/sbin/sshd /usr/sbin/xinetd \
-	  /usr/sbin/telnetd /usr/bin/rsync /usr/sbin/exportfs /usr/sbin/nfsstat /usr/sbin/rpc.idmapd \
-	  /usr/sbin/rpc.mountd /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpcdebug /usr/sbin/showmount \
-	  /usr/sbin/sm-notify /usr/sbin/start-statd /usr/bin/rpcbind \
-	  /usr/bin/rpcinfo /usr/sbin/gss_clnt_send_err /usr/sbin/gss_destroy_creds /usr/sbin/rpc.gssd \
-	  /usr/sbin/rpc.svcgssd /bin/mountpoint"
+          /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/bin/sshd /usr/bin/xinetd \
+	  /usr/bin/telnetd /usr/bin/rsync /usr/bin/exportfs /usr/bin/nfsstat /usr/bin/rpc.idmapd \
+	  /usr/bin/rpc.mountd /usr/bin/rpc.nfsd /usr/bin/rpc.statd /usr/bin/rpcdebug /usr/bin/showmount \
+	  /usr/bin/sm-notify /usr/bin/start-statd /usr/bin/rpcbind \
+	  /usr/bin/rpcinfo /usr/bin/gss_clnt_send_err /usr/bin/gss_destroy_creds /usr/bin/rpc.gssd \
+	  /usr/bin/rpc.svcgssd /bin/mountpoint"
     for i in $apps; do
         add_binary "$i"
     done
