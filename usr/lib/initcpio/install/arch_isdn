@@ -4,10 +4,10 @@
 build ()
 {
     add_checked_modules '/drivers/isdn/'
-    apps="/usr/sbin/hisaxctrl /usr/sbin/icnctrl /usr/sbin/imon /usr/sbin/imontty /usr/sbin/ipppd \
-          /usr/sbin/ipppstats /usr/sbin/isdnctrl /usr/sbin/isdnlog /usr/sbin/mkzonedb /usr/bin/isdnconf \
-	  /usr/bin/isdnrate /usr/bin/isdnrep /usr/bin/capiinfo /usr/sbin/rcapid /usr/sbin/capiinit \
-	  /usr/sbin/avmcapictrl"
+    apps="/usr/bin/hisaxctrl /usr/bin/icnctrl /usr/bin/imon /usr/bin/imontty /usr/bin/ipppd \
+          /usr/bin/ipppstats /usr/bin/isdnctrl /usr/bin/isdnlog /usr/bin/mkzonedb /usr/bin/isdnconf \
+	  /usr/bin/isdnrate /usr/bin/isdnrep /usr/bin/capiinfo /usr/bin/rcapid /usr/bin/capiinit \
+	  /usr/bin/avmcapictrl"
     for i in $apps; do
         add_binary "$i"
     done
