@@ -19,13 +19,13 @@ build ()
           /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
           /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes /sbin/killall5 \
           /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
-          /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/sbin/parted /usr/sbin/partprobe \
+          /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/bin/parted /usr/bin/partprobe \
           /usr/bin/gawk /bin/cp /bin/mv /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
           /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
-          /bin/kill /usr/bin/killall /bin/more /bin/ps /bin/pwd /bin/rmdir /bin/stty \
-          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /sbin/hdparm \
+          /bin/kill /usr/bin/killall /bin/more /usr/bin/ps /bin/pwd /bin/rmdir /bin/stty \
+          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/hdparm \
           /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
-          /bin/su /bin/cat /bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
+          /bin/su /bin/cat /usr/bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
           /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
           /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz /usr/bin/last /usr/bin/wall /usr/bin/mesg /usr/bin/utmpdump \
           /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
@@ -38,8 +38,8 @@ build ()
           /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
           /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
           /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/uuidd \
-          /sbin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
-          /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /bin/keyctl /sbin/request-key \
+          /usr/bin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
+          /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /usr/bin/keyctl /usr/bin/request-key \
           /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
           /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode /usr/bin/zless /usr/bin/zgrep /usr/bin/fold"
     for i in $apps; do
@@ -50,7 +50,7 @@ build ()
         add_file "$i"
     done
     symlinks="/sbin/depmod /bin/pidof /usr/bin/awk /sbin/halt /sbin/telinit /sbin/shutdown /sbin/runlevel /sbin/reboot \
-              /sbin/poweroff /sbin/init /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
+              /sbin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
               /usr/bin/lzma /usr/bin/modinfo /sbin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
@@ -59,6 +59,7 @@ build ()
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
+    add_symlink "/sbin/init" "../usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
@@ -96,8 +97,8 @@ build ()
     add_file "/usr/bin/copy-mountpoint.sh"
 
     ### add pam
-    add_binary "/sbin/pam_tally" 
-    add_binary "/sbin/unix_chkpwd"
+    add_binary "/usr/bin/pam_tally" 
+    add_binary "/usr/bin/unix_chkpwd"
     add_full_dir "/etc/security"
     add_full_dir "/etc/default"
     add_full_dir "/etc/pam.d"
@@ -126,7 +127,7 @@ build ()
     ### add systemd
     # add systemd kernel modules
     add_checked_modules 'nfs|autofs4|loop'
-    apps="/sbin/mount.nfs /usr/bin/setfont /usr/bin/loadkeys"
+    apps="/usr/bin/mount.nfs /usr/bin/setfont /usr/bin/loadkeys"
     for i in $apps; do
         add_binary "$i"
     done
@@ -146,11 +147,10 @@ build ()
           /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-coredumpctl \
           /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
           /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge /usr/bin/systemd-tmpfiles \
-          /usr/bin/systemd-tty-ask-password-agent /usr/bin/timedatectl /bin/systemd"
+          /usr/bin/systemd-tty-ask-password-agent /usr/bin/timedatectl"
     for i in $apps; do
         add_binary "$i"
     done
-    add_symlink "/bin/systemd" "../lib/systemd/systemd"
     add_dir "/etc/tmpfiles.d"
     add_dir "/etc/modules-load.d"
     add_dir "/etc/binfmt.d/"
@@ -188,7 +188,7 @@ build ()
     apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
           /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta \
           /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/testdb /usr/bin/repo-elephant \
-          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg-agent /usr/sbin/haveged"
+          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg-agent /usr/bin/haveged"
     for i in $apps; do
         add_binary "$i"
     done
