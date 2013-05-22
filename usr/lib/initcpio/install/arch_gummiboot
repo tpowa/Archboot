@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/bin/gummiboot"
+    add_binary "gummiboot"
     add_full_dir "/usr/lib/gummiboot"
 }
 
