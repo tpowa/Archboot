@@ -5,7 +5,7 @@ run_hook ()
   if [ "$fbmodule" = "" ]; then
   # check for kms
     for fb in i915 nouveau radeon; do
-      for pci in $(/sbin/modinfo -F alias $fb | sed -e 's/\*/\.&/g'); do
+      for pci in $(modinfo -F alias $fb | sed -e 's/\*/\.&/g'); do
         if cat /sys/bus/pci/devices/*/modalias | grep -i $pci >/dev/null; then
           msg ":: Switching to $fb kms mode..."
           echo "options $fb modeset=1" >> /etc/modprobe.d/modprobe.conf
