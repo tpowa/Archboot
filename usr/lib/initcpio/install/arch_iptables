@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules '/net/ipv6|/net/ipv4|/net/netfilter|/net/bridge/'
-    apps="/usr/sbin/xtables-multi"
+    apps="xtables-multi"
     for i in $apps; do
         add_binary "$i"
     done
