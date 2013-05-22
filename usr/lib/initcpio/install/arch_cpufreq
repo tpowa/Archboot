@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
-    add_binary "/usr/bin/cpupower"
+    add_binary "cpupower"
     add_file "/usr/bin/cpufreq-bench_plot.sh"
     add_file "/etc/cpufreq-bench.conf"
 }
