@@ -9,14 +9,9 @@ build ()
     for i in $STAGING; do
         add_checked_modules "/drivers/staging/$i"
     done
-    apps="/bin/dnsdomainname /usr/bin/domainname /bin/netstat /usr/bin/nisdomainname /usr/bin/ypdomainname \
-          /sbin/arp /sbin/ipmaddr /sbin/iptunnel /sbin/mii-tool /sbin/nameif /sbin/plipconfig /sbin/rarp \
-	  /sbin/slattach /usr/bin/traceroute /usr/bin/arping /usr/bin/clockdiff \
-	  /usr/bin/rarpd /usr/bin/rdisc /usr/bin/tftpd /usr/bin/tracepath /usr/bin/tracepath6 /sbin/route \
-	  /usr/bin/dig /usr/bin/host /usr/bin/nslookup /usr/bin/telnet /usr/bin/ssh /usr/sbin/arpd \
-	  /usr/sbin/genl /usr/sbin/ifstat /usr/sbin/lnstat /usr/sbin/nstat /usr/sbin/rtacct \
-	  /usr/sbin/rtmon  /usr/sbin/ss /usr/sbin/tc /usr/sbin/dhclient /usr/bin/ifplugd \
-	  /usr/bin/ifplugstatus /sbin/ip /usr/bin/ping /usr/bin/ping6"
+    apps="dnsdomainname domainname netstat nisdomainname ypdomainname arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
+	  slattach traceroute arping clockdiff rarpd rdisc tftpd tracepath tracepath6 route \
+	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon  ss tc dhclient ifplugd ifplugstatus ip ping ping6"
     for i in $apps; do
         add_binary "$i"
     done
