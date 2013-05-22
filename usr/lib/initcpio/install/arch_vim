@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/bin/vim"
+    add_binary "vim"
     add_file "/etc/vimrc"
     # fix vi symlink
     add_symlink "/usr/bin/vi" "/usr/bin/vim"
