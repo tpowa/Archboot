@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/bin/ddrescue"
+    add_binary "ddrescue"
 }
 
 help ()
