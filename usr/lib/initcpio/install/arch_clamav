@@ -3,8 +3,8 @@
 
 build ()
 {
-    add_binary "/usr/bin/clamscan"
-    add_binary "/usr/bin/freshclam"
+    add_binary "clamscan"
+    add_binary "freshclam"
     # add /var directories
     add_dir "/var/log/clamav"
     add_file "/etc/clamav/freshclam.conf"
