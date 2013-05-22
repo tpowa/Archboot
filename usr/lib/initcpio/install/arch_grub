@@ -3,10 +3,10 @@
 
 build ()
 {
-    apps="/usr/bin/grub-editenv /usr/bin/grub-fstest /usr/bin/grub-menulst2cfg /usr/bin/grub-mkfont \
-          /usr/bin/grub-mkimage /usr/bin/grub-mklayout /usr/bin/grub-mkpasswd-pbkdf2 /usr/bin/grub-mkrelpath \
-	  /usr/bin/grub-mount /usr/bin/grub-ntldr-img /usr/bin/grub-script-check /usr/bin/grub-bios-setup \
-	  /usr/bin/grub-ofpathname /usr/bin/grub-probe"
+    apps="grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
+          grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath \
+	  grub-mount grub-ntldr-img grub-script-check grub-bios-setup \
+	  grub-ofpathname grub-probe"
     for i in $apps; do
         add_binary "$i"
     done
