@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/netctl-auto /usr/bin/wifi-menu /usr/bin/netctl"
+    apps="netctl-auto wifi-menu netctl"
     for i in $apps; do
         add_binary "$i"
     done
