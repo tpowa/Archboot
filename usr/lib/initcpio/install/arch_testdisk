@@ -3,8 +3,8 @@
 
 build ()
 {
-    add_binary "/usr/bin/testdisk"
-    add_binary "/usr/bin/photorec"
+    add_binary "testdisk"
+    add_binary "photorec"
 }
 
 help ()
