@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules 'drivers/video/|drivers/char/agp|i915|radeon|nouveau'
-    add_binary "/sbin/v86d"
+    add_binary "v86d"
     add_file "/usr/lib/modprobe.d/uvesafb.conf" "/etc/modprobe.d/uvesafb.conf"
     add_runscript
 }
