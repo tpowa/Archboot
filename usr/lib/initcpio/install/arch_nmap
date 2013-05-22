@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/nmap /usr/bin/ncat /usr/bin/ndiff /usr/bin/nping"
+    apps="nmap ncat ndiff nping"
     for i in $apps; do
         add_binary "$i"
     done
