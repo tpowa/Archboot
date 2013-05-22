@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_file "wiki-search"
+    add_file "/usr/bin/wiki-search"
     add_full_dir "/usr/share/doc/arch-wiki/text"
 }
 
