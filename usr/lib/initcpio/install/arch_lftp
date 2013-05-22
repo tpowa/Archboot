@@ -3,8 +3,8 @@
 
 build ()
 {
-    add_binary "/usr/bin/lftp"
-    add_binary "/usr/bin/lftpget"
+    add_binary "lftp"
+    add_binary "lftpget"
     add_file "/etc/lftp.conf"
 }
 
