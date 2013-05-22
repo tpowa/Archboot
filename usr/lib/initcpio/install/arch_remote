@@ -4,13 +4,9 @@
 build ()
 {
     add_checked_modules '/drivers/net/'
-    apps="/usr/bin/findssl.sh /usr/bin/scp /usr/bin/sftp /usr/bin/ssh-add /usr/bin/ssh-agent \
-          /usr/bin/ssh-copy-id /usr/bin/ssh-keygen /usr/bin/ssh-keyscan /usr/bin/sshd /usr/bin/xinetd \
-	  /usr/bin/telnetd /usr/bin/rsync /usr/bin/exportfs /usr/bin/nfsstat /usr/bin/rpc.idmapd \
-	  /usr/bin/rpc.mountd /usr/bin/rpc.nfsd /usr/bin/rpc.statd /usr/bin/rpcdebug /usr/bin/showmount \
-	  /usr/bin/sm-notify /usr/bin/start-statd /usr/bin/rpcbind \
-	  /usr/bin/rpcinfo /usr/bin/gss_clnt_send_err /usr/bin/gss_destroy_creds /usr/bin/rpc.gssd \
-	  /usr/bin/rpc.svcgssd /bin/mountpoint"
+    apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd xinetd \
+	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
+	  sm-notify start-statd rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd mountpoint"
     for i in $apps; do
         add_binary "$i"
     done
