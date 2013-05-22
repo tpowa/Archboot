@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/pcf2vpnc /usr/bin/vpnc /usr/bin/vpnc-disconnect"
+    apps="pcf2vpnc vpnc vpnc-disconnect"
     for i in $apps; do
         add_binary "$i"
     done
