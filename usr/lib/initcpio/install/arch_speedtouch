@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/modem_run /usr/bin/pppoa2 /usr/bin/pppoa3"
+    apps="modem_run pppoa2 pppoa3"
     for i in $apps; do
         add_binary "$i"
     done
