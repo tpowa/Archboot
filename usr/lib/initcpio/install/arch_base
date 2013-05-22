@@ -149,13 +149,11 @@ build ()
     add_full_dir "/usr/share/polkit-1"
     add_full_dir "/usr/lib/tmpfiles.d"
     add_full_dir "/usr/lib/modules-load.d"
-    for i in /usr/lib/libsystemd*; do
-        add_file "$i"
-    done
     add_dir "/var/lib/systemd"
     add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/var-tmp.mount" "/etc/systemd/system/var-tmp.mount"
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
