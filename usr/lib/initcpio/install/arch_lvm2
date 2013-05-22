@@ -7,13 +7,13 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    symlinks="vgcfgbackup vgcfgrestore vgchange \
-              vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport \
-	      vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan \
-	      vgsplit pvchange pvck pvcreate pvdisplay pvmove pvremove \
-	      pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay \
-	      lvextend lvmchange lvmdiskscan lvmsadc lvmsar lvreduce lvremove \
-	      lvrename lvresize lvs lvscan"
+symlinks="/usr/sbin/vgcfgbackup /usr/sbin/vgcfgrestore /usr/sbin/vgchange \
+          /usr/sbin/vgck /usr/sbin/vgconvert /usr/sbin/vgcreate /usr/sbin/vgdisplay /usr/sbin/vgexport /usr/sbin/vgextend /usr/sbin/vgimport \
+	  /usr/sbin/vgmerge /usr/sbin/vgmknodes /usr/sbin/vgreduce /usr/sbin/vgremove /usr/sbin/vgrename /usr/sbin/vgs /usr/sbin/vgscan \
+	  /usr/sbin/vgsplit /usr/sbin/pvchange /usr/sbin/pvck /usr/sbin/pvcreate /usr/sbin/pvdisplay /usr/sbin/pvmove /usr/sbin/pvremove \
+	  /usr/sbin/pvresize /usr/sbin/pvs /usr/sbin/pvscan /usr/sbin/lvchange /usr/sbin/lvconvert /usr/sbin/lvcreate /usr/sbin/lvdisplay \
+	  /usr/sbin/lvextend /usr/sbin/lvmchange /usr/sbin/lvmdiskscan /usr/sbin/lvmsadc /usr/sbin/lvmsar /usr/sbin/lvreduce /usr/sbin/lvremove \
+	  /usr/sbin/lvrename /usr/sbin/lvresize /usr/sbin/lvs /usr/sbin/lvscan"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
