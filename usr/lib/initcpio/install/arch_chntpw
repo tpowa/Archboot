@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/chntpw /usr/bin/reged /usr/bin/cpnt"
+    apps="chntpw reged cpnt"
     for i in $apps; do
         add_binary $i
     done
