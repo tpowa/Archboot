@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/pfc /usr/sbin/xl2tpd /usr/sbin/xl2tpd-control"
+    apps="pfc xl2tpd xl2tpd-control"
     for i in $apps; do
         add_binary "$i"
     done
