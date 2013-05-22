@@ -14,34 +14,21 @@ build ()
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
-    apps="/usr/bin/getent /sbin/agetty /bin/mount /bin/umount /usr/bin/basename /usr/bin/du /usr/bin/clear \
-          /usr/bin/env /usr/bin/head /usr/bin/id /usr/bin/md5sum /usr/bin/nano /usr/bin/printf /usr/bin/tail \
-          /usr/bin/tee /usr/bin/test /usr/bin/tr /usr/bin/tty /usr/bin/uptime /usr/bin/w /usr/bin/who /usr/bin/wc \
-          /usr/bin/which /usr/bin/whoami /usr/bin/xargs /usr/bin/yes /sbin/killall5 \
-          /bin/bash /sbin/swapon /usr/bin/uniq /usr/bin/cut /usr/bin/seq /usr/bin/snarf \
-          /usr/bin/find /usr/bin/sort /sbin/fdisk /sbin/sfdisk /sbin/cfdisk /usr/bin/parted /usr/bin/partprobe \
-          /usr/bin/gawk /bin/cp /bin/mv /usr/bin/free /bin/ls /bin/rm /bin/sed /usr/bin/less /bin/chgrp \
-          /bin/chmod /bin/chown /bin/date /bin/df /usr/bin/dialog /bin/dmesg /usr/bin/egrep /usr/bin/fgrep /usr/bin/grep \
-          /bin/kill /usr/bin/killall /bin/more /usr/bin/ps /bin/pwd /bin/rmdir /bin/stty \
-          /bin/sync /bin/tar /usr/bin/bsdtar /usr/bin/bsdcpio /usr/bin/touch /bin/uname /usr/bin/hdparm \
-          /bin/true /usr/bin/mktemp /usr/bin/chroot /usr/bin/dirname /usr/bin/expr /usr/bin/bzip2 /sbin/hwclock \
-          /bin/su /bin/cat /usr/bin/cpio /bin/dd /usr/bin/gzip /usr/bin/wget /usr/bin/top /usr/bin/sdparm /usr/bin/tput \
-          /sbin/ifconfig /bin/ln /sbin/losetup /bin/mkdir /usr/bin/mkfifo /bin/mknod /usr/bin/readlink /bin/echo \
-          /usr/bin/dir /usr/bin/lzmadec /usr/bin/xz /usr/bin/last /usr/bin/wall /usr/bin/mesg /usr/bin/utmpdump \
-          /usr/bin/xzdec /sbin/switch_root /bin/false /sbin/pivot_root /usr/bin/sleep /sbin/chcpu \
-          /sbin/ctrlaltdel /sbin/raw /usr/bin/gdisk /usr/bin/sgdisk /usr/bin/cgdisk /usr/bin/fixparts /bin/findmnt \
-          /bin/lsblk /sbin/swaplabel /usr/bin/cal /usr/bin/chrt /usr/bin/col /usr/bin/colcrt /usr/bin/colrm \
-          /usr/bin/column /usr/bin/cytune /usr/bin/fallocate /usr/bin/flock /usr/bin/getopt /usr/bin/hexdump \
-          /usr/bin/ionice /usr/bin/ipcmk /usr/bin/ipcrm /usr/bin/ipcs /usr/bin/isosize /sbin/swapoff \
-          /usr/bin/logger /usr/bin/look /usr/bin/lscpu /usr/bin/mcookie /usr/bin/namei /usr/bin/pg \
-          /usr/bin/prlimit /usr/bin/rename /usr/bin/renice /usr/bin/rev /usr/bin/script /usr/bin/scriptreplay \
-          /usr/bin/setarch /usr/bin/setsid /usr/bin/setterm /usr/bin/tailf /usr/bin/taskset /usr/bin/ul /usr/bin/unshare \
-          /usr/bin/uuidgen /usr/bin/whereis /usr/bin/write /usr/sbin/addpart /usr/sbin/delpart /usr/sbin/fdformat \
-          /usr/sbin/ldattach /usr/sbin/partx /usr/sbin/readprofile /usr/sbin/rtcwake /usr/sbin/uuidd \
-          /usr/bin/sysctl /usr/bin/pgrep /usr/bin/pkill /usr/bin/pmap /usr/bin/pwdx /usr/bin/slabtop /usr/bin/tload \
-          /usr/bin/vmstat /usr/bin/watch /usr/bin/file /usr/bin/eject /usr/bin/keyctl /usr/bin/request-key \
-          /usr/bin/kmod /bin/zsh /usr/bin/hostname /usr/bin/tac /sbin/sulogin /sbin/bootlogd \
-          /usr/sbin/resizepart /usr/bin/lslocks /bin/wdctl /sbin/fstab-decode /usr/bin/zless /usr/bin/zgrep /usr/bin/fold"
+    apps="getent agetty mount umount basename du clear env head id md5sum nano printf tail \
+          tee test tr tty uptime w who wc which whoami xargs yes killall5 \
+          bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted partprobe \
+          gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \
+          kill killall more ps pwd rmdir stty sync tar bsdtar bsdcpio touch uname hdparm \
+          true mktemp chroot dirname expr bzip2 hwclock su cat cpio dd gzip wget top sdparm tput \
+          ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec xz last wall mesg utmpdump \
+          xzdec switch_root false pivot_root sleep chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
+          lsblk swaplabel cal chrt col colcrt colrm column cytune fallocate flock getopt hexdump \
+          ionice ipcmk ipcrm ipcs isosize swapoff logger look lscpu mcookie namei pg \
+          prlimit rename renice rev script scriptreplay setarch setsid setterm tailf taskset ul unshare \
+          uuidgen whereis write addpart delpart fdformat \
+          ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
+          vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin bootlogd \
+          resizepart lslocks wdctl fstab-decode zless zgrep fold"
     for i in $apps; do
         add_binary "$i"
     done
@@ -97,8 +84,10 @@ build ()
     add_file "/usr/bin/copy-mountpoint.sh"
 
     ### add pam
-    add_binary "/usr/bin/pam_tally" 
-    add_binary "/usr/bin/unix_chkpwd"
+    apps="mkhomedir_helper pam_tally pam_tally2 pam_timestamp_check unix_chkpwd unix_update"
+    for i in $apps; do
+        add_binary "$i"
+    done
     add_full_dir "/etc/security"
     add_full_dir "/etc/default"
     add_full_dir "/etc/pam.d"
@@ -108,12 +97,9 @@ build ()
     add_file /usr/lib/libcrack.so.2
 
     ### add shadow
-    apps="/bin/groups /bin/login /sbin/nologin /usr/bin/chage /usr/bin/chfn /usr/bin/chsh \
-          /usr/bin/expiry /usr/bin/faillog /usr/bin/gpasswd /usr/bin/lastlog /usr/bin/passwd \
-          /usr/sbin/chgpasswd /usr/sbin/chpasswd /usr/sbin/groupadd /usr/sbin/groupdel /usr/sbin/groupmems \
-          /usr/sbin/groupmod /usr/sbin/grpck /usr/sbin/grpconv /usr/sbin/grpunconv \
-          /usr/sbin/newusers /usr/sbin/pwck /usr/sbin/pwconv /usr/sbin/pwunconv /usr/sbin/useradd \
-          /usr/sbin/userdel /usr/sbin/usermod /usr/bin/sg"
+    apps="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd \
+          chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
+          newusers pwck pwconv pwunconv useradd userdel usermod sg"
     for i in $apps; do
         add_binary "$i"
     done
@@ -127,13 +113,13 @@ build ()
     ### add systemd
     # add systemd kernel modules
     add_checked_modules 'nfs|autofs4|loop'
-    apps="/usr/bin/mount.nfs /usr/bin/setfont /usr/bin/loadkeys"
+    apps="mount.nfs setfont loadkeys"
     for i in $apps; do
         add_binary "$i"
     done
 
     #dbus files
-    apps="/usr/bin/dbus-cleanup-sockets /usr/bin/dbus-daemon /usr/bin/dbus-monitor /usr/bin/dbus-send /usr/bin/dbus-uuidgen"
+    apps="dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
     for i in $apps; do
         add_binary "$i"
     done
@@ -142,12 +128,12 @@ build ()
     add_full_dir "/etc/dbus-1"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="/usr/bin/bootctl /usr/bin/hostnamectl /usr/bin/journalctl /usr/bin/kernel-install /usr/bin/localectl \
-          /usr/bin/loginctl /usr/bin/systemctl /usr/bin/systemd-analyze /usr/bin/systemd-ask-password \
-          /usr/bin/systemd-cat /usr/bin/systemd-cgls /usr/bin/systemd-cgtop /usr/bin/systemd-coredumpctl \
-          /usr/bin/systemd-delta /usr/bin/systemd-detect-virt /usr/bin/systemd-inhibit /usr/bin/systemd-machine-id-setup \
-          /usr/bin/systemd-notify /usr/bin/systemd-nspawn /usr/bin/systemd-stdio-bridge /usr/bin/systemd-tmpfiles \
-          /usr/bin/systemd-tty-ask-password-agent /usr/bin/timedatectl"
+    apps="bootctl hostnamectl journalctl kernel-install localectl \
+          loginctl systemctl systemd-analyze systemd-ask-password \
+          systemd-cat systemd-cgls systemd-cgtop systemd-coredumpctl \
+          systemd-delta systemd-detect-virt systemd-inhibit systemd-machine-id-setup \
+          systemd-notify systemd-nspawn systemd-stdio-bridge systemd-tmpfiles \
+          systemd-tty-ask-password-agent timedatectl"
     for i in $apps; do
         add_binary "$i"
     done
@@ -176,8 +162,8 @@ build ()
              "/etc/systemd/system/getty.target.wants/getty@tty1.service"
 
     ### add udev
-    add_binary "/usr/bin/logger"
-    add_binary "/usr/bin/udevadm"
+    add_binary "logger"
+    add_binary "udevadm"
     add_file "/etc/udev/udev.conf"
     add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
     add_symlink "/usr/bin/udevd" "../lib/systemd/systemd-udevd"
@@ -185,10 +171,8 @@ build ()
     add_full_dir "/usr/lib/udev"
 
     ### add pacman
-    apps="/usr/bin/pacman /usr/bin/pacman-db-upgrade /usr/bin/pacman-key /usr/bin/pacsort \
-          /usr/bin/pactree /usr/bin/cleanupdelta /usr/bin/makepkg /usr/bin/pacman-optimize /usr/bin/pkgdelta \
-          /usr/bin/rankmirrors /usr/bin/repo-add /usr/bin/testdb /usr/bin/repo-elephant \
-          /usr/bin/testpkg /usr/bin/vercmp /usr/bin/curl /usr/bin/gpg-agent /usr/bin/haveged"
+    apps="pacman pacman-db-upgrade pacman-key pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
+          rankmirrors repo-add testdb repo-elephant testpkg vercmp curl gpg-agent haveged"
     for i in $apps; do
         add_binary "$i"
     done
