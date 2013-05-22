@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/sbin/openvpn"
+    add_binary "openvpn"
     add_dir "/etc/openvpn"
     # add examples
     for i in /usr/share/openvpn/examples/*; do
