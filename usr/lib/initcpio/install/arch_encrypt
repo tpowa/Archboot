@@ -4,7 +4,7 @@
 build ()
 {
     add_all_modules -f 'aes.ko' '/crypto/|cryptoloop'
-    add_binary "/usr/sbin/cryptsetup"
+    add_binary "cryptsetup"
     # fix licenses
     add_file "/usr/share/licenses/popt/LICENSE"
     add_runscript
