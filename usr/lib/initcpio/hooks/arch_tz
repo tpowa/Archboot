@@ -1,0 +1,7 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+run_hook ()
+{
+ # fix ntp user permission
+ chown ntp /var/lib/ntp
+}

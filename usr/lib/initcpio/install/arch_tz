@@ -15,6 +15,8 @@ build ()
     add_file "/usr/share/archboot/tz/tz" "/usr/bin/tz"
     # fix licenses
     add_file "/usr/share/licenses/ntp/LICENSE"
+
+    add_runscript
 }
 
 help ()
