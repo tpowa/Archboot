@@ -46,7 +46,7 @@ build ()
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
-    add_symlink "/sbin/init" "../usr/lib/systemd/systemd"
+    add_symlink "/sbin/init" "/usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
