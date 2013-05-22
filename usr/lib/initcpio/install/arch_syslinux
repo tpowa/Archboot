@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="/usr/bin/syslinux /usr/bin/extlinux /usr/bin/mtools"
+    apps="syslinux extlinux mtools"
     for i in $apps; do
         add_binary "$i"
     done
