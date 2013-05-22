@@ -1,7 +1,0 @@
-# Created by Tobias Powalowski <tpowa@archlinux.org>
-
-run_hook ()
-{
-    # add symlink for db files
-    ln -sf /src/clamav /var/lib/clamav
-}
