@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/bin/weechat-curses"
+    add_binary "weechat-curses"
     add_full_dir "/usr/lib/weechat"
 }
 
