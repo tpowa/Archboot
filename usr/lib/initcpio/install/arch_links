@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "/usr/bin/links"
+    add_binary "links"
 }
 
 help ()
