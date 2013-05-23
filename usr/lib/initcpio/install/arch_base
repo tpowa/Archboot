@@ -153,7 +153,7 @@ build ()
     add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
-    add_file "/usr/share/archboot/base/etc/systemd/system/var-tmp.mount" "/etc/systemd/system/var-tmp.mount"
+    add_file "/usr/share/archboot/base/etc/systemd/system/local-fs.target.wants/var-tmp.mount" "/etc/systemd/system/local-fs.target.wants/var-tmp.mount"
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \

@@ -78,7 +78,7 @@ fi
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
 [[ -z "${LTS_KERNEL}" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k13-R1"
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k13-R2"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 IMAGENAME_OLD="${IMAGENAME}"
