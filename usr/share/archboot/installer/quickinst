@@ -157,6 +157,9 @@ install_packages() {
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep jfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
     fi
+    if [[ "$(${_BLKID} -o value -s TYPE | grep f2fs)" ]]; then
+        ! [[ "$(echo ${PACKAGES} | grep -w f2fs-tools)" ]] && PACKAGES="${PACKAGES} f2fs-tools"
+    fi
     if [[ "$(blkid -c /dev/null -o value -s TYPE | grep vfat)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
     fi
