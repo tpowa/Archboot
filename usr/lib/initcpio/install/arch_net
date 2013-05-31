@@ -15,11 +15,11 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/sbin/ifcfg /usr/sbin/routef /usr/sbin/routel /usr/sbin/rtpr /sbin/dhcpcd /usr/bin/ifenslave /usr/sbin/brctl"
+    appfiles="/usr/bin/ifcfg /usr/bin/routef /usr/bin/routel /usr/bin/rtpr /usr/bin/dhcpcd /usr/bin/ifenslave /usr/bin/brctl"
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/usr/sbin/ctstat /usr/sbin/rtstat"
+    symlinks="/usr/bin/ctstat /usr/bin/rtstat"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
