@@ -36,17 +36,17 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/sbin/depmod /bin/pidof /usr/bin/awk /sbin/halt /sbin/telinit /sbin/shutdown /sbin/runlevel /sbin/reboot \
-              /sbin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
+    symlinks="/usr/bin/depmod /usr/bin/pidof /usr/bin/awk /usr/bin/halt /usr/bin/telinit /usr/bin/shutdown /usr/bin/runlevel /usr/bin/reboot \
+              /usr/bin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
-              /usr/bin/lzma /usr/bin/modinfo /sbin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
+              /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
               /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
-    add_symlink "/sbin/init" "/usr/lib/systemd/systemd"
+    add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
@@ -103,7 +103,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    symlinks="/usr/sbin/vigr"
+    symlinks="/usr/bin/vigr"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
