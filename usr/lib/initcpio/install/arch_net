@@ -35,7 +35,7 @@ build ()
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add dhclient support
-    add_file "/sbin/dhclient-script"
+    add_file "/usr/bin/dhclient-script"
     add_dir "/var/lib/dhclient"
     add_dir "/var/state/dhcp"
     # add ifplugd support
