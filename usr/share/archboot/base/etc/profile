@@ -3,7 +3,7 @@
 #Set our umask
 umask 022
 
-PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/bin"
 export PATH
 
 # Load profiles from /etc/profile.d
@@ -20,7 +20,7 @@ if test "$PS1" && test "$BASH" && test -r /etc/bash.bashrc; then
 fi
 
 cd /
-echo "Hit ENTER to enter the bash shell ..."
+echo "Hit ENTER to enter the zsh shell ..."
 read
 clear
 if ! [ -e /tmp/.setup ]; then
