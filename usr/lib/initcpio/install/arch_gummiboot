@@ -3,6 +3,7 @@
 
 build ()
 {
+    add_checked_modules '/fs/efivarfs'
     add_binary "gummiboot"
     add_full_dir "/usr/lib/gummiboot"
 }

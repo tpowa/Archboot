@@ -192,7 +192,7 @@ activate_dmraid()
 activate_lvm2()
 {
     ACTIVATE_LVM2=""
-    if [[ -e /usr/sbin/lvm ]]; then
+    if [[ -e /usr/bin/lvm ]]; then
         OLD_LVM2_GROUPS=${LVM2_GROUPS}
         OLD_LVM2_VOLUMES=${LVM2_VOLUMES}
         DIALOG --infobox "Scanning logical volumes..." 0 0
@@ -221,7 +221,7 @@ activate_raid()
 activate_luks()
 {
     ACTIVATE_LUKS=""
-    if [[ -e /usr/sbin/cryptsetup ]]; then
+    if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
         if [[ "$(${_BLKID} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
             for PART in $(${_BLKID} | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
@@ -3467,17 +3467,23 @@ for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABE
     efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
 done
 
+if [[ "${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
+    _EXTRA_PARAMS=""
+else
+    _EXTRA_PARAMS="--UCS-2 "${_EFIBOOTMGR_LOADER_PARAMETERS}""
+fi
+
 echo
-efibootmgr --verbose --create --gpt --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --write-signature --label "${_EFIBOOTMGR_LABEL}" --loader \'\\EFI\\${_EFIBOOTMGR_LOADER_DIR}\\${_EFIBOOTMGR_LOADER_FILE}\'
+efibootmgr --verbose --create --write-signature --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "/EFI/${_EFIBOOTMGR_LOADER_DIR}/${_EFIBOOTMGR_LOADER_FILE}" --label "${_EFIBOOTMGR_LABEL}" ${_EXTRA_PARAMS}
 echo
 
 EFIBEOF
-            
+        
         chmod a+x "${DESTDIR}/efibootmgr_run.sh"
         chroot "${DESTDIR}" "/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
         mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
     else
-        DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} in the UEFI Boot Manager." 0 0
+        DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} using efibootmgr." 0 0
     fi
         
     chroot_umount
@@ -3487,6 +3493,7 @@ EFIBEOF
     unset _EFIBOOTMGR_PART_NUM
     unset _EFIBOOTMGR_LOADER_DIR
     unset _EFIBOOTMGR_LOADER_FILE
+    unset _EFIBOOTMGR_LOADER_PARAMETERS
     
 }
 
@@ -3516,6 +3523,7 @@ do_uefi_bootmgr_setup() {
         _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
         _EFIBOOTMGR_LOADER_DIR="${_BOOTMGR_LOADER_DIR}"
         _EFIBOOTMGR_LOADER_FILE="${_BOOTMGR_LOADER_FILE}"
+        _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
         do_uefi_efibootmgr
     fi
     
@@ -3524,6 +3532,7 @@ do_uefi_bootmgr_setup() {
     unset _BOOTMGR_PART_NUM
     unset _BOOTMGR_LOADER_DIR
     unset _BOOTMGR_LOADER_FILE
+    unset _BOOTMGR_LOADER_PARAMETERS
     
 }
 
@@ -3625,7 +3634,7 @@ CONFEOF
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} add_efi_memmap initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap initrd=/EFI/arch/${_EFISTUB_INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         if [[ "${_EFILINUX}" == "1" ]]; then
@@ -3647,11 +3656,12 @@ CONFEOF
                 DIALOG --msgbox "You will now be put into the editor to edit efilinux.cfg . After you save your changes, exit the editor." 0 0
                 geteditor || return 1
                 "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
-            # else
-                # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                # _BOOTMGR_LOADER_DIR="arch"
-                # _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
-                # do_uefi_bootmgr_setup
+            else
+                _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+                _BOOTMGR_LOADER_DIR="arch"
+                _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
+                _BOOTMGR_LOADER_PARAMETERS="${_PARAMETERS_MOD}"
+                do_uefi_bootmgr_setup
                 
                 # DIALOG --msgbox "You will now be put into the editor to edit linux.conf . After you save your changes, exit the editor." 0 0
                 # geteditor || return 1
@@ -3759,10 +3769,14 @@ GUMEOF
             do_uefi_bootmgr_setup
         fi
     else
-        chroot_mount
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
-        chroot_umount
+        if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+            chroot_mount
+            chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
+            chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
+            chroot_umount
+        else
+            DIALOG --msgbox "efivarfs does not seem to be mounted at /sys/firmware/efi/efivars . Check whether whether efivarfs is mounted at /sys/firmware/efi/efivars or whether you have booted in UEFI boot mode and re-run /usr/bin/gummiboot ." 0 0
+        fi
     fi
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -3828,13 +3842,13 @@ REFINDEOF
     else
         cat << REFINDEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
 "Boot with Defaults"              "${_PARAMETERS_MOD}"
-"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
 REFINDEOF
         
     fi
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
-        _BOOTMGR_LABEL="ArEFInd"
+        _BOOTMGR_LABEL="rEFInd"
         _BOOTMGR_LOADER_DIR="refind"
         _BOOTMGR_LOADER_FILE="refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
