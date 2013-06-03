@@ -1805,7 +1805,7 @@ autoprepare() {
             fi
         done
         while [[ "${CHOSEN_FS}" = "" ]]; do
-            DIALOG --menu "Select a filesystem for / and /home:" 16 45 8 ${FSOPTS} 2>${ANSWER} || return 1
+            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>${ANSWER} || return 1
             FSTYPE=$(cat ${ANSWER})
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
