@@ -7,11 +7,11 @@ build ()
     add_file "/etc/vimrc"
     # fix vi symlink
     add_symlink "/usr/bin/vi" "/usr/bin/vim"
+    add_file "/usr/share/vim/vimfiles/archlinux.vim"
     add_file "/usr/share/vim/vim73/syntax/syntax.vim"
     add_file "/usr/share/vim/vim73/syntax/conf.vim"
     add_file "/usr/share/vim/vim73/syntax/sh.vim"
     add_file "/usr/share/vim/vim73/syntax/grub.vim"
-    add_file "/usr/share/vim/vim73/syntax/lilo.vim"
     add_file "/usr/share/vim/vim73/syntax/manual.vim"
     add_file "/usr/share/vim/vim73/syntax/synload.vim"
     add_file "/usr/share/vim/vim73/syntax/colortest.vim"
