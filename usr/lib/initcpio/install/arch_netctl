@@ -10,6 +10,11 @@ build ()
     add_full_dir "/usr/lib/network/"
     add_full_dir "/etc/netctl/"
     add_file "/etc/ifplugd/netctl.action"
+    # add openresolv depends
+    add_binary "resolvconf"
+    add_file "/etc/resolvconf.conf"
+    add_full_dir "/usr/lib/resolvconf/"
+    add_file "/usr/share/licenses/openresolv/LICENSE"
 }
 
 help ()
