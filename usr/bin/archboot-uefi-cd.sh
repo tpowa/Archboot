@@ -24,7 +24,7 @@ IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 ## Create efiboot.img
 dd if=/dev/zero of="${FSIMG}"/efiboot.img bs="${IMGSZ}" count=1024 
-mkfs.vfat -F32 "${FSIMG}"/efiboot.img
+mkfs.vfat "${FSIMG}"/efiboot.img
 LOOPDEV="$(losetup --find --show "${FSIMG}"/efiboot.img)"
 
 ## Mount efiboot.img
