@@ -15,33 +15,35 @@ ISOIMG=$(mktemp -d)
 MOUNT_FSIMG=$(mktemp -d)
 
 ## Extract old ISO
-bsdtar -C ${ISOIMG} -xf "${1}"
+bsdtar -C "${ISOIMG}" -xf "${1}"
 # 7z x -o /tmp/ARCHBOOTISO/ "${1}"
 
 ## get size of boot x86_64 files
 BOOTSIZE=$(LANG=EN_US du -bc ${ISOIMG}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
 IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
-## Create efiboot.img
-dd if=/dev/zero of="${FSIMG}"/efiboot.img bs="${IMGSZ}" count=1024 
-mkfs.vfat "${FSIMG}"/efiboot.img
-LOOPDEV="$(losetup --find --show "${FSIMG}"/efiboot.img)"
+## Create cdefiboot.img
+dd if=/dev/zero of="${FSIMG}"/cdefiboot.img bs="${IMGSZ}" count=1024 
+mkfs.vfat "${FSIMG}"/cdefiboot.img
+LOOPDEV="$(losetup --find --show "${FSIMG}"/cdefiboot.img)"
 
-## Mount efiboot.img
+## Mount cdefiboot.img
 mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
 
-## Copy UEFI files fo efiboot.img
+## Copy UEFI files fo cdefiboot.img
 mkdir "${MOUNT_FSIMG}"/boot
 cp -r "${ISOIMG}"/{EFI,loader} "${MOUNT_FSIMG}"
 cp "${ISOIMG}"/boot/*x86_64* "${MOUNT_FSIMG}"/boot
 
-## Unmount efiboot.img
+## Unmount cdefiboot.img
 umount "${LOOPDEV}"
 losetup --detach "${LOOPDEV}"
 rm -rf "${MOUNT_FSIMG}"
 
-## Move updated efiboot.img to old ISO extracted dir
-mv "${FSIMG}"/efiboot.img "${ISOIMG}"/EFI/efiboot.img
+## Move updated cdefiboot.img to old ISO extracted dir
+mkdir -p "${ISOIMG}"/CDEFI/
+rm "${ISOIMG}"/CDEFI/cdefiboot.img
+mv "${FSIMG}"/cdefiboot.img "${ISOIMG}"/CDEFI/cdefiboot.img
 rm -rf "${FSIMG}"
 
 ## Create new ISO with BIOS, ISOHYBRID and UEFI support
@@ -55,12 +57,11 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -eltorito-alt-boot -e EFI/efiboot.img \
+        -eltorito-alt-boot -e CDEFI/cdefiboot.img \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
         -output ARCHBOOT.iso "${ISOIMG}"/ &> /tmp/xorriso.log
 
-## Updated ISO at /tmp/ARCHBOOT.iso
 if [[ -e "ARCHBOOT.iso" ]]; then
     echo "Updated ISO at ARCHBOOT.iso"
 else
