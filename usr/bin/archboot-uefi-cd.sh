@@ -19,12 +19,12 @@ bsdtar -C ${ISOIMG} -xf "${1}"
 # 7z x -o /tmp/ARCHBOOTISO/ "${1}"
 
 ## get size of boot x86_64 files
-BOOTSIZE=$(LANG=EN_US du -bc ${ISOIMG}/boot/*x86_64* | grep total | cut -f1)
+BOOTSIZE=$(LANG=EN_US du -bc ${ISOIMG}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
 IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 ## Create efiboot.img
 dd if=/dev/zero of="${FSIMG}"/efiboot.img bs="${IMGSZ}" count=1024 
-mkfs.vfat "${FSIMG}"/efiboot.img
+mkfs.vfat -F32 "${FSIMG}"/efiboot.img
 LOOPDEV="$(losetup --find --show "${FSIMG}"/efiboot.img)"
 
 ## Mount efiboot.img
