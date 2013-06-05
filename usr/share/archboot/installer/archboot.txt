@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   May, 21st 2013
+   June, 6th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -75,7 +75,6 @@ Introduction
    * It supports BIOS booting with syslinux.
    * It supports UEFI booting with gummiboot and EFISTUB,
      for booting LTS kernels with efilinux-efi .
-     (only UEFI USB is supported, UEFI CD booting is not supported!)
    * It supports grub's iso loopback support.
      variables used (below for example):
      iso_loop_dev=UUID=XXXX
