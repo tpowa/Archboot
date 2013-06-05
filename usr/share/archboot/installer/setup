@@ -3721,19 +3721,14 @@ dogummiboot_uefi_common() {
     PACKAGES=""
     
     if [[ "${_EFILINUX}" == "1" ]]; then
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-main.conf"
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
 title    Arch Linux LTS Kernel via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-fallback.conf"
-title    Arch Linux LTS Kernel via EFILINUX - Fallback Initramfs
 efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
 timeout 5
-default archlinux-core-lts-main
+default archlinux-core-lts-efilinux
 GUMEOF
         
     else
@@ -3784,8 +3779,7 @@ GUMEOF
         geteditor || return 1
         
         if [[ "${_EFILINUX}" == "1" ]]; then
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-main.conf"
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-fallback.conf"
+            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
         else
             "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
             "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"

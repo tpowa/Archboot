@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script for updating existing Archboot iso with newer UEFI shell, rEFInd, and /arch/setup script in the initramfs files
-# Contributed by "Keshav P R" <the.ridikulus.rat aatt geemmayil ddoott ccoomm>
+# Contributed by "Keshav Padram" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
 
 [[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
@@ -82,7 +82,7 @@ echo
 
 ## Extract the archboot iso using bsdtar
 bsdtar -C "${_ARCHBOOT_ISO_EXT_DIR}/" -xf "${_ARCHBOOT_ISO_OLD_PATH}"
-# 7z x "${_ARCHBOOT_ISO_OLD_PATH}"
+# 7z x -o "${_ARCHBOOT_ISO_EXT_DIR}/" "${_ARCHBOOT_ISO_OLD_PATH}"
 echo
 
 rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/[BOOT]/" || true
@@ -316,9 +316,7 @@ GUMEOF
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux.conf"
 title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
-linux    /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -341,7 +339,7 @@ GUMEOF
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	echo
 	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux_._cfg_"
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux.cfg"
 -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	echo
@@ -401,8 +399,6 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
 menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
     icon /EFI/refind/icons/os_arch.icns
     loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-    initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
     ostype Linux
     graphics off
 }

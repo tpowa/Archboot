@@ -238,9 +238,7 @@ GUMEOF
 	
 	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux.conf"
 title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
-linux    /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
 	
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -261,7 +259,7 @@ GUMEOF
 	mkdir -p "${ALLINONE}/EFI/efilinux"
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	
-	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux_._cfg_"
+	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux.cfg"
 -f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH} initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	
@@ -314,8 +312,6 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
 menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
     icon /EFI/refind/icons/os_arch.icns
     loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-    initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap none=UEFI_ARCH_${_UEFI_ARCH}"
     ostype Linux
     graphics off
 }
