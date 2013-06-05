@@ -430,7 +430,8 @@ _remove_i686_iso_files() {
 }
 
 _remove_x86_64_iso_files() {
-	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI" || true
+        rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_x86_64_lts" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_x86_64" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/initramfs_x86_64.img" || true
