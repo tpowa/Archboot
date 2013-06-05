@@ -390,6 +390,15 @@ if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi.iso" ]]; then
+	_UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi.iso"
+fi
+
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso" ]]; then
+	_UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
+fi
 ## create sha256sums.txt
 cd "${WD}/"
 rm -f "${WD}/sha256sums.txt" || true

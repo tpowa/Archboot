@@ -5,6 +5,8 @@
 [[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
 
+[[ -z "${_UPDATE_CD_UEFI}" ]] && _UPDATE_CD_UEFI="0"
+
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
 [[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
@@ -35,10 +37,12 @@ _ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-dual"
+	[[ "${_UPDATE_CD_UEFI}" = "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi
 fi
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
+	[[ "${_UPDATE_CD_UEFI}" = "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi
 fi
 
 if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
@@ -494,6 +498,34 @@ _download_pkgs() {
 	
 }
 
+_update_cd_uefi() {
+        MOUNT_FSIMG=$(mktemp -d)
+
+	## get size of boot x86_64 files
+	BOOTSIZE=$(LANG=EN_US du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
+	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
+
+	## Create cdefiboot.img
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/
+	dd if=/dev/zero of="${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024 
+	mkfs.vfat "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img
+	LOOPDEV="$(losetup --find --show "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img)"
+
+	## Mount cdefiboot.img
+	mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
+
+	## Copy UEFI files fo cdefiboot.img
+	mkdir "${MOUNT_FSIMG}"/boot
+	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"
+	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/*x86_64* "${MOUNT_FSIMG}"/boot
+
+	## Unmount cdefiboot.img
+	umount "${LOOPDEV}"
+	losetup --detach "${LOOPDEV}"
+	rm -rf "${MOUNT_FSIMG}"
+	_CD_UEFI_PARAMETERS="-eltorito-alt-boot -e CDEFI/cdefiboot.img  -no-emul-boot"
+}
+
 [[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
 
 [[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
@@ -531,10 +563,13 @@ fi
 
 [[ "${_UPDATE_SYSLINUX_CONFIG}" == "1" ]] && _update_syslinux_iso_config
 
+[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _update_cd_uefi
+
 cd "${_ARCHBOOT_ISO_WD}/"
 
 ## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating the modified ISO ..."
+
 xorriso -as mkisofs \
 	-iso-level 3 -rock -joliet \
 	-max-iso9660-filenames -omit-period \
@@ -546,6 +581,7 @@ xorriso -as mkisofs \
 	-eltorito-catalog boot/syslinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
+	${_CD_UEFI_PARAMETERS} \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
 
@@ -575,6 +611,7 @@ unset _UPDATE_UEFI_GUMMIBOOT
 unset _UPDATE_UEFI_REFIND
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG
+unset _CD_UEFI_PARAMETERS
 unset _ARCHBOOT_ISO_OLD_PATH
 unset _ARCHBOOT_ISO_WD
 unset _ARCHBOOT_ISO_OLD_NAME
