@@ -362,21 +362,25 @@ xorriso -as mkisofs \
         -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
+# create x86_64 iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
 	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
+# create i686 iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
 	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
+# create dual iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi.iso" ]]; then
 	_UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi.iso"
 fi
 
+# create x86_64 iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso" ]]; then
 	_UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
