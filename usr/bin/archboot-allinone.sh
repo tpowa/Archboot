@@ -194,15 +194,6 @@ _prepare_other_files() {
 	mkdir -p "${ALLINONE}/arch/"
 	mv "${CORE}/tmp"/*/arch/archboot.txt "${ALLINONE}/arch/"
 	
-	# copy in clamav db files
-	if [[ -d /var/lib/clamav && -x /usr/bin/freshclam ]]; then
-		mkdir -p "${ALLINONE}/clamav"
-		rm -f /var/lib/clamav/*
-		freshclam --user=root
-		cp /var/lib/clamav/{daily,main,bytecode}.cvd "${ALLINONE}/clamav/"
-		cp /var/lib/clamav/mirrors.dat "${ALLINONE}/clamav/"
-	fi
-	
 }
 
 _download_uefi_shell_tianocore() {
