@@ -374,16 +374,34 @@ if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
+# create i686 ftp iso, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686-ftp.iso" ]]; then
+	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686-ftp.iso" "${WD}/${IMAGENAME_OLD}-i686-ftp.iso"
+fi
+
 # create dual iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi.iso" ]]; then
 	_UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi.iso"
 fi
 
+# create dual ftp iso with uefi cd boot support, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi-ftp.iso" ]]; then
+	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi-ftp.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi-ftp.iso"
+fi
+
 # create x86_64 iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso" ]]; then
 	_UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
+fi
+
+# create x86_64 ftp iso with uefi cd boot support, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi-ftp.iso" ]]; then
+	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi-ftp.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi-ftp.iso"
 fi
 
 ## create sha256sums.txt

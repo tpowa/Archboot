@@ -5,6 +5,8 @@
 [[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
 
+[[ -z "${_REMOVE_PACKAGES}" ]] && _REMOVE_PACKAGES="0"
+
 [[ -z "${_UPDATE_CD_UEFI}" ]] && _UPDATE_CD_UEFI="0"
 
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
@@ -38,15 +40,20 @@ _ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-dual"
 	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi
+        [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi-ftp
+        [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-ftp
 fi
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
 	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi
+        [[ "${_UPDATE_CD_UEFI}" == "1" ]] && [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi-ftp
+        [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-ftp
 fi
 
 if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-i686"
+        [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-i686-ftp
 fi
 
 _ARCHBOOT_ISO_UPDATED_PATH="${_ARCHBOOT_ISO_WD}/${_ARCHBOOT_ISO_UPDATED_NAME}.iso"
@@ -444,6 +451,11 @@ _remove_x86_64_iso_files() {
 	
 }
 
+_remove_packages() {
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/packages" || true
+	echo
+}
+
 _update_arch_setup_initramfs() {
 	
 	_initramfs_ext="$(mktemp -d /tmp/${_initramfs_name}_ext.XXXXXXXXXX)"
@@ -530,6 +542,8 @@ _update_cd_uefi() {
 
 [[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
 
+[[ "${_REMOVE_PACKAGES}" == "1" ]] && _remove_packages
+
 if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	cd "${_ARCHBOOT_ISO_WD}/"
 	
@@ -605,6 +619,7 @@ unset _UEFI_ARCH
 unset _SPEC_UEFI_ARCH
 unset _REMOVE_i686
 unset _REMOVE_x86_64
+unset _REMOVE_PACKAGES
 unset _UPDATE_SETUP
 unset _UPDATE_UEFI_SHELL
 unset _UPDATE_UEFI_GUMMIBOOT
