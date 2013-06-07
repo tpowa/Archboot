@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # we rely on some output which is parsed in english!
 unset LANG
 ANSWER="/tmp/.setup"
@@ -30,7 +30,7 @@ DLPROG="wget"
 SYNC_URL=""
 FILE_URL="file:///packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
-PACKAGES=""
+unset PACKAGES
 
 # destination of blockdevices in /sys
 block="/sys/block"
@@ -2868,7 +2868,7 @@ run_pacman(){
     dialog --backtitle "${TITLE}" --title " Installing... Please Wait " \
         --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>${ANSWER}
     while [[ -f /tmp/setup-pacman-running ]]; do
-        /bin/true
+        /usr/bin/true
     done
     kill $(cat ${ANSWER})
 
@@ -3440,7 +3440,7 @@ do_uefi_common() {
     
     PACKAGES="dosfstools efibootmgr"
     run_pacman
-    PACKAGES=""
+    unset PACKAGES
     
 }
 
@@ -3486,7 +3486,7 @@ echo
 EFIBEOF
         
         chmod a+x "${DESTDIR}/efibootmgr_run.sh"
-        chroot "${DESTDIR}" "/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
+        chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
         mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
     else
         DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} using efibootmgr." 0 0
@@ -3552,7 +3552,7 @@ doefistub_uefi_common() {
     elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
         PACKAGES="efilinux-efi"
         run_pacman
-        PACKAGES=""
+        unset PACKAGES
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/"
         cp -f "${DESTDIR}/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
@@ -3719,7 +3719,7 @@ dogummiboot_uefi_common() {
     
     PACKAGES="gummiboot"
     run_pacman
-    PACKAGES=""
+    unset PACKAGES
     
     if [[ "${_EFILINUX}" == "1" ]]; then
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
@@ -3802,7 +3802,7 @@ dorefind_uefi_common() {
     
     PACKAGES="refind-efi"
     run_pacman
-    PACKAGES=""
+    unset PACKAGES
     
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -3877,7 +3877,7 @@ prepare_syslinux() {
         PACKAGES="${SYSLINUX_PACKAGES}"
         run_pacman
         # reset PACKAGES after installing
-        PACKAGES=""
+        unset PACKAGES
     fi
     USE_DMRAID=""
     common_bootloader_checks
@@ -4418,7 +4418,7 @@ dogrub_bios() {
         PACKAGES="grub-common grub-bios"
         run_pacman
         # reset PACKAGES after installing
-        PACKAGES=""
+        unset PACKAGES
     fi
     
     # try to auto-configure GRUB(2)...
@@ -4552,10 +4552,9 @@ dogrub_uefi_common() {
     
     DIALOG --msgbox "Installing grub-efi-${_UEFI_ARCH} now ..." 0 0
     PACKAGES="grub-common grub-efi-${_UEFI_ARCH}"
-    
     run_pacman
     # reset PACKAGES after installing
-    PACKAGES=""
+    unset PACKAGES
     
     chroot_mount
     
@@ -4748,7 +4747,7 @@ run_mkinitcpio() {
     sleep 2
     dialog --backtitle "${TITLE}" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
     while [[ -f /tmp/setup-mkinitcpio-running ]]; do
-        /bin/true
+        /usr/bin/true
     done
     chroot_umount
 }
