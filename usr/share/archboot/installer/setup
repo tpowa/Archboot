@@ -1967,12 +1967,18 @@ check_uefisyspart() {
             DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTIION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+        UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
+        
         umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
         umount "${UEFISYS_PART}" &> /dev/null
-        rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
+        
+        if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+            DIALOG --msgbox "You have entered /boot as the mountpoint of your UEFI SYSTEM PARTIION. Any other partition using /boot as mountpoint will be ignored." 0 0
+        fi
         
         if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
-            mkfs.vfat -F32 -n "ESP" "${UEFISYS_PART}"
+            mkfs.vfat -F32 -n "EFISYS" "${UEFISYS_PART}"
         fi
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
@@ -3566,25 +3572,26 @@ doefistub_uefi_common() {
         RAID_ON_LVM=""
         common_bootloader_checks
         
-        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
-        [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
-        _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
-        
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
-        
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-        
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-        
-        #######################
-        
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+            _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
+            [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
+            _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
+            
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
+            
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+            
+            cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+            cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+            cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+            
+            #######################
+            
+            cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
-Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 
 [Path]
 PathChanged=/boot/${VMLINUZ}
@@ -3595,20 +3602,21 @@ Unit=efistub_copy.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-        
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+            
+            cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
 [Unit]
-Description=Copy EFISTUB Kernel and Initramfs to UEFISYS Partition
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 
 [Service]
 Type=oneshot
-ExecStart=/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
-ExecStart=/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
-ExecStart=/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
+            
+            chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
+        fi
         
-        chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
-                
         ###########################
         
         _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
@@ -3643,54 +3651,47 @@ CONFEOF
 CONFEOF
         fi
         
-        # cat << CONFEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/linux.conf"
-# ${_PARAMETERS_MOD}
-# CONFEOF
-        
         ###################################
         
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
-            
+        if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+            if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
+                DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
+                _GOOD="y"
+            else
+                DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
+                _GOOD="n"
+            fi
+        fi
+        
+        if [[ "${_GOOD}" == "y" ]]; then
             if [[ "${_EFILINUX}" == "1" ]]; then
                 DIALOG --msgbox "You will now be put into the editor to edit efilinux.cfg . After you save your changes, exit the editor." 0 0
                 geteditor || return 1
                 "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
-            else
-                _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                _BOOTMGR_LOADER_DIR="arch"
-                _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
-                _BOOTMGR_LOADER_PARAMETERS="${_PARAMETERS_MOD}"
+                
+                _BOOTMGR_LABEL="Arch Linux (LTS)"
+                _BOOTMGR_LOADER_DIR="efilinux"
+                _BOOTMGR_LOADER_FILE="efilinux${_SPEC_UEFI_ARCH}.efi"
                 do_uefi_bootmgr_setup
-                
-                # DIALOG --msgbox "You will now be put into the editor to edit linux.conf . After you save your changes, exit the editor." 0 0
-                # geteditor || return 1
-                # "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/linux.conf"
-                
-                # DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi .\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
-                
-                # if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-                    # mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-                    
-                    # rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-                    # rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/linux.conf"
-                    
-                    # cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-                    # cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/linux.conf" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/linux.conf"
-                # fi
+            else
+                if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+                    _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+                    _BOOTMGR_LOADER_DIR="arch"
+                    _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
+                    _BOOTMGR_LOADER_PARAMETERS="${_PARAMETERS_MOD}"
+                    do_uefi_bootmgr_setup
+                fi
             fi
             
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for EFISTUB kernels?" 13 55 3 \
-                "rEFInd_UEFI_${UEFI_ARCH}" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
                 "GUMMIBOOT_UEFI_${UEFI_ARCH}" "Simple Text Mode ${UEFI_ARCH} UEFI Boot Manager" \
+                "rEFInd_UEFI_${UEFI_ARCH}" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
                 "GUMMIBOOT_UEFI_${UEFI_ARCH}") dogummiboot_uefi_common ;;
                 "rEFInd_UEFI_${UEFI_ARCH}") dorefind_uefi_common ;;
                 "NONE") return 0 ;;
             esac
-        else
-            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
         fi
     fi
     
@@ -3753,7 +3754,12 @@ GUMEOF
         
     fi
     
-    if [[ "${KERNELPKG}" == "linux-lts" ]]; then
+    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        chroot_mount
+        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
+        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
+        chroot_umount
+    else
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/"
         cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
         
@@ -3762,15 +3768,6 @@ GUMEOF
             _BOOTMGR_LOADER_DIR="gummiboot"
             _BOOTMGR_LOADER_FILE="gummiboot${_SPEC_UEFI_ARCH}.efi"
             do_uefi_bootmgr_setup
-        fi
-    else
-        if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-            chroot_mount
-            chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
-            chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
-            chroot_umount
-        else
-            DIALOG --msgbox "efivarfs does not seem to be mounted at /sys/firmware/efi/efivars . Check whether whether efivarfs is mounted at /sys/firmware/efi/efivars or whether you have booted in UEFI boot mode and re-run /usr/bin/gummiboot ." 0 0
         fi
     fi
     
@@ -3795,7 +3792,7 @@ GUMEOF
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error installing gummiboot..." 0 0
+        DIALOG --msgbox "Error installing Gummiboot..." 0 0
     fi
 }
 
