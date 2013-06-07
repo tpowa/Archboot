@@ -3422,7 +3422,7 @@ abort_f2fs_bootpart() {
 
 do_uefi_common() {
     
-    DISC="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}' | sed 's/\(.\{8\}\).*/\1/')"
+    DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
     
     if [[ "${DISC}" != "" ]]; then
         CHECK_UEFISYS_PART="1"
@@ -3507,7 +3507,7 @@ do_apple_efi_hfs_bless() {
 
 do_uefi_bootmgr_setup() {
     
-    _uefisysdev="$(df -T "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $1}')"
+    _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
     _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
     UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
     
@@ -3611,9 +3611,9 @@ CONFEOF
                 
         ###########################
         
-        _bootdev="$(df -T "${DESTDIR}/boot" | tail -n +2 | awk '{print $1}')"
-        _rootdev="$(df -T "${DESTDIR}/" | tail -n +2 | awk '{print $1}')"
-        _uefisysdev="$(df -T "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $1}')"
+        _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
+        _rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
+        _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
         
         ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
         ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
