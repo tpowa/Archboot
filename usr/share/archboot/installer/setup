@@ -3683,13 +3683,13 @@ CONFEOF
                 fi
             fi
             
-            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for EFISTUB kernels?" 13 55 3 \
-                "GUMMIBOOT_UEFI_${UEFI_ARCH}" "Simple Text Mode ${UEFI_ARCH} UEFI Boot Manager" \
-                "rEFInd_UEFI_${UEFI_ARCH}" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
+            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 13 55 3 \
+                "Gummiboot" "Gummiboot ${UEFI_ARCH} UEFI Boot Manager" \
+                "rEFInd" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
-                "GUMMIBOOT_UEFI_${UEFI_ARCH}") dogummiboot_uefi_common ;;
-                "rEFInd_UEFI_${UEFI_ARCH}") dorefind_uefi_common ;;
+                "Gummiboot") dogummiboot_uefi_common ;;
+                "rEFInd") dorefind_uefi_common ;;
                 "NONE") return 0 ;;
             esac
         fi
@@ -3715,7 +3715,7 @@ do_efistub_uefi_i686() {
 
 dogummiboot_uefi_common() {
     
-    DIALOG --msgbox "Setting up gummiboot now ..." 0 0
+    DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
     
     PACKAGES="gummiboot"
     run_pacman
@@ -3798,7 +3798,7 @@ GUMEOF
 
 dorefind_uefi_common() {
     
-    DIALOG --msgbox "Setting up refind-efi now ..." 0 0
+    DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
     PACKAGES="refind-efi"
     run_pacman
