@@ -41,18 +41,14 @@ if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-dual"
 	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi
 	[[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-ftp
-	if [[ "${_REMOVE_PACKAGES}" == "1" ]] && [[ "${_UPDATE_CD_UEFI}" == "1" ]]; then
-		_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi-ftp
-	fi
+	[[ "${_REMOVE_PACKAGES}" == "1" && "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi-ftp
 fi
 
 if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
 	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
 	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi
 	[[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-ftp
-        if [[ "${_REMOVE_PACKAGES}" == "1" ]] && [[ "${_UPDATE_CD_UEFI}" == "1" ]]; then
-		_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi-ftp
-	fi
+        [[ "${_REMOVE_PACKAGES}" == "1" && "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi-ftp
 fi
 
 if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
