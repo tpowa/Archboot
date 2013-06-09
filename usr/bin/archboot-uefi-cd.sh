@@ -57,7 +57,7 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -eltorito-alt-boot -e CDEFI/cdefiboot.img \
+        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
         -output ARCHBOOT.iso "${ISOIMG}"/ &> /tmp/xorriso.log

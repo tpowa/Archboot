@@ -535,7 +535,7 @@ _update_cd_uefi() {
 	umount "${LOOPDEV}"
 	losetup --detach "${LOOPDEV}"
 	rm -rf "${MOUNT_FSIMG}"
-	_CD_UEFI_PARAMETERS="-eltorito-alt-boot -e CDEFI/cdefiboot.img  -no-emul-boot"
+	_CD_UEFI_PARAMETERS="-eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot"
 }
 
 [[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
