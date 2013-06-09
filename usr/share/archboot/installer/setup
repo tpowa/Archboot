@@ -3683,7 +3683,7 @@ CONFEOF
                 fi
             fi
             
-            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 13 55 3 \
+            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
                 "Gummiboot" "Gummiboot ${UEFI_ARCH} UEFI Boot Manager" \
                 "rEFInd" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
@@ -5157,7 +5157,7 @@ configure_system() {
 
 install_bootloader_uefi_x86_64() {
     
-    DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 13 55 2 \
+    DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 9 55 2 \
         "EFISTUB_x86_64" "Only x86_64 Kernels" \
         "GRUB_UEFI_x86_64" "GRUB(2) x86_64 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
@@ -5169,7 +5169,7 @@ install_bootloader_uefi_x86_64() {
 
 install_bootloader_uefi_i386() {
     
-    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 13 55 2 \
+    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 9 55 2 \
         "EFISTUB_i686" "Only i686 Kernels" \
         "GRUB_UEFI_i386" "GRUB(2) i386 UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
