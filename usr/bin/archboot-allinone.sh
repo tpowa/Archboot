@@ -419,7 +419,7 @@ fi
 ## create sha256sums.txt
 cd "${WD}/"
 rm -f "${WD}/sha256sums.txt" || true
-sha256sum *.iso *.img > "${WD}/sha256sums.txt"
+sha256sum *.iso > "${WD}/sha256sums.txt"
 
 # cleanup
 rm -rf "${CORE}"
