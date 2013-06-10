@@ -2,7 +2,33 @@
 ## Script for creating a UEFI CD bootable ISO from existing Archboot ISO
 ## by Tobias Powalowski <tpowa@archlinux.org>
 ## Contributed by "Keshav Padram" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
-## ${1} == PATH to ISO
+# change to english locale!
+export LANG="en_US"
+
+_BASENAME="$(basename "${0}")"
+
+usage () {
+    echo "${_BASENAME}: usage"
+    echo "Create UEFI CD bootable ISO from existing Archboot ISO image."
+    echo ""
+    echo "PARAMETERS:"
+    echo "  -i=IMAGENAME        Your input IMAGENAME."
+    echo "  -o=IMAGENAME        Your output IMAGENAME."
+    echo "  -h                  This message."
+    exit 0
+}
+
+[[ -z "${1}" ]] && usage
+
+while [ $# -gt 0 ]; do
+    case ${1} in
+        -i=*|--i=*) INPUT_IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -o=*|--o=*) OUTPUT_IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -h|--h|?) usage ;; 
+        *) usage ;;
+        esac
+    shift
+done
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
@@ -19,11 +45,11 @@ ISOIMG=$(mktemp -d)
 MOUNT_FSIMG=$(mktemp -d)
 
 ## Extract old ISO
-bsdtar -C "${ISOIMG}" -xf "${1}"
-# 7z x -o /tmp/ARCHBOOTISO/ "${1}"
+bsdtar -C "${ISOIMG}" -xf "${INPUT_IMAGENAME}"
+# 7z x -o /tmp/ARCHBOOTISO/ "${INPUT_IMAGENAME}"
 
 ## get size of boot x86_64 files
-BOOTSIZE=$(LANG=EN_US du -bc ${ISOIMG}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
+BOOTSIZE=$(du -bc ${ISOIMG}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
 IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 ## Create cdefiboot.img
@@ -64,10 +90,10 @@ xorriso -as mkisofs \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
-        -output ARCHBOOT.iso "${ISOIMG}"/ &> /tmp/xorriso.log
+        -output "${OUTPUT_IMAGENAME}" "${ISOIMG}"/ &> /tmp/xorriso.log
 
-if [[ -e "ARCHBOOT.iso" ]]; then
-    echo "Updated ISO at ARCHBOOT.iso"
+if [[ -e "${OUTPUT_IMAGENAME}" ]]; then
+    echo "Updated ISO at "${OUTPUT_IMAGENAME}""
 else
     echo "ISO generation failed. See /tmp/xorriso.log for more info."
 fi
