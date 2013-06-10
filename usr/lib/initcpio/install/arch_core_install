@@ -53,6 +53,10 @@ build ()
         cd base; svn up $BASE; cd ..
         cd devel; svn up $DEVEL; cd ..
         cd support; svn up $SUPPORT; cd ..
+        # cleanup devel from base packages
+        for i in base/*; do
+            [[ -d devel/$(basename $i) ]] && rm -r devel/$(basename $i)
+        done
         cd  ${SVNTREE}
         SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any")"
     else
