@@ -13,8 +13,5 @@ setup changes:
 quickinst changes:
 
 Planned Features:
-- Chroot installation
-- Keymap changing during boot
 
 Long term setup goals:
-- Add automatic installation (perhaps not possible with archboot setup)
