@@ -1,68 +1,3 @@
-Archboot release directory:
-- This directory contains installation images based on archboot scripts.
-- Those files are no official Arch Linux releases.
-- Use them on your own risk.
-
-Latest Releases:
-- Hybrid image file and torrent is provided, 
-  which include i686 and x86_64 core repository. 
-- Please read the according Changelog files for RAM limitations.
-- Please check md5sum before using it.
-  http://www.archlinux.de/?page=GetFileFromMirror;file=iso/archboot/latest
-
-Burning Release:
-Hybrid image file is a standard CD-burnable image and also a raw disk image. 
-- Can be burned to CD(RW) media using most CD-burning utilities. 
-- Can be raw-written to a drive using 'dd' or similar utilities. 
-  This method is intended for use with USB thumb drives.
-  'dd if=<imagefile> of=/dev/<yourdevice> bs=1M'
-
-Known Issues  and limitations:
-- Release specific known issues and workarounds are posted in changelog files.
-- dmraid might be broken on some boards, support is not perfect here.
-  The reason is there are so many different hardware components out there.
-  At the moment 1.0.0rc16 is included, with latest fedora patchset.
-- grub cannot detect correct bios boot order.
-  It may happen that hd(x,x) entries are not correct,
-  thus first reboot may not work. 
-  Reason: grub cannot detect bios boot order. 
-  Fix: Either change bios boot order or change menu.lst to correct entries
-  after successful boot.
-  This cannot be fixed it's a restriction in grub!
-
-What is the difference to the official install media (latest version)?
-- It runs a modified Arch Linux system in initramfs.
-- It is restricted to RAM usage, everything which is not necessary like
-  man pages etc. is not provided.
-- LTS kernel boot images are provided
-- Initial module loading and hardware detection is done by the hwdetect script.
-- It doesn't mount anything during boot process.
-- It uses a different setup script.
-
-Setup features (latest version):
-- CD/USB/OTHER and FTP/HTTP installation mode
-- Changing keymap and consolefont
-- Changing time and date
-- Preparing harddisk, like auto-prepare, partitioning, GUID (gpt) support etc.
-- Creation of software raid/raid partitions, lvm2 devices and 
-  luks encrypted devices
-- Supports standard linux,raid/raid_partitions,dmraid,lvm2 and encrypted devices
-- Filesystem support: ext2/3/4,btrfs,reiserfs,xfs,jfs,ntfs-3g,vfat
-- Package selection support
-- Autoaddition of usefull packages, like ntfs-3g etc.
-- LTS kernel support
-- Auto/Preconfiguration of fstab, mkinitcpio.conf, rc.conf,
-  crypttab and mdadm.conf
-- Auto/Preconfiguration of KMS/framebuffers
-- Configuration of basic system files
-- Setting root password
-- grub-bios, lilo, extlinux/syslinux, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64 bootloader support
-
-Bugs:
-- If you find a bug, please mail the archboot developer directly.
-- Arch Linux Bugtracker:
-  http://bugs.archlinux.org
-
 What is archboot?
 - Archboot is a set of scripts to generate bootable media for CD/USB/PXE.
 - It is designed for installation or rescue operation.
@@ -72,6 +7,98 @@ What is archboot?
 - Git repository: 
   http://projects.archlinux.org/?p=archboot.git;a=summary
 - It is developed by tpowa.
+
+Latest Releases:
+- Hybrid image file and torrent is provided, 
+  which include i686 and x86_64 core repository.
+- Hybrid ftp image file and torrent is provided, 
+  which do not include i686 and x86_64 core repository.
+- Please read the according Changelog files for RAM limitations.
+- Please check md5sum before using it.
+  http://www.archlinux.de/?page=GetFileFromMirror;file=iso/archboot/latest
+
+Burning Release:
+Hybrid image file is a standard CD-burnable image and also a raw disk image. 
+- Can be burned to CD(RW)/DVD media using most CD-burning utilities. 
+- Can be raw-written to a drive using 'dd' or similar utilities. 
+  This method is intended for use with USB thumb drives.
+  'dd if=<imagefile> of=/dev/<yourdevice> bs=1M'
+
+Supported boot modes of Archboot media:
+- It supports BIOS booting with syslinux.
+- It supports UEFI booting with gummiboot and EFISTUB,
+  for booting LTS kernels with efilinux-efi.
+- It supports UEFI CD booting with gummiboot and EFISTUB,
+  for booting LTS kernels with efilinux-efi.
+- It supports grub's iso loopback support.
+  variables used (below for example):
+  iso_loop_dev=UUID=XXXX
+  iso_loop_path=/blah/archboot.iso
+- It supports booting using syslinux's memdisk (only in BIOS mode).
+
+The difference to the archiso install media:
+- It provides an additional interactive setup and quickinst script.
+- It contains [core] repository on media.
+- It provides the long time support kernel as boot and installation option.
+- It runs a modified Arch Linux system in initramfs.
+- It is restricted to RAM usage, everything which is not necessary like
+  man or info pages etc. is not provided.
+- It doesn't mount anything during boot process.
+
+Interactive setup features:
+- Media and Network installation mode
+- Changing keymap and consolefont
+- Changing time and date
+- Setup network with netctl
+- Preparing storage disk, like auto-prepare, partitioning, 
+  GUID (gpt) support, 4k sector drive support etc.
+- Creation of software raid/raid partitions, lvm2 devices 
+  and luks encrypted devices
+- Supports standard linux,raid/raid_partitions,dmraid,lvm2
+  and encrypted devices
+- Filesystem support: ext2/3/4, btrfs, f2fs, nilfs2, reiserfs,xfs,jfs,
+  ntfs-3g,vfat
+- Name scheme support: PARTUUID, PARTLABEL, FSUUID, FSLABEL and KERNEL
+- Mount support of grub loopback and memdisk installation media
+- Package selection support
+- Signed package installation
+- hwdetect script is used for preconfiguration
+- Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
+  mkinitcpio.conf, systemd, crypttab and mdadm.conf
+- Configuration of basic system files
+- Setting root password
+- grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64, gummiboot,
+  efilinux-efi, extlinux/syslinux bootloader support
+
+FAQ, Known Issues and limitations:
+- Release specific known issues and workarounds are posted in changelog files.
+- Check also the forum threads for posted fixes and workarounds.
+- Why screen stays blank or other weird screen issues happen?
+  Some hardware doesn't like the KMS activation, 
+  use radeon.modeset=0 or i915.modeset=0 on boot prompt.
+- dmraid might be broken on some boards, support is not perfect here.
+  The reason is there are so many different hardware components out there. 
+  At the moment 1.0.0rc16 is included, with latest fedora patchset.
+- grub2 cannot detect correct bios boot order:
+  It may happen that hd(x,x) entries are not correct, 
+  thus first reboot may not work.
+  Reason: grub cannot detect bios boot order.
+  Fix: Either change bios boot order or change menu.lst to correct entries
+  after successful boot. This cannot be fixed it is a restriction in grub2!
+- Why is parted used in setup routine, instead of cfdisk in 
+  msdos partitiontable mode?
+  - parted is the only linux partition program that can handle all type of 
+    things the setup routine offers.
+  - cfdisk cannot handle GPT/GUID nor it can allign partitions correct 
+    with 1MB spaces for 4k sector disks.
+  - cfdisk is a nice tool but is too limited to be the standard 
+    partitioner anymore.
+  - cfdisk is still included but has to be run in an other terminal.
+
+Bugs:
+- If you find a bug, please mail the archboot developer directly.
+- Arch Linux Bugtracker:
+  http://bugs.archlinux.org
 
 Have fun!
 tpowa
