@@ -39,7 +39,6 @@ usage () {
 ALLINONE_PRESET="/etc/archboot/presets/allinone"
 ALLINONE_LTS_PRESET="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
-USBIMAGE_HELPER="/usr/bin/archboot-usbimage-helper.sh"
 UPDATEISO_HELPER="/usr/bin/archboot-update-iso.sh"
 
 # change to english locale!
@@ -64,6 +63,10 @@ if ! [[ ${UID} -eq 0 ]]; then
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
+
+### check for available loop devices in a container
+! [[ -e /dev/loop0 ]] && mknod /dev/loop0 b 7 0
+! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
 
 if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${ALLINONE_PRESET}" -t="core-$(uname -m).tar"

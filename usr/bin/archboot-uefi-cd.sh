@@ -10,6 +10,10 @@ if ! [[ ${UID} -eq 0 ]]; then
     exit 1
 fi
 
+### check for available loop devices in a container
+! [[ -e /dev/loop0 ]] && mknod /dev/loop0 b 7 0
+! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
+
 FSIMG=$(mktemp -d)
 ISOIMG=$(mktemp -d)
 MOUNT_FSIMG=$(mktemp -d)
