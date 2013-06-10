@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Script for updating existing Archboot iso with newer UEFI shell, rEFInd, and /arch/setup script in the initramfs files
 # Contributed by "Keshav Padram" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
+# change to english locale!
+export LANG="en_US"
 
 [[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
@@ -514,7 +516,7 @@ _update_cd_uefi() {
         MOUNT_FSIMG=$(mktemp -d)
 
 	## get size of boot x86_64 files
-	BOOTSIZE=$(LANG=EN_US du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
+	BOOTSIZE=$(du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 	## Create cdefiboot.img
