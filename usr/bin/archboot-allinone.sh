@@ -65,7 +65,9 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 ### check for available loop devices in a container
-! [[ -e /dev/loop0 ]] && mknod /dev/loop0 b 7 0
+for i in $(seq 0 7); do
+    ! [[ -e /dev/loop$i ]] && mknod /dev/loop$i b 7 $i
+done
 ! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
 
 if [[ "${TARBALL}" == "1" ]]; then

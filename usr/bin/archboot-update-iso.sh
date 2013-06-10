@@ -84,6 +84,12 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+### check for available loop devices in a container
+for i in $(seq 0 7); do
+    ! [[ -e /dev/loop$i ]] && mknod /dev/loop$i b 7 $i
+done
+! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
+
 set -x
 
 ## Remove old files
