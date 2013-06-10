@@ -3,7 +3,6 @@ Archboot Allinone ISO Howto:
 
 Requirements:
 - x86_64 architecture
-- archboot ISO
 - ~ 3GB free space on disk
 
 Create archboot chroots:
@@ -16,15 +15,10 @@ Create archboot chroots:
   mkdir <i686_chroot>
   linux32 pacman --root "<i686_chroot>" -Sg base --noconfirm --noprogressbar
 
-Enter archboot chroot like this:
-  mount -o bind /dev <chrootpath>/dev
-  mount -o bind /tmp <chrootpath>/tmp
-  mount -o bind /sys <chrootpath>/sys
-  mount -o bind /proc <chrootpath>/proc
-  cp -a /etc/mtab <chrootpath>/etc/mtab
-  cp /etc/resolv.conf  <chrootpath>/etc/resolv.conf
-  # enter chroot
-  chroot <chrootpath>
+Enter archboot x86_64 container:
+  systemd-nspawn --capability=CAP_MKNOD -M $1-$(uname -m) -D <x86_64_chroot>
+Enter archboot i686 container:
+  linux32 systemd-nspawn --capability=CAP_MKNOD -M $1-$(uname -m) -D <i686_chroot>
 
 Install archboot and update to latest packages:
   # update in both chroots to latest available packages
@@ -38,14 +32,7 @@ Generate images:
   # put the generated tarballs in one directory and run (needs quite some time ...)
   archboot-allinone.sh -g
 
-Finished you get a burnable iso image, a rawwrite usb image 
-and a hybrid image which is both in one.
-
-Don't forget after chroot leaving:
-  umount <chrootpath>/dev
-  umount <chrootpath>/tmp
-  umount <chrootpath>/sys
-  umount <chrootpath>/proc
+Finished you get a bunch of images.
 
 Have fun
 tpowa
