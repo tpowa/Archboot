@@ -22,3 +22,7 @@ done
 cd base; for i in $BASE; do svn up $i; sleep 2; done; cd ..
 cd devel; for i in $DEVEL; do svn up $i; sleep 2; done;  cd ..
 cd support; for i in $SUPPORT; do svn up $i; sleep 2; done; cd ..
+# cleanup devel from base packages
+for i in base/*; do
+    [[ -d devel/$(basename $i) ]] && rm -r devel/$(basename $i)
+done
