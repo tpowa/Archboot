@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 6th 2013
+   June, 17th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -493,11 +493,11 @@ Useful links
    Development tree: http://projects.archlinux.org/archboot.git/
 
   Arch Linux resources
-   Homepage:   http://www.archlinux.org
-   Wiki:       http://wiki.archlinux.org
-   Forum:      http://bbs.archlinux.org
-   Bugtracker: http://bugs.archlinux.org
-   AUR:        http://aur.archlinux.org
-   Subversion: http://www.archlinux.org/svn
+   Homepage:   https://www.archlinux.org
+   Wiki:       https://wiki.archlinux.org
+   Forum:      https://bbs.archlinux.org
+   Bugtracker: https://bugs.archlinux.org
+   AUR:        https://aur.archlinux.org
+   Subversion: https://www.archlinux.org/svn
 
 vim: ft=text autoindent tabstop=4 shiftwidth=4 expandtab
