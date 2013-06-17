@@ -114,10 +114,10 @@ build ()
     sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add gummiboot efilinux-efi refind-efi efibootmgr dependencies to image, with separate extra db file
+    ### HACK add gummiboot efilinux-efi refind-efi dependencies to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
-    for i in gummiboot efilinux-efi refind-efi efibootmgr; do
+    for i in gummiboot efilinux-efi refind-efi; do
         pacman -Sw --noconfirm $i
         wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman -Sp $i).sig
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
