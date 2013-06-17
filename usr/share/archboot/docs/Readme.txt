@@ -5,7 +5,7 @@ What is archboot?
   thus it is limited to the RAM which is installed in your system.
   Please read the according Changelog files for RAM limitations.
 - Git repository: 
-  http://projects.archlinux.org/?p=archboot.git;a=summary
+  https://projects.archlinux.org/?p=archboot.git;a=summary
 - It is developed by tpowa.
 
 Latest Releases:
@@ -15,7 +15,7 @@ Latest Releases:
   which do not include i686 and x86_64 core repository.
 - Please read the according Changelog files for RAM limitations.
 - Please check md5sum before using it.
-  http://www.archlinux.de/?page=GetFileFromMirror;file=iso/archboot/latest
+  https://downloads.archlinux.de/iso/archboot/latest
 
 Burning Release:
 Hybrid image file is a standard CD-burnable image and also a raw disk image. 
@@ -96,7 +96,7 @@ FAQ, Known Issues and limitations:
 Bugs:
 - If you find a bug, please mail the archboot developer directly.
 - Arch Linux Bugtracker:
-  http://bugs.archlinux.org
+  https://bugs.archlinux.org
 
 Have fun!
 tpowa
