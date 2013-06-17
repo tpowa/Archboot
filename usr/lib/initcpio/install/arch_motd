@@ -10,8 +10,6 @@ build ()
     echo "Consoles:" >> ${MOTD}
     echo "  - Virtual consoles 1-6 are active." >> ${MOTD}
     echo "  - To change virtual console use ALT + F(1-6)" >> ${MOTD}
-    echo "Device node problems (eg. usbsticks or external harddrives):" >> ${MOTD}
-    echo "  - Please unplug and replug your device to get the correct node in /dev/." >> ${MOTD}
 if [ "$(echo $HOOKS | grep arch_keymap)" ]; then
     echo "Change keymap:" >> ${MOTD}
     echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
