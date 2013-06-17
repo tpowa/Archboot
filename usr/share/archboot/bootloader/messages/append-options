@@ -11,17 +11,19 @@
 Archboot options and troubleshooting:
 - If your system hangs during the boot process, any combinations of the
   boot options: 'noapic acpi=off pci=routeirq nosmp nomsi' may be useful.
+- Some hardware doesn't like the KMS activation, use radeon.modeset=0 
+  or i915.modeset=0 on boot prompt.
 - General installation instructions and boot options, 
   please have a look at: /arch/archboot.txt
 
 Archboot resourses:
-- Homepage:         http://wiki.archlinux.org/index.php/Archboot
-- Latest version:   ftp://ftp.archlinux.org/iso/archboot/
-- Development tree: http://projects.archlinux.org/archboot.git/
+- Homepage:         https://wiki.archlinux.org/index.php/Archboot
+- Latest version:   https://downloads.archlinux.de/iso/archboot/latest/
+- Development tree: https://projects.archlinux.org/archboot.git/
 - Developer:        Tobias Powalowski <tpowa@archlinux.org>
 
 Arch Linux resources:
-- Homepage:   http://www.archlinux.org
-- Wiki:       http://wiki.archlinux.org
-- Forum:      http://bbs.archlinux.org
-- Bugtracker: http://bugs.archlinux.org
+- Homepage:   https://www.archlinux.org
+- Wiki:       https://wiki.archlinux.org
+- Forum:      https://bbs.archlinux.org
+- Bugtracker: https://bugs.archlinux.org
