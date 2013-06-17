@@ -49,7 +49,7 @@ Introduction
 
   What is Arch Linux?
 
-   http://www.archlinux.org
+   https://www.archlinux.org
 
   What is Archboot?
 
@@ -58,7 +58,7 @@ Introduction
    * It only runs in RAM, without any special filesystems like squashfs,
      thus it is limited to the RAM which is installed in your system.
    * Git repository: 
-     http://projects.archlinux.org/?p=archboot.git;a=summary
+     https://projects.archlinux.org/?p=archboot.git;a=summary
    * It is developed by tpowa.
    
   What is the difference to the archiso install media?
@@ -489,8 +489,8 @@ Useful links
 
   Archboot resourses
    Developer:        Tobias Powalowski <tpowa@archlinux.org>
-   Latest version:   ftp://ftp.archlinux.org/iso/archboot/
-   Development tree: http://projects.archlinux.org/archboot.git/
+   Latest version:   https://downloads.archlinux.de/iso/archboot/latest
+   Development tree: https://projects.archlinux.org/archboot.git/
 
   Arch Linux resources
    Homepage:   https://www.archlinux.org
