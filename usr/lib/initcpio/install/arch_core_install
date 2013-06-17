@@ -117,7 +117,7 @@ build ()
     ### HACK add gummiboot efilinux-efi refind-efi efibootmgr dependencies to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
-    for i in gummiboot efilinux-efi refind-efi efibootmgr freetype2 mtools perl-passwd-md5 perl-digest-sha1 ; do
+    for i in gummiboot efilinux-efi refind-efi efibootmgr; do
         pacman -Sw --noconfirm $i
         wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman -Sp $i).sig
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
