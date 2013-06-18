@@ -19,6 +19,8 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
+    # add udev starting of dhcpcd on ethernet devices
+    add_file "/usr/share/archboot/net/etc/udev/rules.d/81-dhcpcd.rules" "/etc/udev/rules.d/81-dhcpcd.rules"
     symlinks="/usr/bin/ctstat /usr/bin/rtstat"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
