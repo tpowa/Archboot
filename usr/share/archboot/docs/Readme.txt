@@ -42,6 +42,7 @@ The difference to the archiso install media:
 - It is restricted to RAM usage, everything which is not necessary like
   man or info pages etc. is not provided.
 - It doesn't mount anything during boot process.
+- It supports remote installation through ssh.
 
 Interactive setup features:
 - Media and Network installation mode
