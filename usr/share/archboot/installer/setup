@@ -3278,8 +3278,11 @@ donetwork() {
         echo "Gateway='${GW}'" >>${NETWORK_PROFILE}
         echo "DNS=('${DNS}')" >>${NETWORK_PROFILE}
     fi
+    # bring down interface first
+    systemctl stop dhcpcd@${INTERFACE}.service
+    ip link set dev ${INTERFACE} down
     # run netctl
-    netctl start $(basename ${NETWORK_PROFILE}) >${LOG}
+    netctl restart $(basename ${NETWORK_PROFILE}) >${LOG}
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
