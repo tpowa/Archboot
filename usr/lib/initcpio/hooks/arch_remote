@@ -7,4 +7,6 @@ run_hook ()
     touch /var/lib/nfs/state
     touch /var/lib/nfs/rmtab
     touch /var/lib/nfs/etab
+    # allow empty password login on sshd
+    echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config
 }

@@ -37,6 +37,8 @@ build ()
     add_dir "/var/lib/nfs/sm.bak"
     add_dir "/var/lib/nfs/v4recovery"
     add_dir "/var/lib/nfs/rpc_pipefs"
+    # start sshd on startup
+    add_symlink "/etc/systemd/system/multi-user.target.wants/sshd.service" "/usr/lib/systemd/system/sshd.service"
     # fix licenses
     add_file "/usr/share/licenses/rpcbind/COPYING"
     add_file "/usr/share/licenses/libsasl/COPYING"
