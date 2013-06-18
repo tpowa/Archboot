@@ -11,7 +11,7 @@ run_hook ()
   [ "$(uname -r)" = "x86_64" ] && ln -s /usr/bin/setarch /usr/bin/x86_64
 
   # disable motd from login, pam does show motd already
-  touch /root/.hushlogin
+  #touch /root/.hushlogin
 
   # these static devices are created for convenience, to autoload the modules if necessary
   # /dev/loop0
