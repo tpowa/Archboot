@@ -3086,26 +3086,12 @@ install_packages() {
     # automagic time!
     # any automatic configuration should go here
     DIALOG --infobox "Writing base configuration..." 6 40
-    auto_addons
     auto_fstab
     auto_mdadm
     auto_luks
     auto_pacman
     # tear down the chroot environment
     chroot_umount
-}
-
-# add archboot addons if activated
-auto_addons()
-{
-    if [[ -d /tmp/packages ]]; then
-        DO_ADDON=""
-        DIALOG --yesno "Would you like to install your addons packages to installed system?" 0 0 && DO_ADDON="yes"
-        if [[ "${DO_ADDON}" = "yes" ]]; then
-            DIALOG --infobox "Installing the addons packages..." 0 0
-            ${PACMAN} -U /tmp/packages/* 2>&1 >> /tmp/pacman.log
-        fi
-    fi
 }
 
 # auto_fstab()

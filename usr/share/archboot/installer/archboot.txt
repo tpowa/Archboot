@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 17th 2013
+   June, 18th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -136,13 +136,6 @@ Archboot bootparameters
       - Usage:
         advanced=hook1,hook2,hook3
         advanced=arch_encrypt,arch_mdadm
-
-   * arch-addons
-      - You want to load external addon packages or configs 
-        into the install environment.
-      - Place external addon packages in /packages directory of your external 
-        device.
-      - Place external configs in /config directory of your external device.
 
   What are the video and framebuffer options?
 
