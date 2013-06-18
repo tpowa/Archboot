@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules '/drivers/net/'
-    apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd xinetd \
+    apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
 	  sm-notify start-statd rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd mountpoint"
     for i in $apps; do
@@ -16,15 +16,10 @@ build ()
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/etc/screenrc"
-    add_file "/etc/xinetd.conf"
-    add_file "/etc/xinetd.d/servers"
-    add_file "/etc/xinetd.d/services"
-    add_file "/etc/xinetd.d/telnet"
     add_file "/etc/ssh/ssh_config"
     add_file "/etc/ssh/sshd_config"
     add_file "/etc/ssh/moduli"
     add_file "/etc/rsyncd.conf"
-    add_file "/etc/xinetd.d/rsync"
     add_file "/etc/exports"
     for i in $(find /usr/share/terminfo/ ! -type d); do
     	add_file "$i"
@@ -44,7 +39,6 @@ build ()
     add_dir "/var/lib/nfs/rpc_pipefs"
     # fix licenses
     add_file "/usr/share/licenses/rpcbind/COPYING"
-    add_file "/usr/share/licenses/xinetd/COPYRIGHT"
     add_file "/usr/share/licenses/libsasl/COPYING"
     add_file "/usr/share/licenses/libldap/LICENSE"
     add_file "/usr/share/licenses/nfsidmap/LICENSE"
