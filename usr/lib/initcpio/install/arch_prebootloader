@@ -1,0 +1,16 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_file "/usr/lib/prebootloader/PreLoader.efi"
+    add_file "/usr/lib/prebootloader/HashTool.efi"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes prebootloader on an arch boot image.
+HELPEOF
+}
+
