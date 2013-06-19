@@ -216,7 +216,7 @@ _download_uefi_shell_tianocore() {
 _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/loader.efi"
 	
 	mkdir -p "${ALLINONE}/loader/entries"
 	

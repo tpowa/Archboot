@@ -14,6 +14,8 @@ export LANG="en_US"
 [[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
 [[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
+[[ -z "${_UPDATE_UEFI_PREBOOTLOADER}" ]] && _UPDATE_UEFI_PREBOOTLOADER="1"
+[[ -z "${_UPDATE_UEFI_LOCKDOWN_MS}" ]] && _UPDATE_UEFI_LOCKDOWN_MS="1"
 [[ -z "${_UPDATE_UEFI_REFIND}" ]] && _UPDATE_UEFI_REFIND="1"
 
 [[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
@@ -109,6 +111,16 @@ echo
 
 [[ -e "${_ARCHBOOT_ISO_WD}/splash.png" ]] && cp -f "${_ARCHBOOT_ISO_WD}/splash.png" "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/splash.png"
 echo
+
+_update_uefi_prebootloader_files() {
+	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx86.efi"
+	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi"
+	echo
+}
+
+_update_uefi_lockdown_ms_files() {
+	cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/LockDown_ms.efi"
+}
 
 _update_syslinux_iso_files() {
 	
@@ -314,7 +326,7 @@ _update_uefi_gummiboot_USB_files() {
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi"
 	echo
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
@@ -579,6 +591,10 @@ fi
 
 [[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
 
+[[ "${_UPDATE_UEFI_PREBOOTLOADER}" == "1" ]] && _update_uefi_prebootloader_files
+
+[[ "${_UPDATE_UEFI_LOCKDOWN_MS}" == "1" ]] && _update_uefi_lockdown_ms_files
+
 [[ "${_UPDATE_UEFI_REFIND}" == "1" ]] && _update_uefi_rEFInd_USB_files
 
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
@@ -631,6 +647,8 @@ unset _REMOVE_PACKAGES
 unset _UPDATE_SETUP
 unset _UPDATE_UEFI_SHELL
 unset _UPDATE_UEFI_GUMMIBOOT
+unset _UPDATE_UEFI_PREBOOTLOADER
+unset _UPDATE_UEFI_LOCKDOWN_MS
 unset _UPDATE_UEFI_REFIND
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG
