@@ -28,6 +28,7 @@ Supported boot modes of Archboot media:
 - It supports BIOS booting with syslinux.
 - It supports UEFI booting with gummiboot and EFISTUB,
   for booting LTS kernels with efilinux-efi.
+- It supports Secure Boot with prebootloader.
 - It supports grub's iso loopback support.
   variables used (below for example):
   iso_loop_dev=UUID=XXXX
