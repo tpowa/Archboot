@@ -45,7 +45,7 @@ build ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g_ntfsprogs fuse dhcp v86d grub f2fs-tools"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g_ntfsprogs fuse dhcp v86d grub f2fs-tools prebootloader lockdown-ms"
         for i in base devel lib support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
