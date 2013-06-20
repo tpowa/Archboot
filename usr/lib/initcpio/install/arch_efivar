@@ -1,0 +1,16 @@
+#!/bin/bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_binary "efivar"
+    add_binary "efivar-tester"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes efivar on an arch boot image.
+HELPEOF
+}
+
