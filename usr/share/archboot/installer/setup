@@ -1721,10 +1721,10 @@ autoprepare() {
     DISCS=$(default_blockdevices)
     if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the storage drive to use" 14 55 7 $(default_blockdevices _) 2>${ANSWER} || return 1
+        DIALOG --menu "Select the storage drive to use" 14 55 7 $(default_blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
-        DISC=${DISCS}
+        DISC="${DISCS}"
     fi
     DEFAULTFS=""
     BOOT_PART_SET=""
@@ -1738,6 +1738,19 @@ autoprepare() {
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
+    
+    detect_uefi_boot
+    
+    if [[ "${_DETECT_UEFI_BOOT}" == "1" ]]; then
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>"${ANSWER}" || return 1
+        UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
+    fi
+    
+    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+        DIALOG --msgbox "You have chose to use /boot as the UEFISYS Mountpoint. THe minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
+        _UEFISYS_BOOTPART="1"
+    fi
+    
     while [[ "${DEFAULTFS}" = "" ]]; do
         FSOPTS=""
         [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
@@ -1752,14 +1765,39 @@ autoprepare() {
         # create 1 MB bios_grub partition for grub-bios GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
+            
             GPT_BIOS_GRUB_PART_SIZE="${GUID_PART_SIZE}"
+            
+            _PART_NUM="1"
+            _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
+            
             UEFISYS_PART_SIZE="512"
+            
+            _PART_NUM="$((${_PART_NUM}+1))"
+            _UEFISYS_PART_NUM="${_PART_NUM}"
         else
             GUID_PART_SIZE="0"
+            
             UEFISYS_PART_SIZE="0"
+            _UEFISYS_PART_NUM="0"
         fi
-        DISC_SIZE=$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))
-        while [[ "${BOOT_PART_SET}" = "" ]]; do
+        
+        if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+            DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}))"
+            
+            BOOT_PART_SIZE="${UEFISYS_PART_SIZE}"
+            
+            if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                DIALOG --msgbox "ERROR: No space left on disk." 0 0
+            else
+                BOOT_PART_SET=1
+                
+                _PART_NUM="${_UEFISYS_PART_NUM}"
+                _BOOT_PART_NUM="${_PART_NUM}"
+            fi
+        else
+            DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))"
+            while [[ "${BOOT_PART_SET}" = "" ]]; do
             DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>${ANSWER} || return 1
             BOOT_PART_SIZE="$(cat ${ANSWER})"
             if [[ "${BOOT_PART_SIZE}" = "" ]]; then
@@ -1769,14 +1807,17 @@ autoprepare() {
                     DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     BOOT_PART_SET=1
+                    
+                    _PART_NUM="$((${_UEFISYS_PART_NUM}+1))"
+                    _BOOT_PART_NUM="${_PART_NUM}"
                 fi
             fi
         done
-        DISC_SIZE=$((${DISC_SIZE}-${BOOT_PART_SIZE}))
+        DISC_SIZE="$((${DISC_SIZE}-${BOOT_PART_SIZE}))"
         SWAP_SIZE="256"
         [[ "${DISC_SIZE}" -lt "256" ]] && SWAP_SIZE="${DISC_SIZE}"
         while [[ "${SWAP_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>"${ANSWER}" || return 1
             SWAP_PART_SIZE=$(cat ${ANSWER})
             if [[ "${SWAP_PART_SIZE}" = "" || "${SWAP_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1785,14 +1826,17 @@ autoprepare() {
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     SWAP_PART_SET=1
+                    
+                    _PART_NUM="$((${_PART_NUM}+1))"
+                    _SWAP_PART_NUM="${_PART_NUM}"
                 fi
             fi
         done
-        DISC_SIZE=$((${DISC_SIZE}-${SWAP_PART_SIZE}))
+        DISC_SIZE="$((${DISC_SIZE}-${SWAP_PART_SIZE}))"
         ROOT_SIZE="7500"
         [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
         while [[ "${ROOT_PART_SET}" = "" ]]; do
-        DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>${ANSWER} || return 1
+        DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
         ROOT_PART_SIZE=$(cat ${ANSWER})
             if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -1801,6 +1845,12 @@ autoprepare() {
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+                    
+                    _PART_NUM="$((${_PART_NUM}+1))"
+                    _ROOT_PART_NUM="${_PART_NUM}"
+                    
+                    _PART_NUM="$((${_PART_NUM}+1))"
+                    _HOME_PART_NUM="${_PART_NUM}"
                 fi
             fi
         done
@@ -1811,6 +1861,7 @@ autoprepare() {
         done
         DEFAULTFS=1
     done
+    
     DIALOG --defaultno --yesno "${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
     || return 1
     DEVICE=${DISC}
@@ -1830,9 +1881,11 @@ autoprepare() {
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
+    
+    PART_ROOT="${DEVICE}${_ROOT_PART_NUM}"
+    
     # we assume a /dev/hdX format (or /dev/sdX)
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
-        PART_ROOT="${DEVICE}5"
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
@@ -1844,15 +1897,20 @@ autoprepare() {
         # create fresh GPT
         sgdisk --clear ${DEVICE} &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new=1:1M:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=1:EF02 --change-name=1:BIOS_GRUB ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=2:+1M:+${UEFISYS_PART_SIZE}M --typecode=2:EF00 --change-name=2:UEFI_SYSTEM ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=3:+1M:+${BOOT_PART_SIZE}M --typecode=3:8300 --attributes=3:set:2 --change-name=3:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=4:+1M:+${SWAP_PART_SIZE}M --typecode=4:8200 --change-name=4:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=5:+1M:+${ROOT_PART_SIZE}M --typecode=5:8300 --change-name=5:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=6:+1M:0 --typecode=6:8300 --change-name=6:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_GPT_BIOS_GRUB_PART_NUM}:1M:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=${_GPT_BIOS_GRUB_PART_NUM}:EF02 --change-name=${_GPT_BIOS_GRUB_PART_NUM}:BIOS_GRUB ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_UEFISYS_PART_NUM}:+1M:+${UEFISYS_PART_SIZE}M --typecode=${_UEFISYS_PART_NUM}:EF00 --change-name=${_UEFISYS_PART_NUM}:UEFI_SYSTEM ${DEVICE} > ${LOG}
+        
+        if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+            sgdisk --attributes=${_UEFISYS_PART_NUM}:set:2 ${DEVICE} > ${LOG}
+        else
+            sgdisk --set-alignment="2048" --new=${_BOOT_PART_NUM}:+1M:+${BOOT_PART_SIZE}M --typecode=${_BOOT_PART_NUM}:8300 --attributes=${_BOOT_PART_NUM}:set:2 --change-name=${_BOOT_PART_NUM}:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
+        fi
+        
+        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:+1M:+${SWAP_PART_SIZE}M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:+1M:+${ROOT_PART_SIZE}M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:+1M:0 --typecode=${_HOME_PART_NUM}:8300 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
-        PART_ROOT="${DEVICE}3"
         # start at sector 1 for 4k drive compatibility and correct alignment
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
@@ -1883,10 +1941,22 @@ autoprepare() {
     ## <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    FSSPECS="3:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 1:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 4:/home:*:${FSTYPE}:::HOME_ARCH 2:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
-
+    
+    _FSSPEC_ROOT_PART="${_ROOT_PART_NUM}:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH"
+    _FSSPEC_HOME_PART="${_HOME_PART_NUM}:/home:*:${FSTYPE}:::HOME_ARCH"
+    _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
+    
+    _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH"
+    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:512:vfat:-F32::EFISYS"
+    
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
-        FSSPECS="5:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH 3:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH 2:${UEFISYS_MOUNTPOINT}:512:vfat:-F32::ESP 6:/home:*:${FSTYPE}:::HOME_ARCH 4:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
+        if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+            FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
+        else
+            FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_BOOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
+        fi
+    else
+        FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_BOOT_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
     fi
 
     ## make and mount filesystems
@@ -1967,7 +2037,7 @@ check_uefisyspart() {
             DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTIION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         
         umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
@@ -3111,7 +3181,7 @@ auto_fstab(){
 # add mdadm setup to existing /etc/mdadm.conf
 auto_mdadm()
 {
-    if [[ -e ${DESTDIR}/etc/mdadm.conf ]];then
+    if [[ -e ${DESTDIR}/etc/mdadm.conf ]]; then
         if [[ "$(cat /proc/mdstat | grep ^md)" ]]; then
             DIALOG --infobox "Adding raid setup to ${DESTDIR}/etc/mdadm.conf ..." 4 40
             mdadm -Ds >> ${DESTDIR}/etc/mdadm.conf
