@@ -1741,7 +1741,7 @@ autoprepare() {
     
     detect_uefi_boot
     
-    if [[ "${_DETECT_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
     fi
@@ -3507,17 +3507,36 @@ bootloader_kernel_parameters() {
     
 }
 
+detect_uefi_secure_boot() {
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+        _SECUREBOOT_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
+        _SETUPMODE_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
+        
+        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
+            _DETECTED_UEFI_SECURE_BOOT="1"
+        else
+            _DETECTED_UEFI_SECURE_BOOT="0"
+        fi
+    else
+        _DETECTED_UEFI_SECURE_BOOT="0"
+    fi
+    
+}
+
 detect_uefi_boot() {
     
     modprobe efivarfs || modprobe efivars
     
     if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-        _DETECT_UEFI_BOOT="1"
+        _DETECTED_UEFI_BOOT="1"
     elif [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-        _DETECT_UEFI_BOOT="1"
+        _DETECTED_UEFI_BOOT="1"
     else
-        _DETECT_UEFI_BOOT="0"
+        _DETECTED_UEFI_BOOT="0"
     fi
+    
+    detect_uefi_secure_boot
     
 }
 
@@ -3548,6 +3567,11 @@ do_uefi_common() {
     fi
     
     PACKAGES="dosfstools efivar efibootmgr"
+    
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        PACKAGES="${PACKAGES} prebootloader lockdown-ms"
+    fi
+    
     run_pacman
     unset PACKAGES
     
@@ -3630,6 +3654,25 @@ do_uefi_bootmgr_setup() {
     unset _BOOTMGR_LOADER_DIR
     unset _BOOTMGR_LOADER_FILE
     unset _BOOTMGR_LOADER_PARAMETERS
+    
+}
+
+do_uefi_secure_boot_preloader() {
+    
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
+        
+        mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/loader.efi"
+        
+        cp -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+        cp -f "${DESTDIR}/usr/lib/prebootloader/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/HashTool.efi"
+        
+        _BOOTMGR_LABEL="Secure Boot (Preloader)"
+        _BOOTMGR_LOADER_DIR="boot"
+        _BOOTMGR_LOADER_FILE="boot${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_PARAMETERS=""
+        do_uefi_bootmgr_setup
+    fi
     
 }
 
@@ -3871,10 +3914,12 @@ GUMEOF
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            
+            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error installing Gummiboot..." 0 0
@@ -3950,16 +3995,18 @@ REFINDEOF
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
             
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/refind.conf"
-            rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/icons"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/refind.conf" || true
+            rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/icons" || true
             
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/refind.conf"
             cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/icons"
+            
+            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error setting up refind-efi." 0 0
@@ -4112,7 +4159,7 @@ do_syslinux_uefi() {
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
             
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
@@ -4122,6 +4169,8 @@ do_syslinux_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
+            
+            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
@@ -4839,12 +4888,12 @@ EOF
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-            
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            
+            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error installing GRUB UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
@@ -5369,7 +5418,7 @@ install_bootloader() {
     
     detect_uefi_boot
     
-    if [[ "${_DETECT_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
         
         DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi && _DIRECT="1"
