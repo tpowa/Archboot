@@ -1991,13 +1991,7 @@ check_uefisyspart() {
             mount -o rw "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         fi
         
-        ## Fix (possible) case-sensitivity issues
-        if [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/efi" ]]; then
-            mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI_"
-            mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI_" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI"
-        fi
-        
-        [[ ! -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI"
+        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" || true
     else
         DIALOG --msgbox "Setup did not find any UEFI SYSTEM PARTITION in ${DISC}. Please create a >=512MiB FAT32 partition with gdisk type code EFOO and try again." 0 0
         return 1
@@ -3415,6 +3409,46 @@ abort_f2fs_bootpart() {
         fi
 }
 
+bootloader_kernel_parameters() {
+    
+    _rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
+    
+    ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
+    ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
+    ROOT_PART_GPT_GUID="$(getpartuuid "${_rootdev}")"
+    ROOT_PART_GPT_LABEL="$(getpartlabel "${_rootdev}")"
+    
+    getrootfstype
+    
+    [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
+    [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
+    
+    ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
+    _KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
+    
+    _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    
+}
+
+detect_uefi_boot() {
+    
+    modprobe efivarfs || modprobe efivars
+    
+    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        _DETECT_UEFI_BOOT="1"
+    elif [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        _DETECT_UEFI_BOOT="1"
+    else
+        _DETECT_UEFI_BOOT="0"
+    fi
+    
+}
+
 do_uefi_setup_env_vars() {
     
     if [[ "$(uname -m)" == "x86_64" ]]; then
@@ -3602,34 +3636,29 @@ CONFEOF
         ###########################
         
         _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
-        _rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
         _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
-        
-        ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
-        ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
-        ROOT_PART_GPT_GUID="$(getpartuuid "${_rootdev}")"
-        ROOT_PART_GPT_LABEL="$(getpartlabel "${_rootdev}")"
-        
-        getrootfstype
         
         UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
         UEFISYS_PART_FS_LABEL="$(getfslabel "${_uefisysdev}")"
         UEFISYS_PART_GPT_GUID="$(getpartuuid "${_uefisysdev}")"
         UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
         
-        [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
-        [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
-        [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
-        [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
-        [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
-        
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap initrd=/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
+        _KERNEL_PARAMS="${_KERNEL_PARAMS_UEFI_MOD}"
+        
+        if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+            _KERNEL="\\${VMLINUZ}"
+            _INITRD="\\${INITRAMFS}.img"
+            _INITRD_FALLBACK="\\${INITRAMFS}-fallback.img"
+        else
+            _KERNEL="\\EFI\\arch\\${_EFISTUB_KERNEL}"
+            _INITRD="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
+            _INITRD_FALLBACK="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+        fi
         
         if [[ "${_EFILINUX}" == "1" ]]; then
             cat << CONFEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
--f \\EFI\\arch\\${_EFISTUB_KERNEL} ${_PARAMETERS_MOD} initrd=\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img
+-f ${_KERNEL} ${_KERNEL_PARAMS} initrd=${_INITRD_FALLBACK}
 CONFEOF
         fi
         
@@ -3660,7 +3689,7 @@ CONFEOF
                     _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
                     _BOOTMGR_LOADER_DIR="arch"
                     _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
-                    _BOOTMGR_LOADER_PARAMETERS="${_PARAMETERS_MOD}"
+                    _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS} initrd=${_INITRD}"
                     do_uefi_bootmgr_setup
                 fi
             fi
@@ -3703,16 +3732,16 @@ GUMEOF
     else
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux Core Kernel
-linux    /EFI/arch/${_EFISTUB_KERNEL}
-initrd   /EFI/arch/${_EFISTUB_INITRAMFS}.img
-options  ${_PARAMETERS_MOD}
+linux    ${_KERNEL}
+initrd   ${_INITRD}
+options  ${_KERNEL_PARAMS}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 title    Arch Linux Core Kernel Fallback Initramfs
-linux    /EFI/arch/${_EFISTUB_KERNEL}
-initrd   /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-options  ${_PARAMETERS_MOD}
+linux    ${_KERNEL}
+initrd   ${_INITRD_FALLBACK}
+options  ${_KERNEL_PARAMS}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
@@ -3791,6 +3820,8 @@ do_refind_uefi() {
     sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
     
     if [[ "${_EFILINUX}" == "1" ]]; then
+        sed 's|^scan_all_linux_kernels|# scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
+        
         cat << REFINDEOF >> "${_REFIND_CONFIG}"
 
 menuentry "Arch Linux LTS via EFILINUX" {
@@ -3801,9 +3832,17 @@ menuentry "Arch Linux LTS via EFILINUX" {
 REFINDEOF
         
     else
-        cat << REFINDEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
-"Boot with Defaults"              "${_PARAMETERS_MOD}"
-"Boot with fallback initramfs"    "${_PARAMETERS_MOD} initrd=/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+            sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
+            
+            _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/refind_linux.conf"
+        else
+            _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
+        fi
+        
+        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
+"Boot with Defaults"              "${_KERNEL_PARAMS} initrd=${_INITRD}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS} initrd=${_INITRD_FALLBACK}"
 REFINDEOF
         
     fi
@@ -3816,10 +3855,10 @@ REFINDEOF
         
         DIALOG --msgbox "refind-efi has been setup successfully." 0 0
         
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf (and maybe refind_linux.conf) . After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit refind.conf (and refind_linux.conf if no LTS) . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
-        [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
+        [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${_REFIND_LINUX_CONF}"
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
@@ -3840,97 +3879,18 @@ REFINDEOF
     
 }
 
-do_syslinux_uefi() {
+do_syslinux_common_before() {
     
-    do_uefi_setup_env_vars
-    
-    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _SYSLINUX_BUILD="efi64"
-    [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
-    
-    DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
-    
-    PACKAGES="syslinux"
-    run_pacman
-    unset PACKAGES
-    
-    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
-    cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
-    
-    do_syslinux_config
-    
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
-        _BOOTMGR_LABEL="Syslinux"
-        _BOOTMGR_LOADER_DIR="syslinux"
-        _BOOTMGR_LOADER_FILE="syslinux.efi"
-        do_uefi_bootmgr_setup
-        
-        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
-        
-        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
-        geteditor || return 1
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
-        
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
-        
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-            
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"/*.c32
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
-            
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
-        fi
-    else
-        DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
-    fi
-}
-
-# install syslinux and run preparation
-prepare_syslinux_bios() {
-    if ! [[ -e "${DESTDIR}/usr/bin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
-        DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
-        PACKAGES="${SYSLINUX_PACKAGES}"
-        run_pacman
-        # reset PACKAGES after installing
-        unset PACKAGES
-    fi
+    bootdev=""
+    complexuuid=""
+    FAIL_COMPLEX=""
     USE_DMRAID=""
+    RAID_ON_LVM=""
     common_bootloader_checks
+    
 }
 
-# common syslinux funtion
-common_syslinux_bios() {
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="${DEVS} $(findbootloaderpartitions _)"
-    
-    if [[ "${DEVS}" == "" ]]; then
-        DIALOG --msgbox "No storage drives were found" 0 0
-        return 1
-    fi
-    
-    DIALOG --menu "Select the boot device where the ${SYSLINUX} BIOS bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-    ROOTDEV=$(cat ${ANSWER})
-    
-    # generate config file
-    TEMPDIR=/tmp
-    
-    # check if GPT/GUID is used
-    GUID_DETECTED=""
-    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
-    
-    PARTITION_NUMBER=$(echo ${bootdev} | sed -e 's#.*[a-z]##g')
-    if [[ "${GUID_DETECTED}" == '1' ]]; then
-        # Set Legacy BIOS Bootable GPT Partition Attribute using sgdisk
-        if ! [[ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]]; then
-            sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
-        fi
-    else
-        # mark the partition with /boot as active in MBR
-        parted -s ${ROOTDEV} set ${PARTITION_NUMBER} boot on >${LOG}
-    fi
+do_syslinux_config() {
     
     [[ -e "${TEMPDIR}/${SYSLINUX_CONF}" ]] && rm -f "${TEMPDIR}/${SYSLINUX_CONF}"
     
@@ -3997,56 +3957,75 @@ EOF
     geteditor || return 1
     "${EDITOR}" "${TEMPDIR}/${SYSLINUX_CONF}"
     
-    # install syslinux
-    DIALOG --infobox "Installing the ${SYSLINUX} bootloader..." 0 0
-    ! [[ -d "${DESTDIR}/boot/${SYSLINUX_DIR}" ]] && mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}"
-    cp -f "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
-    cp -f "${DESTDIR}/usr/lib/syslinux/bios"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
 }
 
-# finish_syslinux
-finish_syslinux_bios() {
-    MBR="${DESTDIR}/usr/lib/syslinux/bios/mbr.bin"
-    GPTMBR="${DESTDIR}/usr/lib/syslinux/bios/gptmbr.bin"
+do_syslinux_uefi() {
     
-    CHECKDEV=$(echo ${ROOTDEV} | sed 's|/dev/||g')
+    do_uefi_setup_env_vars
     
-    ## Install MBR boot code only if the selected ROOTDEV is a DISC and not a partition
-    if [[ -e "${block}/${CHECKDEV}" ]]; then
-        ## check if GPT/GUID is used
-        GUID_DETECTED=""
-        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _SYSLINUX_BUILD="efi64"
+    [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
+    
+    DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
+    
+    PACKAGES="syslinux"
+    run_pacman
+    unset PACKAGES
+    
+    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
+    cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
+    
+    do_syslinux_config
+    
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
+        _BOOTMGR_LABEL="Syslinux"
+        _BOOTMGR_LOADER_DIR="syslinux"
+        _BOOTMGR_LOADER_FILE="syslinux.efi"
+        do_uefi_bootmgr_setup
         
-        if [[ "${GUID_DETECTED}" == '1' ]]; then
-            cat "${GPTMBR}" > "${ROOTDEV}"
-        else
-            cat "${MBR}" > "${ROOTDEV}"
+        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
+        
+        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
+        geteditor || return 1
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
+        
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"/*.c32
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
+            
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
         fi
-    fi
-    
-    [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
-    chroot_umount
-    
-    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" ]]; then
-        DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
     else
-        DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
-        chroot_umount
-        return 1
+        DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
     fi
 }
 
-# install extlinux bootloader
+## install syslinux/extlinux bios bootloader
 do_syslinux_bios() {
-    bootdev=""
-    SYSLINUX_PACKAGES="syslinux"
+    
     SYSLINUX="EXTLINUX"
     SYSLINUX_PROGRAM="extlinux"
     SYSLINUX_DIR="syslinux"
     SYSLINUX_CONF="syslinux.cfg"
     SYSLINUX_OPTS=""
     
-    prepare_syslinux_bios
+    if [[ ! -e "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
+        DIALOG --msgbox "Couldn't find syslinux files, installing syslinux and mtools now ..." 0 0
+        PACKAGES="syslinux mtools"
+        run_pacman
+        # reset PACKAGES after installing
+        unset PACKAGES
+    fi
+    
+    do_syslinux_common_before
+    
     check_bootpart
     abort_nilfs_bootpart || return 1
     abort_f2fs_bootpart || return 1
@@ -4088,16 +4067,80 @@ do_syslinux_bios() {
         return 1
     fi
     
-    common_syslinux_bios
+    DEVS="$(findbootloaderdisks _)"
+    DEVS="${DEVS} $(findbootloaderpartitions _)"
+    
+    if [[ "${DEVS}" == "" ]]; then
+        DIALOG --msgbox "No storage drives were found" 0 0
+        return 1
+    fi
+    
+    DIALOG --menu "Select the boot device where the ${SYSLINUX} BIOS bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
+    ROOTDEV=$(cat ${ANSWER})
+    
+    # generate config file
+    TEMPDIR="/tmp"
+    
+    # check if GPT/GUID is used
+    GUID_DETECTED=""
+    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+    
+    PARTITION_NUMBER=$(echo ${bootdev} | sed -e 's#.*[a-z]##g')
+    if [[ "${GUID_DETECTED}" == '1' ]]; then
+        # Set Legacy BIOS Bootable GPT Partition Attribute using sgdisk
+        if ! [[ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]]; then
+            sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
+        fi
+    else
+        # mark the partition with /boot as active in MBR
+        parted -s ${ROOTDEV} set ${PARTITION_NUMBER} boot on >${LOG}
+    fi
+    
+    ## install syslinux/extlinux bios
+    DIALOG --infobox "Installing the ${SYSLINUX} BIOS bootloader..." 0 0
+    mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}" || true
+    cp -f "${DESTDIR}/usr/lib/syslinux/bios"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
+    # cp -f "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
+    
     chroot_mount
-    chroot ${DESTDIR} ${SYSLINUX_PROGRAM} ${SYSLINUX_OPTS} --install /boot/${SYSLINUX_DIR} >${LOG} 2>&1
-    finish_syslinux
+    chroot "${DESTDIR}" "${SYSLINUX_PROGRAM}" ${SYSLINUX_OPTS} --install "/boot/${SYSLINUX_DIR}" &>"${LOG}"
+    chroot_umount
+    
+    MBR="${DESTDIR}/usr/lib/syslinux/bios/mbr.bin"
+    GPTMBR="${DESTDIR}/usr/lib/syslinux/bios/gptmbr.bin"
+    
+    CHECKDEV="$(echo ${ROOTDEV} | sed 's|/dev/||g')"
+    
+    ## Install MBR boot code only if the selected ROOTDEV is a DISC and not a partition
+    if [[ -e "${block}/${CHECKDEV}" ]]; then
+        ## check if GPT/GUID is used
+        GUID_DETECTED=""
+        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
+        
+        if [[ "${GUID_DETECTED}" == '1' ]]; then
+            cat "${GPTMBR}" > "${ROOTDEV}"
+        else
+            cat "${MBR}" > "${ROOTDEV}"
+        fi
+    fi
+    
+    do_syslinux_config
+    
+    [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
+    
+    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" ]]; then
+        DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
+    else
+        DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
+        return 1
+    fi
+    
 }
 
 do_grub_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub(2) restrictions:
-    # - Encryption is not recommended for grub(2) /boot!
+    ## - Encryption is not recommended for grub(2) /boot!
     
     bootdev=""
     grubdev=""
@@ -4117,42 +4160,42 @@ do_grub_config() {
 
     ########
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    ########
-    
-    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    
+    ########
+    
+    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
         
-        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
         
-        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
     
     ########
@@ -4296,12 +4339,12 @@ EOF
         
     fi
     
-    # fallback to device if no label or uuid can be detected, eg. luks device
+    ## fallback to device if no label or uuid can be detected, eg. luks device
     if [[ -z "${ROOT_PART_FS_UUID}" ]] && [[ -z "${ROOT_PART_FS_LABEL}" ]]; then
         _rootpart="${ROOT_PART_DEVICE}"
     fi
     
-    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro"
+    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_UEFI}"
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
@@ -4342,17 +4385,15 @@ EOF
 if [ "\${grub_platform}" == "efi" ]; then
     
     ## UEFI Shell 2.0
-    ## Will work only in grub(2) uefi
-    #menuentry "UEFI \${_UEFI_ARCH} Shell 2.0 - For Spec. Ver. >=2.3 systems" {
+    #menuentry "UEFI Shell \${_UEFI_ARCH} v2" {
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-    #    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}.efi
+    #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
     #}
     
     ## UEFI Shell 1.0
-    ## Will work only in grub(2) uefi
-    #menuentry "UEFI \${_UEFI_ARCH} Shell 1.0 - For Spec. Ver. <2.3 systems" {
+    #menuentry "UEFI Shell \${_UEFI_ARCH} v1" {
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-    #    chainloader /efi/tools/shell\${_SPEC_UEFI_ARCH}_old.efi
+    #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v1.efi
     #}
     
 fi
@@ -4373,7 +4414,7 @@ if [ "\${grub_platform}" == "efi" ]; then
     #    insmod search_fs_uuid
     #    insmod chain
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-    #    chainloader /efi/Microsoft/Boot/bootmgfw.efi
+    #    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
     #}
     
 fi
@@ -4595,10 +4636,10 @@ do_grub_uefi() {
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib:${DESTDIR}/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
@@ -5203,9 +5244,13 @@ install_bootloader() {
     
     _DIRECT="0"
     
-    [[ "$(grep UEFI_ARCH_x86_64 /proc/cmdline)" ]] && _UEFI_x86_64="1"
+    detect_uefi_boot
     
-    [[ "${_UEFI_x86_64}" == "1" ]] && DIALOG --yesno "Setup has detected that you are using x86_64 (64-bit) UEFI ...\nDo you like to install a x86_64 UEFI bootloader?" 0 0 && install_bootloader_uefi_x86_64 && _DIRECT="1"
+    if [[ "${_DETECT_UEFI_BOOT}" == "1" ]]; then
+        do_uefi_setup_env_vars
+        
+        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi && _DIRECT="1"
+    fi
     
     if [[ "${_DIRECT}" == "1" ]]; then
         DIALOG --yesno "Do you want to install another bootloader?" 0 0 && install_bootloader_menu && _DIRECT="0"
