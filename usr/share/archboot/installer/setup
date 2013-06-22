@@ -3527,14 +3527,11 @@ do_uefi_bootmgr_setup() {
     
 }
 
-do_efistub_uefi_common() {
+do_efistub_uefi() {
     
-    [[ "$(uname -m)" == "x86_64" ]] && __CARCH="x86_64"
-    [[ "$(uname -m)" == "i686" ]] && __CARCH="IA32"
+    do_uefi_setup_env_vars
     
-    if [[ "${__CARCH}" != "${_UEFI_ARCH}" ]]; then
-        DIALOG --msgbox "EFISTUB requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
-    elif [[ "${KERNELPKG}" == "linux-lts" ]]; then
+    if [[ "${KERNELPKG}" == "linux-lts" ]]; then
         PACKAGES="efilinux-efi"
         run_pacman
         unset PACKAGES
@@ -3669,12 +3666,12 @@ CONFEOF
             fi
             
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-                "Gummiboot" "Gummiboot ${UEFI_ARCH} UEFI Boot Manager" \
-                "rEFInd" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
+                "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
+                "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
-                "Gummiboot") do_gummiboot_uefi_common ;;
-                "rEFInd") do_refind_uefi_common ;;
+                "Gummiboot") do_gummiboot_uefi ;;
+                "rEFInd") do_refind_uefi;;
                 "NONE") return 0 ;;
             esac
         fi
@@ -3682,23 +3679,9 @@ CONFEOF
     
 }
 
-do_efistub_uefi_x86_64() {
+do_gummiboot_uefi() {
     
-    do_uefi_x86_64
-    
-    do_efistub_uefi_common
-    
-}
-
-do_efistub_uefi_ia32() {
-    
-    do_uefi_ia32
-    
-    do_efistub_uefi_common
-    
-}
-
-do_gummiboot_uefi_common() {
+    do_uefi_setup_env_vars
     
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
     
@@ -3781,7 +3764,9 @@ GUMEOF
     fi
 }
 
-do_refind_uefi_common() {
+do_refind_uefi() {
+    
+    do_uefi_setup_env_vars
     
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
@@ -3855,86 +3840,51 @@ REFINDEOF
     
 }
 
-do_syslinux_uefi_common() {
+do_syslinux_uefi() {
     
-    DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
+    do_uefi_setup_env_vars
     
-    PACKAGES="gummiboot"
+    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _SYSLINUX_BUILD="efi64"
+    [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
+    
+    DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
+    
+    PACKAGES="syslinux"
     run_pacman
     unset PACKAGES
     
-    if [[ "${_EFILINUX}" == "1" ]]; then
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
-title    Arch Linux LTS Kernel via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
-timeout 5
-default archlinux-core-lts-efilinux
-GUMEOF
-        
-    else
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-title    Arch Linux Core Kernel
-linux    /EFI/arch/${_EFISTUB_KERNEL}
-initrd   /EFI/arch/${_EFISTUB_INITRAMFS}.img
-options  ${_PARAMETERS_MOD}
-GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-title    Arch Linux Core Kernel Fallback Initramfs
-linux    /EFI/arch/${_EFISTUB_KERNEL}
-initrd   /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-options  ${_PARAMETERS_MOD}
-GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
-timeout 5
-default archlinux-core-main
-GUMEOF
-        
-    fi
+    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
+    cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
     
-    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-        chroot_mount
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
-        chroot_umount
-    else
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/"
-        cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
-        
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
-            _BOOTMGR_LABEL="Gummiboot"
-            _BOOTMGR_LOADER_DIR="gummiboot"
-            _BOOTMGR_LOADER_FILE="gummiboot${_SPEC_UEFI_ARCH}.efi"
-            do_uefi_bootmgr_setup
-        fi
-    fi
+    do_syslinux_config
     
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
+        _BOOTMGR_LABEL="Syslinux"
+        _BOOTMGR_LOADER_DIR="syslinux"
+        _BOOTMGR_LOADER_FILE="syslinux.efi"
+        do_uefi_bootmgr_setup
+        
+        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
+        
+        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
         geteditor || return 1
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
         
-        if [[ "${_EFILINUX}" == "1" ]]; then
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
-        else
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-        fi
-        
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
-        
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"/*.c32
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
+            
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
         fi
     else
-        DIALOG --msgbox "Error installing Gummiboot..." 0 0
+        DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
     fi
 }
 
@@ -3985,7 +3935,7 @@ common_syslinux_bios() {
     [[ -e "${TEMPDIR}/${SYSLINUX_CONF}" ]] && rm -f "${TEMPDIR}/${SYSLINUX_CONF}"
     
     cat << EOF > "${TEMPDIR}/${SYSLINUX_CONF}"
-DEFAULT vesamenu.c32
+UI vesamenu.c32
 PROMPT 0
 MENU TITLE Arch Linux
 MENU BACKGROUND ${subdir}/${SYSLINUX_DIR}/splash.png
@@ -4051,13 +4001,13 @@ EOF
     DIALOG --infobox "Installing the ${SYSLINUX} bootloader..." 0 0
     ! [[ -d "${DESTDIR}/boot/${SYSLINUX_DIR}" ]] && mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}"
     cp -f "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
-    cp -f "${DESTDIR}/usr/lib/syslinux"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
+    cp -f "${DESTDIR}/usr/lib/syslinux/bios"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
 }
 
 # finish_syslinux
-finish_syslinux () {
-    MBR="${DESTDIR}/usr/lib/syslinux/mbr.bin"
-    GPTMBR="${DESTDIR}/usr/lib/syslinux/gptmbr.bin"
+finish_syslinux_bios() {
+    MBR="${DESTDIR}/usr/lib/syslinux/bios/mbr.bin"
+    GPTMBR="${DESTDIR}/usr/lib/syslinux/bios/gptmbr.bin"
     
     CHECKDEV=$(echo ${ROOTDEV} | sed 's|/dev/||g')
     
@@ -4087,13 +4037,13 @@ finish_syslinux () {
 }
 
 # install extlinux bootloader
-do_syslinux_bios () {
+do_syslinux_bios() {
     bootdev=""
     SYSLINUX_PACKAGES="syslinux"
-    SYSLINUX=EXTLINUX
-    SYSLINUX_PROGRAM=extlinux
-    SYSLINUX_DIR=syslinux
-    SYSLINUX_CONF=syslinux.cfg
+    SYSLINUX="EXTLINUX"
+    SYSLINUX_PROGRAM="extlinux"
+    SYSLINUX_DIR="syslinux"
+    SYSLINUX_CONF="syslinux.cfg"
     SYSLINUX_OPTS=""
     
     prepare_syslinux_bios
@@ -4482,8 +4432,8 @@ do_grub_bios() {
     do_grub_common_before
     
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub-bios now ..." 0 0
-        PACKAGES="grub-common grub-bios"
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg now ..." 0 0
+        PACKAGES="grub"
         run_pacman
         # reset PACKAGES after installing
         unset PACKAGES
@@ -4614,12 +4564,17 @@ do_grub_bios() {
     
 }
 
-do_grub_uefi_common() {
+do_grub_uefi() {
+    
+    do_uefi_setup_env_vars
+    
+    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _GRUB_ARCH="x86_64"
+    [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     
     do_grub_common_before
     
-    DIALOG --msgbox "Installing grub-efi-${_UEFI_ARCH} now ..." 0 0
-    PACKAGES="grub-common grub-efi-${_UEFI_ARCH}"
+    DIALOG --msgbox "Installing grub pkg now ..." 0 0
+    PACKAGES="grub"
     run_pacman
     # reset PACKAGES after installing
     unset PACKAGES
@@ -4627,13 +4582,13 @@ do_grub_uefi_common() {
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/bin/grub-install" \
-        --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" \
-        --target="${_UEFI_ARCH}-efi" \
+        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+        --target="${_GRUB_ARCH}-efi" \
         --efi-directory="${UEFISYS_MOUNTPOINT}" \
         --bootloader-id="arch_grub" \
         --boot-directory="/boot" \
         --recheck \
-        --debug &>"/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
+        --debug &>"/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
     
     chroot_umount
     
@@ -4691,11 +4646,11 @@ EOF
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
-        --directory="/usr/lib/grub/${_UEFI_ARCH}-efi" \
-        --format="${_UEFI_ARCH}-efi" \
+        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+        --format="${_GRUB_ARCH}-efi" \
         --compression="xz" \
         --output="${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" &>"/tmp/grub_${_UEFI_ARCH}_uefi_mkstandalone.log"
+        "boot/grub/grub.cfg" &>"/tmp/grub_${_GRUB_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
     
@@ -4703,7 +4658,7 @@ EOF
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
     
-    cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
+    cat "/tmp/grub_uefi_${_GRUB_ARCH}_install.log" >> "${LOG}"
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (GRUB)"
@@ -4731,22 +4686,6 @@ EOF
         DIALOG --msgbox "Error installing GRUB UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
-    
-}
-
-do_grub_uefi_x86_64() {
-    
-    do_uefi_x86_64
-    
-    do_grub_uefi_common
-    
-}
-
-do_grub_uefi_ia32() {
-    
-    do_uefi_ia32
-    
-    do_grub_uefi_common
     
 }
 
