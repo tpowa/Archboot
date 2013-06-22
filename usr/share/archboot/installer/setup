@@ -3415,6 +3415,20 @@ abort_f2fs_bootpart() {
         fi
 }
 
+do_uefi_setup_env_vars() {
+    
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        export _UEFI_ARCH="x86_64"
+        export _SPEC_UEFI_ARCH="x64"
+    fi
+    
+    if [[ "$(uname -m)" == "i686" ]]; then
+        export _UEFI_ARCH="IA32"
+        export _SPEC_UEFI_ARCH="ia32"
+    fi
+    
+}
+
 do_uefi_common() {
     
     DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
@@ -3427,27 +3441,9 @@ do_uefi_common() {
         check_uefisyspart
     fi
     
-    PACKAGES="dosfstools efibootmgr"
+    PACKAGES="dosfstools efivar efibootmgr"
     run_pacman
     unset PACKAGES
-    
-}
-
-do_uefi_x86_64() {
-    
-    export _UEFI_ARCH="x86_64"
-    export _SPEC_UEFI_ARCH="x64"
-    
-    do_uefi_common
-    
-}
-
-do_uefi_i386() {
-    
-    export _UEFI_ARCH="i386"
-    export _SPEC_UEFI_ARCH="ia32"
-    
-    do_uefi_common
     
 }
 
@@ -3531,10 +3527,10 @@ do_uefi_bootmgr_setup() {
     
 }
 
-doefistub_uefi_common() {
+do_efistub_uefi_common() {
     
     [[ "$(uname -m)" == "x86_64" ]] && __CARCH="x86_64"
-    [[ "$(uname -m)" == "i686" ]] && __CARCH="i386"
+    [[ "$(uname -m)" == "i686" ]] && __CARCH="IA32"
     
     if [[ "${__CARCH}" != "${_UEFI_ARCH}" ]]; then
         DIALOG --msgbox "EFISTUB requires Kernel and UEFI arch to match, and requires CONFIG_EFI_STUB enabled kernel. Please install matching ARCH Kernel and try again." 0 0
@@ -3631,7 +3627,7 @@ CONFEOF
         [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
         
         ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} efivars.pstore_disable=1 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap initrd=/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        _PARAMETERS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap initrd=/EFI/arch/${_EFISTUB_INITRAMFS}.img"
         _PARAMETERS_MOD=$(echo "${_PARAMETERS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')
         
         if [[ "${_EFILINUX}" == "1" ]]; then
@@ -3677,8 +3673,8 @@ CONFEOF
                 "rEFInd" "rEFInd ${UEFI_ARCH} UEFI Boot Manager" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
-                "Gummiboot") dogummiboot_uefi_common ;;
-                "rEFInd") dorefind_uefi_common ;;
+                "Gummiboot") do_gummiboot_uefi_common ;;
+                "rEFInd") do_refind_uefi_common ;;
                 "NONE") return 0 ;;
             esac
         fi
@@ -3690,19 +3686,19 @@ do_efistub_uefi_x86_64() {
     
     do_uefi_x86_64
     
-    doefistub_uefi_common
+    do_efistub_uefi_common
     
 }
 
-do_efistub_uefi_i686() {
+do_efistub_uefi_ia32() {
     
-    do_uefi_i386
+    do_uefi_ia32
     
-    doefistub_uefi_common
+    do_efistub_uefi_common
     
 }
 
-dogummiboot_uefi_common() {
+do_gummiboot_uefi_common() {
     
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
     
@@ -3785,7 +3781,7 @@ GUMEOF
     fi
 }
 
-dorefind_uefi_common() {
+do_refind_uefi_common() {
     
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
@@ -3859,8 +3855,91 @@ REFINDEOF
     
 }
 
+do_syslinux_uefi_common() {
+    
+    DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
+    
+    PACKAGES="gummiboot"
+    run_pacman
+    unset PACKAGES
+    
+    if [[ "${_EFILINUX}" == "1" ]]; then
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
+title    Arch Linux LTS Kernel via EFILINUX
+efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+timeout 5
+default archlinux-core-lts-efilinux
+GUMEOF
+        
+    else
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+title    Arch Linux Core Kernel
+linux    /EFI/arch/${_EFISTUB_KERNEL}
+initrd   /EFI/arch/${_EFISTUB_INITRAMFS}.img
+options  ${_PARAMETERS_MOD}
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
+title    Arch Linux Core Kernel Fallback Initramfs
+linux    /EFI/arch/${_EFISTUB_KERNEL}
+initrd   /EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+options  ${_PARAMETERS_MOD}
+GUMEOF
+        
+        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+timeout 5
+default archlinux-core-main
+GUMEOF
+        
+    fi
+    
+    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        chroot_mount
+        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
+        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
+        chroot_umount
+    else
+        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/"
+        cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
+        
+        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
+            _BOOTMGR_LABEL="Gummiboot"
+            _BOOTMGR_LOADER_DIR="gummiboot"
+            _BOOTMGR_LOADER_FILE="gummiboot${_SPEC_UEFI_ARCH}.efi"
+            do_uefi_bootmgr_setup
+        fi
+    fi
+    
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
+        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
+        geteditor || return 1
+        
+        if [[ "${_EFILINUX}" == "1" ]]; then
+            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
+        else
+            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
+        fi
+        
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+        
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+        fi
+    else
+        DIALOG --msgbox "Error installing Gummiboot..." 0 0
+    fi
+}
+
 # install syslinux and run preparation
-prepare_syslinux() {
+prepare_syslinux_bios() {
     if ! [[ -e "${DESTDIR}/usr/bin/extlinux" || -e "${DESTDIR}/usr/bin/mcopy" ]]; then
         DIALOG --msgbox "Couldn't find bootloader binary or helper program, installing syslinux now ..." 0 0
         PACKAGES="${SYSLINUX_PACKAGES}"
@@ -3873,7 +3952,7 @@ prepare_syslinux() {
 }
 
 # common syslinux funtion
-common_syslinux() {
+common_syslinux_bios() {
     DEVS="$(findbootloaderdisks _)"
     DEVS="${DEVS} $(findbootloaderpartitions _)"
     
@@ -3882,7 +3961,7 @@ common_syslinux() {
         return 1
     fi
     
-    DIALOG --menu "Select the boot device where the ${SYSLINUX} bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
+    DIALOG --menu "Select the boot device where the ${SYSLINUX} BIOS bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
     ROOTDEV=$(cat ${ANSWER})
     
     # generate config file
@@ -4008,7 +4087,7 @@ finish_syslinux () {
 }
 
 # install extlinux bootloader
-dosyslinux_bios () {
+do_syslinux_bios () {
     bootdev=""
     SYSLINUX_PACKAGES="syslinux"
     SYSLINUX=EXTLINUX
@@ -4017,7 +4096,7 @@ dosyslinux_bios () {
     SYSLINUX_CONF=syslinux.cfg
     SYSLINUX_OPTS=""
     
-    prepare_syslinux
+    prepare_syslinux_bios
     check_bootpart
     abort_nilfs_bootpart || return 1
     abort_f2fs_bootpart || return 1
@@ -4059,13 +4138,13 @@ dosyslinux_bios () {
         return 1
     fi
     
-    common_syslinux
+    common_syslinux_bios
     chroot_mount
     chroot ${DESTDIR} ${SYSLINUX_PROGRAM} ${SYSLINUX_OPTS} --install /boot/${SYSLINUX_DIR} >${LOG} 2>&1
     finish_syslinux
 }
 
-dogrub_common_before() {
+do_grub_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub(2) restrictions:
     # - Encryption is not recommended for grub(2) /boot!
@@ -4084,7 +4163,7 @@ dogrub_common_before() {
     fi
 }
 
-dogrub_config() {
+do_grub_config() {
 
     ########
     
@@ -4398,9 +4477,9 @@ EOF
     
 }
 
-dogrub_bios() {
+do_grub_bios() {
     
-    dogrub_common_before
+    do_grub_common_before
     
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub-bios now ..." 0 0
@@ -4526,7 +4605,7 @@ dogrub_bios() {
         
         GRUB_PREFIX_DIR="/boot/grub/"
         GRUB_BIOS="1"
-        dogrub_config
+        do_grub_config
         GRUB_BIOS=""
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind /dev and /proc into ${DESTDIR} before chrooting." 0 0
@@ -4535,9 +4614,9 @@ dogrub_bios() {
     
 }
 
-dogrub_uefi_common() {
+do_grub_uefi_common() {
     
-    dogrub_common_before
+    do_grub_common_before
     
     DIALOG --msgbox "Installing grub-efi-${_UEFI_ARCH} now ..." 0 0
     PACKAGES="grub-common grub-efi-${_UEFI_ARCH}"
@@ -4636,7 +4715,7 @@ EOF
         
         GRUB_PREFIX_DIR="/boot/grub/"
         GRUB_UEFI="1"
-        dogrub_config
+        do_grub_config
         GRUB_UEFI=""
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
@@ -4655,19 +4734,19 @@ EOF
     
 }
 
-dogrub_uefi_x86_64() {
+do_grub_uefi_x86_64() {
     
     do_uefi_x86_64
     
-    dogrub_uefi_common
+    do_grub_uefi_common
     
 }
 
-dogrub_uefi_i386() {
+do_grub_uefi_ia32() {
     
-    do_uefi_i386
+    do_uefi_ia32
     
-    dogrub_uefi_common
+    do_grub_uefi_common
     
 }
 
@@ -5144,26 +5223,18 @@ configure_system() {
     fi
 }
 
-install_bootloader_uefi_x86_64() {
+install_bootloader_uefi() {
     
-    DIALOG --menu "Which x86_64 UEFI bootloader would you like to use?" 9 55 2 \
-        "EFISTUB_x86_64" "Only x86_64 Kernels" \
-        "GRUB_UEFI_x86_64" "GRUB(2) x86_64 UEFI" 2>${ANSWER} || CANCEL=1
+    do_uefi_setup_env_vars
+    
+    DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
+        "EFISTUB" "EFISTUB for ${_UEFI_ARCH} UEFI" \
+        "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
+        "SYSLINUX_UEFI" "Syslinux for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "EFISTUB_x86_64") do_efistub_uefi_x86_64 ;;
-        "GRUB_UEFI_x86_64") dogrub_uefi_x86_64 ;;
-    esac
-    
-}
-
-install_bootloader_uefi_i386() {
-    
-    DIALOG --menu "Which i386 UEFI bootloader would you like to use?" 9 55 2 \
-        "EFISTUB_i686" "Only i686 Kernels" \
-        "GRUB_UEFI_i386" "GRUB(2) i386 UEFI" 2>${ANSWER} || CANCEL=1
-    case $(cat ${ANSWER}) in
-        "EFISTUB_i686") do_efistub_uefi_i686 ;;
-        "GRUB_UEFI_i386") dogrub_uefi_i386 ;;
+        "EFISTUB") do_efistub_uefi ;;
+        "GRUB_UEFI") do_grub_uefi ;;
+        "SYSLINUX_UEFI") do_syslinux_uefi ;;
     esac
     
 }
@@ -5171,11 +5242,11 @@ install_bootloader_uefi_i386() {
 install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
-        "SYSLINUX_BIOS" "SYSLINUX/EXTLINUX" \
+        "SYSLINUX_BIOS" "SYSLINUX BIOS" \
         "GRUB_BIOS" "GRUB(2) BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "SYSLINUX_BIOS") dosyslinux_bios ;;
-        "GRUB_BIOS") dogrub_bios ;;
+        "SYSLINUX_BIOS") do_syslinux_bios ;;
+        "GRUB_BIOS") do_grub_bios ;;
     esac
     
 }
@@ -5202,18 +5273,17 @@ install_bootloader() {
     else
         install_bootloader_menu
     fi
+    
 }
 
 install_bootloader_menu() {
     
-    DIALOG --menu "What is your boot system type?" 10 40 3 \
-        "BIOS" "BIOS" \
-        "UEFI_x86_64" "x86_64 UEFI" \
-        "UEFI_i386" "i386 UEFI" 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "What is your boot system type?" 10 40 2 \
+        "UEFI" "UEFI" \
+        "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
+        "UEFI") install_bootloader_uefi ;;
         "BIOS") install_bootloader_bios ;;
-        "UEFI_x86_64") install_bootloader_uefi_x86_64 ;;
-        "UEFI_i386") install_bootloader_uefi_i386 ;;
     esac
     
     if [[ "${CANCEL}" = "1" ]]; then
