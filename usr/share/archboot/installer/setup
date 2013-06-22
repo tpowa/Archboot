@@ -1747,7 +1747,7 @@ autoprepare() {
     fi
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        DIALOG --msgbox "You have chose to use /boot as the UEFISYS Mountpoint. THe minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
+        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. THe minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
     fi
     
