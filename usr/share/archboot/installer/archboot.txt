@@ -77,9 +77,9 @@ Introduction
    * It supports UEFI booting with gummiboot and EFISTUB,
      for booting LTS kernels with efilinux-efi.
    * It supports Secure Boot with prebootloader.
-   * It supports grub's iso loopback support.
+   * It supports grub(2)'s iso loopback support.
      variables used (below for example):
-     iso_loop_dev=UUID=XXXX
+     iso_loop_dev=PARTUUID=XXXX
      iso_loop_path=/blah/archboot.iso
    * It supports booting using syslinux's memdisk (only in BIOS mode).
      
@@ -98,7 +98,7 @@ Introduction
    * Filesystem support: ext2/3/4,btrfs,nilfs2,f2fs,reiserfs,
      xfs,jfs,ntfs-3g,vfat
    * Name scheme support: PARTUUID, PARTLABEL, FSUUID, FSLABEL and KERNEL
-   * Mount support of grub loopback and memdisk installation media
+   * Mount support of grub(2) loopback and memdisk installation media
    * Package selection support
    * Signed package installation
    * hwdetect script is used for preconfiguration
@@ -106,8 +106,8 @@ Introduction
      mkinitcpio.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
-   * Bootloader support: grub-bios, grub-efi-x86_64, grub-efi-i386,
-     refind-efi-x86_64, gummiboot, efilinux-efi, extlinux/syslinux
+   * Bootloader support: grub(2) (BIOS and UEFI),
+     refind-efi, gummiboot, efilinux-efi, syslinux (BIOS and UEFI)
 
 Archboot bootparameters
 
@@ -456,7 +456,7 @@ Common Installation Procedure
   Install Bootloader
 
    Choose the bootloader you want to use, if you are unsure which one to use
-   choose grub bootloader.
+   choose grub(2) bootloader.
 
   Exit Install
 

@@ -29,9 +29,9 @@ Supported boot modes of Archboot media:
 - It supports UEFI booting with gummiboot and EFISTUB,
   for booting LTS kernels with efilinux-efi.
 - It supports Secure Boot with prebootloader.
-- It supports grub's iso loopback support.
+- It supports grub(2)'s iso loopback support.
   variables used (below for example):
-  iso_loop_dev=UUID=XXXX
+  iso_loop_dev=PARTUUID=XXXX
   iso_loop_path=/blah/archboot.iso
 - It supports booting using syslinux's memdisk (only in BIOS mode).
 
@@ -59,7 +59,7 @@ Interactive setup features:
 - Filesystem support: ext2/3/4, btrfs, f2fs, nilfs2, reiserfs,xfs,jfs,
   ntfs-3g,vfat
 - Name scheme support: PARTUUID, PARTLABEL, FSUUID, FSLABEL and KERNEL
-- Mount support of grub loopback and memdisk installation media
+- Mount support of grub(2) loopback and memdisk installation media
 - Package selection support
 - Signed package installation
 - hwdetect script is used for preconfiguration
@@ -67,24 +67,18 @@ Interactive setup features:
   mkinitcpio.conf, systemd, crypttab and mdadm.conf
 - Configuration of basic system files
 - Setting root password
-- grub-bios, grub-efi-x86_64, grub-efi-i386, refind-efi-x86_64, gummiboot,
-  efilinux-efi, extlinux/syslinux bootloader support
+- grub(2) (BIOS and UEFI), refind-efi, gummiboot,
+  efilinux-efi, syslinux (BIOS and UEFI) bootloader support
 
 FAQ, Known Issues and limitations:
 - Release specific known issues and workarounds are posted in changelog files.
 - Check also the forum threads for posted fixes and workarounds.
 - Why screen stays blank or other weird screen issues happen?
   Some hardware doesn't like the KMS activation, 
-  use radeon.modeset=0 or i915.modeset=0 on boot prompt.
+  use nouveau.modeset=0 or radeon.modeset=0 or i915.modeset=0 or nomodeset on boot prompt.
 - dmraid might be broken on some boards, support is not perfect here.
   The reason is there are so many different hardware components out there. 
   At the moment 1.0.0rc16 is included, with latest fedora patchset.
-- grub2 cannot detect correct bios boot order:
-  It may happen that hd(x,x) entries are not correct, 
-  thus first reboot may not work.
-  Reason: grub cannot detect bios boot order.
-  Fix: Either change bios boot order or change menu.lst to correct entries
-  after successful boot. This cannot be fixed it is a restriction in grub2!
 - Why is parted used in setup routine, instead of cfdisk in 
   msdos partitiontable mode?
   - parted is the only linux partition program that can handle all type of 
