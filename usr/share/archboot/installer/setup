@@ -2037,8 +2037,10 @@ check_uefisyspart() {
             DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
-        UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
+        if [[ "${S_MKFSAUTO}" != "1" ]]; then
+            DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+            UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
+        fi
         
         umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
         umount "${UEFISYS_PART}" &> /dev/null
@@ -3631,6 +3633,88 @@ do_uefi_bootmgr_setup() {
     
 }
 
+do_efistub_copy_to_efisys() {
+    
+    if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
+        [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
+        _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
+        
+        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
+        
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        
+        #######################
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
+
+[Path]
+PathChanged=/boot/${VMLINUZ}
+PathChanged=/boot/${INITRAMFS}.img
+PathChanged=/boot/${INITRAMFS}-fallback.img
+Unit=efistub_copy.service
+
+[Install]
+WantedBy=multi-user.target
+CONFEOF
+        
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
+CONFEOF
+        
+        chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
+    fi
+     
+    ###########################
+    
+    _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
+    _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
+    
+    UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
+    UEFISYS_PART_FS_LABEL="$(getfslabel "${_uefisysdev}")"
+    UEFISYS_PART_GPT_GUID="$(getpartuuid "${_uefisysdev}")"
+    UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
+    
+    ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
+    _KERNEL_PARAMS_UEFI="${_KERNEL_PARAMS_UEFI_MOD}"
+    
+    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+        _KERNEL="\\${VMLINUZ}"
+        _KERNEL_NORMAL="/${VMLINUZ}"
+        
+        _INITRD="\\${INITRAMFS}.img"
+        _INITRD_NORMAL="/${INITRAMFS}.img"
+        
+        _INITRD_FALLBACK="\\${INITRAMFS}-fallback.img"
+        _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
+    else
+        _KERNEL="\\EFI\\arch\\${_EFISTUB_KERNEL}"
+        _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
+        
+        _INITRD="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
+        _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        
+        _INITRD_FALLBACK="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
+        _INITRD_FALLBACK_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+    fi
+    
+}
+
 do_efistub_uefi() {
     
     do_uefi_setup_env_vars
@@ -3658,77 +3742,11 @@ do_efistub_uefi() {
         RAID_ON_LVM=""
         common_bootloader_checks
         
-        if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-            _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
-            [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
-            _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
-            
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
-            
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-            
-            cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-            cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-            cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-            
-            #######################
-            
-            cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
-
-[Path]
-PathChanged=/boot/${VMLINUZ}
-PathChanged=/boot/${INITRAMFS}.img
-PathChanged=/boot/${INITRAMFS}-fallback.img
-Unit=efistub_copy.service
-
-[Install]
-WantedBy=multi-user.target
-CONFEOF
-            
-            cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
-CONFEOF
-            
-            chroot "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
-        fi
-        
-        ###########################
-        
-        _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
-        _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
-        
-        UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
-        UEFISYS_PART_FS_LABEL="$(getfslabel "${_uefisysdev}")"
-        UEFISYS_PART_GPT_GUID="$(getpartuuid "${_uefisysdev}")"
-        UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
-        
-        ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-        _KERNEL_PARAMS="${_KERNEL_PARAMS_UEFI_MOD}"
-        
-        if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-            _KERNEL="\\${VMLINUZ}"
-            _INITRD="\\${INITRAMFS}.img"
-            _INITRD_FALLBACK="\\${INITRAMFS}-fallback.img"
-        else
-            _KERNEL="\\EFI\\arch\\${_EFISTUB_KERNEL}"
-            _INITRD="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
-            _INITRD_FALLBACK="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
-        fi
+        do_efistub_copy_to_efisys
         
         if [[ "${_EFILINUX}" == "1" ]]; then
             cat << CONFEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
--f ${_KERNEL} ${_KERNEL_PARAMS} initrd=${_INITRD_FALLBACK}
+-f ${_KERNEL} ${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK}
 CONFEOF
         fi
         
@@ -3759,7 +3777,7 @@ CONFEOF
                     _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
                     _BOOTMGR_LOADER_DIR="arch"
                     _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
-                    _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS} initrd=${_INITRD}"
+                    _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
                     do_uefi_bootmgr_setup
                 fi
             fi
@@ -3801,17 +3819,17 @@ GUMEOF
         
     else
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-title    Arch Linux Core Kernel
-linux    ${_KERNEL}
-initrd   ${_INITRD}
-options  ${_KERNEL_PARAMS}
+title    Arch Linux
+linux    ${_KERNEL_NORMAL}
+initrd   ${_INITRD_NORMAL}
+options  ${_KERNEL_PARAMS_UEFI}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-title    Arch Linux Core Kernel Fallback Initramfs
-linux    ${_KERNEL}
-initrd   ${_INITRD_FALLBACK}
-options  ${_KERNEL_PARAMS}
+title    Arch Linux Fallback
+linux    ${_KERNEL_NORMAL}
+initrd   ${_INITRD_FALLBACK_NORMAL}
+options  ${_KERNEL_PARAMS_UEFI}
 GUMEOF
         
         cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
@@ -3911,8 +3929,8 @@ REFINDEOF
         fi
         
         cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS} initrd=${_INITRD}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS} initrd=${_INITRD_FALLBACK}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK}"
 REFINDEOF
         
     fi
@@ -3962,14 +3980,51 @@ do_syslinux_common_before() {
 
 do_syslinux_config() {
     
-    [[ -e "${TEMPDIR}/${SYSLINUX_CONF}" ]] && rm -f "${TEMPDIR}/${SYSLINUX_CONF}"
-    
-    cat << EOF > "${TEMPDIR}/${SYSLINUX_CONF}"
+    if [[ "${_SYSLINUX_UEFI}" == "1" ]]; then
+        _SYSLINUX_UEFI_CONFIG_PATH="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
+        
+        cat << EOF > "${_SYSLINUX_UEFI_CONFIG_PATH}"
+PATH /EFI/syslinux
+
 UI vesamenu.c32
+DEFAULT arch
+
 PROMPT 0
+TIMEOUT 100
+ONTIMEOUT arch
+
+LABEL arch
+    MENU LABEL Arch Linux
+    LINUX ${_KERNEL_NORMAL}
+    APPEND ${_KERNEL_PARAMS_UEFI}
+    INITRD ${_INITRD_NORMAL}
+
+LABEL arch-fallback
+    MENU LABEL Arch Linux Fallback
+    LINUX ${_KERNEL_NORMAL}
+    APPEND ${_KERNEL_PARAMS_UEFI}
+    INITRD ${_INITRD_FALLBACK_NORMAL}
+
+EOF
+        
+        DIALOG --msgbox "You must review the syslinux configuration file.  You will now be put into the editor.  After you save your changes and exit the editor." 0 0
+        geteditor || return 1
+        "${EDITOR}" "${_SYSLINUX_UEFI_CONFIG_PATH}"
+    fi
+    
+    if [[ "${_SYSLINUX_BIOS}" == "1" ]]; then
+        _SYSLINUX_BIOS_CONFIG_PATH="${DESTDIR}/boot/${SYSLINUX_DIR}/syslinux.cfg"
+        
+        cat << EOF > "${_SYSLINUX_BIOS_CONFIG_PATH}"
+PATH ${subdir}/${SYSLINUX_DIR}
+UI vesamenu.c32
+
+PROMPT 0
+TIMEOUT 100
+ONTIMEOUT arch
+
 MENU TITLE Arch Linux
 MENU BACKGROUND ${subdir}/${SYSLINUX_DIR}/splash.png
-TIMEOUT 300
 
 MENU WIDTH 78
 MENU MARGIN 4
@@ -3993,39 +4048,29 @@ MENU COLOR timeout      1;37;40 #c0ffffff #00000000 std
 MENU COLOR msg07        37;40   #90ffffff #a0000000 std
 MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
 
-ONTIMEOUT arch
+LABEL arch
+TEXT HELP
+Boot Arch Linux
+ENDTEXT
+    MENU LABEL Arch Linux
+    LINUX ${subdir}/${VMLINUZ}
+    APPEND ${_KERNEL_PARAMS_BIOS_MOD}
+    INITRD ${subdir}/${INITRAMFS}.img
+
+LABEL arch-fallback
+TEXT HELP
+Boot Arch Linux Fallback
+ENDTEXT
+    MENU LABEL Arch Linux
+    LINUX ${subdir}/${VMLINUZ}
+    APPEND ${_KERNEL_PARAMS_BIOS_MOD}
+    INITRD ${subdir}/${INITRAMFS}-fallback.img
+
 EOF
-    sort /tmp/.device-names >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "label arch" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "TEXT HELP" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "Boot Arch Linux" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "ENDTEXT" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "MENU LABEL Arch Linux" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "LINUX ${subdir}/${VMLINUZ}" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    
-    if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" || "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-        echo "append initrd=${subdir}/${INITRAMFS}.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    else
-        echo "append initrd=${subdir}/${INITRAMFS}.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP} ro" | sed -e 's#  # #g' >> "${TEMPDIR}/${SYSLINUX_CONF}"
+        DIALOG --msgbox "You must review the syslinux configuration file.  You will now be put into the editor.  After you save your changes and exit the editor." 0 0
+        geteditor || return 1
+        "${EDITOR}" "${_SYSLINUX_BIOS_CONFIG_PATH}"
     fi
-    
-    echo "label fallback" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "TEXT HELP" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "Boot Arch Linux Fallback" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "ENDTEXT" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "MENU LABEL Arch Linux Fallback" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    echo "LINUX ${subdir}/${VMLINUZ}" >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    
-    if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" || "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-        echo "append initrd=${subdir}/${INITRAMFS}-fallback.img root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    else
-        echo "append initrd=${subdir}/${INITRAMFS}-fallback.img root=${PART_ROOT} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}" | sed -e 's#  # #g' >> "${TEMPDIR}/${SYSLINUX_CONF}"
-    fi
-    
-    # edit config file
-    DIALOG --msgbox "Before installing ${SYSLINUX}, you must review the configuration file.  You will now be put into the editor.  After you save your changes and exit the editor, ${SYSLINUX} will be installed." 0 0
-    geteditor || return 1
-    "${EDITOR}" "${TEMPDIR}/${SYSLINUX_CONF}"
     
 }
 
@@ -4042,10 +4087,16 @@ do_syslinux_uefi() {
     run_pacman
     unset PACKAGES
     
+    do_syslinux_common_before
+    
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
     cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
     
+    do_efistub_copy_to_efisys
+    
+    _SYSLINUX_UEFI="1"
     do_syslinux_config
+    _SYSLINUX_UEFI=""
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
         _BOOTMGR_LABEL="Syslinux"
@@ -4194,7 +4245,9 @@ do_syslinux_bios() {
         fi
     fi
     
+    _SYSLINUX_BIOS="1"
     do_syslinux_config
+    _SYSLINUX_BIOS=""
     
     [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     
