@@ -3667,7 +3667,7 @@ do_uefi_secure_boot_preloader() {
         cp -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
         cp -f "${DESTDIR}/usr/lib/prebootloader/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/HashTool.efi"
         
-        _BOOTMGR_LABEL="Secure Boot (Preloader)"
+        _BOOTMGR_LABEL="Secure Boot (PreLoader)"
         _BOOTMGR_LOADER_DIR="boot"
         _BOOTMGR_LOADER_FILE="boot${_SPEC_UEFI_ARCH}.efi"
         _BOOTMGR_LOADER_PARAMETERS=""
