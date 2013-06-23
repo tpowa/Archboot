@@ -3583,9 +3583,10 @@ do_uefi_common() {
 }
 
 do_uefi_efibootmgr() {
+    
     chroot_mount
-        
-    if [[ -d "${DESTDIR}/sys/firmware/efi/vars" ]]; then
+    
+    if [[ -d "${DESTDIR}/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
@@ -3596,11 +3597,11 @@ done
 if [[ "${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
     _EXTRA_PARAMS=""
 else
-    _EXTRA_PARAMS="--UCS-2 "${_EFIBOOTMGR_LOADER_PARAMETERS}""
+    _EXTRA_PARAMS="--unicode "${_EFIBOOTMGR_LOADER_PARAMETERS}""
 fi
 
 echo
-efibootmgr --verbose --create --write-signature --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "/EFI/${_EFIBOOTMGR_LOADER_DIR}/${_EFIBOOTMGR_LOADER_FILE}" --label "${_EFIBOOTMGR_LABEL}" ${_EXTRA_PARAMS}
+efibootmgr --verbose --create --write-signature --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" ${_EXTRA_PARAMS}
 echo
 
 EFIBEOF
@@ -3617,8 +3618,7 @@ EFIBEOF
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
     unset _EFIBOOTMGR_PART_NUM
-    unset _EFIBOOTMGR_LOADER_DIR
-    unset _EFIBOOTMGR_LOADER_FILE
+    unset _EFIBOOTMGR_LOADER_PATH
     unset _EFIBOOTMGR_LOADER_PARAMETERS
     
 }
@@ -3647,8 +3647,7 @@ do_uefi_bootmgr_setup() {
         _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
         _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
         _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
-        _EFIBOOTMGR_LOADER_DIR="${_BOOTMGR_LOADER_DIR}"
-        _EFIBOOTMGR_LOADER_FILE="${_BOOTMGR_LOADER_FILE}"
+        _EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
         _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
         do_uefi_efibootmgr
     fi
@@ -3656,8 +3655,7 @@ do_uefi_bootmgr_setup() {
     unset _BOOTMGR_LABEL
     unset _BOOTMGR_DISC
     unset _BOOTMGR_PART_NUM
-    unset _BOOTMGR_LOADER_DIR
-    unset _BOOTMGR_LOADER_FILE
+    unset _BOOTMGR_LOADER_PATH
     unset _BOOTMGR_LOADER_PARAMETERS
     
 }
@@ -3665,17 +3663,15 @@ do_uefi_bootmgr_setup() {
 do_uefi_secure_boot_preloader() {
     
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
+        cp -r "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader"
         
-        mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/loader.efi"
+        mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/loader.efi"
         
-        cp -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-        cp -f "${DESTDIR}/usr/lib/prebootloader/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/HashTool.efi"
+        cp -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/PreLoader.efi"
+        cp -f "${DESTDIR}/usr/lib/prebootloader/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/HashTool.efi"
         
-        _BOOTMGR_LABEL="Secure Boot (PreLoader)"
-        _BOOTMGR_LOADER_DIR="boot"
-        _BOOTMGR_LOADER_FILE="boot${_SPEC_UEFI_ARCH}.efi"
-        _BOOTMGR_LOADER_PARAMETERS=""
+        _BOOTMGR_LABEL="PreLoader (Secure Boot)"
+        _BOOTMGR_LOADER_DIR="/EFI/preloader/PreLoader.efi"
         do_uefi_bootmgr_setup
     fi
     
@@ -3817,14 +3813,12 @@ CONFEOF
                 "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
                 
                 _BOOTMGR_LABEL="Arch Linux (LTS)"
-                _BOOTMGR_LOADER_DIR="efilinux"
-                _BOOTMGR_LOADER_FILE="efilinux${_SPEC_UEFI_ARCH}.efi"
+                _BOOTMGR_LOADER_PATH="/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
                 do_uefi_bootmgr_setup
             else
                 if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
                     _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                    _BOOTMGR_LOADER_DIR="arch"
-                    _BOOTMGR_LOADER_FILE="${_EFISTUB_KERNEL}"
+                    _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
                     _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
                     do_uefi_bootmgr_setup
                 fi
@@ -3898,8 +3892,7 @@ GUMEOF
         
         if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
             _BOOTMGR_LABEL="Gummiboot"
-            _BOOTMGR_LOADER_DIR="gummiboot"
-            _BOOTMGR_LOADER_FILE="gummiboot${_SPEC_UEFI_ARCH}.efi"
+            _BOOTMGR_LOADER_PATH="/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
             do_uefi_bootmgr_setup
         fi
     fi
@@ -3987,8 +3980,7 @@ REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
-        _BOOTMGR_LOADER_DIR="refind"
-        _BOOTMGR_LOADER_FILE="refind_${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "refind-efi has been setup successfully." 0 0
@@ -4152,8 +4144,7 @@ do_syslinux_uefi() {
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
         _BOOTMGR_LABEL="Syslinux"
-        _BOOTMGR_LOADER_DIR="syslinux"
-        _BOOTMGR_LOADER_FILE="syslinux.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/syslinux/syslinux.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
@@ -4880,8 +4871,7 @@ EOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux (GRUB)"
-        _BOOTMGR_LOADER_DIR="arch_grub"
-        _BOOTMGR_LOADER_FILE="grub${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} has been successfully installed." 0 0
