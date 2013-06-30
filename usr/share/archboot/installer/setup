@@ -3531,7 +3531,7 @@ detect_uefi_secure_boot() {
 
 detect_uefi_boot() {
     
-    modprobe efivarfs || modprobe efivars
+    modprobe -q efivarfs || modprobe -q efivars
     
     if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         _DETECTED_UEFI_BOOT="1"
@@ -3583,6 +3583,8 @@ do_uefi_common() {
 }
 
 do_uefi_efibootmgr() {
+    
+    modprobe -q efivars
     
     chroot_mount
     
