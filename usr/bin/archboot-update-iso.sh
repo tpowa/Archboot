@@ -189,16 +189,6 @@ LINUX /boot/vmlinuz_x86_64
 APPEND gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_x86_64.img
 
-LABEL arch64-lts
-TEXT HELP
-Boot the Arch Linux LTS (x86_64) archboot medium. 
-It allows you to install Arch Linux or perform system maintenance.
-ENDTEXT
-MENU LABEL Boot Arch Linux LTS (x86_64)
-LINUX /boot/vmlinuz_x86_64_lts
-APPEND gpt loglevel=7 rootdelay=10
-INITRD /boot/initramfs_x86_64.img
-
 EOF
 	fi
 	
@@ -212,16 +202,6 @@ It allows you to install Arch Linux or perform system maintenance.
 ENDTEXT
 MENU LABEL Boot Arch Linux (i686)
 LINUX /boot/vmlinuz_i686
-APPEND gpt loglevel=7 rootdelay=10
-INITRD /boot/initramfs_i686.img
-
-LABEL arch32-lts
-TEXT HELP
-Boot the Arch Linux LTS (i686) archboot medium. 
-It allows you to install Arch Linux or perform system maintenance.
-ENDTEXT
-MENU LABEL Boot Arch Linux LTS (i686)
-LINUX /boot/vmlinuz_i686_lts
 APPEND gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_i686.img
 
@@ -344,12 +324,7 @@ linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
 options  gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
 GUMEOF
-	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux._conf"
-title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-GUMEOF
-	
+		
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
 title    UEFI Shell ${_UEFI_ARCH} v2
 efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
@@ -370,9 +345,6 @@ GUMEOF
 	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
 	echo
 	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux.cfg"
--f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
-EOF
 	echo
 	
 }
@@ -427,14 +399,6 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     graphics off
 }
 
-menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-    ostype Linux
-    graphics off
-    disabled
-}
-
 menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
     icon /EFI/refind/icons/tool_shell.icns
     loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
@@ -453,7 +417,6 @@ EOF
 
 _remove_i686_iso_files() {
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_i686_lts" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_i686" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/initramfs_i686.img" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/packages/archboot_packages_i686.squashfs" || true
@@ -464,7 +427,6 @@ _remove_i686_iso_files() {
 _remove_x86_64_iso_files() {
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI" || true
         rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_x86_64_lts" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_x86_64" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/initramfs_x86_64.img" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/packages/archboot_packages_x86_64.squashfs" || true
