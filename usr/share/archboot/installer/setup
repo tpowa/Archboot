@@ -3872,10 +3872,12 @@ CONFEOF
                 do_uefi_bootmgr_setup
             else
                 if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-                    _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                    _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
-                    _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
-                    do_uefi_bootmgr_setup
+                    # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+                    # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
+                    # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
+                    # do_uefi_bootmgr_setup
+                    
+                    true
                 fi
             fi
             
