@@ -29,7 +29,6 @@ usage () {
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
-	echo "  -lts=LTSKERNELNAME  Use LTSKERNELNAME in boot message."
 	echo "  -h                  This message."
 	exit 0
 }
@@ -37,7 +36,6 @@ usage () {
 [[ -z "${1}" ]] && usage
 
 ALLINONE_PRESET="/etc/archboot/presets/allinone"
-ALLINONE_LTS_PRESET="/etc/archboot/presets/allinone-lts"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 UPDATEISO_HELPER="/usr/bin/archboot-update-iso.sh"
 
@@ -51,7 +49,6 @@ while [ $# -gt 0 ]; do
 		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-lts=*|--lts=*) LTS_KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -72,7 +69,6 @@ done
 
 if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${ALLINONE_PRESET}" -t="core-$(uname -m).tar"
-	"${TARBALL_HELPER}" -c="${ALLINONE_LTS_PRESET}" -t="core-lts-$(uname -m).tar"
 	exit 0
 fi
 
@@ -82,7 +78,6 @@ fi
 
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
-[[ -z "${LTS_KERNEL}" ]] && LTS_KERNEL="$(cat /lib/modules/extramodules-3.0-lts/version)"
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="2k13-R2"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
@@ -114,7 +109,6 @@ _merge_initramfs_files() {
 		cd "${CORE64}/tmp/initrd"
 		
 		bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img
-		bsdtar xf "${CORE64_LTS}/tmp"/*/boot/initrd.img
 		
 		cd  "${CORE64}/tmp/initrd"
 		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/tmp/initramfs_x86_64.img"
@@ -125,7 +119,6 @@ _merge_initramfs_files() {
 		cd "${CORE}/tmp/initrd"
 		
 		bsdtar xf "${CORE}/tmp"/*/boot/initrd.img
-		bsdtar xf "${CORE_LTS}/tmp"/*/boot/initrd.img
 		
 		cd  "${CORE}/tmp/initrd"
 		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE}/tmp/initramfs_i686.img"
@@ -139,13 +132,11 @@ _prepare_kernel_initramfs_files() {
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
 		mv "${CORE64}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_x86_64"
-		mv "${CORE64_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_x86_64_lts"
 		mv "${CORE64}/tmp/initramfs_x86_64.img" "${ALLINONE}/boot/initramfs_x86_64.img"
 	fi
 	
 	if [[ "${_DO_i686}" == "1" ]]; then
 		mv "${CORE}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_i686"
-		mv "${CORE_LTS}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_i686_lts"
 		mv "${CORE}/tmp/initramfs_i686.img" "${ALLINONE}/boot/initramfs_i686.img"
 	fi
 	
@@ -231,12 +222,7 @@ linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
 options  gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
 GUMEOF
-	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux._conf"
-title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-GUMEOF
-	
+		
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
 title    UEFI Shell ${_UEFI_ARCH} v2
 efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
@@ -251,14 +237,7 @@ GUMEOF
 title    rEFInd ${_UEFI_ARCH}
 efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
 GUMEOF
-	
-	mkdir -p "${ALLINONE}/EFI/efilinux"
-	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
-	
-	cat << EOF > "${ALLINONE}/EFI/efilinux/efilinux.cfg"
--f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
-EOF
-	
+		
 }
 
 _prepare_uefi_rEFInd_USB_files() {
@@ -305,14 +284,6 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     graphics off
 }
 
-menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-    ostype Linux
-    graphics off
-    disabled
-}
-
 menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
     icon /EFI/refind/icons/tool_shell.icns
     loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
@@ -349,7 +320,7 @@ unset _SPEC_UEFI_ARCH
 mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g"  -e "s/@@LTS_KERNEL@@/$LTS_KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
 
 cd "${WD}/"
 
@@ -430,7 +401,5 @@ sha256sum *.iso > "${WD}/sha256sums.txt"
 # cleanup
 rm -rf "${CORE}"
 rm -rf "${CORE64}"
-rm -rf "${CORE_LTS}"
-rm -rf "${CORE64_LTS}"
 rm -rf "${PACKAGES_TEMP_DIR}"
 rm -rf "${ALLINONE}"
