@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 18th 2013
+   July, 3rd 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -65,7 +65,6 @@ Introduction
 
    * It provides an additional interactive setup and quickinst script.
    * It contains [core] repository on media.
-   * It provides the long time support kernel as boot and installation option.
    * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
@@ -74,8 +73,7 @@ Introduction
 
   What are the supported boot modes of Archboot media?
    * It supports BIOS booting with syslinux.
-   * It supports UEFI booting with gummiboot and EFISTUB,
-     for booting LTS kernels with efilinux-efi.
+   * It supports UEFI booting with gummiboot and EFISTUB.
    * It supports Secure Boot with prebootloader.
    * It supports grub(2)'s iso loopback support.
      variables used (below for example):
