@@ -8,7 +8,7 @@ build ()
              ncurses net-tools gnu-netcat pcmciautils procps-ng psmisc reiserfsprogs sed snarf \
              tar util-linux which wireless_tools xfsprogs dnsutils hdparm memtest86+ \
              inetutils openssh hwdetect shadow bridge-utils ifenslave cpupower links \
-             dosfstools filesystem linux linux-lts glibc linux-api-headers \
+             dosfstools filesystem linux glibc linux-api-headers \
              links pacman pacman-mirrorlist screen kbd pam dhcpcd bzip2 gcc-libs openssl zlib \
              elfutils gpm sysfsutils libgcrypt libgpg-error popt kexec-tools ppp libpcap rp-pppoe \
              iptables ntfs-3g isdn4k-utils pciutils usbutils vpnc openvpn b43-fwcutter \
