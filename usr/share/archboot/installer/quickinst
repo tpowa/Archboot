@@ -7,7 +7,6 @@ PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --nopro
 
 # name of kernel package
 KERNELPKG="linux"
-[[ "$(uname -r | grep lts)" ]] && KERNELPKG="linux-lts"
 # name of the kernel image
 VMLINUZ="vmlinuz-${KERNELPKG}"
 
