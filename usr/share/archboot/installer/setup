@@ -16,7 +16,6 @@ UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
 KERNELPKG="linux"
-[[ "$(uname -r | grep lts)" ]] && KERNELPKG="linux-lts"
 # name of the kernel image
 VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
@@ -1758,7 +1757,7 @@ autoprepare() {
         [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
         [[ "$(which mkfs.btrfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
         [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
-        [[ "$(which mkfs.f2fs 2>/dev/null)" && ! "$(uname -r | grep lts)" ]] && FSOPTS="${FSOPTS} f2fs F2FS-(Experimental)"
+        [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS-(Experimental)"
         [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
@@ -2452,7 +2451,7 @@ select_filesystem() {
     [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
     [[ "$(which mkfs.btrfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} btrfs Btrfs-(Experimental)"
     [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2-(Experimental)"
-    [[ "$(which mkfs.f2fs 2>/dev/null)" && ! "$(uname -r | grep lts)" ]] && FSOPTS="${FSOPTS} f2fs F2FS-(Experimental)"
+    [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS-(Experimental)"
     [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
@@ -3817,21 +3816,7 @@ CONFEOF
 do_efistub_uefi() {
     
     do_uefi_setup_env_vars
-    
-    if [[ "${KERNELPKG}" == "linux-lts" ]]; then
-        PACKAGES="efilinux-efi"
-        run_pacman
-        unset PACKAGES
-        
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/"
-        cp -f "${DESTDIR}/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
-        
-        _EFILINUX="1"
-        _CONTINUE="1"
-    else
-        _CONTINUE="1"
-    fi
-    
+    _CONTINUE="1"
     if [[ "${_CONTINUE}" == "1" ]]; then
         bootdev=""
         grubdev=""
