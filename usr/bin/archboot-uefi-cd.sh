@@ -51,7 +51,7 @@ bsdtar -C "${ISOIMG}" -xf "${INPUT_IMAGENAME}"
 # 7z x -o /tmp/ARCHBOOTISO/ "${INPUT_IMAGENAME}"
 
 ## get size of boot x86_64 files
-BOOTSIZE=$(du -bc ${ISOIMG}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
+BOOTSIZE=$(du -bc ${ISOIMG}/{EFI,loader,boot/vmlinuz_x86_64,boot/initramfs_x86_64.img} | grep total | cut -f1)
 IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 ## Create cdefiboot.img
@@ -64,8 +64,8 @@ mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
 
 ## Copy UEFI files fo cdefiboot.img
 mkdir "${MOUNT_FSIMG}"/boot
-cp -r "${ISOIMG}"/{EFI,loader} "${MOUNT_FSIMG}"
-cp "${ISOIMG}"/boot/*x86_64* "${MOUNT_FSIMG}"/boot
+cp -r "${ISOIMG}"/{EFI,loader} "${MOUNT_FSIMG}"/
+cp "${ISOIMG}"/boot/vmlinuz_x86_64 "${ISOIMG}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot/
 
 ## Unmount cdefiboot.img
 umount "${LOOPDEV}"

@@ -3505,7 +3505,7 @@ bootloader_kernel_parameters() {
     
     ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
     _KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_no_storage_paranoia add_efi_memmap" 
     
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"

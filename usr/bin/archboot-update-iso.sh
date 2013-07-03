@@ -342,10 +342,10 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap
+options  gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux.conf"
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-lts-efilinux._conf"
 title    Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX
 efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
 GUMEOF
@@ -371,7 +371,7 @@ GUMEOF
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux.cfg"
--f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
+-f \\boot\\vmlinuz_${_UEFI_ARCH}_lts gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap initrd=\\boot\\initramfs_${_UEFI_ARCH}.img
 EOF
 	echo
 	
@@ -422,7 +422,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap"
+    options "gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap"
     ostype Linux
     graphics off
 }
@@ -432,6 +432,7 @@ menuentry "Arch Linux LTS ${_UEFI_ARCH} Archboot via EFILINUX" {
     loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
     ostype Linux
     graphics off
+    disabled
 }
 
 menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
@@ -531,10 +532,10 @@ _download_pkgs() {
 }
 
 _update_cd_uefi() {
-        MOUNT_FSIMG=$(mktemp -d)
+	MOUNT_FSIMG=$(mktemp -d)
 
 	## get size of boot x86_64 files
-	BOOTSIZE=$(du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/*x86_64*} | grep total | cut -f1)
+	BOOTSIZE=$(du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/vmlinuz_x86_64,boot/initramfs_x86_64.img} | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 	## Create cdefiboot.img
@@ -548,8 +549,8 @@ _update_cd_uefi() {
 
 	## Copy UEFI files fo cdefiboot.img
 	mkdir "${MOUNT_FSIMG}"/boot
-	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"
-	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/*x86_64* "${MOUNT_FSIMG}"/boot
+	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"/
+	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/vmlinuz_x86_64 "${_ARCHBOOT_ISO_EXT_DIR}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot/
 
 	## Unmount cdefiboot.img
 	umount "${LOOPDEV}"
