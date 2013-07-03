@@ -3531,14 +3531,31 @@ detect_uefi_secure_boot() {
 
 detect_uefi_boot() {
     
-    modprobe -q efivarfs || modprobe -q efivars
+    modprobe -q -r efivars || true
+    
+    umount /sys/firmware/efi/efivars || true
+    modprobe -q -r efivarfs || true
+    
+    modprobe -q efivarfs || true
+    mount -t efivarfs efivarfs /sys/firmware/efi/efivars || true
     
     if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         _DETECTED_UEFI_BOOT="1"
-    elif [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-        _DETECTED_UEFI_BOOT="1"
-    else
-        _DETECTED_UEFI_BOOT="0"
+        _DETECTED_EFIVARFS="1"
+    fi
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" != "1" ]]; then
+        umount /sys/firmware/efi/efivars || true
+        modprobe -q -r efivarfs || true
+        modprobe -q efivars
+        
+        if [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+            _DETECTED_UEFI_BOOT="1"
+        else
+            _DETECTED_UEFI_BOOT="0"
+        fi
+        
+        _DETECTED_EFIVARFS="0"
     fi
     
     detect_uefi_secure_boot
@@ -3582,7 +3599,27 @@ do_uefi_common() {
     
 }
 
+do_uefi_systemd_bootctl() {
+    
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        modprobe -q -r efivars || true
+        
+        modprobe -q efivarfs
+        mount -t efivarfs efivarfs /sys/firmware/efi/efivars || true
+        
+        chroot_mount
+        chroot "${DESTDIR}" "/usr/bin/bootctl" --efisys="${_SYSTEMD_BOOTCTL_EFISYS}" --loader="${_SYSTEMD_BOOTCTL_LOADER}" --label="${_SYSTEMD_BOOTCTL_LABEL}" install
+        chroot_umount
+    fi
+    
+}
+
 do_uefi_efibootmgr() {
+    
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        umount /sys/firmware/efi/efivars
+        modprobe -q -r efivarfs || true
+    fi
     
     modprobe -q efivars
     
@@ -3617,6 +3654,13 @@ EFIBEOF
         
     chroot_umount
     
+    modprobe -q -r efivars || true
+    
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        modprobe -q efivarfs
+        mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+    fi
+    
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
     unset _EFIBOOTMGR_PART_NUM
@@ -3646,12 +3690,21 @@ do_uefi_bootmgr_setup() {
         do_apple_efi_hfs_bless
     else
         ## For all the non-Mac UEFI systems
-        _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
-        _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
-        _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
-        _EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
-        _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
-        do_uefi_efibootmgr
+        
+        # if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+            _SYSTEMD_BOOTCTL_EFISYS="${UEFISYS_MOUNTPOINT}"
+            _SYSTEMD_BOOTCTL_LOADER="${_BOOTMGR_LOADER_PATH}"
+            _SYSTEMD_BOOTCTL_LABEL="${_BOOTMGR_LABEL}"
+            _SYSTEMD_BOOTCTL_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
+            # do_uefi_systemd_bootctl
+        # else
+            _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
+            _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
+            _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
+            _EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
+            _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
+            do_uefi_efibootmgr
+        # fi
     fi
     
     unset _BOOTMGR_LABEL
