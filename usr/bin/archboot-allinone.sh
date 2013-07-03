@@ -150,33 +150,29 @@ _prepare_packages() {
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
 		CORE64="$(mktemp -d /tmp/core64.XXX)"
-		CORE64_LTS="$(mktemp -d /tmp/core64-lts.XXX)"
 		
 		tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
-		tar xvf core-lts-x86_64.tar -C "${CORE64_LTS}" || exit 1
 		
-		cp -rf "${CORE64_LTS}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
-		rm -rf "${CORE64_LTS}/tmp"/*/core-x86_64
+		cp -rf "${CORE64}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
+		rm -rf "${CORE64}/tmp"/*/core-x86_64
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
 		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${ALLINONE}/packages/"
 	fi
 	
 	if [[ "${_DO_i686}" == "1" ]]; then
 		CORE="$(mktemp -d /tmp/core.XXX)"
-		CORE_LTS="$(mktemp -d /tmp/core-lts.XXX)"
 		
 		tar xvf core-i686.tar -C "${CORE}" || exit 1
-		tar xvf core-lts-i686.tar -C "${CORE_LTS}" || exit 1
 		
-		cp -rf "${CORE_LTS}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
-		rm -rf "${CORE_LTS}/tmp"/*/core-i686
+		cp -rf "${CORE}/tmp"/*/core-i686 "${PACKAGES_TEMP_DIR}/core-i686"
+		rm -rf "${CORE}/tmp"/*/core-i686
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-i686/" "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" -comp xz -noappend -all-root
 		mv "${PACKAGES_TEMP_DIR}/archboot_packages_i686.squashfs" "${ALLINONE}/packages/"
 	fi
 	
 	# move in 'any' packages
-	cp -rf "${CORE_LTS}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
-	rm -rf "${CORE_LTS}/tmp"/*/core-any
+	cp -rf "${CORE}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
+	rm -rf "${CORE}/tmp"/*/core-any
 	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
 	
 	cd "${WD}/"
