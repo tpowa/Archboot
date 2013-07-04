@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 ### general setup stuff
 SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE=""

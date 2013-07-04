@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # 
 #    copy-mointpoint.sh - copy recursivly a mountpoint using tar
 #    by Tobias Powalowski <tpowa@archlinux.org>

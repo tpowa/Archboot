@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 # Settings
 APPNAME=$(basename "${0}")

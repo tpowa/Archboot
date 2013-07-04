@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 PACKAGES=""
 for i in $PACKAGES; do
 	k=$(find ./ -type d -name $i)

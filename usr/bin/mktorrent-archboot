@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # install mktorrent from http://mktorrent.sourceforge.net/
 # check result on e.g. http://torrenteditor.com/
