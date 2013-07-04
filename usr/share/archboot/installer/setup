@@ -3486,98 +3486,98 @@ abort_f2fs_bootpart() {
 }
 
 bootloader_kernel_parameters() {
-	
-	_rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
-	
-	ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
-	ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
-	ROOT_PART_GPT_GUID="$(getpartuuid "${_rootdev}")"
-	ROOT_PART_GPT_LABEL="$(getpartlabel "${_rootdev}")"
-	
-	getrootfstype
-	
-	[[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
-	[[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
-	[[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
-	[[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
-	[[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
-	
-	## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-	_KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
-	_KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
-	
-	_KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-	_KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-	
+    
+    _rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
+    
+    ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
+    ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
+    ROOT_PART_GPT_GUID="$(getpartuuid "${_rootdev}")"
+    ROOT_PART_GPT_LABEL="$(getpartlabel "${_rootdev}")"
+    
+    getrootfstype
+    
+    [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
+    [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
+    [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
+    
+    ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
+    _KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
+    
+    _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    
 }
 
 detect_uefi_secure_boot() {
-	
-	if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-		if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-			uefi_switch_to_efivarfs
-		else
-			uefi_switch_to_sysfs_efivars
-		fi
-		
-		_SECUREBOOT_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
-		_SETUPMODE_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
-		
-		if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
-			_DETECTED_UEFI_SECURE_BOOT="1"
-		else
-			_DETECTED_UEFI_SECURE_BOOT="0"
-		fi
-	else
-		_DETECTED_UEFI_SECURE_BOOT="0"
-	fi
-	
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+        if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+            uefi_switch_to_efivarfs
+        else
+            uefi_switch_to_sysfs_efivars
+        fi
+        
+        _SECUREBOOT_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
+        _SETUPMODE_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
+        
+        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
+            _DETECTED_UEFI_SECURE_BOOT="1"
+        else
+            _DETECTED_UEFI_SECURE_BOOT="0"
+        fi
+    else
+        _DETECTED_UEFI_SECURE_BOOT="0"
+    fi
+    
 }
 
 uefi_switch_to_efivarfs() {
-	
-	modprobe -q -r efivars
-	
-	umount /sys/firmware/efi/efivars || true
-	modprobe -q -r efivarfs || true
-	
-	modprobe -q efivarfs
-	mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
-	
+    
+    modprobe -q -r efivars
+    
+    umount /sys/firmware/efi/efivars || true
+    modprobe -q -r efivarfs || true
+    
+    modprobe -q efivarfs
+    mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
+    
 }
 
 uefi_switch_to_sysfs_efivars() {
-	
-	umount /sys/firmware/efi/efivars || true
-	modprobe -q -r efivarfs || true
-	
-	modprobe -q efivars
-	
+    
+    umount /sys/firmware/efi/efivars || true
+    modprobe -q -r efivarfs || true
+    
+    modprobe -q efivars
+    
 }
 
 detect_uefi_boot() {
-	
-	uefi_switch_to_efivarfs
-	
-	if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-		_DETECTED_UEFI_BOOT="1"
-		_DETECTED_EFIVARFS="1"
-	fi
-	
-	if [[ "${_DETECTED_UEFI_BOOT}" != "1" ]]; then
-		uefi_switch_to_sysfs_efivars
-		
-		if [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-			_DETECTED_UEFI_BOOT="1"
-		else
-			_DETECTED_UEFI_BOOT="0"
-		fi
-		
-		_DETECTED_EFIVARFS="0"
-	fi
-	
-	detect_uefi_secure_boot
-	
+    
+    uefi_switch_to_efivarfs
+    
+    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        _DETECTED_UEFI_BOOT="1"
+        _DETECTED_EFIVARFS="1"
+    fi
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" != "1" ]]; then
+        uefi_switch_to_sysfs_efivars
+        
+        if [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+            _DETECTED_UEFI_BOOT="1"
+        else
+            _DETECTED_UEFI_BOOT="0"
+        fi
+        
+        _DETECTED_EFIVARFS="0"
+    fi
+    
+    detect_uefi_secure_boot
+    
 }
 
 do_uefi_setup_env_vars() {
@@ -3618,23 +3618,23 @@ do_uefi_common() {
 }
 
 do_uefi_efibootmgr() {
-	
-	uefi_switch_to_sysfs_efivars
-	
-	chroot_mount
-	
-	if [[ -d "${DESTDIR}/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-		cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
+    
+    uefi_switch_to_sysfs_efivars
+    
+    chroot_mount
+    
+    if [[ -d "${DESTDIR}/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
 for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
-	efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
+    efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
 done
 
 if [[ "${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
-	_EXTRA_PARAMS=""
+    _EXTRA_PARAMS=""
 else
-	_EXTRA_PARAMS="--unicode "${_EFIBOOTMGR_LOADER_PARAMETERS}""
+    _EXTRA_PARAMS="--unicode "${_EFIBOOTMGR_LOADER_PARAMETERS}""
 fi
 
 echo
@@ -3642,63 +3642,63 @@ efibootmgr --verbose --create --write-signature --disk "${_EFIBOOTMGR_DISC}" --p
 echo
 
 EFIBEOF
-		
-		chmod a+x "${DESTDIR}/efibootmgr_run.sh"
-		chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
-		mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
-	else
-		DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} using efibootmgr." 0 0
-	fi
-	
-	chroot_umount
-	
-	if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-		uefi_switch_to_efivarfs
-	fi
-	
-	unset _EFIBOOTMGR_LABEL
-	unset _EFIBOOTMGR_DISC
-	unset _EFIBOOTMGR_PART_NUM
-	unset _EFIBOOTMGR_LOADER_PATH
-	unset _EFIBOOTMGR_LOADER_PARAMETERS
-	
+        
+        chmod a+x "${DESTDIR}/efibootmgr_run.sh"
+        chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
+        mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
+    else
+        DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} using efibootmgr." 0 0
+    fi
+    
+    chroot_umount
+    
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        uefi_switch_to_efivarfs
+    fi
+    
+    unset _EFIBOOTMGR_LABEL
+    unset _EFIBOOTMGR_DISC
+    unset _EFIBOOTMGR_PART_NUM
+    unset _EFIBOOTMGR_LOADER_PATH
+    unset _EFIBOOTMGR_LOADER_PARAMETERS
+    
 }
 
 do_apple_efi_hfs_bless() {
-	
-	## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
-	## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
-	DIALOG --msgbox "TODO: Apple Mac EFI Bootloader Setup" 0 0
-	
+    
+    ## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
+    ## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
+    DIALOG --msgbox "TODO: Apple Mac EFI Bootloader Setup" 0 0
+    
 }
 
 do_uefi_bootmgr_setup() {
-	
-	_uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
-	_DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
-	UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
-	
-	_BOOTMGR_DISC="${_DISC}"
-	_BOOTMGR_PART_NUM="${UEFISYS_PART_NUM}"
-	
-	if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
-		do_apple_efi_hfs_bless
-	else
-		## For all the non-Mac UEFI systems
-		_EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
-		_EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
-		_EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
-		_EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
-		_EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
-		do_uefi_efibootmgr
-	fi
-	
-	unset _BOOTMGR_LABEL
-	unset _BOOTMGR_DISC
-	unset _BOOTMGR_PART_NUM
-	unset _BOOTMGR_LOADER_PATH
-	unset _BOOTMGR_LOADER_PARAMETERS
-	
+    
+    _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
+    _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
+    UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
+    
+    _BOOTMGR_DISC="${_DISC}"
+    _BOOTMGR_PART_NUM="${UEFISYS_PART_NUM}"
+    
+    if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
+        do_apple_efi_hfs_bless
+    else
+        ## For all the non-Mac UEFI systems
+        _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
+        _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
+        _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
+        _EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
+        _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
+        do_uefi_efibootmgr
+    fi
+    
+    unset _BOOTMGR_LABEL
+    unset _BOOTMGR_DISC
+    unset _BOOTMGR_PART_NUM
+    unset _BOOTMGR_LOADER_PATH
+    unset _BOOTMGR_LOADER_PARAMETERS
+    
 }
 
 do_uefi_secure_boot_preloader() {
