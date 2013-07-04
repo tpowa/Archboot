@@ -3778,23 +3778,23 @@ CONFEOF
     _KERNEL_PARAMS_UEFI="${_KERNEL_PARAMS_UEFI_MOD}"
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        _KERNEL="\\${VMLINUZ}"
         _KERNEL_NORMAL="/${VMLINUZ}"
+        _KERNEL_EFIPATH="\\${VMLINUZ}"
         
-        _INITRD="\\${INITRAMFS}.img"
         _INITRD_NORMAL="/${INITRAMFS}.img"
+        _INITRD_EFIPATH="\\${INITRAMFS}.img"
         
-        _INITRD_FALLBACK="\\${INITRAMFS}-fallback.img"
         _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
+        _INITRD_FALLBACK_EFIPATH="\\${INITRAMFS}-fallback.img"
     else
-        _KERNEL="\\EFI\\arch\\${_EFISTUB_KERNEL}"
         _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
+        _KERNEL_EFIPATH="\\EFI\\arch\\${_EFISTUB_KERNEL}"
         
-        _INITRD="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        _INITRD_EFIPATH="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         
-        _INITRD_FALLBACK="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
         _INITRD_FALLBACK_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
+        _INITRD_FALLBACK_EFIPATH="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
     fi
     
 }
@@ -3815,25 +3815,23 @@ do_efistub_uefi() {
     
     ###################################
     
-    if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+        _CONTINUE="1"
+    else
         if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
             DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
-            _CONTINUE="y"
+            _CONTINUE="1"
         else
             DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
-            _CONTINUE="n"
+            _CONTINUE="0"
         fi
     fi
     
-    if [[ "${_CONTINUE}" == "y" ]]; then
-        if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-            # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-            # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
-            # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
-            # do_uefi_bootmgr_setup
-            
-            true
-        fi
+    if [[ "${_CONTINUE}" == "1" ]]; then
+        # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+        # _BOOTMGR_LOADER_PATH="${_KERNEL_NORMAL}"
+        # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
+        # do_uefi_bootmgr_setup
         
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
             "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
