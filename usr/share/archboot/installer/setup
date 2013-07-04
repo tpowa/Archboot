@@ -3504,7 +3504,7 @@ bootloader_kernel_parameters() {
     
     ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
     _KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_no_storage_paranoia add_efi_memmap" 
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
     
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
@@ -3536,7 +3536,7 @@ detect_uefi_boot() {
     modprobe -q -r efivarfs || true
     
     modprobe -q efivarfs || true
-    mount -t efivarfs efivarfs /sys/firmware/efi/efivars || true
+    mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars || true
     
     if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         _DETECTED_UEFI_BOOT="1"
@@ -3604,7 +3604,7 @@ do_uefi_systemd_bootctl() {
         modprobe -q -r efivars || true
         
         modprobe -q efivarfs
-        mount -t efivarfs efivarfs /sys/firmware/efi/efivars || true
+        mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars || true
         
         chroot_mount
         chroot "${DESTDIR}" "/usr/bin/bootctl" --efisys="${_SYSTEMD_BOOTCTL_EFISYS}" --loader="${_SYSTEMD_BOOTCTL_LOADER}" --label="${_SYSTEMD_BOOTCTL_LABEL}" install
@@ -3657,7 +3657,7 @@ EFIBEOF
     
     if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
         modprobe -q efivarfs
-        mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+        mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
     fi
     
     unset _EFIBOOTMGR_LABEL
@@ -3735,7 +3735,6 @@ do_efistub_copy_to_efisys() {
     
     if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
         _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
-        [[ "${_EFILINUX}" == "1" ]] && _EFISTUB_KERNEL="${VMLINUZ/linux/arch}"
         _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
@@ -3816,7 +3815,9 @@ CONFEOF
 do_efistub_uefi() {
     
     do_uefi_setup_env_vars
+    
     _CONTINUE="1"
+    
     if [[ "${_CONTINUE}" == "1" ]]; then
         bootdev=""
         grubdev=""
@@ -3827,12 +3828,6 @@ do_efistub_uefi() {
         common_bootloader_checks
         
         do_efistub_copy_to_efisys
-        
-        if [[ "${_EFILINUX}" == "1" ]]; then
-            cat << CONFEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
--f ${_KERNEL} ${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK}
-CONFEOF
-        fi
         
         ###################################
         
@@ -3847,23 +3842,13 @@ CONFEOF
         fi
         
         if [[ "${_GOOD}" == "y" ]]; then
-            if [[ "${_EFILINUX}" == "1" ]]; then
-                DIALOG --msgbox "You will now be put into the editor to edit efilinux.cfg . After you save your changes, exit the editor." 0 0
-                geteditor || return 1
-                "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/efilinux/efilinux.cfg"
+            if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+                # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+                # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
+                # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
+                # do_uefi_bootmgr_setup
                 
-                _BOOTMGR_LABEL="Arch Linux (LTS)"
-                _BOOTMGR_LOADER_PATH="/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
-                do_uefi_bootmgr_setup
-            else
-                if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-                    # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                    # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
-                    # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
-                    # do_uefi_bootmgr_setup
-                    
-                    true
-                fi
+                true
             fi
             
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
@@ -3890,38 +3875,24 @@ do_gummiboot_uefi() {
     run_pacman
     unset PACKAGES
     
-    if [[ "${_EFILINUX}" == "1" ]]; then
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
-title    Arch Linux LTS Kernel via EFILINUX
-efi      /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
-timeout 5
-default archlinux-core-lts-efilinux
-GUMEOF
-        
-    else
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI}
 GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
+    
+    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 title    Arch Linux Fallback
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_FALLBACK_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI}
 GUMEOF
-        
-        cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+    
+    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
 timeout 5
 default archlinux-core-main
 GUMEOF
-        
-    fi
     
     if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         chroot_mount
@@ -3943,12 +3914,8 @@ GUMEOF
         DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         
-        if [[ "${_EFILINUX}" == "1" ]]; then
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-lts-efilinux.conf"
-        else
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-            "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-        fi
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
         
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
         
@@ -3992,33 +3959,18 @@ do_refind_uefi() {
     sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
     sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
     
-    if [[ "${_EFILINUX}" == "1" ]]; then
-        sed 's|^scan_all_linux_kernels|# scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
+    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+        sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
         
-        cat << REFINDEOF >> "${_REFIND_CONFIG}"
-
-menuentry "Arch Linux LTS via EFILINUX" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi
-}
-
-REFINDEOF
-        
+        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/refind_linux.conf"
     else
-        if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-            sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
-            
-            _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/refind_linux.conf"
-        else
-            _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
-        fi
-        
-        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
+        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
+    fi
+    
+    cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
 "Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK}"
 REFINDEOF
-        
-    fi
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
@@ -4027,10 +3979,9 @@ REFINDEOF
         
         DIALOG --msgbox "refind-efi has been setup successfully." 0 0
         
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf (and refind_linux.conf if no LTS) . After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
-        [[ "${_EFILINUX}" != "1" ]] && "${EDITOR}" "${_REFIND_LINUX_CONF}"
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
