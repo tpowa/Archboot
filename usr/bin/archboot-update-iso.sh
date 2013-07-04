@@ -125,7 +125,7 @@ _update_uefi_lockdown_ms_files() {
 _update_syslinux_iso_files() {
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux"/*.{com,bin,c32} || true
-	cp -f "/usr/lib/syslinux"/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
+	cp -f "/usr/lib/syslinux"/bios/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
 	
 }
 
@@ -581,7 +581,7 @@ xorriso -as mkisofs \
 	-eltorito-boot boot/syslinux/isolinux.bin \
 	-eltorito-catalog boot/syslinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
-	-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
+	-isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
 	${_CD_UEFI_PARAMETERS} \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo

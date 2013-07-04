@@ -332,7 +332,7 @@ xorriso -as mkisofs \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin \
+        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
 # create x86_64 iso, if not present

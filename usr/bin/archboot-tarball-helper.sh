@@ -52,8 +52,8 @@ export USEKERNEL="${VERSION}"
 # begin script
 mkdir -p "${TEMPDIR}/${BOOTDIRNAME}/"
 # prepare syslinux bootloader
-install -m755 /usr/lib/syslinux/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.bin
-for i in /usr/lib/syslinux/*; do
+install -m755 /usr/lib/syslinux/bios/isolinux.bin ${TEMPDIR}/${BOOTDIRNAME}/isolinux.bin
+for i in /usr/lib/syslinux/bios/*; do
     [ -f $i ] && install -m644 $i ${TEMPDIR}/${BOOTDIRNAME}/$(basename $i)
 done
 install -m644 /usr/share/hwdata/pci.ids ${TEMPDIR}/${BOOTDIRNAME}/pci.ids
