@@ -3,14 +3,15 @@
 
 build ()
 {
-    add_file "/usr/lib/refind/refind_x64.efi"
+    [[ "$(uname -m )" == "x86_64" ]] && add_file "/usr/lib/refind/refind_x64.efi"
+    [[ "$(uname -m )" == "i686" ]] && add_file "/usr/lib/refind/refind_ia32.efi"
     add_file "/usr/lib/refind/config/refind.conf"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes refind-efi-x86_64 on an arch boot image.
+  This hook includes refind-efi on an arch boot image.
 HELPEOF
 }
 
