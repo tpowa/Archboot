@@ -19,7 +19,7 @@ build ()
              syslinux mtools perl gmp krb5 sqlite db dbus libcap fsarchiver xz librpcsecgss \
              libtirpc wipe ddrescue testdisk ifplugd libdaemon wpa_actiond rfkill libgssglue icu gptfdisk \
              btrfs-progs nilfs-utils linux-firmware ipw2100-fw ipw2200-fw iana-etc chntpw \
-             grub gummiboot efilinux-efi refind-efi efivar efibootmgr lockdown-ms prebootloader file keyutils \
+             grub gummiboot refind-efi efivar efibootmgr lockdown-ms prebootloader file keyutils \
              yp-tools curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua \
              weechat gnutls nettle libtasn1 rpcbind expat progsreiserfs glib2 freetype2 libssh2 libedit \
              talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \

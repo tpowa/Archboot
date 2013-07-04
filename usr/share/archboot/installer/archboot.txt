@@ -105,7 +105,7 @@ Introduction
    * Configuration of basic system files
    * Setting root password
    * Bootloader support: grub(2) (BIOS and UEFI),
-     refind-efi, gummiboot, efilinux-efi, syslinux (BIOS and UEFI)
+     refind-efi, gummiboot, syslinux (BIOS and UEFI)
 
 Archboot bootparameters
 

@@ -66,7 +66,7 @@ Interactive setup features:
 - Configuration of basic system files
 - Setting root password
 - grub(2) (BIOS and UEFI), refind-efi, gummiboot,
-  efilinux-efi, syslinux (BIOS and UEFI) bootloader support
+  syslinux (BIOS and UEFI) bootloader support
 
 FAQ, Known Issues and limitations:
 - Release specific known issues and workarounds are posted in changelog files.
