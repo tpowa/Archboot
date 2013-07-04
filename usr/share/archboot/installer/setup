@@ -3803,51 +3803,47 @@ do_efistub_uefi() {
     
     do_uefi_setup_env_vars
     
-    _CONTINUE="1"
+    bootdev=""
+    grubdev=""
+    complexuuid=""
+    FAIL_COMPLEX=""
+    USE_DMRAID=""
+    RAID_ON_LVM=""
+    common_bootloader_checks
     
-    if [[ "${_CONTINUE}" == "1" ]]; then
-        bootdev=""
-        grubdev=""
-        complexuuid=""
-        FAIL_COMPLEX=""
-        USE_DMRAID=""
-        RAID_ON_LVM=""
-        common_bootloader_checks
-        
-        do_efistub_copy_to_efisys
-        
-        ###################################
-        
+    do_efistub_copy_to_efisys
+    
+    ###################################
+    
+    if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
+        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
+            _CONTINUE="y"
+        else
+            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
+            _CONTINUE="n"
+        fi
+    fi
+    
+    if [[ "${_CONTINUE}" == "y" ]]; then
         if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-            if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
-                DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
-                _GOOD="y"
-            else
-                DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
-                _GOOD="n"
-            fi
+            # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
+            # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
+            # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
+            # do_uefi_bootmgr_setup
+            
+            true
         fi
         
-        if [[ "${_GOOD}" == "y" ]]; then
-            if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-                # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-                # _BOOTMGR_LOADER_PATH="/EFI/arch/${_EFISTUB_KERNEL}"
-                # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
-                # do_uefi_bootmgr_setup
-                
-                true
-            fi
-            
-            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-                "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
-                "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
-                "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
-            case $(cat ${ANSWER}) in
-                "Gummiboot") do_gummiboot_uefi ;;
-                "rEFInd") do_refind_uefi;;
-                "NONE") return 0 ;;
-            esac
-        fi
+        DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
+            "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
+            "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
+            "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
+        case $(cat ${ANSWER}) in
+            "Gummiboot") do_gummiboot_uefi ;;
+            "rEFInd") do_refind_uefi;;
+            "NONE") return 0 ;;
+        esac
     fi
     
 }
@@ -3881,7 +3877,9 @@ timeout 5
 default archlinux-core-main
 GUMEOF
     
-    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        uefi_switch_to_efivarfs
+        
         chroot_mount
         chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
         chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
@@ -3955,8 +3953,8 @@ do_refind_uefi() {
     fi
     
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_NORMAL}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
 REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
