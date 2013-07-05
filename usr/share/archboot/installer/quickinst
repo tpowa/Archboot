@@ -165,9 +165,6 @@ install_packages() {
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
-    # Only install the booted kernel image!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e "s#\ linux-lts\ # #g")"
-    PACKAGES="${KERNELPKG} ${PACKAGES}"
     ### HACK
     # always add systemd-sysvcompat components
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"

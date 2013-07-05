@@ -3112,10 +3112,6 @@ select_packages() {
     if ! [[ "$(dmraid_devices)" = "" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dmraid)" ]] && PACKAGES="${PACKAGES} dmraid"
     fi
-    # Only install the booted kernel image!
-    ### TODO: This misses packages which pull in the kernel itself, like binary modules selected for the kernel!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ linux\ # #g" -e  "s#\ linux-lts\ # #g")"
-    PACKAGES="${KERNELPKG} ${PACKAGES}"
     ### HACK:
     # always add systemd-sysvcompat components
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
