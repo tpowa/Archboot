@@ -340,13 +340,6 @@ title    rEFInd ${_UEFI_ARCH}
 efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
 GUMEOF
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/" || true
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux"
-	cp -f "/usr/lib/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/efilinux/efilinux${_SPEC_UEFI_ARCH}.efi"
-	echo
-	
-	echo
-	
 }
 
 _update_uefi_rEFInd_USB_files() {
