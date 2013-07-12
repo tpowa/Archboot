@@ -2847,16 +2847,15 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
-    DIALOG --msgbox "Keep in mind ftp.archlinux.org is throttled.\nPlease select another mirror to get full download speed." 8 65
     # FIXME: this regex doesn't honor commenting
-    MIRRORS=$(egrep -o '((ftp)|(http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
-    DIALOG --menu "Select an FTP/HTTP mirror" 14 55 7 \
+    MIRRORS=$(egrep -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
+    DIALOG --menu "Select a mirror" 14 55 7 \
         ${MIRRORS} \
         "Custom" "_" 2>${ANSWER} || return 1
     local _server=$(cat ${ANSWER})
     if [[ "${_server}" = "Custom" ]]; then
-        DIALOG --inputbox "Enter the full URL to core repo." 8 65 \
-            "ftp://ftp.archlinux.org/core/os/$(uname -m)" 2>${ANSWER} || return 1
+        DIALOG --inputbox "Enter the full URL to repositories." 8 65 \
+            "" 2>${ANSWER} || return 1
             SYNC_URL=$(cat ${ANSWER})
     else
         # Form the full URL for our mirror by grepping for the server name in
