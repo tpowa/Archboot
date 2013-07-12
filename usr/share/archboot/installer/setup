@@ -2833,7 +2833,7 @@ getsource() {
         manual_media || return 1
     fi
 
-    if [[ "${MODE}" = "ftp" ]]; then
+    if [[ "${MODE}" = "network" ]]; then
         #in order to cache packages from media check on it first!
         get_media
         select_mirror || return 1
@@ -2868,7 +2868,7 @@ select_mirror() {
 }
 
 # dotesting()
-# enable testing repository on ftp install
+# enable testing repository on network install
 dotesting() {
     DOTESTING=""
     DIALOG --defaultno --yesno "Do you want to enable [testing] repository?\n\nOnly enable this if you need latest available packages for testing purposes!" 8 60 && DOTESTING="yes"
@@ -2879,7 +2879,7 @@ dotesting() {
 pacman_conf() {
     if [[ "${MODE}" = "media" ]]; then
         local serverurl="${FILE_URL}"
-    elif [[ "${MODE}" = "ftp" ]]; then
+    elif [[ "${MODE}" = "network" ]]; then
         local serverurl="${SYNC_URL}"
         if [[ "${DOTESTING}" = "yes" ]]; then
             TESTING_REPOSITORY="[testing]"
@@ -3017,7 +3017,7 @@ select_packages() {
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}"
         [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
-    # ftp install routine
+    # network install routine
     else
         # if selection has been done before, warn about loss of input
         # and let the user exit gracefully
@@ -4902,7 +4902,7 @@ select_source() {
     else
         DIALOG --menu "Please select an installation source" 10 45 3 \
         "1" "CD-ROM, USBSTICK or OTHER SOURCE" \
-        "2" "FTP/HTTP" 2>${ANSWER} || return 1
+        "2" "NETWORK" 2>${ANSWER} || return 1
     fi
 
     case $(cat ${ANSWER}) in
@@ -4910,7 +4910,7 @@ select_source() {
             MODE="media"
             ;;
         "2")
-            MODE="ftp"
+            MODE="network"
             ;;
     esac
 
@@ -4924,7 +4924,7 @@ select_source() {
         if [[ ${S_TESTING} -eq 0 ]]; then
             dotesting
         fi
-        TITLE="Arch Linux FTP/HTTP Installation"
+        TITLE="Arch Linux NETWORK Installation"
     fi
     getsource || return 1
     NEXTITEM="5"
@@ -5254,10 +5254,10 @@ auto_timesetting() {
     fi
 }
 
-auto_ftpmirror() {
+auto_networkmirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if [[ "${MODE}" = "ftp" && "${SYNC_URL}" != "" ]]; then
+    if [[ "${MODE}" = "network" && "${SYNC_URL}" != "" ]]; then
         SYNC_URL="${SYNC_URL}"
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
@@ -5279,7 +5279,7 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
-        auto_ftpmirror
+        auto_networkmirror
         auto_network
         auto_parameters
         auto_fb
