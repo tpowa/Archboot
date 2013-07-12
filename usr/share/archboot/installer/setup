@@ -2868,6 +2868,13 @@ select_mirror() {
     echo "Using mirror: ${SYNC_URL}" >${LOG}
 }
 
+# dotesting()
+# enable testing repository on ftp install
+dotesting() {
+    DOTESTING=""
+    DIALOG --defaultno --yesno "Do you want to enable [testing] repository?\n\nOnly enable this if you need latest available packages for testing purposes!" 8 60 && DOTESTING="yes"
+}
+
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
@@ -2875,6 +2882,10 @@ pacman_conf() {
         local serverurl="${FILE_URL}"
     elif [[ "${MODE}" = "ftp" ]]; then
         local serverurl="${SYNC_URL}"
+        if [[ "${DOTESTING}" = "yes" ]]; then
+            TESTING_REPOSITORY="[testing]"
+            TESTING_SERVER="Server = ${serverurl}"
+        fi
     fi
     # Setup a pacman.conf in /tmp
     cat << EOF > /tmp/pacman.conf
@@ -2885,6 +2896,9 @@ CheckSpace
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
+
+${TESTING_REPOSITORY}
+${TESTING_SERVER}
 
 [core]
 Server = ${serverurl}
@@ -4907,6 +4921,9 @@ select_source() {
     else
         if [[ ${S_NET} -eq 0 ]]; then
             donetwork
+        fi
+        if [[ ${S_TESTING} -eq 0 ]]; then
+            dotesting
         fi
         TITLE="Arch Linux FTP/HTTP Installation"
     fi
