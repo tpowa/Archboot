@@ -11,7 +11,7 @@ What is archboot?
 Latest Releases:
 - Hybrid image file and torrent is provided, 
   which include i686 and x86_64 core repository.
-- Hybrid ftp image file and torrent is provided, 
+- Hybrid network image file and torrent is provided, 
   which do not include i686 and x86_64 core repository.
 - Please read the according Changelog files for RAM limitations.
 - Please check md5sum before using it.
