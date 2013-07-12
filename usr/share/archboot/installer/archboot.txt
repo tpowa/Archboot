@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 3rd 2013
+   July, 12th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -168,7 +168,7 @@ Installing Arch Linux with Archboot
   Acquiring Archboot images
 
    You can download Archboot images from any Arch Linux mirror:
-   eg. ftp://ftp.archlinux.org/iso/archboot/
+   eg. https://downloads.archlinux.de/iso/archboot/
 
   Preparing Installation Media
 
@@ -332,23 +332,23 @@ Common Installation Procedure
 
   Select Source
 
-   If you have a fast Internet connection, you might  prefer the FTP/HTTP
+   If you have a fast Internet connection, you might  prefer the NETWORK
    installation to ensure you get the latest packages, instead of using the
    potentially outdated media contents. Please note that you will probably
    run into trouble if you have a complex proxy setup with authentication
-   when using the FTP/HTTP installation. If you  can't use a CD-ROM, USB device
+   when using the NETWORK installation. If you  can't use a CD-ROM, USB device
    or any other medium you could mount at this stage, this is the only viable
    method of installing Arch Linux.
 
-  Choose Mirror (FTP/HTTP method)
+  Choose Mirror (NETWORK method)
 
-   You need to select a mirror for installing the packages, else the FTP/HTTP 
+   You need to select a mirror for installing the packages, else the NETWORK
    installation will not work.
 
   Select Packages
 
    Select Packages will let you select the packages you wish to install
-   from the media or your FTP/HTTP mirror.
+   from the media or your mirror.
 
    Whatever source you chose, after fetching the package list you'll be
    dropped into the package category selection screen.
@@ -428,8 +428,8 @@ Common Installation Procedure
    proceed to the next step, Configure System.
 
    The media includes the latest kernel at the time the image was made.
-   If you are using the FTP/HTTP Installation method, the kernel about to be
-   installed will be the current version waiting on your FTP/HTTP source,
+   If you are using the NETWORK Installation method, the kernel about to be
+   installed will be the current version waiting on your NETWORK source,
    and might therefore introduce changes and/or incompatibilities unknown
    at the present time. This is unlikely, but keep this in mind.
 
