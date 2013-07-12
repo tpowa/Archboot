@@ -8,7 +8,6 @@ build ()
     add_dir "/media"
     add_dir "/install"
     add_dir "/var/log"
-    add_dir "/addons"
     add_dir "/home"
 
     add_symlink /var/run ../run
