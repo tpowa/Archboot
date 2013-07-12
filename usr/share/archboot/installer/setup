@@ -5254,7 +5254,7 @@ auto_timesetting() {
     fi
 }
 
-auto_networkmirror() {
+auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [[ "${MODE}" = "network" && "${SYNC_URL}" != "" ]]; then
@@ -5279,7 +5279,7 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
-        auto_networkmirror
+        auto_pacman_mirror
         auto_network
         auto_parameters
         auto_fb
