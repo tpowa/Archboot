@@ -3855,7 +3855,7 @@ do_efistub_uefi() {
     if [[ "${_CONTINUE}" == "1" ]]; then
         # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
         # _BOOTMGR_LOADER_PATH="${_KERNEL_NORMAL}"
-        # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
+        # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_FALLBACK_NORMAL}"
         # do_uefi_bootmgr_setup
         
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
@@ -3885,14 +3885,14 @@ do_gummiboot_uefi() {
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_NORMAL}
-options  ${_KERNEL_PARAMS_UEFI}
+options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
     
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 title    Arch Linux Fallback
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_FALLBACK_NORMAL}
-options  ${_KERNEL_PARAMS_UEFI}
+options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
     
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
@@ -3976,8 +3976,8 @@ do_refind_uefi() {
     fi
     
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_NORMAL}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI} initrd=${_INITRD_FALLBACK_NORMAL}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_NORMAL}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_FALLBACK_NORMAL}"
 REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -4041,13 +4041,13 @@ ONTIMEOUT arch
 LABEL arch
     MENU LABEL Arch Linux
     LINUX ${_KERNEL_NORMAL}
-    APPEND ${_KERNEL_PARAMS_UEFI}
+    APPEND ${_KERNEL_PARAMS_UEFI_MOD}
     INITRD ${_INITRD_NORMAL}
 
 LABEL arch-fallback
     MENU LABEL Arch Linux Fallback
     LINUX ${_KERNEL_NORMAL}
-    APPEND ${_KERNEL_PARAMS_UEFI}
+    APPEND ${_KERNEL_PARAMS_UEFI_MOD}
     INITRD ${_INITRD_FALLBACK_NORMAL}
 
 EOF
@@ -4512,8 +4512,11 @@ EOF
     if [[ -z "${ROOT_PART_FS_UUID}" ]] && [[ -z "${ROOT_PART_FS_LABEL}" ]]; then
         _rootpart="${ROOT_PART_DEVICE}"
     fi
-    
-    LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_UEFI}"
+    if [[ "${GRUB_UEFI}" == "1" ]]; then
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_UEFI_MOD}"
+    else
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_BIOS_MOD}"
+    fi
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
