@@ -2847,6 +2847,14 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
+    ## Download updated mirrorlist, if possible
+    curl 'https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on' > /tmp/pacman_mirrorlist.txt
+    
+    if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
+        mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
+        cp /tmp/pacman_mirrorlist.txt "${MIRRORLIST}"
+    fi
+    
     # FIXME: this regex doesn't honor commenting
     MIRRORS=$(egrep -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
     DIALOG --menu "Select a mirror" 14 55 7 \
