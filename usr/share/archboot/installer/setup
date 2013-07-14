@@ -3455,6 +3455,8 @@ common_bootloader_checks() {
     
     [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && getrootfsuuid
     [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
+
+    bootloader_kernel_parameters
 }
 
 # look for a separately-mounted /boot partition
