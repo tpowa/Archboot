@@ -3800,7 +3800,6 @@ CONFEOF
     UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
     
     ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-    _KERNEL_PARAMS_UEFI="${_KERNEL_PARAMS_UEFI_MOD}"
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         _KERNEL_NORMAL="/${VMLINUZ}"
