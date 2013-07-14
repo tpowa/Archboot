@@ -3440,13 +3440,8 @@ getrootfslabel() {
     fi
 }
 
-# basic checks needed for all bootloaders
-common_bootloader_checks() {
-    activate_special_devices
-    getrootfstype
-    getraidarrays
-    getcryptsetup
-    getrootflags
+## Setup kernel cmdline parameters to be added to bootloader configs
+bootloader_kernel_parameters() {
     
     if [[ "${GUID_DETECTED}" == "1" ]]; then
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && getrootpartuuid
@@ -3455,7 +3450,26 @@ common_bootloader_checks() {
     
     [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && getrootfsuuid
     [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
+    
+    [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
+    
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
+    
+    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
+    
+    _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    
+}
 
+# basic checks needed for all bootloaders
+common_bootloader_checks() {
+    activate_special_devices
+    getrootfstype
+    getraidarrays
+    getcryptsetup
+    getrootflags
     bootloader_kernel_parameters
 }
 
@@ -3494,32 +3508,6 @@ abort_f2fs_bootpart() {
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
-}
-
-bootloader_kernel_parameters() {
-    
-    _rootdev="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}')"
-    
-    ROOT_PART_FS_UUID="$(getfsuuid "${_rootdev}")"
-    ROOT_PART_FS_LABEL="$(getfslabel "${_rootdev}")"
-    ROOT_PART_GPT_GUID="$(getpartuuid "${_rootdev}")"
-    ROOT_PART_GPT_LABEL="$(getpartlabel "${_rootdev}")"
-    
-    getrootfstype
-    
-    [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _rootpart="UUID=${ROOT_PART_FS_UUID}"
-    [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
-    [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
-    [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
-    [[ "${_rootpart}" == "" ]] && _rootpart="${_rootdev}"
-    
-    ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-    _KERNEL_PARAMS_BIOS_UNMOD="root=${_rootpart} ${ROOTFLAGS} rootfstype=${ROOTFS} ${RAIDARRAYS} ${CRYPTSETUP}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_BIOS_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
-    
-    _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-    _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-    
 }
 
 detect_uefi_secure_boot() {
@@ -3799,8 +3787,6 @@ CONFEOF
     UEFISYS_PART_GPT_GUID="$(getpartuuid "${_uefisysdev}")"
     UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
     
-    ## TODO: All complex stuff like dmraid, cyptsetup etc. for kernel parameters - common_bootloader_checks ?
-    
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         _KERNEL_NORMAL="/${VMLINUZ}"
         _KERNEL_EFIPATH="\\${VMLINUZ}"
@@ -4030,10 +4016,10 @@ do_syslinux_config() {
         cat << EOF > "${_SYSLINUX_UEFI_CONFIG_PATH}"
 PATH /EFI/syslinux
 
-UI vesamenu.c32
+UI menu.c32
 DEFAULT arch
 
-PROMPT 0
+PROMPT 1
 TIMEOUT 100
 ONTIMEOUT arch
 
@@ -4063,7 +4049,7 @@ EOF
 PATH ${subdir}/${SYSLINUX_DIR}
 UI vesamenu.c32
 
-PROMPT 0
+PROMPT 1
 TIMEOUT 100
 ONTIMEOUT arch
 
@@ -4325,50 +4311,45 @@ do_grub_common_before() {
 }
 
 do_grub_config() {
-
-    ########
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    BOOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    _GRUB_PROBE_="LD_LIBRARY_PATH=${DESTDIR}/usr/lib ${DESTDIR}/usr/bin/grub-probe"
     
     ########
     
-    ROOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
     
-    ROOT_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_DEVICE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(${_GRUB_PROBE_} --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(${_GRUB_PROBE_} --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
-    ROOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$(${_GRUB_PROBE_} --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$(${_GRUB_PROBE_} --target="device" "${DESTDIR}/" 2>/dev/null)"
     
-    USR_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    
+    ########
+    
+    USR_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    
+    USR_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        
-        UEFISYS_PART_FS_LABEL="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_DRIVE="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        
-        UEFISYS_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
     
     ########
     
-    ## udev 180 onwards
     if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
         ROOT_PART_GPT_GUID="$(${_BLKID} -p -i -o value -s PART_ENTRY_UUID ${ROOT_PART_DEVICE})"
         ROOT_PART_GPT_LABEL="$(${_BLKID} -p -i -o value -s PART_ENTRY_NAME ${ROOT_PART_DEVICE})"
@@ -4487,35 +4468,24 @@ EOF
     
     if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
-        _rootpart="UUID=${ROOT_PART_FS_UUID}"
-        
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
-        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}" # GRUB(2) does not yet support PARTUUID
-        _rootpart="PARTUUID=${ROOT_PART_GPT_GUID}"
-        
+        ## GRUB(2) does not yet support PARTUUID
+        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
     elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
         GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
-        _rootpart="LABEL=${ROOT_PART_FS_LABEL}"
-        
     elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}" # GRUB(2) does not yet support PARTLABEL
-        _rootpart="PARTLABEL=${ROOT_PART_GPT_LABEL}"
-        
+        ## GRUB(2) does not yet support PARTLABEL
+        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
     else
         GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
-        _rootpart="${ROOT_PART_DEVICE}"
-        
     fi
     
-    ## fallback to device if no label or uuid can be detected, eg. luks device
-    if [[ -z "${ROOT_PART_FS_UUID}" ]] && [[ -z "${ROOT_PART_FS_LABEL}" ]]; then
-        _rootpart="${ROOT_PART_DEVICE}"
-    fi
     if [[ "${GRUB_UEFI}" == "1" ]]; then
         LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_UEFI_MOD}"
     else
         LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_BIOS_MOD}"
     fi
+    
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     
     ## create default kernel entry
