@@ -347,10 +347,10 @@ if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
-# create i686 ftp iso, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686-ftp.iso" ]]; then
+# create i686 network iso, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686-network.iso" ]]; then
 	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686-ftp.iso" "${WD}/${IMAGENAME_OLD}-i686-ftp.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686-network.iso" "${WD}/${IMAGENAME_OLD}-i686-network.iso"
 fi
 
 # create dual iso with uefi cd boot support, if not present
@@ -359,16 +359,16 @@ if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi.iso"
 fi
 
-# create dual ftp iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi-ftp.iso" ]]; then
+# create dual network iso with uefi cd boot support, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi-network.iso" ]]; then
 	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi-ftp.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi-ftp.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi-network.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi-network.iso"
 fi
 
-# create dual ftp iso, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-ftp.iso" ]]; then
+# create dual network iso, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-network.iso" ]]; then
 	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-ftp.iso" "${WD}/${IMAGENAME_OLD}-dual-ftp.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-network.iso" "${WD}/${IMAGENAME_OLD}-dual-network.iso"
 fi
 
 # create x86_64 iso with uefi cd boot support, if not present
@@ -377,16 +377,16 @@ if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
 fi
 
-# create x86_64 ftp iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi-ftp.iso" ]]; then
+# create x86_64 network iso with uefi cd boot support, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso" ]]; then
 	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi-ftp.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi-ftp.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso"
 fi
 
-# create x86_64 ftp iso, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-ftp.iso" ]]; then
+# create x86_64 network iso, if not present
+if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-network.iso" ]]; then
 	_REMOVE_PACKAGES="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-ftp.iso" "${WD}/${IMAGENAME_OLD}-x86_64-ftp.iso"
+	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-network.iso"
 fi
 
 ## create sha256sums.txt
