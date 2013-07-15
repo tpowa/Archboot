@@ -3076,7 +3076,7 @@ select_packages() {
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
         done < <(${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -f -k 2)
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -u -f -k 1 | sort -f -k 2)
         # packages without groups
         while read pkgname pkgcat; do
             pkgdesc $pkgname
@@ -3089,7 +3089,7 @@ select_packages() {
                 _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
             fi
         done < <(${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -f -k 2)
+        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -u -f -k 1 | sort -f -k 2)
         kill $(cat ${ANSWER})
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}"
         [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
