@@ -32,6 +32,6 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook sets up all you need for a arch ftp install image.
+  This hook sets up all you need for a arch network install image.
 HELPEOF
 }
