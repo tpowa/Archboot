@@ -599,15 +599,15 @@ dmraid_devices() {
 # - remove part ot raid
 check_dm_devices() {
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g')"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "crypto_LUKS" | cut -d' ' -f 1)"
         partofcrypt="${partofcrypt} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"LVM2_member\"" | sed -e 's#:.*##g')"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "LVM2_member" | cut -d' ' -f 1)"
         partoflvm="${partoflvm} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_BLKID} -p -i /dev/mapper/${devpath} 2>/dev/null | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g')"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "linux_raid_member" | cut -d' ' -f 1)"
         partofraid="${partofraid} ${k}"
     done
 }
@@ -933,17 +933,17 @@ _stopmd()
                 mdadm --manage --stop /dev/${i} > ${LOG}
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_BLKID} | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g'); do
+            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member" | cut -d' ' -f 1); do
                 mdadm --zero-superblock ${i} > ${LOG}
             done
         fi
     fi
     DISABLEMDSB=""
-    if [[ "$(${_BLKID} | grep "TYPE=\"linux_raid_member\"")" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep "linux_raid_member")" ]]; then
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
         if [[ "${DISABLEMDSB}" = "1" ]]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_BLKID} | grep "TYPE=\"linux_raid_member\"" | sed -e 's#:.*##g'); do
+            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member" | cut -d' ' -f 1); do
                 mdadm --zero-superblock ${i} > ${LOG}
             done
         fi
@@ -1010,13 +1010,13 @@ _stopluks()
     DETECTED_LUKS=""
 
     # detect not running luks devices
-    [[ "$(${_BLKID} | grep "TYPE=\"crypto_LUKS\"")" ]] && DETECTED_LUKS=1
+    [[ "$(${_LSBLK} FSYTPE | grep "crypto_LUKS")" ]] && DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
     if [[ "${DISABLELUKS}" = "1" ]]; then
         DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
-        for i in $(${_BLKID} | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
+        for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS" | cut -d' ' -f 1); do
             # delete header from device
             dd if=/dev/zero of=${i} bs=512 count=2048 >/dev/null 2>&1
         done
@@ -2031,7 +2031,7 @@ check_uefisyspart() {
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
         UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
-        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
+        if [[ "$(${_LSBLK} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
             if [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
                 ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
                 DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
@@ -2059,7 +2059,7 @@ check_uefisyspart() {
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         
-        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
+        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         else
             DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for UEFISYS partition." 0 0
@@ -2166,7 +2166,7 @@ find_btrfs_raid_devices() {
 find_btrfs_raid_bootloader_devices() {
     btrfs_scan
     BTRFS_COUNT=1
-    if [[ "$(${_BLKID} -p -i  ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE ${bootdev})" = "btrfs" ]]; then
         BTRFS_DEVICES=""
         for i in $(btrfs filesystem show ${bootdev} | cut -d " " -f 11); do
             BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
@@ -2190,7 +2190,7 @@ find_btrfs_subvolume() {
 
 find_btrfs_bootloader_subvolume() {
     BTRFS_SUBVOLUME_COUNT=1
-    if [[ "$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)" = "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE ${bootdev})" = "btrfs" ]]; then
         BTRFS_SUBVOLUMES=""
         PART="${bootdev}"
         mount_btrfs
@@ -2482,7 +2482,7 @@ check_mkfs_values() {
     [[ "${BTRFS_LEVEL}" = "" ]] && BTRFS_LEVEL="NONE"
     [[ "${BTRFS_SUBVOLUME}" = "" ]] && BTRFS_SUBVOLUME="NONE"
     [[ "${DOSUBVOLUME}" = "" ]] && DOSUBVOLUME="no"
-    [[ "${LABEL_NAME}" = "" && -n "$(${_BLKID} -p -i -o value -s LABEL ${PART})" ]] && LABEL_NAME="$(${_BLKID} -p -i -o value -s LABEL ${PART})"
+    [[ "${LABEL_NAME}" = "" && -n "$(${_LSBLK} LABEL ${PART})" ]] && LABEL_NAME="$(${_LSBLK} LABEL ${PART})"
     [[ "${LABEL_NAME}" = "" ]] && LABEL_NAME="NONE"
 }
 
@@ -2496,7 +2496,7 @@ create_filesystem() {
     if [[ "${DOMKFS}" = "yes" ]]; then
         while [[ "${LABEL_NAME}" = "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_BLKID} -p -i -o value -s LABEL ${PART})" 2>${ANSWER} || return 1
+            "$(${_LSBLK} LABEL ${PART})" 2>${ANSWER} || return 1
             LABEL_NAME=$(cat ${ANSWER})
             if grep ":${LABEL_NAME}$" /tmp/.parts; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
@@ -2554,7 +2554,7 @@ mountpoints() {
             PART=$(cat ${ANSWER})
             PART_ROOT=${PART}
             # Select root filesystem type
-            FSTYPE="$(${_BLKID} -p -i -o value -s TYPE ${PART})"
+            FSTYPE="$(${_LSBLK} FSTYPE ${PART})"
             DOMKFS="no"
             # clear values first!
             clear_btrfs_values
@@ -2580,7 +2580,7 @@ mountpoints() {
                 DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
                 PART=$(cat ${ANSWER})
                 if [[ "${PART}" != "DONE" ]]; then
-                    FSTYPE="$(${_BLKID} -p -i  -o value -s TYPE ${PART})"
+                    FSTYPE="$(${_LSBLK} FSTYPE ${PART})"
                     DOMKFS="no"
                     # clear values first!
                     clear_btrfs_values
@@ -3404,9 +3404,9 @@ getcryptsetup() {
         #avoid clash with dmraid here
         if [[ "$(cryptsetup status $(basename ${PART_ROOT}))" ]]; then
             if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                CRYPTDEVICE="UUID=$(echo $(${_BLKID} -p -i -s UUID -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="UUID=$(echo $(${_LSBLK} UUID $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                CRYPTDEVICE="LABEL=$(echo $(${_BLKID} -p -i -s LABEL -o value $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="LABEL=$(echo $(${_LSBLK} LABEL $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g')))"
             else
                 CRYPTDEVICE="$(echo $(cryptsetup status $(basename ${PART_ROOT}) | grep device: | sed -e 's#device:##g'))"    
             fi
@@ -3493,7 +3493,7 @@ check_bootpart() {
 
 # check for btrfs bootpart and abort if detected
 abort_btrfs_bootpart() {
-        FSTYPE="$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)"
+        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
         if [[ "${FSTYPE}" = "btrfs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot on it." 0 0
             return 1
@@ -3502,7 +3502,7 @@ abort_btrfs_bootpart() {
 
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
-        FSTYPE="$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)"
+        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
         if [[ "${FSTYPE}" = "nilfs2" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
@@ -3511,7 +3511,7 @@ abort_nilfs_bootpart() {
 
 # check for f2fs bootpart and abort if detected
 abort_f2fs_bootpart() {
-        FSTYPE="$(${_BLKID} -p -i ${bootdev} -o value -s TYPE)"
+        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
         if [[ "${FSTYPE}" = "f2fs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
@@ -4191,7 +4191,7 @@ do_syslinux_bios() {
     abort_f2fs_bootpart || return 1
     
     # extlinux only can boot from ext2/3/4 and btrfs partitions!
-    FSTYPE="$(${_BLKID} -p -i -o value -s TYPE ${bootdev})"
+    FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
     if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 , btrfs or vfat partition with /boot on it." 0 0
         return 1
@@ -5178,7 +5178,7 @@ auto_hwdetect() {
         fi
         # check for separate /usr partition
         [[ $(mount | grep "${DESTDIR}/usr ") ]] && HWPARAMETER="${HWPARAMETER} --shutdown"
-        [[ "$(${_BLKID} -p -i -o value -s TYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
+        [[ "$(${_LSBLK} FSTYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
         read HWKER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
         HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
