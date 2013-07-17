@@ -11,7 +11,7 @@ _MEDIA="/src"
 DESTDIR="/install"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
-_LSBLK="lsblk -rno"
+_LSBLK="lsblk -rpno"
 UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
@@ -222,8 +222,8 @@ activate_luks()
     ACTIVATE_LUKS=""
     if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
-        if [[ "$(${_BLKID} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
-            for PART in $(${_BLKID} | grep "TYPE=\"crypto_LUKS\"" | sed -e 's#:.*##g'); do
+        if [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]]; then
+            for PART in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 OPEN_LUKS=""
                 for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -501,14 +501,14 @@ additional_blockdevices_partitions() {
                     #- part of raid device
                     #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
                     #- part of lvm2 device
-                    #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")
+                    #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
                     #- part of luks device
-                    #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
+                    #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
                     #- extended partition on device
                     #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
                     #- bios_grub partitions
                     # $(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                         echo "/dev/${part}"
                         [[ "${1}" ]] && echo ${1}
                     fi
@@ -524,14 +524,14 @@ additional_blockdevices_partitions() {
                 #- part of raid device
                 #  $(cat /proc/mdstat 2>/dev/null | grep ${i})
                 #- part of lvm2 device
-                #  $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "LVM2_member")
+                #  $(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")
                 #- part of luks device
-                #  $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "crypto_LUKS")
+                #  $(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS")
                 #- extended partition on device
                 #  $(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g" 2>/dev/null | grep "5")
                 #- bios_grub partitions
                 # $(echo ${i} | grep "[a-z]$(parted -s /dev/${dev} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${i})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "LVM2_member")" || $(${_BLKID} -p -i -o value -s TYPE /dev/${i} | grep "crypto_LUKS") || "$(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" || "$(echo ${i} | grep "[a-z]$(parted -s /dev/${dev} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${i})" || "$(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")" || $(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS") || "$(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" || "$(echo ${i} | grep "[a-z]$(parted -s /dev/${dev} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                     echo "/dev/${i}"
                     [[ "${1}" ]] && echo ${1}
                 fi
@@ -545,7 +545,7 @@ raid_devices() {
     for devpath in $(ls ${block} 2>/dev/null | egrep '^md'); do
         if ! [[ "$(ls ${block}/${devpath} 2>/dev/null | egrep ${devpath}p)" ]]; then 
             # exlude md partitions which are part of lvm or luks
-            if ! [[ "$(${_BLKID} -p -i /dev/${devpath} | grep "TYPE=\"LVM2_member\"")" || "$(${_BLKID} -p -i /dev/${devpath} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
+            if ! [[ "$(${_LSBLK} FSTYPE /dev/${devpath} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${devpath} | grep "crypto_LUKS")" ]]; then
                     echo "/dev/${devpath}"
                     [[ "${1}" ]] && echo ${1}
             fi
@@ -572,7 +572,7 @@ partitionable_raid_devices_partitions() {
         for i in $(ls ${block}/${dev} 2>/dev/null | egrep ${dev}p); do 
             if [[ -d "${block}/${dev}/${i}" ]]; then
                 # exlude md partitions which are part of lvm or luks
-                if ! [[ "$(${_BLKID} -p -i /dev/${i} | grep "TYPE=\"LVM2_member\"")" || ! "$(${_BLKID} -p -i /dev/${i} | grep "TYPE=\"crypto_LUKS\"")" ]]; then
+                if ! [[ "$(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")" || ! "$(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS")" ]]; then
                     echo "/dev/${i}"
                     [[ "${1}" ]] && echo ${1}
                 fi
@@ -659,16 +659,16 @@ default_partition_check() {
             #- part of raid device
             #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
             #- part of lvm2 device
-            #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")
+            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
             #- part of luks device
-            #  $(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")
+            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
             #- extended partition
             #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")
             #- extended partition on raid partition device and mmc device
             #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
             #- bios_grub partitions
             # $(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "LVM2_member")" || "$(${_BLKID} -p -i -o value -s TYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
                 if [[ -d ${block}/${disk}/${part} ]]; then
                     echo "/dev/${part}"
                     [[ "${1}" ]] && echo ${1}
