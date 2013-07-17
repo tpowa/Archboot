@@ -11,7 +11,7 @@ _MEDIA="/src"
 DESTDIR="/install"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
-
+_LSBLK="lsblk -rno"
 UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
@@ -135,7 +135,7 @@ chroot_umount()
 
 getfstype()
 {
-    echo "$(${_BLKID} -p -i -s TYPE -o value ${1})"
+    echo "$(${_LSBLK} FSTYPE ${1})"
 }
 
 # getfsuuid()
@@ -147,7 +147,7 @@ getfstype()
 # returns:    nothing
 getfsuuid()
 {
-    echo "$(${_BLKID} -p -i -s UUID -o value ${1})"
+    echo "$(${_LSBLK} UUID ${1})"
 }
 
 # parameters: device file
@@ -156,17 +156,17 @@ getfsuuid()
 # returns:    nothing
 getfslabel()
 {
-    echo "$(${_BLKID} -p -i -s LABEL -o value ${1})"
+    echo "$(${_LSBLK} LABEL ${1})"
 }
 
 getpartuuid()
 {
-    echo "$(${_BLKID} -p -i -s PART_ENTRY_UUID -o value ${1})"
+    echo "$(${_LSBLK} PARTUUID ${1})"
 }
 
 getpartlabel()
 {
-    echo "$(${_BLKID} -p -i -s PART_ENTRY_NAME -o value ${1})"
+    echo "$(${_LSBLK} PARTLABEL ${1})"
 }
 
 # list all net devices with mac adress
@@ -3103,31 +3103,31 @@ select_packages() {
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
     # Add filesystem packages
-    if [[ "$(${_BLKID} -o value -s TYPE | grep ntfs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep btrfs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep btrfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w btrfs-progs)" ]] && PACKAGES="${PACKAGES} btrfs-progs"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep nilfs2)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep nilfs2)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ]] && PACKAGES="${PACKAGES} nilfs-utils"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep ext)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep ext)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w e2fsprogs)" ]] && PACKAGES="${PACKAGES} e2fsprogs"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep reiserfs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep reiserfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w reiserfsprogs)" ]] && PACKAGES="${PACKAGES} reiserfsprogs"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep xfs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep xfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w xfsprogs)" ]] && PACKAGES="${PACKAGES} xfsprogs"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep jfs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep jfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep f2fs)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep f2fs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w f2fs-tools)" ]] && PACKAGES="${PACKAGES} f2fs-tools"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep vfat)" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE | grep vfat)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
     fi
     if ! [[ "$(dmraid_devices)" = "" ]]; then
