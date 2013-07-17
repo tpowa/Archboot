@@ -14,6 +14,9 @@ _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
 UEFISYS_MOUNTPOINT="/boot/efi"
 
+## Setup LD_LIBRARY_PATH for the sake of binaries inside "${DESTDIR}/usr/bin/"
+export LD_LIBRARY_PATH="${DESTDIR}/usr/lib/:/usr/lib/"
+
 # name of kernel package
 KERNELPKG="linux"
 # name of the kernel image
@@ -4320,40 +4323,35 @@ do_grub_common_before() {
 
 do_grub_config() {
     
-    _GRUB_PROBE_="LD_LIBRARY_PATH=${DESTDIR}/usr/lib ${DESTDIR}/usr/bin/grub-probe"
+    ########
+    
+    BOOT_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    
+    BOOT_PART_DRIVE="$("${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
     
     ########
     
-    BOOT_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
     
-    BOOT_PART_FS_LABEL="$(${_GRUB_PROBE_} --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(${_GRUB_PROBE_} --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    BOOT_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    ########
-    
-    ROOT_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_FS_LABEL="$(${_GRUB_PROBE_} --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_DEVICE="$(${_GRUB_PROBE_} --target="device" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$("${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$(${_GRUB_PROBE_} --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
-    
-    USR_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(${_GRUB_PROBE_} --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_HINTS_STRING="$(${_GRUB_PROBE_} --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
     
     ########
@@ -4474,18 +4472,14 @@ EOF
     sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
     
-    if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
+    if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
-    elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
-        ## GRUB(2) does not yet support PARTUUID
-        GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
-    elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
-    elif [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
-        ## GRUB(2) does not yet support PARTLABEL
-        GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
     else
-        GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
+        if [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] ; then
+            GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
+        else
+            GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
+        fi
     fi
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
@@ -4555,8 +4549,8 @@ EOF
 
 if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
-        ## Microsoft Windows via x86_64 UEFI
-        #menuentry \"Microsoft Windows x86_64 UEFI-GPT\" {
+        ## Microsoft Windows Vista/7/8 via x86_64 UEFI
+        #menuentry \"Microsoft Windows Vista/7/8 x86_64 UEFI-GPT\" {
         #    insmod part_gpt
         #    insmod fat
         #    insmod search_fs_uuid
@@ -4577,14 +4571,24 @@ EOF
 
 if [ "\${grub_platform}" == "pc" ]; then
     
-    ## Microsoft Windows via BIOS
-    #menuentry \"Microsoft Windows 7 BIOS-MBR\" {
+    ## Microsoft Windows Vista/7/8 via BIOS
+    #menuentry \"Microsoft Windows Vista/7/8 BIOS-MBR\" {
     #    insmod part_msdos
     #    insmod ntfs
     #    insmod search_fs_uuid
     #    insmod ntldr
-    #    search --fs-uuid --no-floppy --set=root 69B235F6749E84CE
+    #    search --fs-uuid --no-floppy --set=root <FS_UUID of Windows SYSTEM Partition>
     #    ntldr /bootmgr
+    #}
+    
+    ## Microsoft Windows XP
+    #menuentry \"Microsoft Windows XP\" {
+    #    insmod part_msdos
+    #    insmod ntfs
+    #    insmod search_fs_uuid
+    #    insmod ntldr
+    #    search --fs-uuid --no-floppy --set=root <FS_UUID of Windows SYSTEM Partition>
+    #    ntldr /ntldr
     #}
     
 fi
