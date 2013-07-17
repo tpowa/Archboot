@@ -736,19 +736,19 @@ mapdev() {
     partition_flag=0
     device_found=0
     # check if we use hd sd  or vd device
-    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/hd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
+    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
         linuxdevice=$(echo ${1} | sed -e 's#p[0-9].*$##')
     else
         linuxdevice=$(echo ${1} | sed -e 's#[0-9].*$##g')
     fi
-    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/hd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
+    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
         if [[ "$(echo ${1} | egrep 'p[0-9].*$')" ]]; then
             pnum=$(echo ${1} | sed -e 's#.*p##g')
             partition_flag=1
         fi
     else
         if [[ "$(echo ${1} | egrep '[0-9]$')" ]]; then
-            # /dev/hdXY
+            # /dev/sdX and /dev/vdX
             pnum=$(echo ${1} | cut -b9-)
             partition_flag=1
         fi
@@ -1880,7 +1880,7 @@ autoprepare() {
     
     PART_ROOT="${DEVICE}${_ROOT_PART_NUM}"
     
-    # we assume a /dev/hdX format (or /dev/sdX)
+    # we assume a /dev/sdX format
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         printk off
