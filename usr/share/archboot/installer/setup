@@ -351,18 +351,9 @@ get_media() {
     done
        
     AUTOMOUNT="1"
-    
-    # ide devices
-    if [[ "${SET_MEDIA}" == "0" ]]; then
-        for dev in $(ls ${block} | egrep '^hd'); do
-            if [[ "$(cat ${block}/${dev}/device/media)" = "cdrom" ]]; then
-                check_media
-            fi
-        done
-    fi
 
     if [[ "${SET_MEDIA}" == "0" ]]; then
-        # scsi/sata and other devices
+        # ide/scsi/sata and other devices
         for dev in $(ls ${block} | egrep '^[sv]d|^sr|^scd|^sg'); do
             if ! [[ -e "${block}/${dev}/device/type" ]]; then
                 #check virtio devices
