@@ -4357,8 +4357,8 @@ do_grub_config() {
     ########
     
     if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
-        ROOT_PART_GPT_GUID="$(${_BLKID} -p -i -o value -s PART_ENTRY_UUID ${ROOT_PART_DEVICE})"
-        ROOT_PART_GPT_LABEL="$(${_BLKID} -p -i -o value -s PART_ENTRY_NAME ${ROOT_PART_DEVICE})"
+        ROOT_PART_GPT_GUID="$(${_LSBLK} PARTUUID ${ROOT_PART_DEVICE})"
+        ROOT_PART_GPT_LABEL="$(${_LSBLK} PARTLABEL ${ROOT_PART_DEVICE})"
     fi
     
     ########
