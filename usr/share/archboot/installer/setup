@@ -41,10 +41,6 @@ block="/sys/block"
 PART_ROOT=""
 ROOTFS=""
 
-# Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-# Compaq Intelligent Drive Array
-EXTRA_CONTROLLER="rd cciss ida"
-
 # install stages
 S_SRC=0         # choose install medium
 S_NET=0         # network configuration
@@ -226,7 +222,7 @@ activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
         if [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]]; then
-            for PART in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS" | cut -d' ' -f 1); do
+            for PART in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 OPEN_LUKS=""
                 for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
@@ -425,102 +421,39 @@ destdir_mounts(){
     fi
 }
 
-# lists default linux blockdevices
-default_blockdevices() {
-    #ide/scsi/sata devices, and virtio blockdevices (/dev/vd*)
-    for dev in $(ls ${block} 2>/dev/null | egrep '^[sv]d'); do
-        # virtio device doesn't have type file!
-        blktype="$(cat ${block}/${dev}/device/type 2>/dev/null)"
-        if ! [[ "${blktype}" = "5" ]]; then
-            if ! [[ "$(cat ${block}/${dev}/size)" = "0" ]]; then
-                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "${dev}\[")" || "$(dmraid -rc | grep /dev/${dev})" ]]; then
-                    echo "/dev/${dev}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-            fi
-        fi
-    done
+# lists linux blockdevices
+blockdevices() {
+     # all available block disk devices
+     for dev in $(${_LSBLK} NAME,TYPE -d | grep "disk$" | cut -d' ' -f1); do
+         # exclude complete disks as raid_devices or dmraid_devices
+         if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")" || "$(dmraid -rc | grep ${dev})" ]]; then
+             echo "${dev}"
+             [[ "${1}" ]] && echo ${1}
+         fi
+     done
 }
 
-# lists additional linux blockdevices
-additional_blockdevices() {
-    # Include additional controllers:
-    # Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-    # Compaq Intelligent Drive Array
-    for i in ${EXTRA_CONTROLLER}; do
-        for dev in $(ls ${block} 2>/dev/null | egrep "^${i}"); do
-            for k in $(ls ${block}/${dev} 2>/dev/null | egrep "${dev}*p"); do
-                if [[ -d "${block}/${dev}/${k}" ]]; then
-                    echo "/dev/${i}/$(echo ${dev} | sed -e 's#.*\!##g')"
-                    [[ "${1}" ]] && echo ${1}
-                    break
-                fi
-            done
-        done
-    done
-    # Include MMC devices
-    for dev in $(ls ${block} 2>/dev/null | egrep '^mmcblk'); do
-        for i in $(ls ${block}/${dev} 2>/dev/null | egrep ${dev}p); do 
-            if [[ -d "${block}/${dev}/${i}" ]]; then 
-                echo "/dev/${dev}"
+# lists linux blockdevice partitions
+blockdevices_partitions() {
+    # all available block devices partitions
+    for part in $(${_LSBLK} NAME,TYPE -ds | grep "part$"| cut -d' ' -f1); do
+        # exclude checks:
+        #- part of raid device
+        #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
+            #- part of lvm2 device
+            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
+            #- part of luks device
+            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
+            #- extended partition
+            #  $(sfdisk -l 2>/dev/null | grep ${part} | grep "Extended$")"
+            #- bios_grub partitions
+            #  "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")"
+            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep $(basename ${part}))" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep ${part} | grep "Extended$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+                echo "${part}"
                 [[ "${1}" ]] && echo ${1}
-                break
-            fi
-        done
-    done
-}
+            fi           
 
-# lists additional linux blockdevices partitions
-additional_blockdevices_partitions() {
-    # Mylex DAC960 PCI RAID controller, Compaq Next Generation Drive Array, 
-    # Compaq Intelligent Drive Array
-    for k in ${EXTRA_CONTROLLER}; do
-        for dev in $(ls ${block} 2>/dev/null | egrep "^${k}"); do
-            for i in $(ls ${block}/${dev} 2>/dev/null | egrep "${dev}*p"); do
-                if [[ -d "${block}/${dev}/${i}" ]]; then
-                    disk="${k}/$(echo ${dev} | sed -e 's#.*\!##g')"
-                    part="${k}/$(echo ${i} | sed -e 's#.*\!##g')"
-                    # exclude checks:
-                    #- part of raid device
-                    #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
-                    #- part of lvm2 device
-                    #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
-                    #- part of luks device
-                    #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
-                    #- extended partition on device
-                    #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
-                    #- bios_grub partitions
-                    # $(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-                    if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
-                        echo "/dev/${part}"
-                        [[ "${1}" ]] && echo ${1}
-                    fi
-                fi
-            done
         done
-    done
-    # Include MMC devices
-    for dev in $(ls ${block} 2>/dev/null | egrep '^mmcblk'); do
-        for i in $(ls ${block}/${dev} 2>/dev/null | egrep ${dev}p); do 
-            if [[ -d "${block}/${dev}/${i}" ]]; then
-                # exclude checks:
-                #- part of raid device
-                #  $(cat /proc/mdstat 2>/dev/null | grep ${i})
-                #- part of lvm2 device
-                #  $(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")
-                #- part of luks device
-                #  $(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS")
-                #- extended partition on device
-                #  $(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g" 2>/dev/null | grep "5")
-                #- bios_grub partitions
-                # $(echo ${i} | grep "[a-z]$(parted -s /dev/${dev} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-                if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${i})" || "$(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")" || $(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS") || "$(sfdisk -c /dev/${dev} $(echo ${i} | sed -e "s#${dev}\p##g") 2>/dev/null | grep "5")" || "$(echo ${i} | grep "[a-z]$(parted -s /dev/${dev} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
-                    echo "/dev/${i}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-            fi
-        done
-    done
 }
 
 # list none partitionable raid md devices
@@ -582,15 +515,15 @@ dmraid_devices() {
 # - remove part ot raid
 check_dm_devices() {
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "crypto_LUKS" | cut -d' ' -f 1)"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "crypto_LUKS$" | cut -d' ' -f 1)"
         partofcrypt="${partofcrypt} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "LVM2_member" | cut -d' ' -f 1)"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "LVM2_member$" | cut -d' ' -f 1)"
         partoflvm="${partoflvm} ${k}"
     done
     for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "linux_raid_member" | cut -d' ' -f 1)"
+        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "linux_raid_member$" | cut -d' ' -f 1)"
         partofraid="${partofraid} ${k}"
     done
 }
@@ -634,44 +567,14 @@ dmraid_partitions() {
     fi
 }
 
-# do sanity checks on partitions, argument comes ${devpath} loop
-default_partition_check() {
-        disk=$(basename ${devpath})
-        for part in $(ls ${block}/${disk} 2>/dev/null | egrep -v ^${disk}p | egrep ^${disk}); do
-            # exclude checks:
-            #- part of raid device
-            #  $(cat /proc/mdstat 2>/dev/null | grep ${part})
-            #- part of lvm2 device
-            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
-            #- part of luks device
-            #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
-            #- extended partition
-            #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")
-            #- extended partition on raid partition device and mmc device
-            #  $(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g" 2>/dev/null | grep "5")
-            #- bios_grub partitions
-            # $(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")
-            if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep ${part})" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}##g") 2>/dev/null | grep "5")" || "$(sfdisk -c /dev/${disk} $(echo ${part} | sed -e "s#${disk}\p##g") 2>/dev/null | grep "5")" || "$(echo ${part} | grep "[a-z]$(parted -s /dev/${disk} print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
-                if [[ -d ${block}/${disk}/${part} ]]; then
-                    echo "/dev/${part}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-            fi
-        done
-}
-
 finddisks() {
-    default_blockdevices ${1}
-    additional_blockdevices ${1}
+    blockdevices ${1}
     dmraid_devices ${1}
     partitionable_raid_devices ${1}
 }
 
 findpartitions() {
-    for devpath in $(finddisks); do
-        default_partition_check ${1}
-    done
-    additional_blockdevices_partitions ${1}
+    blockdevices_partitions ${1}
     dm_devices ${1}
     dmraid_partitions ${1}
     raid_devices ${1}
@@ -681,8 +584,7 @@ findpartitions() {
 # don't check on raid devices!
 findbootloaderdisks() {
     if ! [[ "${USE_DMRAID}" = "1" ]]; then
-        default_blockdevices ${1}
-        additional_blockdevices ${1}
+        blockdevices ${1}
     else
         dmraid_devices ${1}
     fi
@@ -691,10 +593,7 @@ findbootloaderdisks() {
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
     if ! [[ "${USE_DMRAID}" = "1" ]]; then
-        for devpath in $(findbootloaderdisks); do
-            default_partition_check ${1}
-        done
-        additional_blockdevices_partitions ${1}
+        blockdevices_partitions ${1}
     else
         dmraid_partitions ${1}
     fi
@@ -916,7 +815,7 @@ _stopmd()
                 mdadm --manage --stop /dev/${i} > ${LOG}
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member" | cut -d' ' -f 1); do
+            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 mdadm --zero-superblock ${i} > ${LOG}
             done
         fi
@@ -926,7 +825,7 @@ _stopmd()
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
         if [[ "${DISABLEMDSB}" = "1" ]]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member" | cut -d' ' -f 1); do
+            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 mdadm --zero-superblock ${i} > ${LOG}
             done
         fi
@@ -993,13 +892,13 @@ _stopluks()
     DETECTED_LUKS=""
 
     # detect not running luks devices
-    [[ "$(${_LSBLK} FSYTPE | grep "crypto_LUKS")" ]] && DETECTED_LUKS=1
+    [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]] && DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
     if [[ "${DISABLELUKS}" = "1" ]]; then
         DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
-        for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS" | cut -d' ' -f 1); do
+        for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f 1); do
             # delete header from device
             dd if=/dev/zero of=${i} bs=512 count=2048 >/dev/null 2>&1
         done
@@ -1700,10 +1599,10 @@ autoprepare() {
     NAME_SCHEME_PARAMETER_RUN=""
     # switch for mbr usage
     set_guid
-    DISCS=$(default_blockdevices)
+    DISCS=$(blockdevices)
     if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
         DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the storage drive to use" 14 55 7 $(default_blockdevices _) 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
         DISC="${DISCS}"
