@@ -425,7 +425,11 @@ destdir_mounts(){
 blockdevices() {
      # all available block disk devices
      for dev in $(${_LSBLK} NAME,TYPE -d | grep "disk$" | cut -d' ' -f1); do
-         # exclude complete disks as raid_devices or dmraid_devices
+         # exclude checks:
+         #- exclude complete disks as raid_devices
+         #  $(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")
+         #- dmraid_devices
+         #  $(dmraid -rc | grep ${dev})
          if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")" || "$(dmraid -rc | grep ${dev})" ]]; then
              echo "${dev}"
              [[ "${1}" ]] && echo ${1}
@@ -1965,7 +1969,7 @@ partition() {
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
     # update dmraid
-    _dmraid_update
+    ! [[ "$(dmraid_devices)" = "" ]] && _dmraid_update
     # switch for mbr usage
     set_guid
     # Select disk to partition
