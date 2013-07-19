@@ -424,13 +424,13 @@ destdir_mounts(){
 # lists linux blockdevices
 blockdevices() {
      # all available block disk devices
-     for dev in $(${_LSBLK} NAME,TYPE -d | grep "disk$" | cut -d' ' -f1); do
+     for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
          # exclude checks:
          #- exclude complete disks as raid_devices
          #  $(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")
          #- dmraid_devices
-         #  $(dmraid -rc | grep ${dev})
-         if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")" || "$(dmraid -rc | grep ${dev})" ]]; then
+         #  $(${_LSBLK} TYPE ${dev} | grep dmraid
+         if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")" || "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" ]]; then
              echo "${dev}"
              [[ "${1}" ]] && echo ${1}
          fi
@@ -440,7 +440,7 @@ blockdevices() {
 # lists linux blockdevice partitions
 blockdevices_partitions() {
     # all available block devices partitions
-    for part in $(${_LSBLK} NAME,TYPE -ds | grep "part$"| cut -d' ' -f1); do
+    for part in $(${_LSBLK} NAME,TYPE | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
         #  $(cat /proc/mdstat 2>/dev/null | grep "$(basename ${part})"
@@ -499,74 +499,51 @@ partitionable_raid_devices_partitions() {
     done
 }
 
-# lists default linux dmraid devices
+# lists linux dmraid devices
 dmraid_devices() {
-    if [[ -d /dev/mapper ]]; then
-        for fakeraid in $(dmraid -s -c); do
-                if [[ "$(echo ${fakeraid} | grep '_')" ]]; then
-                    echo "/dev/mapper/${fakeraid}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-        done
-    fi
+    for dev in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
+            echo "${dev}"
+            [[ "${1}" ]] && echo ${1}
+    done
 }
 
-# check_dm_devices
-# - remove part of encrypted devices
-# - remove part of lvm
-# - remove part ot raid
-check_dm_devices() {
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "crypto_LUKS$" | cut -d' ' -f 1)"
-        partofcrypt="${partofcrypt} ${k}"
-    done
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "LVM2_member$" | cut -d' ' -f 1)"
-        partoflvm="${partoflvm} ${k}"
-    done
-    for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-        k="$(${_LSBLK} NAME,FSTYPE /dev/mapper/${devpath} 2>/dev/null | grep "linux_raid_member$" | cut -d' ' -f 1)"
-        partofraid="${partofraid} ${k}"
+# dmraid_partitions
+# - show dmraid partitions
+dmraid_partitions() {
+    for part in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
+        # exclude checks:
+        # - part of lvm2 device
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        # - part of luks device
+        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        # - part of raid device
+        #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
+        # - extended partition
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" ]]; then
+            echo "${part}"
+            [[ "${1}" ]] && echo ${1}
+        fi
     done
 }
 
 # dm_devices
 # - show device mapper devices 
 dm_devices() {
-    check_dm_devices
-    for i in $(dmraid -s -c); do
-        EXCLUDE_DMRAID=""
-        if [[ "$(echo ${i} | grep '_')" ]]; then
-             EXCLUDE_DMRAID="${EXCLUDE_DMRAID} -e ${i} "
+    # lvm2 and cryptdevices
+    for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1); do
+        # exclude checks:
+        # - part of lvm2 device
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        # - part of luks device
+        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        # - part of raid device
+        #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
+        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")" ]]; then
+            echo "${dev}"
+            [[ "${1}" ]] && echo ${1}
         fi
     done
-    if [[ -d /dev/mapper ]]; then
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v -e control ${EXCLUDE_DMRAID}); do
-            if ! [[ "$(ls ${partofcrypt} 2>/dev/null | grep /dev/mapper/${devpath}$)" || "$(ls ${partoflvm} 2>/dev/null | grep /dev/mapper/${devpath}$)" || "$(ls ${partofraid} 2>/dev/null | grep /dev/mapper/${devpath}$)" ]]; then
-                echo "/dev/mapper/${devpath}"
-                [[ "${1}" ]] && echo ${1}
-            fi
-        done
-    fi
-}
-
-# dmraid_partitions
-# - show dmraid partitions
-dmraid_partitions() {
-    check_dm_devices
-    if [[ -d /dev/mapper ]]; then
-        for fakeraid in $(dmraid -s -c); do
-            if [[ "$(echo ${fakeraid} | grep '_')" ]]; then
-                for k in $(ls /dev/mapper/${fakeraid}*); do
-                    devpath=$(basename ${k})
-                    if ! [[ "$(dmraid -s -c | grep ${devpath}$)" || "$(ls ${partofcrypt} 2>/dev/null | grep /dev/mapper/${devpath}$)" || "$(ls ${partoflvm} 2>/dev/null | grep /dev/mapper/${devpath}$)" || "$(ls ${partofraid} 2>/dev/null | grep /dev/mapper/${devpath}$)" ]]; then
-                        echo "/dev/mapper/${devpath}"
-                        [[ "${1}" ]] && echo ${1}
-                    fi
-                done
-            fi
-        done
-    fi
 }
 
 finddisks() {
