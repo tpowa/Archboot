@@ -471,8 +471,10 @@ raid_devices() {
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
     for dev in $(ls ${block} 2>/dev/null | egrep '^md'); do
-        for i in $(ls ${block}/${dev} 2>/dev/null | egrep "${dev}\!*p"); do 
-            if [[ -d "${block}/${dev}/${i}" ]]; then 
+         echo $dev >>/tmp/debug.txt
+        for i in $(ls ${block}/${dev} 2>/dev/null | egrep "${dev}\!*p"); do
+         echo $i >> /tmp/debug.txt
+            if [[ -d "${block}/${dev}/${i}" ]]; then
                 echo "/dev/${dev}"
                 [[ "${1}" ]] && echo ${1}
                 break
@@ -483,16 +485,18 @@ partitionable_raid_devices() {
 
 # lists default linux partitionable raid devices
 partitionable_raid_devices_partitions() {
-    for dev in $(ls ${block} 2>/dev/null | egrep '^md'); do
-        for i in $(ls ${block}/${dev} 2>/dev/null | egrep ${dev}p); do 
-            if [[ -d "${block}/${dev}/${i}" ]]; then
-                # exlude md partitions which are part of lvm or luks
-                if ! [[ "$(${_LSBLK} FSTYPE /dev/${i} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${i} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "/dev/${i}" | grep "Extended$")" ]]; then
-                    echo "/dev/${i}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-            fi
-        done
+    for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1); do
+        # exclude checks:
+        # - part of lvm2 device_found
+        #   ${_LSBLK} FSTYPE ${part} | grep "LVM2_member")
+        # - part of luks device
+        #   $(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")
+        # - extended partition
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" ]]; then
+            echo "${part}"
+            [[ "${1}" ]] && echo ${1}
+        fi
     done
 }
 
