@@ -457,13 +457,15 @@ blockdevices_partitions() {
 
 # list none partitionable raid md devices
 raid_devices() {
-    for devpath in $(ls ${block} 2>/dev/null | egrep '^md'); do
-        if ! [[ "$(ls ${block}/${devpath} 2>/dev/null | egrep ${devpath}p)" ]]; then 
-            # exlude md partitions which are part of lvm or luks
-            if ! [[ "$(${_LSBLK} FSTYPE /dev/${devpath} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE /dev/${devpath} | grep "crypto_LUKS")" ]]; then
-                    echo "/dev/${devpath}"
-                    [[ "${1}" ]] && echo ${1}
-            fi
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep -v "_d.*$"); do
+        # exclude checks:
+        # - part of lvm2 device_found
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        # - part of luks device
+        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")" ]]; then
+            echo "${dev}"
+            [[ "${1}" ]] && echo ${1}
         fi
     done
 }
