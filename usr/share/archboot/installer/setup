@@ -470,20 +470,13 @@ raid_devices() {
 
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
-    for dev in $(ls ${block} 2>/dev/null | egrep '^md'); do
-         echo $dev >>/tmp/debug.txt
-        for i in $(ls ${block}/${dev} 2>/dev/null | egrep "${dev}\!*p"); do
-         echo $i >> /tmp/debug.txt
-            if [[ -d "${block}/${dev}/${i}" ]]; then
-                echo "/dev/${dev}"
-                [[ "${1}" ]] && echo ${1}
-                break
-            fi
-        done
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep "_d.*$"); do
+        echo "${dev}"
+        [[ "${1}" ]] && echo ${1}
     done
 }
 
-# lists default linux partitionable raid devices
+# lists linux partitionable raid devices partitions
 partitionable_raid_devices_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1); do
         # exclude checks:
