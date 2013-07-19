@@ -1130,6 +1130,7 @@ _createraid()
         if [[ "${GUIDPARAMETER}" = "" ]]; then
             DIALOG --msgbox "Now you'll be put into the parted program where you can partition your raiddevice to your needs." 18 70
             clear
+            parted -a optimal -s ${RAIDDEVICE} mktable msdos
             parted ${RAIDDEVICE} print
             parted ${RAIDDEVICE}
         else
