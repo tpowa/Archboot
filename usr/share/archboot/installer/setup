@@ -707,66 +707,23 @@ set_guid() {
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
-# Get a list of available disks for use in the "Available disks" dialogs. This
-# will print the mountpoints as follows, getting size info from /sys:
-#   /dev/sda: 64000 MB
-#   /dev/sdb: 64000 MB
+# Get a list of available disks for use in the "Available disks" dialogs. 
+# This will print the mountpoints as follows, getting size info from lsblk:
+#   /dev/sda 64G
 _getavaildisks()
 {
     for i in $(finddisks); do
-            if [[ "$(echo "${i}" | grep '/dev/mapper')" ]]; then
-                # device mapper is always 512 aligned!
-                # only dmraid device can be here
-                echo -n "${i} : "; echo $(($(expr 512 '*' $(dmsetup status ${i} | cut -f2 -d " "))/1000000)) MB; echo "\n"
-            # special block devices
-            elif [[  "$(echo "${i}" | grep "/dev/rd")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/rd\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/rd\!$(basename ${i} | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
-            elif [[  "$(echo "${i}" | grep "/dev/cciss")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/cciss\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/cciss\!$(basename ${i} | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
-            elif [[  "$(echo "${i}" | grep "/dev/ida")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/ida\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/ida\!$(basename ${i} | sed -e 's#p.*##g')/size))/1000000)) MB; echo "\n"
-            else
-                echo -n "${i} : "; echo $(($(expr $(cat ${block}/$(basename ${i})/queue/logical_block_size) '*' $(cat ${block}/$(basename ${i})/size))/1000000)) MB; echo "\n"
-            fi
+        ${_LSBLK} NAME,SIZE -d ${i}
     done
 }
 
-# Get a list of available partitions for use in the "Available Mountpoints" dialogs. This
-# will print the mountpoints as follows, getting size info from /sys:
-#   /dev/sda1: 640 MB
-#   /dev/sdb2: 640 MB
+# Get a list of available partitions for use in the "Available Mountpoints" dialogs. 
+# This will print the mountpoints as follows, getting size info from lsblk:
+#   /dev/sda1 640M
 _getavailpartitions()
 {
     for i in $(findpartitions); do
-        # mmc and raid partitions
-        if [[ "$(echo "${i}" | grep '/dev/md_d[0-9]')"  ||  "$(echo "${i}" | grep '/dev/md[0-9]p')" || "$(echo "${i}" | grep '/dev/mmcblk')" ]]; then
-            echo -n "${i}: "; echo $(($(expr $(cat ${block}/$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/$(basename ${i} | sed -e 's#p.*##g')/$(basename ${i})/size))/1000000)) MB; echo "\n"
-        # special block devices
-        elif [[  "$(echo "${i}" | grep "/dev/rd")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/rd\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/rd\!$(basename ${i} | sed -e 's#p.*##g')/rd\!$(basename ${i})/size))/1000000)) MB; echo "\n"
-        elif [[  "$(echo "${i}" | grep "/dev/cciss")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/cciss\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/cciss\!$(basename ${i} | sed -e 's#p.*##g')/cciss\!$(basename ${i})/size))/1000000)) MB; echo "\n"
-        elif [[  "$(echo "${i}" | grep "/dev/ida")" ]]; then
-                echo -n "${i}: "; echo $(($(expr $(cat ${block}/ida\!$(basename ${i} | sed -e 's#p.*##g')/queue/logical_block_size) '*' $(cat ${block}/ida\!$(basename ${i} | sed -e 's#p.*##g')/ida\!$(basename ${i})/size))/1000000)) MB; echo "\n"
-        # raid device
-        elif [[ "$(echo "${i}" | grep -v 'p' |grep '/dev/md')" ]]; then
-            echo -n "${i}: "; echo $(($(expr $(cat ${block}/$(basename ${i})/queue/logical_block_size) '*' $(cat ${block}/$(basename ${i})/size))/1000000)) MB; echo "\n"
-        # mapper devices
-        elif [[ "$(echo "${i}" | grep '/dev/mapper')" ]]; then
-            # mapper devices are always 512 aligned
-            # crypt device
-            if [[ "$(cryptsetup status ${i} 2>/dev/null)" ]]; then
-                echo -n "${i}: "; echo $(($(expr 512 '*' $(cryptsetup status $(basename ${i}) | grep " size:" | sed -e 's#sectors##g' -e 's#size:##g'))/1000000)) MB; echo "\n"
-            # dmraid device
-            elif [[ "$(dmsetup info ${i} | grep 'DMRAID')"  ]]; then
-                [[ "$(echo ${i} | grep 'p*[0-9]$')" ]] && echo -n "${i}: "; echo $(($(expr 512 '*' $(dmsetup status ${i} | cut -f2 -d " "))/1000000)) MB; echo "\n"
-            # mapper device
-            else
-                echo -n "${i}: "; echo $(lvs -o lv_size --noheading --units m ${i} | sed -e 's#m##g') MB; echo "\n"
-            fi
-        else
-            echo -n "${i}: "; echo $(($(expr $(cat ${block}/$(basename ${i} | sed -e 's#[0-9].*##g')/queue/logical_block_size) '*' $(cat ${block}/$(basename ${i} | sed -e 's#[0-9].*##g')/$(basename ${i})/size))/1000000)) MB; echo "\n"
-        fi
+        ${_LSBLK} NAME,SIZE -d ${i}
     done
 }
 
@@ -1045,7 +1002,7 @@ _raid()
             PARTIY=$(cat ${ANSWER})
         fi
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
+        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
@@ -1199,7 +1156,7 @@ _createpv()
             return 1
         fi
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         DEVNUMBER=1
         DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
@@ -1555,7 +1512,7 @@ _luks()
             return 1
         fi
         # show all devices with sizes
-        DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         DIALOG --menu "Select device for luks encryption" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         # enter luks name
@@ -1582,7 +1539,7 @@ autoprepare() {
     set_guid
     DISCS=$(blockdevices)
     if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
-        DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+        DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
@@ -1954,7 +1911,7 @@ partition() {
     # Select disk to partition
     DISCS=$(finddisks _)
     DISCS="${DISCS} OTHER _ DONE +"
-    DIALOG --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+    DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
     DISC=""
     while true; do
         # Prompt the user with a list of known disks
@@ -2387,7 +2344,7 @@ mountpoints() {
         #
         # Select mountpoints
         #
-        DIALOG --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+        DIALOG --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
         DO_SWAP=""
         while [[ "${DO_SWAP}" != "DONE" ]]; do
