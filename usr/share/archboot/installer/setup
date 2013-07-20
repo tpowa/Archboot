@@ -426,11 +426,9 @@ blockdevices() {
      # all available block disk devices
      for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
          # exclude checks:
-         #- exclude complete disks as raid_devices
-         #  $(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")
          #- dmraid_devices
          #  $(${_LSBLK} TYPE ${dev} | grep dmraid
-         if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${dev}\\[)")" || "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" ]]; then
+         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" ]]; then
              echo "${dev}"
              [[ "${1}" ]] && echo ${1}
          fi
