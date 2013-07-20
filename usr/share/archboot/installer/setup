@@ -528,9 +528,10 @@ dmraid_partitions() {
 }
 
 # dm_devices
-# - show device mapper devices 
+# - show device mapper devices:
+#   lvm2 and cryptdevices
 dm_devices() {
-    # lvm2 and cryptdevices
+    
     for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1); do
         # exclude checks:
         # - part of lvm2 device
@@ -888,6 +889,7 @@ _stopluks()
 #_dmraid_update
 _dmraid_update()
 {
+    printk off
     DIALOG --infobox "Deactivating dmraid devices ..." 0 0
     dmraid -an >/dev/null 2>&1
     if [[ "${DETECTED_LVM}" = "1" || "${DETECTED_LUKS}" = "1" ]]; then
@@ -902,6 +904,7 @@ _dmraid_update()
     fi
     DIALOG --infobox "Reactivating dmraid devices ..." 0 0
     dmraid -ay -Z >/dev/null 2>&1
+    printk on
 }
 
 #helpbox for raid
