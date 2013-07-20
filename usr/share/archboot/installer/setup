@@ -441,7 +441,7 @@ blockdevices_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
-        #  $(cat /proc/mdstat 2>/dev/null | grep "$(basename ${part})"
+        #  $(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")
         #- part of lvm2 device
         #  $(${_LSBLK} FSTYPE /dev/${part} | grep "LVM2_member")
         #- part of luks device
@@ -450,7 +450,7 @@ blockdevices_partitions() {
         #  $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"
         #- bios_grub partitions
         #  "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")"
-        if ! [[ "$(cat /proc/mdstat 2>/dev/null | grep "$(basename ${part})")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi           
@@ -459,7 +459,7 @@ blockdevices_partitions() {
 
 # list none partitionable raid md devices
 raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep -v "_d.*$"); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep -v "_d.*$" | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
@@ -474,7 +474,7 @@ raid_devices() {
 
 # lists default linux partitionable raid devices
 partitionable_raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep "_d.*$"); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep "_d.*$" | sort -u); do
         echo "${dev}"
         [[ "${1}" ]] && echo ${1}
     done
@@ -482,7 +482,7 @@ partitionable_raid_devices() {
 
 # lists linux partitionable raid devices partitions
 partitionable_raid_devices_partitions() {
-    for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1); do
+    for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${part} | grep "LVM2_member")
