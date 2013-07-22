@@ -538,7 +538,9 @@ dm_devices() {
         #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
         # - part of raid device
         #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
-        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")" ]]; then
+        # - part of running raid on encrypted device
+        #   $(${_LSBLK} TYPE ${dev} | grep " raid.*$
+        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")" || "$(${_LSBLK} TYPE ${dev} | grep "raid.*$")" ]]; then
             echo "${dev}"
             [[ "${1}" ]] && echo ${1}
         fi
