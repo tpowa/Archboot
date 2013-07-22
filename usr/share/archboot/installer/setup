@@ -1072,8 +1072,6 @@ _createpv()
     while [[ "${PVFINISH}" != "DONE" ]]; do
         activate_special_devices
         : >/tmp/.pvs-create
-        PVDEVICE=""
-        PARTS="$(findpartitions _)"
         # Remove all lvm devices with children
         LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do 
                     echo $(${_LSBLK} NAME ${i}) _
@@ -1377,66 +1375,72 @@ _luks()
     LUKSFINISH=""
     while [[ "${LUKSFINISH}" != "DONE" ]]; do
         activate_special_devices
-        PARTS="$(findpartitions _)"
-        ALREADYINUSE=""
-        # skip already encrypted devices, device mapper!
-        for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
-            [[ "$(cryptsetup status ${devpath})" ]] && ALREADYINUSE="${ALREADYINUSE} /dev/mapper/${devpath}"
-        done
+        # Remove all crypt devices with children
+        CRYPT_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do 
+                    echo $(${_LSBLK} NAME ${i}) _
+                    done)"
+        PARTS="$(for i in $(findpartitions); do 
+                ! [[ "$(echo "${CRYPT_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                done)"
+        # break if all dev
+        ## skip already encrypted devices, device mapper!
+        #for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
+        #    [[ "$(cryptsetup status ${devpath})" ]] && ALREADYINUSE="${ALREADYINUSE} /dev/mapper/${devpath}"
+        #done
         # skip already encrypted devices, device mapper with encrypted parts!
-        for devpath in $(pvs -o pv_name --noheading); do
-             if [[ "$(echo ${devpath} | grep dm-)" ]]; then
-                if [[ "$(cryptsetup status $(basename ${devpath}))" ]]; then
-                   killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
-                   ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
-                fi
-             fi
-             # remove hidden crypt by md device
-             if [[ "$(echo ${devpath} | grep /dev/md)" ]]; then
-                 mdcheck="$(echo ${devpath} | sed -e 's#/dev/##g')"
-                 if ! [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
-                     for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*'); do
-                         if [[ "$(cryptsetup status $(cat ${k}/dm/name))" ]]; then
-                             killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
-                             ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
-                         fi
-                     done
-                 fi
-             fi
-        done
-        # skip md devices, which already has encrypted devices!
-        for i in ${PARTS}; do
-            mdcheck="$(echo ${i} | sed -e 's#/dev/##g')"
-            if ! [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
-                for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
-                    [[ "$(cryptsetup status $(cat ${k}/dm/name))"  ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                    # check lvm devices if encryption was used!
-                    if [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]]; then
-                        for devpath in ${ALREADYINUSE}; do
-                            [[ "$(echo ${devpath} | grep "/dev/mapper/$(cat ${k}/dm/name)"$)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                        done
-                    fi
-                done
-            fi
-        done
+        #for devpath in $(pvs -o pv_name --noheading); do
+        #     if [[ "$(echo ${devpath} | grep dm-)" ]]; then
+        #        if [[ "$(cryptsetup status $(basename ${devpath}))" ]]; then
+        #           killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
+        #           ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
+        #        fi
+        #     fi
+        #     # remove hidden crypt by md device
+        #     if [[ "$(echo ${devpath} | grep /dev/md)" ]]; then
+        #         mdcheck="$(echo ${devpath} | sed -e 's#/dev/##g')"
+        #         if ! [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
+        #             for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*'); do
+        #                 if [[ "$(cryptsetup status $(cat ${k}/dm/name))" ]]; then
+        #                     killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
+        #                     ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
+        #                 fi
+        #             done
+        #         fi
+        #     fi
+        #done
+        ## skip md devices, which already has encrypted devices!
+        #for i in ${PARTS}; do
+        #    mdcheck="$(echo ${i} | sed -e 's#/dev/##g')"
+        #    if ! [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
+        #        for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
+        #            [[ "$(cryptsetup status $(cat ${k}/dm/name))"  ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
+        #            # check lvm devices if encryption was used!
+        #            if [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]]; then
+        #                for devpath in ${ALREADYINUSE}; do
+        #                    [[ "$(echo ${devpath} | grep "/dev/mapper/$(cat ${k}/dm/name)"$)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
+        #                done
+        #            fi
+        #        done
+        #    fi
+        #done
         # skip md partition devices, which already has encrypted devices!
-        for i in ${PARTS}; do
-            mdcheck="$(echo ${i} | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" != "" && "${mdcheck}" != "" ]]; then
-                for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
-                    [[ "$(cryptsetup status $(cat ${k}/dm/name))" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                    # check lvm devices if encryption was used!
-                    if [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]]; then
-                        for devpath in ${ALREADYINUSE}; do
-                            [[ "$(echo ${devpath} | grep "/dev/mapper/$(cat ${k}/dm/name)"$)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                        done
-                    fi
-                done
-            fi
-        done
-        for i in ${ALREADYINUSE}; do
-            PARTS=$(echo ${PARTS} | sed -e "s#${i}\ _##g")
-        done
+        #for i in ${PARTS}; do
+        #    mdcheck="$(echo ${i} | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
+        #    if [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" != "" && "${mdcheck}" != "" ]]; then
+        #        for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
+        #            [[ "$(cryptsetup status $(cat ${k}/dm/name))" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
+        #            # check lvm devices if encryption was used!
+        #            if [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]]; then
+        #                for devpath in ${ALREADYINUSE}; do
+        #                    [[ "$(echo ${devpath} | grep "/dev/mapper/$(cat ${k}/dm/name)"$)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
+        #                done
+        #            fi
+        #        done
+        #    fi
+        #done
+        #for i in ${ALREADYINUSE}; do
+        #    PARTS=$(echo ${PARTS} | sed -e "s#${i}\ _##g")
+        #done
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
             DIALOG --msgbox "No devices left for luks encryption." 0 0
