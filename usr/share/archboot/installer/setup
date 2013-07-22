@@ -605,7 +605,7 @@ freeze_xfs() {
 mapdev() {
     partition_flag=0
     device_found=0
-    # check if we use hd sd  or vd device
+    # check if we use sd or vd device
     if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
         linuxdevice=$(echo ${1} | sed -e 's#p[0-9].*$##')
     else
@@ -1382,7 +1382,7 @@ _luks()
         PARTS="$(for i in $(findpartitions); do 
                 ! [[ "$(echo "${CRYPT_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
                 done)"
-        # break if all devices in use
+        # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
             DIALOG --msgbox "No devices left for luks encryption." 0 0
             return 1
@@ -1427,9 +1427,8 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    if [[ "$(cat ${block}/$(basename ${DISC} 2>/dev/null)/size 2>/dev/null)" ]]; then
-        DISC_SIZE="$(($(expr $(cat ${block}/$(basename ${DISC})/queue/logical_block_size) '*' $(cat ${block}/$(basename ${DISC})/size))/1000000))"
-    else
+    DISC_SIZE="$(($(${_LSBLK} SIZE -d -b ${DISC})/1000000))"
+    if [[ "${DISC_SIZE}" = "" ]]; then
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
