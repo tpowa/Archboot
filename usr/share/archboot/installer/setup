@@ -539,7 +539,7 @@ dm_devices() {
         # - part of raid device
         #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
         # - part of running raid on encrypted device
-        #   $(${_LSBLK} TYPE ${dev} | grep " raid.*$
+        #   $(${_LSBLK} TYPE ${dev} | grep "raid.*$
         if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")" || "$(${_LSBLK} TYPE ${dev} | grep "raid.*$")" ]]; then
             echo "${dev}"
             [[ "${1}" ]] && echo ${1}
@@ -931,7 +931,7 @@ _raid()
         # check for devices
         # Remove all raid devices with children
         RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f1 | sort -u); do 
-                    echo $(${_LSBLK} NAME,TYPE ${i} | cut -d' ' -f1) _
+                    echo $(${_LSBLK} NAME ${i}) _
                     done)"
         PARTS="$(for i in $(findpartitions); do 
                 ! [[ "$(echo "${RAID_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
@@ -3730,24 +3730,24 @@ do_refind_uefi() {
     unset PACKAGES
     
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
-    cp -f "${DESTDIR}/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
+    cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons"
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/fonts"
     
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
-    cp -rf "${DESTDIR}/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+    cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+    mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"/ext2_x64.{,_}efi
     
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind.conf"
-    cp -f "${DESTDIR}/usr/lib/refind/config/refind.conf" "${_REFIND_CONFIG}"
+    cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
 
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
     sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
+    sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
-        
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/refind_linux.conf"
     else
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"

@@ -349,13 +349,13 @@ _update_uefi_rEFInd_USB_files() {
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind"
-	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
 	# cp -rf "/usr/share/refind/icons" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/icons" || true
 	# cp -rf "/usr/share/refind/fonts" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/fonts" || true
 	echo
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools"
-	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+	cp -rf "/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind.conf"
@@ -377,7 +377,7 @@ scan_delay 0
 
 dont_scan_dirs EFI/boot
 
-#scan_all_linux_kernels
+scan_all_linux_kernels
 
 max_tags 0
 

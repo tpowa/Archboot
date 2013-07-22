@@ -239,12 +239,12 @@ GUMEOF
 _prepare_uefi_rEFInd_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/refind"
-	cp -f "/usr/lib/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
+	cp -f "/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
 	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/refind/icons" || true
 	# cp -rf "/usr/share/refind/fonts" "${ALLINONE}/EFI/refind/fonts" || true
 	
 	mkdir -p "${ALLINONE}/EFI/tools"
-	cp -rf "/usr/lib/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+	cp -rf "/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
 	
 	cat << EOF > "${ALLINONE}/EFI/refind/refind.conf"
 timeout 5
@@ -265,7 +265,7 @@ scan_delay 0
 
 dont_scan_dirs EFI/boot
 
-#scan_all_linux_kernels
+scan_all_linux_kernels
 
 max_tags 0
 
