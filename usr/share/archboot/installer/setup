@@ -1074,47 +1074,13 @@ _createpv()
         : >/tmp/.pvs-create
         PVDEVICE=""
         PARTS="$(findpartitions _)"
-        ALREADYINUSE=""
-        # skip volume devices
-        for i in $(ls /dev/mapper/* | grep -v control); do
-            [[ "$(lvs ${i} 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-        done
-        # skip already encrypted volume devices
-        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
-            realdevice="$(cryptsetup status ${devpath} 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            if ! [[ "${realdevice}" = "" ]]; then
-                [[ "$(lvs ${realdevice} 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} /dev/mapper/${devpath}"
-            fi
-        done
-        # skip md devices, which already have lvm devices!
-        for i in ${PARTS}; do
-            mdcheck="$(echo ${i} | sed -e 's#/dev/##g')"
-            if ! [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" = "" ]]; then
-                for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
-                    # check encrypted volume
-                    realdevice="$(cryptsetup status $(cat ${k}/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-                    [[ "$(lvs ${realdevice} 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                    # check on normal lvs
-                    [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                done
-            fi
-        done
-        # skip md partition devices, which already have lvm devices!
-        for i in ${PARTS}; do
-            mdcheck="$(echo ${i} | grep /dev/md*p | sed -e 's#p.*##g' -e 's#/dev/##g')"
-            if [[ "$(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null)" != "" && "${mdcheck}" != "" ]]; then
-                for k in $(find ${block}/${mdcheck}/slaves/ -name 'dm*' 2>/dev/null); do
-                    # check encrypted volume
-                    realdevice="$(cryptsetup status $(cat ${k}/dm/name) 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-                    [[ "$(lvs ${realdevice} 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                   # check on normal lvs
-                    [[ "$(lvs /dev/mapper/$(cat ${k}/dm/name) 2>/dev/null)" ]] && ALREADYINUSE="${ALREADYINUSE} ${i}"
-                done
-            fi
-        done
-        for i in ${ALREADYINUSE}; do
-            PARTS=$(echo ${PARTS} | sed -e "s#${i}\ _##g")
-        done
+        # Remove all lvm devices with children
+        LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do 
+                    echo $(${_LSBLK} NAME ${i}) _
+                    done)"
+        PARTS="$(for i in $(findpartitions); do 
+                ! [[ "$(echo "${LVM_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
             DIALOG --msgbox "No devices left for physical volume creation." 0 0
