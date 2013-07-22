@@ -530,7 +530,7 @@ dmraid_partitions() {
 #   lvm2 and cryptdevices
 dm_devices() {
     
-    for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
@@ -927,50 +927,13 @@ _raid()
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
-        PARTS="$(findpartitions _)"
-        ALREADYINUSE=""
-        #hell yeah, this is complicated! kill software raid devices already in use.
-        ALREADYINUSE=$(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*linear##g' -e 's# :.*raid[0-9][0-9]##g' -e 's# :.*raid[0-9]##g' -e 's#\[[0-9]\]##g')
-        for i in ${ALREADYINUSE}; do
-            PARTS=$(echo ${PARTS} | sed -e "s#/dev/${i}\ _##g" -e "s#/dev/${i}\p[0-9]\ _##g")
-            k=$(echo /dev/${i} | sed -e 's#[0-9]##g')
-            if ! [[ "$(echo ${k} | grep ^md)" ]]; then
-                PARTS=$(echo ${PARTS} | sed -e "s#${k}\ _##g")
-            fi
-        done
-        # skip encrypted mapper devices which contain raid devices
-        ALREADYINUSE=""
-        for i in $(ls /dev/mapper/* 2>/dev/null | grep -v control); do
-            cryptsetup status ${i} 2>/dev/null | grep -q "device:.*/dev/md" && ALREADYINUSE="${ALREADYINUSE} ${i}"
-        done
-        # skip lvm with raid devices
-        for devpath in $(pvs -o pv_name --noheading); do
-            # skip simple lvm device with raid device
-            if [[ "$(echo ${devpath} | grep /dev/md)" ]]; then
-                killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
-                ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
-            fi
-            # skip encrypted raid device
-            if [[ "$(echo ${devpath} | grep dm-)" ]]; then
-                if [[ "$(cryptsetup status $(basename ${devpath}) | grep "device:.*/dev/md")" ]]; then
-                   killvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
-                   ALREADYINUSE="${ALREADYINUSE} $(ls /dev/mapper/${killvolumegroup}-*)"
-                fi
-            fi
-        done
-        # skip already encrypted volume devices with raid device
-        for devpath in $(ls /dev/mapper/ 2>/dev/null | grep -v control); do
-            realdevice="$(cryptsetup status ${devpath} 2>/dev/null | grep "device:.*/dev/mapper/" | sed -e 's#.*\ ##g')"
-            if [[ "$(lvs ${realdevice} 2>/dev/null)" ]]; then
-                vg="$(echo $(lvs -o vg_name --noheading ${realdevice}))"
-                if [[ "$(pvs -o pv_name,vg_name --noheading | grep "${vg}$" | grep "/dev/md")" ]]; then
-                   ALREADYINUSE="${ALREADYINUSE} /dev/mapper/${devpath}"
-                fi
-            fi
-        done
-        for i in ${ALREADYINUSE}; do
-            PARTS=$(echo ${PARTS} | sed -e "s#${i}\ _##g")
-        done
+        # Remove all raid devices with children
+        RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f1 | sort -u); do 
+                    echo $(${_LSBLK} NAME,TYPE ${i} | cut -d' ' -f1) _
+                    done)"
+        PARTS="$(for i in $(findpartitions); do 
+                ! [[ "$(echo "${RAID_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
             DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
