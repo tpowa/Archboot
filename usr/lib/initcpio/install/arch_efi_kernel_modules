@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
     add_checked_modules '/fs/efivarfs'
-    add_checked_modules '/firmware/efivars'
-    add_checked_modules '/firmware/efi_pstore'
+    add_checked_modules '/firmware/efi/efivars'
+    add_checked_modules '/firmware/efi/efi-pstore'
 }
 
 help ()
