@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 MODE="${1}"
 DESTDIR="${2}"
 PKGARG="${3}"
