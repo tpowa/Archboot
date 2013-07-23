@@ -303,7 +303,7 @@ check_media() {
             unset _iso_loop_path
         fi
     elif [[ ! "${dev}" == "" ]]; then
-        ! [[ "$(cat /proc/self/mounts | grep /dev/${dev})" ]] && mount "/dev/${dev}" "${_MEDIA}" >/dev/null 2>&1
+        ! [[ "$(cat /proc/self/mounts | grep ${dev})" ]] && mount "${dev}" "${_MEDIA}" >/dev/null 2>&1
     fi
     
     
@@ -350,30 +350,7 @@ get_media() {
 
     if [[ "${SET_MEDIA}" == "0" ]]; then
         # ide/scsi/sata and other devices
-        for dev in $(ls ${block} | egrep '^[sv]d|^sr|^scd|^sg'); do
-            if ! [[ -e "${block}/${dev}/device/type" ]]; then
-                #check virtio devices
-                check_media
-            else
-                if [[ "$(cat ${block}/${dev}/device/type)" = "5" ]]; then
-                    check_media
-                fi
-            fi
-        done
-    fi
-
-    if [[ "${SET_MEDIA}" == "0" ]]; then
-        # usb devices with raw partition
-        for dev in $(ls ${block} | egrep '^sd'); do
-            if [[ "$(cat ${block}/${dev}/device/type)" == "0" && "$(cat ${block}/${dev}/removable)" == "1" && ! "$(cat ${block}/${dev}/size)" == "0" ]]; then
-                check_media
-            fi
-        done
-    fi
-
-    if [[ "${SET_MEDIA}" == "0" ]]; then
-        # MMC devices with raw partitions
-        for dev in $(ls /dev/mmcblk* 2>/dev/null | egrep -v 'p'); do
+        for dev in $(${_LSBLK} NAME,TYPE | grep -e " disk$" -e " rom$" | cut -d' ' -f1); do
             check_media
         done
     fi
@@ -447,10 +424,12 @@ blockdevices_partitions() {
         #- part of luks device
         #  $(${_LSBLK} FSTYPE /dev/${part} | grep "crypto_LUKS")
         #- extended partition
-        #  $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"
+        #  $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
+        # - extended partition (LBA)
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
         #- bios_grub partitions
         #  "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")"
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi           
@@ -490,7 +469,10 @@ partitionable_raid_devices_partitions() {
         #   $(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")
         # - extended partition
         #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" ]]; then
+        # - extended partition (LBA)
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")")
+            echo "${part}"
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"  || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi
@@ -518,7 +500,9 @@ dmraid_partitions() {
         #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
         # - extended partition
         #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" ]]; then
+        # - extended partition (LBA)
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"|| "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi
