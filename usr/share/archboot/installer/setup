@@ -355,13 +355,6 @@ get_media() {
             check_media
         done
     fi
-
-    #if [[ "${SET_MEDIA}" == "0" ]]; then
-    #   # memdisk device with raw partitions
-    #    for dev in $(ls /dev/mtdblock0 2>/dev/null); do
-    #        check_media
-    #    done
-    #fi
     
 }
 
