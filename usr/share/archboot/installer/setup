@@ -342,6 +342,7 @@ get_media() {
         fi
         
         if [[ -n "${_iso_loop_dev}" ]] && [[ -n "${_iso_loop_path}" ]]; then
+            check_media
             break
         fi
     done
@@ -355,12 +356,12 @@ get_media() {
         done
     fi
 
-    if [[ "${SET_MEDIA}" == "0" ]]; then
-       # memdisk device with raw partitions
-        for dev in $(ls /dev/mtdblock0 2>/dev/null); do
-            check_media
-        done
-    fi
+    #if [[ "${SET_MEDIA}" == "0" ]]; then
+    #   # memdisk device with raw partitions
+    #    for dev in $(ls /dev/mtdblock0 2>/dev/null); do
+    #        check_media
+    #    done
+    #fi
     
 }
 
