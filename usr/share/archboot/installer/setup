@@ -34,9 +34,6 @@ FILE_URL="file:///packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 unset PACKAGES
 
-# destination of blockdevices in /sys
-block="/sys/block"
-
 # partitions
 PART_ROOT=""
 ROOTFS=""
@@ -3942,10 +3939,8 @@ do_syslinux_bios() {
     MBR="${DESTDIR}/usr/lib/syslinux/bios/mbr.bin"
     GPTMBR="${DESTDIR}/usr/lib/syslinux/bios/gptmbr.bin"
     
-    CHECKDEV="$(echo ${ROOTDEV} | sed 's|/dev/||g')"
-    
     ## Install MBR boot code only if the selected ROOTDEV is a DISC and not a partition
-    if [[ -e "${block}/${CHECKDEV}" ]]; then
+    if [[ "$(${_LSBLK} TYPE -d ${ROOTDEV} | grep "disk")" ]]; then
         ## check if GPT/GUID is used
         GUID_DETECTED=""
         [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
