@@ -219,7 +219,7 @@ activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
         if [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]]; then
-            for PART in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f 1); do
+            for PART in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 OPEN_LUKS=""
                 for devpath in $(ls /dev/mapper 2>/dev/null | grep -v control); do
