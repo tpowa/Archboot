@@ -1158,7 +1158,7 @@ _createvg()
             fi
         done
         # show all devices with sizes, which are not in use
-        DIALOG --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
+        DIALOG --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         PVNUMBER=1
         DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>${ANSWER} || return 1
