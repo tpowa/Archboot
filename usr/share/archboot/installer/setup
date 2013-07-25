@@ -1102,19 +1102,15 @@ findpv()
 
 getavailablepv()
 {
-    for i in "$(pvs -o pv_name,pv_size --noheading --units m)"; do
-            if [[ "$(echo ${i} | grep /dev/dm-)" ]]; then
-                for k in $(ls /dev/mapper | grep -v control); do
-                    if [[ -h /dev/mapper/${k} ]]; then
-                        pv="$(basename ${i})"
-                        if [[ "$(readlink /dev/mapper/${k} | grep ${pv}$)" ]]; then
-                            echo "${i}" | sed -e "s#/dev/dm-.* #/dev/mapper/${k} #g" | sed -e 's#$#\\n#'
-                        fi
-                    fi
-                 done
-            else
-                echo "${i}" | sed -e 's#$#\\n#'
-            fi
+    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1); do
+         # exclude checks:
+         #-  not part of running lvm2
+         # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
+         #- not part of volume group
+         # $(pvs -o vg_name --noheading ${i} | grep " $")
+         if [[ ! "$(${_LSBLK} TYPE ${i} | grep "lvm")" && $(pvs -o vg_name --noheading ${i} | grep " $") ]]; then
+             echo "$(${_LSBLK} NAME,SIZE ${i})"
+         fi
     done
 }
 
@@ -1161,8 +1157,8 @@ _createvg()
                 VGDEVICE=""
             fi
         done
-        # show all devices with sizes
-        DIALOG --msgbox "Physical Volumes:\n$(getavailablepv)\n\nPhysical Volumes that are not shown in next dialog, are already in use!" 0 0
+        # show all devices with sizes, which are not in use
+        DIALOG --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         PVNUMBER=1
         DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>${ANSWER} || return 1
