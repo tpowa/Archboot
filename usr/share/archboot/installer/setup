@@ -1079,28 +1079,24 @@ _createpv()
         DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0
         return 1
     fi
+    # run udevadm to get values exported
+    udevadm trigger
+    udevadm settle
 }
 
 #find physical volumes that are not in use
 findpv()
 {
-    for i in $(pvs -o pv_name --noheading);do
-        if [[ "$(pvs -o vg_name --noheading ${i})" = "      " ]]; then
-                if [[ "$(echo ${i} | grep /dev/dm-)" ]]; then
-                    for k in $(ls /dev/mapper | grep -v control); do
-                        if [[ -h /dev/mapper/${k} ]]; then
-                            pv="$(basename ${i})"
-                            if [[ "$(readlink /dev/mapper/${k} | grep ${pv}$)" ]]; then
-                                echo "${i}" | sed -e "s#/dev/dm-.*#/dev/mapper/${k}#g"
-                                [[ "${1}" ]] && echo ${1}
-                            fi
-                        fi
-                    done
-                else
-                    echo "${i}"
-                    [[ "${1}" ]] && echo ${1}
-                fi
-        fi
+    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1); do
+         # exclude checks:
+         #-  not part of running lvm2
+         # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
+         #- not part of volume group
+         # $(pvs -o vg_name --noheading ${i} | grep " $")
+         if [[ ! "$(${_LSBLK} TYPE ${i} | grep "lvm")" && $(pvs -o vg_name --noheading ${i} | grep " $") ]]; then
+             echo "${i}"
+             [[ "${1}" ]] && echo ${1}
+         fi
     done
 }
 
