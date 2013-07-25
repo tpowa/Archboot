@@ -84,6 +84,8 @@ else
         echo ":: Post-mount break requested, type 'exit' to resume operation"
         launch_interactive_shell
     fi
+
+    # this should always be the last thing we do before the switch_root.
     rdlogger_stop
     
     exec env -i \
