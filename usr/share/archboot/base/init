@@ -23,7 +23,7 @@ mkdir -m755 /run/initramfs
 mkdir -m1777 /run/lock
 
 # parse the kernel command line
-parse_cmdline
+parse_cmdline </proc/cmdline
 
 for d in ${disablehooks//,/ }; do
     [ -e "/hooks/$d" ] && chmod 644 "/hooks/$d"
