@@ -3,6 +3,7 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 udevd_running=0
 mount_handler=default_mount_handler
 init=/sbin/init
+rd_logmask=0
 
 if [ -x /usr/bin/systemd-timestamp ]; then
     RD_TIMESTAMP=$(systemd-timestamp)
@@ -24,6 +25,9 @@ mkdir -m1777 /run/lock
 
 # parse the kernel command line
 parse_cmdline </proc/cmdline
+
+# setup logging as early as possible
+rdlogger_start
 
 for d in ${disablehooks//,/ }; do
     [ -e "/hooks/$d" ] && chmod 644 "/hooks/$d"
@@ -80,7 +84,8 @@ else
         echo ":: Post-mount break requested, type 'exit' to resume operation"
         launch_interactive_shell
     fi
-
+    rdlogger_stop
+    
     exec env -i \
         "TERM=$TERM" \
         "RD_TIMESTAMP=$RD_TIMESTAMP" \
