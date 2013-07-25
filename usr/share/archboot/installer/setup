@@ -1127,9 +1127,9 @@ findvg()
 
 getavailablevg()
 {
-    for i in $(vgs -o vg_name,vg_free --noheading --units m); do
+    for i in "$(vgs -o vg_name,vg_free --noheading --units m)"; do
         if ! [[ "$(echo ${i} | grep " 0m$")" ]]; then
-            echo ${i} | sed -e 's#$#\\n#'
+            echo "${i}\n"
         fi
     done
 }
@@ -1199,8 +1199,8 @@ _createlv()
             DIALOG --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
             return 1
         fi
-        # show all devices with sizes
-        DIALOG --msgbox "Volume Groups:\n$(getavailablevg)\n\nVolume Groups that are not shown, are already 100% in use!" 0 0
+        # show all devices with sizes, which are not 100% in use!
+        DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
         DIALOG --menu "Select Volume Group" 21 50 13 ${LVS} 2>${ANSWER} || return 1
         LV=$(cat ${ANSWER})
         # enter logical volume name
