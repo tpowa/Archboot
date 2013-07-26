@@ -3040,9 +3040,9 @@ getrootfstype() {
 }
 
 getrootflags() {
-    # remove rw for all filesystems and gcpid for nilfs2
+    # remove gcpid for nilfs2
     ROOTFLAGS=""
-    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
+    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/,gcpid=.*[0-9]//g')"
     [[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
