@@ -5041,7 +5041,13 @@ install_bootloader() {
         set_device_name_scheme || return 1
     fi
     source_set || return 1
+    ### HACK: Always enable TESTING for bootloaders, until syslinux will finally move to core,
+    # due to PXE boot bug for archiso
+    DOTESTING_OFF=""
+    [[ "${DOTESTING}" = "" ]] && DOTESTING_OFF="1"
+    [[ "${MODE}" = "network" ]] && DOTESTING="yes"
     pacman_conf
+    [[ "${DOTESTING_OFF}" = "1" ]] &&  DOTESTING=""
     prepare_pacman
     CANCEL=""
     
