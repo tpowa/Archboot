@@ -392,7 +392,9 @@ blockdevices() {
          # exclude checks:
          #- dmraid_devices
          #  $(${_LSBLK} TYPE ${dev} | grep dmraid
-         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" ]]; then
+         #- iso9660 devices
+         #  "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")
+         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" || "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")" ]]; then
              echo "${dev}"
              [[ "${1}" ]] && echo ${1}
          fi
@@ -416,7 +418,9 @@ blockdevices_partitions() {
         #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
         #- bios_grub partitions
         #  "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")"
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" ]]; then
+        #- iso9660 devices
+        #  "$(${_LSBLK} FSTYPE -s ${part} | grep "iso9660")"
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || "$(echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$")" || "$(${_LSBLK} FSTYPE -s ${part} | grep "iso9660")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi           
