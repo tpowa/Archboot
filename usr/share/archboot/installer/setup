@@ -2562,6 +2562,7 @@ CheckSpace
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
+XferCommand = /usr/bin/curl -C - -f %u > %o
 
 ${TESTING_REPOSITORY}
 ${TESTING_SERVER}
@@ -3044,9 +3045,9 @@ getrootfstype() {
 }
 
 getrootflags() {
-    # remove gcpid for nilfs2
+    # remove rw for all filesystems and gcpid for nilfs2
     ROOTFLAGS=""
-    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/,gcpid=.*[0-9]//g')"
+    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
     [[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
@@ -3122,8 +3123,8 @@ bootloader_kernel_parameters() {
     
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     
-    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
+    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} rw"
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap rw" 
     
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
