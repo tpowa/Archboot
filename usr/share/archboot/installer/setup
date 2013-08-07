@@ -3044,9 +3044,9 @@ getrootfstype() {
 }
 
 getrootflags() {
-    # remove rw for all filesystems and gcpid for nilfs2
+    # remove rw for all filesystems
     ROOTFLAGS=""
-    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw//g' -e 's/,gcpid=.*[0-9]//g')"
+    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw,//g')"
     [[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
@@ -3758,7 +3758,7 @@ LABEL arch-fallback
 TEXT HELP
 Boot Arch Linux Fallback
 ENDTEXT
-    MENU LABEL Arch Linux
+    MENU LABEL Arch Linux Fallback
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
     INITRD ${subdir}/${INITRAMFS}-fallback.img
