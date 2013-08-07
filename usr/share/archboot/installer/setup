@@ -2693,7 +2693,7 @@ select_packages() {
         fi
         DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
         DO_EXTRA=""
-        DIALOG --yesno "Would you like to activate the [extra] repository for package installation to get the complete package list?" 0 0 && DO_EXTRA="yes"
+        DIALOG --defaultno --yesno "Would you like to activate the [extra] repository for package installation to get the complete package list?" 0 0 && DO_EXTRA="yes"
         local _catlist="base ^ ON"
         if [[ "${DO_EXTRA}" = "yes" ]]; then
             # show group listing for group selection
