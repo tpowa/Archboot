@@ -2562,7 +2562,6 @@ CheckSpace
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 CacheDir = /packages/core-$(uname -m)/pkg
 CacheDir = /packages/core-any/pkg
-XferCommand = /usr/bin/curl -C - -f %u > %o
 
 ${TESTING_REPOSITORY}
 ${TESTING_SERVER}
