@@ -186,7 +186,7 @@ It allows you to install Arch Linux or perform system maintenance.
 ENDTEXT
 MENU LABEL Boot Arch Linux (x86_64)
 LINUX /boot/vmlinuz_x86_64
-APPEND gpt loglevel=7 rootdelay=10
+APPEND cgroup_disable=memory gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_x86_64.img
 
 EOF
@@ -202,7 +202,7 @@ It allows you to install Arch Linux or perform system maintenance.
 ENDTEXT
 MENU LABEL Boot Arch Linux (i686)
 LINUX /boot/vmlinuz_i686
-APPEND gpt loglevel=7 rootdelay=10
+APPEND cgroup_disable=memory gpt loglevel=7 rootdelay=10
 INITRD /boot/initramfs_i686.img
 
 EOF
@@ -322,7 +322,7 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap
+options  cgroup_disable=memory gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap
 GUMEOF
 		
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -387,7 +387,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap"
+    options "cgroup_disable=memory gpt loglevel=7 efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap"
     ostype Linux
     graphics off
 }
