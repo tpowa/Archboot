@@ -45,4 +45,6 @@ run_hook ()
     else
         msg ":: Skipping already run by arch_root_advanced hook..."
     fi
+    ### HACK: allow udev assembly again!
+    rm /etc/udev/rules.d/64-md-raid-assembly.rules
 }
