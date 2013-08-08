@@ -3120,7 +3120,7 @@ bootloader_kernel_parameters() {
     
     [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
     
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP} cgroup_disable=memory"
     
     _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} rw"
     _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap rw" 
