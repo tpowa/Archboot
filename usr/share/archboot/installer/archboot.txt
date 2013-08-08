@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 12th 2013
+   August, 8th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -128,6 +128,12 @@ Archboot bootparameters
       - Usage:
         root=/dev/<your-root-of-installed-system>
         root=/dev/sda3
+
+   * rootflags
+       - Using this option will pass special mount options for your root device
+       - Usage:
+         rootflags=<comma-separated-array>
+         rootflags=subvol=root,compress,ssd
 
    * advanced
       - This will override advanced hooks running order for your system.

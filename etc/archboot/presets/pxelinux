@@ -4,7 +4,7 @@
 # DEFAULT kernel boot options like ip=:::::eth0:dhcp etc.
 # add your root= option, if you boot from a disk device
 # and don't want to add it by hand on each boot
-KERNEL_BOOT_OPTIONS="gpt loglevel=7 rootdelay=10"
+KERNEL_BOOT_OPTIONS="cgroup_disable=memory gpt loglevel=7 rootdelay=10"
 
 # mkinitcpio config file, defaulted to stock config file
 MKINITCPIO_CONFIG="/etc/archboot/default-pxelinux.conf"
