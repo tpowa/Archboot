@@ -3044,9 +3044,8 @@ getrootfstype() {
 }
 
 getrootflags() {
-    # remove rw for all filesystems
     ROOTFLAGS=""
-    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR} | sed -e 's/^rw,//g')"
+    ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR})"
     [[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
@@ -3120,10 +3119,10 @@ bootloader_kernel_parameters() {
     
     [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
     
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP} cgroup_disable=memory"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP} cgroup_disable=memory"
     
-    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} rw"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap rw" 
+    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} efi_pstore.pstore_disable=1 efi_no_storage_paranoia add_efi_memmap" 
     
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
