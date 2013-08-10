@@ -3704,7 +3704,7 @@ LABEL arch-fallback
 
 EOF
         
-        DIALOG --msgbox "You must review the syslinux configuration file.  You will now be put into the editor.  After you save your changes and exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_SYSLINUX_UEFI_CONFIG_PATH}"
     fi
@@ -3764,7 +3764,7 @@ ENDTEXT
     INITRD ${subdir}/${INITRAMFS}-fallback.img
 
 EOF
-        DIALOG --msgbox "You must review the syslinux configuration file.  You will now be put into the editor.  After you save your changes and exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_SYSLINUX_BIOS_CONFIG_PATH}"
     fi
@@ -3791,20 +3791,18 @@ do_syslinux_uefi() {
     
     do_efistub_copy_to_efisys
     
-    _SYSLINUX_UEFI="1"
-    do_syslinux_config
-    _SYSLINUX_UEFI=""
-    
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
         _BOOTMGR_LABEL="Syslinux"
         _BOOTMGR_LOADER_DIR="/EFI/syslinux/syslinux.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
+        _SYSLINUX_BIOS="0"
+        _SYSLINUX_UEFI="1"
+        do_syslinux_config
+        _SYSLINUX_UEFI=""
+        _SYSLINUX_BIOS=""
         
-        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
-        geteditor || return 1
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
+        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
@@ -3897,9 +3895,6 @@ do_syslinux_bios() {
     DIALOG --menu "Select the boot device where the ${SYSLINUX} BIOS bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
     ROOTDEV=$(cat ${ANSWER})
     
-    # generate config file
-    TEMPDIR="/tmp"
-    
     # check if GPT/GUID is used
     GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
@@ -3919,7 +3914,6 @@ do_syslinux_bios() {
     DIALOG --infobox "Installing the ${SYSLINUX} BIOS bootloader..." 0 0
     mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}" || true
     cp -f "${DESTDIR}/usr/lib/syslinux/bios"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
-    # cp -f "${TEMPDIR}/${SYSLINUX_CONF}" "${DESTDIR}/boot/${SYSLINUX_DIR}/${SYSLINUX_CONF}"
     
     chroot_mount
     chroot "${DESTDIR}" "${SYSLINUX_PROGRAM}" ${SYSLINUX_OPTS} --install "/boot/${SYSLINUX_DIR}" &>"${LOG}"
@@ -3941,13 +3935,15 @@ do_syslinux_bios() {
         fi
     fi
     
-    _SYSLINUX_BIOS="1"
-    do_syslinux_config
-    _SYSLINUX_BIOS=""
-    
     [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     
     if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" ]]; then
+        _SYSLINUX_UEFI="0"
+        _SYSLINUX_BIOS="1"
+        do_syslinux_config
+        _SYSLINUX_BIOS=""
+        _SYSLINUX_UEFI=""
+        
         DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
     else
         DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
