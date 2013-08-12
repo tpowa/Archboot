@@ -52,7 +52,7 @@ Interactive setup features:
   GUID (gpt) support, 4k sector drive support etc.
 - Creation of software raid/raid partitions, lvm2 devices 
   and luks encrypted devices
-- Supports standard linux,raid/raid_partitions,dmraid,lvm2
+- Supports standard linux,raid/raid_partitions,dmraid/fakeraid,lvm2
   and encrypted devices
 - Filesystem support: ext2/3/4, btrfs, f2fs, nilfs2, reiserfs,xfs,jfs,
   ntfs-3g,vfat
