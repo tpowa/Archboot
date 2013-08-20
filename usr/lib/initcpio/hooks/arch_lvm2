@@ -7,6 +7,8 @@ run_hook ()
         modprobe -q dm-mirror >/dev/null 2>&1
         # fix if udev initialises /dev/mapper/control
         udevadm settle
+        # fix missing tmpfiles.d support in early userspace
+        [ ! -d "/run/lvm" ] && mkdir /run/lvm
         if [ -e "/sys/class/misc/device-mapper" ]; then
             if [ ! -e "/dev/mapper/control" ]; then
                 mknod "/dev/mapper/control" c $(cat /sys/class/misc/device-mapper/dev | sed 's|:| |')
