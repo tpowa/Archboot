@@ -135,14 +135,6 @@ Archboot bootparameters
          rootflags=<comma-separated-array>
          rootflags=subvol=root,compress,ssd
 
-   * advanced
-      - This will override advanced hooks running order for your system.
-      - Default order is arch_mdadm,arch_lvm2,arch_encrypt
-      - Advanced hooks are: arch_mdadm,arch_lvm2,arch_encrypt
-      - Usage:
-        advanced=hook1,hook2,hook3
-        advanced=arch_encrypt,arch_mdadm
-
   What are the video and framebuffer options?
 
    * ati/radeon, intel and nvidia cards will switch to KMS mode during boot.
