@@ -7,14 +7,11 @@ build ()
     add_binary "mdassemble" 
     add_binary "mdadm" 
     add_binary "mdmon"
-    ### HACK stop assembling of dmraid devices before dmraid was called!
-    add_symlink "/etc/udev/rules.d/64-md-raid-assembly.rules" "/dev/null"
     # check if a custom mdadm.conf exists
     if grep -q ^ARRAY /etc/mdadm.conf; then
         echo "Custom /etc/mdadm.conf file will be used in initramfs for assembling arrays."
         add_file "/etc/mdadm.conf"
     fi
-    add_runscript
 }
 
 help ()
