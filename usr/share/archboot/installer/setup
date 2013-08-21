@@ -14,9 +14,6 @@ _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
 UEFISYS_MOUNTPOINT="/boot/efi"
 
-## Setup LD_LIBRARY_PATH for the sake of binaries inside "${DESTDIR}/usr/bin/"
-export LD_LIBRARY_PATH="${DESTDIR}/usr/lib/:/usr/lib/"
-
 # name of kernel package
 KERNELPKG="linux"
 # name of the kernel image
@@ -4014,40 +4011,41 @@ do_grub_common_before() {
 }
 
 do_grub_config() {
+    chroot_mount 
+    ########
+    
+    BOOT_PART_FS_UUID="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+    BOOT_PART_FS="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
+    
+    BOOT_PART_DRIVE="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="drive" "/boot" 2>/dev/null)"
     
     ########
     
-    BOOT_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS_LABEL="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/" 2>/dev/null)"
+    ROOT_PART_FS_LABEL="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/" 2>/dev/null)"
+    ROOT_PART_FS="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/" 2>/dev/null)"
     
-    BOOT_PART_DRIVE="$("${DESTDIR}/usr/bin/grub-probe" --target="drive" "${DESTDIR}/boot" 2>/dev/null)"
-    
-    ########
-    
-    ROOT_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS_LABEL="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_label" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/" 2>/dev/null)"
-    ROOT_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/" 2>/dev/null)"
-    
-    ROOT_PART_DEVICE="$("${DESTDIR}/usr/bin/grub-probe" --target="device" "${DESTDIR}/" 2>/dev/null)"
+    ROOT_PART_DEVICE="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="device" "/" 2>/dev/null)"
     
     ########
     
-    USR_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/usr" 2>/dev/null)"
-    USR_PART_FS="$("${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/usr" 2>/dev/null)"
+    USR_PART_FS_UUID="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
+    USR_PART_HINTS_STRING="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/usr" 2>/dev/null)"
+    USR_PART_FS="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/usr" 2>/dev/null)"
     
     ########
     
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$("${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_HINTS_STRING="$("${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$("chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
     
     ########
-    
+    chroot_umount
+
     if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
         ROOT_PART_GPT_GUID="$(${_LSBLK} PARTUUID ${ROOT_PART_DEVICE})"
         ROOT_PART_GPT_LABEL="$(${_LSBLK} PARTLABEL ${ROOT_PART_DEVICE})"
@@ -4474,15 +4472,15 @@ do_grub_uefi() {
         --recheck \
         --debug &>"/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
     
-    chroot_umount
-    
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
-    BOOT_PART_FS_UUID="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs_uuid" "${DESTDIR}/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="fs" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
     
-    BOOT_PART_HINTS_STRING="$(LD_LIBRARY_PATH="${DESTDIR}/usr/lib" "${DESTDIR}/usr/bin/grub-probe" --target="hints_string" "${DESTDIR}/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+
+    chroot_umount
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
