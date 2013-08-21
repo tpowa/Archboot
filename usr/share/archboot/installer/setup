@@ -395,8 +395,10 @@ blockdevices() {
          #- iso9660 devices
          #  "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")
          #- fakeraid isw devices
-         #  $(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member
-         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" || "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")" || "$(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member")" ]]; then
+         #  $(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member")
+         #- fakeraid ddf devices
+         #  $(${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member")
+         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" || "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")" || "$(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member")" ]]; then
              echo "${dev}"
              [[ "${1}" ]] && echo ${1}
          fi
@@ -439,7 +441,9 @@ raid_devices() {
         #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
         # - part of isw fakeraid
         #   $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")
-        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")" || "$(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")" ]]; then
+        # - part of ddf fakeraid
+        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")
+        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")" || "$(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")" || "$(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")" ]]; then
             echo "${dev}"
             [[ "${1}" ]] && echo ${1}
         fi
@@ -468,7 +472,9 @@ partitionable_raid_devices_partitions() {
         #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")")
         # - part of isw fakeraid
         #   $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"  || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member") ]]; then
+        # - part of ddf fakeraid
+        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")
+        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"  || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member") || "$(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")" ]]; then
             echo "${part}"
             [[ "${1}" ]] && echo ${1}
         fi
@@ -484,6 +490,13 @@ dmraid_devices() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "isw_raid_member$" | cut -d' ' -f 1)" ]]; then
+            echo "${dev}"
+            [[ "${1}" ]] && echo ${1}
+        fi
+    done
+    # ddf_raid_member, managed by mdadm
+    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+        if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "ddf_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
             [[ "${1}" ]] && echo ${1}
         fi
@@ -513,6 +526,13 @@ dmraid_partitions() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "isw_raid_member$" | cut -d' ' -f 1)" ]]; then
+            echo "${dev}"
+            [[ "${1}" ]] && echo ${1}
+        fi
+    done
+    # ddf_raid_member, managed by mdadm
+    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " md$" | cut -d' ' -f 1 | sort -u); do
+        if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "ddf_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
             [[ "${1}" ]] && echo ${1}
         fi
