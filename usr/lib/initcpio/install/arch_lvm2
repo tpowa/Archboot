@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="lvm lvmdump lvmconf vgimportclone fsadm lvmetad"
+    apps="lvmdump lvmconf vgimportclone fsadm"
     for i in $apps; do
         add_binary "$i"
     done
@@ -20,18 +20,15 @@ symlinks="/usr/bin/vgcfgbackup /usr/bin/vgcfgrestore /usr/bin/vgchange \
     done
     add_dir "/etc/lvm/backup/"
     add_dir "/etc/lvm/archive/"
-    add_file "/etc/lvm/lvm.conf"
     for i in /usr/lib/liblvm*; do
         add_file "$i"
     done
-    add_runscript
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook loads the necessary modules for an LVM2 root device 
-  on an arch boot image.
-  It depends on arch_devicemapper hook.
+  This hook adds complete lvm2 to arch boot image, 
+  which are not covered by lvm2 hook.
 HELPEOF
 }
