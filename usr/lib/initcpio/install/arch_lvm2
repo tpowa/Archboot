@@ -29,6 +29,6 @@ help ()
 {
 cat<<HELPEOF
   This hook adds complete lvm2 to arch boot image, 
-  which are not covered by lvm2 hook.
+  which is not covered by lvm2 hook.
 HELPEOF
 }

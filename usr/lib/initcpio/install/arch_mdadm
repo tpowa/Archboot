@@ -3,9 +3,7 @@
 
 build ()
 {
-    add_checked_modules -f 'dm-' 'drivers/md/*'
-    add_binary "mdassemble" 
-    add_binary "mdadm" 
+    add_binary "mdassemble"
     add_binary "mdmon"
     # add custom archboot mdadm.conf to avoid mdadm handling isw and ddf metadata devices
     # which are also covered by dmraid
@@ -15,6 +13,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook adds mdadm to arch boot image.
+  This hook adds complete mdadm to arch boot image
+  which is not covered by mdadm_udev hook.
 HELPEOF
 }
