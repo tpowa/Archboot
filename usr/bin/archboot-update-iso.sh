@@ -115,6 +115,7 @@ echo
 _update_uefi_prebootloader_files() {
 	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx64.efi"
 	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi"
+	cp -f "/usr/lib/prebootloader/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/KeyTool.efi"
 	echo
 }
 
