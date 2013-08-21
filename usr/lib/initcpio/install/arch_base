@@ -158,12 +158,9 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
              "/etc/systemd/system/getty.target.wants/getty@tty1.service"
 
-    ### add udev
+    ### add udev, which is not covered by udev hook
     add_binary "logger"
-    add_binary "udevadm"
-    add_file "/etc/udev/udev.conf"
     add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
-    add_symlink "/usr/bin/udevd" "../lib/systemd/systemd-udevd"
     # add rule files
     add_full_dir "/usr/lib/udev"
 

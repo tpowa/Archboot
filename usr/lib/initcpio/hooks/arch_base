@@ -1,10 +1,5 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-run_earlyhook() {
-    udevd --daemon --resolve-names=never
-    udevd_running=1
-}
-
 run_hook ()
 {
   # fix x86_64 symlink on x86_64
@@ -13,15 +8,4 @@ run_hook ()
   # these static devices are created for convenience, to autoload the modules if necessary
   # /dev/loop0
   mknod -m 0660 /dev/loop0 b 7 0
-
-  # trigger udev events
-  msg ":: Triggering uevents..."
-  udevadm trigger --action=add --type=subsystems
-  udevadm trigger --action=add --type=devices
-  udevadm settle
-}
-
-run_cleanuphook() {
-    udevadm control --exit
-    udevadm info --cleanup-db
 }
