@@ -132,9 +132,6 @@ install_packages() {
         PACKAGES="$(pacman -Sg base | awk '{print $2}')"
     fi
     # Add packages which are not in core repository
-    if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
-    fi
     if [[ "$(lsblk -rnpo FSTYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
     fi

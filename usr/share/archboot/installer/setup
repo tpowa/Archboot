@@ -2795,9 +2795,6 @@ select_packages() {
         PACKAGES="${ANSWER_CHECKLIST[@]}"
     fi
     # Add packages which are not in core repository
-    if [[ "$(grep -w uvesafb /proc/cmdline)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w v86d)" ]] && PACKAGES="${PACKAGES} v86d"
-    fi
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
@@ -4844,21 +4841,15 @@ auto_hwdetect() {
     HWPARAMETER=""
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
-    HWDETECTFILES=""
     HWKVER==
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on used keymap
         ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
         # check on framebuffer modules and kms
-        if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d && "$(grep -w uvesafb /proc/cmdline)" ]]; then
-             FBPARAMETER="--uvesafb"
-             HWDETECTFILES="/etc/modprobe.d/uvesafb.conf"
-        fi
-        [[ "$(grep "radeon" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--ati-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep "i915" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--intel-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep "nouveau" /etc/modprobe.d/modprobe.conf)" ]] && (FBPARAMETER="--nvidia-kms";HWDETECTFILES="/etc/modprobe.d/modprobe.conf")
-        [[ "$(grep -w fbmodule /proc/cmdline)" ]] && FBPARAMETER="--fbmodule"
+        [[ "$(grep "^radeon" /proc/modules)" ]] && FBPARAMETER="--ati-kms"
+        [[ "$(grep "^i915" /proc/modules )" ]] && FBPARAMETER="--intel-kms"
+        [[ "$(grep "^nouveau" /proc/modules)" ]] && FBPARAMETER="--nvidia-kms"
         if [[ "$(lsmod | grep ^pcmcia)" ]]; then
             DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --pcmcia"
         fi
@@ -4879,18 +4870,6 @@ auto_hwdetect() {
         HWDETECTHOOKS="$(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
         [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
-        [[ -n "${HWDETECTFILES}" ]] && sed -i -e "s#^FILES=.*#FILES=\"${HWDETECTFILES}\"#g" ${DESTDIR}/etc/mkinitcpio.conf
-    fi
-}
-
-auto_fb() {
-    UVESAFB=""
-    # clean modprobe.conf file from options first
-    sed -i -e '/options/d' ${DESTDIR}/etc/modprobe.d/modprobe.conf
-    grep ^[a-z] /etc/modprobe.d/modprobe.conf >> ${DESTDIR}/etc/modprobe.d/modprobe.conf
-    if [[ -e ${DESTDIR}/lib/initcpio/hooks/v86d && "$(grep -w uvesafb /proc/cmdline)" ]]; then
-        UVESAFB="$(grep ^[a-z] /etc/modprobe.d/uvesafb.conf)" 
-        sed -i -e "s#options.*#${UVESAFB}#g" ${DESTDIR}/etc/modprobe.d/uvesafb.conf
     fi
 }
 
@@ -4958,7 +4937,6 @@ configure_system() {
         auto_pacman_mirror
         auto_network
         auto_parameters
-        auto_fb
         auto_system_files
         auto_hwdetect
     fi
