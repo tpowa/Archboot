@@ -3708,7 +3708,13 @@ do_syslinux_common_before() {
     USE_DMRAID=""
     RAID_ON_LVM=""
     common_bootloader_checks
-    
+    if [[ ! -e "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
+        DIALOG --msgbox "Couldn't find syslinux files, installing syslinux and mtools now ..." 0 0
+        PACKAGES="syslinux mtools"
+        run_pacman
+        # reset PACKAGES after installing
+        unset PACKAGES
+    fi
 }
 
 do_syslinux_config() {
@@ -3816,10 +3822,6 @@ do_syslinux_uefi() {
     
     DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
     
-    PACKAGES="syslinux"
-    run_pacman
-    unset PACKAGES
-    
     do_syslinux_common_before
     
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
@@ -3868,14 +3870,6 @@ do_syslinux_bios() {
     SYSLINUX_DIR="syslinux"
     SYSLINUX_CONF="syslinux.cfg"
     SYSLINUX_OPTS=""
-    
-    if [[ ! -e "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
-        DIALOG --msgbox "Couldn't find syslinux files, installing syslinux and mtools now ..." 0 0
-        PACKAGES="syslinux mtools"
-        run_pacman
-        # reset PACKAGES after installing
-        unset PACKAGES
-    fi
     
     do_syslinux_common_before
     
