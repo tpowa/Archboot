@@ -62,7 +62,7 @@ Interactive setup features:
 - Package selection support
 - Signed package installation
 - hwdetect script is used for preconfiguration
-- Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
+- Auto/Preconfiguration of fstab,
   mkinitcpio.conf, systemd, crypttab and mdadm.conf
 - Configuration of basic system files
 - Setting root password

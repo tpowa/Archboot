@@ -101,7 +101,7 @@ Introduction
    * Package selection support
    * Signed package installation
    * hwdetect script is used for preconfiguration
-   * Auto/Preconfiguration of framebuffer, uvesafb, kms mode, fstab,
+   * Auto/Preconfiguration of fstab,
      mkinitcpio.conf, systemd, crypttab and mdadm.conf
    * Configuration of basic system files
    * Setting root password
@@ -135,22 +135,6 @@ Archboot bootparameters
        - Usage:
          rootflags=<comma-separated-array>
          rootflags=subvol=root,compress,ssd
-
-  What are the video and framebuffer options?
-
-   * ati/radeon, intel and nvidia cards will switch to KMS mode during boot.
-
-   * uvesafb
-     - enables uvesafb mode during boot and activates setup routine 
-       to use it later on installed system.
-     - you need to specify your supported resolution eg.:
-       uvesafb=<resolution>-<depth>
-       uvesafb=1024x768-16
-
-   * fbmodule
-     - Loads the fb module you specify durin boot process 
-       and activates setup routine to use it later on installed system.
-     - Use it like this fbmodule=<yourmodule>, e.g. fbmodule=cirrusfb
 
 Installing Arch Linux with Archboot 
 
