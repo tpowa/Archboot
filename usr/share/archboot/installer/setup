@@ -3572,6 +3572,9 @@ do_gummiboot_uefi() {
         unset PACKAGES
     fi
 
+    # create directory structure, if it doesn't exist
+    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries
+
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
