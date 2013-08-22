@@ -3648,12 +3648,12 @@ do_refind_uefi() {
         unset PACKAGES
     fi
     
-    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
+    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons"
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/fonts"
     
-    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
+     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
     cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
     mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"/ext2_x64.{,_}efi
     
@@ -3833,7 +3833,7 @@ do_syslinux_uefi() {
     
     do_syslinux_common_before
     
-    mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
+    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
     cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
     
     do_efistub_copy_to_efisys
@@ -3854,7 +3854,7 @@ do_syslinux_uefi() {
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
             
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"/*.c32
