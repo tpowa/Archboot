@@ -18,7 +18,7 @@ Latest Releases:
   https://downloads.archlinux.de/iso/archboot/latest
 
 Burning Release:
-Hybrid image file is a standard CD-burnable image and also a raw disk image. 
+Hybrid image file is a standard CD-burnable image and also a raw disk image.
 - Can be burned to CD(RW)/DVD media using most CD-burning utilities. 
 - Can be raw-written to a drive using 'dd' or similar utilities. 
   This method is intended for use with USB thumb drives.
@@ -37,6 +37,7 @@ Supported boot modes of Archboot media:
 The difference to the archiso install media:
 - It provides an additional interactive setup and quickinst script.
 - It contains [core] repository on media.
+- It supports UEFI_CD boot.
 - It runs a modified Arch Linux system in initramfs.
 - It is restricted to RAM usage, everything which is not necessary like
   man or info pages etc. is not provided.
@@ -73,10 +74,13 @@ FAQ, Known Issues and limitations:
 - Check also the forum threads for posted fixes and workarounds.
 - Why screen stays blank or other weird screen issues happen?
   Some hardware doesn't like the KMS activation, 
-  use nouveau.modeset=0 or radeon.modeset=0 or i915.modeset=0 or nomodeset on boot prompt.
-- dmraid might be broken on some boards, support is not perfect here.
+  use nouveau.modeset=0 or radeon.modeset=0 or i915.modeset=0 
+  or nomodeset on boot prompt.
+- dmraid/fakeraid might be broken on some boards, support is not perfect here.
   The reason is there are so many different hardware components out there. 
-  At the moment 1.0.0rc16 is included, with latest fedora patchset.
+  At the moment 1.0.0rc16 is included, with latest fedora patchset, 
+  development has been stopped. mdadm supports some isw and ddf fakeraid 
+  chipsets, but assembling during boot is deactivated in /etc/mdadm.conf!
 - Why is parted used in setup routine, instead of cfdisk in 
   msdos partitiontable mode?
   - parted is the only linux partition program that can handle all type of 
