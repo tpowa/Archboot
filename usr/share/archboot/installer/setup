@@ -3564,11 +3564,14 @@ do_gummiboot_uefi() {
     do_uefi_setup_env_vars
     
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
-    
-    PACKAGES="gummiboot"
-    run_pacman
-    unset PACKAGES
-    
+
+    if [[ ! -f "${DESTDIR}/usr/bin/gummiboot" ]]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/gummiboot, installing gummiboot pkg now ..." 0 0
+        PACKAGES="gummiboot"
+        run_pacman
+        unset PACKAGES
+    fi
+
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
