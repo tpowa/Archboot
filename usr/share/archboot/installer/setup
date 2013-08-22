@@ -4005,6 +4005,13 @@ do_grub_common_before() {
     if ! [[ "$(dmraid -r | grep ^no )" ]]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
+    if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg now ..." 0 0
+        PACKAGES="grub"
+        run_pacman
+        # reset PACKAGES after installing
+        unset PACKAGES
+    fi
 }
 
 do_grub_config() {
@@ -4309,15 +4316,7 @@ EOF
 do_grub_bios() {
     
     do_grub_common_before
-    
-    if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg now ..." 0 0
-        PACKAGES="grub"
-        run_pacman
-        # reset PACKAGES after installing
-        unset PACKAGES
-    fi
-    
+        
     # try to auto-configure GRUB(2)...
     if [[ "${PART_ROOT}" != "" ]]; then
         check_bootpart
@@ -4451,13 +4450,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     
     do_grub_common_before
-    
-    DIALOG --msgbox "Installing grub pkg now ..." 0 0
-    PACKAGES="grub"
-    run_pacman
-    # reset PACKAGES after installing
-    unset PACKAGES
-    
+        
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/bin/grub-install" \
