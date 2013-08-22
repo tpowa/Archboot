@@ -3638,9 +3638,12 @@ do_refind_uefi() {
     
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
-    PACKAGES="refind-efi"
-    run_pacman
-    unset PACKAGES
+    if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind-efi pkg now ..." 0 0
+        PACKAGES="refind-efi"
+        run_pacman
+        unset PACKAGES
+    fi
     
     mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
