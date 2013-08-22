@@ -3440,7 +3440,7 @@ do_efistub_copy_to_efisys() {
         _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
         _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
         
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
         
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
