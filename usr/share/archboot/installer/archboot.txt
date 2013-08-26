@@ -16,7 +16,8 @@ Table Of Contents
          2. What is Archboot
          3. What is the difference to the archiso install media?
          4. What are the supported boot modes of Archboot media?
-         5. What are the Archboot Setup features?
+         5. How to do a remote installation with ssh?
+         6. What are the Archboot Setup features?
     2. Archboot bootparameters
          1. What are general boot parameters?
          2. What are the video and framebuffer options?
@@ -94,6 +95,13 @@ Introduction
      linux16 /memdisk iso
      initrd16 hd(X,X)/<archboot.iso>}
      </example-code>
+
+  How to do a remote installation with ssh?
+   * During boot all network interfaces will try to obtain an IP address 
+     through dhcp.
+   * root password is not set by default! 
+     If you need privacy during installation set a password.
+     # ssh root@<yourip>
 
   What are the Archboot Setup features?
 

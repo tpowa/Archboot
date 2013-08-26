@@ -8,6 +8,16 @@ What is archboot?
   https://projects.archlinux.org/?p=archboot.git;a=summary
 - It is developed by tpowa.
 
+The difference to the archiso install media:
+- It provides an additional interactive setup and quickinst script.
+- It contains [core] repository on media.
+- It supports UEFI_CD boot.
+- It runs a modified Arch Linux system in initramfs.
+- It is restricted to RAM usage, everything which is not necessary like
+  man or info pages etc. is not provided.
+- It doesn't mount anything during boot process.
+- It supports remote installation through ssh.
+
 Latest Releases:
 - Hybrid image file and torrent is provided, 
   which include i686 and x86_64 core repository.
@@ -26,23 +36,13 @@ Hybrid image file is a standard CD-burnable image and also a raw disk image.
 
 Supported boot modes of Archboot media:
 - It supports BIOS booting with syslinux.
-- It supports UEFI booting with gummiboot and EFISTUB.
+- It supports UEFI/UEFI_CD booting with gummiboot and EFISTUB.
 - It supports Secure Boot with prebootloader.
 - It supports grub(2)'s iso loopback support.
   variables used (below for example):
   iso_loop_dev=PARTUUID=XXXX
   iso_loop_path=/blah/archboot.iso
 - It supports booting using syslinux's memdisk (only in BIOS mode).
-
-The difference to the archiso install media:
-- It provides an additional interactive setup and quickinst script.
-- It contains [core] repository on media.
-- It supports UEFI_CD boot.
-- It runs a modified Arch Linux system in initramfs.
-- It is restricted to RAM usage, everything which is not necessary like
-  man or info pages etc. is not provided.
-- It doesn't mount anything during boot process.
-- It supports remote installation through ssh.
 
 Interactive setup features:
 - Media and Network installation mode
