@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August, 22th 2013
+   August, 26th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -74,14 +74,27 @@ Introduction
 
   What are the supported boot modes of Archboot media?
    * It supports BIOS booting with syslinux.
-   * It supports UEFI booting with gummiboot and EFISTUB.
+   * It supports UEFI/UEFI_CD booting with gummiboot and EFISTUB.
    * It supports Secure Boot with prebootloader.
    * It supports grub(2)'s iso loopback support.
      variables used (below for example):
      iso_loop_dev=PARTUUID=XXXX
      iso_loop_path=/blah/archboot.iso
+     <example-code> 
+     menuentry "Archboot" --class iso {
+     loopback loop (hdX,X)/<archboot.iso>
+     linux (loop)/boot/vmlinuz_x86_64 iso_loop_dev=/dev/sdXX 
+                                      iso_loop_path=/<archboot.iso>
+     initrd (loop)/boot/initramfs_x86_64.img
+     }
+     </example-code>
    * It supports booting using syslinux's memdisk (only in BIOS mode).
-     
+     <example-code> 
+     menuentry "Archboot Memdisk" {
+     linux16 /memdisk iso
+     initrd16 hd(X,X)/<archboot.iso>}
+     </example-code>
+
   What are the Archboot Setup features?
 
    * Media and Network installation mode
