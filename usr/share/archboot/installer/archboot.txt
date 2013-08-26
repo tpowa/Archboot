@@ -20,8 +20,6 @@ Table Of Contents
          6. What are the Archboot Setup features?
     2. Archboot bootparameters
          1. What are general boot parameters?
-         2. What are the video and framebuffer options?
-         3. What are other included features of the environment?
     3. Installing Arch Linux with Archboot
          1. What you will need?
          2. Acquiring Archboot images
