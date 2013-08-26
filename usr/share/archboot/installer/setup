@@ -2873,6 +2873,7 @@ install_packages() {
     auto_mdadm
     auto_luks
     auto_pacman
+    auto_testing
     # tear down the chroot environment
     chroot_umount
 }
@@ -2948,6 +2949,15 @@ auto_pacman()
             cp -ar /etc/pacman.d/gnupg ${DESTDIR}/etc/pacman.d 2>&1
         fi
     fi
+}
+
+# If [testing] repository was enabled during installation, 
+# enable it on installed system too!
+auto_testing()
+{
+   sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
+   sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
+   sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${DESTDIR}/etc/pacman.conf
 }
 
 # donetwork()
