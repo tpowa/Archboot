@@ -1,9 +1,0 @@
-# Created by Tobias Powalowski <tpowa@archlinux.org>
-
-run_hook ()
-{
-  # activate network and mount nfs for setup
-  for i in $(ls /sys/class/net | grep -v lo); do
-	ipconfig $i && NFS="$(ipconfig $i | grep rootpath | awk -Frootpath: '{print $2}')" && nfsmount ${NFS} /src
-  done
-}
