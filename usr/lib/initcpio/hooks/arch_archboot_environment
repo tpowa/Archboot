@@ -2,6 +2,7 @@
 
 run_cleanuphook () 
 {
+  init=/sbin/init
   if [ "${root}" = "" -a "${ip}" = "" ]; then
       # enter install environment
       exec $init
