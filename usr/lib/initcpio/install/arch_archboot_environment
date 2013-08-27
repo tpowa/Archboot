@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_runscript
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes archboot environment switch on an arch boot image.
+HELPEOF
+}

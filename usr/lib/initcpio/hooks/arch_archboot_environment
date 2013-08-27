@@ -1,0 +1,9 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+run_cleanuphook () 
+{
+  if [ "${root}" = "" -a "${ip}" = "" ]; then
+      # enter install environment
+      exec $init
+  fi
+}
