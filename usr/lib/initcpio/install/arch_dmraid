@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # start dmraid on startup
+    add_symlink "/etc/systemd/system/multi-user.target.wants/dmraid.service" "/usr/lib/systemd/system/dmraid.service"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook starts dmraid on an arch boot image.
+HELPEOF
+} 

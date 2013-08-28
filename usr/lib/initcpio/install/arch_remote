@@ -24,6 +24,7 @@ build ()
     for i in $(find /usr/share/terminfo/ ! -type d); do
     	add_file "$i"
     done
+    add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
     add_file "/usr/lib/ssh/sftp-server"
     add_file "/usr/lib/ssh/ssh-keysign"
     add_file "/usr/lib/ssh/ssh-pkcs11-helper"
@@ -33,6 +34,7 @@ build ()
     add_file "/etc/gssapi_mech.conf"
     add_file "/etc/idmapd.conf"
     add_file "/etc/netconfig"
+    add_full_dir "/usr/lib/libnfsidmap/"
     add_dir "/var/lib/nfs/sm"
     add_dir "/var/lib/nfs/sm.bak"
     add_dir "/var/lib/nfs/v4recovery"
@@ -45,8 +47,6 @@ build ()
     add_file "/usr/share/licenses/libldap/LICENSE"
     add_file "/usr/share/licenses/nfsidmap/LICENSE"
     add_file "/usr/share/licenses/libgssglue/COPYING"
-
-    add_runscript
 }
 
 help ()

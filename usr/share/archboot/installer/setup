@@ -1127,7 +1127,7 @@ _createpv()
 #find physical volumes that are not in use
 findpv()
 {
-    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1); do
+    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
          # exclude checks:
          #-  not part of running lvm2
          # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
@@ -1142,7 +1142,7 @@ findpv()
 
 getavailablepv()
 {
-    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1); do
+    for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
          # exclude checks:
          #-  not part of running lvm2
          # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"

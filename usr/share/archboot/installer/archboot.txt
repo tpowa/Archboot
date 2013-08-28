@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August, 26th 2013
+   August, 28th 2013
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -18,14 +18,12 @@ Table Of Contents
          4. What are the supported boot modes of Archboot media?
          5. How to do a remote installation with ssh?
          6. What are the Archboot Setup features?
-    2. Archboot bootparameters
-         1. What are general boot parameters?
-    3. Installing Arch Linux with Archboot
+    2. Installing Arch Linux with Archboot
          1. What you will need?
          2. Acquiring Archboot images
          3. Preparing Installation Media
          4. Booting the Install Media
-    4. Common Installation Procedure
+    3. Common Installation Procedure
          1. Running Setup
          2. Set Keyboard And Console Font
          3. Set up Network
@@ -41,8 +39,8 @@ Table Of Contents
          9. Configure System
          10. Install Bootloader
          11. Exit Install
-    5. System Configuration
-    6. Useful links
+    4. System Configuration
+    5. Useful links
 
 Introduction
 
@@ -126,34 +124,6 @@ Introduction
    * Setting root password
    * Bootloader support: grub(2) (BIOS and UEFI),
      refind-efi, gummiboot, syslinux (BIOS and UEFI)
-
-Archboot bootparameters
-
-  What are general boot parameters?
-
-   * earlymodules
-      - load modules before hooks are executed
-      - Usage:
-        earlymodules=<comma-separated-array>
-        earlymodules=ahci,ehci-hcd
-
-   * disablehooks
-      - disable a hook which is run during bootup
-      - Usage:
-        disablehooks=<comma-separated-array>
-        disablehooks=arch_floppy,arch_cdrom
-
-   * root
-      - Using this option will boot you into your specified existing system.
-      - Usage:
-        root=/dev/<your-root-of-installed-system>
-        root=/dev/sda3
-
-   * rootflags
-       - Using this option will pass special mount options for your root device
-       - Usage:
-         rootflags=<comma-separated-array>
-         rootflags=subvol=root,compress,ssd
 
 Installing Arch Linux with Archboot 
 

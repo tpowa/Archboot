@@ -40,12 +40,13 @@ build ()
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
               /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
-              /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb"
+              /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb /usr/bin/sh"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
+    add_symlink "/init" "/usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
@@ -57,8 +58,6 @@ build ()
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
     add_file "/usr/share/terminfo/l/linux"
-    add_file "/usr/lib/initcpio/init" "/init"
-    add_file "/usr/lib/initcpio/init_functions" "/init_functions"
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
@@ -202,8 +201,6 @@ build ()
     add_file "/usr/share/licenses/zlib/LICENSE"
     add_file "/usr/share/licenses/iana-etc/LICENSE"
     add_file "/usr/share/licenses/dbus/COPYING"
-
-    add_runscript
 }
 
 help ()
