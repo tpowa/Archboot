@@ -868,7 +868,7 @@ _dmraid_update()
         dmsetup remove_all >/dev/null 2>&1
     fi
     DIALOG --infobox "Reactivating dmraid devices ..." 0 0
-    dmraid -ay -Z >/dev/null 2>&1
+    dmraid -ay -I -Z >/dev/null 2>&1
     printk on
 }
 
@@ -1777,6 +1777,8 @@ check_uefisyspart() {
 partition() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
+    # activate dmraid
+    activate_dmraid
     # check on encrypted devices, else weird things can happen!
     _stopluks
     # check on raid devices, else weird things can happen during partitioning!
