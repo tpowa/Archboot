@@ -3334,6 +3334,8 @@ do_uefi_setup_env_vars() {
 
 do_uefi_common() {
     
+    do_uefi_setup_env_vars
+    
     DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
     
     if [[ "${DISC}" != "" ]]; then
@@ -3441,6 +3443,8 @@ do_uefi_bootmgr_setup() {
 
 do_uefi_secure_boot_preloader() {
     
+    do_uefi_common
+    
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         cp -r "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader"
         
@@ -3536,7 +3540,7 @@ CONFEOF
 
 do_efistub_uefi() {
     
-    do_uefi_setup_env_vars
+    do_uefi_common
     
     bootdev=""
     grubdev=""
@@ -3583,7 +3587,7 @@ do_efistub_uefi() {
 
 do_gummiboot_uefi() {
     
-    do_uefi_setup_env_vars
+    do_uefi_common
     
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
 
@@ -3659,7 +3663,7 @@ GUMEOF
 
 do_refind_uefi() {
     
-    do_uefi_setup_env_vars
+    do_uefi_common
     
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
@@ -3846,7 +3850,7 @@ EOF
 
 do_syslinux_uefi() {
     
-    do_uefi_setup_env_vars
+    do_uefi_common
     
     [[ "${_UEFI_ARCH}" == "x86_64" ]] && _SYSLINUX_BUILD="efi64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
@@ -4469,7 +4473,7 @@ do_grub_bios() {
 
 do_grub_uefi() {
     
-    do_uefi_setup_env_vars
+    do_uefi_common
     
     [[ "${_UEFI_ARCH}" == "x86_64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
