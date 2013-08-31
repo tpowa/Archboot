@@ -3283,7 +3283,7 @@ detect_uefi_boot() {
     
     uefi_switch_to_efivarfs
     
-    if [[ -e "/sys/firmware/efi/efivars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+    if [[ -e "/sys/firmware/efi/efivars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         _DETECTED_UEFI_BOOT="1"
         _DETECTED_EFIVARFS="1"
     fi
@@ -3291,7 +3291,7 @@ detect_uefi_boot() {
     if [[ "${_DETECTED_UEFI_BOOT}" != "1" ]]; then
         uefi_switch_to_sysfs_efivars
         
-        if [[ -d "/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+        if [[ -e "/sys/firmware/efi/vars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
             _DETECTED_UEFI_BOOT="1"
         else
             _DETECTED_UEFI_BOOT="0"
@@ -3363,23 +3363,21 @@ do_uefi_efibootmgr() {
     
     chroot_mount
     
-    if [[ -d "${DESTDIR}/sys/firmware/efi/vars/ConOut-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+    if [[ -e "${DESTDIR}/sys/firmware/efi/vars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
         cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
+_EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
+
 for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
-    efibootmgr --bootnum "\${_bootnum}" --delete-bootnum
+    efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 
-if [[ "${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
-    _EXTRA_PARAMS=""
+if [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
+    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}"
 else
-    _EXTRA_PARAMS="--unicode "${_EFIBOOTMGR_LOADER_PARAMETERS}""
+    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}"
 fi
-
-echo
-efibootmgr --verbose --create --write-signature --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" ${_EXTRA_PARAMS}
-echo
 
 EFIBEOF
         
