@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_checked_modules 'i915|radeon|nouveau'
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the kms subsystem on an arch boot image.
+HELPEOF
+}
