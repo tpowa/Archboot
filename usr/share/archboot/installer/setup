@@ -3248,23 +3248,33 @@ detect_uefi_secure_boot() {
     
 }
 
-uefi_switch_to_efivarfs() {
+uefi_disable_all_var_interfaces() {
     
+    ## Unmount sysfs-efivars
     modprobe -q -r efivars
     
+    ## Unmount efivarfs
     umount /sys/firmware/efi/efivars || true
     modprobe -q -r efivarfs || true
     
+}
+
+uefi_switch_to_efivarfs() {
+    
+    uefi_disable_all_var_interfaces
+    
+    ## Remount efivarfs
     modprobe -q efivarfs
-    mount -t efivarfs -o rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
+    mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+    # mount -t efivarfs -o defaults,rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
     
 }
 
 uefi_switch_to_sysfs_efivars() {
     
-    umount /sys/firmware/efi/efivars || true
-    modprobe -q -r efivarfs || true
+    uefi_disable_all_var_interfaces
     
+    ## Remount sysfs-efivars
     modprobe -q efivars
     
 }
