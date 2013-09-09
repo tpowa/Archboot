@@ -3363,7 +3363,7 @@ do_uefi_common() {
 
 do_uefi_efibootmgr() {
     
-    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+    if [[ "$(chroot ${DESTDIR} /usr/bin/ldd /usr/bin/efibootmgr | grep libefivar)" ]] && [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
         uefi_switch_to_efivarfs
         
         _EFIBOOTMGR_EXTRA_ARGS="1"
