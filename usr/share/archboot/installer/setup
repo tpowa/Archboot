@@ -1745,12 +1745,12 @@ check_uefisyspart() {
             UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         fi
         
-        umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
-        umount "${UEFISYS_PART}" &> /dev/null
-        
         if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
             DIALOG --msgbox "You have entered /boot as the mountpoint of your UEFI SYSTEM PARTIION. Any other partition using /boot as mountpoint will be ignored." 0 0
         fi
+        
+        umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
+        umount "${UEFISYS_PART}" &> /dev/null
         
         if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
             mkfs.vfat -F32 -n "EFISYS" "${UEFISYS_PART}"
@@ -3225,6 +3225,80 @@ abort_f2fs_bootpart() {
         fi
 }
 
+uefi_disable_all_efivar_interfaces() {
+    
+    ## Disable sysfs-efivars
+    modprobe -q -r efivars
+    
+    ## Unmount efivarfs
+    umount /sys/firmware/efi/efivars || true
+    modprobe -q -r efivarfs || true
+    
+}
+
+uefi_switch_to_efivarfs() {
+    
+    uefi_disable_all_efivar_interfaces
+    
+    ## Remount efivarfs
+    modprobe -q efivarfs
+    mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+    
+}
+
+uefi_switch_to_sysfs_efivars() {
+    
+    uefi_disable_all_efivar_interfaces
+    
+    ## Enable sysfs-efivars
+    modprobe -q efivars
+    
+}
+
+detect_uefi_boot() {
+    
+    uefi_switch_to_efivarfs
+    
+    if [[ "$(efivar -l)" ]]; then
+        _DETECTED_UEFI_BOOT="1"
+        _DETECTED_EFIVARFS="1"
+    else
+        _DETECTED_UEFI_BOOT="0"
+        _DETECTED_EFIVARFS="0"
+    fi
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
+        uefi_switch_to_sysfs_efivars
+        
+        if [[ "$(efivar -l)" ]]; then
+            _DETECTED_UEFI_BOOT="1"
+        else
+            _DETECTED_UEFI_BOOT="0"
+        fi
+        
+        _DETECTED_EFIVARFS="0"
+    fi
+    
+    detect_uefi_secure_boot
+    
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+        if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+            if [[ ! "$(grep 'blacklist efivars' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
+                echo 'blacklist efivars' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
+            fi
+        fi
+        
+        if [[ ! "$(grep 'blacklist efi_pstore' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
+            echo 'blacklist efi_pstore' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
+        fi
+        
+        if [[ ! "$(grep 'options efi_pstore pstore_disable=1' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
+            echo 'options efi_pstore pstore_disable=1' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
+        fi
+    fi
+    
+}
+
 detect_uefi_secure_boot() {
     
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
@@ -3244,76 +3318,6 @@ detect_uefi_secure_boot() {
         fi
     else
         _DETECTED_UEFI_SECURE_BOOT="0"
-    fi
-    
-}
-
-uefi_disable_all_var_interfaces() {
-    
-    ## Unmount sysfs-efivars
-    modprobe -q -r efivars
-    
-    ## Unmount efivarfs
-    umount /sys/firmware/efi/efivars || true
-    modprobe -q -r efivarfs || true
-    
-}
-
-uefi_switch_to_efivarfs() {
-    
-    uefi_disable_all_var_interfaces
-    
-    ## Remount efivarfs
-    modprobe -q efivarfs
-    mount -t efivarfs efivarfs /sys/firmware/efi/efivars
-    # mount -t efivarfs -o defaults,rw,nosuid,nodev,noexec,relatime efivarfs /sys/firmware/efi/efivars
-    
-}
-
-uefi_switch_to_sysfs_efivars() {
-    
-    uefi_disable_all_var_interfaces
-    
-    ## Remount sysfs-efivars
-    modprobe -q efivars
-    
-}
-
-detect_uefi_boot() {
-    
-    uefi_switch_to_efivarfs
-    
-    if [[ -e "/sys/firmware/efi/efivars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-        _DETECTED_UEFI_BOOT="1"
-        _DETECTED_EFIVARFS="1"
-    fi
-    
-    if [[ "${_DETECTED_UEFI_BOOT}" != "1" ]]; then
-        uefi_switch_to_sysfs_efivars
-        
-        if [[ -e "/sys/firmware/efi/vars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
-            _DETECTED_UEFI_BOOT="1"
-        else
-            _DETECTED_UEFI_BOOT="0"
-        fi
-        
-        _DETECTED_EFIVARFS="0"
-    fi
-    
-    detect_uefi_secure_boot
-    
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        if [[ ! "$(grep 'blacklist efivars' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-            echo 'blacklist efivars' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-        fi
-        
-        if [[ ! "$(grep 'blacklist efi_pstore' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-            echo 'blacklist efi_pstore' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-        fi
-        
-        if [[ ! "$(grep 'options efi_pstore pstore_disable=1' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-            echo 'options efi_pstore pstore_disable=1' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-        fi
     fi
     
 }
@@ -3359,24 +3363,33 @@ do_uefi_common() {
 
 do_uefi_efibootmgr() {
     
-    uefi_switch_to_sysfs_efivars
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+        uefi_switch_to_efivarfs
+        
+        _EFIBOOTMGR_EXTRA_ARGS="1"
+    else
+        uefi_switch_to_sysfs_efivars
+        
+        _EFIBOOTMGR_EXTRA_ARGS="0"
+    fi
     
     chroot_mount
     
-    if [[ -e "${DESTDIR}/sys/firmware/efi/vars/BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c" ]]; then
+    if [[ "$(chroot ${DESTDIR} /usr/bin/efivar -l)" ]]; then
         cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
+_EFIBOOTMGR_EXTRA_ARGS="${_EFIBOOTMGR_EXTRA_ARGS}"
 _EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
 
 for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 
-if [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" == "" ]]; then
-    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}"
-else
+if [[ "\${_EFIBOOTMGR_EXTRA_ARGS}" == "1" ]] && [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
     efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}"
+else
+    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}"
 fi
 
 EFIBEOF
@@ -3385,7 +3398,7 @@ EFIBEOF
         chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
         mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
     else
-        DIALOG --msgbox "${DESTDIR}/sys/firmware/efi/vars/ directory not found. Check whether you have booted in UEFI boot mode and create a boot entry for ${_EFIBOOTMGR_LABEL} using efibootmgr." 0 0
+        DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for /${UEFISYS_MOUNTPOINT}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
     fi
     
     chroot_umount
@@ -3588,17 +3601,17 @@ do_gummiboot_uefi() {
     do_uefi_common
     
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
-
+    
     if [[ ! -f "${DESTDIR}/usr/bin/gummiboot" ]]; then
         DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/gummiboot, installing gummiboot pkg now ..." 0 0
         PACKAGES="gummiboot"
         run_pacman
         unset PACKAGES
     fi
-
+    
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries
-
+    
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
@@ -4489,6 +4502,8 @@ do_grub_uefi() {
         --recheck \
         --debug &>"/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
     
+    chroot_umount
+    
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
@@ -4496,8 +4511,6 @@ do_grub_uefi() {
     BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
     
     BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-
-    chroot_umount
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
