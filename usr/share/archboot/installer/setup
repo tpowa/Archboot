@@ -109,11 +109,11 @@ chroot_mount()
     [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
     [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
-    mount -t sysfs sysfs "${DESTDIR}/sys"
-    mount -t proc proc "${DESTDIR}/proc"
+    mount -o bind /sysfs "${DESTDIR}/sys"
+    mount -o bind /proc "${DESTDIR}/proc"
     mount -o bind /dev "${DESTDIR}/dev"
-    chmod 555 "${DESTDIR}/sys"
-    chmod 555 "${DESTDIR}/proc"
+    # chmod 555 "${DESTDIR}/sys"
+    # chmod 555 "${DESTDIR}/proc"
 }
 
 # chroot_umount()
@@ -1445,7 +1445,7 @@ autoprepare() {
     fi
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. THe minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
+        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
     fi
     
@@ -1470,7 +1470,7 @@ autoprepare() {
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             
-            UEFISYS_PART_SIZE="512"
+            UEFISYS_PART_SIZE="1024"
             
             _PART_NUM="$((${_PART_NUM}+1))"
             _UEFISYS_PART_NUM="${_PART_NUM}"
@@ -1650,7 +1650,7 @@ autoprepare() {
     _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
     
     _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH"
-    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:512:vfat:-F32::EFISYS"
+    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:${UEFISYS_PART_SIZE}:vfat:-F32::EFISYS"
     
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
@@ -1717,7 +1717,7 @@ check_uefisyspart() {
     
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" != "gpt" ]]; then
         DIALOG --msgbox "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\nSetup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
-        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
+        sgdisk --mbrtogpt "${DISC}" &> "${LOG}" && GUID_DETECTED="1"
     fi
     
     if [[ ! "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
@@ -1730,18 +1730,16 @@ check_uefisyspart() {
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
         UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
-        if [[ "$(${_LSBLK} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]]; then
-            if [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
-                ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
-                DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
-            fi
+        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
+            ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
+            DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         else
             ## Check whether UEFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
             DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         
         if [[ "${S_MKFSAUTO}" != "1" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi): " 0 0 "/boot/efi" 2>${ANSWER} || return 1
             UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         fi
         
@@ -3610,7 +3608,7 @@ do_gummiboot_uefi() {
     fi
     
     # create directory structure, if it doesn't exist
-    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries
+    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
     
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
@@ -4055,7 +4053,9 @@ do_grub_common_before() {
 }
 
 do_grub_config() {
+    
     chroot_mount 
+    
     ########
     
     BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
@@ -4088,8 +4088,7 @@ do_grub_config() {
     fi
     
     ########
-    chroot_umount
-
+    
     if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
         ROOT_PART_GPT_GUID="$(${_LSBLK} PARTUUID ${ROOT_PART_DEVICE})"
         ROOT_PART_GPT_LABEL="$(${_LSBLK} PARTLABEL ${ROOT_PART_DEVICE})"
@@ -4331,6 +4330,8 @@ EOF
     
     ## copy unicode.pf2 font file
     cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB_PREFIX_DIR}/fonts/unicode.pf2"
+    
+    chroot_umount
     
     ## Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
