@@ -109,7 +109,7 @@ chroot_mount()
     [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
     [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
-    mount -o bind /sysfs "${DESTDIR}/sys"
+    mount -o bind /sys "${DESTDIR}/sys"
     mount -o bind /proc "${DESTDIR}/proc"
     mount -o bind /dev "${DESTDIR}/dev"
     # chmod 555 "${DESTDIR}/sys"
