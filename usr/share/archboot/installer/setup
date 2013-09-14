@@ -1684,7 +1684,18 @@ autoprepare() {
     S_MKFSAUTO=1
 }
 
+detect_DISC() {
+    
+    [[ "${DISC}" == "" ]] && DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    
+    [[ "${DISC}" == "" ]] && DISC="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    
+}
+
 check_gpt() {
+    
+    detect_DISC
+    
     GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
     
@@ -1695,7 +1706,7 @@ check_gpt() {
     
     if [[ "${GUID_DETECTED}" == "1" ]]; then
         if [[ "${CHECK_UEFISYS_PART}" == "1" ]]; then
-            check_uefisyspart
+            check_efisys_part
         fi
         
         if [[ "${CHECK_BIOS_BOOT_GRUB}" == "1" ]]; then
@@ -1713,7 +1724,9 @@ check_gpt() {
 }
 
 ## check and mount UEFI SYSTEM PARTITION at ${UEFISYS_MOUNTPOINT}
-check_uefisyspart() {
+check_efisys_part() {
+    
+    detect_DISC
     
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" != "gpt" ]]; then
         DIALOG --msgbox "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\nSetup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
@@ -1730,7 +1743,7 @@ check_uefisyspart() {
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
         UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
-        if [[ "$(${_BLKID} -p -i -o value -s TYPE ${UEFISYS_PART})" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
+        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
             ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
             DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
         else
@@ -3338,15 +3351,12 @@ do_uefi_common() {
     
     do_uefi_setup_env_vars
     
-    DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    # CHECK_UEFISYS_PART="1"
+    # CHECK_BIOS_BOOT_GRUB=""
+    # RUN_CGDISK=""
+    # check_gpt
     
-    if [[ "${DISC}" != "" ]]; then
-        CHECK_UEFISYS_PART="1"
-        CHECK_BIOS_BOOT_GRUB=""
-        RUN_CGDISK=""
-        # check_gpt
-        check_uefisyspart
-    fi
+    check_efisys_part
     
     PACKAGES="dosfstools efivar efibootmgr"
     
