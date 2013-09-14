@@ -61,7 +61,7 @@ build ()
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
-                 services sysctl.conf"
+                 services"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
@@ -138,7 +138,7 @@ build ()
     add_dir "/etc/tmpfiles.d"
     add_dir "/etc/modules-load.d"
     add_dir "/etc/binfmt.d/"
-    add_dir "/etc/sysctl.d/"
+    add_full_dir "/etc/sysctl.d/"
     add_file "/etc/os-release"
     add_full_dir "/etc/systemd"
     add_full_dir "/etc/xdg"
