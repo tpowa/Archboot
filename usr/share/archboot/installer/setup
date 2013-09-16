@@ -1727,7 +1727,7 @@ check_gpt() {
     fi
 }
 
-## check and mount UEFI SYSTEM PARTITION at ${UEFISYS_MOUNTPOINT}
+## check and mount EFISYS partition at ${UEFISYS_MOUNTPOINT}
 check_efisys_part() {
     
     detect_DISC
@@ -1738,7 +1738,7 @@ check_efisys_part() {
     fi
     
     if [[ ! "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
-        DIALOG --msgbox "Setup detected no UEFI SYSTEM PARTITION in ${DISC}. You will now be put into cgdisk. Please create a >=512 MiB partition with gdisk type code EF00 .\nWhen prompted (later) to format as FAT32, say Yes.\nIf you already have a >=512 MiB FAT32 UEFI SYSTEM Partition, check whether that partition has EF00 gdisk type code." 0 0
+        DIALOG --msgbox "Setup detected no EFISYS partition in ${DISC}. You will now be put into cgdisk. Please create a 1 GB partition with gdisk type code EF00 .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a 1 GB FAT32 EFISYS partition, check whether that partition has EF00 gdisk type code." 0 0
         clear && cgdisk "${DISC}"
         RUN_CGDISK=""
     fi
@@ -1747,21 +1747,24 @@ check_efisys_part() {
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
         UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
-        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
-            ## Check whether UEFISYS is FAT32 (specifically), otherwise warn the user (but do not exit).
-            DIALOG --defaultno --yesno "UEFI SYSTEM PARTIION ${UEFISYS_PART} is not FAT32 formatted. Some UEFI firmwares may not work properly with a FAT16 or FAT12 filesystem in the UEFISYS partition.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
-        else
-            ## Check whether UEFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
-            DIALOG --defaultno --yesno "UEFI Specification requires UEFI SYSTEM PARTIION to be formatted as FAT32.\nDo you want to format ${UEFISYS_PART} as FAT32?" 0 0 && _FORMAT_UEFISYS_FAT32="1"
+        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" != "vfat" ]]
+            ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
+            DIALOG --defaultno --yesno "Detected EFISYS partition ${UEFISYS_PART} does not appear to be FAT formatted. UEFI Specification requires EFISYS partition to be FAT32 formatted. Do you want to format ${UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFISYS. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         
+        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION ${UEFISYS_PART})" != "FAT32" ]]; then
+            ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
+            DIALOG --defaultno --yesno "Detected EFISYS partition ${UEFISYS_PART} does not appear FAT32 formatted. Do you want to format ${UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFISYS, however some firmwares may refuse to boot with a non-FAT32 EFISYS partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32="1"
+        fi
+        
+        
         if [[ "${S_MKFSAUTO}" != "1" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi): " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the mountpoint of your EFISYS partition (Default is /boot/efi): " 0 0 "/boot/efi" 2>${ANSWER} || return 1
             UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         fi
         
         if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-            DIALOG --msgbox "You have entered /boot as the mountpoint of your UEFI SYSTEM PARTIION. Any other partition using /boot as mountpoint will be ignored." 0 0
+            DIALOG --msgbox "You have entered /boot as the mountpoint of your EFISYS partition. Any other partition using /boot as mountpoint will be ignored.\nYou may have to re-install kernel and bootloader files (currently existing in /boot) to the EFISYS partition once it is setup at /boot." 0 0
         fi
         
         umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
@@ -1776,14 +1779,14 @@ check_efisys_part() {
         if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         else
-            DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for UEFISYS partition." 0 0
+            DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFISYS partition." 0 0
             
             mount -o rw "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         fi
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" || true
     else
-        DIALOG --msgbox "Setup did not find any UEFI SYSTEM PARTITION in ${DISC}. Please create a >=512MiB FAT32 partition with gdisk type code EFOO and try again." 0 0
+        DIALOG --msgbox "Setup did not find any EFISYS partition in ${DISC}. Please create a 1 GB FAT32 partition with gdisk type code EFOO and try again." 0 0
         return 1
     fi
     
