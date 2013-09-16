@@ -10,7 +10,7 @@ build ()
     fi
 
     ### check for TEMPDIR
-    if [ $TEMPDIR = "" ]; then
+    if [ "$TEMPDIR" = "" ]; then
 	 echo "ERROR: No TEMPDIR was set, please set TEMPDIR first!"
 	 exit 1
     fi

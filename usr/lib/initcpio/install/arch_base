@@ -42,8 +42,11 @@ build ()
               /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
               /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb /usr/bin/sh"
     for i in $symlinks; do
-        add_binary "$(which $(basename $(readlink "$i")))"
-        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+        echo "Checking $i"
+        # if [ -e $i ]; then
+            add_binary "$(which "$(basename "$(readlink "$i")")")"
+            add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
+        # fi
     done
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
@@ -103,8 +106,11 @@ build ()
     done
     symlinks="/usr/bin/vigr"
     for i in $symlinks; do
-        add_binary "$(which $(basename $(readlink "$i")))"
-        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+        echo "Checking $i"
+        # if [ -e $i ]; then
+            add_binary "$(which "$(basename "$(readlink "$i")")")"
+            add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
+        # fi
     done
     add_file "/etc/login.defs"
 
@@ -171,8 +177,11 @@ build ()
     done
     symlinks="/usr/bin/gpg /usr/bin/repo-remove"
     for i in $symlinks; do
-        add_binary "$(which $(basename $(readlink "$i")))"
-        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+        echo "Checking $i"
+        # if [ -e $i ]; then
+            add_binary "$(which "$(basename "$(readlink "$i")")")"
+            add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
+        # fi
     done
     add_dir "/var/cache/pacman/pkg"
     add_dir "/var/lib/pacman"

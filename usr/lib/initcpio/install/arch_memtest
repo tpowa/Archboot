@@ -3,10 +3,10 @@
 
 build ()
 {
-    [ ${RUNPROGRAM}  = "mkisolinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
-    [ ${RUNPROGRAM}  = "archboot-tarball-helper.sh" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
-    [ ${RUNPROGRAM}  = "mksyslinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
-    [ ${RUNPROGRAM}  = "mkpxelinux" ] && cp "/boot/memtest86+/memtest.bin" "${INSTALLDIR}/memtest"
+    [ "${RUNPROGRAM}"  = "mkisolinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
+    [ "${RUNPROGRAM}"  = "archboot-tarball-helper.sh" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
+    [ "${RUNPROGRAM}"  = "mksyslinux" ] && cp "/boot/memtest86+/memtest.bin" "${TEMPDIR}/boot/memtest"
+    [ "${RUNPROGRAM}"  = "mkpxelinux" ] && cp "/boot/memtest86+/memtest.bin" "${INSTALLDIR}/memtest"
 }
 
 help ()

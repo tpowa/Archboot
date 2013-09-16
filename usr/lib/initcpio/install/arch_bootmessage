@@ -3,6 +3,13 @@
 
 build ()
 {
+    
+    # [ -n "${APPENDBOOTMESSAGE}" ] && export APPENDBOOTMESSAGE
+    # [ -n "${APPENDOPTIONSBOOTMESSAGE}" ] && export APPENDOPTIONSBOOTMESSAGE
+    
+    # [ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /tmp/bootmessage.XXXX)
+    # [ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /tmp/optionsbootmessage.XXXX)
+    
     ### generate boot.msg
     [ "${RUNPROGRAM}" = "mkisolinux" ] && TITLEMSG="ISOLINUX"
     [ "${RUNPROGRAM}" = "mksyslinux" ] && TITLEMSG="SYSLINUX"
