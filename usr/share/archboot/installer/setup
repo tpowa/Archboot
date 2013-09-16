@@ -1686,9 +1686,13 @@ autoprepare() {
 
 detect_DISC() {
     
-    [[ "${DISC}" == "" ]] && DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    if [[ "${DISC}" == "" ]] || [[ ! "$(grep '/dev/' "${DISC}")" ]]; then
+        DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    fi
     
-    [[ "${DISC}" == "" ]] && DISC="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    if [[ "${DISC}" == "" ]]; then
+        DISC="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+    fi
     
 }
 
