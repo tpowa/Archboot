@@ -3347,11 +3347,7 @@ do_uefi_common() {
     # check_gpt
     
     check_efisys_part
-    ### HACK
-    PACKAGES="efivar"
-    run_pacman
-    
-    PACKAGES="dosfstools efibootmgr"
+    PACKAGES="dosfstools efivar efibootmgr"
     run_pacman
     
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
@@ -3364,8 +3360,7 @@ do_uefi_common() {
 }
 
 do_uefi_efibootmgr() {
-    ### HACK
-    if [[ "$(chroot ${DESTDIR} /usr/bin/ldd /usr/bin/efibootmgr | grep libefivar)" ]] && [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
+    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
         uefi_switch_to_efivarfs
         
         _EFIBOOTMGR_EXTRA_ARGS="1"
