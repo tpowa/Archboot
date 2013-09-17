@@ -1747,7 +1747,7 @@ check_efisys_part() {
         UEFISYS_PART_NUM="$(sgdisk -p ${DISC} | grep 'EF00' | tail -n +1 | awk '{print $1}')"
         UEFISYS_PART="${DISC}${UEFISYS_PART_NUM}"
         
-        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" != "vfat" ]]
+        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" != "vfat" ]]; then
             ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
             DIALOG --defaultno --yesno "Detected EFISYS partition ${UEFISYS_PART} does not appear to be FAT formatted. UEFI Specification requires EFISYS partition to be FAT32 formatted. Do you want to format ${UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFISYS. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
