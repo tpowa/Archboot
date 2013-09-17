@@ -3298,23 +3298,6 @@ detect_uefi_boot() {
     fi
     
     detect_uefi_secure_boot
-    
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-            if [[ ! "$(grep 'blacklist efivars' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-                echo 'blacklist efivars' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-            fi
-        fi
-        
-        if [[ ! "$(grep 'blacklist efi_pstore' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-            echo 'blacklist efi_pstore' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-        fi
-        
-        if [[ ! "$(grep 'options efi_pstore pstore_disable=1' "${DESTDIR}/etc/modprobe.d/modprobe.conf")" ]]; then
-            echo 'options efi_pstore pstore_disable=1' >> "${DESTDIR}/etc/modprobe.d/modprobe.conf"
-        fi
-    fi
-    
 }
 
 detect_uefi_secure_boot() {
