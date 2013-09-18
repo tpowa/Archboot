@@ -106,14 +106,12 @@ pkgdesc () {
 #
 chroot_mount()
 {
-    [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
-    [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
+    [[ -e "${DESTDIR}/proc" ]] || mkdir "${DESTDIR}/proc"
+    [[ -e "${DESTDIR}/sys" ]] || mkdir "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
-    mount -o bind /sys "${DESTDIR}/sys"
-    mount -o bind /proc "${DESTDIR}/proc"
-    mount -o bind /dev "${DESTDIR}/dev"
-    # chmod 555 "${DESTDIR}/sys"
-    # chmod 555 "${DESTDIR}/proc"
+    mount --rbind "/proc" "${DESTDIR}/proc"
+    mount --rbind "/sys" "${DESTDIR}/sys"
+    mount --rbind "/dev" "${DESTDIR}/dev"
 }
 
 # chroot_umount()
@@ -3344,7 +3342,7 @@ EFIBEOF
         chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
         mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
     else
-        DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for /${UEFISYS_MOUNTPOINT}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
+        DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${UEFISYS_MOUNTPOINT}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
     fi
     
     chroot_umount
