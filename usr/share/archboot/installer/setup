@@ -3243,83 +3243,44 @@ abort_f2fs_bootpart() {
         fi
 }
 
-uefi_disable_all_efivar_interfaces() {
+uefi_mount_efivarfs() {
     
-    ## Disable sysfs-efivars
-    modprobe -q -r efivars
-    
-    ## Unmount efivarfs
-    umount /sys/firmware/efi/efivars || true
-    modprobe -q -r efivarfs || true
-    
-}
-
-uefi_switch_to_efivarfs() {
-    
-    uefi_disable_all_efivar_interfaces
-    
-    ## Remount efivarfs
-    modprobe -q efivarfs
-    mount -t efivarfs efivarfs /sys/firmware/efi/efivars
-    
-}
-
-uefi_switch_to_sysfs_efivars() {
-    
-    uefi_disable_all_efivar_interfaces
-    
-    ## Enable sysfs-efivars
-    modprobe -q efivars
-    
-}
-
-detect_uefi_boot() {
-    
-    uefi_switch_to_efivarfs
-    
-    if [[ "$(efivar -l)" ]]; then
-        _DETECTED_UEFI_BOOT="1"
-        _DETECTED_EFIVARFS="1"
-    else
-        _DETECTED_UEFI_BOOT="0"
-        _DETECTED_EFIVARFS="0"
+    ## Mount efivarfs if it is not already mounted
+    if [[ ! "$(mount | grep /sys/firmware/efi/efivars)" ]]; then
+        modprobe -q efivarfs
+        mount -t efivarfs efivarfs /sys/firmware/efi/efivars
     fi
     
-    if [[ "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
-        uefi_switch_to_sysfs_efivars
-        
-        if [[ "$(efivar -l)" ]]; then
-            _DETECTED_UEFI_BOOT="1"
-        else
-            _DETECTED_UEFI_BOOT="0"
-        fi
-        
-        _DETECTED_EFIVARFS="0"
-    fi
-    
-    detect_uefi_secure_boot
 }
 
 detect_uefi_secure_boot() {
     
+    export _DETECTED_UEFI_SECURE_BOOT="0"
+    
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-            uefi_switch_to_efivarfs
-        else
-            uefi_switch_to_sysfs_efivars
-        fi
+        uefi_mount_efivarfs
         
         _SECUREBOOT_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
         _SETUPMODE_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
         
         if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
-            _DETECTED_UEFI_SECURE_BOOT="1"
-        else
-            _DETECTED_UEFI_SECURE_BOOT="0"
+            export _DETECTED_UEFI_SECURE_BOOT="1"
         fi
-    else
-        _DETECTED_UEFI_SECURE_BOOT="0"
     fi
+    
+}
+
+detect_uefi_boot() {
+    
+    export _DETECTED_UEFI_BOOT="0"
+    
+    uefi_mount_efivarfs
+    
+    if [[ "$(efivar -l)" ]]; then
+        export _DETECTED_UEFI_BOOT="1"
+    fi
+    
+    detect_uefi_secure_boot
     
 }
 
@@ -3341,34 +3302,23 @@ do_uefi_common() {
     
     do_uefi_setup_env_vars
     
-    # CHECK_UEFISYS_PART="1"
-    # CHECK_BIOS_BOOT_GRUB=""
-    # RUN_CGDISK=""
-    # check_gpt
-    
-    check_efisys_part
     PACKAGES="dosfstools efivar efibootmgr"
     run_pacman
+    unset PACKAGES
     
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         PACKAGES="prebootloader lockdown-ms"
         run_pacman
+        unset PACKAGES
     fi
     
-    unset PACKAGES
+    check_efisys_part
     
 }
 
 do_uefi_efibootmgr() {
-    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-        uefi_switch_to_efivarfs
-        
-        _EFIBOOTMGR_EXTRA_ARGS="1"
-    else
-        uefi_switch_to_sysfs_efivars
-        
-        _EFIBOOTMGR_EXTRA_ARGS="0"
-    fi
+    
+    uefi_mount_efivarfs
     
     chroot_mount
     
@@ -3376,14 +3326,13 @@ do_uefi_efibootmgr() {
         cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
-_EFIBOOTMGR_EXTRA_ARGS="${_EFIBOOTMGR_EXTRA_ARGS}"
 _EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
 
 for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 
-if [[ "\${_EFIBOOTMGR_EXTRA_ARGS}" == "1" ]] && [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
+if [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
     efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}"
 else
     efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}"
@@ -3399,10 +3348,6 @@ EFIBEOF
     fi
     
     chroot_umount
-    
-    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-        uefi_switch_to_efivarfs
-    fi
     
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
@@ -3628,23 +3573,12 @@ timeout 5
 default archlinux-core-main
 GUMEOF
     
-    if [[ "${_DETECTED_EFIVARFS}" == "1" ]]; then
-        uefi_switch_to_efivarfs
-        
-        chroot_mount
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
-        chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
-        chroot_umount
-    else
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/"
-        cp -f "${DESTDIR}/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
-        
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
-            _BOOTMGR_LABEL="Gummiboot"
-            _BOOTMGR_LOADER_PATH="/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi"
-            do_uefi_bootmgr_setup
-        fi
-    fi
+    uefi_mount_efivarfs
+    
+    chroot_mount
+    chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
+    chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
+    chroot_umount
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
         DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
