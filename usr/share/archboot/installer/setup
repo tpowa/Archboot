@@ -120,9 +120,9 @@ chroot_mount()
 #
 chroot_umount()
 {
-    umount "${DESTDIR}/proc"
-    umount "${DESTDIR}/sys"
-    umount "${DESTDIR}/dev"
+    umount -R "${DESTDIR}/proc"
+    umount -R "${DESTDIR}/sys"
+    umount -R "${DESTDIR}/dev"
     mount --make-rshared /sys/fs/cgroup
 }
 
