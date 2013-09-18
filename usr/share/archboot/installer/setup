@@ -106,9 +106,9 @@ pkgdesc () {
 #
 chroot_mount()
 {
-    [[ -e "${DESTDIR}/proc" ]] || mkdir "${DESTDIR}/proc"
-    [[ -e "${DESTDIR}/sys" ]] || mkdir "${DESTDIR}/sys"
-    [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
+    [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555"${DESTDIR}/proc"
+    [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
+    [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
     mount --make-runbindable /sys/fs/cgroup
     mount --rbind "/proc" "${DESTDIR}/proc"
     mount --rbind "/sys" "${DESTDIR}/sys"
