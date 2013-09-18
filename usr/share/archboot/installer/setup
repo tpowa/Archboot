@@ -109,6 +109,7 @@ chroot_mount()
     [[ -e "${DESTDIR}/proc" ]] || mkdir "${DESTDIR}/proc"
     [[ -e "${DESTDIR}/sys" ]] || mkdir "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/dev" ]] || mkdir "${DESTDIR}/dev"
+    mount --make-runbindable /sys/fs/cgroup
     mount --rbind "/proc" "${DESTDIR}/proc"
     mount --rbind "/sys" "${DESTDIR}/sys"
     mount --rbind "/dev" "${DESTDIR}/dev"
@@ -122,6 +123,7 @@ chroot_umount()
     umount "${DESTDIR}/proc"
     umount "${DESTDIR}/sys"
     umount "${DESTDIR}/dev"
+    mount --make-rshared /sys/fs/cgroup
 }
 
 getfstype()
