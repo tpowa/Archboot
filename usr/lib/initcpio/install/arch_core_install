@@ -58,10 +58,10 @@ build ()
             [[ -d devel/$(basename $i) ]] && rm -r devel/$(basename $i)
         done
         cd  ${SVNTREE}
-        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any" ! -name "testing*")"
+        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*" ! -name "*unstable*") $(find ./ -type d -name *"any" ! -name "testing*" ! -name "*unstable*")"
     else
         cd ${SVNTREE}
-        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any" ! -name "testing*")"
+        SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*" ! -name "*unstable*") $(find ./ -type d -name *"any" ! -name "testing*" ! -name "*unstable*")"
     fi
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
