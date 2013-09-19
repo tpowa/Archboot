@@ -3303,14 +3303,9 @@ do_uefi_common() {
     do_uefi_setup_env_vars
     
     PACKAGES="dosfstools efivar efibootmgr"
+    [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]] && PACKAGES="${PACKAGES} prebootloader lockdown-ms"
     run_pacman
     unset PACKAGES
-    
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        PACKAGES="prebootloader lockdown-ms"
-        run_pacman
-        unset PACKAGES
-    fi
     
     check_efisys_part
     
