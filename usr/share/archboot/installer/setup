@@ -4415,27 +4415,24 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     
     do_grub_common_before
-        
+    
     chroot_mount
     
     chroot "${DESTDIR}" "/usr/bin/grub-install" \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
         --efi-directory="${UEFISYS_MOUNTPOINT}" \
-        --bootloader-id="arch_grub" \
+        --bootloader-id="grub" \
         --boot-directory="/boot" \
         --recheck \
         --debug &>"/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
-    
-    chroot_umount
     
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
     
     BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
-    
     BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
     
     [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
     
@@ -4460,33 +4457,33 @@ insmod hfsplus
 insmod linux
 insmod chain
 
+insmod search_fs_uuid
+
 search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}
 
-if [ -f "(\${root})/grub/grub.cfg" ]; then
-    set prefix="(\${root})/grub"
-    source "(\${root})/grub/grub.cfg"
+if [ -f "/grub/grub.cfg" ]; then
+    source "/grub/grub.cfg"
 else
-    if [ -f "(\${root})/boot/grub/grub.cfg" ]; then
-        set prefix="(\${root})/boot/grub"
-        source "(\${root})/boot/grub/grub.cfg"
+    if [ -f "/boot/grub/grub.cfg" ]; then
+        source "/boot/grub/grub.cfg"
     fi
 fi
 
 EOF
     
-    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}_standalone.cfg"
+    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.cfg"
     
     __WD="${PWD}/"
     
     cd "${DESTDIR}/"
-    
-    chroot_mount
-    
+        
     chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --format="${_GRUB_ARCH}-efi" \
+        --install-modules="all" \
         --compression="xz" \
-        --output="${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
+        --compress="xz" \
+        --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
         "boot/grub/grub.cfg" &>"/tmp/grub_${_GRUB_ARCH}_uefi_mkstandalone.log"
     
     chroot_umount
@@ -4497,9 +4494,9 @@ EOF
     
     cat "/tmp/grub_uefi_${_GRUB_ARCH}_install.log" >> "${LOG}"
     
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
-        _BOOTMGR_LABEL="Arch Linux (GRUB)"
-        _BOOTMGR_LOADER_DIR="/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi"
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
+        _BOOTMGR_LABEL="GRUB"
+        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} has been successfully installed." 0 0
@@ -4509,17 +4506,17 @@ EOF
         do_grub_config
         GRUB_UEFI=""
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch_grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
             
             do_uefi_secure_boot_preloader
         fi
     else
-        DIALOG --msgbox "Error installing GRUB UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB(2) UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
