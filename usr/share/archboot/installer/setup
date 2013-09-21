@@ -3535,8 +3535,6 @@ do_efistub_uefi() {
 
 do_gummiboot_uefi() {
     
-    do_uefi_common
-    
     DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
     
     if [[ ! -f "${DESTDIR}/usr/bin/gummiboot" ]]; then
@@ -3599,8 +3597,6 @@ GUMEOF
 }
 
 do_refind_uefi() {
-    
-    do_uefi_common
     
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
