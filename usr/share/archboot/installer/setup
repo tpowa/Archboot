@@ -5024,26 +5024,31 @@ install_bootloader() {
     prepare_pacman
     CANCEL=""
     
-    _DIRECT="0"
+    [[ "${_DIRECT}" == "" ]] && export _DIRECT="0"
+    export _ANOTHER="1"
     
     detect_uefi_boot
     
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]] && [[ "${_DIRECT}" != "1" ]]; then
         do_uefi_setup_env_vars
         
-        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi && _DIRECT="1"
+        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && export _DIRECT="1"
+        
+        if [[ "${_DIRECT}" == "1" ]]; then
+            install_bootloader_uefi
+            
+            export _ANOTHER="0"
+            DIALOG --yesno "Do you want to install another bootloader?" 0 0 && export _ANOTHER="1"
+        fi
     fi
     
-    if [[ "${_DIRECT}" == "1" ]]; then
-        DIALOG --yesno "Do you want to install another bootloader?" 0 0 && install_bootloader_menu && _DIRECT="0"
-    else
+    if [[ "${_ANOTHER}" == "1" ]]; then
         install_bootloader_menu
     fi
     
 }
 
 install_bootloader_menu() {
-    
     DIALOG --menu "What is your boot system type?" 10 40 2 \
         "BIOS" "BIOS" \
         "UEFI" "UEFI" 2>${ANSWER} || CANCEL=1
