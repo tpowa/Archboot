@@ -12,7 +12,6 @@ DESTDIR="/install"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
-UEFISYS_MOUNTPOINT="/boot/efi"
 
 # name of kernel package
 KERNELPKG="linux"
@@ -1758,7 +1757,7 @@ check_efisys_part() {
         fi
         
         
-        if [[ "${S_MKFSAUTO}" != "1" ]]; then
+        if [[ "${UEFISYS_MOUNTPOINT}" == "" ]]; then
             DIALOG --inputbox "Enter the mountpoint of your EFISYS partition (Default is /boot/efi): " 0 0 "/boot/efi" 2>${ANSWER} || return 1
             UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         fi
