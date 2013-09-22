@@ -5031,25 +5031,21 @@ install_bootloader() {
     CANCEL=""
     
     detect_uefi_boot
-    
+    _ANOTHER="1"
+    _DIRECT=""
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
-        _ANOTHER="1"
-        while [[ "${_ANOTHER}" == "1" ]]; do    
-            _DIRECT=""
-            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && _DIRECT="1"
-        
-            if [[ "${_DIRECT}" == "1" ]]; then
-                install_bootloader_uefi
-            else
-                install_bootloader_menu
-            fi
-            _ANOTHER="0"
-            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
-        done
-    else
-        install_bootloader_menu
-    fi   
+        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && _DIRECT="1"
+    fi
+    while [[ "${_ANOTHER}" == "1" ]]; do  
+        if [[ "${_DIRECT}" == "1" ]]; then
+            install_bootloader_uefi
+        else
+            install_bootloader_menu
+        fi
+        _ANOTHER="0"
+        DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
+    done
 }
 
 install_bootloader_menu() {
