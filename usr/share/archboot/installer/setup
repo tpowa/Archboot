@@ -3310,7 +3310,7 @@ do_uefi_common() {
         [[ ! -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" ]] && PACKAGES="${PACKAGES} prebootloader"
         [[ ! -f "${DESTDIR}/usr/lib/lockdown-ms/LockDown_ms.efi" ]] && PACKAGES="${PACKAGES} lockdown-ms"
     fi
-    run_pacman
+    ! [[ "${PACKAGES}" == "" ]] && run_pacman
     unset PACKAGES
     
     check_efisys_part
@@ -5030,28 +5030,26 @@ install_bootloader() {
     prepare_pacman
     CANCEL=""
     
-    [[ "${_DIRECT}" == "" ]] && export _DIRECT="0"
-    export _ANOTHER="1"
-    
     detect_uefi_boot
     
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]] && [[ "${_DIRECT}" != "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
+        _ANOTHER="1"
+        while [[ "${_ANOTHER}" == "1" ]]; do    
+            _DIRECT=""
+            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && _DIRECT="1"
         
-        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && export _DIRECT="1"
-        
-        if [[ "${_DIRECT}" == "1" ]]; then
-            install_bootloader_uefi
-            
-            export _ANOTHER="0"
-            DIALOG --yesno "Do you want to install another bootloader?" 0 0 && export _ANOTHER="1"
-        fi
-    fi
-    
-    if [[ "${_ANOTHER}" == "1" ]]; then
+            if [[ "${_DIRECT}" == "1" ]]; then
+                install_bootloader_uefi
+            else
+                install_bootloader_menu
+            fi
+            _ANOTHER="0"
+            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
+        done
+    else
         install_bootloader_menu
-    fi
-    
+    fi   
 }
 
 install_bootloader_menu() {
