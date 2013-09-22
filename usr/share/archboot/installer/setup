@@ -3302,8 +3302,14 @@ do_uefi_common() {
     
     do_uefi_setup_env_vars
     
-    PACKAGES="dosfstools efivar efibootmgr"
-    [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]] && PACKAGES="${PACKAGES} prebootloader lockdown-ms"
+    PACKAGES=""
+    [[ ! -f "${DESTDIR}/usr/bin/mkfs.vfat" ]] && PACKAGES="${PACKAGES} dosfstools"
+    [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
+    [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        [[ ! -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" ]] && PACKAGES="${PACKAGES} prebootloader"
+        [[ ! -f "${DESTDIR}/usr/lib/lockdown-ms/LockDown_ms.efi" ]] && PACKAGES="${PACKAGES} lockdown-ms"
+    fi
     run_pacman
     unset PACKAGES
     
@@ -3676,7 +3682,7 @@ do_syslinux_common_before() {
     USE_DMRAID=""
     RAID_ON_LVM=""
     common_bootloader_checks
-    if [[ ! -e "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
+    if [[ ! -f "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
         DIALOG --msgbox "Couldn't find syslinux files, installing syslinux and mtools now ..." 0 0
         PACKAGES="syslinux mtools"
         run_pacman
