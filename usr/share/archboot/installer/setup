@@ -2973,10 +2973,12 @@ auto_pacman()
 # If [testing] repository was enabled during installation, 
 # enable it on installed system too!
 auto_testing()
-{
-   sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
-   sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
-   sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${DESTDIR}/etc/pacman.conf
+{  
+   if [[ "${DOTESTING}" == "yes" ]]; then
+       sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
+       sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
+       sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${DESTDIR}/etc/pacman.conf
+   fi
 }
 
 # donetwork()
