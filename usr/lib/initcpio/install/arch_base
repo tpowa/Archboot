@@ -42,7 +42,7 @@ build ()
               /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
               /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb /usr/bin/sh"
     for i in $symlinks; do
-        echo "Checking $i"
+        # echo "Checking $i"
         # if [ -e $i ]; then
             add_binary "$(which "$(basename "$(readlink "$i")")")"
             add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
@@ -106,7 +106,7 @@ build ()
     done
     symlinks="/usr/bin/vigr"
     for i in $symlinks; do
-        echo "Checking $i"
+        # echo "Checking $i"
         # if [ -e $i ]; then
             add_binary "$(which "$(basename "$(readlink "$i")")")"
             add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
@@ -177,7 +177,7 @@ build ()
     done
     symlinks="/usr/bin/gpg /usr/bin/repo-remove"
     for i in $symlinks; do
-        echo "Checking $i"
+        # echo "Checking $i"
         # if [ -e $i ]; then
             add_binary "$(which "$(basename "$(readlink "$i")")")"
             add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
