@@ -11,7 +11,6 @@ What is archboot?
 The difference to the archiso install media:
 - It provides an additional interactive setup and quickinst script.
 - It contains [core] repository on media.
-- It supports UEFI_CD boot.
 - It runs a modified Arch Linux system in initramfs.
 - It is restricted to RAM usage, everything which is not necessary like
   man or info pages etc. is not provided.
