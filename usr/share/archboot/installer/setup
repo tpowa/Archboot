@@ -1608,9 +1608,9 @@ autoprepare() {
             sgdisk --set-alignment="2048" --new=${_BOOT_PART_NUM}:+1M:+${BOOT_PART_SIZE}M --typecode=${_BOOT_PART_NUM}:8300 --attributes=${_BOOT_PART_NUM}:set:2 --change-name=${_BOOT_PART_NUM}:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
         fi
         
-        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:+1M:+${SWAP_PART_SIZE}M --typecode=${_SWAP_PART_NUM}:0657fd6d-a4ab-43c4-84e50933c84b4f4f --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:+1M:+${SWAP_PART_SIZE}M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
         sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:+1M:+${ROOT_PART_SIZE}M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:+1M:0 --typecode=${_HOME_PART_NUM}:933ac7e1-2eb4-4f13-b8440e14e2aef915 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:+1M:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
         sgdisk --print ${DEVICE} > ${LOG}
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
