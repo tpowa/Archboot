@@ -1439,7 +1439,7 @@ autoprepare() {
     detect_uefi_boot
     
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot/efi) : " 0 0 "/boot/efi" 2>"${ANSWER}" || return 1
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 0 0 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
     fi
     
@@ -1758,7 +1758,7 @@ check_efisys_part() {
         
         
         if [[ "${UEFISYS_MOUNTPOINT}" == "" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your EFISYS partition (Default is /boot/efi): " 0 0 "/boot/efi" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the mountpoint of your EFISYS partition (Default is /boot): " 0 0 "/boot" 2>${ANSWER} || return 1
             UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
         fi
         
