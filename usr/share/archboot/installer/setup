@@ -1425,6 +1425,7 @@ autoprepare() {
         fi
     fi
     DEFAULTFS=""
+    _UEFISYS_BOOTPART=""
     BOOT_PART_SET=""
     SWAP_PART_SET=""
     ROOT_PART_SET=""
@@ -1438,13 +1439,13 @@ autoprepare() {
     
     detect_uefi_boot
     
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1"  ||  "${GUIDPARAMETER}" = "yes" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 0 0 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
     fi
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum parition size is 512 MiB and only FAT32 FS is supported" 0 0
+        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partion size is 512 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
     fi
     
@@ -1482,17 +1483,22 @@ autoprepare() {
         
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
             DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}))"
-            
-            BOOT_PART_SIZE="${UEFISYS_PART_SIZE}"
-            
-            if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
-                DIALOG --msgbox "ERROR: No space left on disk." 0 0
-            else
-                BOOT_PART_SET=1
+            while [[ "${BOOT_PART_SET}" = "" ]]; do
+                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 512.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>${ANSWER} || return 1
+                BOOT_PART_SIZE="$(cat ${ANSWER})"
+                if [[ "${BOOT_PART_SIZE}" = "" ]]; then
+                    DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                else
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "512" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                         DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+                    else
+                        BOOT_PART_SET=1
                 
-                _PART_NUM="${_UEFISYS_PART_NUM}"
-                _BOOT_PART_NUM="${_PART_NUM}"
-            fi
+                        _PART_NUM="${_UEFISYS_PART_NUM}"
+                        _BOOT_PART_NUM="${_PART_NUM}"
+                    fi
+                fi
+            done
         else
             DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))"
             while [[ "${BOOT_PART_SET}" = "" ]]; do
