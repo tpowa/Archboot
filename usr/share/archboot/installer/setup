@@ -2915,8 +2915,8 @@ auto_fstab(){
             sort /tmp/.device-names >>${DESTDIR}/etc/fstab
         fi
         if [[ -f /tmp/.fstab ]]; then
-            # clean fstab first from /dev entries
-            sed -i -e '/^\/dev/d' ${DESTDIR}/etc/fstab
+            # clean fstab first from entries
+            sed -i -e '/^\#/!d' ${DESTDIR}/etc/fstab
             sort /tmp/.fstab >>${DESTDIR}/etc/fstab
         fi
     fi
