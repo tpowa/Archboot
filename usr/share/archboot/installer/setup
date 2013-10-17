@@ -3948,7 +3948,8 @@ do_syslinux_bios() {
     
     [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     
-    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" ]]; then
+    # btrfs does not have ldlinux.sys in filesystem!
+    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" || "${FSTYPE}" == "btrfs" ]]; then
         _SYSLINUX_UEFI="0"
         _SYSLINUX_BIOS="1"
         do_syslinux_config
