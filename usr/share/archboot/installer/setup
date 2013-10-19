@@ -1437,8 +1437,6 @@ autoprepare() {
         return 1
     fi
     
-    detect_uefi_boot
-    
     if [[ "${_DETECTED_UEFI_BOOT}" == "1"  ||  "${GUIDPARAMETER}" = "yes" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 0 0 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
@@ -2531,7 +2529,7 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value $(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep $(echo ${_device} | cut -d"=" -f2) | cut -d" " -f 1))"
-    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_mountpoint}" == "/boot" || "${_mountpoint}" == "/" ]]; then
+    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_mountpoint}" == "/boot" && "${_DETECTED_UEFI_BOOT}" == "1" || "${_mountpoint}" == "/" ]]; then
         if [[ "${_fstype}" = "btrfs" && -n "${_btrfsmountoptions}" ]]; then
             echo -n "${_device} ${_mountpoint} ${_fstype} defaults,${_btrfsmountoptions} 0 " >>/tmp/.fstab
         else
@@ -4624,6 +4622,7 @@ prepare_storagedrive() {
     S_MKFS=0
     DONE=0
     NEXTITEM=""
+    detect_uefi_boot
     while [[ "${DONE}" = "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
