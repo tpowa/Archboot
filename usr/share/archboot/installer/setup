@@ -377,6 +377,7 @@ destdir_mounts(){
     # Run mountpoints, if nothing is mounted on ${DESTDIR}
     if [[ "${PART_ROOT}" = "" ]]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
+        detect_uefi_boot
         mountpoints || return 1
     fi
 }
