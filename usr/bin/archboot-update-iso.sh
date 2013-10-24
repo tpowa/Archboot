@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script for updating existing Archboot iso with newer UEFI shell, rEFInd, and /arch/setup script in the initramfs files
-# Contributed by "Keshav Padram" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
+# Contributed by "Keshav Padram Amburay" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
 # change to english locale!
 export LANG="en_US"
 

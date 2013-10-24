@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## Script for creating a UEFI CD bootable ISO from existing Archboot ISO
 ## by Tobias Powalowski <tpowa@archlinux.org>
-## Contributed by "Keshav Padram" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
+## Contributed by "Keshav Padram Amburay" <the ddoott ridikulus ddoott rat aatt geemmayil ddoott ccoomm>
 # change to english locale!
 export LANG="en_US"
 
