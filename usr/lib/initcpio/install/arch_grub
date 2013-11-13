@@ -5,7 +5,7 @@ build ()
 {
     apps="grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
           grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath \
-	  grub-mount grub-ntldr-img grub-script-check grub-bios-setup \
+	  grub-mount grub-script-check grub-bios-setup \
 	  grub-ofpathname grub-probe"
     for i in $apps; do
         add_binary "$i"
