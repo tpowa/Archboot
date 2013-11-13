@@ -6,7 +6,7 @@ build ()
     add_checked_modules '/drivers/net/'
     apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
-	  sm-notify start-statd rpcbind rpcinfo gss_clnt_send_err gss_destroy_creds rpc.gssd rpc.svcgssd mountpoint"
+	  sm-notify start-statd rpcbind rpcinfo rpc.gssd rpc.svcgssd mountpoint"
     for i in $apps; do
         add_binary "$i"
     done
