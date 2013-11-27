@@ -92,6 +92,7 @@ xorriso -as mkisofs \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
+        --sort-weight 1 boot/syslinux/isolinux.bin \
         -output "${OUTPUT_IMAGENAME}" "${ISOIMG}"/ &> /tmp/xorriso.log
 
 if [[ -e "${OUTPUT_IMAGENAME}" ]]; then
