@@ -577,6 +577,7 @@ xorriso -as mkisofs \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
 	${_CD_UEFI_PARAMETERS} \
+	--sort-weight 1 boot/syslinux/isolinux/isolinux.bin \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
 
