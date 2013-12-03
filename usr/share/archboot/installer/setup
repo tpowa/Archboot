@@ -4126,14 +4126,14 @@ insmod font
 search --fs-uuid --no-floppy --set=usr_part ${USR_PART_HINTS_STRING} ${USR_PART_FS_UUID}
 search --fs-uuid --no-floppy --set=root_part ${ROOT_PART_HINTS_STRING} ${ROOT_PART_FS_UUID}
 
-if [ -e "(\${usr_part})/share/grub/unicode.pf2" ]; then
-    set _fontfile="(\${usr_part})/share/grub/unicode.pf2"
+if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
+    set _fontfile="\${prefix}/fonts/unicode.pf2"
 else
     if [ -e "(\${root_part})/usr/share/grub/unicode.pf2" ]; then
         set _fontfile="(\${root_part})/usr/share/grub/unicode.pf2"
     else
-        if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
-            set _fontfile="\${prefix}/fonts/unicode.pf2"
+        if [ -e "(\${usr_part})/share/grub/unicode.pf2" ]; then
+            set _fontfile="(\${usr_part})/share/grub/unicode.pf2"
         fi
     fi
 fi
@@ -4441,93 +4441,55 @@ do_grub_uefi() {
     
     chroot_mount
     
+    ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
+    echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
+    chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
+        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+        --format="${_GRUB_ARCH}-efi" \
+        --modules="part_gpt part_msdos" \
+        --install-modules="all" \
+        --fonts="unicode" \
+        --locales="en@quot" \
+        --themes="" \
+        --verbose \
+        --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
+        "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_GRUB_ARCH}_mkstandalone.log"
+    
+    ## Install GRUB normally
     chroot "${DESTDIR}" "/usr/bin/grub-install" \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
         --efi-directory="${UEFISYS_MOUNTPOINT}" \
         --bootloader-id="grub" \
         --boot-directory="/boot" \
+        --no-nvram \
         --recheck \
-        --debug &>"/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
+        --debug &> "/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
     
-    mkdir -p "${DESTDIR}/boot/grub/locale"
-    cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
-    
-    BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
-    
-    [[ -e "${DESTDIR}/boot/grub/grub.cfg" ]] && mv "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/boot/grub/grub.cfg.save"
-    
-    cat << EOF > "${DESTDIR}/boot/grub/grub.cfg"
-
-insmod usbms
-insmod usb_keyboard
-
-insmod part_gpt
-insmod part_msdos
-
-insmod fat
-insmod iso9660
-insmod udf
-insmod ${BOOT_PART_FS}
-
-insmod ext2
-insmod reiserfs
-insmod ntfs
-insmod hfsplus
-
-insmod linux
-insmod chain
-
-insmod search_fs_uuid
-
-search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}
-
-if [ -f "/grub/grub.cfg" ]; then
-    source "/grub/grub.cfg"
-else
-    if [ -f "/boot/grub/grub.cfg" ]; then
-        source "/boot/grub/grub.cfg"
-    fi
-fi
-
-EOF
-    
-    cp -f "${DESTDIR}/boot/grub/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.cfg"
-    
-    __WD="${PWD}/"
-    
-    cd "${DESTDIR}/"
-        
-    chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
-        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-        --format="${_GRUB_ARCH}-efi" \
-        --install-modules="all" \
-        --compression="xz" \
-        --compress="xz" \
-        --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
-        "boot/grub/grub.cfg" &>"/tmp/grub_${_GRUB_ARCH}_uefi_mkstandalone.log"
-    
-    chroot_umount
-    
-    cd "${__WD}/"
-    
-    [[ -e "${DESTDIR}/boot/grub/grub.cfg.save" ]] && mv "${DESTDIR}/boot/grub/grub.cfg.save" "${DESTDIR}/boot/grub/grub.cfg"
-    
+    cat "/tmp/grub_uefi_${_GRUB_ARCH}_mkstandalone.log" >> "${LOG}"
     cat "/tmp/grub_uefi_${_GRUB_ARCH}_install.log" >> "${LOG}"
     
+    GRUB_PREFIX_DIR="/boot/grub/"
+    GRUB_UEFI="1"
+    do_grub_config
+    GRUB_UEFI=""
+    
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" ]]; then
+        cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub.cfg"
+        
+        _BOOTMGR_LABEL="GRUB_Standalone"
+        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
+        do_uefi_bootmgr_setup
+        
+        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} Standalone has been successfully installed." 0 0
+    fi
+    
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
-        _BOOTMGR_LABEL="GRUB"
+        _BOOTMGR_LABEL="GRUB_Normal"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} has been successfully installed." 0 0
-        
-        GRUB_PREFIX_DIR="/boot/grub/"
-        GRUB_UEFI="1"
-        do_grub_config
-        GRUB_UEFI=""
+        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} Normal has been successfully installed." 0 0
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
