@@ -9,10 +9,6 @@ build ()
     for i in /usr/share/openvpn/examples/*; do
         add_file "$i"
     done
-    # add easy rsa
-    for i in /usr/share/openvpn/easy-rsa/*; do
-        add_file "$i"
-    done
     # add plugins
     for i in /usr/lib/openvpn/plugins/*; do
         add_file "$i"
