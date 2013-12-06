@@ -14,7 +14,7 @@ build ()
     add_symlink /var/lock ../run/lock
     
     apps="getent agetty mount umount basename du clear env head id md5sum nano printf tail \
-          tee test tr tty uptime w who wc which whoami xargs yes killall5 \
+          tee test tr tty uptime w who wc which whoami xargs yes \
           bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted partprobe \
           gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \
           kill killall more ps pwd rmdir stty sync tar bsdtar bsdcpio touch uname hdparm \
@@ -26,8 +26,8 @@ build ()
           prlimit rename renice rev script scriptreplay setarch setsid setterm tailf taskset ul unshare \
           uuidgen whereis write addpart delpart fdformat \
           ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
-          vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin bootlogd \
-          resizepart lslocks wdctl fstab-decode zless zgrep fold od ldd"
+          vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin \
+          resizepart lslocks wdctl zless zgrep fold od ldd pidof"
     for i in $apps; do
         add_binary "$i"
     done
@@ -35,7 +35,7 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/usr/bin/depmod /usr/bin/pidof /usr/bin/awk /usr/bin/halt /usr/bin/telinit /usr/bin/shutdown /usr/bin/runlevel /usr/bin/reboot \
+    symlinks="/usr/bin/depmod /usr/bin/awk /usr/bin/halt /usr/bin/telinit /usr/bin/shutdown /usr/bin/runlevel /usr/bin/reboot \
               /usr/bin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
