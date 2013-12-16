@@ -4802,8 +4802,6 @@ auto_hwdetect() {
                 HWPARAMETER="${HWPARAMETER} --dmraid"
             fi
         fi
-        # check for separate /usr partition
-        [[ $(mount | grep "${DESTDIR}/usr ") ]] && HWPARAMETER="${HWPARAMETER} --shutdown"
         [[ "$(${_LSBLK} FSTYPE ${PART_ROOT})" = "btrfs" ]] && HWPARAMETER="${HWPARAMETER} --btrfs"
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
         read HWKER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
