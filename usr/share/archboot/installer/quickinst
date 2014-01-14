@@ -30,13 +30,8 @@ usage() {
     echo "Examples:"
     
     if [[ -e "/usr/bin/curl" ]]; then
-        if [[ "$(uname -m)" = "x86_64" ]]; then
-                echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/x86_64"
-                echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/x86_64"
-        else
-                echo "  quickinst net /mnt ftp://ftp.archlinux.org/core/os/i686"
-                echo "  quickinst net /mnt http://ftp.archlinux.org/core/os/i686"
-        fi
+                echo "  quickinst net /mnt 'ftp://ftp.archlinux.org/$repo/os/$arch'"
+                echo "  quickinst net /mnt 'http://ftp.archlinux.org/$repo/os/$arch'"
     fi
 
     echo "  quickinst media /mnt /packages/core-$(uname -m)/pkg"
@@ -153,7 +148,7 @@ install_packages() {
     if [[ "$(lsblk -rnpo FSTYPE | grep jfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
     fi
-    if [[ "$(${_BLKID} -o value -s TYPE | grep f2fs)" ]]; then
+    if [[ "$(lsblk -rnpo FSTYPE | grep f2fs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w f2fs-tools)" ]] && PACKAGES="${PACKAGES} f2fs-tools"
     fi
     if [[ "$(lsblk -rnpo FSTYPE | grep vfat)" ]]; then
@@ -180,7 +175,7 @@ fi
 
 # prepare pacman
 pacman_conf
-if [[ "${INSTMODE}" = "net" ]]; then
+if [[ "${MODE}" = "net" ]]; then
     pacman_conf_extra
 fi
 prepare_pacman
