@@ -216,7 +216,7 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
+options  cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
 GUMEOF
 		
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -275,7 +275,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap"
+    options "cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap"
     ostype Linux
     graphics off
 }
