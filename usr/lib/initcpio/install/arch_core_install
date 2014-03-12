@@ -45,7 +45,7 @@ build ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g_ntfsprogs fuse dhcp f2fs-tools prebootloader lockdown-ms gc guile libunistring"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) ntfs-3g_ntfsprogs fuse dhcp f2fs-tools prebootloader lockdown-ms gc guile libunistring libatomic_ops libseccomp"
         for i in base devel support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
