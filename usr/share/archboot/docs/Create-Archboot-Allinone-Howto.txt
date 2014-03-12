@@ -16,9 +16,9 @@ Create archboot chroots:
   linux32 pacman --root "<i686_chroot>" -Sg base --noconfirm --noprogressbar
 
 Enter archboot x86_64 container:
-  systemd-nspawn --capability=CAP_MKNOD -M $1-$(uname -m) -D <x86_64_chroot>
+  systemd-nspawn --capability=CAP_MKNOD --register=no -M $1-$(uname -m) -D <x86_64_chroot>
 Enter archboot i686 container:
-  linux32 systemd-nspawn --capability=CAP_MKNOD -M $1-$(uname -m) -D <i686_chroot>
+  linux32 systemd-nspawn --capability=CAP_MKNOD --register=no -M $1-$(uname -m) -D <i686_chroot>
 
 Install archboot and update to latest packages:
   # update in both chroots to latest available packages
