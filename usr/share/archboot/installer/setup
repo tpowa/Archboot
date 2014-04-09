@@ -2051,7 +2051,7 @@ select_btrfs_raid_devices () {
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
-     DIALOG --yesno "Would you like to create btrfs raid like this?\n\nLEVEL:\n${BTRFS_LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "${i}\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
+     DIALOG --yesno "Would you like to create btrfs raid data like this?\n\nLEVEL:\n${BTRFS_LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "${i}\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
 }
 
 # prepare new btrfs device
