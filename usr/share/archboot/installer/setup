@@ -2006,9 +2006,9 @@ btrfs_raid_level() {
     BTRFS_LEVEL=""
     BTRFS_DEVICE="${PART}"
     : >/tmp/.btrfs-devices
-    DIALOG --msgbox "BTRFS RAID OPTIONS:\n\nBTRFS has options to control the raid configuration for data and metadata.\nValid choices are raid0, raid1, raid5, raid6, raid10 and single.\nsingle means that no duplication of metadata is done, which may be desired when using hardware raid.\nraid5 requires at least 3 devices.\nraid6 and raid10 requires at least 4 devices.\n\nIf you don't need this feature select NONE." 0 0
+    DIALOG --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${BTRFS_RAID_FINISH}" != "DONE" ]]; do
-        DIALOG --menu "Select the raid level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select the raid data level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>${ANSWER} || return 1
         BTRFS_LEVEL=$(cat ${ANSWER})
         if [[ "${BTRFS_LEVEL}" = "NONE" ]]; then
             echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
