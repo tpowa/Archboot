@@ -1950,14 +1950,12 @@ btrfs_compress() {
     fi
 }
 
-# ask for btrfs ssd option
+# check for btrfs ssd option
 btrfs_ssd() {
     BTRFS_SSD="NONE"
-    if [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; then
-        DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on ${PART}?" 0 0 && BTRFS_SSD="ssd"
-    else
-        DIALOG --defaultno --yesno "Would you like to optimize the data for ssd disk usage on ${PART} subvolume=${BTRFS_SUBVOLUME}?" 0 0 && BTRFS_SSD="ssd"
-    fi
+    for i in $(${_LSBLK} NAME,TYPE ${PART} -s | grep "disk$" | cut -d' ' -f 1); do
+        [[ "$(cat /sys/block/$(basename ${i})/queue/rotational)" == "0" ]] && BTRFS_SSD="ssd"
+    done
 }
 
 # values that are only needed for btrfs creation
@@ -2405,6 +2403,8 @@ _mkfs() {
     [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
     [[ ! "${_btrfslevel}" = "NONE" && "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -d ${_btrfslevel}"
+    # add btrfs options, minimum requirement linux 3.14 -O extref,skinny-metadata,no-holes
+    [[ "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -O extref,skinny-metadata,no-holes"
     # we have two main cases: "swap" and everything else.
     if [[ "${_fstype}" = "swap" ]]; then
         swapoff ${_device} >/dev/null 2>&1
