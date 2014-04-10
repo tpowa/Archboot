@@ -1950,14 +1950,6 @@ btrfs_compress() {
     fi
 }
 
-# check for btrfs ssd option
-btrfs_ssd() {
-    BTRFS_SSD="NONE"
-    for i in $(${_LSBLK} NAME,TYPE ${PART} -s | grep "disk$" | cut -d' ' -f 1); do
-        [[ "$(cat /sys/block/$(basename ${i})/queue/rotational)" == "0" ]] && BTRFS_SSD="ssd"
-    done
-}
-
 # values that are only needed for btrfs creation
 clear_btrfs_values() {
     : >/tmp/.btrfs-devices
@@ -2157,9 +2149,29 @@ btrfs_subvolume() {
             choose_btrfs_subvolume || return 1
         fi
         btrfs_compress
-        btrfs_ssd
     fi
     FILESYSTEM_FINISH="yes"
+}
+
+# add ssd mount options, set deadline scheduler
+ssd_optimization() {
+    # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
+    if [[ "$(echo ${_fstype} | egrep 'ext4|jfs|btrfs|xfs|nilfs2|f2fs')" ]]; then     
+        ssd_mount_options=""
+        # check all underlying devices on ssd
+        for i in $(${_LSBLK} NAME,TYPE ${device} -s | grep "disk$" | cut -d' ' -f 1); do
+            # check for ssd
+            if [[ "$(cat /sys/block/$(basename ${i})/queue/rotational)" == "0" ]]; then
+                ssd_mount_options="noatime"
+                # check for trim
+                [[ "$(hdparm -I ${i} | grep TRIM)" && ! "$(echo ${ssd_mount_options} | grep "discard")" ]] && ssd_mount_options="${ssd_mount_options} discard"
+                # check on btrfs
+                [[ "${_fstype}" = "btrfs" && ! "$(echo ${ssd_mount_options} | grep "ssd")" ]] && ssd_mount_options="${ssd_mount_options} ssd,space_cache,inode_cache"
+                # set deadline scheduler
+                echo deadline > /sys/block/$(basename ${i})/queue/scheduler
+            fi
+        done
+    fi
 }
 
 select_filesystem() {
@@ -2227,7 +2239,6 @@ create_filesystem() {
         if [[ "${FSTYPE}" = "btrfs" ]]; then
             prepare_btrfs || return 1
             btrfs_compress
-            btrfs_ssd
         fi
         DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>${ANSWER} || return 1
         FS_OPTIONS=$(cat ${ANSWER})
@@ -2267,7 +2278,7 @@ mountpoints() {
         check_mkfs_values
         if [[ "${PART}" != "NONE" ]]; then
             PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g")"
-            echo "${PART}:swap:swap:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}:${BTRFS_SSD}" >>/tmp/.parts
+            echo "${PART}:swap:swap:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         DO_ROOT=""
         while [[ "${DO_ROOT}" != "DONE" ]]; do
@@ -2290,7 +2301,7 @@ mountpoints() {
         find_btrfs_raid_devices
         btrfs_parts
         check_mkfs_values
-        echo "${PART}:${FSTYPE}:/:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}:${BTRFS_SSD}" >>/tmp/.parts
+        echo "${PART}:${FSTYPE}:/:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
         ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g")"
         #
         # Additional partitions
@@ -2323,7 +2334,7 @@ mountpoints() {
                 find_btrfs_raid_devices
                 btrfs_parts
                 check_mkfs_values
-                echo "${PART}:${FSTYPE}:${MP}:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}:${BTRFS_SSD}" >>/tmp/.parts
+                echo "${PART}:${FSTYPE}:${MP}:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
                 ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g")"
             fi
         done
@@ -2347,21 +2358,20 @@ mountpoints() {
         BTRFS_SUBVOLUME=$(echo ${line} | cut -d: -f 9)
         DOSUBVOLUME=$(echo ${line} | cut -d: -f 10)
         BTRFS_COMPRESS=$(echo ${line} | cut -d: -f 11)
-        BTRFS_SSD=$(echo ${line} | cut -d: -f 12)
         if [[ "${DOMKFS}" = "yes" ]]; then
             if [[ "${FSTYPE}" = "swap" ]]; then
                 DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
             else
                 DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} ${BTRFS_SSD} || return 1
+            _mkfs yes ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         else
             if [[ "${FSTYPE}" = "swap" ]]; then
                 DIALOG --infobox "Activating swapspace on ${PART}" 0 0
             else
                 DIALOG --infobox "Mounting ${FSTYPE} on ${PART} to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs no ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} ${BTRFS_SSD} || return 1
+            _mkfs no ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         fi
         sleep 1
     done
@@ -2395,10 +2405,8 @@ _mkfs() {
     local _btrfssubvolume=${10}
     local _dosubvolume=${11}
     local _btrfscompress=${12}
-    local _btrfsssd=${13}
     # correct empty entries
     [[ "${_fsoptions}" = "NONE" ]] && _fsoptions=""
-    [[ "${_btrfsssd}" = "NONE" ]] && _btrfsssd=""
     [[ "${_btrfscompress}" = "NONE" ]] && _btrfscompress=""
     [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
@@ -2460,18 +2468,18 @@ _mkfs() {
         sleep 2
         # create our mount directory
         mkdir -p ${_dest}${_mountpoint}
+        # add ssd optimization before mounting
+        ssd_optimization
+        _mountoptions=""
         # prepare btrfs mount options
-        _btrfsmountoptions=""
-        [[ -n "${_btrfssubvolume}" ]] && _btrfsmountoptions="subvol=${_btrfssubvolume}"
-        [[ -n "${_btrfscompress}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfscompress}"
-        [[ -n "${_btrfsssd}" ]] && _btrfsmountoptions="${_btrfsmountoptions} ${_btrfsssd}"
-        _btrfsmountoptions="$(echo ${_btrfsmountoptions} | sed -e 's#^ ##g' | sed -e 's# #,#g')"
+        [[ -n "${_btrfssubvolume}" ]] && _mountoptions="${_mountoptions} subvol=${_btrfssubvolume}"
+        [[ -n "${_btrfscompress}" ]] && _mountoptions="${_mountoptions} ${_btrfscompress}"
+        [[ "${_fstype}" = "btrfs" ]] && _mountoptions="${_mountoptions} autodefrag"
+        _mountoptions="${_mountoptions} ${ssd_mount_options}"
+        # eleminate spaces at beginning and end, replace other spaces with ,
+        _mountoptions="$(echo ${_mountoptions} | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        if [[ "${_fstype}" = "btrfs" && -n "${_btrfsmountoptions}" ]]; then
-            mount -t ${_fstype} -o ${_btrfsmountoptions} ${_device} ${_dest}${_mountpoint} >${LOG} 2>&1
-        else
-            mount -t ${_fstype} ${_device} ${_dest}${_mountpoint} >${LOG} 2>&1
-        fi
+        mount -t ${_fstype} -o "${_mountoptions}" ${_device} ${_dest}${_mountpoint} >${LOG} 2>&1
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
@@ -2904,6 +2912,7 @@ install_packages() {
     # any automatic configuration should go here
     DIALOG --infobox "Writing base configuration..." 6 40
     auto_fstab
+    auto_ssd
     auto_mdadm
     auto_luks
     auto_pacman
@@ -2928,6 +2937,16 @@ auto_fstab(){
             sed -i -e '/^\#/!d' ${DESTDIR}/etc/fstab
             sort /tmp/.fstab >>${DESTDIR}/etc/fstab
         fi
+    fi
+}
+
+# auto_ssd()
+# add udev rule for ssd disks using the deadline scheduler by default
+auto_ssd () {
+    if [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules ]]; then
+        echo "# set deadline scheduler for non-rotating disks" >> ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules
+        echo "ACTION=="add|change", KERNEL=="sd[a-z]", TEST!="queue/rotational", ATTR{queue/scheduler}="deadline"" >> ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules
+        echo "ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"" >> ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules
     fi
 }
 
