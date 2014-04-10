@@ -1675,13 +1675,12 @@ autoprepare() {
         [[ "${fsoptions}" == "" ]] && fsoptions="NONE"
         labelname="$(echo ${fsspec} | tr -d ' ' | cut -f7 -d:)"
         btrfsdevices="${DEVICE}${part}"
-        btrfsssd="NONE"
         btrfscompress="NONE"
         btrfssubvolume="NONE"
         btrfslevel="NONE"
         dosubvolume="no"
         DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}\nwith FSLABEL ${labelname} ,\nmounting to ${DESTDIR}${mountpoint}" 0 0
-        _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfssd}" "${btrfscompress}" || return 1
+        _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfscompress}" || return 1
     done
 
     DIALOG --msgbox "Auto-prepare was successful" 0 0
