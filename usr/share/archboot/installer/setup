@@ -1949,13 +1949,17 @@ btrfs_compress() {
     fi
 }
 
-# values that are only needed for btrfs creation
-clear_btrfs_values() {
+# values that are needed for fs creation
+clear_fs_values() {
     : >/tmp/.btrfs-devices
+    DOMKFS="no"
     LABEL_NAME=""
     FS_OPTIONS=""
     BTRFS_DEVICES=""
     BTRFS_LEVEL=""
+    BTRFS_SUBVOLUME=""
+    DOSUBVOLUME=""
+    BTRFS_COMPRESS=""
 }
 
 # do not ask for btrfs filesystem creation, if already prepared for creation!
@@ -2261,7 +2265,7 @@ mountpoints() {
             DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - ${PARTS} 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             if [[ "${PART}" != "NONE" ]]; then
-                DOMKFS="no"
+                clear_fs_values
                 if [[ "${ASK_MOUNTPOINTS}" = "1" ]]; then
                     create_filesystem
                 else
@@ -2284,9 +2288,8 @@ mountpoints() {
             PART_ROOT=${PART}
             # Select root filesystem type
             FSTYPE="$(${_LSBLK} FSTYPE ${PART})"
-            DOMKFS="no"
             # clear values first!
-            clear_btrfs_values
+            clear_fs_values
             check_btrfs_filesystem_creation
             if [[ "${ASK_MOUNTPOINTS}" = "1" && "${SKIP_FILESYSTEM}" = "no" ]]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
@@ -2310,9 +2313,8 @@ mountpoints() {
                 PART=$(cat ${ANSWER})
                 if [[ "${PART}" != "DONE" ]]; then
                     FSTYPE="$(${_LSBLK} FSTYPE ${PART})"
-                    DOMKFS="no"
                     # clear values first!
-                    clear_btrfs_values
+                    clear_fs_values
                     check_btrfs_filesystem_creation
                     # Select a filesystem type
                     if [[ "${ASK_MOUNTPOINTS}" = "1" && "${SKIP_FILESYSTEM}" = "no" ]]; then
@@ -2532,6 +2534,7 @@ _mkfs() {
     # swap:  0657fd6d-a4ab-43c4-84e5-0933c84b4f4f
     # /home: 933ac7e1-2eb4-4f13-b844-0e14e2aef915
     # Complex devices, like mdadm, encrypt or lvm are not supported
+    # btrfs on subvolumes is not supported!
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value $(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep $(echo ${_device} | cut -d"=" -f2) | cut -d" " -f 1))"
