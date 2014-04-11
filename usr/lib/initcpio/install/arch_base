@@ -168,6 +168,8 @@ build ()
     add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
     # add rule files
     add_full_dir "/usr/lib/udev"
+    # add schedule rules file
+    add_file "/usr/share/archboot/base/etc/udev/rules.d/60-schedulers.rules" "/etc/udev/rules.d/60-schedulers.rules" 
 
     ### add pacman
     apps="pacman pacman-db-upgrade pacman-key pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
