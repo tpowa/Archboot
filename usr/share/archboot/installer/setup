@@ -1939,9 +1939,9 @@ btrfs_compress() {
     BTRFS_COMPRESS="NONE"
     BTRFS_COMPRESSLEVELS="lzo - zlib -"
     if [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; then
-        DIALOG --defaultno --yesno "Would you like to compress the data on ${PART}?" 0 0 && BTRFS_COMPRESS="compress"
+        DIALOG --yesno "Would you like to compress the data on ${PART}?" 0 0 && BTRFS_COMPRESS="compress"
     else
-        DIALOG --defaultno --yesno "Would you like to compress the data on ${PART} subvolume=${BTRFS_SUBVOLUME}?" 0 0 && BTRFS_COMPRESS="compress"
+        DIALOG --yesno "Would you like to compress the data on ${PART} subvolume=${BTRFS_SUBVOLUME}?" 0 0 && BTRFS_COMPRESS="compress"
     fi
     if [[ "${BTRFS_COMPRESS}" = "compress" ]]; then
         DIALOG --menu "Select the compression method you want to use" 21 50 9 ${BTRFS_COMPRESSLEVELS} 2>${ANSWER} || return 1
