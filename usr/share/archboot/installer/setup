@@ -3139,6 +3139,10 @@ getrootfstype() {
 getrootflags() {
     ROOTFLAGS=""
     ROOTFLAGS="$(findmnt -m -n -o options -T ${DESTDIR})"
+    # add subvolume for btrfs
+    if [[ "${ROOTFS}" == "btrfs" ]]; then 
+        [[ "$(findmnt -m -n -o SOURCE -T ${DESTDIR} | grep "[")" ]] && ROOTFLAGS="${ROOTFLAGS},subvol=$(basename "$(findmnt -m -n -o SOURCE -T ${DESTDIR} | cut -d "]" -f1)")"
+    fi
     [[ -n "${ROOTFLAGS}" ]] && ROOTFLAGS="rootflags=${ROOTFLAGS}"
 }
 
