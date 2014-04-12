@@ -2169,7 +2169,7 @@ ssd_optimization() {
                 # check for trim
                 [[ "$(hdparm -I ${i} | grep TRIM)" && ! "$(echo ${ssd_mount_options} | grep "discard")" ]] && ssd_mount_options="${ssd_mount_options} discard"
                 # check on btrfs
-                [[ "${_fstype}" = "btrfs" && ! "$(echo ${ssd_mount_options} | grep "ssd")" ]] && ssd_mount_options="${ssd_mount_options} ssd,space_cache,inode_cache"
+                [[ "${_fstype}" = "btrfs" && ! "$(echo ${ssd_mount_options} | grep "ssd")" ]] && ssd_mount_options="${ssd_mount_options} ssd,inode_cache"
             fi
         done
     fi
