@@ -716,7 +716,7 @@ set_guid() {
     ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
     ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
     GUIDPARAMETER=""
-    DIALOG --defaultno --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows Vista and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows Vista and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
+    DIALOG --yesno "Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows Vista and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows Vista and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
   bootloader used). " 0 0 && GUIDPARAMETER="yes"
 }
 
@@ -1427,6 +1427,7 @@ autoprepare() {
     fi
     DEFAULTFS=""
     _UEFISYS_BOOTPART=""
+    UEFISYS_MOUNTPOINT=""
     BOOT_PART_SET=""
     SWAP_PART_SET=""
     ROOT_PART_SET=""
@@ -1438,7 +1439,7 @@ autoprepare() {
         return 1
     fi
     
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1"  ||  "${GUIDPARAMETER}" = "yes" ]]; then
+    if [[  "${GUIDPARAMETER}" = "yes" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 0 0 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
     fi
@@ -1538,34 +1539,36 @@ autoprepare() {
             fi
         done
         
-        DISC_SIZE="$((${DISC_SIZE}-${SWAP_PART_SIZE}))"
-        ROOT_SIZE="7500"
-        [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
-        while [[ "${ROOT_PART_SET}" = "" ]]; do
-        DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
-        ROOT_PART_SIZE=$(cat ${ANSWER})
-            if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" ]]; then
-                DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
-            else
-                if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
-                    DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
-                else
-                    DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
-                    
-                    _PART_NUM="$((${_PART_NUM}+1))"
-                    _ROOT_PART_NUM="${_PART_NUM}"
-                    
-                    _PART_NUM="$((${_PART_NUM}+1))"
-                    _HOME_PART_NUM="${_PART_NUM}"
-                fi
-            fi
-        done
-        
         while [[ "${CHOSEN_FS}" = "" ]]; do
             DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>${ANSWER} || return 1
             FSTYPE=$(cat ${ANSWER})
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
+        # / and /home are subvolumes on btrfs
+        if ! [[ "${FSTYPE}" = "btrfs" ]]; then
+            DISC_SIZE="$((${DISC_SIZE}-${SWAP_PART_SIZE}))"
+            ROOT_SIZE="7500"
+            [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
+            while [[ "${ROOT_PART_SET}" = "" ]]; do
+            DIALOG --inputbox "Enter the size (MB) of your / partition,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
+            ROOT_PART_SIZE=$(cat ${ANSWER})
+                if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" ]]; then
+                    DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+                else
+                    if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
+                        DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+                    else
+                        DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+                    fi
+                fi
+            done
+        fi
+        _PART_NUM="$((${_PART_NUM}+1))"
+        _ROOT_PART_NUM="${_PART_NUM}"
+        if ! [[ "${FSTYPE}" = "btrfs" ]]; then            
+            _PART_NUM="$((${_PART_NUM}+1))"
+        fi
+        _HOME_PART_NUM="${_PART_NUM}"
         DEFAULTFS=1
     done
     
@@ -1614,8 +1617,12 @@ autoprepare() {
         fi
         
         sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:+1M:+${SWAP_PART_SIZE}M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:+1M:+${ROOT_PART_SIZE}M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:+1M:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+        if [[ "${FSTYPE}" = "btrfs" ]]; then
+            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:+1M:0 --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+        else
+            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:+1M:+${ROOT_PART_SIZE}M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+            sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:+1M:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+        fi
         sgdisk --print ${DEVICE} > ${LOG}
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -1629,8 +1636,12 @@ autoprepare() {
         parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} unit MiB set 1 boot on >${LOG}
         parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+1)) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+1)) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+2)) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+2)) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+3)) 100% >${LOG}
+        if [[ "${FSTYPE}" = "btrfs" ]]; then
+            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+2)) 100% >${LOG}
+        else
+            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+2)) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+2)) >${LOG}
+            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE}+3)) 100% >${LOG}
+        fi
     fi
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
@@ -1649,12 +1660,12 @@ autoprepare() {
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
     
-    _FSSPEC_ROOT_PART="${_ROOT_PART_NUM}:/:${ROOT_PART_SIZE}:${FSTYPE}:::ROOT_ARCH"
-    _FSSPEC_HOME_PART="${_HOME_PART_NUM}:/home:*:${FSTYPE}:::HOME_ARCH"
-    _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:${SWAP_PART_SIZE}:swap:::SWAP_ARCH"
+    _FSSPEC_ROOT_PART="${_ROOT_PART_NUM}:/:${FSTYPE}::ROOT_ARCH"
+    _FSSPEC_HOME_PART="${_HOME_PART_NUM}:/home:${FSTYPE}::HOME_ARCH"
+    _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:swap::SWAP_ARCH"
     
-    _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:${BOOT_PART_SIZE}:ext2::+:BOOT_ARCH"
-    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:${UEFISYS_PART_SIZE}:vfat:-F32::EFISYS"
+    _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:ext2::BOOT_ARCH"
+    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:vfat:-F32:EFISYS"
     
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
@@ -1668,19 +1679,28 @@ autoprepare() {
 
     ## make and mount filesystems
     for fsspec in ${FSSPECS}; do
-        part="$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
-        mountpoint="$(echo ${fsspec} | tr -d ' ' | cut -f2 -d:)"
-        fstype="$(echo ${fsspec} | tr -d ' ' | cut -f4 -d:)"
-        fsoptions="$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)"
-        [[ "${fsoptions}" == "" ]] && fsoptions="NONE"
-        labelname="$(echo ${fsspec} | tr -d ' ' | cut -f7 -d:)"
-        btrfsdevices="${DEVICE}${part}"
-        btrfscompress="NONE"
-        btrfssubvolume="NONE"
-        btrfslevel="NONE"
-        dosubvolume="no"
-        DIALOG --infobox "Creating ${fstype} on ${DEVICE}${part}\nwith FSLABEL ${labelname} ,\nmounting to ${DESTDIR}${mountpoint}" 0 0
-        _mkfs yes "${DEVICE}${part}" "${fstype}" "${DESTDIR}" "${mountpoint}" "${labelname}" "${fsoptions}" "${btrfsdevices}" "${btrfssubvolume}" "${btrfslevel}" "${dosubvolume}" "${btrfscompress}" || return 1
+        DOMKFS="yes"
+        PART="${DEVICE}$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
+        MP="$(echo ${fsspec} | tr -d ' ' | cut -f2 -d:)"
+        FSTYPE="$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)"
+        FS_OPTIONS="$(echo ${fsspec} | tr -d ' ' | cut -f4 -d:)"
+        [[ "${FS_OPTIONS}" == "" ]] && FS_OPTIONS="NONE"
+        LABEL_NAME="$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)"
+        BTRFS_DEVICES="${PART}"
+        if [[ "${FSTYPE}" = "btrfs" ]]; then
+            BTRFS_COMPRESS="compress=lzo"
+            [[ "${MP}" = "/" ]] && BTRFS_SUBVOLUME="root"
+            [[ "${MP}" = "/home" ]] && BTRFS_SUBVOLUME="home" && DOMKFS="no"
+            DOSUBVOLUME="yes"
+        else
+            BTRFS_COMPRESS="NONE"
+            BTRFS_SUBVOLUME="NONE"
+            DOSUBVOLUME="no"
+        fi
+        BTRFS_LEVEL="NONE"
+        DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP}" 0 0
+        _mkfs ${DOMKFS} ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        sleep 1
     done
 
     DIALOG --msgbox "Auto-prepare was successful" 0 0
