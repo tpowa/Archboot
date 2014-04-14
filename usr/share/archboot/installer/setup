@@ -2960,7 +2960,7 @@ auto_fstab(){
 # add sysctl file for swaps
 auto_ssd () {
     [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules ]] && cp /etc/udev/rules.d/60-schedulers.rules ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules
-    [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf]] && cp /etc/sysctl.d/99-sysctl.conf ${DESTDIR}/etc/sysctl.d/99-sysctl.conf
+    [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]] && cp /etc/sysctl.d/99-sysctl.conf ${DESTDIR}/etc/sysctl.d/99-sysctl.conf
 }
 
 # auto_mdadm()
