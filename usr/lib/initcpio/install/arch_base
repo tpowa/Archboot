@@ -171,6 +171,9 @@ build ()
     # add schedule rules file
     add_file "/usr/share/archboot/base/etc/udev/rules.d/60-schedulers.rules" "/etc/udev/rules.d/60-schedulers.rules" 
 
+    # add swapiness sysctl config file
+    add_file "/usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf" "/etc/sysctl.d/99-sysctl.conf"
+
     ### add pacman
     apps="pacman pacman-db-upgrade pacman-key pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
           rankmirrors repo-add testdb repo-elephant testpkg vercmp curl gpg-agent haveged"
