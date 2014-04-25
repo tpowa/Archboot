@@ -26,4 +26,4 @@ fi
 NEWMOUNTPOINT="${2}"
 OLDMOUNTPOINT="${1}"
 
-tar -C $OLDMOUNTPOINT -clspf - . | tar -C $NEWMOUNTPOINT -vxlspf - 
+tar -C $OLDMOUNTPOINT -clpf - . | tar -C $NEWMOUNTPOINT -vxlspf - 
