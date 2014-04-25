@@ -17,6 +17,7 @@ export LANG="en_US"
 [[ -z "${_UPDATE_UEFI_PREBOOTLOADER}" ]] && _UPDATE_UEFI_PREBOOTLOADER="1"
 [[ -z "${_UPDATE_UEFI_LOCKDOWN_MS}" ]] && _UPDATE_UEFI_LOCKDOWN_MS="1"
 [[ -z "${_UPDATE_UEFI_REFIND}" ]] && _UPDATE_UEFI_REFIND="1"
+[[ -z "${_UPDATE_UEFI_IA32_GRUB}" ]] && _UPDATE_UEFI_IA32_GRUB="1"
 
 [[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
 [[ -z "${_UPDATE_SYSLINUX_CONFIG}" ]] && _UPDATE_SYSLINUX_CONFIG="1"
@@ -187,7 +188,7 @@ It allows you to install Arch Linux or perform system maintenance.
 ENDTEXT
 MENU LABEL Boot Arch Linux (x86_64)
 LINUX /boot/vmlinuz_x86_64
-APPEND cgroup_disable=memory audit=0 gpt loglevel=7 rootdelay=10
+APPEND cgroup_disable=memory audit=0 loglevel=7 rootdelay=10
 INITRD /boot/initramfs_x86_64.img
 
 EOF
@@ -203,7 +204,7 @@ It allows you to install Arch Linux or perform system maintenance.
 ENDTEXT
 MENU LABEL Boot Arch Linux (i686)
 LINUX /boot/vmlinuz_i686
-APPEND cgroup_disable=memory audit=0 gpt loglevel=7 rootdelay=10
+APPEND cgroup_disable=memory audit=0 loglevel=7 rootdelay=10
 INITRD /boot/initramfs_i686.img
 
 EOF
@@ -301,6 +302,48 @@ _download_uefi_shell_tianocore() {
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.backup" || true
 	echo
 	
+	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For Spec. Ver. >=2.3 systems
+	
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" || true
+	echo
+	
+	if [[ -e "${_ARCHBOOT_ISO_WD}/shellia32_v2.efi" ]]; then
+		cp -f "${_ARCHBOOT_ISO_WD}/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi"
+		echo
+	else
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi" || true
+		echo
+		
+		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" | grep 'executable')" ]]; then
+			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
+		fi
+	fi
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" || true
+	echo
+	
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For Spec. Ver. <2.3 systems
+	
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" || true
+	echo
+	
+	if [[ -e "${_ARCHBOOT_ISO_WD}/shellia32_v1.efi" ]]; then
+		cp -f "${_ARCHBOOT_ISO_WD}/shellia32_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi"
+		echo
+	else
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi" || true
+		echo
+		
+		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" | grep 'executable')" ]]; then
+			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
+		fi
+	fi
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" || true
+	echo
+	
 }
 
 _update_uefi_gummiboot_USB_files() {
@@ -323,7 +366,7 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
+options  cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
 GUMEOF
 		
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -388,7 +431,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap"
+    options "cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap"
     ostype Linux
     graphics off
 }
@@ -405,6 +448,66 @@ menuentry "UEFI Shell ${_UEFI_ARCH} v1" {
     graphics off
 }
 EOF
+	echo
+	
+}
+
+_update_uefi_IA32_GRUB_USB_files() {
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/grubia32.cfg" || true
+	echo
+	
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
+	
+	echo 'configfile ${cmdpath}/grubia32.cfg' > /tmp/grub.cfg
+	
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"  "/boot/grub/grub.cfg=/tmp/grub.cfg" -v
+	echo
+	
+	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/grubia32.cfg"
+insmod part_gpt
+insmod part_msdos
+insmod fat
+
+insmod efi_gop
+insmod efi_uga
+insmod video_bochs
+insmod video_cirrus
+
+insmod font
+
+if loadfont "${prefix}/fonts/unicode.pf2" ; then
+    insmod gfxterm
+    set gfxmode="1366x768x32;1280x800x32;1024x768x32;auto"
+    terminal_input console
+    terminal_output gfxterm
+fi
+
+menuentry "Arch Linux i686 Archboot on IA32 UEFI" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_i686
+    linux /boot/vmlinuz_i686 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
+    initrd /boot/initramfs_i686.img
+}
+
+menuentry "Arch Linux x86_64 Archboot on IA32 UEFI - if x86_64 CPU - no efivar/efibootmgr support" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap _EFI_IA32=1
+    initrd /boot/initramfs_x86_64.img
+}
+
+menuentry "UEFI Shell IA32 v2" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
+    chainloader /EFI/tools/shellia32_v2.efi
+}
+    
+menuentry "UEFI Shell IA32 v1" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v1.efi
+    chainloader /EFI/tools/shellia32_v1.efi
+}
+GRUBEOF
 	echo
 	
 }
@@ -554,6 +657,8 @@ fi
 
 [[ "${_UPDATE_UEFI_REFIND}" == "1" ]] && _update_uefi_rEFInd_USB_files
 
+[[ "${_UPDATE_UEFI_IA32_GRUB}" == "1" ]] && _update_uefi_IA32_GRUB_USB_files
+
 [[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
 
 [[ "${_UPDATE_SYSLINUX_CONFIG}" == "1" ]] && _update_syslinux_iso_config
@@ -608,6 +713,7 @@ unset _UPDATE_UEFI_GUMMIBOOT
 unset _UPDATE_UEFI_PREBOOTLOADER
 unset _UPDATE_UEFI_LOCKDOWN_MS
 unset _UPDATE_UEFI_REFIND
+unset _UPDATE_UEFI_IA32_GRUB
 unset _UPDATE_SYSLINUX
 unset _UPDATE_SYSLINUX_CONFIG
 unset _CD_UEFI_PARAMETERS

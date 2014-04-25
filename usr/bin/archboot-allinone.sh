@@ -192,11 +192,17 @@ _download_uefi_shell_tianocore() {
 	
 	mkdir -p "${ALLINONE}/EFI/tools/"
 	
-	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI "Full Shell" - For UEFI Spec. >=2.3 systems
+	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
 	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
-	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI "Full Shell" - For UEFI Spec. <2.3 systems
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
 	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	
+	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi"
+	
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
 	
 }
 
@@ -216,7 +222,7 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap
+options  cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
 GUMEOF
 		
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -275,7 +281,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory audit=0 gpt loglevel=7 efi_no_storage_paranoia add_efi_memmap"
+    options "cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap"
     ostype Linux
     graphics off
 }
@@ -295,6 +301,60 @@ EOF
 	
 }
 
+_prepare_uefi_IA32_GRUB_USB_files() {
+	
+	mkdir -p "${ALLINONE}/EFI/boot"
+	
+	echo 'configfile ${cmdpath}/grubia32.cfg' > /tmp/grub.cfg
+	
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/boot/bootia32.efi"  "/boot/grub/grub.cfg=/tmp/grub.cfg" -v
+	
+	cat << GRUBEOF > "${ALLINONE}/EFI/boot/grubia32.cfg"
+insmod part_gpt
+insmod part_msdos
+insmod fat
+
+insmod efi_gop
+insmod efi_uga
+insmod video_bochs
+insmod video_cirrus
+
+insmod font
+
+if loadfont "${prefix}/fonts/unicode.pf2" ; then
+    insmod gfxterm
+    set gfxmode="1366x768x32;1280x800x32;1024x768x32;auto"
+    terminal_input console
+    terminal_output gfxterm
+fi
+
+menuentry "Arch Linux i686 Archboot on IA32 UEFI" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_i686
+    linux /boot/vmlinuz_i686 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
+    initrd /boot/initramfs_i686.img
+}
+
+menuentry "Arch Linux x86_64 Archboot on IA32 UEFI - if x86_64 CPU - no efivar/efibootmgr support" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap _EFI_IA32=1
+    initrd /boot/initramfs_x86_64.img
+}
+
+menuentry "UEFI Shell IA32 v2" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
+    chainloader /EFI/tools/shellia32_v2.efi
+}
+    
+menuentry "UEFI Shell IA32 v1" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v1.efi
+    chainloader /EFI/tools/shellia32_v1.efi
+}
+GRUBEOF
+	
+}
+
 _prepare_packages
 
 _prepare_other_files
@@ -308,6 +368,8 @@ _download_uefi_shell_tianocore
 _prepare_uefi_gummiboot_USB_files
 
 _prepare_uefi_rEFInd_USB_files
+
+_prepare_uefi_IA32_GRUB_USB_files
 
 unset _UEFI_ARCH
 unset _SPEC_UEFI_ARCH
@@ -333,7 +395,7 @@ xorriso -as mkisofs \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-	--sort-weight 1 boot/syslinux/isolinux.bin \
+        --sort-weight 1 boot/syslinux/isolinux.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
 # create x86_64 iso, if not present
