@@ -222,7 +222,7 @@ GUMEOF
 title    Arch Linux ${_UEFI_ARCH} Archboot
 linux    /boot/vmlinuz_${_UEFI_ARCH}
 initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
+options  cgroup_disable=memory loglevel=7 add_efi_memmap
 GUMEOF
 		
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
@@ -281,7 +281,7 @@ menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
     icon /EFI/refind/icons/os_arch.icns
     loader /boot/vmlinuz_${_UEFI_ARCH}
     initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap"
+    options "cgroup_disable=memory loglevel=7 add_efi_memmap"
     ostype Linux
     graphics off
 }
@@ -331,14 +331,14 @@ fi
 menuentry "Arch Linux i686 Archboot on IA32 UEFI" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_i686
-    linux /boot/vmlinuz_i686 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap
+    linux /boot/vmlinuz_i686 cgroup_disable=memory loglevel=7 add_efi_memmap
     initrd /boot/initramfs_i686.img
 }
 
 menuentry "Arch Linux x86_64 Archboot on IA32 UEFI - if x86_64 CPU - no efivar/efibootmgr support" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory audit=0 loglevel=7 add_efi_memmap _EFI_IA32=1
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _EFI_IA32=1
     initrd /boot/initramfs_x86_64.img
 }
 
