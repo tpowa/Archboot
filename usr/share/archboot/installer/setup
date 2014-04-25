@@ -2179,8 +2179,8 @@ btrfs_subvolume() {
 # add ssd mount options, set deadline scheduler
 ssd_optimization() {
     # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
-    if [[ "$(echo ${_fstype} | egrep 'ext4|jfs|btrfs|xfs|nilfs2|f2fs')" ]]; then     
-        ssd_mount_options=""
+    ssd_mount_options=""
+    if [[ "$(echo ${_fstype} | egrep 'ext4|jfs|btrfs|xfs|nilfs2|f2fs')" ]]; then
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE ${device} -s | grep "disk$" | cut -d' ' -f 1); do
             # check for ssd
