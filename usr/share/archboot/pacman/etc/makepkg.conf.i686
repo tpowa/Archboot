@@ -23,15 +23,15 @@ DLAGENTS=('ftp::/usr/bin/curl -fC - --ftp-pasv --retry 3 --retry-delay 3 -o %o %
 # ARCHITECTURE, COMPILE FLAGS
 #########################################################################
 #
-CARCH="x86_64"
-CHOST="x86_64-unknown-linux-gnu"
+CARCH="i686"
+CHOST="i686-pc-linux-gnu"
 
 #-- Compiler and Linker Flags
 # -march (or -mcpu) builds exclusively for an architecture
 # -mtune optimizes for an architecture, but builds for whole processor family
 CPPFLAGS="-D_FORTIFY_SOURCE=2"
-CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
 LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro"
 #-- Make Flags: change this for DistCC/SMP systems
 #MAKEFLAGS="-j2"
