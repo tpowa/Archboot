@@ -8,10 +8,15 @@
 
 _BASENAME="$(basename "${0}")"
 
-[[ -z "${_UEFI_ARCH}" ]] && _UEFI_ARCH="x86_64"
+[[ -z "${_CARCH}" ]] && _CARCH="x86_64"
 
-[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
-[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
+if [[ "${_CARCH}" == "x86_64" ]]; then
+	_UEFI_ARCH="X64"
+	_SPEC_UEFI_ARCH="x64"
+else
+	_UEFI_ARCH="IA32"
+	_SPEC_UEFI_ARCH="ia32"
+fi
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -209,107 +214,81 @@ _download_uefi_shell_tianocore() {
 _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/boot"
-	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/boot/loader.efi"
+	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${ALLINONE}/EFI/boot/loader.efi"
+	cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${ALLINONE}/EFI/boot/bootia32.efi"
 	
 	mkdir -p "${ALLINONE}/loader/entries"
 	
 	cat << GUMEOF > "${ALLINONE}/loader/loader.conf"
-timeout 5
-default archboot-${_UEFI_ARCH}-main
+timeout  5
+default  default*
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-${_UEFI_ARCH}-main.conf"
-title    Arch Linux ${_UEFI_ARCH} Archboot
-linux    /boot/vmlinuz_${_UEFI_ARCH}
-initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory loglevel=7 add_efi_memmap
-GUMEOF
-		
-	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
-title    UEFI Shell ${_UEFI_ARCH} v2
-efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
+	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf"
+title           Arch Linux x86_64 Archboot EFISTUB
+linux           /boot/vmlinuz_x86_64
+initrd          /boot/initramfs_x86_64.img
+options         cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
+architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
-title    UEFI Shell ${_UEFI_ARCH} v1
-efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-i686-efistub.conf"
+title           Arch Linux i686 Archboot EFISTUB
+linux           /boot/vmlinuz_i686
+initrd          /boot/initramfs_i686.img
+options         cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+architecture    ia32
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/refind-${_UEFI_ARCH}-gummiboot.conf"
-title    rEFInd ${_UEFI_ARCH}
-efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-x64-v2.conf"
+title           UEFI Shell X64 v2
+efi             /EFI/tools/shellx64_v2.efi
+architecture    x64
 GUMEOF
-		
-}
-
-_prepare_uefi_rEFInd_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/refind"
-	cp -f "/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${ALLINONE}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
-	# cp -rf "/usr/share/refind/icons" "${ALLINONE}/EFI/refind/icons" || true
-	# cp -rf "/usr/share/refind/fonts" "${ALLINONE}/EFI/refind/fonts" || true
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-x64-v1.conf"
+title           UEFI Shell X64 v1
+efi             /EFI/tools/shellx64_v1.efi
+architecture    x64
+GUMEOF
 	
-	mkdir -p "${ALLINONE}/EFI/tools"
-	cp -rf "/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${ALLINONE}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-ia32-v2.conf"
+title           UEFI Shell IA32 v2
+efi             /EFI/tools/shellia32_v2.efi
+architecture    ia32
+GUMEOF
 	
-	cat << EOF > "${ALLINONE}/EFI/refind/refind.conf"
-timeout 5
-
-textonly
-
-resolution 1024 768
-
-showtools mok_tool,about,reboot,shutdown,exit
-
-scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}
-
-scanfor manual,internal,external,optical
-
-scan_delay 0
-
-#also_scan_dirs boot
-
-dont_scan_dirs EFI/boot
-
-scan_all_linux_kernels
-
-max_tags 0
-
-default_selection "Arch Linux ${_UEFI_ARCH} Archboot"
-
-menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /boot/vmlinuz_${_UEFI_ARCH}
-    initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory loglevel=7 add_efi_memmap"
-    ostype Linux
-    graphics off
-}
-
-menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
-    icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
-    graphics off
-}
-
-menuentry "UEFI Shell ${_UEFI_ARCH} v1" {
-    icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
-    graphics off
-}
-EOF
+	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-ia32-v1.conf"
+title           UEFI Shell IA32 v1
+efi             /EFI/tools/shellia32_v1.efi
+architecture    ia32
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/grub-x64-gummiboot.conf"
+title           GRUB X64 - if EFISTUB boot fails
+efi             /EFI/grub/grubx64.efi
+architecture    x64
+GUMEOF
+	
+	cat << GUMEOF > "${ALLINONE}/loader/entries/syslinux-ia32-gummiboot.conf"
+title           Syslinux IA32 - for x86_64 kernel boot
+efi             /EFI/syslinux/efi32/syslinux.efi
+architecture    ia32
+GUMEOF
+	
+	mv "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf" "${ALLINONE}/loader/entries/default-x64.conf"
+	mv "${ALLINONE}/loader/entries/syslinux-ia32-gummiboot.conf" "${ALLINONE}/loader/entries/default-ia32.conf"
 	
 }
 
-_prepare_uefi_IA32_GRUB_USB_files() {
+_prepare_uefi_X64_GRUB_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/boot"
+	mkdir -p "${ALLINONE}/EFI/grub"
 	
-	echo 'configfile ${cmdpath}/grubia32.cfg' > /tmp/grub.cfg
+	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/grub/grubx64.efi"  "/boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
 	
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/boot/bootia32.efi"  "/boot/grub/grub.cfg=/tmp/grub.cfg" -v
-	
-	cat << GRUBEOF > "${ALLINONE}/EFI/boot/grubia32.cfg"
+	cat << GRUBEOF > "${ALLINONE}/EFI/grub/grubx64.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -328,30 +307,61 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
     terminal_output gfxterm
 fi
 
-menuentry "Arch Linux i686 Archboot on IA32 UEFI" {
-    set gfxpayload=keep
-    search --no-floppy --set=root --file /boot/vmlinuz_i686
-    linux /boot/vmlinuz_i686 cgroup_disable=memory loglevel=7 add_efi_memmap
-    initrd /boot/initramfs_i686.img
-}
-
-menuentry "Arch Linux x86_64 Archboot on IA32 UEFI - if x86_64 CPU - no efivar/efibootmgr support" {
+menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _EFI_IA32=1
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
     initrd /boot/initramfs_x86_64.img
 }
 
-menuentry "UEFI Shell IA32 v2" {
-    search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
-    chainloader /EFI/tools/shellia32_v2.efi
+menuentry "UEFI Shell X64 v2" {
+    search --no-floppy --set=root --file /EFI/tools/shellx64_v2.efi
+    chainloader /EFI/tools/shellx64_v2.efi
 }
-    
-menuentry "UEFI Shell IA32 v1" {
-    search --no-floppy --set=root --file /EFI/tools/shellia32_v1.efi
-    chainloader /EFI/tools/shellia32_v1.efi
+
+menuentry "UEFI Shell X64 v1" {
+    search --no-floppy --set=root --file /EFI/tools/shellx64_v1.efi
+    chainloader /EFI/tools/shellx64_v1.efi
+}
+
+menuentry "Exit GRUB" {
+    exit
 }
 GRUBEOF
+	
+}
+
+_prepare_uefi_IA32_syslinux_USB_files() {
+	
+	mkdir -p "${ALLINONE}/EFI/syslinux"
+	cp -rf "/usr/lib/syslinux/efi32" "${ALLINONE}/EFI/syslinux/efi32"
+	
+	cat << EOF > "${ALLINONE}/EFI/syslinux/efi32/syslinux.cfg"
+PATH /EFI/syslinux/efi32
+
+# UI vesamenu.c32
+UI menu.c32
+
+DEFAULT archboot-x86_64
+
+PROMPT 1
+TIMEOUT 40
+
+MENU TITLE SYSLINUX
+MENU RESOLUTION 1280 800
+
+LABEL archboot-x86_64
+    MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
+    LINUX /boot/vmlinuz_x86_64
+    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    INITRD /boot/initramfs_x86_64.img
+
+LABEL archboot-i686
+    MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
+    LINUX /boot/vmlinuz_i686
+    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    INITRD /boot/initramfs_i686.img
+EOF
 	
 }
 
@@ -367,12 +377,9 @@ _download_uefi_shell_tianocore
 
 _prepare_uefi_gummiboot_USB_files
 
-_prepare_uefi_rEFInd_USB_files
+_prepare_uefi_X64_GRUB_USB_files
 
-_prepare_uefi_IA32_GRUB_USB_files
-
-unset _UEFI_ARCH
-unset _SPEC_UEFI_ARCH
+_prepare_uefi_IA32_syslinux_USB_files
 
 # place syslinux files
 mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
@@ -400,55 +407,55 @@ xorriso -as mkisofs \
 
 # create x86_64 iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
 fi
 
 # create i686 iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686.iso" ]]; then
-	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686.iso" "${WD}/${IMAGENAME_OLD}-i686.iso"
 fi
 
 # create i686 network iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-i686-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="1" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-i686-network.iso" "${WD}/${IMAGENAME_OLD}-i686-network.iso"
 fi
 
 # create dual iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi.iso" ]]; then
-	_UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi.iso"
 fi
 
 # create dual network iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-uefi-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-uefi-network.iso" "${WD}/${IMAGENAME_OLD}-dual-uefi-network.iso"
 fi
 
 # create dual network iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-dual-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_PACKAGES="1" _REMOVE_i686="0" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-dual-network.iso" "${WD}/${IMAGENAME_OLD}-dual-network.iso"
 fi
 
 # create x86_64 iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso" ]]; then
-	_UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
 fi
 
 # create x86_64 network iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso"
 fi
 
 # create x86_64 network iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_SETUP="0" _UPDATE_UEFI_SHELL="0" _UPDATE_UEFI_REFIND="0" _UPDATE_SYSLINUX="0" _UPDATE_SYSLINUX_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
+	_REMOVE_PACKAGES="1" _REMOVE_i686="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}-dual.iso"
 	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-network.iso"
 fi
 

@@ -11,23 +11,30 @@ export LANG="en_US"
 
 [[ -z "${_UPDATE_CD_UEFI}" ]] && _UPDATE_CD_UEFI="0"
 
-[[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="1"
-[[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
-[[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
+[[ -z "${_UPDATE_SETUP}" ]] && _UPDATE_SETUP="0"
+
 [[ -z "${_UPDATE_UEFI_PREBOOTLOADER}" ]] && _UPDATE_UEFI_PREBOOTLOADER="1"
 [[ -z "${_UPDATE_UEFI_LOCKDOWN_MS}" ]] && _UPDATE_UEFI_LOCKDOWN_MS="1"
-[[ -z "${_UPDATE_UEFI_REFIND}" ]] && _UPDATE_UEFI_REFIND="1"
-[[ -z "${_UPDATE_UEFI_IA32_GRUB}" ]] && _UPDATE_UEFI_IA32_GRUB="1"
 
-[[ -z "${_UPDATE_SYSLINUX}" ]] && _UPDATE_SYSLINUX="1"
-[[ -z "${_UPDATE_SYSLINUX_CONFIG}" ]] && _UPDATE_SYSLINUX_CONFIG="1"
+[[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
+[[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
+[[ -z "${_UPDATE_UEFI_X64_GRUB}" ]] && _UPDATE_UEFI_X64_GRUB="1"
+[[ -z "${_UPDATE_UEFI_IA32_SYSLINUX}" ]] && _UPDATE_UEFI_IA32_SYSLINUX="1"
 
-[[ "${_UPDATE_SYSLINUX}" == "1" ]] && _UPDATE_SYSLINUX_CONFIG="1"
+[[ -z "${_UPDATE_SYSLINUX_BIOS}" ]] && _UPDATE_SYSLINUX_BIOS="0"
+[[ -z "${_UPDATE_SYSLINUX_BIOS_CONFIG}" ]] && _UPDATE_SYSLINUX_BIOS_CONFIG="1"
 
-[[ -z "${_UEFI_ARCH}" ]] && _UEFI_ARCH="x86_64"
+[[ "${_UPDATE_SYSLINUX_BIOS}" == "1" ]] && _UPDATE_SYSLINUX_BIOS_CONFIG="1"
 
-[[ "${_UEFI_ARCH}" == "x86_64" ]] && _SPEC_UEFI_ARCH="x64"
-[[ "${_UEFI_ARCH}" == "i386" ]] && _SPEC_UEFI_ARCH="ia32"
+[[ -z "${_CARCH}" ]] && _CARCH="x86_64"
+
+if [[ "${_CARCH}" == "x86_64" ]]; then
+	_UEFI_ARCH="X64"
+	_SPEC_UEFI_ARCH="x64"
+else
+	_UEFI_ARCH="IA32"
+	_SPEC_UEFI_ARCH="ia32"
+fi
 
 #############################
 
@@ -114,21 +121,22 @@ echo
 echo
 
 _update_uefi_prebootloader_files() {
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx64.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/KeyTool.efi" || true
 	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx64.efi"
 	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi"
 	cp -f "/usr/lib/prebootloader/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/KeyTool.efi"
-	echo
 }
 
 _update_uefi_lockdown_ms_files() {
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/LockDown_ms.efi" || true
 	cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/LockDown_ms.efi"
 }
 
 _update_syslinux_iso_files() {
-	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux"/*.{com,bin,c32} || true
 	cp -f "/usr/lib/syslinux"/bios/*.{com,bin,c32} "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/"
-	
 }
 
 _update_syslinux_iso_config() {
@@ -260,212 +268,140 @@ _download_uefi_shell_tianocore() {
 	
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/"
 	
-	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI x86_64 "Full Shell" - For Spec. Ver. >=2.3 systems
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.backup" || true
-	echo
-	
-	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64_v2.efi" ]]; then
-		cp -f "${_ARCHBOOT_ISO_WD}/shellx64_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi"
-		echo
+	if [[ -e "/usr/share/uefi-shell/shellx64_v2.efi" ]]; then
+		rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" || true
+		cp -f "/usr/share/uefi-shell/shellx64_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi"
 	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
+		## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
 		echo
 		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" | grep 'executable')" ]]; then
+		if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" | grep 'executable')" ]]; then
 			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi" || true
 		fi
 	fi
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.backup" || true
+	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For Spec. Ver. <2.3 systems
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
 	echo
 	
-	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI x86_64 "Full Shell" - For Spec. Ver. <2.3 systems
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.backup" || true
-	echo
-	
-	if [[ -e "${_ARCHBOOT_ISO_WD}/shellx64_v1.efi" ]]; then
-		cp -f "${_ARCHBOOT_ISO_WD}/shellx64_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi"
-		echo
-	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
-		echo
-		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" | grep 'executable')" ]]; then
-			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" || true
-		fi
+	if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" | grep 'executable')" ]]; then
+		rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" || true
+		mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi" || true
 	fi
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.backup" || true
-	echo
 	
-	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For Spec. Ver. >=2.3 systems
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" || true
-	echo
-	
-	if [[ -e "${_ARCHBOOT_ISO_WD}/shellia32_v2.efi" ]]; then
-		cp -f "${_ARCHBOOT_ISO_WD}/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi"
-		echo
+	if [[ -e "/usr/share/uefi-shell/shellia32_v2.efi" ]]; then
+		rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
+		cp -f "/usr/share/uefi-shell/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi"
 	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi" || true
+		## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi" || true
 		echo
 		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" | grep 'executable')" ]]; then
+		if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" | grep 'executable')" ]]; then
 			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
+			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi" || true
 		fi
 	fi
-	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.backup" || true
-	echo
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For Spec. Ver. <2.3 systems
-	
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" || true
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi" || true
 	echo
 	
-	if [[ -e "${_ARCHBOOT_ISO_WD}/shellia32_v1.efi" ]]; then
-		cp -f "${_ARCHBOOT_ISO_WD}/shellia32_v1.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi"
-		echo
-	else
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi" || true
-		echo
-		
-		if [[ ! "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" | grep 'executable')" ]]; then
-			rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
-			mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
-		fi
+	if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" | grep 'executable')" ]]; then
+		rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
+		mv "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi" || true
 	fi
-	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.backup" || true
-	echo
 	
 }
 
 _update_uefi_gummiboot_USB_files() {
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	cp -f "/usr/lib/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi"
-	echo
+	
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
+	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi"
+	cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries"
-	echo
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/loader.conf"
-timeout 5
-default archboot-${_UEFI_ARCH}-main
+timeout  5
+default  default*
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-${_UEFI_ARCH}-main.conf"
-title    Arch Linux ${_UEFI_ARCH} Archboot
-linux    /boot/vmlinuz_${_UEFI_ARCH}
-initrd   /boot/initramfs_${_UEFI_ARCH}.img
-options  cgroup_disable=memory loglevel=7 add_efi_memmap
-GUMEOF
-		
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v2.conf"
-title    UEFI Shell ${_UEFI_ARCH} v2
-efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-x86_64-efistub.conf"
+title           Arch Linux x86_64 Archboot EFISTUB
+linux           /boot/vmlinuz_x86_64
+initrd          /boot/initramfs_x86_64.img
+options         cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
+architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-${_UEFI_ARCH}-v1.conf"
-title    UEFI Shell ${_UEFI_ARCH} v1
-efi      /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-i686-efistub.conf"
+title           Arch Linux i686 Archboot EFISTUB
+linux           /boot/vmlinuz_i686
+initrd          /boot/initramfs_i686.img
+options         cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+architecture    ia32
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/refind-${_UEFI_ARCH}-gummiboot.conf"
-title    rEFInd ${_UEFI_ARCH}
-efi      /EFI/refind/refind${_SPEC_UEFI_ARCH}.efi
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-x64-v2.conf"
+title           UEFI Shell X64 v2
+efi             /EFI/tools/shellx64_v2.efi
+architecture    x64
 GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-x64-v1.conf"
+title           UEFI Shell X64 v1
+efi             /EFI/tools/shellx64_v1.efi
+architecture    x64
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v2.conf"
+title           UEFI Shell IA32 v2
+efi             /EFI/tools/shellia32_v2.efi
+architecture    ia32
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v1.conf"
+title           UEFI Shell IA32 v1
+efi             /EFI/tools/shellia32_v1.efi
+architecture    ia32
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/grub-x64-gummiboot.conf"
+title           GRUB X64 - if EFISTUB boot fails
+efi             /EFI/grub/grubx64.efi
+architecture    x64
+GUMEOF
+	
+	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf"
+title           Syslinux IA32 - for x86_64 kernel boot
+efi             /EFI/syslinux/efi32/syslinux.efi
+architecture    ia32
+GUMEOF
+	
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-x86_64-efistub.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-x64.conf"
+	mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-ia32.conf"
 	
 }
 
-_update_uefi_rEFInd_USB_files() {
+_update_uefi_X64_GRUB_USB_files() {
 	
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/" || true
-	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg" || true
 	echo
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind"
-	cp -f "/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind${_SPEC_UEFI_ARCH}.efi"
-	# cp -rf "/usr/share/refind/icons" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/icons" || true
-	# cp -rf "/usr/share/refind/fonts" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/fonts" || true
-	echo
+	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi"  "/boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools"
-	cp -rf "/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
-	echo
-	
-	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/refind/refind.conf"
-timeout 5
-
-textonly
-
-resolution 1024 768
-
-showtools mok_tool,about,reboot,shutdown,exit
-
-scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}
-
-scanfor manual,internal,external,optical
-
-scan_delay 0
-
-#also_scan_dirs boot
-
-dont_scan_dirs EFI/boot
-
-scan_all_linux_kernels
-
-max_tags 0
-
-default_selection "Arch Linux ${_UEFI_ARCH} Archboot"
-
-menuentry "Arch Linux ${_UEFI_ARCH} Archboot" {
-    icon /EFI/refind/icons/os_arch.icns
-    loader /boot/vmlinuz_${_UEFI_ARCH}
-    initrd /boot/initramfs_${_UEFI_ARCH}.img
-    options "cgroup_disable=memory loglevel=7 add_efi_memmap"
-    ostype Linux
-    graphics off
-}
-
-menuentry "UEFI Shell ${_UEFI_ARCH} v2" {
-    icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v2.efi
-    graphics off
-}
-
-menuentry "UEFI Shell ${_UEFI_ARCH} v1" {
-    icon /EFI/refind/icons/tool_shell.icns
-    loader /EFI/tools/shell${_SPEC_UEFI_ARCH}_v1.efi
-    graphics off
-}
-EOF
-	echo
-	
-}
-
-_update_uefi_IA32_GRUB_USB_files() {
-	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/grubia32.cfg" || true
-	echo
-	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	
-	echo 'configfile ${cmdpath}/grubia32.cfg' > /tmp/grub.cfg
-	
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"  "/boot/grub/grub.cfg=/tmp/grub.cfg" -v
-	echo
-	
-	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/grubia32.cfg"
+	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -484,31 +420,63 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
     terminal_output gfxterm
 fi
 
-menuentry "Arch Linux i686 Archboot on IA32 UEFI" {
-    set gfxpayload=keep
-    search --no-floppy --set=root --file /boot/vmlinuz_i686
-    linux /boot/vmlinuz_i686 cgroup_disable=memory loglevel=7 add_efi_memmap
-    initrd /boot/initramfs_i686.img
-}
-
-menuentry "Arch Linux x86_64 Archboot on IA32 UEFI - if x86_64 CPU - no efivar/efibootmgr support" {
+menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _EFI_IA32=1
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
     initrd /boot/initramfs_x86_64.img
 }
 
-menuentry "UEFI Shell IA32 v2" {
-    search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
-    chainloader /EFI/tools/shellia32_v2.efi
+menuentry "UEFI Shell X64 v2" {
+    search --no-floppy --set=root --file /EFI/tools/shellx64_v2.efi
+    chainloader /EFI/tools/shellx64_v2.efi
 }
-    
-menuentry "UEFI Shell IA32 v1" {
-    search --no-floppy --set=root --file /EFI/tools/shellia32_v1.efi
-    chainloader /EFI/tools/shellia32_v1.efi
+
+menuentry "UEFI Shell X64 v1" {
+    search --no-floppy --set=root --file /EFI/tools/shellx64_v1.efi
+    chainloader /EFI/tools/shellx64_v1.efi
+}
+
+menuentry "Exit GRUB" {
+    exit
 }
 GRUBEOF
+	
+}
+
+_update_uefi_IA32_syslinux_USB_files() {
+	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux"
+	cp -rf "/usr/lib/syslinux/efi32" "${ALLINONE}/EFI/syslinux/efi32"
 	echo
+	
+	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux/efi32/syslinux.cfg"
+PATH /EFI/syslinux/efi32
+
+# UI vesamenu.c32
+UI menu.c32
+
+DEFAULT archboot-x86_64
+
+PROMPT 1
+TIMEOUT 40
+
+MENU TITLE SYSLINUX
+MENU RESOLUTION 1280 800
+
+LABEL archboot-x86_64
+    MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
+    LINUX /boot/vmlinuz_x86_64
+    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    INITRD /boot/initramfs_x86_64.img
+
+LABEL archboot-i686
+    MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
+    LINUX /boot/vmlinuz_i686
+    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    INITRD /boot/initramfs_i686.img
+EOF
 	
 }
 
@@ -647,21 +615,21 @@ if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	echo
 fi
 
-[[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
-
-[[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
-
 [[ "${_UPDATE_UEFI_PREBOOTLOADER}" == "1" ]] && _update_uefi_prebootloader_files
 
 [[ "${_UPDATE_UEFI_LOCKDOWN_MS}" == "1" ]] && _update_uefi_lockdown_ms_files
 
-[[ "${_UPDATE_UEFI_REFIND}" == "1" ]] && _update_uefi_rEFInd_USB_files
+[[ "${_UPDATE_UEFI_SHELL}" == "1" ]] && _download_uefi_shell_tianocore
 
-[[ "${_UPDATE_UEFI_IA32_GRUB}" == "1" ]] && _update_uefi_IA32_GRUB_USB_files
+[[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
 
-[[ "${_UPDATE_SYSLINUX}" == "1" ]] && _update_syslinux_iso_files
+[[ "${_UPDATE_UEFI_X64_GRUB}" == "1" ]] && _update_uefi_IA32_GRUB_USB_files
 
-[[ "${_UPDATE_SYSLINUX_CONFIG}" == "1" ]] && _update_syslinux_iso_config
+[[ "${_UPDATE_UEFI_IA32_SYSLINUX}" == "1" ]] && _update_uefi_IA32_syslinux_USB_files
+
+[[ "${_UPDATE_SYSLINUX_BIOS}" == "1" ]] && _update_syslinux_iso_files
+
+[[ "${_UPDATE_SYSLINUX_BIOS_CONFIG}" == "1" ]] && _update_syslinux_iso_config
 
 [[ "${_UPDATE_CD_UEFI}" == "1" ]] && _update_cd_uefi
 
@@ -708,14 +676,14 @@ unset _REMOVE_i686
 unset _REMOVE_x86_64
 unset _REMOVE_PACKAGES
 unset _UPDATE_SETUP
-unset _UPDATE_UEFI_SHELL
-unset _UPDATE_UEFI_GUMMIBOOT
 unset _UPDATE_UEFI_PREBOOTLOADER
 unset _UPDATE_UEFI_LOCKDOWN_MS
-unset _UPDATE_UEFI_REFIND
-unset _UPDATE_UEFI_IA32_GRUB
-unset _UPDATE_SYSLINUX
-unset _UPDATE_SYSLINUX_CONFIG
+unset _UPDATE_UEFI_SHELL
+unset _UPDATE_UEFI_GUMMIBOOT
+unset _UPDATE_UEFI_X64_GRUB
+unset _UPDATE_UEFI_IA32_SYSLINUX
+unset _UPDATE_SYSLINUX_BIOS
+unset _UPDATE_SYSLINUX_BIOS_CONFIG
 unset _CD_UEFI_PARAMETERS
 unset _ARCHBOOT_ISO_OLD_PATH
 unset _ARCHBOOT_ISO_WD
