@@ -3326,11 +3326,7 @@ detect_uefi_boot() {
     
     export _DETECTED_UEFI_BOOT="0"
     
-    uefi_mount_efivarfs
-    
-    if [[ "$(efivar -l)" ]]; then
-        export _DETECTED_UEFI_BOOT="1"
-    fi
+    [[ -e "/sys/firmware/efi" ]] && _DETECTED_UEFI_BOOT="1"
     
     detect_uefi_secure_boot
     
@@ -3339,11 +3335,19 @@ detect_uefi_boot() {
 do_uefi_setup_env_vars() {
     
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        export _UEFI_ARCH="x86_64"
-        export _SPEC_UEFI_ARCH="x64"
+        if [[ "$(grep '_IA32_UEFI=1' /proc/cmdline 1>/dev/null)" ]]; then
+            export _EFI_MIXED="1"
+            export _UEFI_ARCH="IA32"
+            export _SPEC_UEFI_ARCH="ia32"
+        else
+            export _EFI_MIXED="0"
+            export _UEFI_ARCH="X64"
+            export _SPEC_UEFI_ARCH="x64"
+        fi
     fi
     
     if [[ "$(uname -m)" == "i686" ]]; then
+        export _EFI_MIXED="0"
         export _UEFI_ARCH="IA32"
         export _SPEC_UEFI_ARCH="ia32"
     fi
@@ -3843,7 +3847,7 @@ do_syslinux_uefi() {
     
     do_uefi_common
     
-    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _SYSLINUX_BUILD="efi64"
+    [[ "${_UEFI_ARCH}" == "X64" ]] && _SYSLINUX_BUILD="efi64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
     
     DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
@@ -4470,7 +4474,7 @@ do_grub_uefi() {
     
     do_uefi_common
     
-    [[ "${_UEFI_ARCH}" == "x86_64" ]] && _GRUB_ARCH="x86_64"
+    [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     
     do_grub_common_before
@@ -4489,7 +4493,7 @@ do_grub_uefi() {
         --themes="" \
         --verbose \
         --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
-        "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_GRUB_ARCH}_mkstandalone.log"
+        "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
     
     ## Install GRUB normally
     chroot "${DESTDIR}" "/usr/bin/grub-install" \
@@ -4500,10 +4504,10 @@ do_grub_uefi() {
         --boot-directory="/boot" \
         --no-nvram \
         --recheck \
-        --debug &> "/tmp/grub_uefi_${_GRUB_ARCH}_install.log"
+        --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     
-    cat "/tmp/grub_uefi_${_GRUB_ARCH}_mkstandalone.log" >> "${LOG}"
-    cat "/tmp/grub_uefi_${_GRUB_ARCH}_install.log" >> "${LOG}"
+    cat "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log" >> "${LOG}"
+    cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
     
     GRUB_PREFIX_DIR="/boot/grub/"
     GRUB_UEFI="1"
@@ -4517,15 +4521,15 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} Standalone has been successfully installed." 0 0
+        DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
     fi
     
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_UEFI_ARCH}-efi/core.efi" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB_Normal"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) UEFI ${_UEFI_ARCH} Normal has been successfully installed." 0 0
+        DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
@@ -4537,7 +4541,7 @@ do_grub_uefi() {
             do_uefi_secure_boot_preloader
         fi
     else
-        DIALOG --msgbox "Error installing GRUB(2) UEFI ${_UEFI_ARCH}.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
     
@@ -5003,10 +5007,18 @@ install_bootloader_uefi() {
     
     do_uefi_setup_env_vars
     
+    if [[ "${_EFI_MIXED}" == "1" ]];
+        _EFISTUB_MENU_LABEL=""
+        _EFISTUB_MENU_TEXT=""
+    else
+        _EFISTUB_MENU_LABEL="EFISTUB"
+        _EFISTUB_MENU_TEXT="EFISTUB for ${_UEFI_ARCH} UEFI"
+    fi
+    
     DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
-        "EFISTUB" "EFISTUB for ${_UEFI_ARCH} UEFI" \
+        "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
         "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
-        "SYSLINUX_UEFI" "Syslinux for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+        "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "EFISTUB") do_efistub_uefi ;;
         "GRUB_UEFI") do_grub_uefi ;;
