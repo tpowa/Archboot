@@ -19,6 +19,7 @@ export LANG="en_US"
 [[ -z "${_UPDATE_UEFI_SHELL}" ]] && _UPDATE_UEFI_SHELL="1"
 [[ -z "${_UPDATE_UEFI_GUMMIBOOT}" ]] && _UPDATE_UEFI_GUMMIBOOT="1"
 [[ -z "${_UPDATE_UEFI_X64_GRUB}" ]] && _UPDATE_UEFI_X64_GRUB="1"
+[[ -z "${_UPDATE_UEFI_IA32_GRUB}" ]] && _UPDATE_UEFI_IA32_GRUB="1"
 [[ -z "${_UPDATE_UEFI_IA32_SYSLINUX}" ]] && _UPDATE_UEFI_IA32_SYSLINUX="1"
 
 [[ -z "${_UPDATE_SYSLINUX_BIOS}" ]] && _UPDATE_SYSLINUX_BIOS="0"
@@ -322,16 +323,17 @@ _update_uefi_gummiboot_USB_files() {
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
 	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi"
-	cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"
+	
+	# rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
+	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries"
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/loader.conf"
-timeout  5
-default  default*
+timeout  4
+default  default-*
 GUMEOF
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-x86_64-efistub.conf"
@@ -342,13 +344,13 @@ options         cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-i686-efistub.conf"
-title           Arch Linux i686 Archboot EFISTUB
-linux           /boot/vmlinuz_i686
-initrd          /boot/initramfs_i686.img
-options         cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
-architecture    ia32
-GUMEOF
+	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-i686-efistub.conf"
+# title           Arch Linux i686 Archboot EFISTUB
+# linux           /boot/vmlinuz_i686
+# initrd          /boot/initramfs_i686.img
+# options         cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+# architecture    ia32
+# GUMEOF
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-x64-v2.conf"
 title           UEFI Shell X64 v2
@@ -362,17 +364,17 @@ efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v2.conf"
-title           UEFI Shell IA32 v2
-efi             /EFI/tools/shellia32_v2.efi
-architecture    ia32
-GUMEOF
+	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v2.conf"
+# title           UEFI Shell IA32 v2
+# efi             /EFI/tools/shellia32_v2.efi
+# architecture    ia32
+# GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v1.conf"
-title           UEFI Shell IA32 v1
-efi             /EFI/tools/shellia32_v1.efi
-architecture    ia32
-GUMEOF
+	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v1.conf"
+# title           UEFI Shell IA32 v1
+# efi             /EFI/tools/shellia32_v1.efi
+# architecture    ia32
+# GUMEOF
 	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/grub-x64-gummiboot.conf"
 title           GRUB X64 - if EFISTUB boot fails
@@ -380,14 +382,14 @@ efi             /EFI/grub/grubx64.efi
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf"
-title           Syslinux IA32 - for x86_64 kernel boot
-efi             /EFI/syslinux/efi32/syslinux.efi
-architecture    ia32
-GUMEOF
+	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf"
+# title           Syslinux IA32 - for x86_64 kernel boot
+# efi             /EFI/syslinux/efi32/syslinux.efi
+# architecture    ia32
+# GUMEOF
 	
 	mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-x86_64-efistub.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-x64.conf"
-	mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-ia32.conf"
+	# mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-ia32.conf"
 	
 }
 
@@ -399,7 +401,7 @@ _update_uefi_X64_GRUB_USB_files() {
 	echo
 	
 	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi"  "/boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" "/boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -420,6 +422,9 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
     terminal_output gfxterm
 fi
 
+set default="Arch Linux x86_64 Archboot Non-EFISTUB"
+set timeout="2"
+
 menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
@@ -435,6 +440,60 @@ menuentry "UEFI Shell X64 v2" {
 menuentry "UEFI Shell X64 v1" {
     search --no-floppy --set=root --file /EFI/tools/shellx64_v1.efi
     chainloader /EFI/tools/shellx64_v1.efi
+}
+
+menuentry "Exit GRUB" {
+    exit
+}
+GRUBEOF
+	
+}
+
+_update_uefi_IA32_GRUB_USB_files() {
+	
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.cfg" || true
+	echo
+	
+	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" "/boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	
+	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.cfg"
+insmod part_gpt
+insmod part_msdos
+insmod fat
+
+insmod efi_gop
+insmod efi_uga
+insmod video_bochs
+insmod video_cirrus
+
+insmod font
+
+if loadfont "${prefix}/fonts/unicode.pf2" ; then
+    insmod gfxterm
+    set gfxmode="1366x768x32;1280x800x32;1024x768x32;auto"
+    terminal_input console
+    terminal_output gfxterm
+fi
+
+set default="Syslinux for x86_64 Kernel in IA32 UEFI"
+set timeout="2"
+
+menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
+    search --no-floppy --set=root --file /EFI/syslinux/efi32/syslinux.efi
+    chainloader /EFI/syslinux/efi32/syslinux.efi
+}
+
+menuentry "UEFI Shell IA32 v2" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
+    chainloader /EFI/tools/shellia32_v2.efi
+}
+
+menuentry "UEFI Shell IA32 v1" {
+    search --no-floppy --set=root --file /EFI/tools/shellia32_v1.efi
+    chainloader /EFI/tools/shellia32_v1.efi
 }
 
 menuentry "Exit GRUB" {
@@ -623,7 +682,9 @@ fi
 
 [[ "${_UPDATE_UEFI_GUMMIBOOT}" == "1" ]] && _update_uefi_gummiboot_USB_files
 
-[[ "${_UPDATE_UEFI_X64_GRUB}" == "1" ]] && _update_uefi_IA32_GRUB_USB_files
+[[ "${_UPDATE_UEFI_X64_GRUB}" == "1" ]] && _update_uefi_X64_GRUB_USB_files
+
+[[ "${_UPDATE_UEFI_IA32_GRUB}" == "1" ]] && _update_uefi_IA32_GRUB_USB_files
 
 [[ "${_UPDATE_UEFI_IA32_SYSLINUX}" == "1" ]] && _update_uefi_IA32_syslinux_USB_files
 

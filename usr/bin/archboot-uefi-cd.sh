@@ -42,16 +42,28 @@ for i in $(seq 0 7); do
 done
 ! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
 
-FSIMG=$(mktemp -d)
 ISOIMG=$(mktemp -d)
+TEMP_DIR=$(mktemp -d)
+FSIMG=$(mktemp -d)
 MOUNT_FSIMG=$(mktemp -d)
 
 ## Extract old ISO
 bsdtar -C "${ISOIMG}" -xf "${INPUT_IMAGENAME}"
 # 7z x -o /tmp/ARCHBOOTISO/ "${INPUT_IMAGENAME}"
 
+## Copy UEFI files
+mkdir "${TEMP_DIR}"/boot
+cp -r "${ISOIMG}"/{EFI,loader} "${TEMP_DIR}"/
+cp "${ISOIMG}"/boot/vmlinuz_x86_64 "${ISOIMG}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
+
+## Delete IA32 UEFI files
+rm -f "${TEMP_DIR}"/loader/*ia32*.conf
+rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
+rm -f "${TEMP_DIR}"/EFI/boot/bootia32.{efi,cfg}
+rm -rf "${TEMP_DIR}"/EFI/syslinux/efi32
+
 ## get size of boot x86_64 files
-BOOTSIZE=$(du -bc ${ISOIMG}/{EFI,loader,boot/vmlinuz_x86_64,boot/initramfs_x86_64.img} | grep total | cut -f1)
+BOOTSIZE=$(du -bc ${TEMP_DIR} | grep total | cut -f1)
 IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 
 ## Create cdefiboot.img
@@ -62,15 +74,14 @@ LOOPDEV="$(losetup --find --show "${FSIMG}"/cdefiboot.img)"
 ## Mount cdefiboot.img
 mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
 
-## Copy UEFI files fo cdefiboot.img
-mkdir "${MOUNT_FSIMG}"/boot
-cp -r "${ISOIMG}"/{EFI,loader} "${MOUNT_FSIMG}"/
-cp "${ISOIMG}"/boot/vmlinuz_x86_64 "${ISOIMG}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot/
+## Copy all files from TEMP_DIR to MOUNT_FSIMG
+cp -r "${TEMP_DIR}"/* "${MOUNT_FSIMG}"/
 
 ## Unmount cdefiboot.img
 umount "${LOOPDEV}"
 losetup --detach "${LOOPDEV}"
 rm -rf "${MOUNT_FSIMG}"
+rm -rf "${TEMP_DIR}"
 
 ## Move updated cdefiboot.img to old ISO extracted dir
 mkdir -p "${ISOIMG}"/CDEFI/
