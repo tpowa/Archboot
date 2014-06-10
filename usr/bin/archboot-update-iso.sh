@@ -507,7 +507,7 @@ _update_uefi_IA32_syslinux_USB_files() {
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux"
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux"
-	cp -rf "/usr/lib/syslinux/efi32" "${ALLINONE}/EFI/syslinux/efi32"
+	cp -rf "/usr/lib/syslinux/efi32" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux/efi32"
 	echo
 	
 	cat << EOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/syslinux/efi32/syslinux.cfg"
