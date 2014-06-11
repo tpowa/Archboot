@@ -401,7 +401,7 @@ _update_uefi_X64_GRUB_USB_files() {
 	echo
 	
 	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" "/boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -457,7 +457,7 @@ _update_uefi_IA32_GRUB_USB_files() {
 	echo
 	
 	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" "/boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.cfg"
 insmod part_gpt
