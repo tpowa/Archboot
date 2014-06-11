@@ -360,13 +360,27 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
     terminal_output gfxterm
 fi
 
-set default="Syslinux for x86_64 Kernel in IA32 UEFI"
+set default="Arch Linux x86_64 Archboot - EFI MIXED MODE"
 set timeout="2"
 
-menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
-    search --no-floppy --set=root --file /EFI/syslinux/efi32/syslinux.efi
-    chainloader /EFI/syslinux/efi32/syslinux.efi
+menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    initrd /boot/initramfs_x86_64.img
 }
+
+menuentry "Arch Linux i686 Archboot Non-EFISTUB" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_i686
+    linux /boot/vmlinuz_i686 cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    initrd /boot/initramfs_i686.img
+}
+
+# menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
+    # search --no-floppy --set=root --file /EFI/syslinux/efi32/syslinux.efi
+    # chainloader /EFI/syslinux/efi32/syslinux.efi
+# }
 
 menuentry "UEFI Shell IA32 v2" {
     search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
@@ -435,7 +449,7 @@ _prepare_uefi_X64_GRUB_USB_files
 
 _prepare_uefi_IA32_GRUB_USB_files
 
-_prepare_uefi_IA32_syslinux_USB_files
+# _prepare_uefi_IA32_syslinux_USB_files
 
 # place syslinux files
 mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
