@@ -632,31 +632,47 @@ _download_pkgs() {
 }
 
 _update_cd_uefi() {
+	
+	TEMP_DIR=$(mktemp -d)
 	MOUNT_FSIMG=$(mktemp -d)
-
+	
+	## Copy UEFI files fo cdefiboot.img
+	mkdir "${TEMP_DIR}"/boot
+	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${TEMP_DIR}"/
+	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/vmlinuz_x86_64 "${_ARCHBOOT_ISO_EXT_DIR}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
+	
+	## Delete IA32 UEFI files
+	rm -f "${TEMP_DIR}"/loader/*ia32*.conf
+	rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
+	rm -f "${TEMP_DIR}"/EFI/boot/bootia32.{efi,cfg}
+	rm -rf "${TEMP_DIR}"/EFI/syslinux/efi32
+	
 	## get size of boot x86_64 files
-	BOOTSIZE=$(du -bc ${_ARCHBOOT_ISO_EXT_DIR}/{EFI,loader,boot/vmlinuz_x86_64,boot/initramfs_x86_64.img} | grep total | cut -f1)
+	BOOTSIZE=$(du -bc ${TEMP_DIR} | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
-
-	## Create cdefiboot.img
+	
+	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/
+	
+	## Create cdefiboot.img
 	dd if=/dev/zero of="${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024 
 	mkfs.vfat "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img
 	LOOPDEV="$(losetup --find --show "${_ARCHBOOT_ISO_EXT_DIR}"/CDEFI/cdefiboot.img)"
-
+	
 	## Mount cdefiboot.img
 	mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
-
-	## Copy UEFI files fo cdefiboot.img
-	mkdir "${MOUNT_FSIMG}"/boot
-	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"/
-	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/vmlinuz_x86_64 "${_ARCHBOOT_ISO_EXT_DIR}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot/
-
+	
+	## Copy all files from TEMP_DIR to MOUNT_FSIMG
+	cp -r "${TEMP_DIR}"/* "${MOUNT_FSIMG}"/
+	
 	## Unmount cdefiboot.img
 	umount "${LOOPDEV}"
 	losetup --detach "${LOOPDEV}"
 	rm -rf "${MOUNT_FSIMG}"
+	rm -rf "${TEMP_DIR}"
+	
 	_CD_UEFI_PARAMETERS="-eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot"
+	
 }
 
 [[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
