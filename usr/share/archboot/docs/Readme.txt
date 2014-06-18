@@ -36,6 +36,7 @@ Hybrid image file is a standard CD-burnable image and also a raw disk image.
 Supported boot modes of Archboot media:
 - It supports BIOS booting with syslinux.
 - It supports UEFI/UEFI_CD booting with gummiboot and EFISTUB.
+- It support UEFI_MIX_MODE booting with grub.
 - It supports Secure Boot with prebootloader.
 - It supports grub(2)'s iso loopback support.
   variables used (below for example):
