@@ -27,7 +27,7 @@ build ()
           uuidgen whereis write addpart delpart fdformat \
           ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
           vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin \
-          resizepart lslocks wdctl zless zgrep fold od ldd pidof shred"
+          resizepart lslocks wdctl zless zgrep fold od ldd pidof shred blockdev blockdiscard newgrp nsenter runuser vipw"
     for i in $apps; do
         add_binary "$i"
     done
@@ -132,11 +132,11 @@ build ()
     add_full_dir "/etc/dbus-1"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="bootctl hostnamectl journalctl kernel-install localectl \
-          loginctl systemctl systemd-analyze systemd-ask-password \
+    apps="busctl bootctl hostnamectl journalctl kernel-install localectl \
+          loginctl machinectl systemctl systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop systemd-coredumpctl \
           systemd-delta systemd-detect-virt systemd-inhibit systemd-machine-id-setup \
-          systemd-notify systemd-nspawn systemd-stdio-bridge systemd-tmpfiles \
+          systemd-notify systemd-nspawn systemd-run systemd-stdio-bridge systemd-tmpfiles \
           systemd-tty-ask-password-agent timedatectl"
     for i in $apps; do
         add_binary "$i"
