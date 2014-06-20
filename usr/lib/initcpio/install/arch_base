@@ -27,7 +27,7 @@ build ()
           uuidgen whereis write addpart delpart fdformat \
           ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
           vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin \
-          resizepart lslocks wdctl zless zgrep fold od ldd pidof shred blockdev blockdiscard newgrp nsenter runuser vipw"
+          resizepart lslocks wdctl zless zgrep fold od ldd pidof shred blockdev blkdiscard newgrp nsenter runuser vipw"
     for i in $apps; do
         add_binary "$i"
     done
