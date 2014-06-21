@@ -643,8 +643,9 @@ _update_cd_uefi() {
 	
 	## Delete IA32 UEFI files
 	rm -f "${TEMP_DIR}"/loader/*ia32*.conf
-	rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
-	rm -f "${TEMP_DIR}"/EFI/BOOT/bootia32.{efi,cfg}
+	# rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
+	# rm -f "${TEMP_DIR}"/EFI/BOOT/BOOTIA32.EFI
+	# rm -f "${TEMP_DIR}"/EFI/BOOT/bootia32.cfg
 	rm -rf "${TEMP_DIR}"/EFI/syslinux/efi32
 	
 	## get size of boot x86_64 files
