@@ -215,7 +215,7 @@ _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/BOOT"
 	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${ALLINONE}/EFI/BOOT/loader.efi"
-	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${ALLINONE}/EFI/BOOT/bootia32.efi"
+	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${ALLINONE}/EFI/BOOT/BOOTIA32.EFI"
 	
 	mkdir -p "${ALLINONE}/loader/entries"
 	
@@ -339,7 +339,7 @@ _prepare_uefi_IA32_GRUB_USB_files() {
 	mkdir -p "${ALLINONE}/EFI/BOOT"
 	
 	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/BOOT/bootia32.efi" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${ALLINONE}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt

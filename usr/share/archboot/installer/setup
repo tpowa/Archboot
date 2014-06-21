@@ -3456,7 +3456,7 @@ do_uefi_secure_boot_preloader() {
     do_uefi_common
     
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        cp -r "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader"
+        cp -r "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader"
         
         mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/loader.efi"
         
@@ -3644,12 +3644,12 @@ GUMEOF
         
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             
             do_uefi_secure_boot_preloader
         fi
@@ -3709,18 +3709,18 @@ REFINDEOF
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/refind.conf" || true
-            rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/icons" || true
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf" || true
+            rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/icons" || true
             
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/refind.conf"
-            cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/icons"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf"
+            cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/icons"
             
             do_uefi_secure_boot_preloader
         fi
@@ -3872,18 +3872,18 @@ do_syslinux_uefi() {
         
         DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-            ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
+            ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"/*.c32
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"/*.c32
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/syslinux.cfg"
             
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/syslinux.cfg"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/syslinux.cfg"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
             
             do_uefi_secure_boot_preloader
         fi
@@ -4531,12 +4531,12 @@ do_grub_uefi() {
         
         DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/boot/boot${_SPEC_UEFI_ARCH}.efi"
+            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             
             do_uefi_secure_boot_preloader
         fi
