@@ -122,17 +122,17 @@ echo
 echo
 
 _update_uefi_prebootloader_files() {
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx64.efi" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/KeyTool.efi" || true
-	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootx64.efi"
-	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/HashTool.efi"
-	cp -f "/usr/lib/prebootloader/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/KeyTool.efi"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootx64.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/HashTool.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/KeyTool.efi" || true
+	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootx64.efi"
+	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/HashTool.efi"
+	cp -f "/usr/lib/prebootloader/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/KeyTool.efi"
 }
 
 _update_uefi_lockdown_ms_files() {
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/LockDown_ms.efi" || true
-	cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/LockDown_ms.efi"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/LockDown_ms.efi" || true
+	cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/LockDown_ms.efi"
 }
 
 _update_syslinux_iso_files() {
@@ -320,13 +320,13 @@ _download_uefi_shell_tianocore() {
 
 _update_uefi_gummiboot_USB_files() {
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT"
 	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi" || true
-	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/loader.efi"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/loader.efi" || true
+	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/loader.efi"
 	
-	# rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
-	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi"
+	# rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.efi" || true
+	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.efi"
 	
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries"
@@ -451,15 +451,15 @@ GRUBEOF
 
 _update_uefi_IA32_GRUB_USB_files() {
 	
-	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot"
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.cfg" || true
+	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT"
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.efi" || true
+	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.cfg" || true
 	echo
 	
 	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.efi" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.efi" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
 	
-	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/boot/bootia32.cfg"
+	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -644,7 +644,7 @@ _update_cd_uefi() {
 	## Delete IA32 UEFI files
 	rm -f "${TEMP_DIR}"/loader/*ia32*.conf
 	rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
-	rm -f "${TEMP_DIR}"/EFI/boot/bootia32.{efi,cfg}
+	rm -f "${TEMP_DIR}"/EFI/BOOT/bootia32.{efi,cfg}
 	rm -rf "${TEMP_DIR}"/EFI/syslinux/efi32
 	
 	## get size of boot x86_64 files
