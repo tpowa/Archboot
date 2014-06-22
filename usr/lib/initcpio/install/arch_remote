@@ -29,6 +29,7 @@ build ()
     add_file "/usr/lib/ssh/ssh-keysign"
     add_file "/usr/lib/ssh/ssh-pkcs11-helper"
     add_dir  "/var/empty"
+    add_file "/etc/conf.d/rpcbind"
     add_file "/etc/conf.d/nfs-common.conf"
     add_file "/etc/conf.d/nfs-server.conf"
     add_file "/etc/gssapi_mech.conf"
