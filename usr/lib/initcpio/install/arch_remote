@@ -43,7 +43,7 @@ build ()
     add_dir "/var/lib/rpcbind"
     chmod 700 "$BUILDROOT/var/lib/rpcbind"
     chown 32:32 "$BUILDROOT/var/lib/rpcbind"
-    add_dir "/var/lib/rpcbind"
+    add_dir "/var/lib/openldap"
     chmod 700 "$BUILDROOT/var/lib/openldap"
     chown 439:439 "$BUILDROOT/var/lib/openldap"
     # start sshd on startup
