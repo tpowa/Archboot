@@ -136,7 +136,7 @@ build ()
           loginctl machinectl systemctl systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop systemd-coredumpctl \
           systemd-delta systemd-detect-virt systemd-inhibit systemd-machine-id-setup \
-          systemd-notify systemd-nspawn systemd-run systemd-stdio-bridge systemd-tmpfiles \
+          systemd-notify systemd-nspawn systemd-run systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
           systemd-tty-ask-password-agent timedatectl"
     for i in $apps; do
         add_binary "$i"
