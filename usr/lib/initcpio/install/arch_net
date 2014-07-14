@@ -11,7 +11,8 @@ build ()
     done
     apps="dnsdomainname domainname netstat nisdomainname ypdomainname arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
 	  slattach traceroute arping clockdiff rarpd rdisc tftpd tracepath tracepath6 route \
-	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon  ss tc dhclient ifplugd ifplugstatus ip ping ping6"
+	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon  ss tc dhclient ifplugd ifplugstatus \
+	  ip ping ping6 ethtool"
     for i in $apps; do
         add_binary "$i"
     done
