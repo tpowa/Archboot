@@ -7,8 +7,8 @@ build ()
     apps="mkswap debugreiserfs mkreiserfs reiserfsck reiserfstune resize_reiserfs badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag mkntfs \
 	  ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls \
-	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_repair xfs_copy xfs_db xfs_growfs xfs_io \
-	  xfs_logprint xfs_mdrestore xfs_quota xfs_rtcp mkdosfs dosfsck fatlabel lowntfs-3g ntfs-3g mount.cifs \
+	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \
+	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel lowntfs-3g ntfs-3g mount.cifs \
 	  cifs.upcall fsck.ext2 fsck.ext3 fsck.ext4 fsck.ext4dev e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
 	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-debug-tree btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super btrfs-show-super \
 	  btrfs-zero-log btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
@@ -17,8 +17,7 @@ build ()
         add_binary "$i"
     done
     appfiles="/usr/bin/compile_et /usr/bin/mk_cmds /usr/bin/fsck.xfs /usr/bin/xfs_admin /usr/bin/xfs_bmap \
-              /usr/bin/xfs_check /usr/bin/xfs_freeze /usr/bin/xfs_info /usr/bin/xfs_metadump /usr/bin/xfs_mkfile \
-	      /usr/bin/xfs_ncheck" 
+              /usr/bin/xfs_freeze /usr/bin/xfs_info /usr/bin/xfs_metadump /usr/bin/xfs_mkfile /usr/bin/xfs_ncheck" 
     for i in $appfiles; do
         add_file "$i"
     done
