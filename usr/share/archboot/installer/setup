@@ -109,6 +109,7 @@ chroot_mount()
     [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
     mount --make-runbindable /sys/fs/cgroup
+    mount --make-runbindable /proc/sys/fs/binfmt_misc
     mount --rbind "/proc" "${DESTDIR}/proc"
     mount --rbind "/sys" "${DESTDIR}/sys"
     mount --rbind "/dev" "${DESTDIR}/dev"
@@ -123,6 +124,7 @@ chroot_umount()
     umount -R "${DESTDIR}/sys"
     umount -R "${DESTDIR}/dev"
     mount --make-rshared /sys/fs/cgroup
+    mount --make-rshared /proc/sys/fs/binfmt_misc
 }
 
 getfstype()
@@ -405,6 +407,8 @@ blockdevices() {
 # lists linux blockdevice partitions
 blockdevices_partitions() {
     # all available block devices partitions
+    # printk off needed cause of parted usage
+    printk off
     for part in $(${_LSBLK} NAME,TYPE | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
@@ -426,6 +430,7 @@ blockdevices_partitions() {
             [[ "${1}" ]] && echo ${1}
         fi           
     done
+    printk on
 }
 
 # list none partitionable raid md devices
@@ -1698,6 +1703,7 @@ autoprepare() {
             DOSUBVOLUME="no"
         fi
         BTRFS_LEVEL="NONE"
+        ### TODO: SWAP CHECK MISSING
         DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP}" 0 0
         _mkfs ${DOMKFS} ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
@@ -3966,8 +3972,10 @@ do_syslinux_bios() {
             sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
         fi
     else
+        printk off
         # mark the partition with /boot as active in MBR
         parted -s ${ROOTDEV} set ${PARTITION_NUMBER} boot on >${LOG}
+        printk on
     fi
     
     ## install syslinux/extlinux bios
