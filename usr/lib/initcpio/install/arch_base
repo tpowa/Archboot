@@ -134,7 +134,7 @@ build ()
     #systemd files
     apps="busctl bootctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl systemctl systemd-analyze systemd-ask-password \
-          systemd-cat systemd-cgls systemd-cgtop systemd-coredumpctl \
+          systemd-cat systemd-cgls systemd-cgtop coredumpctl \
           systemd-delta systemd-detect-virt systemd-inhibit systemd-machine-id-setup \
           systemd-notify systemd-nspawn systemd-run systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
           systemd-tty-ask-password-agent timedatectl"
