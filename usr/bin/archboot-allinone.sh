@@ -228,7 +228,7 @@ GUMEOF
 title           Arch Linux x86_64 Archboot EFISTUB
 linux           /boot/vmlinuz_x86_64
 initrd          /boot/initramfs_x86_64.img
-options         cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
+options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1
 architecture    x64
 GUMEOF
 	
@@ -236,7 +236,7 @@ GUMEOF
 # title           Arch Linux i686 Archboot EFISTUB
 # linux           /boot/vmlinuz_i686
 # initrd          /boot/initramfs_i686.img
-# options         cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+# options         cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
 # architecture    ia32
 # GUMEOF
 	
@@ -313,7 +313,7 @@ set timeout="2"
 menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _X64_UEFI=1
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1
     initrd /boot/initramfs_x86_64.img
 }
 
@@ -366,14 +366,14 @@ set timeout="2"
 menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
     initrd /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux i686 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_i686
-    linux /boot/vmlinuz_i686 cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    linux /boot/vmlinuz_i686 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
     initrd /boot/initramfs_i686.img
 }
 
@@ -421,13 +421,13 @@ MENU RESOLUTION 1280 800
 LABEL archboot-x86_64
     MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
     LINUX /boot/vmlinuz_x86_64
-    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
     INITRD /boot/initramfs_x86_64.img
 
 LABEL archboot-i686
     MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
     LINUX /boot/vmlinuz_i686
-    APPEND cgroup_disable=memory loglevel=7 add_efi_memmap _IA32_UEFI=1
+    APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
     INITRD /boot/initramfs_i686.img
 EOF
 	
