@@ -41,4 +41,6 @@ systemd-timesync:x:192:
 systemd-network:x:193:
 systemd-bus-proxy:x:194:
 systemd-resolve:x:195:
+systemd-journal-remote:x:996:
+systemd-journal-upload:x:995:
 ldap:x:439:

@@ -132,11 +132,11 @@ build ()
     add_full_dir "/etc/dbus-1"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="busctl bootctl hostnamectl journalctl kernel-install localectl \
-          loginctl machinectl systemctl systemd-analyze systemd-ask-password \
-          systemd-cat systemd-cgls systemd-cgtop coredumpctl \
-          systemd-delta systemd-detect-virt systemd-inhibit systemd-machine-id-setup \
-          systemd-notify systemd-nspawn systemd-run systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
+    apps="busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
+          loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
+          systemd-cat systemd-cgls systemd-cgtop  \
+          systemd-delta systemd-detect-virtsystemd-escape systemd-firstboot systemd-inhibit systemd-machine-id-setup \
+          systemd-notify systemd-nspawn systemd-path systemd-run systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
           systemd-tty-ask-password-agent timedatectl"
     for i in $apps; do
         add_binary "$i"
