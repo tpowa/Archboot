@@ -162,9 +162,8 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
              "/etc/systemd/system/getty.target.wants/getty@tty1.service"
-    # mask firstboot script
-    add_symlink "/etc/systemd/system/systemd-firstboot.service" "/dev/null"
-
+    add_file "/usr/share/archboot/base/etc/machine-id" "/etc/machine-id"
+    
     ### add udev, which is not covered by udev hook
     add_binary "logger"
     add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
@@ -197,10 +196,10 @@ build ()
     [ "$(uname -m)" = "i686" ] && add_file "/usr/share/archboot/pacman/etc/makepkg.conf.i686" "/etc/makepkg.conf"
     add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
-    add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
-    add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
+    add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
+    add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_full_dir "/usr/share/pacman/keyrings"
 
     ### fix file
