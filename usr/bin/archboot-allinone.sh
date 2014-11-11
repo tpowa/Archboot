@@ -146,6 +146,7 @@ _prepare_kernel_initramfs_files() {
 	fi
 	
 	mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
+	mv "${CORE}/tmp"/*/boot/intel-ucode.img "${ALLINONE}/boot/intel-ucode.img"
 	
 }
 
@@ -227,6 +228,7 @@ GUMEOF
 	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf"
 title           Arch Linux x86_64 Archboot EFISTUB
 linux           /boot/vmlinuz_x86_64
+initrd          /boot/intel-ucode.img
 initrd          /boot/initramfs_x86_64.img
 options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1
 architecture    x64
@@ -235,6 +237,7 @@ GUMEOF
 	# cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-i686-efistub.conf"
 # title           Arch Linux i686 Archboot EFISTUB
 # linux           /boot/vmlinuz_i686
+# initrd          /boot/intel-ucode.img
 # initrd          /boot/initramfs_i686.img
 # options         cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
 # architecture    ia32
@@ -314,7 +317,7 @@ menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1
-    initrd /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "UEFI Shell X64 v2" {
@@ -367,14 +370,14 @@ menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    initrd /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux i686 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_i686
     linux /boot/vmlinuz_i686 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    initrd /boot/initramfs_i686.img
+    initrd /boot/intel-ucode.img /boot/initramfs_i686.img
 }
 
 # menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
@@ -422,13 +425,13 @@ LABEL archboot-x86_64
     MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
     LINUX /boot/vmlinuz_x86_64
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    INITRD /boot/initramfs_x86_64.img
+    INITRD /boot/intel-ucode.img /boot/initramfs_x86_64.img
 
 LABEL archboot-i686
     MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
     LINUX /boot/vmlinuz_i686
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    INITRD /boot/initramfs_i686.img
+    INITRD /boot/intel-ucode.img /boot/initramfs_i686.img
 EOF
 	
 }
