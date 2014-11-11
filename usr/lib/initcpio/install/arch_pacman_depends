@@ -22,7 +22,7 @@ build ()
              grub gummiboot refind-efi efivar efibootmgr lockdown-ms prebootloader file keyutils \
              yp-tools curl smartmontools dnsmasq lftp openconnect libxml2 libproxy speedtouch tcpdump nmap lua \
              weechat gnutls nettle libtasn1 rpcbind expat progsreiserfs glib2 freetype2 libssh2 libedit \
-             talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry dirmngr gpgme ldns \
+             talloc eventlog idnkit libjpeg-turbo pth gnupg libksba libassuan pinentry gpgme ldns \
              dnssec-anchors hwids systemd dmidecode archlinux-keyring haveged \
              pambase traceroute arch-wiki-lite intel-ucode arch-install-scripts zsh gdbm \
              grml-zsh-config sysvinit-tools xl2tpd wvdial usb_modeswitch f2fs-tools"
