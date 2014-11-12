@@ -2899,6 +2899,10 @@ select_packages() {
     # always add systemd-sysvcompat components
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
     PACKAGES="${PACKAGES} systemd-sysvcompat"
+    ### HACK:
+    # always add intel-ucode
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
+    PACKAGES="${PACKAGES} intel-ucode"
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
