@@ -19,6 +19,8 @@ KERNELPKG="linux"
 VMLINUZ="vmlinuz-${KERNELPKG}"
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
+# name of intel ucode initramfs image
+INTEL_UCODE="intel-ucode.img"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -3507,6 +3509,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 
 [Path]
 PathChanged=/boot/${VMLINUZ}
+PathChanged=/boot/intel-ucode.img
 PathChanged=/boot/${INITRAMFS}.img
 PathChanged=/boot/${INITRAMFS}-fallback.img
 Unit=efistub_copy.service
@@ -3522,6 +3525,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/intel-ucode.img ${UEFISYS_MOUNTPOINT}/EFI/arch/intel-ucode.img
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
@@ -3541,22 +3545,20 @@ CONFEOF
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         _KERNEL_NORMAL="/${VMLINUZ}"
-        _KERNEL_EFIPATH="\\${VMLINUZ}"
+
+        _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
         
         _INITRD_NORMAL="/${INITRAMFS}.img"
-        _INITRD_EFIPATH="\\${INITRAMFS}.img"
         
         _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
-        _INITRD_FALLBACK_EFIPATH="\\${INITRAMFS}-fallback.img"
     else
         _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
-        _KERNEL_EFIPATH="\\EFI\\arch\\${_EFISTUB_KERNEL}"
         
+        _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
+
         _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        _INITRD_EFIPATH="\\EFI\\arch\\${_EFISTUB_INITRAMFS}.img"
         
         _INITRD_FALLBACK_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
-        _INITRD_FALLBACK_EFIPATH="\\EFI\\arch\\${_EFISTUB_INITRAMFS}-fallback.img"
     fi
     
 }
@@ -3589,12 +3591,7 @@ do_efistub_uefi() {
         fi
     fi
     
-    if [[ "${_CONTINUE}" == "1" ]]; then
-        # _BOOTMGR_LABEL="Arch Linux (EFISTUB)"
-        # _BOOTMGR_LOADER_PATH="${_KERNEL_NORMAL}"
-        # _BOOTMGR_LOADER_PARAMETERS="${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_FALLBACK_NORMAL}"
-        # do_uefi_bootmgr_setup
-        
+    if [[ "${_CONTINUE}" == "1" ]]; then        
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
             "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
@@ -3625,6 +3622,7 @@ do_gummiboot_uefi() {
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
+initrd   ${_INITRD_INTEL_UCODE}
 initrd   ${_INITRD_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
@@ -3632,6 +3630,7 @@ GUMEOF
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 title    Arch Linux Fallback
 linux    ${_KERNEL_NORMAL}
+initrd   ${_INITRD_INTEL_UCODE}
 initrd   ${_INITRD_FALLBACK_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
@@ -3707,8 +3706,8 @@ do_refind_uefi() {
     fi
     
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_NORMAL}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_FALLBACK_NORMAL}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_NORMAL}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_FALLBACK_NORMAL}"
 REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -3779,13 +3778,13 @@ LABEL arch
     MENU LABEL Arch Linux
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE} ${_INITRD_NORMAL}
 
 LABEL arch-fallback
     MENU LABEL Arch Linux Fallback
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_FALLBACK_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE} ${_INITRD_FALLBACK_NORMAL}
 
 EOF
         
@@ -3837,7 +3836,7 @@ ENDTEXT
     MENU LABEL Arch Linux
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INITRAMFS}.img
+    INITRD ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}.img
 
 LABEL arch-fallback
 TEXT HELP
@@ -3846,7 +3845,7 @@ ENDTEXT
     MENU LABEL Arch Linux Fallback
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INITRAMFS}-fallback.img
+    INITRD ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}-fallback.img
 
 EOF
         DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
@@ -4236,7 +4235,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INITRAMFS}.img
+    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}.img
 }
 
 EOF
@@ -4251,7 +4250,7 @@ menuentry "Arch Linux Fallback" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INITRAMFS}-fallback.img
+    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}-fallback.img
 }
 
 EOF
