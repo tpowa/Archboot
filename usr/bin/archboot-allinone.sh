@@ -425,13 +425,13 @@ LABEL archboot-x86_64
     MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
     LINUX /boot/vmlinuz_x86_64
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    INITRD /boot/intel-ucode.img /boot/initramfs_x86_64.img
+    INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
 
 LABEL archboot-i686
     MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
     LINUX /boot/vmlinuz_i686
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1
-    INITRD /boot/intel-ucode.img /boot/initramfs_i686.img
+    INITRD /boot/intel-ucode.img,/boot/initramfs_i686.img
 EOF
 	
 }

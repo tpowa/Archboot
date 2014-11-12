@@ -3778,13 +3778,13 @@ LABEL arch
     MENU LABEL Arch Linux
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE} ${_INITRD_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_NORMAL}
 
 LABEL arch-fallback
     MENU LABEL Arch Linux Fallback
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE} ${_INITRD_FALLBACK_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_FALLBACK_NORMAL}
 
 EOF
         
@@ -3836,7 +3836,7 @@ ENDTEXT
     MENU LABEL Arch Linux
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}.img
+    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${INITRAMFS}.img
 
 LABEL arch-fallback
 TEXT HELP
@@ -3845,7 +3845,7 @@ ENDTEXT
     MENU LABEL Arch Linux Fallback
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}-fallback.img
+    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${INITRAMFS}-fallback.img
 
 EOF
         DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
