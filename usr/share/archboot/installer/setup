@@ -3509,7 +3509,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 
 [Path]
 PathChanged=/boot/${VMLINUZ}
-PathChanged=/boot/intel-ucode.img
+PathChanged=/boot/${INTEL_UCODE}
 PathChanged=/boot/${INITRAMFS}.img
 PathChanged=/boot/${INITRAMFS}-fallback.img
 Unit=efistub_copy.service
@@ -3525,7 +3525,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
-ExecStart=/usr/bin/cp -f /boot/intel-ucode.img ${UEFISYS_MOUNTPOINT}/EFI/arch/intel-ucode.img
+ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INTEL_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
