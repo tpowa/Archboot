@@ -212,7 +212,7 @@ build ()
     add_file "/usr/share/licenses/file/COPYING"
     add_file "/usr/share/licenses/bzip2/LICENSE"
     add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
-    add_file "/usr/share/licenses/ncurses/LICENSE"
+    add_file "/usr/share/licenses/ncurses/license.txt"
     add_file "/usr/share/licenses/pcre/LICENSE"
     add_file "/usr/share/licenses/shadow/LICENSE"
     add_file "/usr/share/licenses/sdparm/LICENSE" 
