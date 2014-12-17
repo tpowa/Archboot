@@ -176,13 +176,11 @@ build ()
     add_file "/usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf" "/etc/sysctl.d/99-sysctl.conf"
 
     ### add pacman
-    apps="pacman pacman-db-upgrade pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
+    apps="pacman pacman-key pacman-db-upgrade pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
           rankmirrors repo-add testdb repo-elephant testpkg vercmp curl gpg-agent haveged"
     for i in $apps; do
         add_binary "$i"
     done
-    ### HACK until pacman-key is fixed for gnupg-2.1.x, readd to array above when fixed!
-    add_binary "/usr/share/archboot/pacman/usr/bin/pacman-key" "/usr/bin/pacman-key"
 
     symlinks="/usr/bin/gpg /usr/bin/repo-remove"
     for i in $symlinks; do
