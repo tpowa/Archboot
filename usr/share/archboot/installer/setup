@@ -2441,8 +2441,8 @@ _mkfs() {
     [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
     [[ ! "${_btrfslevel}" = "NONE" && "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -m ${_btrfslevel} -d ${_btrfslevel}"
-    # add btrfs options, minimum requirement linux 3.14 -O extref,skinny-metadata,no-holes
-    [[ "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -O extref,skinny-metadata,no-holes"
+    # add btrfs options, minimum requirement linux 3.14 -O no-holes
+    [[ "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -O no-holes"
     # we have two main cases: "swap" and everything else.
     if [[ "${_fstype}" = "swap" ]]; then
         swapoff ${_device} >/dev/null 2>&1
