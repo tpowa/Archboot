@@ -44,7 +44,7 @@ build ()
     chmod 700 "$BUILDROOT/var/lib/rpcbind"
     chown 32:32 "$BUILDROOT/var/lib/rpcbind"
     # start rpcbind on startup
-    add_symlink "/etc/systemd/system/multi-user.target.wants/rpcbind.service" "/usr/lib/systemd/system/rpcbind.service"
+    add_symlink "/etc/systemd/system/sockets.target.wants/rpcbind.socket" "/usr/lib/systemd/system/rpcbind.socket"
     add_dir "/var/lib/openldap"
     chmod 700 "$BUILDROOT/var/lib/openldap"
     chown 439:439 "$BUILDROOT/var/lib/openldap"
