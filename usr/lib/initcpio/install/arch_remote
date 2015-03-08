@@ -6,7 +6,8 @@ build ()
     add_checked_modules '/drivers/net/'
     apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
-	  sm-notify start-statd rpcbind rpcinfo rpc.gssd rpc.svcgssd mountpoint mountstats nfsdcltrack nfsiostat osd_login"
+	  sm-notify start-statd rpcbind rpcinfo rpc.gssd rpc.svcgssd mountpoint mountstats \
+	  nfsdcltrack nfsiostat osd_login gssproxy"
     for i in $apps; do
         add_binary "$i"
     done
@@ -43,6 +44,10 @@ build ()
     add_dir "/var/lib/rpcbind"
     chmod 700 "$BUILDROOT/var/lib/rpcbind"
     chown 32:32 "$BUILDROOT/var/lib/rpcbind"
+    add_full_dir "/etc/gss"
+    add_full_dir "/etc/gssproxy"
+    add_full_dir "/var/lib/gssproxy"
+    add_dir "/var/log/gssproxy"
     # start rpcbind on startup
     add_symlink "/etc/systemd/system/sockets.target.wants/rpcbind.socket" "/usr/lib/systemd/system/rpcbind.socket"
     add_dir "/var/lib/openldap"
