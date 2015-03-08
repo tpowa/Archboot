@@ -150,6 +150,7 @@ build ()
     add_full_dir "/etc/xdg"
     add_full_dir "/usr/lib/systemd"
     add_full_dir "/usr/share/systemd"
+    add_full_dir "/usr/share/factory"
     add_full_dir "/usr/share/polkit-1"
     add_full_dir "/usr/lib/tmpfiles.d"
     add_full_dir "/usr/lib/modules-load.d"
