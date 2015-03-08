@@ -83,7 +83,7 @@ fi
 
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k15-R1"
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k15-R2"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
 
 IMAGENAME_OLD="${IMAGENAME}"
