@@ -266,6 +266,8 @@ _mount_packages_squashfs_images() {
     modprobe -q loop
     modprobe -q squashfs
     mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
+    # avoid mounting issues
+    sleep 2
     mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_any.squashfs" "/packages/core-any"
     
     # mkdir -p /tmp/TMP_ARCHBOOT_ROOT
