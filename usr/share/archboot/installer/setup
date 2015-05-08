@@ -255,23 +255,13 @@ activate_special_devices()
 
 _mount_packages_squashfs_images() {
     
-    umount "/packages/core-$(uname -m)"  >/dev/null 2>&1
-    umount "/packages/core-any"  >/dev/null 2>&1
-    rm -rf "/packages/core-$(uname -m)"
-    rm -rf "/packages/core-any"
+    ! [[ -d "/packages/core-$(uname -m)" ]] && mkdir -p "/packages/core-$(uname -m)"
+    ! [[ -d "/packages/core-any" ]] && mkdir -p "/packages/core-any"
     
-    mkdir -p "/packages/core-$(uname -m)"
-    mkdir -p "/packages/core-any"
-    
-    modprobe -q loop
-    modprobe -q squashfs
-    mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
-    # avoid mounting issues
-    sleep 2
-    mount -o ro,loop -t squashfs "${_MEDIA}/packages/archboot_packages_any.squashfs" "/packages/core-any"
-    
-    # mkdir -p /tmp/TMP_ARCHBOOT_ROOT
-    # tar -C /tmp/TMP_ARCHBOOT_ROOT -xf "/packages/core-$(uname -m)/pkg"/libarchive-*-$(uname -m).pkg.tar.xz
+    mountpoint -q /packages/core-$(uname -m) && umount "/packages/core-$(uname -m)"
+    mountpoint -q /packages/core-any && umount "/packages/core-any"
+    mount "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
+    mount "${_MEDIA}/packages/archboot_packages_any.squashfs" "/packages/core-any"
     
 }
 
