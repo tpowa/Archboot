@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 18th 2014
+   September, 4th 2015
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -70,7 +70,7 @@ Introduction
 
   What are the supported boot modes of Archboot media?
    * It supports BIOS booting with syslinux.
-   * It supports UEFI/UEFI_CD booting with gummiboot and EFISTUB.
+   * It supports UEFI/UEFI_CD booting with systemd-boot and EFISTUB.
    * It support UEFI_MIX_MODE booting with grub.
    * It supports Secure Boot with prebootloader.
    * It supports grub(2)'s iso loopback support.
@@ -123,7 +123,7 @@ Introduction
    * Configuration of basic system files
    * Setting root password
    * Bootloader support: grub(2) (BIOS and UEFI),
-     refind-efi, gummiboot, syslinux (BIOS and UEFI)
+     refind-efi, systemd-boot, syslinux (BIOS and UEFI)
 
 Installing Arch Linux with Archboot 
 
