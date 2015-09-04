@@ -199,24 +199,23 @@ _download_uefi_shell_tianocore() {
 	mkdir -p "${ALLINONE}/EFI/tools/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v2.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/Ia32/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v1.efi" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
 	
 }
 
 _prepare_uefi_gummiboot_USB_files() {
 	
 	mkdir -p "${ALLINONE}/EFI/BOOT"
-	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${ALLINONE}/EFI/BOOT/loader.efi"
-	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${ALLINONE}/EFI/BOOT/BOOTIA32.EFI"
+	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${ALLINONE}/EFI/BOOT/loader.efi"
 	
 	mkdir -p "${ALLINONE}/loader/entries"
 	
@@ -234,15 +233,6 @@ options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramf
 architecture    x64
 GUMEOF
 	
-	# cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-i686-efistub.conf"
-# title           Arch Linux i686 Archboot EFISTUB
-# linux           /boot/vmlinuz_i686
-# initrd          /boot/intel-ucode.img
-# initrd          /boot/initramfs_i686.img
-# options         cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-# architecture    ia32
-# GUMEOF
-	
 	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-x64-v2.conf"
 title           UEFI Shell X64 v2
 efi             /EFI/tools/shellx64_v2.efi
@@ -255,32 +245,13 @@ efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
 GUMEOF
 	
-	# cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-ia32-v2.conf"
-# title           UEFI Shell IA32 v2
-# efi             /EFI/tools/shellia32_v2.efi
-# architecture    ia32
-# GUMEOF
-	 
-	# cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-ia32-v1.conf"
-# title           UEFI Shell IA32 v1
-# efi             /EFI/tools/shellia32_v1.efi
-# architecture    ia32
-# GUMEOF
-	
 	cat << GUMEOF > "${ALLINONE}/loader/entries/grub-x64-gummiboot.conf"
 title           GRUB X64 - if EFISTUB boot fails
 efi             /EFI/grub/grubx64.efi
 architecture    x64
 GUMEOF
 	
-	# cat << GUMEOF > "${ALLINONE}/loader/entries/syslinux-ia32-gummiboot.conf"
-# title           Syslinux IA32 - for x86_64 kernel boot
-# efi             /EFI/syslinux/efi32/syslinux.efi
-# architecture    ia32
-# GUMEOF
-	
 	mv "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf" "${ALLINONE}/loader/entries/default-x64.conf"
-	# mv "${ALLINONE}/loader/entries/syslinux-ia32-gummiboot.conf" "${ALLINONE}/loader/entries/default-ia32.conf"
 	
 }
 

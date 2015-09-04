@@ -274,7 +274,7 @@ _download_uefi_shell_tianocore() {
 		cp -f "/usr/share/uefi-shell/shellx64_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi"
 	else
 		## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/X64/Shell.efi" || true
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi" || true
 		echo
 		
 		if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v2.efi.temp" | grep 'executable')" ]]; then
@@ -284,7 +284,7 @@ _download_uefi_shell_tianocore() {
 	fi
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For Spec. Ver. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi" || true
 	echo
 	
 	if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellx64_v1.efi.temp" | grep 'executable')" ]]; then
@@ -298,7 +298,7 @@ _download_uefi_shell_tianocore() {
 		cp -f "/usr/share/uefi-shell/shellia32_v2.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi"
 	else
 		## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/ShellBinPkg/UefiShell/Ia32/Shell.efi" || true
+		curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/Ia32/Shell.efi" || true
 		echo
 		
 		if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v2.efi.temp" | grep 'executable')" ]]; then
@@ -308,7 +308,7 @@ _download_uefi_shell_tianocore() {
 	fi
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For Spec. Ver. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" "https://svn.code.sf.net/p/edk2/code/trunk/edk2/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi" || true
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi" || true
 	echo
 	
 	if [[ "$(file "${_ARCHBOOT_ISO_EXT_DIR}/EFI/tools/shellia32_v1.efi.temp" | grep 'executable')" ]]; then
@@ -323,11 +323,8 @@ _update_uefi_gummiboot_USB_files() {
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT"
 	
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/loader.efi" || true
-	cp -f "/usr/lib/gummiboot/gummibootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/loader.efi"
-	
-	# rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTIA32.EFI" || true
-	# cp -f "/usr/lib/gummiboot/gummibootia32.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTIA32.EFI"
-	
+	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/loader.efi"
+		
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
 	mkdir -p "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries"
 	
@@ -345,15 +342,6 @@ options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramf
 architecture    x64
 GUMEOF
 	
-	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-i686-efistub.conf"
-# title           Arch Linux i686 Archboot EFISTUB
-# linux           /boot/vmlinuz_i686
-# initrd          /boot/intel-ucode.img
-# initrd          /boot/initramfs_i686.img
-# options         cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-# architecture    ia32
-# GUMEOF
-	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-x64-v2.conf"
 title           UEFI Shell X64 v2
 efi             /EFI/tools/shellx64_v2.efi
@@ -364,34 +352,14 @@ GUMEOF
 title           UEFI Shell X64 v1
 efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
-GUMEOF
-	
-	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v2.conf"
-# title           UEFI Shell IA32 v2
-# efi             /EFI/tools/shellia32_v2.efi
-# architecture    ia32
-# GUMEOF
-	
-	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/uefi-shell-ia32-v1.conf"
-# title           UEFI Shell IA32 v1
-# efi             /EFI/tools/shellia32_v1.efi
-# architecture    ia32
-# GUMEOF
-	
+GUMEOF	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/grub-x64-gummiboot.conf"
 title           GRUB X64 - if EFISTUB boot fails
 efi             /EFI/grub/grubx64.efi
 architecture    x64
 GUMEOF
 	
-	# cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf"
-# title           Syslinux IA32 - for x86_64 kernel boot
-# efi             /EFI/syslinux/efi32/syslinux.efi
-# architecture    ia32
-# GUMEOF
-	
 	mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/archboot-x86_64-efistub.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-x64.conf"
-	# mv "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/syslinux-ia32-gummiboot.conf" "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/default-ia32.conf"
 	
 }
 
@@ -645,9 +613,6 @@ _update_cd_uefi() {
 	
 	## Delete IA32 UEFI files
 	rm -f "${TEMP_DIR}"/loader/*ia32*.conf
-	# rm -f "${TEMP_DIR}"/EFI/tools/shellia32_v{1,2}.efi
-	# rm -f "${TEMP_DIR}"/EFI/BOOT/BOOTIA32.EFI
-	# rm -f "${TEMP_DIR}"/EFI/BOOT/bootia32.cfg
 	rm -rf "${TEMP_DIR}"/EFI/syslinux/efi32
 	
 	## get size of boot x86_64 files
