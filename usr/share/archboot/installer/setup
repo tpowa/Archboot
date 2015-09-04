@@ -3587,11 +3587,11 @@ do_efistub_uefi() {
     
     if [[ "${_CONTINUE}" == "1" ]]; then        
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-            "Gummiboot" "Gummiboot for ${UEFI_ARCH} UEFI" \
+            "Systemd-boot" "Systemd-boot for ${UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
             "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
         case $(cat ${ANSWER}) in
-            "Gummiboot") do_gummiboot_uefi ;;
+            "Systemd-boot") do_systemd_boot_uefi ;;
             "rEFInd") do_refind_uefi;;
             "NONE") return 0 ;;
         esac
@@ -3599,16 +3599,9 @@ do_efistub_uefi() {
     
 }
 
-do_gummiboot_uefi() {
+do_systemd_boot_uefi() {
     
-    DIALOG --msgbox "Setting up Gummiboot now ..." 0 0
-    
-    if [[ ! -f "${DESTDIR}/usr/bin/gummiboot" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/gummiboot, installing gummiboot pkg now ..." 0 0
-        PACKAGES="gummiboot"
-        run_pacman
-        unset PACKAGES
-    fi
+    DIALOG --msgbox "Setting up Systemd-boot now ..." 0 0
     
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -3637,12 +3630,12 @@ GUMEOF
     uefi_mount_efivarfs
     
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" install
-    chroot "${DESTDIR}" "/usr/bin/gummiboot" --path="${UEFISYS_MOUNTPOINT}" update
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update
     chroot_umount
     
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and gummiboot menu entry files . After you save your changes, exit the editor." 0 0
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
+        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and Systemd-boot menu entry files . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
@@ -3650,17 +3643,17 @@ GUMEOF
         
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
         
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/gummiboot/gummiboot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             
             do_uefi_secure_boot_preloader
         fi
     else
-        DIALOG --msgbox "Error installing Gummiboot..." 0 0
+        DIALOG --msgbox "Error installing Systemd-boot..." 0 0
     fi
 }
 
