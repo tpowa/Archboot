@@ -436,17 +436,14 @@ cd "${WD}/"
 ## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating ALLINONE hybrid ISO ..."
 xorriso -as mkisofs \
-        -iso-level 3 -rock -joliet \
-        -max-iso9660-filenames -omit-period \
-        -omit-version-number -allow-leading-dots \
-        -relaxed-filenames -allow-lowercase -allow-multidot \
+        -iso-level 3 \
+        -max-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
         -eltorito-boot boot/syslinux/isolinux.bin \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        --sort-weight 1 boot/syslinux/isolinux.bin \
         -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
 
 # create x86_64 iso, if not present

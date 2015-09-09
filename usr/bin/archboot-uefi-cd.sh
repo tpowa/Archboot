@@ -89,10 +89,8 @@ rm -rf "${FSIMG}"
 
 ## Create new ISO with BIOS, ISOHYBRID and UEFI support
 xorriso -as mkisofs \
-        -iso-level 3 -rock -joliet \
-        -max-iso9660-filenames -omit-period \
-        -omit-version-number -allow-leading-dots \
-        -relaxed-filenames -allow-lowercase -allow-multidot \
+        -iso-level 3 \
+        -full-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by archboot-uefi-cd.sh" \
         -eltorito-boot boot/syslinux/isolinux.bin \
@@ -101,7 +99,6 @@ xorriso -as mkisofs \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
-        --sort-weight 1 boot/syslinux/isolinux.bin \
         -output "${OUTPUT_IMAGENAME}" "${ISOIMG}"/ &> /tmp/xorriso.log
 
 if [[ -e "${OUTPUT_IMAGENAME}" ]]; then

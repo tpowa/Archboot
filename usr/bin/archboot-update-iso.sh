@@ -698,10 +698,8 @@ cd "${_ARCHBOOT_ISO_WD}/"
 echo "Generating the modified ISO ..."
 
 xorriso -as mkisofs \
-	-iso-level 3 -rock -joliet \
-	-max-iso9660-filenames -omit-period \
-	-omit-version-number -allow-leading-dots \
-	-relaxed-filenames -allow-lowercase -allow-multidot \
+	-iso-level 3 \
+	-full-iso9660-filenames \
 	-volid "ARCHBOOT" \
 	-preparer "prepared by ${_BASENAME}" \
 	-eltorito-boot boot/syslinux/isolinux.bin \
@@ -709,7 +707,6 @@ xorriso -as mkisofs \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
 	${_CD_UEFI_PARAMETERS} \
-	--sort-weight 1 boot/syslinux/isolinux.bin \
 	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
 echo
 
