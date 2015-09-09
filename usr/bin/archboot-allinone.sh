@@ -437,7 +437,7 @@ cd "${WD}/"
 echo "Generating ALLINONE hybrid ISO ..."
 xorriso -as mkisofs \
         -iso-level 3 \
-        -max-iso9660-filenames \
+        -full-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
         -eltorito-boot boot/syslinux/isolinux.bin \
