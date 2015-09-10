@@ -352,7 +352,8 @@ GUMEOF
 title           UEFI Shell X64 v1
 efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
-GUMEOF	
+GUMEOF
+	
 	cat << GUMEOF > "${_ARCHBOOT_ISO_EXT_DIR}/loader/entries/grub-x64-gummiboot.conf"
 title           GRUB X64 - if EFISTUB boot fails
 efi             /EFI/grub/grubx64.efi
@@ -609,7 +610,7 @@ _update_cd_uefi() {
 	## Copy UEFI files fo cdefiboot.img
 	mkdir "${TEMP_DIR}"/boot
 	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${TEMP_DIR}"/
-	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/vmlinuz_x86_64 "${_ARCHBOOT_ISO_EXT_DIR}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
+	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/{vmlinuz_x86_64,intel-ucode.img,initramfs_x86_64.img} "${TEMP_DIR}"/boot/
 	
 	## Delete IA32 UEFI files
 	rm -f "${TEMP_DIR}"/loader/*ia32*.conf
@@ -631,7 +632,10 @@ _update_cd_uefi() {
 	mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
 	
 	## Copy all files from TEMP_DIR to MOUNT_FSIMG
-	cp -r "${TEMP_DIR}"/* "${MOUNT_FSIMG}"/
+	# repeat all steps from above cp * is not working here!
+	mkdir "${MOUNT_FSIMG}"/boot
+	cp -r "${TEMP_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"/
+	cp  "${TEMP_DIR}"/boot/{vmlinuz_x86_64,intel-ucode.img,initramfs_x86_64.img} "${MOUNT_FSIMG}"/boot
 	
 	## Unmount cdefiboot.img
 	umount "${LOOPDEV}"
