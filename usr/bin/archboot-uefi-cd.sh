@@ -54,7 +54,9 @@ bsdtar -C "${ISOIMG}" -xf "${INPUT_IMAGENAME}"
 ## Copy UEFI files
 mkdir "${TEMP_DIR}"/boot
 cp -r "${ISOIMG}"/{EFI,loader} "${TEMP_DIR}"/
-cp "${ISOIMG}"/boot/{vmlinuz_x86_64,intel-ucode.img,initramfs_x86_64.img} "${TEMP_DIR}"/boot/
+cp "${ISOIMG}"/boot/vmlinuz_x86_64 "${TEMP_DIR}"/boot/
+cp "${ISOIMG}"/boot/intel-ucode.img "${TEMP_DIR}"/boot/
+cp "${ISOIMG}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
 
 ## Delete IA32 UEFI files
 rm -f "${TEMP_DIR}"/loader/*ia32*.conf
@@ -76,11 +78,12 @@ mount -t vfat -o rw,users "${LOOPDEV}" "${MOUNT_FSIMG}"
 # repeat all steps from above cp * is not working here!
 mkdir "${MOUNT_FSIMG}"/boot
 cp -r "${TEMP_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"/
-cp  "${TEMP_DIR}"/boot/{vmlinuz_x86_64,intel-ucode.img,initramfs_x86_64.img} "${MOUNT_FSIMG}"/boot
+cp "${TEMP_DIR}"/boot/vmlinuz_x86_64 "${MOUNT_FSIMG}"/boot
+cp "${TEMP_DIR}"/boot/intel-ucode.img "${MOUNT_FSIMG}"/boot
+cp "${TEMP_DIR}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot
 
 ## Unmount cdefiboot.img
-umount "${LOOPDEV}"
-losetup --detach "${LOOPDEV}"
+umount -d "${LOOPDEV}"
 rm -rf "${MOUNT_FSIMG}"
 rm -rf "${TEMP_DIR}"
 
