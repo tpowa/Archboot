@@ -178,7 +178,7 @@ build ()
 
     ### add pacman
     apps="pacman pacman-key pacman-db-upgrade pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
-          rankmirrors repo-add testdb repo-elephant testpkg vercmp curl gpg-agent haveged"
+          rankmirrors repo-add repo-elephant testpkg vercmp curl gpg-agent haveged"
     for i in $apps; do
         add_binary "$i"
     done
