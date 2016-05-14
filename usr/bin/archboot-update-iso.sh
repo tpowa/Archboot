@@ -125,9 +125,9 @@ _update_uefi_prebootloader_files() {
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTX64.EFI" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/HashTool.efi" || true
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/KeyTool.efi" || true
-	cp -f "/usr/lib/prebootloader/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTX64.EFI"
-	cp -f "/usr/lib/prebootloader/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/HashTool.efi"
-	cp -f "/usr/lib/prebootloader/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/KeyTool.efi"
+	cp -f "/usr/share/efitools/efi/PreLoader.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTX64.EFI"
+	cp -f "/usr/share/efitools/efi/HashTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/HashTool.efi"
+	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/KeyTool.efi"
 }
 
 _update_uefi_lockdown_ms_files() {

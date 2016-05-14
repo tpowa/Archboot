@@ -3,8 +3,9 @@
 
 build ()
 {
-    add_file "/usr/lib/prebootloader/PreLoader.efi"
-    add_file "/usr/lib/prebootloader/HashTool.efi"
+    add_file "/usr/share/efitools/efi/PreLoader.efi"
+    add_file "/usr/share/efitools/efi/HashTool.efi"
+    add_file "/usr/share/efitools/efi/KeyTool.efi"
 }
 
 help ()
