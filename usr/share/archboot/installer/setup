@@ -3373,7 +3373,7 @@ do_uefi_common() {
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
     [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        [[ ! -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" ]] && PACKAGES="${PACKAGES} prebootloader"
+        [[ ! -f "${DESTDIR}/usr/share/efitools/efi/PreLoader.efi" ]] && PACKAGES="${PACKAGES} efitools"
         [[ ! -f "${DESTDIR}/usr/lib/lockdown-ms/LockDown_ms.efi" ]] && PACKAGES="${PACKAGES} lockdown-ms"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
@@ -3470,8 +3470,8 @@ do_uefi_secure_boot_preloader() {
         
         mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/loader.efi"
         
-        cp -f "${DESTDIR}/usr/lib/prebootloader/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/PreLoader.efi"
-        cp -f "${DESTDIR}/usr/lib/prebootloader/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/HashTool.efi"
+        cp -f "${DESTDIR}/usr/share/efitools/efi/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/PreLoader.efi"
+        cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/HashTool.efi"
         
         _BOOTMGR_LABEL="PreLoader (Secure Boot)"
         _BOOTMGR_LOADER_DIR="/EFI/preloader/PreLoader.efi"
