@@ -11,7 +11,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    symlinks="/usr/bin/screen /usr/bin/slogin"
+    symlinks="/usr/bin/screen"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
