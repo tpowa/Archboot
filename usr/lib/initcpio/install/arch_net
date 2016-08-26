@@ -35,6 +35,9 @@ build ()
     add_full_dir "/usr/lib/tc"
     add_full_dir "/usr/share/tc"
     add_full_dir "/etc/iproute2"
+    # add openssl helper libraries
+    add_full_dir "/usr/lib/engines"
+
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add dhclient support
