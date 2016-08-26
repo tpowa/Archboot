@@ -67,9 +67,12 @@ build ()
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
     pacman -Sy
     pacman -Sw --noconfirm ${PACKAGES}
+    SIGNATURES=""
     for i in $(pacman -Sp ${PACKAGES}); do
-        wget -N --directory-prefix /var/cache/pacman/pkg/ $i.sig
+        SIGNATURES="${SIGNATURES} ${i}.sig"
     done
+    wget -N --directory-prefix /var/cache/pacman/pkg/ ${SIGNATURES}
+    unset SIGNATURES
     # collect the packages
     mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
     mkdir -p ${TEMPDIR}/core-any/pkg/

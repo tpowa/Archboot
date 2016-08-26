@@ -207,6 +207,17 @@ build ()
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"
 
+    ### add ca certificates
+    cafile="tls-ca-bundle.pem"
+    cert="cert.pem"
+    cert2="ca-certificates.crt"
+    ca_dir="/etc/ca-certificates/extracted"
+    cert_dir="/etc/ssl"
+    cert2_dir="/etc/ssl/certs"
+    add_full_dir "$ca_dir"
+    add_full_dir "$cert2_dir"
+    add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
+    add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
     ### fix licenses
     add_file "/usr/share/licenses/file/COPYING"
     add_file "/usr/share/licenses/bzip2/LICENSE"
