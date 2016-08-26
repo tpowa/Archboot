@@ -1,9 +1,10 @@
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2016-05-12
+## Generated on 2016-08-23
 ##
 
 ## Worldwide
+#Server = https://archlinux.surlyjake.com/archlinux/$repo/os/$arch
 #Server = http://mirrors.evowise.com/archlinux/$repo/os/$arch
 #Server = http://mirror.rackspace.com/archlinux/$repo/os/$arch
 
@@ -46,6 +47,7 @@
 #Server = https://mirrors.uni-plovdiv.net/archlinux/$repo/os/$arch
 
 ## Canada
+#Server = http://mirror.cedille.club/archlinux/$repo/os/$arch
 #Server = http://mirror.clibre.uqam.ca/archlinux/$repo/os/$arch
 #Server = http://mirror.csclub.uwaterloo.ca/archlinux/$repo/os/$arch
 #Server = http://mirror.frgl.pw/archlinux/$repo/os/$arch
@@ -61,28 +63,30 @@
 
 ## China
 #Server = http://mirrors.163.com/archlinux/$repo/os/$arch
-#Server = http://mirror.bjtu.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.cug.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.cug6.edu.cn/archlinux/$repo/os/$arch
-#Server = http://mirrors.hust.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirror.lzu.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.neusoft.edu.cn/archlinux/$repo/os/$arch
-#Server = http://mirrors.opencas.cn/archlinux/$repo/os/$arch
 #Server = http://run.hit.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
+#Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
 #Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+#Server = http://mirrors.xjtu.edu.cn/archlinux/$repo/os/$arch
+#Server = https://mirrors.xjtu.edu.cn/archlinux/$repo/os/$arch
 #Server = http://mirrors.zju.edu.cn/archlinux/$repo/os/$arch
 
 ## Colombia
 #Server = http://mirror.edatel.net.co/archlinux/$repo/os/$arch
+#Server = http://www.laqee.unal.edu.co/archlinux/$repo/os/$arch
 
 ## Croatia
 #Server = http://archlinux.iskon.hr/$repo/os/$arch
 
 ## Czech Republic
-#Server = http://archlinux.mirror.dkm.cz/pub/archlinux/$repo/os/$arch
+#Server = http://mirror.dkm.cz/archlinux/$repo/os/$arch
+#Server = https://mirror.dkm.cz/archlinux/$repo/os/$arch
 #Server = http://ftp.fi.muni.cz/pub/linux/arch/$repo/os/$arch
 #Server = http://ftp.linux.cz/pub/linux/arch/$repo/os/$arch
 #Server = http://gluttony.sin.cvut.cz/arch/$repo/os/$arch
@@ -93,6 +97,7 @@
 
 ## Denmark
 #Server = http://mirrors.dotsrc.org/archlinux/$repo/os/$arch
+#Server = https://mirrors.dotsrc.org/archlinux/$repo/os/$arch
 #Server = http://ftp.klid.dk/ftp/archlinux/$repo/os/$arch
 #Server = http://mirror.one.com/archlinux/$repo/os/$arch
 #Server = https://mirror.one.com/archlinux/$repo/os/$arch
@@ -112,13 +117,10 @@
 #Server = https://archlinux.vi-di.fr/$repo/os/$arch
 #Server = http://mirror.armbrust.me/archlinux/$repo/os/$arch
 #Server = https://mirror.armbrust.me/archlinux/$repo/os/$arch
-#Server = http://mir.art-software.fr/arch/$repo/os/$arch
 #Server = http://fooo.biz/archlinux/$repo/os/$arch
 #Server = https://fooo.biz/archlinux/$repo/os/$arch
 #Server = http://mirror.ibcp.fr/pub/archlinux/$repo/os/$arch
 #Server = http://mirror.lastmikoi.net/archlinux/$repo/os/$arch
-#Server = http://mirror.bitjungle.info/archlinux/$repo/os/$arch
-#Server = https://mirror.bitjungle.info/archlinux/$repo/os/$arch
 #Server = http://archlinux.mailtunnel.eu/$repo/os/$arch
 #Server = https://www.mailtunnel.eu/archlinux/$repo/os/$arch
 #Server = http://mir.archlinux.fr/$repo/os/$arch
@@ -140,6 +142,7 @@
 ## Germany
 #Server = http://mirror.23media.de/archlinux/$repo/os/$arch
 #Server = https://arch.32g.eu/$repo/os/$arch
+#Server = https://mirror.aardvark.it/archlinux/$repo/os/$arch
 #Server = http://artfiles.org/archlinux.org/$repo/os/$arch
 #Server = http://mirror5.bastelfreak.org/archlinux/$repo/os/$arch
 #Server = http://mirror.compojoom.com/archlinux/$repo/os/$arch
@@ -151,12 +154,9 @@
 #Server = https://mirror.f4st.host/archlinux/$repo/os/$arch
 #Server = http://ftp.fau.de/archlinux/$repo/os/$arch
 #Server = https://ftp.fau.de/archlinux/$repo/os/$arch
-#Server = http://mirror.flipez.de/archlinux/$repo/os/$arch
-#Server = https://mirror.flipez.de/archlinux/$repo/os/$arch
 #Server = http://mirror.fluxent.de/archlinux/$repo/os/$arch
 #Server = https://mirror.fluxent.de/archlinux/$repo/os/$arch
 #Server = http://mirror.gnomus.de/$repo/os/$arch
-#Server = http://arch.packages.gnp-tec.net/$repo/os/$arch
 #Server = http://www.gutscheindrache.com/mirror/archlinux/$repo/os/$arch
 #Server = http://ftp5.gwdg.de/pub/linux/archlinux/$repo/os/$arch
 #Server = http://mirror.hactar.bz/$repo/os/$arch
@@ -181,6 +181,7 @@
 #Server = https://archlinux.my-universe.com/$repo/os/$arch
 #Server = http://mirrors.n-ix.net/archlinux/$repo/os/$arch
 #Server = http://mirror.netcologne.de/archlinux/$repo/os/$arch
+#Server = https://mirror.netcologne.de/archlinux/$repo/os/$arch
 #Server = http://mirrors.niyawe.de/archlinux/$repo/os/$arch
 #Server = https://mirrors.niyawe.de/archlinux/$repo/os/$arch
 #Server = http://mirror.pseudoform.org/$repo/os/$arch
@@ -190,6 +191,8 @@
 #Server = http://mirror.selfnet.de/archlinux/$repo/os/$arch
 #Server = http://mirror1.shellbot.com/archlinux/$repo/os/$arch
 #Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch
+#Server = http://archlinux.thaller.ws/$repo/os/$arch
+#Server = https://archlinux.thaller.ws/$repo/os/$arch
 #Server = http://ftp.tu-chemnitz.de/pub/linux/archlinux/$repo/os/$arch
 #Server = http://ftp.tuxdroid.org/archlinux/$repo/os/$arch
 #Server = https://ftp.tuxdroid.org/archlinux/$repo/os/$arch
@@ -199,6 +202,7 @@
 #Server = http://ftp.uni-hannover.de/archlinux/$repo/os/$arch
 #Server = http://ftp.uni-kl.de/pub/linux/archlinux/$repo/os/$arch
 #Server = http://mirror.united-gameserver.de/archlinux/$repo/os/$arch
+#Server = https://arch.packages.zachlge.org/$repo/os/$arch
 
 ## Greece
 #Server = http://ftp.cc.uoc.gr/mirrors/linux/archlinux/$repo/os/$arch
@@ -213,7 +217,7 @@
 #Server = https://arch-mirror.wtako.net/$repo/os/$arch
 
 ## Hungary
-#Server = http://ftp.mfa.kfki.hu/pub/mirrors/ftp.archlinux.org/$repo/os/$arch
+#Server = http://ftp.energia.mta.hu/pub/mirrors/ftp.archlinux.org/$repo/os/$arch
 
 ## Iceland
 #Server = http://mirror.system.is/arch/$repo/os/$arch
@@ -266,16 +270,15 @@
 ## Macedonia
 #Server = http://arch.softver.org.mk/archlinux/$repo/os/$arch
 #Server = http://mirror.t-home.mk/archlinux/$repo/os/$arch
-
-## Mexico
-#Server = http://arch.jellyfish.lol/$repo/os/$arch
+#Server = https://mirror.t-home.mk/archlinux/$repo/os/$arch
 
 ## Netherlands
 #Server = http://arch.apt-get.eu/$repo/os/$arch
 #Server = http://mirror.i3d.net/pub/archlinux/$repo/os/$arch
 #Server = https://mirror.i3d.net/pub/archlinux/$repo/os/$arch
-#Server = http://www.imegumii.space/arch/$repo/os/$arch
 #Server = http://mirror.nl.leaseweb.net/archlinux/$repo/os/$arch
+#Server = http://archlinux.lucysan.net/$repo/os/$arch
+#Server = https://archlinux.lucysan.net/$repo/os/$arch
 #Server = http://ftp.nluug.nl/os/Linux/distr/archlinux/$repo/os/$arch
 #Server = http://ftp.snt.utwente.nl/pub/os/linux/archlinux/$repo/os/$arch
 
@@ -311,6 +314,8 @@
 #Server = http://mirrors.m247.ro/archlinux/$repo/os/$arch
 
 ## Russia
+#Server = http://mirrors.prok.pw/archlinux/$repo/os/$arch
+#Server = https://mirrors.prok.pw/archlinux/$repo/os/$arch
 #Server = http://mirror.rol.ru/archlinux/$repo/os/$arch
 #Server = https://mirror.rol.ru/archlinux/$repo/os/$arch
 #Server = http://mirror.yandex.ru/archlinux/$repo/os/$arch
@@ -326,7 +331,11 @@
 
 ## Slovakia
 #Server = http://mirror.lnx.sk/pub/linux/archlinux/$repo/os/$arch
+#Server = https://mirror.lnx.sk/pub/linux/archlinux/$repo/os/$arch
 #Server = http://tux.rainside.sk/archlinux/$repo/os/$arch
+
+## Slovenia
+#Server = http://archimonde.ts.si/archlinux/$repo/os/$arch
 
 ## South Africa
 #Server = http://archlinux-za.mirror.host1plus.com/$repo/os/$arch
@@ -369,7 +378,6 @@
 #Server = http://ftp.linux.org.tr/archlinux/$repo/os/$arch
 
 ## Ukraine
-#Server = http://archlinux.bln-ua.net/$repo/os/$arch
 #Server = http://archlinux.ip-connect.vn.ua/$repo/os/$arch
 #Server = http://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
 #Server = https://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
@@ -388,7 +396,7 @@
 #Server = http://mirrors.advancedhosters.com/archlinux/$repo/os/$arch
 #Server = http://mirrors.aggregate.org/archlinux/$repo/os/$arch
 #Server = http://archlinux.surlyjake.com/archlinux/$repo/os/$arch
-#Server = http://mirror.atlantic.net/archlinux/$repo/os/$arch
+#Server = http://arlm.tyzoid.com/$repo/os/$arch
 #Server = http://ca.us.mirror.archlinux-br.org/$repo/os/$arch
 #Server = http://mirrors.cat.pdx.edu/archlinux/$repo/os/$arch
 #Server = http://mirror.cc.columbia.edu/pub/linux/archlinux/$repo/os/$arch
@@ -405,7 +413,6 @@
 #Server = http://mirror.htnshost.com/archlinux/$repo/os/$arch
 #Server = http://arch.mirrors.ionfish.org/$repo/os/$arch
 #Server = http://mirror.jmu.edu/pub/archlinux/$repo/os/$arch
-#Server = http://jordynsblog.tk/packages/archlinux/$repo/os/$arch
 #Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch
 #Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 #Server = http://kwk.pw/arch/$repo/os/$arch
@@ -429,6 +436,7 @@
 #Server = http://mirrors.rit.edu/archlinux/$repo/os/$arch
 #Server = https://mirrors.rit.edu/archlinux/$repo/os/$arch
 #Server = http://mirrors.rutgers.edu/archlinux/$repo/os/$arch
+#Server = https://mirrors.rutgers.edu/archlinux/$repo/os/$arch
 #Server = http://mirror.umd.edu/archlinux/$repo/os/$arch
 #Server = http://mirror.vtti.vt.edu/archlinux/$repo/os/$arch
 #Server = http://mirrors.xmission.com/archlinux/$repo/os/$arch
@@ -436,6 +444,5 @@
 
 ## Vietnam
 #Server = http://f.archlinuxvn.org/archlinux/$repo/os/$arch
-#Server = http://mirror.digistar.vn/archlinux/$repo/os/$arch
 #Server = http://mirror-fpt-telecom.fpt.net/archlinux/$repo/os/$arch
 
