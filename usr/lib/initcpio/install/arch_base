@@ -167,7 +167,6 @@ build ()
     
     ### add udev, which is not covered by udev hook
     add_binary "logger"
-    add_file "/usr/lib/modprobe.d/usb-load-ehci-first.conf"
     # add rule files
     add_full_dir "/usr/lib/udev"
     # add schedule rules file
