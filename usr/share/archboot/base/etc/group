@@ -44,4 +44,5 @@ systemd-bus-proxy:x:194:
 systemd-resolve:x:195:
 systemd-journal-remote:x:996:
 systemd-journal-upload:x:995:
+systemd-coredump:x:993:
 ldap:x:439:
