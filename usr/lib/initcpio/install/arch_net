@@ -10,7 +10,7 @@ build ()
         add_checked_modules "/drivers/staging/$i"
     done
     apps="dnsdomainname domainname netstat nisdomainname ypdomainname arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
-	  slattach traceroute arping clockdiff rarpd rdisc tftpd tracepath tracepath6 route \
+	  slattach traceroute arping clockdiff rarpd rdisc tftpd tracepath route \
 	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon  ss tc dhclient ifplugd ifplugstatus \
 	  ip ping ethtool"
     for i in $apps; do
