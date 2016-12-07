@@ -18,7 +18,7 @@ build ()
     add_full_dir "/usr/share/refind/keys"
     add_file "/usr/share/refind/refind.conf-sample"
     
-    appfiles="/usr/bin/refind-install /usr/bin/refind-mkfont /usr/bin/refind-mkrlconf /usr/bin/refind-mvrefind"
+    appfiles="/usr/bin/refind-install /usr/bin/refind-mkfont /usr/bin/mkrlconf /usr/bin/mvrefind"
     for i in $appfiles; do
         add_file "$i"
     done
