@@ -12,7 +12,8 @@ build ()
 	  cifs.upcall fsck.ext2 fsck.ext3 fsck.ext4 fsck.ext4dev e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
 	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-debug-tree btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super btrfs-show-super \
 	  btrfs-zero-log btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
-	  umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs"
+	  umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs \
+	  dumpexfat exfatfsck exfatlabel mkexfatfs mount.exfat-fuse fusermount mount.fuse ulockmgr_server"
     for i in $apps; do
         add_binary "$i"
     done
@@ -23,12 +24,14 @@ build ()
     done
     symlinks="/usr/bin/fsck.msdos /usr/bin/fsck.vfat /usr/bin/fsck.reiserfs /usr/bin/mkfs.vfat /usr/bin/mkfs.msdos \
               /usr/bin/mkfs.ntfs /usr/bin/mkfs.reiserfs /usr/bin/mount.nfs4 /usr/bin/mount.ntfs /usr/bin/mount.lowntfs-3g \
-              /usr/bin/mount.ntfs-3g /usr/bin/umount.nfs /usr/bin/umount.nfs4"
+              /usr/bin/mount.ntfs-3g /usr/bin/umount.nfs /usr/bin/umount.nfs4 /usr/bin/fsck.exfat /usr/bin/mkfs.exfat \
+              /usr/bin/mount.exfat"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
     add_file "/etc/nilfs_cleanerd.conf"
+    add_file "/etc/fuse.conf"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
