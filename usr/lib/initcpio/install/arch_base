@@ -164,7 +164,12 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
              "/etc/systemd/system/getty.target.wants/getty@tty1.service"
     add_file "/usr/share/archboot/base/etc/machine-id" "/etc/machine-id"
-    
+    ### add missing libsystemd files
+    add_file "/usr/lib/libnss_myhostname.so.2"
+    add_file "/usr/lib/libnss_mymachines.so.2"
+    add_file "/usr/lib/libnss_resolve.so.2"
+    add_file "/usr/lib/libnss_systemd.so.2"
+
     ### add udev, which is not covered by udev hook
     add_binary "logger"
     # add rule files
