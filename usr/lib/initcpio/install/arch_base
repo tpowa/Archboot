@@ -123,7 +123,8 @@ build ()
     done
 
     #dbus files
-    apps="dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
+    apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
+          dbus-update-activation-environment dbus-uuidgen"
     for i in $apps; do
         add_binary "$i"
     done
@@ -136,7 +137,8 @@ build ()
           loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop  \
           systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
-          systemd-notify systemd-nspawn systemd-path systemd-run systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
+          systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
+          systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
           systemd-tty-ask-password-agent timedatectl"
     for i in $apps; do
         add_binary "$i"
