@@ -171,6 +171,8 @@ build ()
     add_file "/usr/lib/libnss_mymachines.so.2"
     add_file "/usr/lib/libnss_resolve.so.2"
     add_file "/usr/lib/libnss_systemd.so.2"
+    ### fix tmpfiles startup
+    add_file "/usr/lib/libnss_compat.so.2"
 
     ### add udev, which is not covered by udev hook
     add_binary "logger"
