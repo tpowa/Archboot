@@ -12,7 +12,7 @@ symlinks="/usr/bin/vgcfgbackup /usr/bin/vgcfgrestore /usr/bin/vgchange \
 	  /usr/bin/vgmerge /usr/bin/vgmknodes /usr/bin/vgreduce /usr/bin/vgremove /usr/bin/vgrename /usr/bin/vgs /usr/bin/vgscan \
 	  /usr/bin/vgsplit /usr/bin/pvchange /usr/bin/pvck /usr/bin/pvcreate /usr/bin/pvdisplay /usr/bin/pvmove /usr/bin/pvremove \
 	  /usr/bin/pvresize /usr/bin/pvs /usr/bin/pvscan /usr/bin/lvchange /usr/bin/lvconvert /usr/bin/lvcreate /usr/bin/lvdisplay \
-	  /usr/bin/lvextend /usr/bin/lvmchange /usr/bin/lvmdiskscan /usr/bin/lvmsadc /usr/bin/lvmsar /usr/bin/lvreduce /usr/bin/lvremove \
+	  /usr/bin/lvextend /usr/bin/lvmdiskscan /usr/bin/lvmsadc /usr/bin/lvmsar /usr/bin/lvreduce /usr/bin/lvremove \
 	  /usr/bin/lvrename /usr/bin/lvresize /usr/bin/lvs /usr/bin/lvscan"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
