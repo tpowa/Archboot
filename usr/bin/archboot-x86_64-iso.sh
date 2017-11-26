@@ -16,7 +16,7 @@ usage () {
 	echo "CREATE X86_64 USB/CD IMAGES"
 	echo "-----------------------------"
 	echo "Run in archboot x86_64 chroot first ..."
-	echo "archboot-allinone.sh -t"
+	echo "archboot-x86_64-iso.sh -t"
 	echo ""
 	echo "PARAMETERS:"
 	echo "  -t                  Start generation of tarball."
