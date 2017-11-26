@@ -135,7 +135,7 @@ build ()
     #systemd files
     apps="busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
-          systemd-cat systemd-cgls systemd-cgtop  \
+          systemd-cat systemd-cgls systemd-cgtop \
           systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
           systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
           systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
