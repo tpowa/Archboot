@@ -22,8 +22,8 @@ build ()
           ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec xz last wall mesg utmpdump \
           xzdec switch_root false pivot_root sleep chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt hexdump \
-          ionice ipcmk ipcrm ipcs isosize swapoff logger look lscpu mcookie namei pg \
-          prlimit rename renice rev script scriptreplay setarch setsid setterm tailf taskset ul unshare \
+          ionice ipcmk ipcrm ipcs isosize swapoff logger look lscpu mcookie namei \
+          prlimit rename renice rev script scriptreplay setarch setsid setterm  taskset ul unshare \
           uuidgen whereis write addpart delpart fdformat \
           ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
           vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin \
