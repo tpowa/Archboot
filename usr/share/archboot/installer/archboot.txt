@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   September, 4th 2015
+   November, 27th 2017
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -145,7 +145,7 @@ Installing Arch Linux with Archboot
   Preparing Installation Media
 
    * Hybrid image file is provided, which includes
-     i686 and x86_64 core repository. Please check md5sum before using it.
+     x86_64 core repository. Please check md5sum before using it.
    * Can be burned to CD(RW) media using most CD-burning utilities.
    * Can be raw-written to a drive using 'dd' or similar utilities.
      This method is intended for use with USB thumb drives.
