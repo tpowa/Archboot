@@ -75,7 +75,7 @@ fi
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="2k17-R1"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-allinone-$(date +%Y.%m)"
+[[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-x86_64-$(date +%Y.%m)"
 
 IMAGENAME_OLD="${IMAGENAME}"
 
@@ -83,12 +83,12 @@ if [[ "${_DO_x86_64}" == "1" ]]; then
 	IMAGENAME="${IMAGENAME}-x86_64"
 fi
 
-ALLINONE="$(mktemp -d /tmp/allinone.XXX)"
+X86_64="$(mktemp -d /tmp/X86_64.XXX)"
 
 # create directories
-mkdir -p "${ALLINONE}/arch"
-mkdir -p "${ALLINONE}/boot/syslinux"
-mkdir -p "${ALLINONE}/packages/"
+mkdir -p "${X86_64}/arch"
+mkdir -p "${X86_64}/boot/syslinux"
+mkdir -p "${X86_64}/packages/"
 
 _merge_initramfs_files() {
 	
@@ -109,12 +109,12 @@ _merge_initramfs_files() {
 _prepare_kernel_initramfs_files() {
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
-		mv "${CORE64}/tmp"/*/boot/vmlinuz "${ALLINONE}/boot/vmlinuz_x86_64"
-		mv "${CORE64}/tmp/initramfs_x86_64.img" "${ALLINONE}/boot/initramfs_x86_64.img"
+		mv "${CORE64}/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
+		mv "${CORE64}/tmp/initramfs_x86_64.img" "${X86_64}/boot/initramfs_x86_64.img"
 	fi
 		
-	mv "${CORE}/tmp"/*/boot/memtest "${ALLINONE}/boot/memtest"
-	mv "${CORE}/tmp"/*/boot/intel-ucode.img "${ALLINONE}/boot/intel-ucode.img"
+	mv "${CORE64}/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
+	mv "${CORE64}/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
 	
 }
 
@@ -130,58 +130,58 @@ _prepare_packages() {
 		cp -rf "${CORE64}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
 		rm -rf "${CORE64}/tmp"/*/core-x86_64
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
-		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${ALLINONE}/packages/"
+		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${X86_64}/packages/"
 	fi
 	
 	# move in 'any' packages
-	cp -rf "${CORE}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
-	rm -rf "${CORE}/tmp"/*/core-any
+	cp -rf "${CORE64}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
+	rm -rf "${CORE64}/tmp"/*/core-any
 	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
 	
 	cd "${WD}/"
-	mv "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" "${ALLINONE}/packages/"
+	mv "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" "${X86_64}/packages/"
 	
 }
 
 _prepare_other_files() {
 	
 	# move in doc
-	mkdir -p "${ALLINONE}/arch/"
-	mv "${CORE}/tmp"/*/arch/archboot.txt "${ALLINONE}/arch/"
+	mkdir -p "${X86_64}/arch/"
+	mv "${CORE64}/tmp"/*/arch/archboot.txt "${X86_64}/arch/"
 	
 }
 
 _download_uefi_shell_tianocore() {
 	
-	mkdir -p "${ALLINONE}/EFI/tools/"
+	mkdir -p "${X86_64}/EFI/tools/"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellx64_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellx64_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellx64_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
 	
 	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/Ia32/Shell.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellia32_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/Ia32/Shell.efi"
 	
 	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${ALLINONE}/EFI/tools/shellia32_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
+	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellia32_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
 	
 }
 
 _prepare_uefi_gummiboot_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/BOOT"
-	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${ALLINONE}/EFI/BOOT/loader.efi"
+	mkdir -p "${X86_64}/EFI/BOOT"
+	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${X86_64}/EFI/BOOT/loader.efi"
 	
-	mkdir -p "${ALLINONE}/loader/entries"
+	mkdir -p "${X86_64}/loader/entries"
 	
-	cat << GUMEOF > "${ALLINONE}/loader/loader.conf"
+	cat << GUMEOF > "${X86_64}/loader/loader.conf"
 timeout  4
 default  default-*
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf"
+	cat << GUMEOF > "${X86_64}/loader/entries/archboot-x86_64-efistub.conf"
 title           Arch Linux x86_64 Archboot EFISTUB
 linux           /boot/vmlinuz_x86_64
 initrd          /boot/intel-ucode.img
@@ -190,36 +190,36 @@ options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramf
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-x64-v2.conf"
+	cat << GUMEOF > "${X86_64}/loader/entries/uefi-shell-x64-v2.conf"
 title           UEFI Shell X64 v2
 efi             /EFI/tools/shellx64_v2.efi
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/uefi-shell-x64-v1.conf"
+	cat << GUMEOF > "${X86_64}/loader/entries/uefi-shell-x64-v1.conf"
 title           UEFI Shell X64 v1
 efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${ALLINONE}/loader/entries/grub-x64-gummiboot.conf"
+	cat << GUMEOF > "${X86_64}/loader/entries/grub-x64-gummiboot.conf"
 title           GRUB X64 - if EFISTUB boot fails
 efi             /EFI/grub/grubx64.efi
 architecture    x64
 GUMEOF
 	
-	mv "${ALLINONE}/loader/entries/archboot-x86_64-efistub.conf" "${ALLINONE}/loader/entries/default-x64.conf"
+	mv "${X86_64}/loader/entries/archboot-x86_64-efistub.conf" "${X86_64}/loader/entries/default-x64.conf"
 	
 }
 
 _prepare_uefi_X64_GRUB_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/grub"
+	mkdir -p "${X86_64}/EFI/grub"
 	
 	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
 	
-	cat << GRUBEOF > "${ALLINONE}/EFI/grub/grubx64.cfg"
+	cat << GRUBEOF > "${X86_64}/EFI/grub/grubx64.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -267,12 +267,12 @@ GRUBEOF
 
 _prepare_uefi_IA32_GRUB_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/BOOT"
+	mkdir -p "${X86_64}/EFI/BOOT"
 	
 	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${ALLINONE}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
 	
-	cat << GRUBEOF > "${ALLINONE}/EFI/BOOT/bootia32.cfg"
+	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -325,10 +325,10 @@ GRUBEOF
 
 _prepare_uefi_IA32_syslinux_USB_files() {
 	
-	mkdir -p "${ALLINONE}/EFI/syslinux"
-	cp -rf "/usr/lib/syslinux/efi32" "${ALLINONE}/EFI/syslinux/efi32"
+	mkdir -p "${X86_64}/EFI/syslinux"
+	cp -rf "/usr/lib/syslinux/efi32" "${X86_64}/EFI/syslinux/efi32"
 	
-	cat << EOF > "${ALLINONE}/EFI/syslinux/efi32/syslinux.cfg"
+	cat << EOF > "${X86_64}/EFI/syslinux/efi32/syslinux.cfg"
 PATH /EFI/syslinux/efi32
 
 # UI vesamenu.c32
@@ -370,15 +370,15 @@ _prepare_uefi_IA32_GRUB_USB_files
 # _prepare_uefi_IA32_syslinux_USB_files
 
 # place syslinux files
-mv "${CORE}/tmp"/*/boot/syslinux/* "${ALLINONE}/boot/syslinux/"
+mv "${CORE64}/tmp"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${ALLINONE}/boot/syslinux/boot.msg"
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${X86_64}/boot/syslinux/boot.msg"
 
 cd "${WD}/"
 
 ## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-echo "Generating ALLINONE hybrid ISO ..."
+echo "Generating X86_64 hybrid ISO ..."
 xorriso -as mkisofs \
         -iso-level 3 \
         -full-iso9660-filenames \
@@ -388,7 +388,7 @@ xorriso -as mkisofs \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -output "${IMAGENAME}.iso" "${ALLINONE}/" &> "/tmp/archboot_allinone_xorriso.log"
+        -output "${IMAGENAME}.iso" "${X86_64}/" &> "/tmp/archboot_allinone_xorriso.log"
 
 # create x86_64 iso, if not present
 if [[ -e "${WD}/${IMAGENAME_OLD}-dual.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
@@ -420,7 +420,7 @@ rm -f "${WD}/sha256sums.txt" || true
 sha256sum *.iso > "${WD}/sha256sums.txt"
 
 # cleanup
-rm -rf "${CORE}"
+rm -rf "${CORE64}"
 rm -rf "${CORE64}"
 rm -rf "${PACKAGES_TEMP_DIR}"
-rm -rf "${ALLINONE}"
+rm -rf "${X86_64}"
