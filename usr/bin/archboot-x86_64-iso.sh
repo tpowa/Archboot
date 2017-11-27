@@ -347,7 +347,8 @@ LABEL archboot-x86_64
     LINUX /boot/vmlinuz_x86_64
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
     INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
-	
+EOF
+
 }
 
 _prepare_packages
