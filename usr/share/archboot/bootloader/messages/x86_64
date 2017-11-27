@@ -1,0 +1,25 @@
+
+
+
+
+
+
+
+
+
+
+Arch Linux
+https://www.archlinux.org
+
+
+
+
+@@BOOTLOADER@@ BOOT
+Creation Tool: 'archboot' written by Tobias Powalowski <tpowa@archlinux.org>
+
+ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM
+Creation Date: @@DATE@@
+Release: @@RELEASENAME@@
+Boot kernel: @@KERNEL@@
+Architecture: x86_64
+RAM requirement to boot: 600 MB or greater
