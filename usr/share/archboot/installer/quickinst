@@ -30,8 +30,7 @@ usage() {
     echo "Examples:"
     
     if [[ -e "/usr/bin/curl" ]]; then
-                echo "  quickinst net /mnt 'ftp://ftp.archlinux.org/$repo/os/$arch'"
-                echo "  quickinst net /mnt 'http://ftp.archlinux.org/$repo/os/$arch'"
+                echo "  quickinst net /mnt 'http://mirror.rackspace.com/archlinux/\$repo/os/\$arch'"
     fi
 
     echo "  quickinst media /mnt /packages/core-$(uname -m)/pkg"
