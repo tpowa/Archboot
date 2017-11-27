@@ -30,7 +30,8 @@ usage () {
 
 [[ -z "${1}" ]] && usage
 
-ALLINONE_PRESET="/etc/archboot/presets/allinone"
+
+PRESET="/etc/archboot/presets/x86_64"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 UPDATEISO_HELPER="/usr/bin/archboot-update-iso.sh"
 
@@ -63,7 +64,7 @@ done
 ! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
 
 if [[ "${TARBALL}" == "1" ]]; then
-	"${TARBALL_HELPER}" -c="${ALLINONE_PRESET}" -t="core-$(uname -m).tar"
+	"${TARBALL_HELPER}" -c="${PRESET}" -t="core-$(uname -m).tar"
 	exit 0
 fi
 
