@@ -23,6 +23,7 @@ http:x:33:
 games:x:50:
 lock:x:54:
 uuidd:x:68:
+kvm:x:78:
 dbus:x:81:
 ntp:x:87:
 network:x:90:
@@ -45,4 +46,6 @@ systemd-resolve:x:195:
 systemd-journal-remote:x:996:
 systemd-journal-upload:x:995:
 systemd-coredump:x:993:
+render:x:991:
+dhcp:x:992:
 ldap:x:439:
