@@ -187,7 +187,7 @@ build ()
     add_file "/usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf" "/etc/sysctl.d/99-sysctl.conf"
 
     ### add pacman
-    apps="pacman pacman-key pacman-db-upgrade cleanupdelta makepkg pkgdelta \
+    apps="pacman pacman-conf pacman-key pacman-db-upgrade cleanupdelta makepkg pkgdelta \
           repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg"
     for i in $apps; do
         add_binary "$i"
@@ -212,6 +212,7 @@ build ()
     add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
     add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_full_dir "/usr/share/pacman/keyrings"
+    add_full_dir "/usr/share/makepkg"
 
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"
