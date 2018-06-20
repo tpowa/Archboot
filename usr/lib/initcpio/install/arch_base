@@ -48,7 +48,7 @@ build ()
             add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
         # fi
     done
-    add_full_dir "/usr/lib"
+    #add_full_dir "/usr/lib"
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
     ### add zsh
