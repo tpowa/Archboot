@@ -10,8 +10,8 @@ build ()
 	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \
 	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel lowntfs-3g ntfs-3g mount.cifs \
 	  cifs.upcall fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
-	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-debug-tree btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
-	  btrfs-zero-log btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
+	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
+	  btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
 	  umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs \
 	  dumpexfat exfatfsck exfatlabel mkexfatfs mount.exfat-fuse fusermount mount.fuse ulockmgr_server"
     for i in $apps; do
