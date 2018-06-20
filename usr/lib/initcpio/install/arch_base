@@ -135,7 +135,7 @@ build ()
     #systemd files
     apps="busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
-          systemd-cat systemd-cgls systemd-cgtop \
+          systemd-cat systemd-cgls systemd-cgtop  \
           systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
           systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
           systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
@@ -173,7 +173,6 @@ build ()
     add_file "/usr/lib/libnss_systemd.so.2"
     ### fix tmpfiles startup
     add_file "/usr/lib/libnss_compat.so.2"
-    add_file "/usr/lib/libnsl.so.1"
 
     ### add udev, which is not covered by udev hook
     add_binary "logger"
@@ -187,12 +186,12 @@ build ()
 
     ### add pacman
     apps="pacman pacman-key pacman-db-upgrade pacsort pactree cleanupdelta makepkg pacman-optimize pkgdelta \
-          rankmirrors repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg"
+          rankmirrors repo-add repo-elephant testpkg vercmp curl gpg-agent haveged"
     for i in $apps; do
         add_binary "$i"
     done
 
-    symlinks="/usr/bin/repo-remove"
+    symlinks="/usr/bin/gpg /usr/bin/repo-remove"
     for i in $symlinks; do
         # echo "Checking $i"
         # if [ -e $i ]; then
