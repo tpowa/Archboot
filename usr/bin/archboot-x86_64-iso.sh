@@ -77,8 +77,6 @@ fi
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="2k17-R1"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-$(date +%Y.%m)"
 
-IMAGENAME_OLD="${IMAGENAME}"
-
 if [[ "${_DO_x86_64}" == "1" ]]; then
 	IMAGENAME="${IMAGENAME}-x86_64"
 fi
@@ -390,28 +388,22 @@ xorriso -as mkisofs \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
         -output "${IMAGENAME}.iso" "${X86_64}/" &> "/tmp/archboot_allinone_xorriso.log"
 
-# create x86_64 iso, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64.iso" ]]; then
-	_REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64.iso" "${WD}/${IMAGENAME_OLD}-x86_64.iso"
-fi
-
 # create x86_64 iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso" ]]; then
-	_UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi.iso"
+if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-uefi.iso" ]]; then
+	_UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
+	mv "${WD}/${IMAGENAME}-updated-dual-uefi.iso" "${WD}/${IMAGENAME}-uefi.iso"
 fi
 
 # create x86_64 network iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-uefi-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-uefi-network.iso"
+if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-uefi-network.iso" ]]; then
+	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
+	mv "${WD}/${IMAGENAME}-updated-dual-uefi-network.iso" "${WD}/${IMAGENAME}-uefi-network.iso"
 fi
 
 # create x86_64 network iso, if not present
-if [[ -e "${WD}/${IMAGENAME_OLD}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME_OLD}-x86_64-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME_OLD}.iso"
-	mv "${WD}/${IMAGENAME_OLD}-dual-updated-x86_64-network.iso" "${WD}/${IMAGENAME_OLD}-x86_64-network.iso"
+if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-network.iso" ]]; then
+	_REMOVE_PACKAGES="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
+	mv "${WD}/${IMAGENAME}-updated-dual-network.iso" "${WD}/${IMAGENAME}-network.iso"
 fi
 
 ## create sha256sums.txt
