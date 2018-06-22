@@ -66,13 +66,14 @@ build ()
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
     pacman -Sy
-    pacman -Sw --noconfirm ${PACKAGES}
-    SIGNATURES=""
+        SIGNATURES=""
     for i in $(pacman -Sp ${PACKAGES}); do
         SIGNATURES="${SIGNATURES} ${i}.sig"
     done
     wget -N --directory-prefix /var/cache/pacman/pkg/ ${SIGNATURES}
     unset SIGNATURES
+    pacman -Sw --noconfirm ${PACKAGES}
+
     # collect the packages
     mkdir -p ${TEMPDIR}/core-$(uname -m)/pkg/
     mkdir -p ${TEMPDIR}/core-any/pkg/
@@ -121,8 +122,9 @@ build ()
     # set LANG to US we parse language output here
     LANG=US
     for i in refind-efi; do
-        pacman -Sw --noconfirm $i
         wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman -Sp $i).sig
+        pacman -Sw --noconfirm $i
+
         pkgver="$(echo $(pacman -Si $i | grep -m 1 Version | cut -d ":" -f 2,3))"
         pkgarch="$(echo $(pacman -Si $i | grep -m 1 Architecture | cut -d ":" -f 2))"
         if [ "${pkgarch}" = 'any' ]; then
