@@ -23,12 +23,12 @@ INITRAMFS="initramfs-${KERNELPKG}"
 INTEL_UCODE="intel-ucode.img"
 
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --sysroot ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 # downloader
 DLPROG="wget"
 # sources
 SYNC_URL=""
-FILE_URL="file:///packages/core-$(uname -m)/pkg"
+FILE_URL="file:////packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 unset PACKAGES
 

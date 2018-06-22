@@ -3,7 +3,7 @@ MODE="${1}"
 DESTDIR="${2}"
 PKGARG="${3}"
 
-PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --sysroot "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
 
 # name of kernel package
 KERNELPKG="linux"
@@ -42,7 +42,7 @@ usage() {
 # creates temporary pacman.conf file
 pacman_conf() {
     if [[ "${MODE}" = "media" ]]; then
-        serverurl="file://${PKGARG}"
+        serverurl="file:///${PKGARG}"
     elif [[ "${MODE}" = "net" ]]; then
         serverurl="${PKGARG}"
     fi
