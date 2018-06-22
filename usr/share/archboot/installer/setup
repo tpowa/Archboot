@@ -23,7 +23,7 @@ INITRAMFS="initramfs-${KERNELPKG}"
 INTEL_UCODE="intel-ucode.img"
 
 # abstract the common pacman args
-PACMAN="pacman --sysroot ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
 # downloader
 DLPROG="wget"
 # sources
