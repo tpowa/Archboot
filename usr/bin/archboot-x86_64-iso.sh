@@ -74,7 +74,7 @@ fi
 
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k17-R1"
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k18-R1"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-$(date +%Y.%m)"
 
 if [[ "${_DO_x86_64}" == "1" ]]; then
