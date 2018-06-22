@@ -4,6 +4,8 @@
 build ()
 {
     add_checked_modules '/drivers/net/wireless/|/net/wireless/|/net/ieee80211/|/net/mac80211/'
+    # add broadcom wl support
+    add_module 'wl.ko'
     apps="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase \
 	  wpa_supplicant iw crda regdbdump wpa_actiond rfkill"
     for i in $apps; do
@@ -22,6 +24,7 @@ build ()
     add_file "/usr/share/licenses/expat/COPYING"
     add_file "/usr/share/licenses/crda/LICENSE"
     add_file "/usr/share/licenses/wireless-regdb/LICENSE"
+    add_file "/usr/share/licenses/broadcom-wl/LICENSE.shipped"
 }
 
 help ()
