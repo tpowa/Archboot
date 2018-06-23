@@ -2180,7 +2180,7 @@ btrfs_subvolume() {
     FILESYSTEM_FINISH="yes"
 }
 
-# add ssd mount options, set deadline scheduler
+# add ssd mount options
 ssd_optimization() {
     # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
     ssd_mount_options=""
