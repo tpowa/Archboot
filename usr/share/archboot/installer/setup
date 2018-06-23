@@ -4822,9 +4822,6 @@ auto_hwdetect() {
         [[ "$(grep "^radeon" /proc/modules)" ]] && FBPARAMETER="--ati-kms"
         [[ "$(grep "^i915" /proc/modules )" ]] && FBPARAMETER="--intel-kms"
         [[ "$(grep "^nouveau" /proc/modules)" ]] && FBPARAMETER="--nvidia-kms"
-        if [[ "$(lsmod | grep ^pcmcia)" ]]; then
-            DIALOG --defaultno --yesno "Setup detected pcmcia hardware...\nDo you need support for booting from pcmcia devices?" 0 0 && HWPARAMETER="${HWPARAMETER} --pcmcia"
-        fi
         if [[ "$(lsmod | grep ^nfs)" ]]; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
         fi
