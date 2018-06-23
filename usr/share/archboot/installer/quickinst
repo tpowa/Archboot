@@ -42,7 +42,7 @@ usage() {
 # creates temporary pacman.conf file
 pacman_conf() {
     if [[ "${MODE}" = "media" ]]; then
-        serverurl="file:///${PKGARG}"
+        serverurl="file://${PKGARG}"
     elif [[ "${MODE}" = "net" ]]; then
         serverurl="${PKGARG}"
     fi

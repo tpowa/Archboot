@@ -28,7 +28,7 @@ PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogr
 DLPROG="wget"
 # sources
 SYNC_URL=""
-FILE_URL="file:////packages/core-$(uname -m)/pkg"
+FILE_URL="file:///packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 unset PACKAGES
 
