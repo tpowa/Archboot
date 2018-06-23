@@ -45,7 +45,7 @@ build ()
             DEVEL="$DEVEL $(echo $i)"
         done
         SUPPORT=""
-        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng"
+        SUPPORT="$(echo -n $(pacman -Ss | grep -e "^core" | grep -v '(' | sed -e 's/\ .*/ /g' -e 's#core/##g')) fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng fuse2 fuse3"
         for i in base devel support; do
             mkdir $i
             svn co -N ${SVNSETUP} $i
@@ -65,6 +65,8 @@ build ()
     fi
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
+    ### HACK remove gpgme packages which move in a lot of extra depends
+    PACKAGES="$(echo $PACKAGES | sed -e 's#qgpgme python-gpgme python2-gpgme ##g')
     pacman -Sy
         SIGNATURES=""
     for i in $(pacman --cachedir / -Sp ${PACKAGES}); do
