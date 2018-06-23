@@ -7,7 +7,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_full_dir "/usr/lib/network/"
+    add_full_dir "/usr/lib/netctl/"
     add_full_dir "/etc/netctl/"
     add_file "/etc/ifplugd/netctl.action"
     # add openresolv depends
