@@ -295,7 +295,7 @@ check_media() {
     if [[ -e "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" && -e "${_MEDIA}/packages/archboot_packages_any.squashfs" ]]; then
         _mount_packages_squashfs_images
         SET_MEDIA="1"
-        [[ "${AUTOMOUNT}" == "1" ]] && break
+        [[ "${AUTOMOUNT}" == "1" ]]
     else
         umount "${_MEDIA}" &>/dev/null
         SET_MEDIA="0"
