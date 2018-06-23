@@ -66,7 +66,7 @@ build ()
     # Download all packages
     PACKAGES=$(for i in ${SEARCHSVN};do ! [ "$(echo $i | awk -F/ '{print $3}')" = "" ] && (. $i/PKGBUILD; echo ${pkgname[@]});unset pkgname;done)
     ### HACK remove gpgme packages which move in a lot of extra depends
-    PACKAGES="$(echo $PACKAGES | sed -e 's#qgpgme python-gpgme python2-gpgme ##g')
+    PACKAGES="$(echo $PACKAGES | sed -e 's#qgpgme python-gpgme python2-gpgme ##g')"
     pacman -Sy
         SIGNATURES=""
     for i in $(pacman --cachedir / -Sp ${PACKAGES}); do
