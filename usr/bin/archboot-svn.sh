@@ -4,7 +4,7 @@ SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE=""
 DEVEL=""
 SUPPORT=""
-SUPPORT_ADDITION="ntfs-3g mtools fuse dhcp f2fs-tools efitools lockdown-ms gc libatomic_ops guile libaio intel-ucode unixodbc libnftnl libmnl tcl"
+SUPPORT_ADDITION="fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng"
 # generate base
 for i in $(pacman -Sg base | sed -e "s/base//g"); do 
 	BASE="$BASE $(echo $i)"
