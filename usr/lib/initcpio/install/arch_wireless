@@ -12,10 +12,6 @@ build ()
         add_binary "$i"
     done
     add_dir "/etc/wpa_supplicant"
-    # add zd1211 firmware files
-    for i in /usr/lib/firmware/zd1211/* ; do
-	add_file "$i"
-    done
     # crda support
     add_file "/usr/bin/set-wireless-regdom"
     add_file "/etc/conf.d/wireless-regdom"
