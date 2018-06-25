@@ -1772,7 +1772,7 @@ check_efisys_part() {
     
     if [[ "$(sgdisk -p ${DISC} | grep 'EF00')" ]]; then
         # check on unique PARTTYPE c12a7328-f81f-11d2-ba4b-00a0c93ec93b for EFI System Partition type UUID
-        UEFISYS_PART="$(${_LSBLK} NAME,PARTTYPE | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
+        UEFISYS_PART="$(${_LSBLK} NAME,PARTTYPE ${DISC} | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
         
         if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" != "vfat" ]]; then
             ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
