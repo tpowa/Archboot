@@ -2567,6 +2567,9 @@ _mkfs() {
             echo "1" >>/tmp/.fstab
         fi
     fi
+    unset _mountoptions
+    unset _btrfssubvolume
+    unset _btrfscompress
 }
 
 # source_set()
