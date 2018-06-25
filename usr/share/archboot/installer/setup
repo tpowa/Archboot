@@ -1413,6 +1413,7 @@ autoprepare() {
     NAME_SCHEME_PARAMETER_RUN=""
     # switch for mbr usage
     set_guid
+    : >/tmp/.device-names
     DISCS=$(blockdevices)
     if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
