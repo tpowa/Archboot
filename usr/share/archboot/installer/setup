@@ -1714,11 +1714,11 @@ autoprepare() {
 detect_DISC() {
     
     if [[ "${DISC}" == "" ]] || [[ ! "$(grep '/dev/' "${DISC}")" ]]; then
-        DISC="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+        DISC="$(${_LSBLK} PKNAME $(findmnt "${DESTDIR}/boot" -o source -v -n))"
     fi
     
     if [[ "${DISC}" == "" ]]; then
-        DISC="$(findmnt "${DESTDIR}/" | tail -n +2 | awk '{print $2}' | sed 's/\(.\{8\}\).*/\1/')"
+        DISC="$(${_LSBLK} PKNAME $(findmnt "${DESTDIR}/" -o source -v -n))"
     fi
     
 }
