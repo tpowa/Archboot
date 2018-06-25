@@ -270,7 +270,7 @@ check_media() {
     
     if [[ -n "${_iso_loop_dev}" ]] && [[ -n "${_iso_loop_path}" ]]; then
         if [[ "$(cat /proc/self/mounts | grep "${_iso_loop_dev}")" ]]; then
-            _iso_loop_dev_mp="$(findmnt "${_iso_loop_dev}" | tail -n +2 | awk '{print $1}')"
+            _iso_loop_dev_mp="$(findmnt -vno SOURCE "${_iso_loop_dev}")"
         else
             _iso_loop_dev_mp="/iso_loop_dev"
             mkdir -p "${_iso_loop_dev_mp}"
@@ -1714,11 +1714,11 @@ autoprepare() {
 detect_DISC() {
     
     if [[ "${DISC}" == "" ]] || [[ ! "$(grep '/dev/' "${DISC}")" ]]; then
-        DISC="$(${_LSBLK} PKNAME $(findmnt "${DESTDIR}/boot" -o source -v -n))"
+        DISC="$(${_LSBLK} PKNAME $(findmnt -vno SOURCE "${DESTDIR}/boot"))"
     fi
     
     if [[ "${DISC}" == "" ]]; then
-        DISC="$(${_LSBLK} PKNAME $(findmnt "${DESTDIR}/" -o source -v -n))"
+        DISC="$(${_LSBLK} PKNAME $(findmnt -vno SOURCE "${DESTDIR}/"))"
     fi
     
 }
@@ -3423,8 +3423,8 @@ do_apple_efi_hfs_bless() {
 
 do_uefi_bootmgr_setup() {
     
-    _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
-    _DISC="$(echo "${_uefisysdev}" | sed 's/\(.\{8\}\).*/\1/')"
+    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
+    _DISC="$(${_LSBLK} KNAME "${_uefisysdev}")"
     UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
     
     _BOOTMGR_DISC="${_DISC}"
@@ -3519,8 +3519,8 @@ CONFEOF
      
     ###########################
     
-    _bootdev="$(findmnt "${DESTDIR}/boot" | tail -n +2 | awk '{print $2}')"
-    _uefisysdev="$(findmnt "${DESTDIR}/${UEFISYS_MOUNTPOINT}" | tail -n +2 | awk '{print $2}')"
+    _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
+    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}""
     
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
     UEFISYS_PART_FS_LABEL="$(getfslabel "${_uefisysdev}")"
