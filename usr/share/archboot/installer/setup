@@ -1592,8 +1592,6 @@ autoprepare() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
     
-    PART_ROOT="${DEVICE}${_ROOT_PART_NUM}"
-    
     # we assume a /dev/sdX format
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
