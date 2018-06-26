@@ -1446,7 +1446,7 @@ autoprepare() {
     fi
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 512 MiB and only FAT32 FS is supported" 0 0
+        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
     fi
     
@@ -1485,12 +1485,12 @@ autoprepare() {
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
             DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}))"
             while [[ "${BOOT_PART_SET}" = "" ]]; do
-                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 512.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>${ANSWER} || return 1
+                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>${ANSWER} || return 1
                 BOOT_PART_SIZE="$(cat ${ANSWER})"
                 if [[ "${BOOT_PART_SIZE}" = "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "512" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "260" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
                          DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         BOOT_PART_SET=1
@@ -1635,11 +1635,12 @@ autoprepare() {
         parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
         parted -a optimal -s ${DEVICE} unit MiB set 1 boot on >${LOG}
         parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) 100% >${LOG}
+            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
         else
             parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) 100% >${LOG}
+            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
         fi
     fi
     if [[ $? -gt 0 ]]; then
@@ -1647,6 +1648,8 @@ autoprepare() {
         printk on
         return 1
     fi
+    # reread partitiontable for kernel
+    partprobe ${DEVICE}
     printk on
     ## wait until /dev initialized correct devices
     udevadm settle
@@ -1734,6 +1737,8 @@ check_gpt() {
     if [[ "${GUID_DETECTED}" == "" ]]; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt ${DISC} > ${LOG} && GUID_DETECTED="1"
+        # reread partitiontable for kernel
+        partprobe ${DISC} > ${LOG}
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --defaultno --yesno "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
@@ -1764,6 +1769,8 @@ check_gpt() {
     if [[ "${RUN_CFDISK}" == "1" ]]; then
         DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
         clear && cfdisk ${DISC}
+        # reread partitiontable for kernel
+        partprobe ${DEVICE}
     fi
 }
 
@@ -1777,6 +1784,7 @@ check_efisys_part() {
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         DIALOG --msgbox "Setup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
         sgdisk --mbrtogpt ${DISC} > ${LOG} && GUID_DETECTED="1"
+        partprobe ${DISC} > ${LOG}
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --msgbox "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1
@@ -1890,6 +1898,8 @@ partition() {
                 DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70
                 clear
                 cfdisk ${DISC}
+                # reread partitiontable for kernel
+                partprobe ${DISC}
             fi
         fi
     done
