@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   November, 27th 2017
+   June, 26th 2018
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -132,9 +132,7 @@ Installing Arch Linux with Archboot
    * a working knowledge of Linux and your system, especially your
      hardware
    * Archboot installation media
-   * an i686-based or x86-64 computer (PPro, Pentium 2 or higher,
-     Athlon/Duron, etc. Note that AMD K6, Transmeta Crusoe, CyrixIII, and
-     VIA-C3 are NOT supported.)
+   * an x86-64 computer
    * some time to kill
 
   Acquiring Archboot images
