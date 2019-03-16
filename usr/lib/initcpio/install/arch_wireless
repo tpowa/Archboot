@@ -7,7 +7,7 @@ build ()
     # add broadcom wl support
     add_module 'wl.ko'
     apps="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase \
-	  wpa_supplicant iw crda regdbdump wpa_actiond rfkill"
+	  wpa_supplicant iw crda regdbdump rfkill"
     for i in $apps; do
         add_binary "$i"
     done
