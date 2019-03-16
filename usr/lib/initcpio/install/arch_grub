@@ -15,8 +15,6 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done    
-    ## add grub(2) config file
-    add_file "/boot/grub/grub.cfg"
     
     ## add grub-mkconfig helper scripts
     add_file "/usr/share/grub/grub-mkconfig_lib"
