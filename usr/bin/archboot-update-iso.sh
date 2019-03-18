@@ -4,7 +4,6 @@
 # change to english locale!
 export LANG="en_US"
 
-[[ -z "${_REMOVE_i686}" ]] && _REMOVE_i686="0"
 [[ -z "${_REMOVE_x86_64}" ]] && _REMOVE_x86_64="0"
 
 [[ -z "${_REMOVE_PACKAGES}" ]] && _REMOVE_PACKAGES="0"
@@ -50,24 +49,10 @@ _ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
 
 #############################
 
-if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-dual"
-	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi
-	[[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-network
-	[[ "${_REMOVE_PACKAGES}" == "1" && "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-dual-uefi-network
-fi
-
-if [[ "${_REMOVE_x86_64}" != "1" ]] && [[ "${_REMOVE_i686}" == "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
-	[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi
-	[[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-network
-        [[ "${_REMOVE_PACKAGES}" == "1" && "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi-network
-fi
-
-if [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
-	_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-i686"
-        [[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-i686-network
-fi
+_ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}-updated-x86_64"
+[[ "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi
+[[ "${_REMOVE_PACKAGES}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-network
+[[ "${_REMOVE_PACKAGES}" == "1" && "${_UPDATE_CD_UEFI}" == "1" ]] && _ARCHBOOT_ISO_UPDATED_NAME="${_ARCHBOOT_ISO_OLD_NAME}"-updated-x86_64-uefi-network
 
 _ARCHBOOT_ISO_UPDATED_PATH="${_ARCHBOOT_ISO_WD}/${_ARCHBOOT_ISO_UPDATED_NAME}.iso"
 
@@ -185,11 +170,6 @@ For troubleshooting and other options press F2 key.
 ENDTEXT
 MENU LABEL Help
 
-EOF
-	
-	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
-		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
-
 LABEL arch64
 TEXT HELP
 Boot the Arch Linux (x86_64) archboot medium. 
@@ -199,27 +179,6 @@ MENU LABEL Boot Arch Linux (x86_64)
 LINUX /boot/vmlinuz_x86_64
 APPEND cgroup_disable=memory rootdelay=10 rootfstype=ramfs
 INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
-
-EOF
-	fi
-	
-	if [[ "${_REMOVE_i686}" != "1" ]]; then
-		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
-
-LABEL arch32
-TEXT HELP
-Boot the Arch Linux (i686) archboot medium. 
-It allows you to install Arch Linux or perform system maintenance.
-ENDTEXT
-MENU LABEL Boot Arch Linux (i686)
-LINUX /boot/vmlinuz_i686
-APPEND cgroup_disable=memory rootdelay=10 rootfstype=ramfs
-INITRD /boot/intel-ucode.img,/boot/initramfs_i686.img
-
-EOF
-	fi
-	
-	cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
 
 LABEL existing
 TEXT HELP
@@ -247,21 +206,9 @@ LABEL poweroff
 MENU LABEL Power Off
 COMBOOT poweroff.com
 
-EOF
-	
-	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
-		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
-
 ONTIMEOUT arch64
 
 EOF
-	elif [[ "${_REMOVE_x86_64}" == "1" ]] && [[ "${_REMOVE_i686}" != "1" ]]; then
-		cat << EOF >> "${_ARCHBOOT_ISO_EXT_DIR}/boot/syslinux/syslinux.cfg"
-
-ONTIMEOUT arch32
-
-EOF
-	fi
 	
 }
 
@@ -524,15 +471,6 @@ EOF
 	
 }
 
-_remove_i686_iso_files() {
-	
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/vmlinuz_i686" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/boot/initramfs_i686.img" || true
-	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/packages/archboot_packages_i686.squashfs" || true
-	echo
-	
-}
-
 _remove_x86_64_iso_files() {
 	rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/EFI" || true
         rm -rf "${_ARCHBOOT_ISO_EXT_DIR}/loader" || true
@@ -650,8 +588,6 @@ _update_cd_uefi() {
 	
 }
 
-[[ "${_REMOVE_i686}" == "1" ]] && _remove_i686_iso_files
-
 [[ "${_REMOVE_x86_64}" == "1" ]] && _remove_x86_64_iso_files
 
 [[ "${_REMOVE_PACKAGES}" == "1" ]] && _remove_packages
@@ -668,11 +604,6 @@ if [[ "${_UPDATE_SETUP}" == "1" ]] && [[ -e "${_ARCHBOOT_ISO_WD}/setup" ]]; then
 	
 	if [[ "${_REMOVE_x86_64}" != "1" ]]; then
 		_initramfs_name="initramfs_x86_64"
-		_update_arch_setup_initramfs
-	fi
-	
-	if [[ "${_REMOVE_i686}" != "1" ]]; then
-		_initramfs_name="initramfs_i686"
 		_update_arch_setup_initramfs
 	fi
 	
@@ -735,7 +666,6 @@ fi
 
 unset _UEFI_ARCH
 unset _SPEC_UEFI_ARCH
-unset _REMOVE_i686
 unset _REMOVE_x86_64
 unset _REMOVE_PACKAGES
 unset _UPDATE_SETUP
