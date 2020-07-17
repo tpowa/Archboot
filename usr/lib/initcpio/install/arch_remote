@@ -7,7 +7,7 @@ build ()
     apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
 	  sm-notify start-statd rpcbind rpcinfo rpc.gssd mountpoint mountstats \
-	  nfsdcltrack nfsiostat osd_login gssproxy"
+	  nfsdcltrack nfsiostat gssproxy"
     for i in $apps; do
         add_binary "$i"
     done
