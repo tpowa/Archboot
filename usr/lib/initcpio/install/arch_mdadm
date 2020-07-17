@@ -3,7 +3,6 @@
 
 build ()
 {
-    add_binary "mdassemble"
     add_binary "mdmon"
     # add custom archboot mdadm.conf to avoid mdadm handling isw and ddf metadata devices
     # which are also covered by dmraid
