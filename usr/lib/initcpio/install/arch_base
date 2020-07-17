@@ -184,6 +184,8 @@ build ()
     ### fix tmpfiles startup
     add_file "/usr/lib/libnss_compat.so.2"
     add_file "/usr/lib/libnsl.so.1"
+    ## fix for systemd >=245 set default target
+    add_symlink "/etc/systemd/system/initrd.target" "/usr/lib/systemd/system/multi-user.target"
 
     ### add udev, which is not covered by udev hook
     add_binary "logger"
