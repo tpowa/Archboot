@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 ### general setup stuff
 SVNSETUP="svn://svn.archlinux.org/packages/"
-BASE=""
+BASE="base linux"
 DEVEL=""
 SUPPORT=""
 SUPPORT_ADDITION="fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng fuse2 fuse3 libnfnetlink libnetfilter_conntrack libcroco libxml2 nftables python python2"
 # generate base
-for i in $(pacman -Sg base | sed -e "s/base//g"); do 
+for i in $(expac -S '%D' base); do 
 	BASE="$BASE $(echo $i)"
 done
 # generate base-devel
@@ -25,4 +25,5 @@ cd support; for i in $SUPPORT; do svn up $i; sleep 2; done; cd ..
 # cleanup devel from base packages
 for i in base/*; do
     [[ -d devel/$(basename $i) ]] && rm -r devel/$(basename $i)
+    [[ -d support/$(basename $i) ]] && rm -r support/$(basename $i)
 done

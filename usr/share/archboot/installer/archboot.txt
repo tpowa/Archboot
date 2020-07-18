@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   June, 26th 2018
+   July, 18th 2020
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -370,9 +370,6 @@ Common Installation Procedure
 
    dhcpcd or dhclient
           Add if your machine is a DHCP client.
-
-   isdn4k-utils
-          Add if you use ISDN for dialup.
 
    ppp
           Add if you use an analog modem for dialup.
