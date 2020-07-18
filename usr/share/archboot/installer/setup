@@ -3687,8 +3687,8 @@ do_refind_uefi() {
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind-efi pkg now ..." 0 0
-        PACKAGES="refind-efi"
+        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg now ..." 0 0
+        PACKAGES="refind"
         run_pacman
         unset PACKAGES
     fi
@@ -3727,7 +3727,7 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "refind-efi has been setup successfully." 0 0
+        DIALOG --msgbox "refind has been setup successfully." 0 0
         
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
         geteditor || return 1
@@ -3749,7 +3749,7 @@ REFINDEOF
             do_uefi_secure_boot_preloader
         fi
     else
-        DIALOG --msgbox "Error setting up refind-efi." 0 0
+        DIALOG --msgbox "Error setting up refind." 0 0
     fi
     
 }
