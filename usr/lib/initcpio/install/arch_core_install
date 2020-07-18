@@ -35,8 +35,8 @@ build ()
     cd ${SVNTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
         # generate base
-        BASE=""
-        for i in $(pacman -Sg base | sed -e "s/base//g"); do 
+        BASE="base linux"
+        for i in $(expac -S '%D' base); do 
             BASE="$BASE $(echo $i)"
         done
         # generate base-devel
@@ -56,6 +56,7 @@ build ()
         # cleanup devel from base packages
         for i in base/*; do
             [[ -d devel/$(basename $i) ]] && rm -r devel/$(basename $i)
+            [[ -d support/$(basename $i) ]] && rm -r support/$(basename $i)
         done
         cd  ${SVNTREE}
         SEARCHSVN="$(find ./ -type d -name *"$(uname -m)" ! -name "testing*") $(find ./ -type d -name *"any" ! -name "testing*")"
@@ -86,11 +87,13 @@ build ()
                     if  [ "${epoch}" = "" ]; then
                         cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || \
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-any.pkg.tar.zst || return 1
                     else
                         cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.[a-z]z || \
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-any.pkg.tar.zst || return 1
                      fi
                 done
             else
@@ -98,11 +101,13 @@ build ()
                     if  [ "${epoch}" = "" ]; then
                         cp /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || \
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-${pkgrel}-$(uname -m).pkg.tar.zst || return 1
                     else
                         cp /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
                         echo "$(echo ${COPY}| awk -F/ '{print $2}')/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.*" >> ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || return 1
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.[a-z]z || \
+                        repo-add ${TEMPDIR}/core-$(uname -m)/pkg/core.db.tar.gz /var/cache/pacman/pkg/${i}-${epoch}:${pkgver}-${pkgrel}-$(uname -m).pkg.tar.zst || return 1
                     fi
                 done
             fi
@@ -120,10 +125,10 @@ build ()
     sed -i '/qgpgme\|python-gpgme\|python2-gpgme/d' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
-    ### HACK add refind-efi to image, with separate extra db file
+    ### HACK add refind to image, with separate extra db file
     # set LANG to US we parse language output here
     LANG=US
-    for i in refind-efi; do
+    for i in refind; do
         wget -N --directory-prefix /var/cache/pacman/pkg/ $(pacman --cachedir / -Sp $i).sig
         pacman -Sw --noconfirm $i
 
@@ -131,10 +136,12 @@ build ()
         pkgarch="$(echo $(pacman -Si $i | grep -m 1 Architecture | cut -d ":" -f 2))"
         if [ "${pkgarch}" = 'any' ]; then
             cp /var/cache/pacman/pkg/$i-${pkgver}-any.pkg.tar.* ${TEMPDIR}/core-any/pkg/
-            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.[a-z]z || return 1
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.[a-z]z || \
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-any.pkg.tar.zst || return 1
         else
             cp /var/cache/pacman/pkg/$i-${pkgver}-$(uname -m).pkg.tar.* ${TEMPDIR}/core-$(uname -m)/pkg/
-            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.[a-z]z || return 1
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.[a-z]z || \
+            repo-add ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz /var/cache/pacman/pkg/${i}-${pkgver}-$(uname -m).pkg.tar.zst || return 1
         fi        
     done
     rm  ${TEMPDIR}/core-$(uname -m)/pkg/extra.db.tar.gz.old
