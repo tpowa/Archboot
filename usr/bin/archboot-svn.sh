@@ -4,7 +4,7 @@ SVNSETUP="svn://svn.archlinux.org/packages/"
 BASE="base linux"
 DEVEL=""
 SUPPORT=""
-SUPPORT_ADDITION="fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng fuse2 fuse3 libnfnetlink libnetfilter_conntrack libcroco libxml2 nftables python python2"
+SUPPORT_ADDITION="fuse ntfs-3g dhcp f2fs-tools mtools efitools lockdown-ms gc guile libatomic_ops libaio intel-ucode unixodbc libnftnl libmnl tcl libcap-ng fuse2 fuse3 libnfnetlink libnetfilter_conntrack libcroco libxml2 python python2"
 # generate base
 for i in $(expac -S '%D' base); do 
 	BASE="$BASE $(echo $i)"
