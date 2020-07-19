@@ -123,6 +123,9 @@ build ()
     sed -i -e 's#base/linux-docs#support/linux-docs#g' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK remove gpgme packages which move in a lot of extra depends
     sed -i '/qgpgme\|python-gpgme\|python2-gpgme/d' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+    ### HACK remove iptables packages which depend on community packages
+    sed -i '/iptables/d' ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
+
     # generate packages.txt
     sort -u ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt -o ${TEMPDIR}/core-$(uname -m)/pkg/packages.txt
     ### HACK add refind to image, with separate extra db file
