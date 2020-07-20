@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 18th 2020
+   July, 20th 2020
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -123,7 +123,7 @@ Introduction
    * Configuration of basic system files
    * Setting root password
    * Bootloader support: grub(2) (BIOS and UEFI),
-     refind-efi, systemd-boot, syslinux (BIOS and UEFI)
+     refind, systemd-boot, syslinux (BIOS and UEFI)
 
 Installing Arch Linux with Archboot 
 
@@ -364,18 +364,7 @@ Common Installation Procedure
    It is recommended that you install all the BASE packages, but not
    anything else at this point. Don't worry about getting all the
    packages you want - you can easily install more of them once the basic
-   system boots by itself. The only exception to this rule is installing
-   any packages you need for setting up Internet connectivity. These
-   packages usually are:
-
-   dhcpcd or dhclient
-          Add if your machine is a DHCP client.
-
-   ppp
-          Add if you use an analog modem for dialup.
-
-   rp-pppoe
-          Add if you use DSL for pseudo-dialup.
+   system boots by itself. 
 
    Once you're done selecting the packages you need, leave the selection
    screen and continue to the next step, Install Packages.
