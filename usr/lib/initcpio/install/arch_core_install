@@ -35,7 +35,7 @@ build ()
     cd ${SVNTREE}
     if ! [ "${LOCALSETUP}" = "yes" ]; then
         # generate base
-        BASE="base linux"
+        BASE="base linux linux-firmware"
         for i in $(expac -S '%D' base); do 
             BASE="$BASE $(echo $i)"
         done
