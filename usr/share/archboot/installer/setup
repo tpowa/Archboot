@@ -21,6 +21,8 @@ VMLINUZ="vmlinuz-${KERNELPKG}"
 INITRAMFS="initramfs-${KERNELPKG}"
 # name of intel ucode initramfs image
 INTEL_UCODE="intel-ucode.img"
+# name of amd ucode initramfs image
+AMD_UCODE="amd-ucode.img"
 
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
@@ -2371,7 +2373,6 @@ mountpoints() {
                         enter_mountpoint
                         btrfs_subvolume
                     fi
-                    check_btrfs_boot_subvolume
                 else
                     FILESYSTEM_FINISH="yes"
                 fi
@@ -2817,75 +2818,11 @@ select_packages() {
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}"
         [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
         PACKAGES="${ANSWER_CHECKLIST[@]}"
-    # network install routine
+    # network install routine, only install base, linux and linux-firmware for minimal system
     else
-        # if selection has been done before, warn about loss of input
-        # and let the user exit gracefully
-        if [[ ${S_SELECT} -ne 0 ]]; then
-            DIALOG --yesno "WARNING: Running this stage again will result in the loss of previous package selections.\n\nDo you wish to continue?" 10 50 || return 1
-        fi
-        DIALOG --msgbox "Package selection is split into two stages. First you will select package categories that contain packages you may be interested in. Then you will be presented with a full list of packages for each category, allowing you to fine-tune.\n\n" 10 70
-        DO_EXTRA=""
-        DIALOG --defaultno --yesno "Would you like to activate the [extra] repository for package installation to get the complete package list?" 0 0 && DO_EXTRA="yes"
-        local _catlist="base ^ ON"
-        if [[ "${DO_EXTRA}" = "yes" ]]; then
-            # show group listing for group selection
-            # only show xorg and DEs
-            for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep -v -e "^kde[a-z]" -e "^kde-meta" -e "^bmp"\
-                                                          -e "^gimp" -e "^fprint" -e "-l10n" -e "^ladspa"\
-                                                          -e "qtcurve" -e "^telepathy" -e "^texlive" -e "^gstreamer"\
-                                                          -e "i18n" -e "^koffice" -e "^vim" -e "^libreoffice"\
-                                                          -e "^pulseaudio" -e "^calligra" -e "^kde-telepathy" -e "^haskell" | sort); do
-                _catlist="${_catlist} ${i} - OFF"
-            done
-            local _pkgtmp="$(${PACMAN} -Sl core extra | awk '{print $2}')"        
-        else
-            # show group listing for group selection
-            # only show xorg and DEs
-            for i in $(${PACMAN} -Sg | sed "s/^base$/ /g" | grep ^base | sort); do
-                _catlist="${_catlist} ${i} - OFF"
-            done
-            local _pkgtmp="$(${PACMAN} -Sl core | awk '{print $2}')"  
-        fi
-        DIALOG --checklist "Select Package Categories\nDO NOT deselect BASE unless you know what you're doing!" 20 60 12 ${_catlist} 2>${ANSWER} || return 1
-        _catlist="$(cat ${ANSWER})"
-        # assemble a list of packages with groups, marking pre-selected ones
-        # <package> <group> <selected>
-        local _pkglist=()
-        : >/tmp/package-process.log
-        # display pkglist output while it's running
-        dialog --backtitle "${TITLE}" --title "Generating list with packages, this might take some time ..." \
-            --no-kill --tailboxbg "/tmp/package-process.log" 18 70 2>${ANSWER}
-        # packages in groups
-        while read pkgname pkgcat; do
-            pkgdesc $pkgname
-            echo "Processing "${pkgname}" ..." 2>&1 >> /tmp/package-process.log
-            # check if this package is in a selected group
-            # slightly ugly but sorting later requires newlines in the variable
-            if [[ "${_catlist/"${pkgcat}"/XXXX}" != "${_catlist}" ]]; then
-                _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
-            else
-                _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
-            fi
-        done < <(${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep -v 'None' | sort -u -f -k 1 | sort -f -k 2)
-        # packages without groups
-        while read pkgname pkgcat; do
-            pkgdesc $pkgname
-            echo "Processing "${pkgname} ..." " 2>&1 >> /tmp/package-process.log
-            # check if this package is in a selected group
-            # slightly ugly but sorting later requires newlines in the variable
-            if [[ "${_catlist/"${pkgcat}"/XXXX}" != "${_catlist}" ]]; then
-                _pkglist+=("${pkgname}" "(${pkgcat})" ON "${PKGDESC}")
-            else
-                _pkglist+=("${pkgname}" "(${pkgcat})" OFF "${PKGDESC}")
-            fi
-        done < <(${PACMAN} -Si ${_pkgtmp} | \
-        awk '/^Name/{ printf("%s ",$3) } /^Group/{ print $3 }' | grep 'None' | sort -u -f -k 1 | sort -f -k 2)
-        kill $(cat ${ANSWER})
-        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${_pkglist[@]}"
-        [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
-        PACKAGES="${ANSWER_CHECKLIST[@]}"
+        PACKAGES=""
+        DIALOG --yesno "Next step will install base, linux, linux-firmware and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
+        PACKAGES="base linux linux-firmware"
     fi
     # Add packages which are not in core repository
     if [[ -n "$(pgrep dhclient)" ]]; then
@@ -2930,6 +2867,17 @@ select_packages() {
     # always add intel-ucode
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
     PACKAGES="${PACKAGES} intel-ucode"
+    # always add amd-ucode
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
+    PACKAGES="${PACKAGES} amd-ucode"
+    ### HACK:
+    # always add lvm2, cryptsetup and mdadm
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ lvm2\ # #g")"
+    PACKAGES="${PACKAGES} lvm2"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ cryptsetup\ # #g")"
+    PACKAGES="${PACKAGES} cryptsetup"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ mdadm\ # #g")"
+    PACKAGES="${PACKAGES} mdadm"  
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
@@ -3529,6 +3477,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Path]
 PathChanged=/boot/${VMLINUZ}
 PathChanged=/boot/${INTEL_UCODE}
+PathChanged=/boot/${AMD_UCODE}
 PathChanged=/boot/${INITRAMFS}.img
 PathChanged=/boot/${INITRAMFS}-fallback.img
 Unit=efistub_copy.service
@@ -3545,6 +3494,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INTEL_UCODE}
+ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${AMD_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
@@ -3567,6 +3517,8 @@ CONFEOF
 
         _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
         
+        _INITRD_AMD_UCODE="/${AMD_UCODE}"
+        
         _INITRD_NORMAL="/${INITRAMFS}.img"
         
         _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
@@ -3574,6 +3526,8 @@ CONFEOF
         _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
         
         _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
+        
+        _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
 
         _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
         
@@ -3635,6 +3589,7 @@ do_systemd_boot_uefi() {
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_INTEL_UCODE}
+initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
@@ -3643,6 +3598,7 @@ GUMEOF
 title    Arch Linux Fallback
 linux    ${_KERNEL_NORMAL}
 initrd   ${_INITRD_INTEL_UCODE}
+initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD_FALLBACK_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
@@ -3718,8 +3674,8 @@ do_refind_uefi() {
     fi
     
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_NORMAL}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_FALLBACK_NORMAL}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD_NORMAL}"
+"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD_FALLBACK_NORMAL}"
 REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -3790,13 +3746,13 @@ LABEL arch
     MENU LABEL Arch Linux
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_AMD_UCODE},${_INITRD_NORMAL}
 
 LABEL arch-fallback
     MENU LABEL Arch Linux Fallback
     LINUX ${_KERNEL_NORMAL}
     APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_FALLBACK_NORMAL}
+    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_AMD_UCODE},${_INITRD_FALLBACK_NORMAL}
 
 EOF
         
@@ -3848,7 +3804,7 @@ ENDTEXT
     MENU LABEL Arch Linux
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${INITRAMFS}.img
+    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${AMD_UCODE},${subdir}/${INITRAMFS}.img
 
 LABEL arch-fallback
 TEXT HELP
@@ -3857,7 +3813,7 @@ ENDTEXT
     MENU LABEL Arch Linux Fallback
     LINUX ${subdir}/${VMLINUZ}
     APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${INITRAMFS}-fallback.img
+    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${AMD_UCODE},${subdir}/${INITRAMFS}-fallback.img
 
 EOF
         DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
@@ -4247,7 +4203,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}.img
+    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}.img
 }
 
 EOF
@@ -4262,7 +4218,7 @@ menuentry "Arch Linux Fallback" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${INITRAMFS}-fallback.img
+    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}-fallback.img
 }
 
 EOF
