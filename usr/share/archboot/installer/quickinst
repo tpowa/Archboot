@@ -123,7 +123,7 @@ install_packages() {
             PACKAGES="${PACKAGES} ${pkgname}"
         done
     else
-        PACKAGES="$(pacman -Sg base | awk '{print $2}')"
+        PACKAGES="base linux linux-firmware"
     fi
     # Add packages which are not in core repository
     if [[ "$(lsblk -rnpo FSTYPE | grep ntfs)" ]]; then
@@ -156,7 +156,7 @@ install_packages() {
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
     fi
-    ### HACK
+    ### HACK:
     # always add systemd-sysvcompat components
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
     PACKAGES="${PACKAGES} systemd-sysvcompat"
@@ -164,6 +164,17 @@ install_packages() {
     # always add intel-ucode
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
     PACKAGES="${PACKAGES} intel-ucode"
+    # always add amd-ucode
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
+    PACKAGES="${PACKAGES} amd-ucode"
+    ### HACK:
+    # always add lvm2, cryptsetup and mdadm
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ lvm2\ # #g")"
+    PACKAGES="${PACKAGES} lvm2"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ cryptsetup\ # #g")"
+    PACKAGES="${PACKAGES} cryptsetup"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ mdadm\ # #g")"
+    PACKAGES="${PACKAGES} mdadm"  
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
