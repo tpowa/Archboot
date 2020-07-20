@@ -2182,14 +2182,6 @@ choose_btrfs_subvolume () {
     fi
 }
 
-# boot on btrfs subvolume is not supported
-check_btrfs_boot_subvolume() {
-    if [[ "${MP}" = "/boot" && "${FSTYPE}" = "btrfs" && ! "${BTRFS_SUBVOLUME}" = "NONE" ]]; then
-        DIALOG --msgbox "ERROR: \n/boot on a btrfs subvolume is not supported by any bootloader yet!" 8 65
-        FILESYSTEM_FINISH="no"
-    fi
-}
-
 # btrfs subvolume menu
 btrfs_subvolume() {
     FILESYSTEM_FINISH=""
