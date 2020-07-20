@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+### TODO: add btrfs subvolume support in grub!
 # we rely on some output which is parsed in english!
 unset LANG
 ANSWER="/tmp/.setup"
