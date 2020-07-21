@@ -178,7 +178,7 @@ ENDTEXT
 MENU LABEL Boot Arch Linux (x86_64)
 LINUX /boot/vmlinuz_x86_64
 APPEND cgroup_disable=memory rootdelay=10 rootfstype=ramfs
-INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
+INITRD /boot/intel-ucode.img,/boot/amd-ucode.img,/boot/initramfs_x86_64.img
 
 LABEL existing
 TEXT HELP
@@ -284,6 +284,7 @@ GUMEOF
 title           Arch Linux x86_64 Archboot EFISTUB
 linux           /boot/vmlinuz_x86_64
 initrd          /boot/intel-ucode.img
+initrd          /boot/amd-ucode.img
 initrd          /boot/initramfs_x86_64.img
 options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
 architecture    x64
@@ -347,7 +348,7 @@ menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
-    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "UEFI Shell X64 v2" {
@@ -403,14 +404,14 @@ menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "Arch Linux i686 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_i686
     linux /boot/vmlinuz_i686 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    initrd /boot/intel-ucode.img /boot/initramfs_i686.img
+    initrd /boot/intel-ucode.img /boot/amd-ucode.img /boot/initramfs_i686.img
 }
 
 # menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
@@ -460,13 +461,13 @@ LABEL archboot-x86_64
     MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
     LINUX /boot/vmlinuz_x86_64
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
+    INITRD /boot/intel-ucode.img,/boot/amd-ucode.img,/boot/initramfs_x86_64.img
 
 LABEL archboot-i686
     MENU LABEL Arch Linux i686 Archboot - EFI HANDOVER PROTOCOL
     LINUX /boot/vmlinuz_i686
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    INITRD /boot/intel-ucode.img,/boot/initramfs_i686.img
+    INITRD /boot/intel-ucode.img,/boot/amd-ucode.img,/boot/initramfs_i686.img
 EOF
 	
 }
@@ -550,6 +551,7 @@ _update_cd_uefi() {
 	cp -r "${_ARCHBOOT_ISO_EXT_DIR}"/{EFI,loader} "${TEMP_DIR}"/
 	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/vmlinuz_x86_64 "${TEMP_DIR}"/boot/
 	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/intel-ucode.img "${TEMP_DIR}"/boot/
+	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/amd-ucode.img "${TEMP_DIR}"/boot/
 	cp "${_ARCHBOOT_ISO_EXT_DIR}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
 	
 	## Delete IA32 UEFI files

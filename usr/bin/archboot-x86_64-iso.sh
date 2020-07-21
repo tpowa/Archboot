@@ -74,7 +74,7 @@ fi
 
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k20-R1"
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k20-R2"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-$(date +%Y.%m)"
 
 if [[ "${_DO_x86_64}" == "1" ]]; then
@@ -113,6 +113,7 @@ _prepare_kernel_initramfs_files() {
 		
 	mv "${CORE64}/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
 	mv "${CORE64}/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
+	mv "${CORE64}/tmp"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
 	
 }
 
@@ -183,6 +184,7 @@ GUMEOF
 title           Arch Linux x86_64 Archboot EFISTUB
 linux           /boot/vmlinuz_x86_64
 initrd          /boot/intel-ucode.img
+initrd          /boot/amd-ucode.img
 initrd          /boot/initramfs_x86_64.img
 options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
 architecture    x64
@@ -243,7 +245,7 @@ menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
-    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "UEFI Shell X64 v2" {
@@ -296,7 +298,7 @@ menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    initrd /boot/intel-ucode.img /boot/initramfs_x86_64.img
+    initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
 # menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
@@ -344,7 +346,7 @@ LABEL archboot-x86_64
     MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
     LINUX /boot/vmlinuz_x86_64
     APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    INITRD /boot/intel-ucode.img,/boot/initramfs_x86_64.img
+    INITRD /boot/intel-ucode.img,/boot/amd-ucode.img,/boot/initramfs_x86_64.img
 EOF
 
 }

@@ -56,6 +56,7 @@ mkdir "${TEMP_DIR}"/boot
 cp -r "${ISOIMG}"/{EFI,loader} "${TEMP_DIR}"/
 cp "${ISOIMG}"/boot/vmlinuz_x86_64 "${TEMP_DIR}"/boot/
 cp "${ISOIMG}"/boot/intel-ucode.img "${TEMP_DIR}"/boot/
+cp "${ISOIMG}"/boot/amd-ucode.img "${TEMP_DIR}"/boot/
 cp "${ISOIMG}"/boot/initramfs_x86_64.img "${TEMP_DIR}"/boot/
 
 ## Delete IA32 UEFI files
@@ -80,6 +81,7 @@ mkdir "${MOUNT_FSIMG}"/boot
 cp -r "${TEMP_DIR}"/{EFI,loader} "${MOUNT_FSIMG}"/
 cp "${TEMP_DIR}"/boot/vmlinuz_x86_64 "${MOUNT_FSIMG}"/boot
 cp "${TEMP_DIR}"/boot/intel-ucode.img "${MOUNT_FSIMG}"/boot
+cp "${TEMP_DIR}"/boot/amd-ucode.img "${MOUNT_FSIMG}"/boot
 cp "${TEMP_DIR}"/boot/initramfs_x86_64.img "${MOUNT_FSIMG}"/boot
 
 ## Unmount cdefiboot.img
