@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 20th 2020
+   July, 21th 2020
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -234,7 +234,7 @@ Common Installation Procedure
    it's save to answer no.
 
    You should select the disk(s) you want to partition, and
-   you'll be dropped into the parted program where you can freely modify
+   you'll be dropped into the cfdisk program where you can freely modify
    the partitioning information.
 
    You will need at least a root partition to continue the installation,
@@ -438,7 +438,7 @@ Useful links
 
   Archboot resourses
    Developer:        Tobias Powalowski <tpowa@archlinux.org>
-   Latest version:   https://downloads.archlinux.de/iso/archboot/latest
+   Latest version:   http://mirror.rackspace.com/archlinux/iso/archboot/latest
    Development tree: https://projects.archlinux.org/archboot.git/
 
   Arch Linux resources
