@@ -168,6 +168,14 @@ install_packages() {
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
     PACKAGES="${PACKAGES} amd-ucode"
     ### HACK:
+    # always add netctl with optdepends
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netctl\ # #g")"
+    PACKAGES="${PACKAGES} netctl"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ dhcpd\ # #g")"
+    PACKAGES="${PACKAGES} dhcpcd"
+    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ wpa_supplicant\ # #g")"
+    PACKAGES="${PACKAGES} wpa_supplicant"
+    ### HACK:
     # always add lvm2, cryptsetup and mdadm
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ lvm2\ # #g")"
     PACKAGES="${PACKAGES} lvm2"
