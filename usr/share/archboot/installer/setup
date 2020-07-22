@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 ### TODO:
-#- autoprepare uefisys partition is hardcoded
+# - autoprepare uefisys partition is hardcoded
+# - fix package selection in CDROM mode
 # -add btrfs subvolume support in grub configuration!
 # we rely on some output which is parsed in english!
 unset LANG
