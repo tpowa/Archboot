@@ -67,6 +67,7 @@ Introduction
      man or info pages etc. is not provided.
    * It doesn't mount anything during boot process.
    * It supports remote installation through ssh.
+   * It uses netctl for network setup.
 
   What are the supported boot modes of Archboot media?
    * It supports BIOS booting with syslinux.
