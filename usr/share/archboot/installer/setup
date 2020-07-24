@@ -1,4 +1,4 @@
-##!/usr/bin/env bash
+#!/usr/bin/env bash
 ### TODO:
 # - autoprepare uefisys partition is hardcoded
 # -add btrfs subvolume support in grub configuration!
@@ -1454,8 +1454,6 @@ autoprepare() {
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
-    else
-
     fi
     
     while [[ "${DEFAULTFS}" = "" ]]; do
