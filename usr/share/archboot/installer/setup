@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+##!/usr/bin/env bash
 ### TODO:
 # - autoprepare uefisys partition is hardcoded
-# - fix package selection in CDROM mode
 # -add btrfs subvolume support in grub configuration!
 # we rely on some output which is parsed in english!
 unset LANG
@@ -1435,6 +1434,7 @@ autoprepare() {
     DEFAULTFS=""
     _UEFISYS_BOOTPART=""
     UEFISYS_MOUNTPOINT=""
+    UEFISYS_PART_SET=""
     BOOT_PART_SET=""
     SWAP_PART_SET=""
     ROOT_PART_SET=""
@@ -1454,6 +1454,8 @@ autoprepare() {
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported" 0 0
         _UEFISYS_BOOTPART="1"
+    else
+
     fi
     
     while [[ "${DEFAULTFS}" = "" ]]; do
@@ -1477,10 +1479,6 @@ autoprepare() {
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             
-            UEFISYS_PART_SIZE="1024"
-            
-            _PART_NUM="$((${_PART_NUM}+1))"
-            _UEFISYS_PART_NUM="${_PART_NUM}"
         else
             GUID_PART_SIZE="0"
             
@@ -1507,6 +1505,22 @@ autoprepare() {
                 fi
             done
         else
+            while [[ "${UEFISYS_PART_SET}" = "" ]]; do
+                DIALOG --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>${ANSWER} || return 1
+                UEFISYS_PART_SIZE="$(cat ${ANSWER})"
+                if [[ "${UEFISYS_PART_SIZE}" = "" ]]; then
+                    DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                else
+                    if [[ "${UEFISYS_PART_SIZE}" -ge "${DISC_SIZE}" || "${UEFISYS_PART_SIZE}" -lt "260" || "${UEFISYS_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                        DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+                    else
+                        UEFISYS_PART_SET=1
+                        _PART_NUM="$((${_PART_NUM}+1))"
+                        _UEFISYS_PART_NUM="${_PART_NUM}"
+                    fi
+                fi
+            done
+            
             DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}-${UEFISYS_PART_SIZE}))"
             while [[ "${BOOT_PART_SET}" = "" ]]; do
                 DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>${ANSWER} || return 1
@@ -2779,10 +2793,9 @@ select_packages() {
     
     # Archboot setup media Mode uses packages.txt!
     if [[ "${MODE}" = "media" ]]; then
-        DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: It is recommended that you install the BASE category from this setup, SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
+        DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
         PKGS="/packages/core-$(uname -m)/pkg/packages.txt"
         if ! [[ -s /tmp/.pkgcategory ]]; then
-            CHKLIST="base ^ ON"
             for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v base ); do
                 CHKLIST="${CHKLIST} ${category} - OFF"
             done
@@ -2813,11 +2826,11 @@ select_packages() {
         done
         _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}"
         [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
-        PACKAGES="${ANSWER_CHECKLIST[@]}"
+        PACKAGES="base linux linux-firmware ${ANSWER_CHECKLIST[@]}"
     # network install routine, only install base, linux and linux-firmware for minimal system
     else
         PACKAGES=""
-        DIALOG --yesno "Next step will install base, linux, linux-firmware and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
+        DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
         PACKAGES="base linux linux-firmware"
     fi
     # Add packages which are not in core repository
