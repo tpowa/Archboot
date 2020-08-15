@@ -35,7 +35,7 @@ build ()
     for i in $appfiles; do
         add_file "$i"
     done
-    symlinks="/usr/bin/depmod /usr/bin/awk /usr/bin/halt /usr/bin/telinit /usr/bin/shutdown /usr/bin/runlevel /usr/bin/reboot \
+    symlinks="/usr/bin/depmod /usr/bin/awk /usr/bin/halt /usr/bin/shutdown /usr/bin/reboot \
               /usr/bin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
