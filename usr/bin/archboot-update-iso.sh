@@ -45,7 +45,7 @@ _ARCHBOOT_ISO_OLD_PATH="${1}"
 _ARCHBOOT_ISO_WD="$(dirname "${_ARCHBOOT_ISO_OLD_PATH}")"
 _ARCHBOOT_ISO_OLD_NAME="$(basename "${_ARCHBOOT_ISO_OLD_PATH}" | sed 's|\.iso||g')"
 
-_ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /tmp/archboot_iso_ext.XXXXXXXXXX)"
+_ARCHBOOT_ISO_EXT_DIR="$(mktemp -d /var/tmp/archboot_iso_ext.XXXXXXXXXX)"
 
 #############################
 
@@ -319,8 +319,8 @@ _update_uefi_X64_GRUB_USB_files() {
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg" || true
 	echo
 	
-	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
+	echo 'configfile ${cmdpath}/grubx64.cfg' > /var/tmp/grubx64.cfg
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/var/tmp/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -375,8 +375,8 @@ _update_uefi_IA32_GRUB_USB_files() {
 	rm -f "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.cfg" || true
 	echo
 	
-	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	echo 'configfile ${cmdpath}/bootia32.cfg' > /var/tmp/bootia32.cfg
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/var/tmp/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${_ARCHBOOT_ISO_EXT_DIR}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
@@ -489,7 +489,7 @@ _remove_packages() {
 
 _update_arch_setup_initramfs() {
 	
-	_initramfs_ext="$(mktemp -d /tmp/${_initramfs_name}_ext.XXXXXXXXXX)"
+	_initramfs_ext="$(mktemp -d /var/tmp/${_initramfs_name}_ext.XXXXXXXXXX)"
 	echo
 	
 	cd "${_initramfs_ext}/"
@@ -647,7 +647,7 @@ xorriso -as mkisofs \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
 	${_CD_UEFI_PARAMETERS} \
-	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/tmp/archboot_update_xorriso.log"
+	-output "${_ARCHBOOT_ISO_UPDATED_PATH}" "${_ARCHBOOT_ISO_EXT_DIR}/" &> "/var/tmp/archboot_update_xorriso.log"
 echo
 
 set +x

@@ -4,7 +4,7 @@
 APPNAME=$(basename "${0}")
 CONFIG=""
 TARNAME=""
-export TEMPDIR=$(mktemp -d /tmp/tarball-helper.XXXX)
+export TEMPDIR=$(mktemp -d /var/tmp/tarball-helper.XXXX)
 
 usage ()
 {
@@ -46,8 +46,8 @@ export RUNPROGRAM="${APPNAME}"
 export BOOTDIRNAME="boot/syslinux"
 export USEKERNEL="${VERSION}"
 
-[ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /tmp/bootmessage.XXXX)
-[ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /tmp/optionsbootmessage.XXXX)
+[ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /var/tmp/bootmessage.XXXX)
+[ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /var/tmp/optionsbootmessage.XXXX)
 
 # begin script
 mkdir -p "${TEMPDIR}/${BOOTDIRNAME}/"
@@ -85,5 +85,5 @@ if ! [ "${TARNAME}" = "" ]; then
 	[ -e ${TARNAME} ] && rm ${TARNAME}
 	tar cfv ${TARNAME} ${TEMPDIR} > /dev/null 2>&1 && echo ":: tar Image succesfull created at ${TARNAME}"
 fi
-# clean /tmp
+# clean /var/tmp
 rm -r ${TEMPDIR}

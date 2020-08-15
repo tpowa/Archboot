@@ -49,7 +49,7 @@ MOUNT_FSIMG=$(mktemp -d)
 
 ## Extract old ISO
 bsdtar -C "${ISOIMG}" -xf "${INPUT_IMAGENAME}"
-# 7z x -o /tmp/ARCHBOOTISO/ "${INPUT_IMAGENAME}"
+# 7z x -o /var/tmp/ARCHBOOTISO/ "${INPUT_IMAGENAME}"
 
 ## Copy UEFI files
 mkdir "${TEMP_DIR}"/boot
@@ -107,12 +107,12 @@ xorriso -as mkisofs \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat \
         -no-emul-boot \
         -isohybrid-mbr "${ISOIMG}"/boot/syslinux/isohdpfx.bin \
-        -output "${OUTPUT_IMAGENAME}" "${ISOIMG}"/ &> /tmp/xorriso.log
+        -output "${OUTPUT_IMAGENAME}" "${ISOIMG}"/ &> /var/tmp/xorriso.log
 
 if [[ -e "${OUTPUT_IMAGENAME}" ]]; then
     echo "Updated ISO at "${OUTPUT_IMAGENAME}""
 else
-    echo "ISO generation failed. See /tmp/xorriso.log for more info."
+    echo "ISO generation failed. See /var/tmp/xorriso.log for more info."
 fi
 
 ## Delete old ISO extracted files

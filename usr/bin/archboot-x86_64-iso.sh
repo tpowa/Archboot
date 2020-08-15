@@ -81,7 +81,7 @@ if [[ "${_DO_x86_64}" == "1" ]]; then
 	IMAGENAME="${IMAGENAME}-x86_64"
 fi
 
-X86_64="$(mktemp -d /tmp/X86_64.XXX)"
+X86_64="$(mktemp -d /var/tmp/X86_64.XXX)"
 
 # create directories
 mkdir -p "${X86_64}/arch"
@@ -91,13 +91,13 @@ mkdir -p "${X86_64}/packages/"
 _merge_initramfs_files() {
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
-		mkdir -p "${CORE64}/tmp/initrd"
-		cd "${CORE64}/tmp/initrd"
+		mkdir -p "${CORE64}/var/tmp/initrd"
+		cd "${CORE64}/var/tmp/initrd"
 		
-		bsdtar xf "${CORE64}/tmp"/*/boot/initrd.img
+		bsdtar xf "${CORE64}/var/tmp"/*/boot/initrd.img
 		
-		cd  "${CORE64}/tmp/initrd"
-		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/tmp/initramfs_x86_64.img"
+		cd  "${CORE64}/var/tmp/initrd"
+		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/var/tmp/initramfs_x86_64.img"
 	fi
 	
 	cd "${WD}/"
@@ -107,34 +107,34 @@ _merge_initramfs_files() {
 _prepare_kernel_initramfs_files() {
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
-		mv "${CORE64}/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
-		mv "${CORE64}/tmp/initramfs_x86_64.img" "${X86_64}/boot/initramfs_x86_64.img"
+		mv "${CORE64}/var/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
+		mv "${CORE64}/var/tmp/initramfs_x86_64.img" "${X86_64}/boot/initramfs_x86_64.img"
 	fi
 		
-	mv "${CORE64}/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
-	mv "${CORE64}/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
-	mv "${CORE64}/tmp"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
+	mv "${CORE64}/var/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
+	mv "${CORE64}/var/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
+	mv "${CORE64}/var/tmp"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
 	
 }
 
 _prepare_packages() {
 	
-	PACKAGES_TEMP_DIR="$(mktemp -d /tmp/pkgs_temp.XXX)"
+	PACKAGES_TEMP_DIR="$(mktemp -d /var/tmp/pkgs_temp.XXX)"
 	
 	if [[ "${_DO_x86_64}" == "1" ]]; then
-		CORE64="$(mktemp -d /tmp/core64.XXX)"
+		CORE64="$(mktemp -d /var/tmp/core64.XXX)"
 		
 		tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
 		
-		cp -rf "${CORE64}/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
-		rm -rf "${CORE64}/tmp"/*/core-x86_64
+		cp -rf "${CORE64}/var/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
+		rm -rf "${CORE64}/var/tmp"/*/core-x86_64
 		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
 		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${X86_64}/packages/"
 	fi
 	
 	# move in 'any' packages
-	cp -rf "${CORE64}/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
-	rm -rf "${CORE64}/tmp"/*/core-any
+	cp -rf "${CORE64}/var/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
+	rm -rf "${CORE64}/var/tmp"/*/core-any
 	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
 	
 	cd "${WD}/"
@@ -146,7 +146,7 @@ _prepare_other_files() {
 	
 	# move in doc
 	mkdir -p "${X86_64}/arch/"
-	mv "${CORE64}/tmp"/*/arch/archboot.txt "${X86_64}/arch/"
+	mv "${CORE64}/var/tmp"/*/arch/archboot.txt "${X86_64}/arch/"
 	
 }
 
@@ -216,8 +216,8 @@ _prepare_uefi_X64_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/grub"
 	
-	echo 'configfile ${cmdpath}/grubx64.cfg' > /tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/tmp/grubx64.cfg" -v
+	echo 'configfile ${cmdpath}/grubx64.cfg' > /var/tmp/grubx64.cfg
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/var/tmp/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -269,8 +269,8 @@ _prepare_uefi_IA32_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
 	
-	echo 'configfile ${cmdpath}/bootia32.cfg' > /tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/tmp/bootia32.cfg" -v
+	echo 'configfile ${cmdpath}/bootia32.cfg' > /var/tmp/bootia32.cfg
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/var/tmp/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
@@ -370,7 +370,7 @@ _prepare_uefi_IA32_GRUB_USB_files
 # _prepare_uefi_IA32_syslinux_USB_files
 
 # place syslinux files
-mv "${CORE64}/tmp"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
+mv "${CORE64}/var/tmp"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
 
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${X86_64}/boot/syslinux/boot.msg"
@@ -388,7 +388,7 @@ xorriso -as mkisofs \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -output "${IMAGENAME}.iso" "${X86_64}/" &> "/tmp/archboot_allinone_xorriso.log"
+        -output "${IMAGENAME}.iso" "${X86_64}/" &> "/var/tmp/archboot_allinone_xorriso.log"
 
 # create x86_64 iso with uefi cd boot support, if not present
 if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-uefi.iso" ]]; then

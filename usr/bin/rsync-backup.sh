@@ -12,7 +12,7 @@ usage()
     echo ""
     echo "- For system backup start with full mounted system and then invoke this script"
     echo "  with system's root directory as backupdir."
-    echo " - excluded directories are /dev /tmp /proc /sys /run /mnt /media /lost+found"
+    echo " - excluded directories are /dev /var/tmp /proc /sys /run /mnt /media /lost+found"
     echo " - --numeric-ids option is invoked to preserve users"
     echo ""
     echo "usage: ${APPNAME} <backupdir> <backupdestination>"
@@ -28,5 +28,5 @@ fi
 BACKUPDESTINATION="${2}"
 BACKUPDIR="${1}"
 
-rsync -aAXv --numeric-ids --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} $BACKUPDIR $BACKUPDESTINATION
+rsync -aAXv --numeric-ids --exclude={"/dev/*","/proc/*","/sys/*","/var/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} $BACKUPDIR $BACKUPDESTINATION
 
