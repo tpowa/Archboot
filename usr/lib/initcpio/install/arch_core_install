@@ -26,7 +26,7 @@ build ()
     fi
     ### setting up directories
     if ! [ "${LOCALSETUP}" = "yes" ]; then 
-        SVNTREE=$(mktemp /tmp/svntree.XXXX)
+        SVNTREE=$(mktemp /var/tmp/svntree.XXXX)
         rm ${SVNTREE}
         mkdir -p ${SVNTREE}
     else

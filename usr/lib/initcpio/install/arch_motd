@@ -4,7 +4,7 @@
 build ()
 {
     ### generate motd
-    MOTD=$(mktemp /tmp/motd.XXXX)
+    MOTD=$(mktemp /var/tmp/motd.XXXX)
     echo "Welcome to Arch Linux (archboot environment)" >> ${MOTD}
     echo "--------------------------------------------" >> ${MOTD}
     echo "Consoles:" >> ${MOTD}
