@@ -50,7 +50,7 @@ build ()
     add_file "/usr/share/licenses/db/LICENSE"
     add_file "/usr/share/licenses/dhcpcd/LICENSE"
     add_file "/usr/share/licenses/dhclient/LICENSE"
-    add_file "/usr/share/licenses/bind-tools/LICENSE"
+    add_file "/usr/share/licenses/bind/LICENSE"
     add_file "/usr/share/licenses/krb5/LICENSE"
     add_file "/usr/share/licenses/openssh/LICENCE"
     add_file "/usr/share/licenses/openssl/LICENSE"
