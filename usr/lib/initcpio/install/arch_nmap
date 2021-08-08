@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="nmap ncat ndiff nping"
+    apps="nmap ncat nping"
     for i in $apps; do
         add_binary "$i"
     done
