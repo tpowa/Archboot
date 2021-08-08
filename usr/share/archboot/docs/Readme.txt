@@ -5,7 +5,7 @@ What is archboot?
   thus it is limited to the RAM which is installed in your system.
   Please read the according Changelog files for RAM limitations.
 - Git repository: 
-  https://projects.archlinux.org/?p=archboot.git;a=summary
+  https://gitlab.archlinux.org/tpowa/archboot
 - It is developed by tpowa.
 
 The difference to the archiso install media:
