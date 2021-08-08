@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="lvmdump lvmconf vgimportclone fsadm"
+    apps="lvmdump lvmconfig vgimportclone fsadm"
     for i in $apps; do
         add_binary "$i"
     done
