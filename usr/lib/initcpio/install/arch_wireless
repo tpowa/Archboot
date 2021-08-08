@@ -20,7 +20,7 @@ build ()
     add_file "/usr/share/licenses/expat/COPYING"
     add_file "/usr/share/licenses/crda/LICENSE"
     add_file "/usr/share/licenses/wireless-regdb/LICENSE"
-    add_file "/usr/share/licenses/broadcom-wl/LICENSE.shipped"
+    add_file "/usr/share/licenses/broadcom-wl/LICENSE"
 }
 
 help ()
