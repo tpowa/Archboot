@@ -9,10 +9,7 @@ KERNEL_BOOT_OPTIONS="cgroup_disable=memory rootdelay=10 rootfstype=ramfs"
 MKINITCPIO_CONFIG="/etc/archboot/x86_64.conf"
 
 # kernel version, defaulted to build for runtime kernel
-VERSION="$(uname -r)"
-
-# kernel image, defaulted to stock arch kernel
-KERNEL="/boot/vmlinuz-linux"
+ALL_kver="/boot/vmlinuz-linux"
 
 # boot message file
 # blank by default arch-bootmessage hook will create it by default

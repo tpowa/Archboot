@@ -57,12 +57,6 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
-### check for available loop devices in a container
-for i in $(seq 0 7); do
-    ! [[ -e /dev/loop$i ]] && mknod /dev/loop$i b 7 $i
-done
-! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
-
 if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${PRESET}" -t="core-$(uname -m).tar"
 	exit 0
@@ -72,8 +66,13 @@ if ! [[ "${GENERATE}" == "1" ]]; then
 	usage
 fi
 
+### check for available loop devices in a container
+for i in $(seq 0 7); do
+    ! [[ -e /dev/loop$i ]] && mknod /dev/loop$i b 7 $i
+done
+! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
+
 # set defaults, if nothing given
-[[ -z "${KERNEL}" ]] && KERNEL="$(uname -r)"
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="2k21-R1"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-$(date +%Y.%m)"
 
