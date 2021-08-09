@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   July, 21th 2020
+   August, 09th 2021
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -440,7 +440,7 @@ Useful links
   Archboot resourses
    Developer:        Tobias Powalowski <tpowa@archlinux.org>
    Latest version:   http://mirror.rackspace.com/archlinux/iso/archboot/latest
-   Development tree: https://projects.archlinux.org/archboot.git/
+   Development tree: https://gitlab.archlinux.org/tpowa/archboot/
 
   Arch Linux resources
    Homepage:   https://www.archlinux.org
