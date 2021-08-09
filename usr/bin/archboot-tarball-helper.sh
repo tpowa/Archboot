@@ -44,7 +44,6 @@ fi
 
 export RUNPROGRAM="${APPNAME}"
 export BOOTDIRNAME="boot/syslinux"
-export USEKERNEL="${VERSION}"
 
 [ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /var/tmp/bootmessage.XXXX)
 [ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /var/tmp/optionsbootmessage.XXXX)
@@ -70,9 +69,9 @@ else
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/syslinux.cfg ] && echo "No syslinux.cfg found" && exit 1
 fi
 # generate initramdisk
-echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} KERNEL=${VERSION} ..." 
+echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} ..." 
 echo ":: Creating initramdisk ..."
-	mkinitcpio -c ${MKINITCPIO_CONFIG} -k ${VERSION} -g ${TEMPDIR}/boot/initrd.img
+	mkinitcpio -c ${MKINITCPIO_CONFIG} -g ${TEMPDIR}/boot/initrd.img
 echo ":: Using ${KERNEL} as image kernel ..."
 	install -m644 ${KERNEL} ${TEMPDIR}/boot/vmlinuz
 	install -m644 ${BOOTMESSAGE} ${TEMPDIR}/${BOOTDIRNAME}/boot.msg
