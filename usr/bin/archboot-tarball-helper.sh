@@ -4,6 +4,7 @@
 APPNAME=$(basename "${0}")
 CONFIG=""
 TARNAME=""
+
 export TEMPDIR=$(mktemp -d /var/tmp/tarball-helper.XXXX)
 
 usage ()
@@ -71,9 +72,9 @@ fi
 # generate initramdisk
 echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} ..." 
 echo ":: Creating initramdisk ..."
-	mkinitcpio -c ${MKINITCPIO_CONFIG} -g ${TEMPDIR}/boot/initrd.img
-echo ":: Using ${All_kver} as image kernel ..."
-	install -m644 ${All_kver} ${TEMPDIR}/boot/vmlinuz
+	mkinitcpio -c ${MKINITCPIO_CONFIG} -k ${ALL_kver} -g ${TEMPDIR}/boot/initrd.img
+echo ":: Using ${ALL_kver} as image kernel ..."
+	install -m644 ${ALL_kver} ${TEMPDIR}/boot/vmlinuz
 	install -m644 ${BOOTMESSAGE} ${TEMPDIR}/${BOOTDIRNAME}/boot.msg
 	install -m644 ${OPTIONSBOOTMESSAGE} ${TEMPDIR}/${BOOTDIRNAME}/options.msg
 	[ ! -s ${TEMPDIR}/${BOOTDIRNAME}/boot.msg ] && echo 'ERROR:no boot.msg found, aborting!' && exit 1
