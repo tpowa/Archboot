@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules '/net/ipv6|/net/ipv4|/net/netfilter|/net/bridge/'
-    apps="nft"
+    apps="nft xtables-nft-multi xtables-legacy-multi nfnl_osf nfbpf_compile"
     for i in $apps; do
         add_binary "$i"
     done
@@ -20,9 +20,7 @@ build ()
             /usr/bin/iptables-legacy /usr/bin/iptables-legacy-restore /usr/bin/iptables-legacy-save \
             /usr/bin/iptables-nft /usr/bin/iptables-nft-restore /usr/bin/iptables-nft-save \
             /usr/bin/iptables-restore /usr/bin/iptables-restore-translate /usr/bin/iptables-save \
-            /usr/bin/iptables-translate /usr/bin/iptables-xml /usr/bin/nfbpf_compile \
-            /usr/bin/nfnl_osf /usr/bin/xtables-legacy-multi /usr/bin/xtables-monitor \
-            /usr/bin/xtables-nft-multi"
+            /usr/bin/iptables-translate /usr/bin/iptables-xml /usr/bin/xtables-monitor"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
