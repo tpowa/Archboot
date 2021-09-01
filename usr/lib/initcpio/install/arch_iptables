@@ -4,18 +4,33 @@
 build ()
 {
     add_checked_modules '/net/ipv6|/net/ipv4|/net/netfilter|/net/bridge/'
-    apps="xtables-legacy-multi"
+    apps="nft"
     for i in $apps; do
         add_binary "$i"
     done
-  symlinks="/usr/bin/ip6tables /usr/bin/ip6tables-restore /usr/bin/ip6tables-save /usr/bin/iptables \
-            /usr/bin/iptables-restore /usr/bin/iptables-save /usr/bin/iptables-xml"
+  symlinks="/usr/bin/arptables /usr/bin/arptables-nft /usr/bin/arptables-nft-restore \
+            /usr/bin/arptables-nft-save /usr/bin/arptables-restore /usr/bin/arptables-save \
+            /usr/bin/ebtables /usr/bin/ebtables-nft /usr/bin/ebtables-nft-restore \
+            /usr/bin/ebtables-nft-save /usr/bin/ebtables-restore /usr/bin/ebtables-save \
+            /usr/bin/ip6tables /usr/bin/ip6tables-apply /usr/bin/ip6tables-legacy \
+            /usr/bin/ip6tables-legacy-restore /usr/bin/ip6tables-legacy-save \
+            /usr/bin/ip6tables-nft /usr/bin/ip6tables-nft-restore /usr/bin/ip6tables-nft-save \
+            /usr/bin/ip6tables-restore /usr/bin/ip6tables-restore-translate /usr/bin/ip6tables-save \
+            /usr/bin/ip6tables-translate /usr/bin/iptables /usr/bin/iptables-apply \
+            /usr/bin/iptables-legacy /usr/bin/iptables-legacy-restore /usr/bin/iptables-legacy-save \
+            /usr/bin/iptables-nft /usr/bin/iptables-nft-restore /usr/bin/iptables-nft-save \
+            /usr/bin/iptables-restore /usr/bin/iptables-restore-translate /usr/bin/iptables-save \
+            /usr/bin/iptables-translate /usr/bin/iptables-xml /usr/bin/nfbpf_compile \
+            /usr/bin/nfnl_osf /usr/bin/xtables-legacy-multi /usr/bin/xtables-monitor \
+            /usr/bin/xtables-nft-multi"
     for i in $symlinks; do
         add_binary "$(which $(basename $(readlink "$i")))"
         add_symlink "$i" "$(which $(basename $(readlink "$i")))"
     done
-    add_file "/etc/iptables/empty.rules"
-    add_file "/etc/iptables/simple_firewall.rules"
+    add_file "/etc/arptables.conf"
+    add_file "/etc/ebtables.conf"
+    add_file "/etc/ethertypes"
+    add_dir "/etc/iptables/"
 }
 
 help ()
