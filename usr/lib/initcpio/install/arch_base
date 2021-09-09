@@ -83,9 +83,9 @@ build ()
     add_file "/lib/libnss_dns.so.2"
 
     ### add copy-mountpoint.sh
-    add_file "/usr/bin/copy-mountpoint.sh"
+    add_file "/usr/bin/archboot-copy-mountpoint.sh"
     ### add rsync-backup.sh
-    add_file "/usr/bin/rsync-backup.sh"
+    add_file "/usr/bin/archboot-rsync-backup.sh"
 
     ### add pam
     apps="mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update"
