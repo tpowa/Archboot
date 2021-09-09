@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-[[ -z "${_DO_x86_64}" ]] && _DO_x86_64="1"
 [[ -z "${WD}" ]] && WD="${PWD}/"
 
 _BASENAME="$(basename "${0}")"
@@ -9,7 +8,6 @@ _BASENAME="$(basename "${0}")"
 _CARCH="x86_64"
 _UEFI_ARCH="X64"
 _SPEC_UEFI_ARCH="x64"
-
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -57,8 +55,12 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+# set defaults, if nothing given
+[[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
+[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot"
+
 if [[ "${TARBALL}" == "1" ]]; then
-	"${TARBALL_HELPER}" -c="${PRESET}" -t="core-$(uname -m).tar"
+	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
 	exit 0
 fi
 
@@ -72,72 +74,21 @@ for i in $(seq 0 7); do
 done
 ! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
 
-# set defaults, if nothing given
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="2k21-R1"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="Archlinux-$(date +%Y.%m)"
 
-if [[ "${_DO_x86_64}" == "1" ]]; then
-	IMAGENAME="${IMAGENAME}-x86_64"
-fi
 
 X86_64="$(mktemp -d /var/tmp/X86_64.XXX)"
 
 # create directories
 mkdir -p "${X86_64}/arch"
 mkdir -p "${X86_64}/boot/syslinux"
-mkdir -p "${X86_64}/packages/"
-
-_merge_initramfs_files() {
-	
-	if [[ "${_DO_x86_64}" == "1" ]]; then
-		mkdir -p "${CORE64}/var/tmp/initrd"
-		cd "${CORE64}/var/tmp/initrd"
-		
-		bsdtar xf "${CORE64}/var/tmp"/*/boot/initrd.img
-		
-		cd  "${CORE64}/var/tmp/initrd"
-		find . -print0 | bsdcpio -0oH newc | lzma > "${CORE64}/var/tmp/initramfs_x86_64.img"
-	fi
-	
-	cd "${WD}/"
-	
-}
 
 _prepare_kernel_initramfs_files() {
 	
-	if [[ "${_DO_x86_64}" == "1" ]]; then
-		mv "${CORE64}/var/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
-		mv "${CORE64}/var/tmp/initramfs_x86_64.img" "${X86_64}/boot/initramfs_x86_64.img"
-	fi
-		
+        mv "${CORE64}/var/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
+        mv "${CORE64}/var/tmp"/*/boot/initrd.img "${X86_64}/boot/initramfs_x86_64.img"
 	mv "${CORE64}/var/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
 	mv "${CORE64}/var/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
 	mv "${CORE64}/var/tmp"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
-	
-}
-
-_prepare_packages() {
-	
-	PACKAGES_TEMP_DIR="$(mktemp -d /var/tmp/pkgs_temp.XXX)"
-	
-	if [[ "${_DO_x86_64}" == "1" ]]; then
-		CORE64="$(mktemp -d /var/tmp/core64.XXX)"
-		
-		tar xvf core-x86_64.tar -C "${CORE64}" || exit 1
-		
-		cp -rf "${CORE64}/var/tmp"/*/core-x86_64 "${PACKAGES_TEMP_DIR}/core-x86_64"
-		rm -rf "${CORE64}/var/tmp"/*/core-x86_64
-		mksquashfs "${PACKAGES_TEMP_DIR}/core-x86_64/" "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" -comp xz -noappend -all-root
-		mv "${PACKAGES_TEMP_DIR}/archboot_packages_x86_64.squashfs" "${X86_64}/packages/"
-	fi
-	
-	# move in 'any' packages
-	cp -rf "${CORE64}/var/tmp"/*/core-any "${PACKAGES_TEMP_DIR}/core-any"
-	rm -rf "${CORE64}/var/tmp"/*/core-any
-	mksquashfs "${PACKAGES_TEMP_DIR}/core-any/" "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" -comp xz -noappend -all-root
-	
-	cd "${WD}/"
-	mv "${PACKAGES_TEMP_DIR}/archboot_packages_any.squashfs" "${X86_64}/packages/"
 	
 }
 
@@ -350,11 +301,7 @@ EOF
 
 }
 
-_prepare_packages
-
 _prepare_other_files
-
-_merge_initramfs_files
 
 _prepare_kernel_initramfs_files
 
