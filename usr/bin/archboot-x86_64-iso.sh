@@ -3,10 +3,6 @@
 
 _BASENAME="$(basename "${0}")"
 
-_CARCH="x86_64"
-_UEFI_ARCH="X64"
-_SPEC_UEFI_ARCH="x64"
-
 usage () {
 	echo "${_BASENAME}: usage"
 	echo "CREATE X86_64 USB/CD IMAGES"
@@ -56,7 +52,7 @@ fi
 
 # set defaults, if nothing given
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot"
+[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot-X86_64"
 
 if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
