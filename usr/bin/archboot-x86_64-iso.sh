@@ -32,7 +32,6 @@ usage () {
 
 PRESET="/etc/archboot/presets/x86_64"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
-UPDATEISO_HELPER="/usr/bin/archboot-update-iso.sh"
 
 # change to english locale!
 export LANG="en_US"
@@ -74,18 +73,12 @@ fi
 
 X86_64="$(mktemp -d ${WD}/X86_64.XXX)"
 
-# create directories
-mkdir -p "${X86_64}/arch"
-mkdir -p "${X86_64}/boot/syslinux"
-
 _prepare_kernel_initramfs_files() {
 	
         mv "${CORE64}"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
         mv "${CORE64}"/*/boot/initrd.img "${X86_64}/boot/initramfs_x86_64.img"
-	mv "${CORE64}"/*/boot/memtest "${X86_64}/boot/memtest"
-	mv "${CORE64}"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
-	mv "${CORE64}"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
-	
+	mv "${CORE64}"/*/boot/{memtest,intel-ucode.img,amd-ucode.img} "${X86_64}/boot/"
+        
 }
 
 _prepare_other_files() {
@@ -110,13 +103,7 @@ _prepare_uefi_boot() {
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
-	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/{EFI,loader} ::/
-	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/vmlinuz_x86_64 ::/boot
-	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/intel-ucode.img ::/boot
-	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/amd-ucode.img ::/boot
-	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/initramfs_x86_64.img ::/boot
-		
-	_CD_UEFI_PARAMETERS=""
+	mcopy -i "${VFAT_IMAGE}" -s "${X86_64}"/{EFI,loader,boot} ::/
 	
 }
 
@@ -303,6 +290,7 @@ _prepare_uefi_IA32_GRUB_USB_files
 _prepare_uefi_boot
 
 # place syslinux files
+mkdir -p "${X86_64}/boot/syslinux"
 mv "${CORE64}"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
 
 # Change parameters in boot.msg
