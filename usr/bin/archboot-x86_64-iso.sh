@@ -174,7 +174,7 @@ _prepare_uefi_X64_GRUB_USB_files() {
 	mkdir -p "${X86_64}/EFI/grub"
 	
 	echo 'configfile ${cmdpath}/grubx64.cfg' > ${X86_64}/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg= ${X86_64}/grubx64.cfg" -v
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=${X86_64}/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -219,6 +219,8 @@ menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
+        
+	rm ${X86_64}/grubx64.cfg
 	
 }
 
@@ -226,8 +228,8 @@ _prepare_uefi_IA32_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
 	
-	echo 'configfile ${cmdpath}/bootia32.cfg' >  ${X86_64}/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg= ${X86_64}/bootia32.cfg" -v
+	echo 'configfile ${cmdpath}/bootia32.cfg' > ${X86_64}/bootia32.cfg
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=${X86_64}/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
@@ -272,7 +274,9 @@ menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
-	
+        
+        rm ${X86_64}/bootia32.cfg
+        
 }
 
 _prepare_other_files
