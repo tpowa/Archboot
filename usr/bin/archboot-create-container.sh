@@ -10,13 +10,6 @@ usage () {
 	echo "This will create an archboot container for an archboot image."
 	exit 0
 }
-while [ $# -gt 0 ]; do
-	case ${1} in
-		-h|--h|?) usage ;; 
-		*) usage ;;
-		esac
-	shift
-done
 
 [[ -z "${1}" ]] && usage
 

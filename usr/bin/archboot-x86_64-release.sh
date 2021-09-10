@@ -3,20 +3,13 @@
 
 _BASENAME="$(basename "${0}")"
 usage () {
-	echo "${_BASENAME}: usage"
+	echo "${_BASENAME}:"
 	echo "CREATE ARCHBOOT RELEASE IMAGE"
 	echo "-----------------------------"
 	echo "Usage: ${_BASENAME} <directory>"
-	echo "This will create an archboot release image."
+	echo "This will create an archboot release image in <directory>."
 	exit 0
 }
-while [ $# -gt 0 ]; do
-	case ${1} in
-		-h|--h|?) usage ;; 
-		*) usage ;;
-		esac
-	shift
-done
 
 [[ -z "${1}" ]] && usage
 
@@ -27,8 +20,8 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 mkdir -p $1
 cd $1
-archboot-x86_64-release.sh archboot-release
-systemd-nspawn -D $1 archboot-x86_64-iso.sh -t
-systemd-nspawn -D $1 archboot-x86_64-iso.sh -g -T=*.tar
-mv $1/*.iso ../
+#archboot-create-container.sh archboot-release
+#systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -t -i=archrelease
+systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar
+mv archboot-release/*.iso ./
 
