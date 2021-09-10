@@ -5,7 +5,8 @@ APPNAME=$(basename "${0}")
 CONFIG=""
 TARNAME=""
 
-export TEMPDIR=$(mktemp -d /var/tmp/tarball-helper.XXXX)
+[[ -z "${WD}" ]] && WD="${PWD}/"
+export TEMPDIR=$(mktemp -d ${WD}/tarball-helper.XXXX)
 
 usage ()
 {
@@ -46,8 +47,8 @@ fi
 export RUNPROGRAM="${APPNAME}"
 export BOOTDIRNAME="boot/syslinux"
 
-[ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp /var/tmp/bootmessage.XXXX)
-[ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp /var/tmp/optionsbootmessage.XXXX)
+[ "${BOOTMESSAGE}" = "" ] && export BOOTMESSAGE=$(mktemp ${WD}/bootmessage.XXXX)
+[ "${OPTIONSBOOTMESSAGE}" = "" ] && export OPTIONSBOOTMESSAGE=$(mktemp ${WD}/optionsbootmessage.XXXX)
 
 # begin script
 mkdir -p "${TEMPDIR}/${BOOTDIRNAME}/"

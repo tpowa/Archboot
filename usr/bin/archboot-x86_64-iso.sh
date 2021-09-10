@@ -22,6 +22,7 @@ usage () {
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
+	echo "  -T=tarball          Use this tarball for image creation."
 	echo "  -h                  This message."
 	exit 0
 }
@@ -43,17 +44,12 @@ while [ $# -gt 0 ]; do
 		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
+                -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;	
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
 	shift
 done
-
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
-fi
 
 # set defaults, if nothing given
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
@@ -68,15 +64,15 @@ if ! [[ "${GENERATE}" == "1" ]]; then
 	usage
 fi
 
-### check for available loop devices in a container
-for i in $(seq 0 7); do
-    ! [[ -e /dev/loop$i ]] && mknod /dev/loop$i b 7 $i
-done
-! [[ -e /dev/loop-control ]] && mknod /dev/loop-control c 10 237
+if ! [[ "${TARBALL_NAME}" == "" ]]; then
+        CORE64="$(mktemp -d ${WD}/core64.XXX)"
+        tar xvf ${TARBALL_NAME} -C "${CORE64}" || exit 1
+    else
+        echo "Please enter a tarball name with parameter -T=tarball"
+        exit 1
+fi
 
-
-
-X86_64="$(mktemp -d /var/tmp/X86_64.XXX)"
+X86_64="$(mktemp -d ${WD}/X86_64.XXX)"
 
 # create directories
 mkdir -p "${X86_64}/arch"
@@ -84,11 +80,11 @@ mkdir -p "${X86_64}/boot/syslinux"
 
 _prepare_kernel_initramfs_files() {
 	
-        mv "${CORE64}/var/tmp"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
-        mv "${CORE64}/var/tmp"/*/boot/initrd.img "${X86_64}/boot/initramfs_x86_64.img"
-	mv "${CORE64}/var/tmp"/*/boot/memtest "${X86_64}/boot/memtest"
-	mv "${CORE64}/var/tmp"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
-	mv "${CORE64}/var/tmp"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
+        mv "${CORE64}"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
+        mv "${CORE64}"/*/boot/initrd.img "${X86_64}/boot/initramfs_x86_64.img"
+	mv "${CORE64}"/*/boot/memtest "${X86_64}/boot/memtest"
+	mv "${CORE64}"/*/boot/intel-ucode.img "${X86_64}/boot/intel-ucode.img"
+	mv "${CORE64}"/*/boot/amd-ucode.img "${X86_64}/boot/amd-ucode.img"
 	
 }
 
@@ -96,7 +92,31 @@ _prepare_other_files() {
 	
 	# move in doc
 	mkdir -p "${X86_64}/arch/"
-	mv "${CORE64}/var/tmp"/*/arch/archboot.txt "${X86_64}/arch/"
+	mv "${CORE64}"/*/arch/archboot.txt "${X86_64}/arch/"
+	
+}
+
+_prepare_uefi_boot() {
+        
+        ## get size of boot x86_64 files
+	BOOTSIZE=$(du -bc ${X86_64} | grep total | cut -f1)
+	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
+	
+	mkdir -p "${X86_64}"/CDEFI/
+	
+	## Create cdefiboot.img
+	dd if=/dev/zero of="${X86_64}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024
+	VFAT_IMAGE="${X86_64}/CDEFI/cdefiboot.img"
+	mkfs.vfat "${VFAT_IMAGE}"
+	
+	## Copy all files to UEFI vfat image
+	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/{EFI,loader} ::/
+	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/vmlinuz_x86_64 ::/boot
+	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/intel-ucode.img ::/boot
+	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/amd-ucode.img ::/boot
+	mcopy -i "${VFAT_IMAGE}" "${X86_64}"/boot/initramfs_x86_64.img ::/boot
+		
+	_CD_UEFI_PARAMETERS=""
 	
 }
 
@@ -118,7 +138,7 @@ _download_uefi_shell_tianocore() {
 	
 }
 
-_prepare_uefi_gummiboot_USB_files() {
+_prepare_uefi_systemd-boot_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
 	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${X86_64}/EFI/BOOT/loader.efi"
@@ -152,7 +172,7 @@ efi             /EFI/tools/shellx64_v1.efi
 architecture    x64
 GUMEOF
 	
-	cat << GUMEOF > "${X86_64}/loader/entries/grub-x64-gummiboot.conf"
+	cat << GUMEOF > "${X86_64}/loader/entries/grub-x64-systemd-boot.conf"
 title           GRUB X64 - if EFISTUB boot fails
 efi             /EFI/grub/grubx64.efi
 architecture    x64
@@ -166,8 +186,8 @@ _prepare_uefi_X64_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/grub"
 	
-	echo 'configfile ${cmdpath}/grubx64.cfg' > /var/tmp/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=/var/tmp/grubx64.cfg" -v
+	echo 'configfile ${cmdpath}/grubx64.cfg' > ${X86_64}/grubx64.cfg
+	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg= ${X86_64}/grubx64.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/grub/grubx64.cfg"
 insmod part_gpt
@@ -219,8 +239,8 @@ _prepare_uefi_IA32_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
 	
-	echo 'configfile ${cmdpath}/bootia32.cfg' > /var/tmp/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=/var/tmp/bootia32.cfg" -v
+	echo 'configfile ${cmdpath}/bootia32.cfg' >  ${X86_64}/bootia32.cfg
+	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg= ${X86_64}/bootia32.cfg" -v
 	
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
@@ -251,11 +271,6 @@ menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
-# menuentry "Syslinux for x86_64 Kernel in IA32 UEFI" {
-    # search --no-floppy --set=root --file /EFI/syslinux/efi32/syslinux.efi
-    # chainloader /EFI/syslinux/efi32/syslinux.efi
-# }
-
 menuentry "UEFI Shell IA32 v2" {
     search --no-floppy --set=root --file /EFI/tools/shellia32_v2.efi
     chainloader /EFI/tools/shellia32_v2.efi
@@ -273,57 +288,29 @@ GRUBEOF
 	
 }
 
-_prepare_uefi_IA32_syslinux_USB_files() {
-	
-	mkdir -p "${X86_64}/EFI/syslinux"
-	cp -rf "/usr/lib/syslinux/efi32" "${X86_64}/EFI/syslinux/efi32"
-	
-	cat << EOF > "${X86_64}/EFI/syslinux/efi32/syslinux.cfg"
-PATH /EFI/syslinux/efi32
-
-# UI vesamenu.c32
-UI menu.c32
-
-DEFAULT archboot-x86_64
-
-PROMPT 1
-TIMEOUT 40
-
-MENU TITLE SYSLINUX
-MENU RESOLUTION 1280 800
-
-LABEL archboot-x86_64
-    MENU LABEL Arch Linux x86_64 Archboot - EFI MIXED MODE
-    LINUX /boot/vmlinuz_x86_64
-    APPEND cgroup_disable=memory add_efi_memmap _IA32_UEFI=1 rootfstype=ramfs
-    INITRD /boot/intel-ucode.img,/boot/amd-ucode.img,/boot/initramfs_x86_64.img
-EOF
-
-}
-
 _prepare_other_files
 
 _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_prepare_uefi_gummiboot_USB_files
+_prepare_uefi_systemd-boot_USB_files
 
 _prepare_uefi_X64_GRUB_USB_files
 
 _prepare_uefi_IA32_GRUB_USB_files
 
-# _prepare_uefi_IA32_syslinux_USB_files
+_prepare_uefi_boot
 
 # place syslinux files
-mv "${CORE64}/var/tmp"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
+mv "${CORE64}"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
 
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${X86_64}/boot/syslinux/boot.msg"
 
 cd "${WD}/"
 
-## Generate the BIOS+ISOHYBRID CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
 xorriso -as mkisofs \
         -iso-level 3 \
@@ -334,25 +321,8 @@ xorriso -as mkisofs \
         -eltorito-catalog boot/syslinux/boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -output "${IMAGENAME}.iso" "${X86_64}/" &> "/var/tmp/archboot_allinone_xorriso.log"
-
-# create x86_64 iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-uefi.iso" ]]; then
-	_UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
-	mv "${WD}/${IMAGENAME}-updated-dual-uefi.iso" "${WD}/${IMAGENAME}-uefi.iso"
-fi
-
-# create x86_64 network iso with uefi cd boot support, if not present
-if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-uefi-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _UPDATE_CD_UEFI="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
-	mv "${WD}/${IMAGENAME}-updated-dual-uefi-network.iso" "${WD}/${IMAGENAME}-uefi-network.iso"
-fi
-
-# create x86_64 network iso, if not present
-if [[ -e "${WD}/${IMAGENAME}.iso" ]] && [[ ! -e "${WD}/${IMAGENAME}-network.iso" ]]; then
-	_REMOVE_PACKAGES="1" _REMOVE_x86_64="0" _UPDATE_UEFI_SHELL="0" _UPDATE_SYSLINUX_BIOS_CONFIG="1" "${UPDATEISO_HELPER}" "${WD}/${IMAGENAME}.iso"
-	mv "${WD}/${IMAGENAME}-updated-dual-network.iso" "${WD}/${IMAGENAME}-network.iso"
-fi
+        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
+        -output "${IMAGENAME}.iso" "${X86_64}/" &> "${WD}/${IMAGENAME}.log"
 
 ## create sha256sums.txt
 cd "${WD}/"
@@ -361,6 +331,4 @@ sha256sum *.iso > "${WD}/sha256sums.txt"
 
 # cleanup
 rm -rf "${CORE64}"
-rm -rf "${CORE64}"
-rm -rf "${PACKAGES_TEMP_DIR}"
 rm -rf "${X86_64}"
