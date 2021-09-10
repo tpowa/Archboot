@@ -1,7 +1,7 @@
 
    Archboot Guide
 
-   August, 09th 2021
+   September, 10th 2021
 
    Tobias Powalowski <tpowa@archlinux.org>
 
@@ -61,7 +61,6 @@ Introduction
   What is the difference to the archiso install media?
 
    * It provides an additional interactive setup and quickinst script.
-   * It contains [core] repository on media.
    * It runs a modified Arch Linux system in initramfs.
    * It is restricted to RAM usage, everything which is not necessary like
      man or info pages etc. is not provided.
@@ -102,7 +101,7 @@ Introduction
 
   What are the Archboot Setup features?
 
-   * Media and Network installation mode
+   * Network installation mode
    * Changing keymap and consolefont
    * Changing time and date
    * Setup network with netctl
@@ -143,8 +142,8 @@ Installing Arch Linux with Archboot
 
   Preparing Installation Media
 
-   * Hybrid image file is provided, which includes
-     x86_64 core repository. Please check md5sum before using it.
+   * Hybrid image file is provided.
+     Please check md5sum before using it.
    * Can be burned to CD(RW) media using most CD-burning utilities.
    * Can be raw-written to a drive using 'dd' or similar utilities.
      This method is intended for use with USB thumb drives.
@@ -302,14 +301,10 @@ Common Installation Procedure
    partitions, you may return to the Main Menu and proceed with the next step.
 
   Select Source
-
-   If you have a fast Internet connection, you might  prefer the NETWORK
-   installation to ensure you get the latest packages, instead of using the
-   potentially outdated media contents. Please note that you will probably
-   run into trouble if you have a complex proxy setup with authentication
-   when using the NETWORK installation. If you  can't use a CD-ROM, USB device
-   or any other medium you could mount at this stage, this is the only viable
-   method of installing Arch Linux.
+  
+   Please note that you will probably run into trouble if you have a 
+   complex proxy setup with authentication when using the NETWORK 
+   installation.
 
   Choose Mirror (NETWORK method)
 
