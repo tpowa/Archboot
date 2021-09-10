@@ -18,7 +18,7 @@ usage () {
 	echo ""
 	echo "PARAMETERS:"
 	echo "  -t                  Start generation of tarball."
-	echo "  -g                  Start generation of images."
+	echo "  -g                  Start generation of image."
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
@@ -89,7 +89,7 @@ _prepare_other_files() {
 	
 }
 
-_prepare_uefi_boot() {
+_prepare_uefi_image() {
         
         ## get size of boot x86_64 files
 	BOOTSIZE=$(du -bc ${X86_64} | grep total | cut -f1)
@@ -291,7 +291,7 @@ _prepare_uefi_X64_GRUB_USB_files
 
 _prepare_uefi_IA32_GRUB_USB_files
 
-_prepare_uefi_boot
+_prepare_uefi_image
 
 # place syslinux files
 mkdir -p "${X86_64}/boot/syslinux"
