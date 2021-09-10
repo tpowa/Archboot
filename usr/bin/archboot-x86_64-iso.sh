@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-[[ -z "${WD}" ]] && WD="${PWD}/"
-
 _BASENAME="$(basename "${0}")"
 
 _CARCH="x86_64"
@@ -70,14 +68,14 @@ if ! [[ "${GENERATE}" == "1" ]]; then
 fi
 
 if ! [[ "${TARBALL_NAME}" == "" ]]; then
-        CORE64="$(mktemp -d ${WD}/core64.XXX)"
+        CORE64="$(mktemp -d core64.XXX)"
         tar xvf ${TARBALL_NAME} -C "${CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
         exit 1
 fi
 
-X86_64="$(mktemp -d ${WD}/X86_64.XXX)"
+X86_64="$(mktemp -d X86_64.XXX)"
 
 _prepare_kernel_initramfs_files() {
 	
@@ -306,8 +304,6 @@ mv "${CORE64}"/*/boot/syslinux/* "${X86_64}/boot/syslinux/"
 # Change parameters in boot.msg
 sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${X86_64}/boot/syslinux/boot.msg"
 
-cd "${WD}/"
-
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
 xorriso -as mkisofs \
@@ -320,12 +316,11 @@ xorriso -as mkisofs \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${IMAGENAME}.iso" "${X86_64}/" &> "${WD}/${IMAGENAME}.log"
+        -output "${IMAGENAME}.iso" "${X86_64}/" &> "${IMAGENAME}.log"
 
 ## create sha256sums.txt
-cd "${WD}/"
-rm -f "${WD}/sha256sums.txt" || true
-sha256sum *.iso > "${WD}/sha256sums.txt"
+rm -f "sha256sums.txt" || true
+sha256sum *.iso > "sha256sums.txt"
 
 # cleanup
 rm -rf "${CORE64}"
