@@ -20,8 +20,8 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 mkdir -p $1
 cd $1
-#archboot-create-container.sh archboot-release
-#systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -t -i=archrelease
+archboot-create-container.sh archboot-release
+systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -t -i=archrelease
 systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar
 mv archboot-release/*.iso ./
 
