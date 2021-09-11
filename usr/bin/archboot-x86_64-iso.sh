@@ -50,7 +50,31 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+# from initcpio functions
+kver() {
+    # this is intentionally very loose. only ensure that we're
+    # dealing with some sort of string that starts with something
+    # resembling dotted decimal notation. remember that there's no
+    # requirement for CONFIG_LOCALVERSION to be set.
+    local kver re='^[[:digit:]]+(\.[[:digit:]]+)+'
+
+    # scrape the version out of the kernel image. locate the offset
+    # to the version string by reading 2 bytes out of image at at
+    # address 0x20E. this leads us to a string of, at most, 128 bytes.
+    # read the first word from this string as the kernel version.
+    local offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/boot/vmlinuz-linux")
+    [[ $offset = +([0-9]) ]] || return 1
+
+    read kver _ < \
+        <(dd if="$1" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+
+    [[ $kver =~ $re ]] || return 1
+
+    printf '%s' "$kver"
+}
+
 # set defaults, if nothing given
+[[ -z "${KERNEL}" ]] && KERNEL="$(kver)"
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot-X86_64"
 
