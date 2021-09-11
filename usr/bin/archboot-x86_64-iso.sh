@@ -66,7 +66,7 @@ kver() {
     [[ $offset = +([0-9]) ]] || return 1
 
     read kver _ < \
-        <(dd if="$1" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+        <(dd if="/boot/vmlinuz-linux" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
 
     [[ $kver =~ $re ]] || return 1
 
