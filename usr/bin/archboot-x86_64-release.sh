@@ -20,8 +20,24 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 mkdir -p $1
 cd $1
+# create container
 archboot-create-container.sh archboot-release
+# generate tarball in container
 systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -t -i=archrelease
+# generate iso in container
 systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar
+# move iso out of container
 mv archboot-release/*.iso ./
-
+# create boot directory with ramdisks
+mkdir boot
+isoinfo -R -i *.iso -x /boot/amd-ucode.img > boot/amd-ucode.img
+isoinfo -R -i *.iso -x /boot/intel-ucode.img > boot/intel-ucode.img
+isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_x86_64_archboot.img
+isoinfo -R -i *.iso -x /boot/vmlinuz_x86_64 > boot/vmlinuz_x86_64_archboot
+# create torrent file
+archboot-mktorrent.sh archboot/$1 *.iso
+# create sha256sums
+sha256sum boot/* >> boot/sha256sum.txt
+sha256sum * >> sha256sum.txt
+# remove container
+rm -r archboot-release
