@@ -70,11 +70,11 @@ kver() {
 
     [[ $kver =~ $re ]] || return 1
 
-    printf '%s' "$kver"
+    KERNEL="$(printf '%s' "$kver")"
 }
 
 # set defaults, if nothing given
-[[ -z "${KERNEL}" ]] && KERNEL="$(kver)"
+[[ -z "${KERNEL}" ]] && kver
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot-X86_64"
 
