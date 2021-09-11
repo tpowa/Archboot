@@ -11,29 +11,17 @@ KERNELPKG="linux"
 VMLINUZ="vmlinuz-${KERNELPKG}"
 
 usage() {
-    echo "quickinst <install_mode> <destdir> <package_directory|server_url>"
+    echo "quickinst <destdir> <package_directory|server_url>"
     echo
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
     echo
     echo "First make sure you have all your filesystems mounted under <destdir>."
-    echo "e.g. mount -t iso9660 /dev/cdrom /src "
     echo "Then run this script to install all base packages to <destdir>."
     echo
-    if [[ -e "/usr/bin/curl" ]]; then
-        echo "<install_mode> must be either 'net' or 'media'"
-    else
-        echo "<install_mode> must be 'media'"
-    fi
-    
     echo
     echo "Examples:"
-    
-    if [[ -e "/usr/bin/curl" ]]; then
-                echo "  quickinst net /mnt 'http://mirror.rackspace.com/archlinux/\$repo/os/\$arch'"
-    fi
-
-    echo "  quickinst media /mnt /packages/core-$(uname -m)/pkg"
+    echo "  quickinst net /mnt 'http://mirror.rackspace.com/archlinux/\$repo/os/\$arch'"
     echo ""
     exit 0
 }
@@ -41,11 +29,7 @@ usage() {
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
-    if [[ "${MODE}" = "media" ]]; then
-        serverurl="file://${PKGARG}"
-    elif [[ "${MODE}" = "net" ]]; then
-        serverurl="${PKGARG}"
-    fi
+    serverurl="${PKGARG}"
     # Setup a pacman.conf in /tmp
     cat << EOF > /tmp/pacman.conf
 [options]
@@ -53,8 +37,6 @@ Architecture = auto
 SigLevel = PackageRequired
 CheckSpace
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-CacheDir = /packages/core-$(uname -m)/pkg
-CacheDir = /packages/core-any/pkg
 
 [core]
 Server = ${serverurl}
@@ -108,23 +90,8 @@ chroot_umount()
 
 # package_installation
 install_packages() {
-    if [[ "${MODE}" = "media" ]]; then
-        PKGFILE="/tmp/.pkglist"
-        cp "${PKGARG}/packages.txt" "${PKGFILE}"
-        if [[ ! -f "${PKGFILE}" ]]; then
-            echo "error: Could not find package list: ${PKGFILE}"
-            exit 1
-        fi
-        PACKAGES=
-        # fix pacman list!
-        sed -i -e 's/-i686//g' -e 's/-x86_64//g' -e 's/-any//g' -e 's/"//g' ${PKGFILE}
-        for pkg in $(cat ${PKGFILE} | grep 'base/' | cut -d/ -f2); do
-            pkgname=${pkg%-*-*}
-            PACKAGES="${PACKAGES} ${pkgname}"
-        done
-    else
-        PACKAGES="base linux linux-firmware"
-    fi
+
+    PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
     if [[ "$(lsblk -rnpo FSTYPE | grep ntfs)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
@@ -197,9 +164,7 @@ fi
 
 # prepare pacman
 pacman_conf
-if [[ "${MODE}" = "net" ]]; then
-    pacman_conf_extra
-fi
+pacman_conf_extra
 prepare_pacman
 if [[ $? -ne 0 ]]; then
     echo "Pacman preparation FAILED!"
