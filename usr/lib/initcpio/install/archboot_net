@@ -30,7 +30,7 @@ build ()
     done
     # start dhcpcd on startup
     add_symlink "/etc/systemd/system/multi-user.target.wants/dhcpcd.service" "/usr/lib/systemd/system/dhcpcd.service"
-    add_file "/usr/share/archboot/network/etc/system/dhcpcd@.service.d/no-wait.conf" "/etc/system/dhcpcd@.service.d/no-wait.conf"
+    add_file "/usr/share/archboot/net/etc/system/dhcpcd@.service.d/no-wait.conf" "/etc/system/dhcpcd@.service.d/no-wait.conf"
     add_file "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
     add_full_dir "/usr/lib/tc"
