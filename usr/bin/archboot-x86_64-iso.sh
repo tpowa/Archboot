@@ -96,6 +96,7 @@ if ! [[ "${TARBALL_NAME}" == "" ]]; then
 fi
 
 X86_64="$(mktemp -d X86_64.XXX)"
+mkdir -p "${X86_64}/EFI/BOOT"
 
 _prepare_kernel_initramfs_files() {
 
@@ -114,6 +115,17 @@ _prepare_other_files() {
 	
 }
 
+_prepare_prebootloader_uefi () {
+        mkdir -p "${X86_64}/EFI/BOOT"
+        cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
+	cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
+	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
+}
+
+prepare_lockdowm_ms () {
+        mkdir -p "${X86_64}/EFI/BOOT"
+        cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${X86_64}/EFI/BOOT/LockDown_ms.efi"
+}
 _prepare_uefi_image() {
         
         ## get size of boot x86_64 files
@@ -136,19 +148,17 @@ _download_uefi_shell_tianocore() {
 	
 	mkdir -p "${X86_64}/EFI/tools/"
 	
-	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellx64_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/X64/Shell.efi"
+	## Install Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
+	cp /usr/share/edk2-shell/x64/Shell.efi "${X86_64}/EFI/tools/shellx64_v2.efi" 
 	
-	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellx64_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/X64/Shell_Full.efi"
+	## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
+	cp /usr/share/edk2-shell/x64/Shell_Full.efi "${X86_64}/EFI/tools/shellx64_v1.efi" 
 	
-	## Download Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellia32_v2.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/ShellBinPkg/UefiShell/Ia32/Shell.efi"
+	## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
+	cp /usr/share/edk2-shell/ia32/Shell.efi "${X86_64}/EFI/tools/shellia32_v2.efi"
 	
-	## Download Tianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
-	curl --verbose -f -C - --ftp-pasv --retry 3 --retry-delay 3 -o "${X86_64}/EFI/tools/shellia32_v1.efi" "https://raw.githubusercontent.com/tianocore/edk2/master/EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi"
-	
-}
+	## InstallTianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
+	cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${X86_64}/EFI/tools/shellia32_v1.efi" 
 
 _prepare_uefi_systemd-boot_USB_files() {
 	
@@ -305,6 +315,10 @@ GRUBEOF
 }
 
 _prepare_other_files
+
+_prepare_lockdown_ms_uefi
+
+_prepare_prebootloader_uefi
 
 _prepare_kernel_initramfs_files
 
