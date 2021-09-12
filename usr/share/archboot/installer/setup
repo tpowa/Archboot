@@ -4491,7 +4491,7 @@ select_source() {
     NEXTITEM="4"
     MODE="network"
     if [[ ${S_NET} -eq 0 ]]; then
-            donetwork
+            donetwork || return 1
     fi
     if [[ ${S_TESTING} -eq 0 ]]; then
         dotesting
