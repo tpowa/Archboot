@@ -4946,11 +4946,10 @@ mainmenu() {
     "2" "Set Time And Date" \
     "3" "Prepare Storage Drive" \
     "4" "Select Source" \
-    "5" "Select Packages" \
-    "6" "Install Packages" \
-    "7" "Configure System" \
-    "8" "Install Bootloader" \
-    "9" "Exit Install" 2>${ANSWER}
+    "5" "Install Packages" \
+    "6" "Configure System" \
+    "7" "Install Bootloader" \
+    "8" "Exit Install" 2>${ANSWER}
     NEXTITEM="$(cat ${ANSWER})"
     case $(cat ${ANSWER}) in
         "0")
