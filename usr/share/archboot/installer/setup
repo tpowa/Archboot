@@ -2722,58 +2722,20 @@ run_pacman(){
     chroot_umount
 }
 
-# select_packages()
-# prompts the user to select packages to install
+# install_packages()
+# performs package installation to the target system
 #
-# params: none
-# returns: 1 on error
-select_packages() {
+install_packages() {
     source_set || return 1
+    destdir_mounts || return 1
+    if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
+        getdest
+    fi
     pacman_conf
     prepare_pacman
-    
-    # Archboot setup media Mode uses packages.txt!
-    if [[ "${MODE}" = "media" ]]; then
-        DIALOG --msgbox "Package selection is split into two stages.  First you will select package categories that contain packages you may be interested in.  Then you will be presented with a full list of packages in your selected categories, allowing you to fine-tune your selection.\n\nNOTE: SUPPORT contains additional useful packages for networking and filesystems, DEVEL contains software building tools." 18 70
-        PKGS="/packages/core-$(uname -m)/pkg/packages.txt"
-        if ! [[ -s /tmp/.pkgcategory ]]; then
-            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq | grep -v base ); do
-                CHKLIST="${CHKLIST} ${category} - OFF"
-            done
-        else
-            CHKLIST=
-            for i in $(cat /tmp/.pkgcategory | sed 's|\"||g'); do
-                CHKLIST="${CHKLIST} ${i} ^ ON"
-            done
-            for category in $(cat ${PKGS} | sed 's|/.*$||g' | uniq ); do
-                grep ${category} /tmp/.pkgcategory >/dev/null 2>&1 || CHKLIST="${CHKLIST} ${category} - OFF"
-            done
-        fi
-        DIALOG --checklist "Select Package Categories" 19 55 12 ${CHKLIST} 2>/tmp/.pkgcategory || return 1
-        SELECTALL="no"
-        DIALOG --yesno "Select all packages by default?" 0 0 && SELECTALL="yes"
-        CHKLIST=()
-        for category in $(cat /tmp/.pkgcategory | sed 's|"||g'); do
-            tag="OFF"
-            if [[ "${SELECTALL}" = "yes" ]]; then
-                tag="ON"
-            fi
-            for i in $(grep "${category}/" ${PKGS} | sed -e 's|^[a-z0-9-]*/||g' -e "s|pkg.tar.*$||g" -e 's/-x86_64\.//g' -e 's/-any\.//g'); do
-              pkgname=${i%-*-*}
-              pkgdesc $pkgname
-              CHKLIST+=("${pkgname}" "(${category})" ${tag} "${PKGDESC}")
-            done
-            tag="OFF"
-        done
-        _package_checklist "Select Packages to install. Use SPACE to select." 1 "${CHKLIST[@]}"
-        [[ "${ANSWER_CHECKLIST}" = "" ]] && return 1
-        PACKAGES="base linux linux-firmware ${ANSWER_CHECKLIST[@]}"
-    # network install routine, only install base, linux and linux-firmware for minimal system
-    else
-        PACKAGES=""
-        DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
-        PACKAGES="base linux linux-firmware"
-    fi
+    PACKAGES=""
+    DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
+
     # Add packages which are not in core repository
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
@@ -2839,35 +2801,11 @@ select_packages() {
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
-    NEXTITEM="6"
-    S_SELECT=1
-}
-
-
-# install_packages()
-# performs package installation to the target system
-#
-install_packages() {
-    source_set || return 1
-    destdir_mounts || return 1
-    if [[ "${MODE}" = "media" ]]; then
-        if [[ "${PACKAGES}" = "" || "${S_SELECT}" != "1" ]]; then
-            DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
-            select_packages || return 1
-        fi
-    else
-        if [[ "${S_SELECT}" != "1" ]]; then
-            DIALOG --msgbox "Error:\nYou have to select packages first." 0 0
-            select_packages || return 1
-        fi
-    fi
-    if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
-        getdest
-    fi
+    
     DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
     run_pacman
     S_INSTALL=1
-    NEXTITEM="7"
+    NEXTITEM="6"
     chroot_mount
     # automagic time!
     # any automatic configuration should go here
@@ -4913,7 +4851,7 @@ configure_system() {
         ! [[ $(grep -q ^[a-z] ${DESTDIR}/etc/locale.gen) ]] && sed -i -e 's:^#en_US.UTF-8:en_US.UTF-8:g' ${DESTDIR}/etc/locale.gen
         chroot ${DESTDIR} locale-gen >/dev/null 2>&1
         ## END POSTPROCESSING ##
-        NEXTITEM="8"
+        NEXTITEM="7"
     fi
 }
 
@@ -4989,9 +4927,9 @@ install_bootloader_menu() {
     esac
     
     if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="8"
+        NEXTITEM="7"
     else
-        NEXTITEM="9"
+        NEXTITEM="8"
     fi
 }
 
@@ -5026,17 +4964,12 @@ mainmenu() {
         "4")
             select_source ;;
         "5")
-            select_packages ;;
-        "6")
             install_packages ;;
-        "7")
+        "6")
             configure_system ;;
-        "8")
+        "7")
             install_bootloader ;;
-        "9")
-            if [[ "${S_SRC}" = "1" && "${MODE}" = "media" ]]; then
-                umount "${_MEDIA}" >/dev/null 2>&1
-            fi
+        "8")
             [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear
             echo ""
