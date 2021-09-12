@@ -2735,7 +2735,7 @@ install_packages() {
     prepare_pacman
     PACKAGES=""
     DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
-
+    PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
