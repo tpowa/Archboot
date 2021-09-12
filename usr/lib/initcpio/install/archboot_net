@@ -11,7 +11,7 @@ build ()
     done
     apps="dnsdomainname netstat arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
 	  slattach traceroute arping clockdiff rarpd rdisc tftpd tracepath route \
-	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon  ss tc dhclient ifplugd ifplugstatus \
+	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon ss tc dhclient ifplugd ifplugstatus \
 	  ip ping ethtool"
     for i in $apps; do
         add_binary "$i"
@@ -28,6 +28,9 @@ build ()
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
     done
+    # start dhcpcd on startup
+    add_symlink "/etc/systemd/system/multi-user.target.wants/dhcpcd.service" "/usr/lib/systemd/system/dhcpcd.service"
+    add_file "/usr/share/archboot/network/etc/system/dhcpcd@.service.d/no-wait.conf" "/etc/system/dhcpcd@.service.d/no-wait.conf"
     add_file "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
     add_full_dir "/usr/lib/tc"
