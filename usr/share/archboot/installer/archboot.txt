@@ -435,7 +435,8 @@ Useful links
   Archboot resourses
    Developer:        Tobias Powalowski <tpowa@archlinux.org>
    Latest version:   http://mirror.rackspace.com/archlinux/iso/archboot/latest
-   Development tree: https://gitlab.archlinux.org/tpowa/archboot/
+   Git repository:   https://gitlab.archlinux.org/tpowa/archboot/
+   Wiki entry:       https://wiki.archlinux.org/title/Archboot
 
   Arch Linux resources
    Homepage:   https://www.archlinux.org
