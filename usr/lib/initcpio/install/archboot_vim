@@ -23,6 +23,7 @@ build ()
     add_file "/usr/share/vim/vim82/syntax/resolv.vim"
     add_file "/usr/share/vim/vim82/syntax/fstab.vim"
     add_file "/usr/share/vim/vim82/filetype.vim"
+    add_file "/usr/share/vim/vim82/rgb.txt"
     add_file "/usr/share/licenses/vim/license.txt"
 }
 
