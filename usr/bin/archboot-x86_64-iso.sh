@@ -159,6 +159,7 @@ _download_uefi_shell_tianocore() {
 	
 	## InstallTianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
 	cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${X86_64}/EFI/tools/shellia32_v1.efi" 
+}
 
 _prepare_uefi_systemd-boot_USB_files() {
 	
