@@ -122,7 +122,7 @@ _prepare_prebootloader_uefi () {
 	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
 }
 
-prepare_lockdowm_ms () {
+_prepare_lockdown_ms_uefi () {
         mkdir -p "${X86_64}/EFI/BOOT"
         cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${X86_64}/EFI/BOOT/LockDown_ms.efi"
 }
