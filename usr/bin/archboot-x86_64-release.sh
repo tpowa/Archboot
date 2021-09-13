@@ -32,8 +32,8 @@ mv archboot-release/*.iso ./
 mkdir boot
 isoinfo -R -i *.iso -x /boot/amd-ucode.img > boot/amd-ucode.img
 isoinfo -R -i *.iso -x /boot/intel-ucode.img > boot/intel-ucode.img
-isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_x86_64_archboot.img
-isoinfo -R -i *.iso -x /boot/vmlinuz_x86_64 > boot/vmlinuz_x86_64_archboot
+isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
+isoinfo -R -i *.iso -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
 # create torrent file
 archboot-mktorrent.sh archboot/$1 *.iso
 # create sha256sums
