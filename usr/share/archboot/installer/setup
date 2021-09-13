@@ -30,7 +30,6 @@ PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogr
 DLPROG="wget"
 # sources
 SYNC_URL=""
-FILE_URL="file:///packages/core-$(uname -m)/pkg"
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 unset PACKAGES
 
@@ -2579,9 +2578,7 @@ dotesting() {
 # pacman_conf()
 # creates temporary pacman.conf file
 pacman_conf() {
-    if [[ "${MODE}" = "media" ]]; then
-        local serverurl="${FILE_URL}"
-    elif [[ "${MODE}" = "network" ]]; then
+    if [[ "${MODE}" = "network" ]]; then
         local serverurl="${SYNC_URL}"
         if [[ "${DOTESTING}" = "yes" ]]; then
             TESTING_REPOSITORY="[testing]"
