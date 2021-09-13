@@ -7,8 +7,6 @@ ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation"
 # use the first VT not dedicated to a running console
 LOG="/dev/tty7"
-# where the Archboot media (ISO/CD/USB) should be mounted
-_MEDIA="/src"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/install"
 EDITOR=""
@@ -255,56 +253,6 @@ activate_special_devices()
         activate_lvm2
         activate_luks
     done
-}
-
-_mount_packages_squashfs_images() {
-    
-    ! [[ -d "/packages/core-$(uname -m)" ]] && mkdir -p "/packages/core-$(uname -m)"
-    ! [[ -d "/packages/core-any" ]] && mkdir -p "/packages/core-any"
-    
-    mountpoint -q /packages/core-$(uname -m) && umount "/packages/core-$(uname -m)"
-    mountpoint -q /packages/core-any && umount "/packages/core-any"
-    mount "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" "/packages/core-$(uname -m)"
-    mount "${_MEDIA}/packages/archboot_packages_any.squashfs" "/packages/core-any"
-    
-}
-
-# Check media on install packages
-check_media() {
-    
-    if [[ -n "${_iso_loop_dev}" ]] && [[ -n "${_iso_loop_path}" ]]; then
-        if [[ "$(cat /proc/self/mounts | grep "${_iso_loop_dev}")" ]]; then
-            _iso_loop_dev_mp="$(findmnt -vno SOURCE "${_iso_loop_dev}")"
-        else
-            _iso_loop_dev_mp="/iso_loop_dev"
-            mkdir -p "${_iso_loop_dev_mp}"
-            mount "${_iso_loop_dev}" "${_iso_loop_dev_mp}"
-        fi
-        
-        if [[ -e "${_iso_loop_dev_mp}/${_iso_loop_path}" ]]; then
-            modprobe -q loop
-            _ISO_LOOP_DEVICE="$(losetup --show --find "${_iso_loop_dev_mp}/${_iso_loop_path}")"
-            
-            umount "${_MEDIA}" &>/dev/null
-            mount -o ro,users -t iso9660 "${_ISO_LOOP_DEVICE}" "${_MEDIA}"
-        else
-            unset _iso_loop_dev
-            unset _iso_loop_path
-        fi
-    elif [[ ! "${dev}" == "" ]]; then
-        ! [[ "$(cat /proc/self/mounts | grep ${dev})" ]] && mount "${dev}" "${_MEDIA}" >/dev/null 2>&1
-    fi
-    
-    
-    if [[ -e "${_MEDIA}/packages/archboot_packages_$(uname -m).squashfs" && -e "${_MEDIA}/packages/archboot_packages_any.squashfs" ]]; then
-        _mount_packages_squashfs_images
-        SET_MEDIA="1"
-        [[ "${AUTOMOUNT}" == "1" ]]
-    else
-        umount "${_MEDIA}" &>/dev/null
-        SET_MEDIA="0"
-    fi
-    
 }
 
 # destdir_mounts()
@@ -3872,8 +3820,6 @@ do_syslinux_bios() {
             cat "${MBR}" > "${ROOTDEV}"
         fi
     fi
-    
-    [[ -f "${_MEDIA}/boot/syslinux/splash.png" ]] && cp -f "${_MEDIA}/boot/syslinux/splash.png" "${DESTDIR}/boot/${SYSLINUX_DIR}"
     
     # btrfs does not have ldlinux.sys in filesystem!
     if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" || "${FSTYPE}" == "btrfs" ]]; then
