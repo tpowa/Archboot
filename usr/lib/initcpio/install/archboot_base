@@ -5,7 +5,6 @@ build ()
 {
     ### setting up base structure
     add_dir "/mnt"
-    add_dir "/media"
     add_dir "/install"
     add_dir "/var/log"
     add_dir "/home"
