@@ -98,11 +98,6 @@ _package_checklist ()
     return $ret
 }
 
-# get package description
-pkgdesc () {
-    PKGDESC=$(LANG=C $PACMAN -Si "$@" 2>&1 | awk '/^Name/{ printf("%s ",$3) } /^Version/{ printf("%s:",$3) }/^Description/{ for(i=3;i<=NF;++i) printf(" %s",$i); printf ("\n")}')
-}
-
 # chroot_mount()
 # prepares target system as a chroot
 #
