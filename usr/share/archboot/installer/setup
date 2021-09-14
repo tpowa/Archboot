@@ -2504,20 +2504,6 @@ _mkfs() {
     unset _btrfscompress
 }
 
-# source_set()
-# check if installation source is set, if not run select_source!
-source_set(){
-    while ! [[ "${S_SRC}" = "1" ]]; do
-        if ! [[ "${S_SRC}" = "1" ]]; then
-            DIALOG --msgbox "Error:\nYou have to select Source first." 0 0
-            select_source || break
-        fi
-    done
-    if [[ "${S_SRC}" = "0" ]]; then
-        return 1
-    fi
-}
-
 getsource() {
     S_SRC=0
     if [[ "${MODE}" = "network" ]]; then
@@ -2663,7 +2649,6 @@ run_pacman(){
 # performs package installation to the target system
 #
 install_packages() {
-    source_set || return 1
     destdir_mounts || return 1
     if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
         getdest
@@ -4832,7 +4817,6 @@ install_bootloader() {
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
-    source_set || return 1
     pacman_conf
     prepare_pacman
     CANCEL=""
