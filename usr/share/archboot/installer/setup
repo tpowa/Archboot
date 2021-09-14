@@ -1647,8 +1647,6 @@ detect_DISC() {
 
 check_gpt() {
     
-    detect_DISC
-    
     GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
     
