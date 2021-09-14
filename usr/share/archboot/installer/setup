@@ -38,7 +38,7 @@ PART_ROOT=""
 ROOTFS=""
 
 # install stages
-S_SRC=0         # choose install medium
+S_SRC=0         # choose mirror
 S_NET=0         # network configuration
 S_PART=0        # partitioning
 S_MKFS=0        # formatting
