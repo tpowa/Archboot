@@ -3727,8 +3727,10 @@ do_syslinux_bios() {
             SYSLINUX_OPTS="--raid"
         fi
     fi
-    ### Only not compressed btrfs is supported
-    # extlinux cannot boot from btrfs raid
+    # extlinux cannot boot from compressed btrfs
+    # extlinux cannot boot from btrfs raid, compressed btrfs
+    # FS60996:
+    # btrfs subvolume support of /boot is broken as of 14.09.2021
     ### CHECK is wrong!
     #find_btrfs_raid_bootloader_deviceskk
     #if [[ ${BTRFS_COUNT} -ge 3 ]]; then
