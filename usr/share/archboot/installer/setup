@@ -1635,7 +1635,7 @@ autoprepare() {
 
 detect_DISC() {
     
-    if [[ "${DISC}" == "" ]] || [[ ! "$(grep '/dev/' "${DISC}")" ]]; then
+    if [[ "${DISC}" == "" ]] || [[ ! "$(echo ${DISC} | grep '/dev/')" ]]; then
         DISC="$(${_LSBLK} PKNAME $(findmnt -vno SOURCE "${DESTDIR}/boot"))"
     fi
     
