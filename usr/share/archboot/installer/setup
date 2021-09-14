@@ -2519,7 +2519,7 @@ getsource() {
 # returns: nothing
 select_mirror() {
     ## Download updated mirrorlist, if possible
-    DLPROG "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
+    ${DLPROG} -q -b "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>&1
     
     if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
         mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
@@ -2955,6 +2955,9 @@ donetwork() {
     else
         export ftp_proxy=${PROXY_FTP}
     fi
+    # add sleep here dhcp can need some time to get link
+    DIALOG --infobox "Waiting for network link to come up" 0 0
+    sleep 5
     DIALOG --msgbox "The network is configured." 8 30
     NEXTITEM="2"
     S_NET=1
