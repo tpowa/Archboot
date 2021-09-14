@@ -2519,7 +2519,7 @@ getsource() {
 # returns: nothing
 select_mirror() {
     ## Download updated mirrorlist, if possible
-    curl 'https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on' > /tmp/pacman_mirrorlist.txt
+    DLPROG "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
     
     if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
         mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
@@ -3708,7 +3708,7 @@ do_syslinux_bios() {
     # extlinux only can boot from ext2/3/4, xfs and btrfs partitions!
     FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
     if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" || "${FSTYPE}" == "xfs" ]]; then
-        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 , btrfs or vfat partition with /boot on it." 0 0
+        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4, btrfs, vfat or xfs partition with /boot on it." 0 0
         return 1
     fi
     
@@ -3730,9 +3730,9 @@ do_syslinux_bios() {
     # extlinux cannot boot from compressed btrfs
     # extlinux cannot boot from btrfs raid, compressed btrfs
     # FS60996:
-    # btrfs subvolume support of /boot is broken as of 14.09.2021
+    # btrfs subvolume support of /boot or / is broken as of 14.09.2021
     ### CHECK is wrong!
-    #find_btrfs_raid_bootloader_deviceskk
+    #find_btrfs_raid_bootloader_devices
     #if [[ ${BTRFS_COUNT} -ge 3 ]]; then
     #    DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from any btrfs raid." 0 0
     #    return 1
