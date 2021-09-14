@@ -3705,9 +3705,9 @@ do_syslinux_bios() {
     abort_nilfs_bootpart || return 1
     abort_f2fs_bootpart || return 1
     
-    # extlinux only can boot from ext2/3/4 and btrfs partitions!
+    # extlinux only can boot from ext2/3/4, xfs and btrfs partitions!
     FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
-    if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" ]]; then
+    if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" || "${FSTYPE}" == "xfs" ]]; then
         DIALOG --msgbox "Error:\nCouldn't find ext2/3/4 , btrfs or vfat partition with /boot on it." 0 0
         return 1
     fi
@@ -3721,26 +3721,20 @@ do_syslinux_bios() {
     # check if raid1 device is used, else fail.
     if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
         if ! [[ "$(mdadm --detail ${bootdev} | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
-            DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from non raid1 devices." 0 0
+            DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from none raid1 devices." 0 0
             return 1
         else
             SYSLINUX_OPTS="--raid"
         fi
     fi
-    
+    ### Only not compressed btrfs is supported
     # extlinux cannot boot from btrfs raid
-    find_btrfs_raid_bootloader_devices
-    if [[ ${BTRFS_COUNT} -ge 3 ]]; then
-        DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from any btrfs raid." 0 0
-        return 1
-    fi
-    
-    # extlinux cannot boot from btrfs subvolume
-    find_btrfs_bootloader_subvolume
-    if [[ ${BTRFS_SUBVOLUME_COUNT} -ge 3 ]]; then
-        DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from btrfs subvolume." 0 0
-        return 1
-    fi
+    ### CHECK is wrong!
+    #find_btrfs_raid_bootloader_deviceskk
+    #if [[ ${BTRFS_COUNT} -ge 3 ]]; then
+    #    DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from any btrfs raid." 0 0
+    #    return 1
+    #fi
     
     DEVS="$(findbootloaderdisks _)"
     DEVS="${DEVS} $(findbootloaderpartitions _)"
