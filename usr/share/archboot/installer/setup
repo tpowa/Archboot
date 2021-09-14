@@ -2519,7 +2519,10 @@ getsource() {
 # returns: nothing
 select_mirror() {
     ## Download updated mirrorlist, if possible
+    dialog --infobox "Downloading latest mirrorlist ..." 0 0
     ${DLPROG} -q -b "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>&1
+    # add sleep for getting download done and output nice
+    sleep 5
     
     if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
         mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
