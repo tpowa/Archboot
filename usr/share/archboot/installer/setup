@@ -4862,8 +4862,8 @@ install_bootloader_menu() {
         "UEFI" "UEFI" \
         "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1 
     case $(cat ${ANSWER}) in
-        "UEFI") install_bootloader_bios ;;
-        "BIOS") install_bootloader_uefi ;;
+        "UEFI") install_bootloader_uefi ;;
+        "BIOS") install_bootloader_bios ;;
     esac
     
     if [[ "${CANCEL}" = "1" ]]; then
