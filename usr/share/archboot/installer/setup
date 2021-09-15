@@ -4859,11 +4859,11 @@ install_bootloader() {
 
 install_bootloader_menu() {
     DIALOG --menu "What is your boot system type?" 10 40 2 \
-        "BIOS" "BIOS" \
-        "UEFI" "UEFI" 2>${ANSWER} || CANCEL=1
+        "UEFI" "UEFI" \
+        "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1 
     case $(cat ${ANSWER}) in
-        "BIOS") install_bootloader_bios ;;
-        "UEFI") install_bootloader_uefi ;;
+        "UEFI") install_bootloader_bios ;;
+        "BIOS") install_bootloader_uefi ;;
     esac
     
     if [[ "${CANCEL}" = "1" ]]; then
