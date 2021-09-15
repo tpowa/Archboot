@@ -4117,16 +4117,6 @@ if [ "\${grub_platform}" == "pc" ]; then
     #    ntldr /bootmgr
     #}
     
-    ## Microsoft Windows XP
-    #menuentry \"Microsoft Windows XP\" {
-    #    insmod part_msdos
-    #    insmod ntfs
-    #    insmod search_fs_uuid
-    #    insmod ntldr
-    #    search --fs-uuid --no-floppy --set=root <FS_UUID of Windows SYSTEM Partition>
-    #    ntldr /ntldr
-    #}
-    
 fi
 
 EOF
