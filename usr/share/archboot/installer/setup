@@ -3903,13 +3903,13 @@ do_grub_config() {
         subdir="/boot"
         # on btrfs we need to check on subvol
         if [[ $(mount | grep "${DESTDIR} " | grep btrfs | grep subvol) ]]; then
-            subdir="$(btrfs subvolume show "${DESTDIR}/" | grep Name | cut -d ":" -f2)"
+            subdir="/$(echo $(btrfs subvolume show "${DESTDIR}/" | grep Name | cut -d ":" -f2))"/boot
         fi
     else
         subdir=""
         # on btrfs we need to check on subvol
         if [[ $(mount | "${DESTDIR}/boot " | grep btrfs | grep subvol) ]]; then
-            subdir="$(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2)"
+            subdir="/$(echo $(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2))"
         fi
     fi
     
