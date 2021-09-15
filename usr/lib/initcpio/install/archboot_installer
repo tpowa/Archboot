@@ -14,7 +14,7 @@ build ()
     add_file "/usr/bin/genfstab"
     add_file "/usr/bin/arch-chroot"
     add_file "/usr/bin/pacstrap"
-    add_file "/usr/bin/archboot-update-installer.sh"
+    add_file "/usr/bin/update-installer.sh"
 }
 
 help ()
