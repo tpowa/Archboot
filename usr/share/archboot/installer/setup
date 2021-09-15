@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-### TODO:
-# -add btrfs subvolume support in grub configuration!
 # we rely on some output which is parsed in english!
 unset LANG
 ANSWER="/tmp/.setup"
@@ -4818,11 +4816,11 @@ install_bootloader_uefi() {
 install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
-        "SYSLINUX_BIOS" "SYSLINUX BIOS" \
-        "GRUB_BIOS" "GRUB(2) BIOS" 2>${ANSWER} || CANCEL=1
+        "GRUB_BIOS" "GRUB(2) BIOS" \
+        "SYSLINUX_BIOS" "SYSLINUX BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
-        "SYSLINUX_BIOS") do_syslinux_bios ;;
         "GRUB_BIOS") do_grub_bios ;;
+        "SYSLINUX_BIOS") do_syslinux_bios ;;
     esac
     
 }
