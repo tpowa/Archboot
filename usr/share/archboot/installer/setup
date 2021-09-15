@@ -2724,7 +2724,8 @@ install_packages() {
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
     PACKAGES="filesystem ${PACKAGES}"
     
-    DIALOG --msgbox "Package installation will begin now.  You can watch the output in the progress window. Please be patient." 0 0
+    DIALOG --infobox "Package installation will begin in 3 seconds. You can watch the output in the progress window. Please be patient." 0 0
+    sleep 3
     run_pacman
     S_INSTALL=1
     NEXTITEM="6"
@@ -3490,7 +3491,8 @@ do_refind_uefi() {
     DIALOG --msgbox "Setting up rEFInd now ..." 0 0
     
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg now ..." 0 0
+        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg in 3 seconds ..." 0 0
+        sleep 3
         PACKAGES="refind"
         run_pacman
         unset PACKAGES
@@ -3566,7 +3568,8 @@ do_syslinux_common_before() {
     RAID_ON_LVM=""
     common_bootloader_checks
     if [[ ! -f "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
-        DIALOG --msgbox "Couldn't find syslinux files, installing syslinux and mtools now ..." 0 0
+        DIALOG --infobox "Couldn't find syslinux files, installing syslinux and mtools in 3 seconds ..." 0 0
+        sleep 3
         PACKAGES="syslinux mtools"
         run_pacman
         # reset PACKAGES after installing
@@ -3845,7 +3848,8 @@ do_grub_common_before() {
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --msgbox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg now ..." 0 0
+        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg in 3 secons ..." 0 0
+        sleep 3
         PACKAGES="grub"
         run_pacman
         # reset PACKAGES after installing
