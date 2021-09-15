@@ -2959,9 +2959,8 @@ donetwork() {
         export ftp_proxy=${PROXY_FTP}
     fi
     # add sleep here dhcp can need some time to get link
-    DIALOG --infobox "Waiting for network link to come up" 0 0
+    DIALOG --infobox "Waiting for network link to come up, network is configured..." 0 0
     sleep 5
-    DIALOG --msgbox "The network is configured." 8 30
     NEXTITEM="2"
     S_NET=1
 }
@@ -4356,7 +4355,7 @@ select_source() {
     if [[ ${S_TESTING} -eq 0 ]]; then
         dotesting
     fi
-    TITLE="Arch Linux NETWORK Installation"
+    TITLE="Arch Linux Installation"
     getsource || return 1
     NEXTITEM="5"
 }
