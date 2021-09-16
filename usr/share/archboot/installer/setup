@@ -2138,7 +2138,7 @@ select_filesystem() {
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
     [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs-3g NTFS"
-    [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat VFAT"
+    [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>${ANSWER} || return 1
     FSTYPE=$(cat ${ANSWER})
 }
