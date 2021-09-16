@@ -4,9 +4,7 @@
 build ()
 {
     # add firmware files and licenses
-    for i in $(pacman -Ql linux-firmware | cut -d ' ' -f2 | grep -v /$); do
-        [ -e "$i" ] && add_file "$i"
-    done
+    add_dir "/lib/firmware"
 }
 
 help ()
