@@ -4,7 +4,8 @@
 build ()
 {
     # add firmware files and licenses
-    add_dir "/lib/firmware"
+    add_full_dir "/lib/firmware"
+    add_full_dir "/usr/share/licenses/linux-firmware"
 }
 
 help ()
