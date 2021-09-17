@@ -30,10 +30,14 @@ systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar
 mv archboot-release/*.iso ./
 # create boot directory with ramdisks
 mkdir boot
+mkdir -p boot/licenses/amd-ucode
+mkdir -p boot/licenses/intel-ucode
 isoinfo -R -i *.iso -x /boot/amd-ucode.img > boot/amd-ucode.img
 isoinfo -R -i *.iso -x /boot/intel-ucode.img > boot/intel-ucode.img
 isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
 isoinfo -R -i *.iso -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
+cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
+cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
 archboot-mktorrent.sh archboot/$1 *.iso
 # create sha256sums
