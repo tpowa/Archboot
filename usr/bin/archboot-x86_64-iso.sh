@@ -76,7 +76,7 @@ kver() {
 # set defaults, if nothing given
 [[ -z "${KERNEL}" ]] && kver
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y%m%d-%H%M)"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-${RELEASENAME}-archboot-x86_64"
+[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-archboot-${RELEASENAME}-x86_64"
 
 if [[ "${TARBALL}" == "1" ]]; then
 	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
