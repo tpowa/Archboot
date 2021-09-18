@@ -40,6 +40,16 @@ cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
 archboot-mktorrent.sh archboot/$1 *.iso
+# create Release.txt with included main archlinux packages
+echo Welcome to Archboot image: >>Release.txt
+echo Main Homepage: https://wiki.archlinux.org/title/Archboot >>Release.txt
+echo RAM Recommandation: minimum 1024 MB >>Release.txt
+echo Kernel:$(pacman -Qi linux | grep Version | cut -d ":" -f2) >>Release.txt
+echo Pacman:$(pacman -Qi pacman | grep Version | cut -d ":" -f2) >>Release.txt
+echo Systemd:$(pacman -Qi systemd | grep Version | cut -d ":" -f2) >>Release.txt
+echo Have fun >>Release.txt
+echo Tobias Powalowski >>Release.txt
+echo tpowa@archlinux.org >>Release.txt
 # create sha256sums
 sha256sum boot/* >> boot/sha256sum.txt
 sha256sum * >> sha256sum.txt
