@@ -22,4 +22,4 @@ Creation Date: @@DATE@@
 Release: @@RELEASENAME@@
 Boot kernel: @@KERNEL@@
 Architecture: x86_64
-RAM requirement to boot: 2048 MB or greater
+RAM requirement to boot: 1024 MB or greater
