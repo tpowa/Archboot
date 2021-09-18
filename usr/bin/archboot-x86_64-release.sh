@@ -41,7 +41,7 @@ cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
 archboot-mktorrent.sh archboot/$1 *.iso
 # create Release.txt with included main archlinux packages
-echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM:" >>Release.txt
+echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "RAM Recommandation: minimum 1024 MB" >>Release.txt
