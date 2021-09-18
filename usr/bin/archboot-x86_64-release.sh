@@ -44,7 +44,8 @@ archboot-mktorrent.sh archboot/$1 *.iso
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
-echo "RAM Recommandation: minimum 1024 MB" >>Release.txt
+echo "Architecture: x86_64" >>Release.txt
+echo "RAM requirement to boot: 1024 MB or greater" >>Release.txt
 echo "Kernel:$(pacman -Qi linux | grep Version | cut -d ":" -f2)" >>Release.txt
 echo "Pacman:$(pacman -Qi pacman | grep Version | cut -d ":" -f2)" >>Release.txt
 echo "Systemd:$(pacman -Qi systemd | grep Version | cut -d ":" -f2)" >>Release.txt
