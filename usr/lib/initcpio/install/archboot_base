@@ -73,6 +73,9 @@ build ()
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
         add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
     done
+    add_file "/etc/profile"
+    add_file "/etc/group"
+    add_file "/etc/gshadow"
 
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
