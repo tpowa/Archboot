@@ -24,6 +24,6 @@ echo "Hit ENTER to enter the zsh shell ..."
 read
 clear
 if ! [ -e /tmp/.setup ]; then
-	[ -e /arch/setup ] && /arch/setup
+	[ -e /usr/bin/setup ] && setup
 fi
 # End of file
