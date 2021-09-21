@@ -191,7 +191,7 @@ build ()
     # add rule files
     add_full_dir "/usr/lib/udev"
     # add schedule rules file
-    add_file "/usr/share/archboot/base/etc/udev/rules.d/60-schedulers.rules" "/etc/udev/rules.d/60-schedulers.rules" 
+    add_file "/usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules" "/etc/udev/rules.d/60-ioschedulers.rules" 
 
     # add swapiness sysctl config file
     add_file "/usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf" "/etc/sysctl.d/99-sysctl.conf"
@@ -215,7 +215,7 @@ build ()
     add_dir "/var/lib/pacman"
     add_file "/etc/pacman.conf"
     add_file "/etc/makepkg.conf"
-    add_file "/etc/pacman.d/mirrorlist"
+#     add_file "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
     add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
