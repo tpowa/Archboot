@@ -13,13 +13,11 @@ Archboot options and troubleshooting:
   boot options: 'noapic acpi=off pci=routeirq nosmp nomsi' may be useful.
 - Some hardware doesn't like the KMS activation, use nouveau.modeset=0
   or radeon.modeset=0 or i915.modeset=0 or nomodeset on boot prompt.
-- General installation instructions and boot options, 
-  please have a look at: /arch/archboot.txt
 
 Archboot resourses:
 - Homepage:         https://wiki.archlinux.org/index.php/Archboot
-- Latest version:   https://mirror.rackspace.com/archlinux/iso/archboot/latest/
-- Development tree: https://gitlab.archlinux.org/tpowa/archboot/
+- Latest version:   https://mirror.rackspace.com/archlinux/iso/archboot/latest
+- Development tree: https://gitlab.archlinux.org/tpowa/archboot
 - Developer:        Tobias Powalowski <tpowa@archlinux.org>
 
 Arch Linux resources:
