@@ -213,9 +213,9 @@ build ()
     done
     add_dir "/var/cache/pacman/pkg"
     add_dir "/var/lib/pacman"
-    add_file "/usr/share/archboot/pacman/etc/pacman.conf" "/etc/pacman.conf"
-    add_file "/usr/share/archboot/pacman/etc/makepkg.conf" "/etc/makepkg.conf"
-    add_file "/usr/share/archboot/pacman/etc/pacman.d/mirrorlist" "/etc/pacman.d/mirrorlist"
+    add_file "/etc/pacman.conf"
+    add_file "/etc/makepkg.conf"
+    add_file "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
     add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
