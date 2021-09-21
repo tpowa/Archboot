@@ -13,7 +13,7 @@ build ()
     done
     add_dir "/var/lib/ntp"
     chown ntp:root "$BUILDROOT/var/lib/ntp"
-    add_file "/usr/share/archboot/tz/tz" "/usr/bin/tz"
+    add_file "/usr/bin/archboot-tz.sh" "/usr/bin/tz"
     # fix licenses
     add_file "/usr/share/licenses/ntp/LICENSE"
 }
