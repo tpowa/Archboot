@@ -226,6 +226,8 @@ build ()
     add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
     add_full_dir "/usr/share/pacman/keyrings"
     add_full_dir "/usr/share/makepkg"
+    # add local installed pacman database
+    add_full_dir "/var/lib/pacman/local"
 
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"
