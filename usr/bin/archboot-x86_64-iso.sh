@@ -107,14 +107,6 @@ _prepare_kernel_initramfs_files() {
         
 }
 
-_prepare_other_files() {
-	
-	# move in doc
-	mkdir -p "${X86_64}/arch/"
-	mv "${CORE64}"/*/arch/archboot.txt "${X86_64}/arch/"
-	
-}
-
 _prepare_prebootloader_uefi () {
         mkdir -p "${X86_64}/EFI/BOOT"
         cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
@@ -314,8 +306,6 @@ GRUBEOF
         rm ${X86_64}/bootia32.cfg
         
 }
-
-_prepare_other_files
 
 _prepare_lockdown_ms_uefi
 

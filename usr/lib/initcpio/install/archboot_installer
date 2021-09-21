@@ -6,11 +6,6 @@ build ()
     ! [ -d "${TEMPDIR}/arch/" ] && mkdir -p ${TEMPDIR}/arch/
     add_file "/usr/share/archboot/installer/setup" "/arch/setup"
     add_file "/usr/share/archboot/installer/quickinst" "/arch/quickinst"
-    DOCS=$(mktemp /var/tmp/docs.XXXX)
-    cp -f /usr/share/archboot/installer/archboot.txt ${DOCS}
-    gzip -9 ${DOCS}
-    add_file "${DOCS}.gz" "/arch/archboot.txt.gz" 
-    cp /usr/share/archboot/installer/archboot.txt ${TEMPDIR}/arch/archboot.txt
     add_file "/usr/bin/genfstab"
     add_file "/usr/bin/arch-chroot"
     add_file "/usr/bin/pacstrap"
