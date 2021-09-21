@@ -2763,7 +2763,7 @@ auto_fstab(){
 # add udev rule for ssd disks using the deadline scheduler by default
 # add sysctl file for swaps
 auto_ssd () {
-    [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules ]] && cp /etc/udev/rules.d/60-schedulers.rules ${DESTDIR}/etc/udev/rules.d/60-schedulers.rules
+    [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules ]] && cp /etc/udev/rules.d/60-ioschedulers.rules ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules
     [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]] && cp /etc/sysctl.d/99-sysctl.conf ${DESTDIR}/etc/sysctl.d/99-sysctl.conf
 }
 
