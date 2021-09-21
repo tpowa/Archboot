@@ -19,11 +19,18 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 mkdir -p $1/var/lib/pacman
+# install archboot
 pacman --root "$1" -Sy base archboot --noconfirm
+# generate locales
 systemd-nspawn -D $1 /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen"
 systemd-nspawn -D $1 /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen"
 systemd-nspawn -D $1 locale-gen
+# generate pacman keyring
 systemd-nspawn -D $1 pacman-key --init
 systemd-nspawn -D $1 pacman-key --populate archlinux
+# add genneral mirror
 systemd-nspawn -D $1 /bin/bash -c "echo 'Server = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch' >> /etc/pacman.d/mirrorlist"
+# reinstall kernel to get files in /boot
 systemd-nspawn -D $1 pacman -Sy linux --noconfirm
+# disable checkspace option in pacman.conf, to allow to install packages in environment
+systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/pacman.conf"
