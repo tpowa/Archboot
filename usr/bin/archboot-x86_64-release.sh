@@ -23,9 +23,9 @@ cd $1
 # create container
 archboot-create-container.sh archboot-release
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
-systemd-nspawn -D archboot-release /bin/bash -c "umount /tmp;archboot-release archboot-x86_64-iso.sh -t -i=archrelease"
+systemd-nspawn -D archboot-release /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
 # generate iso in container
-systemd-nspawn -D archboot-release /bin/bash -c "umount /tmp;archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar"
+systemd-nspawn -D archboot-release /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # move iso out of container
 mv archboot-release/*.iso ./
 # remove container
