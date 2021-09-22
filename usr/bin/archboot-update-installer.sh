@@ -9,16 +9,21 @@ CONFIG="/etc/archboot/x86_64.conf"
 
 usage () {
 	echo "${_BASENAME}: usage"
-	echo "Update installer or complete environment or create new image files:"
-	echo "-------------------------------------------------------------------"
+	echo "Update installer, launch latest environment or create latest image files:"
+	echo "---------------------------------------------------------------------------"
 	echo ""
 	echo "PARAMETERS:"
-	echo "  -u      Update scripts: setup, quickinst, tz and km."
-	echo "  -c      Update and launch complete updated archboot environment (using kexec)."
-        echo "          This operation needs at least 7500 MB RAM."
-        echo "  -i      Generate new release image files in /archboot-release directory"
-        echo "          This operation needs at least 8000 MB RAM."
-	echo "  -h      This message."
+	echo "  -u             Update scripts: setup, quickinst, tz km and helpers."
+	echo ""
+	echo "  -latest        Launch latest archboot environment (using kexec)."
+        echo "                 This operation needs at least 4500 MB RAM."
+        echo "                 On fast internet connection (100Mbit) (approx. 5 minutes)"
+        echo ""
+        echo "  -latest-image  Generate latest image files in /archboot-release directory"
+        echo "                 This operation needs at least 5500 MB RAM."
+        echo "                 On fast internet connection (100Mbit) (approx. 5 minutes)"
+        echo ""
+	echo "  -h             This message."
 	exit 0
 }
 
@@ -27,8 +32,8 @@ usage () {
 while [ $# -gt 0 ]; do
 	case ${1} in
 		-u|--u) D_SCRIPTS="1" ;;
-		-c|--c) L_COMPLETE="1" ;;
-		-i|--i) G_RELEASE="1" ;;
+		-latest|--latest) L_COMPLETE="1" ;;
+		-latest-image|--latest-image) G_RELEASE="1" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -43,6 +48,9 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup
     [[ -e /usr/bin/km ]] && wget -q "$INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km
     [[ -e /usr/bin/tz ]] && wget -q "$INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz
+    [[ -e /usr/bin/archboot-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-create-container.sh?inline=false" -O /usr/bin/archboot-create-container.sh
+    [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh
+    [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh
 fi
 
 # Generate new environment and launch it with kexec
@@ -53,7 +61,7 @@ if [[ "${L_COMPLETE}" == "1" ]]; then
     pacman -Scc --noconfirm
     systemd-nspawn -D archboot pacman -Scc --noconfirm
     # generate initrd in container
-    systemd-nspawn -D archboot /bin/bash -c "mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
+    systemd-nspawn -D archboot /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
     mv archboot/initrd.img /
     mv archboot/boot/vmlinuz-linux /
     mv archboot/boot/intel-ucode.img /

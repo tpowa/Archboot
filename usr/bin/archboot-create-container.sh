@@ -33,6 +33,6 @@ systemd-nspawn -D $1 /bin/bash -c "echo 'Server = https://mirror.rackspace.com/a
 # disable checkspace option in pacman.conf, to allow to install packages in environment
 systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/pacman.conf"
 # enable parallel downloads
-systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParlallelDownloads:g' /etc/pacman.conf"
+systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' /etc/pacman.conf"
 # reinstall kernel to get files in /boot
 systemd-nspawn -D $1 pacman -Sy linux --noconfirm
