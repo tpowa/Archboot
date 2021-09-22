@@ -5,7 +5,7 @@ _BASENAME="$(basename "${0}")"
 D_SCRIPTS=""
 L_COMPLETE=""
 G_RELEASE=""
-PRESET="/etc/archboot/presets/x86_64"
+CONFIG="/etc/archboot/x86_64.conf"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -13,12 +13,12 @@ usage () {
 	echo "-------------------------------------------------------------------"
 	echo ""
 	echo "PARAMETERS:"
-	echo "  -u                  Update scripts: setup, quickinst, tz and km."
-	echo "  -c                  Update and launch complete updated archboot environment (using kexec)."
-        echo "                      This operation needs at least 3072 MB RAM."
-        echo "  -i                  Generate new release image files in /archboot-release directory"
-        echo "                      This operation needs at least 4096 MB RAM."
-	echo "  -h                  This message."
+	echo "  -u      Update scripts: setup, quickinst, tz and km."
+	echo "  -c      Update and launch complete updated archboot environment (using kexec)."
+        echo "          This operation needs at least 6144 MB RAM."
+        echo "  -i      Generate new release image files in /archboot-release directory"
+        echo "          This operation needs at least 6144 MB RAM."
+	echo "  -h      This message."
 	exit 0
 }
 
@@ -48,10 +48,13 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" ]]; then
     # create container
-    archboot-create-container.sh archboot
+    archboot-create-container.sh archboot || exit 1
+    # clean cache to safe memory
+    pacman -Scc --noconfirm
+    systemd-nspawn -D archboot pacman -Scc --noconfirm
     # generate tarball in container
-    systemd-nspawn -D archboot mkinitcpio -c ${PRESET} -k ${ALL_kver} -g /initrd.img
-    kexec -l archboot/boot/vmlinuz-linux --initrd=archboot/boot/intel-ucode.img --initrd=archboot/boot/amd-ucode.img --initrd=archboot/initd.img --append="group_disable=memory rootdelay=10 rootfstype=ramfs"
+    systemd-nspawn -D archboot /bin/bash -c "mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
+    kexec -l archboot/boot/vmlinuz-linux --initrd=archboot/boot/intel-ucode.img --initrd=archboot/boot/amd-ucode.img --initrd=archboot/initrd.img --reuse-cmdline
     systemctl kexec
 fi
 
