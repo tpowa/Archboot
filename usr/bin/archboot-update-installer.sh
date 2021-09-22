@@ -52,9 +52,17 @@ if [[ "${L_COMPLETE}" == "1" ]]; then
     # clean cache to safe memory
     pacman -Scc --noconfirm
     systemd-nspawn -D archboot pacman -Scc --noconfirm
-    # generate tarball in container
+    # generate initrd in container
     systemd-nspawn -D archboot /bin/bash -c "mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
-    kexec -l archboot/boot/vmlinuz-linux --initrd=archboot/boot/intel-ucode.img --initrd=archboot/boot/amd-ucode.img --initrd=archboot/initrd.img --reuse-cmdline
+    mv archboot/initrd.img /
+    mv archboot/boot/vmlinuz-linux /
+    mv archboot/boot/intel-ucode.img /
+    mv archboot/boot/amd-ucode.img /
+    # cleanup archboot
+    rm -r archboot
+    # load kernel and initrds into running kernel
+    kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
+    # restart environment
     systemctl kexec
 fi
 

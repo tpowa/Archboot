@@ -28,6 +28,8 @@ systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -t -i=archrelease
 systemd-nspawn -D archboot-release archboot-x86_64-iso.sh -g -T=archrelease.tar
 # move iso out of container
 mv archboot-release/*.iso ./
+# remove container
+rm -r archboot-release
 # create boot directory with ramdisks
 mkdir boot
 mkdir -p boot/licenses/amd-ucode
@@ -55,5 +57,3 @@ echo "tpowa@archlinux.org" >>Release.txt
 # create sha256sums
 sha256sum boot/* >> boot/sha256sum.txt
 sha256sum * >> sha256sum.txt
-# remove container
-rm -r archboot-release
