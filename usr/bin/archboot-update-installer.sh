@@ -15,9 +15,9 @@ usage () {
 	echo "PARAMETERS:"
 	echo "  -u      Update scripts: setup, quickinst, tz and km."
 	echo "  -c      Update and launch complete updated archboot environment (using kexec)."
-        echo "          This operation needs at least 6144 MB RAM."
+        echo "          This operation needs at least 7500 MB RAM."
         echo "  -i      Generate new release image files in /archboot-release directory"
-        echo "          This operation needs at least 6144 MB RAM."
+        echo "          This operation needs at least 8000 MB RAM."
 	echo "  -h      This message."
 	exit 0
 }
