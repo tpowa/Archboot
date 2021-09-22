@@ -42,7 +42,7 @@ done
 
 # Download latest setup and quickinst script from git repository
 if [[ "${D_SCRIPTS}" == "1" ]]; then 
-    echo 'Downloading latest km, tz, quickinst and setup script...'
+    echo 'Downloading latest km, tz, quickinst,setup and helpers...'
     INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
     [[ -e /usr/bin/quickinst ]] && wget -q "$INSTALLER_SOURCE/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup
