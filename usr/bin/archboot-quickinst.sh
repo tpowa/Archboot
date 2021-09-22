@@ -36,6 +36,7 @@ pacman_conf() {
 Architecture = auto
 SigLevel = PackageRequired
 CheckSpace
+ParallelDownloads = 5
 CacheDir = ${DESTDIR}/var/cache/pacman/pkg
 
 [core]
