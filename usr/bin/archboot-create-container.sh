@@ -34,5 +34,6 @@ systemd-nspawn -D $1 /bin/bash -c "echo 'Server = https://mirror.rackspace.com/a
 systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/pacman.conf"
 # enable parallel downloads
 systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' /etc/pacman.conf"
+cp /var/cache/pacman/pkg/linux-"$(systemd-nspawn -D archboot-release pacman -Qi linux | grep Version | cut -d ":" -f2)"* $1/var/cache/pacman/pkg/
 # reinstall kernel to get files in /boot
 systemd-nspawn -D $1 pacman -Sy linux --noconfirm
