@@ -23,7 +23,7 @@ if [ "$(echo "${HOOKS[@]}" | grep archboot_installer)" ]; then
     echo "  - On first login setup is launched automatically." >> ${MOTD}
     echo "  - Please run 'setup' again to install Arch Linux if you left setup." >> ${MOTD}
     echo "  - vc7 is used for setup logging." >> ${MOTD}
-    echo "  - Run update-installer.sh to get latest setup, quickinst, tz and km script." >> ${MOTD}
+    echo "  - Run update-installer.sh to get update options of installer." >> ${MOTD}
     echo "For Experts:" >> ${MOTD}
     echo "  - Use 'quickinst' to install and bypass the setup routine." >> ${MOTD}
 fi

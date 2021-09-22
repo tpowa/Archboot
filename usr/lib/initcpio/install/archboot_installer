@@ -10,6 +10,10 @@ build ()
     add_file "/usr/bin/arch-chroot"
     add_file "/usr/bin/pacstrap"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
+    add_file "/usr/bin/archboot-create-container.sh"
+    add_file "/usr/bin/archboot-x86_64-release.sh"
+    add_file "/usr/bin/archboot-mktorrent.sh"
+    add_binary "isoinfo mktorrent sha256sum"
 }
 
 help ()
