@@ -34,9 +34,9 @@ echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Relea
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "Architecture: x86_64" >>Release.txt
 echo "RAM requirement to boot: 1024 MB or greater" >>Release.txt
-echo "Kernel:$(systemd-nspawn -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2)" >>Release.txt
-echo "Pacman:$(systemd-nspawn -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2)" >>Release.txt
-echo "Systemd:$(systemd-nspawn -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2)" >>Release.txt
+echo "Kernel:$(systemd-nspawn -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
+echo "Pacman:$(systemd-nspawn -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
+echo "Systemd:$(systemd-nspawn -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
 echo "Have fun" >>Release.txt
 echo "Tobias Powalowski" >>Release.txt
 echo "tpowa@archlinux.org" >>Release.txt
