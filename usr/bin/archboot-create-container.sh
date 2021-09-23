@@ -35,6 +35,6 @@ systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/
 # enable parallel downloads
 systemd-nspawn -D $1 /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' /etc/pacman.conf"
 mkdir -p $1/var/cache/pacman/pkg/
-cp /var/cache/pacman/pkg/linux-"$(echo $(systemd-nspawn -D $1 pacman -Qi linux | grep Version | cut -d ":" -f2))"* $1/var/cache/pacman/pkg/
+cp /var/cache/pacman/pkg/linux-"$(echo $(systemd-nspawn -D $1 pacman -Qi linux | grep Version | cut -d ":" -f2 | cut -d "-" -f1))"* $1/var/cache/pacman/pkg/
 # reinstall kernel to get files in /boot
 systemd-nspawn -D $1 pacman -Sy linux --noconfirm
