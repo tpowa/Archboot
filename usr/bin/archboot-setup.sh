@@ -57,16 +57,6 @@ DIALOG() {
     return $?
 }
 
-# DIALOG() taken from aif installer
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_checklist_dialog()
-{
-    dialog --backtitle "$TITLE" --aspect 15 "$@" 3>&1 1>&2 2>&3 3>&-
-}
-
 # chroot_mount()
 # prepares target system as a chroot
 #
