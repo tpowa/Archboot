@@ -13,8 +13,6 @@ build ()
     for i in /usr/lib/openvpn/plugins/*; do
         add_file "$i"
     done
-    # fix licenses
-    add_file "/usr/share/licenses/openvpn/COPYING"
 }
 
 help ()
