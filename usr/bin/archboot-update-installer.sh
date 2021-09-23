@@ -6,6 +6,8 @@ D_SCRIPTS=""
 L_COMPLETE=""
 G_RELEASE=""
 CONFIG="/etc/archboot/x86_64.conf"
+W_DIR="archboot"
+INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -43,7 +45,7 @@ done
 # Download latest setup and quickinst script from git repository
 if [[ "${D_SCRIPTS}" == "1" ]]; then 
     echo 'Downloading latest km, tz, quickinst,setup and helpers...'
-    INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
+
     [[ -e /usr/bin/quickinst ]] && wget -q "$INSTALLER_SOURCE/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup
     [[ -e /usr/bin/km ]] && wget -q "$INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km
@@ -56,18 +58,15 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" ]]; then
     # create container
-    archboot-create-container.sh archboot || exit 1
-    # clean cache to safe memory
-    pacman -Scc --noconfirm
-    systemd-nspawn -D archboot pacman -Scc --noconfirm
+    archboot-create-container.sh "${W_DIR}" || exit 1
     # generate initrd in container
-    systemd-nspawn -D archboot /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
-    mv archboot/initrd.img /
-    mv archboot/boot/vmlinuz-linux /
-    mv archboot/boot/intel-ucode.img /
-    mv archboot/boot/amd-ucode.img /
-    # cleanup archboot
-    rm -r archboot
+    systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
+    mv "${W_DIR}"/initrd.img /
+    mv "${W_DIR}"/boot/vmlinuz-linux /
+    mv "${W_DIR}"/boot/intel-ucode.img /
+    mv "${W_DIR}"/boot/amd-ucode.img /
+    # remove "${W_DIR}"
+    rm -r "${W_DIR}"
     # load kernel and initrds into running kernel
     kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
     # restart environment
@@ -76,5 +75,5 @@ fi
 
 # Generate new images
 if [[ "${G_RELEASE}" == "1" ]]; then
-    archboot-x86_64-release.sh archboot
+    archboot-x86_64-release.sh "${W_DIR}"
 fi
