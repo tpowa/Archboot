@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_PWD="$(PWD)"
+_PWD="$(pwd)"
 _BASENAME="$(basename "${0}")"
 _CACHEDIR=""$1"/var/cache/pacman/pkg"
 
