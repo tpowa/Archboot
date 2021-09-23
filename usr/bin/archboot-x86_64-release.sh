@@ -45,9 +45,7 @@ mv "${W_DIR}"/*.iso ./
 # remove container
 rm -r "${W_DIR}"
 # create boot directory with ramdisks
-mkdir boot
-mkdir -p boot/licenses/amd-ucode
-mkdir -p boot/licenses/intel-ucode
+mkdir -p boot/licenses/{amd-ucode,intel-ucode}
 isoinfo -R -i *.iso -x /boot/amd-ucode.img > boot/amd-ucode.img
 isoinfo -R -i *.iso -x /boot/intel-ucode.img > boot/intel-ucode.img
 isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
