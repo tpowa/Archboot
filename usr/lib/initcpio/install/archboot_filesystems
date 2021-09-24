@@ -13,7 +13,7 @@ build ()
 	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
 	  btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
 	  umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs \
-	  fusermount mount.fuse ulockmgr_server fsck.exfat mkfs.exfat tune.exfat exfatlabel dump.exfat"
+	  fusermount mount.fuse ulockmgr_server fsck.exfat mkfs.exfat tune.exfat exfatlabel dump.exfat fatresize"
     for i in $apps; do
         add_binary "$i"
     done
