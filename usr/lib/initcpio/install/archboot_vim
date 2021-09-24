@@ -9,19 +9,10 @@ build ()
     add_symlink "/usr/bin/vi" "/usr/bin/vim"
     add_file "/usr/share/vim/vimfiles/archlinux.vim"
     add_file "/usr/share/vim/vim82/defaults.vim"
-    add_file "/usr/share/vim/vim82/syntax/syntax.vim"
-    add_file "/usr/share/vim/vim82/syntax/conf.vim"
-    add_file "/usr/share/vim/vim82/syntax/sh.vim"
-    add_file "/usr/share/vim/vim82/syntax/grub.vim"
-    add_file "/usr/share/vim/vim82/syntax/manual.vim"
-    add_file "/usr/share/vim/vim82/syntax/synload.vim"
-    add_file "/usr/share/vim/vim82/syntax/colortest.vim"
-    add_file "/usr/share/vim/vim82/syntax/syncolor.vim"
-    add_file "/usr/share/vim/vim82/syntax/hitest.vim"
-    add_file "/usr/share/vim/vim82/syntax/whitespace.vim"
-    add_file "/usr/share/vim/vim82/syntax/modconf.vim"
-    add_file "/usr/share/vim/vim82/syntax/resolv.vim"
-    add_file "/usr/share/vim/vim82/syntax/fstab.vim"
+    SYNTAX=(syntax conf sh grup manual synload colortest syncolor hitest whitespace modconf resolv fstab bash zsh exports passwd sysctl systemd vim)
+    for i in ${SYNTAX}; do
+        add_file "/usr/share/vim/vim82/syntax/$i.vim"
+    done
     add_file "/usr/share/vim/vim82/filetype.vim"
     add_file "/usr/share/vim/vim82/rgb.txt"
     add_file "/usr/share/licenses/vim/license.txt"
