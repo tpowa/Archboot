@@ -10,7 +10,6 @@ W_DIR="archboot"
 INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 
 usage () {
-	echo "${_BASENAME}: usage"
 	echo "Update installer, launch latest environment or create latest image files:"
 	echo "---------------------------------------------------------------------------"
 	echo ""
