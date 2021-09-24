@@ -15,7 +15,7 @@ usage () {
 	echo "---------------------------------------------------------------------------"
 	echo ""
 	echo "PARAMETERS:"
-	echo "  -u             Update scripts: setup, quickinst, tz km and helpers."
+	echo "  -u             Update scripts: setup, quickinst, tz, km and helpers."
 	echo ""
 	echo "  -latest        Launch latest archboot environment (using kexec)."
         echo "                 This operation needs at least 3500 MB RAM."
