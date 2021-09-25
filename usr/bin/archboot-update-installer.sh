@@ -57,7 +57,7 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
 fi
 
 # Generate new environment and launch it with kexec
-if [[ "${L_COMPLETE}" == "1" -o "${L_INSTALL_COMPLETE}" == "1" ]]; then
+if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # create container
     [[ "${L_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -cp -alf || exit 1
     [[ "${L_INSTALL_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -alf || exit 1
