@@ -36,7 +36,7 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-u|--u) D_SCRIPTS="1" ;;
 		-latest|--latest) L_COMPLETE="1" ;;
-		-latest-install|--latest-install) L_INSTALL_COMPLETE;;
+		-latest-install|--latest-install) L_INSTALL_COMPLETE="1";;
 		-latest-image|--latest-image) G_RELEASE="1" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
