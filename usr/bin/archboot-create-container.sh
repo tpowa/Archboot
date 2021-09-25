@@ -5,7 +5,6 @@ _BASENAME="$(basename "${0}")"
 _CACHEDIR=""$1"/var/cache/pacman/pkg"
 _FIRMWARE="linux-firmware"
 _CLEANUP_CACHE=""
-_MOVE_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
@@ -16,7 +15,7 @@ usage () {
 	echo "This will create an archboot container for an archboot image."
 	echo "Usage: ${_BASENAME} <directory> <options>"
 	echo " Options:"
-	echo "  -c     Cleanup container eg. remove manpages, includes ..."
+	echo "  -cc    Cleanup container eg. remove manpages, includes ..."
 	echo "  -cp    Cleanup container package cache"
 	echo "  -lf    add linux-firmware to container"
 	echo "  -alf   add archboot-linux-firmware to container"
@@ -66,7 +65,7 @@ systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^#ParallelDownloads:Paral
 systemd-nspawn -D "${_DIR}" pacman -Sy linux --noconfirm
  [[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
 
-if [[ "${SAVE_RAM}" ==  "1" ]]; then
+if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     rm -r "${_DIR}"/usr/include
     rm -r "${_DIR}"/usr/share/{man,doc}
@@ -74,5 +73,5 @@ fi
 
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
-    systemd-nspawn -D "${_DIR}" pacman -Scc --noconfirm
+    rm -r "${_DIR}"/var/cache/pacman
 fi
