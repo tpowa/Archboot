@@ -4,6 +4,7 @@
 _BASENAME="$(basename "${0}")"
 D_SCRIPTS=""
 L_COMPLETE=""
+L_INSTALL_COMPLETE=""
 G_RELEASE=""
 CONFIG="/etc/archboot/x86_64.conf"
 W_DIR="archboot"
@@ -59,8 +60,8 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # create container
-    [[ "${L_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -cp -alf || exit 1
-    [[ "${L_INSTALL_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -alf || exit 1
+    [[ "${L_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
+    [[ "${L_INSTALL_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
     # generate initrd in container
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
     mv "${W_DIR}"/initrd.img /
