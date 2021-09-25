@@ -66,8 +66,9 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
         archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
     fi
-    # generate initrd in container
-    systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
+    
+    # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
+    systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
     mv "${W_DIR}"/initrd.img /
     mv "${W_DIR}"/boot/vmlinuz-linux /
     mv "${W_DIR}"/boot/intel-ucode.img /
