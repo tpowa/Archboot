@@ -60,8 +60,12 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # create container
-    [[ "${L_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
-    [[ "${L_INSTALL_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
+    if [[ "${L_COMPLETE}" == "1" ]]; then
+        archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
+    fi
+    if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
+        archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
+    fi
     # generate initrd in container
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
     mv "${W_DIR}"/initrd.img /
