@@ -12,17 +12,19 @@ INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/b
 usage () {
 	echo "Update installer, launch latest environment or create latest image files:"
 	echo "---------------------------------------------------------------------------"
-	echo ""
 	echo "PARAMETERS:"
-	echo "  -u             Update scripts: setup, quickinst, tz, km and helpers."
+	echo " -u             Update scripts: setup, quickinst, tz, km and helpers."
 	echo ""
-	echo "  -latest        Launch latest archboot environment (using kexec)."
-        echo "                 This operation needs at least 3500 MB RAM."
-        echo "                 On fast internet connection (100Mbit) (approx. 5 minutes)"
+        echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
+	echo " -latest          Launch latest archboot environment (using kexec)."
+        echo "                  This operation needs at least 3500 MB RAM."
         echo ""
-        echo "  -latest-image  Generate latest image files in /archboot-release directory"
+        echo " -latest-install  Launch latest archboot environment with downloaded"
+        echo "                  package cache (using kexec)."
+        echo "                  This operation needs at least 4000 MB RAM."
+        echo ""
+        echo " -latest-image  Generate latest image files in /archboot-release directory"
         echo "                 This operation needs at least 4000 MB RAM."
-        echo "                 On fast internet connection (100Mbit) (approx. 5 minutes)"
         echo ""
 	echo "  -h             This message."
 	exit 0
@@ -34,6 +36,7 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-u|--u) D_SCRIPTS="1" ;;
 		-latest|--latest) L_COMPLETE="1" ;;
+		-latest-install|--latest-install) L_INSTALL_COMPLETE;;
 		-latest-image|--latest-image) G_RELEASE="1" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
@@ -44,7 +47,6 @@ done
 # Download latest setup and quickinst script from git repository
 if [[ "${D_SCRIPTS}" == "1" ]]; then 
     echo 'Downloading latest km, tz, quickinst,setup and helpers...'
-
     [[ -e /usr/bin/quickinst ]] && wget -q "$INSTALLER_SOURCE/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup
     [[ -e /usr/bin/km ]] && wget -q "$INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km
@@ -55,9 +57,10 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
 fi
 
 # Generate new environment and launch it with kexec
-if [[ "${L_COMPLETE}" == "1" ]]; then
+if [[ "${L_COMPLETE}" == "1" -o "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # create container
-    archboot-create-container.sh "${W_DIR}" || exit 1
+    [[ "${L_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -cp -alf || exit 1
+    [[ "${L_INSTALL_COMPLETE}" == "1" ]] && archboot-create-container.sh "${W_DIR}" -c -alf || exit 1
     # generate initrd in container
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
     mv "${W_DIR}"/initrd.img /

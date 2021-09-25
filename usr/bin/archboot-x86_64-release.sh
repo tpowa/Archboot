@@ -5,7 +5,6 @@ _BASENAME="$(basename "${0}")"
 W_DIR="archboot-release"
 
 usage () {
-	echo "${_BASENAME}:"
 	echo "CREATE ARCHBOOT RELEASE IMAGE"
 	echo "-----------------------------"
 	echo "Usage: ${_BASENAME} <directory>"
@@ -23,7 +22,7 @@ fi
 mkdir -p $1
 cd $1
 # create container
-archboot-create-container.sh "${W_DIR}"
+archboot-create-container.sh "${W_DIR}" -c -cp
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
 # generate iso in container
