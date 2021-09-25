@@ -62,7 +62,6 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # reeove everything not necessary
     rm -r /lib/firmware
     rm -r /lib/modules
-    rm -r /usr/share
     # create container
     if [[ "${L_COMPLETE}" == "1" ]]; then
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
