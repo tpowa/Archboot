@@ -9,7 +9,7 @@ build ()
     add_symlink "/usr/bin/vi" "/usr/bin/vim"
     add_file "/usr/share/vim/vimfiles/archlinux.vim"
     add_file "/usr/share/vim/vim82/defaults.vim"
-    SYNTAX="syntax conf sh grup manual synload colortest syncolor hitest whitespace modconf resolv fstab bash zsh exports passwd sysctl systemd vim"
+    SYNTAX="syntax conf sh grub manual synload colortest syncolor hitest whitespace modconf resolv fstab bash zsh exports passwd sysctl systemd vim"
     for i in ${SYNTAX}; do
         add_file "/usr/share/vim/vim82/syntax/$i.vim"
     done
