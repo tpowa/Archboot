@@ -22,7 +22,7 @@ usage () {
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 4000 MB RAM."
+        echo "                  This operation needs at least 4500 MB RAM."
         echo ""
         echo " -latest-image  Generate latest image files in /archboot-release directory"
         echo "                 This operation needs at least 4000 MB RAM."
