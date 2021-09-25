@@ -28,7 +28,7 @@ usage () {
 _DIR="$1"
 
 while [ $# -gt 0 ]; do
-	case ${2} in
+	case ${1} in
 		-cc|--cc) _SAVE_RAM="1" ;;
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
 		-lf|--lf) _LINUX_FIRMWARE="linux-firmware" ;;
@@ -64,7 +64,7 @@ systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g
 systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' /etc/pacman.conf"
 # reinstall kernel to get files in /boot and firmware package
 systemd-nspawn -D "${_DIR}" pacman -Sy linux --noconfirm
-! [[ ${_LINUX_FIRMWARE} == "" ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
+ [[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
 
 if [[ "${SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
