@@ -3,7 +3,6 @@
 _PWD="$(pwd)"
 _BASENAME="$(basename "${0}")"
 _CACHEDIR=""$1"/var/cache/pacman/pkg"
-_FIRMWARE="linux-firmware"
 _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""

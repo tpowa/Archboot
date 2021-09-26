@@ -18,7 +18,7 @@ usage () {
 	echo ""
         echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
 	echo " -latest          Launch latest archboot environment (using kexec)."
-        echo "                  This operation needs at least 3500 MB RAM."
+        echo "                  This operation needs at least 3000 MB RAM."
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
@@ -62,10 +62,11 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # reeove everything not necessary
     rm -r /lib/{firmware,modules}
     rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,terminfo,usb_modeswitch,vim,zoneinfo,zsh}
-    # create container
+    # create container without package cache
     if [[ "${L_COMPLETE}" == "1" ]]; then
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
     fi
+    # create container with package cache
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
         archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
     fi
