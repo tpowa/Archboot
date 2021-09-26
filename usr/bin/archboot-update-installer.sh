@@ -22,7 +22,7 @@ usage () {
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 4500 MB RAM."
+        echo "                  This operation needs at least 4000 MB RAM."
         echo ""
         echo " -latest-image  Generate latest image files in /archboot-release directory"
         echo "                 This operation needs at least 4000 MB RAM."
@@ -60,8 +60,8 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # reeove everything not necessary
-    rm -r /lib/firmware
-    rm -r /lib/modules
+    rm -r /lib/{firmware,modules}
+    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,terminfo,usb_modeswitch,vim,zoneinfo,zsh}
     # create container
     if [[ "${L_COMPLETE}" == "1" ]]; then
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
