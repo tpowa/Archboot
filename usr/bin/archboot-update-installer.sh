@@ -61,7 +61,7 @@ fi
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # reeove everything not necessary
     rm -r /lib/{firmware,modules}
-    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,terminfo,usb_modeswitch,vim,zoneinfo,zsh}
+    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh}
     # create container without package cache
     if [[ "${L_COMPLETE}" == "1" ]]; then
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1

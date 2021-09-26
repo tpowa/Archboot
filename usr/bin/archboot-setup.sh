@@ -2503,6 +2503,13 @@ select_mirror() {
         SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     echo "Using mirror: ${SYNC_URL}" >${LOG}
+    echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
+    if [[ "${DOTESTING}" == "yes" ]]; then
+        echo "[testing]" >> /etc/pacman.conf
+        echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+        echo "[community-testing]" >> /etc/pacman.conf
+        echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+    fi
 }
 
 # dotesting()
@@ -4334,6 +4341,19 @@ select_source() {
     fi
     TITLE="Arch Linux Installation"
     getsource || return 1
+    # check for updating complete environment with packages
+    if [ -d "/var/cache/pacman/pkg" ] && [ -n "$(ls -A "/var/cache/pacman/pkg")" ]; then
+        echo "Packages are already in pacman cache...  > ${LOG}"
+    else
+        UPDATE_ENVIRONMENT=""
+        if [[ -e "/usr/bin/update-installer.sh" ]];then
+            DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nRequires at least 4GB RAM and will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
+            if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
+                DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer.sh -latest-install\nCheck "${LOG}" for progress...\n\nGet a cup of coffee ...\nThis needs approx. 5 minutes on a fast internet connection (100Mbit)." 0 0
+                /usr/bin/update-installer.sh -latest-install > "${LOG}" 2>&1
+            fi
+        fi
+    fi
     NEXTITEM="3"
 }
 
