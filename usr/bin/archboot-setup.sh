@@ -4324,7 +4324,7 @@ do_grub_uefi() {
 }
 
 select_source() {
-    NEXTITEM="4"
+    NEXTITEM="2"
     MODE="network"
     if [[ ${S_NET} -eq 0 ]]; then
             donetwork || return 1
@@ -4334,12 +4334,12 @@ select_source() {
     fi
     TITLE="Arch Linux Installation"
     getsource || return 1
-    NEXTITEM="5"
+    NEXTITEM="3"
 }
 
 set_clock() {
     if [[ -e /usr/bin/tz ]]; then
-        tz --setup && NEXTITEM="3"
+        tz --setup && NEXTITEM="4"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
@@ -4413,9 +4413,9 @@ prepare_storagedrive() {
         esac
     done
     if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="3"
-    else
         NEXTITEM="4"
+    else
+        NEXTITEM="5"
     fi
 }
 
@@ -4843,9 +4843,9 @@ mainmenu() {
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 18 58 14 \
     "0" "Set Keyboard And Console Font" \
     "1" "Set up Network" \
-    "2" "Set Time And Date" \
-    "3" "Prepare Storage Drive" \
-    "4" "Select Source" \
+    "2" "Select Source" \
+    "3" "Set Time And Date" \
+    "4" "Prepare Storage Drive" \
     "5" "Install Packages" \
     "6" "Configure System" \
     "7" "Install Bootloader" \
@@ -4857,11 +4857,11 @@ mainmenu() {
         "1")
             donetwork ;;
         "2")
-            set_clock ;;
-        "3")
-            prepare_storagedrive ;;
-        "4")
             select_source ;;
+        "3")
+            set_clock ;;
+        "4")
+            prepare_storagedrive ;;
         "5")
             install_packages ;;
         "6")
