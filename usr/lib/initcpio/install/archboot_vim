@@ -10,12 +10,12 @@ build ()
     add_file "/usr/share/vim/vimfiles/archlinux.vim"
     VIM_MODULE="syntax conf sh grub manual synload colortest syncolor hitest whitespace nosyntax resolv fstab bash zsh exports passwd sysctl systemd vim"
     for i in ${VIM_MODULE}; do
-        add_file "/usr/share/vim/vim82/syntax/$i.vim"
-        add_file "/usr/share/vim/vim82/indent/$i.vim"
+        [[ -e "/usr/share/vim/vim82/syntax/$i.vim" ]] && add_file "/usr/share/vim/vim82/syntax/$i.vim"
+        [[ -e "/usr/share/vim/vim82/indent/$i.vim" ]] && add_file "/usr/share/vim/vim82/indent/$i.vim"
     done
     VIM_BASIC_MODULE="defaults filetype indent indoff menu scripts synmenu"
     for i in ${VIM_BASIC_MODULE}; do
-        add_file "/usr/share/vim/vim82/$i.vim"
+       [[ -e "/usr/share/vim/vim82/$i.vim" ]] && add_file "/usr/share/vim/vim82/$i.vim"
     done
     add_file "/usr/share/vim/vim82/rgb.txt"
     add_file "/usr/share/licenses/vim/license.txt"
