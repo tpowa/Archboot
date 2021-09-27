@@ -56,11 +56,18 @@ systemd-nspawn -D "${_DIR}" pacman-key --init
 systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux
 # copy local mirrorlist to container
 cp /etc/pacman.d/mirrorlist "${_DIR}"/etc/pacman.d/mirrorlist
-cp /etc/pacman.conf "${_DIR}"/etc/pacman.conf
+# only copy from archboot pacman.conf, else use default file
+[[ "$(cat /etc/hostname)" == "archboot" ]] && cp /etc/pacman.conf "${_DIR}"/etc/pacman.conf
 # disable checkspace option in pacman.conf, to allow to install packages in environment
-systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/pacman.conf"
+sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 # enable parallel downloads
-systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' /etc/pacman.conf"
+sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
+# enable [testing] if enabled in host
+if [[ "$(grep "^[testing" /etc/pacman.conf)" ]]; then
+    sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
+    sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
+    sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
+fi
 # reinstall kernel to get files in /boot and firmware package
 systemd-nspawn -D "${_DIR}" pacman -Sy linux --noconfirm
  [[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
