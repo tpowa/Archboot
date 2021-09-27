@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-MODE="${1}"
-DESTDIR="${2}"
+DESTDIR="${1}"
 
 PACMAN="pacman --root "${DESTDIR}" --cachedir "${DESTDIR}"/var/cache/pacman/pkg --noconfirm"
 
