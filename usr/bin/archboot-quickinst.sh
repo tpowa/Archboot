@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 MODE="${1}"
 DESTDIR="${2}"
-PKGARG="${3}"
 
-PACMAN="pacman --root "${DESTDIR}" --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --root "${DESTDIR}" --cachedir "${DESTDIR}"/var/cache/pacman/pkg --noconfirm"
 
 # name of kernel package
 KERNELPKG="linux"
@@ -11,47 +10,21 @@ KERNELPKG="linux"
 VMLINUZ="vmlinuz-${KERNELPKG}"
 
 usage() {
-    echo "quickinst <destdir> <package_directory|server_url>"
+    echo "quickinst <destdir>"
     echo
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
     echo
-    echo "First make sure you have all your filesystems mounted under <destdir>."
+    echo "First configure /etc/pacman.conf which repositories to use"
+    echo "and set a mirror in /etc/pacman.d/mirrorlist"
+    echo ""
+    echo "Make sure you have all your filesystems mounted under <destdir>."
     echo "Then run this script to install all base packages to <destdir>."
     echo
-    echo
-    echo "Examples:"
-    echo "  quickinst net /mnt 'http://mirror.rackspace.com/archlinux/\$repo/os/\$arch'"
+    echo "Example:"
+    echo "  quickinst /mnt"
     echo ""
     exit 0
-}
-
-# pacman_conf()
-# creates temporary pacman.conf file
-pacman_conf() {
-    serverurl="${PKGARG}"
-    # Setup a pacman.conf in /tmp
-    cat << EOF > /tmp/pacman.conf
-[options]
-Architecture = auto
-SigLevel = PackageRequired
-CheckSpace
-ParallelDownloads = 5
-CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-
-[core]
-Server = ${serverurl}
-
-EOF
-}
-
-# pacman_conf_extra()
-# adds extra repository for net installation mode
-pacman_conf_extra() {
-    serverurl="${PKGARG}"
-    # Setup a pacman.conf in /tmp
-    echo "[extra]" >> /tmp/pacman.conf
-    echo "Server =  ${serverurl}" >> /tmp/pacman.conf
 }
 
 # configures pacman and syncs db on destination system
@@ -164,8 +137,6 @@ fi
 ! [[ -d /tmp ]] && mkdir /tmp
 
 # prepare pacman
-pacman_conf
-pacman_conf_extra
 prepare_pacman
 if [[ $? -ne 0 ]]; then
     echo "Pacman preparation FAILED!"
