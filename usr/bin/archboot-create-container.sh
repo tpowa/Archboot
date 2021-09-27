@@ -63,7 +63,7 @@ sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 # enable parallel downloads
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # enable [testing] if enabled in host
-if [[ "$(grep "^[testing" /etc/pacman.conf)" ]]; then
+if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
     sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
     sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
