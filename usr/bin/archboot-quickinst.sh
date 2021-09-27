@@ -129,7 +129,7 @@ install_packages() {
     ${PACMAN} -S ${PACKAGES}
 }
 
-if [[ "${PKGARG}" = "" ]]; then
+if [[ -z "${1}" ]]; then
     usage
 fi
 
