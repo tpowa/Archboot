@@ -16,7 +16,6 @@ build ()
     add_file "/usr/bin/archboot-restore-usbstick.sh"
     add_binary "/usr/bin/isoinfo" 
     add_binary "/usr/bin/mktorrent"
-    add_binary "/usr/bin/sha256sum"
     add_full_dir "/var/cache/pacman/pkg"
 }
 

@@ -346,7 +346,7 @@ xorriso -as mkisofs \
 
 ## create sha256sums.txt
 rm -f "sha256sums.txt" || true
-sha256sum *.iso > "sha256sums.txt"
+cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
 rm -rf "${CORE64}"

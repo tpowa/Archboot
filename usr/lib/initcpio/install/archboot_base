@@ -12,7 +12,7 @@ build ()
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
-    apps="getent agetty mount umount basename du clear env head id md5sum nano printf tail \
+    apps="getent agetty mount umount basename du clear env head id cksum nano printf tail \
           tee test tr tty uptime w who wc which whoami xargs yes \
           bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted partprobe \
           gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \

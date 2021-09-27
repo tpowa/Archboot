@@ -54,5 +54,5 @@ cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
 archboot-mktorrent.sh archboot/$1 *.iso
 # create sha256sums
-sha256sum boot/* >> boot/sha256sum.txt
-sha256sum * >> sha256sum.txt
+cksum -a sha256 boot/* >> boot/sha256sum.txt
+cksum -a sha256 * >> sha256sum.txt
