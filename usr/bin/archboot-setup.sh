@@ -23,7 +23,7 @@ INTEL_UCODE="intel-ucode.img"
 AMD_UCODE="amd-ucode.img"
 
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} --config /tmp/pacman.conf --noconfirm --noprogressbar"
+PACMAN="pacman --root "${DESTDIR}" --cachedir="${DESTDIR}"/var/cache/pacman/pkg --noconfirm --noprogressbar"
 # downloader
 DLPROG="wget"
 # sources
@@ -2519,36 +2519,6 @@ dotesting() {
     DIALOG --defaultno --yesno "Do you want to enable [testing] repository?\n\nOnly enable this if you need latest available packages for testing purposes!" 8 60 && DOTESTING="yes"
 }
 
-# pacman_conf()
-# creates temporary pacman.conf file
-pacman_conf() {
-    if [[ "${MODE}" = "network" ]]; then
-        local serverurl="${SYNC_URL}"
-        if [[ "${DOTESTING}" = "yes" ]]; then
-            TESTING_REPOSITORY="[testing]"
-            TESTING_SERVER="Server = ${serverurl}"
-        fi
-    fi
-    # Setup a pacman.conf in /tmp
-    cat << EOF > /tmp/pacman.conf
-[options]
-Architecture = auto
-SigLevel = PackageRequired
-CheckSpace
-ParallelDownloads = 5
-CacheDir = ${DESTDIR}/var/cache/pacman/pkg
-
-${TESTING_REPOSITORY}
-${TESTING_SERVER}
-
-[core]
-Server = ${serverurl}
-
-[extra]
-Server = ${serverurl}
-EOF
-}
-
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
@@ -2620,7 +2590,6 @@ install_packages() {
     if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
         getdest
     fi
-    pacman_conf
     prepare_pacman
     PACKAGES=""
     DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
@@ -4818,7 +4787,6 @@ install_bootloader() {
     if [[ "${S_SRC}" = "0" ]]; then
         select_source || return 1
     fi
-    pacman_conf
     prepare_pacman
     CANCEL=""
     
