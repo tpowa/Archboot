@@ -54,8 +54,9 @@ systemd-nspawn -D "${_DIR}" locale-gen
 # generate pacman keyring
 systemd-nspawn -D "${_DIR}" pacman-key --init
 systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux
-# add genneral mirror
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'Server = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch' >> /etc/pacman.d/mirrorlist"
+# copy local mirrorlist to container
+cp /etc/pacman.d/mirrorlist "${_DIR}"/etc/pacman.d/mirrorlist
+cp /etc/pacman.conf "${_DIR}"/etc/pacman.conf
 # disable checkspace option in pacman.conf, to allow to install packages in environment
 systemd-nspawn -D "${_DIR}" /bin/bash -c "sed -i -e 's:^CheckSpace:#CheckSpace:g' /etc/pacman.conf"
 # enable parallel downloads
