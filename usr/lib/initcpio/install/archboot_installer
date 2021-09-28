@@ -16,7 +16,8 @@ build ()
     add_file "/usr/bin/archboot-restore-usbstick.sh"
     add_binary "/usr/bin/isoinfo" 
     add_binary "/usr/bin/mktorrent"
-    add_full_dir "/var/cache/pacman/pkg"
+    # only include cachedir on booted archboot
+    [[ "$(cat /etc/hostname)  == "archboot" ]] && add_full_dir "/var/cache/pacman/pkg"
 }
 
 help ()
