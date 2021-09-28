@@ -17,7 +17,7 @@ build ()
     add_binary "/usr/bin/isoinfo" 
     add_binary "/usr/bin/mktorrent"
     # only include cachedir on booted archboot
-    [[ "$(cat /etc/hostname)"  == "archboot" || && add_full_dir "/var/cache/pacman/pkg"
+    [[ "$(cat /etc/hostname)"  == "archboot" ]] && add_full_dir "/var/cache/pacman/pkg"
 }
 
 help ()
