@@ -8,7 +8,7 @@ build ()
     # fix vi symlink
     add_symlink "/usr/bin/vi" "/usr/bin/vim"
     add_file "/usr/share/vim/vimfiles/archlinux.vim"
-    VIM_MODULE="syntax conf sh grub manual synload colortest syncolor hitest whitespace nosyntax resolv fstab bash zsh exports passwd sysctl systemd vim"
+    VIM_MODULE="syntax conf dosini sh grub manual synload colortest syncolor hitest whitespace nosyntax resolv fstab bash zsh exports passwd sysctl systemd vim"
     for i in ${VIM_MODULE}; do
         [[ -e "/usr/share/vim/vim82/syntax/$i.vim" ]] && add_file "/usr/share/vim/vim82/syntax/$i.vim"
         [[ -e "/usr/share/vim/vim82/indent/$i.vim" ]] && add_file "/usr/share/vim/vim82/indent/$i.vim"
