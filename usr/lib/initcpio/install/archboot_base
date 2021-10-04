@@ -230,7 +230,11 @@ build ()
     add_full_dir "/usr/share/pacman/keyrings"
     add_full_dir "/usr/share/makepkg"
     # add local installed pacman database in container mode
-    [[ "$(cat /etc/hostname)" == "archboot" || ! -e "/etc/hostname" ]] && add_full_dir "/var/lib/pacman/local"
+    if [[ -e "/etc/hostname" ]]; then
+       [[ "$(cat /etc/hostname )" == "archboot" ]] && add_full_dir "/var/lib/pacman/local"
+    else
+        add_full_dir "/var/lib/pacman/local"
+    fi
 
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"

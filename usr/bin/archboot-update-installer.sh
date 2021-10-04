@@ -60,8 +60,8 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # reeove everything not necessary
-    rm -r /lib/{firmware,modules}
-    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh}
+    rm -r /lib/{firmware,modules} >/dev/null 2>&1
+    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/null 2>&1
     # create container without package cache
     if [[ "${L_COMPLETE}" == "1" ]]; then
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
