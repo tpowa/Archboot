@@ -57,7 +57,7 @@ for i in *.iso; do
         isoinfo -R -i "$i" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
     else
         isoinfo -R -i "$i" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img
-        isoinfo -R -i "$i" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_latest_x86_64
+    fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
