@@ -62,7 +62,9 @@ done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
-archboot-mktorrent.sh archboot/$1 *.iso
+for i in *.iso; do
+    archboot-mktorrent.sh archboot/$1 $i
+done
 # create sha256sums
 cksum -a sha256 boot/* >> boot/sha256sum.txt
 cksum -a sha256 * >> sha256sum.txt
