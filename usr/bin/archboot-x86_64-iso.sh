@@ -52,6 +52,7 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+
 # from initcpio functions
 kver() {
     # this is intentionally very loose. only ensure that we're
