@@ -9,7 +9,6 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook will use hwdetect to load 
-  and detect the needed modules for your system.
+  This hook will add hwdetect on an arch boot image.
 HELPEOF
 }
