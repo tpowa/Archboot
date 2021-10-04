@@ -27,6 +27,10 @@ archboot-create-container.sh "${W_DIR}" -cc -cp -alf
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
 # generate iso in container
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
+# generate latest tarball in container
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest"
+# generate latest iso in container
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
@@ -45,10 +49,16 @@ mv "${W_DIR}"/*.iso ./
 rm -r "${W_DIR}"
 # create boot directory with ramdisks
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
-isoinfo -R -i *.iso -x /boot/amd-ucode.img > boot/amd-ucode.img
-isoinfo -R -i *.iso -x /boot/intel-ucode.img > boot/intel-ucode.img
-isoinfo -R -i *.iso -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
-isoinfo -R -i *.iso -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
+for i in *.iso; do
+    if [[ ! "$(echo $i | grep latest)" ]]; then
+        isoinfo -R -i "$i" -x /boot/amd-ucode.img > boot/amd-ucode.img
+        isoinfo -R -i "$i" -x /boot/intel-ucode.img > boot/intel-ucode.img
+        isoinfo -R -i "$i" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
+        isoinfo -R -i "$i" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
+    else
+        isoinfo -R -i "$i" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img
+        isoinfo -R -i "$i" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_latest_x86_64
+done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
