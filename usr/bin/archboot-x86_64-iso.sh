@@ -13,6 +13,7 @@ usage () {
 	echo "PARAMETERS:"
 	echo "  -t                  Start generation of tarball."
 	echo "  -g                  Start generation of image."
+	echo "  -p=PRESET           Which preset should be used."
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
@@ -34,6 +35,7 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-g|--g) GENERATE="1" ;;
 		-t|--t) TARBALL="1" ;;
+                -p=*|--p=*) PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;

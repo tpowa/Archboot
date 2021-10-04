@@ -28,9 +28,9 @@ systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t
 # generate iso in container
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # generate latest tarball in container
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest"
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="/etc/archboot/presets/x86_64-latest""
 # generate latest iso in container
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="/etc/archboot/presets/x86_64-latest" -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
