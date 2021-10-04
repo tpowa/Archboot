@@ -79,6 +79,7 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     mv "${W_DIR}"/boot/amd-ucode.img /
     # remove "${W_DIR}"
     rm -r "${W_DIR}"
+    echo "Rebooting soon, loading files to kexec now..."
     # load kernel and initrds into running kernel
     kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
     # restart environment
