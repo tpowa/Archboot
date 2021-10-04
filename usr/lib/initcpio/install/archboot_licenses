@@ -9,6 +9,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the common licenses on an arch boot image.
+  This hook includes the common licenses on an archboot image.
 HELPEOF
 } 

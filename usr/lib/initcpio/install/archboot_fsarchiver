@@ -9,6 +9,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes fsarchiver on arch boot image.
+  This hook includes fsarchiver on archboot image.
 HELPEOF
 }

@@ -24,6 +24,6 @@ help ()
 {
 cat<<HELPEOF
   This hook includes the archboot installer and arch-install-scripts 
-  on an arch boot image.
+  on an archboot image.
 HELPEOF
 }

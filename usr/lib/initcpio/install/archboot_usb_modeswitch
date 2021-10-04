@@ -15,6 +15,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes usb_modeswitch on an arch boot image.
+  This hook includes usb_modeswitch on an archboot image.
 HELPEOF
 } 

@@ -10,6 +10,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes tcpdump on an arch boot image.
+  This hook includes tcpdump on an archboot image.
 HELPEOF
 } 

@@ -25,6 +25,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes small version of vim on an arch boot image.
+  This hook includes small version of vim on an archboot image.
 HELPEOF
 } 

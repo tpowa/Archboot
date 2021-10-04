@@ -9,6 +9,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook adds cryptoloop module on an arch boot image.
+  This hook adds cryptoloop module on an archboot image.
 HELPEOF
 }

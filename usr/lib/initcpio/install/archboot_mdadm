@@ -12,7 +12,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook adds complete mdadm to arch boot image
+  This hook adds complete mdadm to archboot image
   which is not covered by mdadm_udev hook.
 HELPEOF
 }

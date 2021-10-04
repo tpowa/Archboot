@@ -13,6 +13,6 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook will add lshw to your arch boot image.
+  This hook will add lshw to your archboot image.
 HELPEOF
 }

@@ -28,7 +28,7 @@ symlinks="/usr/bin/vgcfgbackup /usr/bin/vgcfgrestore /usr/bin/vgchange \
 help ()
 {
 cat<<HELPEOF
-  This hook adds complete lvm2 to arch boot image, 
+  This hook adds complete lvm2 to archboot image, 
   which is not covered by lvm2 hook.
 HELPEOF
 }

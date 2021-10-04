@@ -14,6 +14,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the keymaps and fonts on an arch boot image.
+  This hook includes the keymaps and fonts on an archboot image.
 HELPEOF
 }

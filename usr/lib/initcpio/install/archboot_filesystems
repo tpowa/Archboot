@@ -39,6 +39,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook is responsible for including filesystems on an arch boot image.
+  This hook is responsible for including filesystems on an archboot image.
 HELPEOF
 }

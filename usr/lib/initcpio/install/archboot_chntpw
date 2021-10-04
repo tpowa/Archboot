@@ -12,6 +12,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes chntpw on an arch boot image.
+  This hook includes chntpw on an archboot image.
 HELPEOF
 } 

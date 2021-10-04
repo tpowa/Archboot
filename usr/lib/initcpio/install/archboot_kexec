@@ -9,6 +9,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes kexec on an arch boot image.
+  This hook includes kexec on an archboot image.
 HELPEOF
 } 

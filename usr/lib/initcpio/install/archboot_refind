@@ -21,7 +21,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes refind-efi on an arch boot image.
+  This hook includes refind-efi on an archboot image.
 HELPEOF
 }
 

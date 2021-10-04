@@ -9,7 +9,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes efibootmgr on an arch boot image.
+  This hook includes efibootmgr on an archboot image.
 HELPEOF
 }
 

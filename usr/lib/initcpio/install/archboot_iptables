@@ -34,6 +34,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes iptables on an arch boot image.
+  This hook includes iptables on an archboot image.
 HELPEOF
 } 

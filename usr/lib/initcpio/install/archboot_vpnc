@@ -15,6 +15,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes vpnc on an arch boot image.
+  This hook includes vpnc on an archboot image.
 HELPEOF
 } 

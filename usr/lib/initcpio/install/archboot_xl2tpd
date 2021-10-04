@@ -13,6 +13,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes xl2tpd on an arch boot image.
+  This hook includes xl2tpd on an archboot image.
 HELPEOF
 } 

@@ -20,6 +20,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the netctl package on an arch boot image.
+  This hook includes the netctl package on an archboot image.
 HELPEOF
 }

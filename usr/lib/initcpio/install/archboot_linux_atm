@@ -16,6 +16,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes linux-atm on an arch boot image.
+  This hook includes linux-atm on an archboot image.
 HELPEOF
 } 

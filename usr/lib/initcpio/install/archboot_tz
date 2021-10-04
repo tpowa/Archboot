@@ -21,6 +21,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the timezone data on an arch boot image.
+  This hook includes the timezone data on an archboot image.
 HELPEOF
 }

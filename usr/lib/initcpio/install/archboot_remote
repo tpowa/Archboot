@@ -63,6 +63,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes remote tools on an arch boot image.
+  This hook includes remote tools on an archboot image.
 HELPEOF
 }

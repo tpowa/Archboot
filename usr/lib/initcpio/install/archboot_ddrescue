@@ -9,6 +9,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes ddrescue on an arch boot image.
+  This hook includes ddrescue on an archboot image.
 HELPEOF
 } 

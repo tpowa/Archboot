@@ -18,6 +18,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes intel wireless on an arch boot image.
+  This hook includes intel wireless on an archboot image.
 HELPEOF
 }

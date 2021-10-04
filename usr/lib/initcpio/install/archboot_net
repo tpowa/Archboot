@@ -62,6 +62,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the network on an arch boot image.
+  This hook includes the network on an archboot image.
 HELPEOF
 }

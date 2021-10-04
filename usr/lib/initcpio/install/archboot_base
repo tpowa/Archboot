@@ -264,7 +264,7 @@ help ()
 cat <<HELPEOF
   This hook sets up all initial directories and installs base, kmod,
   pam, pacman, shadow, systemd, udev utilities and libraries 
-  for a arch boot image.
+  for a archboot image.
   DO NOT remove this one unless you know what you're doing.
 HELPEOF
 }

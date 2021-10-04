@@ -9,7 +9,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes lockdown-ms on an arch boot image.
+  This hook includes lockdown-ms on an archboot image.
 HELPEOF
 }
 

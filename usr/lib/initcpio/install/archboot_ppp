@@ -16,6 +16,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes ppp on an arch boot image.
+  This hook includes ppp on an archboot image.
 HELPEOF
 } 

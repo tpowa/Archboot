@@ -11,7 +11,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes dmidecode on an arch boot image.
+  This hook includes dmidecode on an archboot image.
 HELPEOF
 }
 

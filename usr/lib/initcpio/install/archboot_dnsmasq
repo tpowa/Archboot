@@ -12,6 +12,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes dnsmasq on an arch boot image.
+  This hook includes dnsmasq on an archboot image.
 HELPEOF
 } 
