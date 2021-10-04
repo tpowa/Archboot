@@ -118,7 +118,10 @@ build ()
         # fi
     done
     add_file "/etc/login.defs"
-
+    
+    ### add virtio modules
+    add_checked_modules 'virtio'
+    
     ### add systemd
     # add systemd kernel modules
     add_checked_modules 'nfs|autofs4|loop'
