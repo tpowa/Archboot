@@ -49,7 +49,7 @@ build ()
     for i in $(find /usr/share/archboot/base/etc/* ! -type d ! -name passwd); do
         add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
     done
-    add_file "/usr/share/archboot/latest_installer/etc/passwd" "/etc/passwd"
+    add_file "/usr/share/archboot/installer_latest/etc/passwd" "/etc/passwd"
     add_file "/etc/profile"
     add_file "/etc/group"
     add_file "/etc/gshadow"
