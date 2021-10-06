@@ -9,6 +9,7 @@ G_RELEASE=""
 CONFIG="/etc/archboot/x86_64.conf"
 W_DIR="archboot"
 INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
+LOG="/dev/tty7"
 
 usage () {
 	echo "Update installer, launch latest environment or create latest image files:"
@@ -59,27 +60,34 @@ fi
 
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
-    # reeove everything not necessary
-    rm -r /lib/{firmware,modules} >/dev/null 2>&1
-    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/null 2>&1
+    # remove everything not necessary
+    echo "Main logging is done on /dev/tty7 ..."
+    echo "Removing files not necessary files ..."
+    rm -r /lib/{firmware,modules} >/dev/tty7 2>&1
+    rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/tty7 2>&1
     # create container without package cache
     if [[ "${L_COMPLETE}" == "1" ]]; then
-        archboot-create-container.sh "${W_DIR}" -cc -cp -alf || exit 1
+        echo "Generating archboot container ..."
+        archboot-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
-        archboot-create-container.sh "${W_DIR}" -cc -alf || exit 1
+        echo "Generating archboot container ..."
+        archboot-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
     fi
     
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
-    systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" || exit 1
-    mv "${W_DIR}"/initrd.img /
-    mv "${W_DIR}"/boot/vmlinuz-linux /
-    mv "${W_DIR}"/boot/intel-ucode.img /
-    mv "${W_DIR}"/boot/amd-ucode.img /
+    echo "Generating initramfs ..."
+    systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
+    echo "Moving initramfs files from "${W_DIR}" to / ..."
+    mv "${W_DIR}"/initrd.img / || exit 1
+    mv "${W_DIR}"/boot/vmlinuz-linux / || exit 1
+    mv "${W_DIR}"/boot/intel-ucode.img / || exit 1
+    mv "${W_DIR}"/boot/amd-ucode.img / || exit 1
     # remove "${W_DIR}"
-    rm -r "${W_DIR}"
-    echo "Rebooting soon, loading files to kexec now..."
+    echo "Remove ${W_DIR} ..."
+    rm -r "${W_DIR}" || exit 1
+    echo "Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
     kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
     # restart environment
@@ -88,5 +96,5 @@ fi
 
 # Generate new images
 if [[ "${G_RELEASE}" == "1" ]]; then
-    archboot-x86_64-release.sh "${W_DIR}"
+    archboot-x86_64-release.sh "${W_DIR}" >/dev/null 2>&1 || exit 1
 fi
