@@ -4,7 +4,7 @@
 build ()
 {
     # add staging wireless here
-    STAGING="rtl8187se rtl8192e rtl8192u rtl8712 vt6655 vt6656 winbond wlan-ng"
+    STAGING="rtl8188eu rtl8192e rtl8192u rtl8712 rtl8723bs vt6655 vt6656 wlan-ng"
     for i in $STAGING; do
         add_checked_modules "/drivers/staging/$i"
     done
