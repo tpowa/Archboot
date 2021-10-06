@@ -63,7 +63,7 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # remove everything not necessary
     echo "Logging is done on /dev/tty7 use ALT-F7 to change to VC7 and ALT-F1 to come back to VC1..."
     echo ""
-    echo "Removing files not necessary files from /usr ..."
+    echo "Removing not necessary files from /usr ..."
     rm -r /lib/{firmware,modules} >/dev/tty7 2>&1
     rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/tty7 2>&1
     # create container without package cache
