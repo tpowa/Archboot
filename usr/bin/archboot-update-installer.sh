@@ -61,24 +61,26 @@ fi
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # remove everything not necessary
-    echo "Logging is done on /dev/tty7 use ALT-F7 to change to VC7 and ALT-F1 to come back to VC1..."
-    echo ""
+    echo "Logging is done on /dev/tty7 ..."
     echo "Removing not necessary files from /usr ..."
     rm -r /lib/{firmware,modules} >/dev/tty7 2>&1
     rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/tty7 2>&1
     # create container without package cache
     if [[ "${L_COMPLETE}" == "1" ]]; then
         echo "Generating archboot container in "${W_DIR}" ..."
+        echo "This will need some time ..."
         archboot-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
         echo "Generating archboot container in "${W_DIR}" ..."
+        echo "This will need some time ..."
         archboot-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
     fi
     
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
     echo "Generating initramfs in "${W_DIR}" ..."
+    echo "This will need some time ..."
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     echo "Moving initramfs files from "${W_DIR}" to / ..."
     mv "${W_DIR}"/initrd.img / || exit 1
@@ -97,8 +99,8 @@ fi
 
 # Generate new images
 if [[ "${G_RELEASE}" == "1" ]]; then
-    echo "Logging is done on /dev/tty7 use ALT-F7 to change to VC7 and ALT-F1 to come back to VC1..."
-    echo ""
+    echo "Logging is done on /dev/tty7 ..."
     echo "Generating new iso files now in "${W_DIR}" ..."
+    echo "This will need some time ..."
     archboot-x86_64-release.sh "${W_DIR}" >/dev/tty7 2>&1 || exit 1
 fi
