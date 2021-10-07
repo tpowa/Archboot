@@ -55,8 +55,8 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 #set PRESET
-[[ -z ${PRESET} ]] && PRESET="x86_64"
-PRESET="${PRESET_DIR}/${PRESET})"
+[[ -z "${PRESET}" ]] && PRESET="x86_64"
+PRESET=""${PRESET_DIR}"/"${PRESET}")"
 
 # from initcpio functions
 kver() {
