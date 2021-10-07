@@ -2478,7 +2478,7 @@ select_mirror() {
     NEXTITEM="4"
     ## Download updated mirrorlist, if possible
     dialog --infobox "Downloading latest mirrorlist ..." 0 0
-    ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG}
+    ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>/dev/null
     
     if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
         mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
