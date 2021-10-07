@@ -56,7 +56,7 @@ fi
 
 #set PRESET
 [[ -z "${PRESET}" ]] && PRESET="x86_64"
-PRESET=""${PRESET_DIR}"/"${PRESET}")"
+PRESET=""${PRESET_DIR}"/"${PRESET}""
 
 # from initcpio functions
 kver() {
