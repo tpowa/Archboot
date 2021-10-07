@@ -1,5 +1,5 @@
 cd /
-echo "Welcome to the archboot Arch Linux install/rescue system:"
+echo "Welcome to Arch Linux (archboot environment):"
 echo "----------------------------------------------------------------"
 echo "Go get a cup of coffee, on a fast internet connection (100Mbit),"
 echo "you can start in 5 minutes with your tasks..."
