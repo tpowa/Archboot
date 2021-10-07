@@ -4572,6 +4572,7 @@ auto_hwdetect() {
         ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
         # check on framebuffer modules and kms
         [[ "$(grep "^radeon" /proc/modules)" ]] && FBPARAMETER="--ati-kms"
+        [[ "$(grep "^amdgpu" /proc/modules)" ]] && FBPARAMETER="--amd-kms"
         [[ "$(grep "^i915" /proc/modules )" ]] && FBPARAMETER="--intel-kms"
         [[ "$(grep "^nouveau" /proc/modules)" ]] && FBPARAMETER="--nvidia-kms"
         if [[ "$(lsmod | grep ^nfs)" ]]; then
