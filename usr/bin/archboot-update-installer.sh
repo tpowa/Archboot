@@ -55,7 +55,7 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/archboot-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-create-container.sh?inline=false" -O /usr/bin/archboot-create-container.sh >/dev/null 2>&1
     [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
-    echo " Finished: Downloading scripts done."
+    echo "Finished: Downloading scripts done."
 fi
 
 # Generate new environment and launch it with kexec
