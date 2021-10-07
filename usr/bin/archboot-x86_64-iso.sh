@@ -14,6 +14,8 @@ usage () {
 	echo "  -t                  Start generation of tarball."
 	echo "  -g                  Start generation of image."
 	echo "  -p=PRESET           Which preset should be used."
+	echo "                      /etc/archboot/presets locates the presets"
+	echo "                      default=x86_64"
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
@@ -25,7 +27,7 @@ usage () {
 [[ -z "${1}" ]] && usage
 
 
-PRESET="/etc/archboot/presets/x86_64"
+PRESET_DIR="/etc/archboot/presets"
 TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 
 # change to english locale!
@@ -52,6 +54,9 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+#set PRESET
+[[ -z ${PRESET} ]] && PRESET="x86_64"
+PRESET="${PRESET_DIR}/${PRESET})"
 
 # from initcpio functions
 kver() {

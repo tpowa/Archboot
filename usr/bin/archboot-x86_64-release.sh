@@ -2,6 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
+_PRESET_LATEST="x86_64-latest"
+
 W_DIR="archboot-release"
 
 usage () {
@@ -28,9 +30,9 @@ systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t
 # generate iso in container
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # generate latest tarball in container
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="/etc/archboot/presets/x86_64-latest""
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
 # generate latest iso in container
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="/etc/archboot/presets/x86_64-latest" -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
