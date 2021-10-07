@@ -35,9 +35,6 @@ build ()
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
     
-    ### add en_US.utf8 locale
-    add_file "/usr/lib/locale/locale-archive"
-    
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
     add_file "/usr/share/terminfo/l/linux"
