@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' '/drivers/net/'
-    apps="route ip wget"
+    apps="route ip"
     for i in $apps; do
         add_binary "$i"
     done
