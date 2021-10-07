@@ -21,7 +21,7 @@ build ()
           ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec xz last wall mesg utmpdump \
           xzdec switch_root false pivot_root sleep chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt hexdump \
-          ionice ipcmk ipcrm ipcs isosize swapoff logger look lscpu mcookie namei \
+          ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei \
           prlimit rename renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart \
           ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
@@ -47,7 +47,6 @@ build ()
             add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
         # fi
     done
-    #add_full_dir "/usr/lib"
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
     ### add zsh
