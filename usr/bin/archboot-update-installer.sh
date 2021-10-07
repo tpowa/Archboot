@@ -6,7 +6,7 @@ L_COMPLETE=""
 L_INSTALL_COMPLETE=""
 G_RELEASE=""
 CONFIG="/etc/archboot/x86_64.conf"
-W_DIR="archboot"
+W_DIR="/archboot"
 INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 LOG="/dev/tty7"
 
