@@ -63,10 +63,12 @@ build ()
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
-                 services"
+                 services wgetrc"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
+    ### add nano files
+    add_full_dir /usr/share/nano
 
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do

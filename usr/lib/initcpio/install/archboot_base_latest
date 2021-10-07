@@ -13,7 +13,8 @@ build ()
     add_symlink /var/lock ../run/lock
     
     apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp mv rm sed grep \
-          kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod find wc" 
+          kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
+          find wc nano wget" 
     for i in $apps; do
         add_binary "$i"
     done
@@ -39,12 +40,14 @@ build ()
     add_file "/usr/share/terminfo/l/linux"
     add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout fstab host.conf hosts inputrc \
-                 nsswitch.conf protocols request-key.conf resolv.conf securetty \
-                 services"
+                 nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
+                 wgetrc services"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
-
+    
+    add_full_dir /usr/share/nano
+    
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d ! -name passwd); do
         add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
