@@ -45,8 +45,23 @@ fi
 # prepare pacman dirs
 mkdir -p "${_DIR}"/var/lib/pacman
 mkdir -p "${_CACHEDIR}"
+[[ -e "${_DIR}/proc" ]] || mkdir -m 555 "${_DIR}/proc"
+[[ -e "${_DIR}/sys" ]] || mkdir -m 555 "${_DIR}/sys"
+[[ -e "${_DIR}/dev" ]] || mkdir -m 755 "${_DIR}/dev"
+# mount special file systems to ${_DIR}
+mount --make-runbindable /sys/fs/cgroup
+mount --make-runbindable /proc/sys/fs/binfmt_misc
+mount --rbind "/proc" "${_DIR}/proc"
+mount --rbind "/sys" "${_DIR}/sys"
+mount --rbind "/dev" "${_DIR}/dev"
 # install archboot
 pacman --root "${_DIR}" -Sy base archboot --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}"
+# umount special file systems
+umount -R "${_DIR}/proc"
+umount -R "${_DIR}/sys"
+umount -R "${_DIR}/dev"
+mount --make-rshared /sys/fs/cgroup
+mount --make-rshared /proc/sys/fs/binfmt_misc
 # generate locales
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen"
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen"
@@ -68,9 +83,8 @@ if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
     sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
 fi
-# reinstall kernel to get files in /boot and firmware package
-systemd-nspawn -D "${_DIR}" pacman -Sy linux --noconfirm
- [[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
+# install firmware package
+[[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
 
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
