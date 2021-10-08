@@ -56,12 +56,14 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
+    exit 0
 fi
+
+echo "Information: Logging is done on /dev/tty7 ..."
 
 # Generate new environment and launch it with kexec
 if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # remove everything not necessary
-    echo "Information: Logging is done on /dev/tty7 ..."
     echo "Step 1/6: Removing not necessary files from /usr ..."
     rm -r /lib/{firmware,modules} >/dev/tty7 2>&1
     rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/tty7 2>&1
@@ -100,7 +102,6 @@ fi
 
 # Generate new images
 if [[ "${G_RELEASE}" == "1" ]]; then
-    echo "Information: Logging is done on /dev/tty7 ..."
     echo "Step 1/1: Generating new iso files now in "${W_DIR}" ..."
     echo "          This will need some time ..."
     archboot-x86_64-release.sh "${W_DIR}" >/dev/tty7 2>&1 || exit 1
