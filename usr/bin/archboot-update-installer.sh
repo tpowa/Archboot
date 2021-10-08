@@ -45,6 +45,11 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
+    echo "This script should only be run in booted archboot environment. Aborting..."
+    exit 1
+fi
+
 # Download latest setup and quickinst script from git repository
 if [[ "${D_SCRIPTS}" == "1" ]]; then
     echo "Downloading latest km, tz, quickinst, setup and helpers..."
