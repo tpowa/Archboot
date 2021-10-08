@@ -12,7 +12,7 @@ build ()
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
-    apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp mv rm sed grep \
+    apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc nano wget" 
     for i in $apps; do
