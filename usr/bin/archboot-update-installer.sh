@@ -24,10 +24,10 @@ usage () {
         echo "                  package cache (using kexec)."
         echo "                  This operation needs at least 4000 MB RAM."
         echo ""
-        echo " -latest-image  Generate latest image files in /archboot-release directory"
-        echo "                 This operation needs at least 4000 MB RAM."
+        echo " -latest-image    Generate latest image files in /archboot-release directory"
+        echo "                  This operation needs at least 4000 MB RAM."
         echo ""
-	echo "  -h             This message."
+	echo " -h               This message."
 	exit 0
 }
 
