@@ -48,20 +48,18 @@ mkdir -p "${_CACHEDIR}"
 [[ -e "${_DIR}/proc" ]] || mkdir -m 555 "${_DIR}/proc"
 [[ -e "${_DIR}/sys" ]] || mkdir -m 555 "${_DIR}/sys"
 [[ -e "${_DIR}/dev" ]] || mkdir -m 755 "${_DIR}/dev"
-# mount special file systems to ${_DIR}
-mount --make-runbindable /sys/fs/cgroup
-mount --make-runbindable /proc/sys/fs/binfmt_misc
-mount --rbind "/proc" "${_DIR}/proc"
-mount --rbind "/sys" "${_DIR}/sys"
-mount --rbind "/dev" "${_DIR}/dev"
+# mount special filesystems to ${_DIR}
+mount proc ""${_DIR}"/proc" -t proc -o nosuid,noexec,nodev 
+mount sys ""${_DIR}"/sys" -t sysfs -o nosuid,noexec,nodev,ro 
+mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid 
+mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
+mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
 pacman --root "${_DIR}" -Sy base archboot --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}"
-# umount special file systems
-umount -R "${_DIR}/proc"
-umount -R "${_DIR}/sys"
-umount -R "${_DIR}/dev"
-mount --make-rshared /sys/fs/cgroup
-mount --make-rshared /proc/sys/fs/binfmt_misc
+# umount special filesystems
+umount -R ""${_DIR}"/proc"
+umount -R ""${_DIR}"/sys"
+umount -R ""${_DIR}"/dev"
 # generate locales
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen"
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen"
