@@ -45,6 +45,7 @@ cp "${PACMAN_CONF}".old "${PACMAN_CONF}"
 sudo -u "${USER}" scp -r "${DIRECTORY}" "${SERVER}":"${HOME}"
 sudo -u "${USER}" ssh "${SERVER}" <<EOF
 rm -r "${SERVER_DIR}"/"${DIRECTORY}"
+rm -r "${SERVER_DIR}"/"$(date -d "$(date +) - 3 month" +%Y.%m")"
 mv "${DIRECTORY}" "${SERVER_DIR}"/
 cd "${SERVER_DIR}"
 rm latest
