@@ -23,21 +23,21 @@ cp "${PACMAN_MIRROR}".archboot "${PACMAN_MIRROR}"
 cd "${BUILDDIR}"
 [[ -e "${DIRECTORY}" ]] && rm -r "${DIRECTORY}"
 archboot-x86_64-release.sh "${DIRECTORY}"
-rm sha256sum.txt boot/sha256sum.txt
-# sign files
+cd "${DIRECTORY}"
+rm sha256sum.txt
+# sign files and create sha256sum.txt
 for i in *; do
     [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
-done
-for i in boot/*; do
-    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
-done
-# create sha256sums
-for i in *; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+    [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 for i in boot/*; do
-    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> boot/sha256sum.txt
+    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
+    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+    [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
+cd ..
+# create sha256sums
 chown -R "${USER}" "${DIRECTORY}"
 chgrp -R "${GROUP}" "${DIRECTORY}"
 cp "${PACMAN_MIRROR}".old "${PACMAN_MIRROR}"

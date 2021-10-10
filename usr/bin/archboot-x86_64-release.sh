@@ -68,5 +68,9 @@ for i in *.iso; do
     archboot-mktorrent.sh archboot/"${1}" "${i}"
 done
 # create sha256sums
-cksum -a sha256 boot/* >> boot/sha256sum.txt
-cksum -a sha256 * >> sha256sum.txt
+for i in *; do
+    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+done
+for i in boot/*; do
+    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+done
