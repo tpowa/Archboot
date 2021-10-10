@@ -8,6 +8,7 @@ HOME="/home/tpowa/"
 SERVER_DIR="/srv/ftp/iso/archboot"
 USER="tobias"
 GROUP="users"
+GPG= "--detach-sign --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
@@ -22,6 +23,21 @@ cp "${PACMAN_MIRROR}".archboot "${PACMAN_MIRROR}"
 cd "${BUILDDIR}"
 [[ -e "${DIRECTORY}" ]] && rm -r "${DIRECTORY}"
 archboot-x86_64-release.sh "${DIRECTORY}"
+rm sha256sum.txt boot/sha256sum.txt
+# sign files
+for i in *; do
+    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
+done
+for i in boot/*; do
+    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
+done
+# create sha256sums
+for i in *; do
+    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+done
+for i in boot/*; do
+    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> boot/sha256sum.txt
+done
 chown -R "${USER}" "${DIRECTORY}"
 chgrp -R "${GROUP}" "${DIRECTORY}"
 cp "${PACMAN_MIRROR}".old "${PACMAN_MIRROR}"

@@ -53,19 +53,19 @@ rm -r "${W_DIR}"
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
 for i in *.iso; do
     if [[ ! "$(echo $i | grep latest)" ]]; then
-        isoinfo -R -i "$i" -x /boot/amd-ucode.img > boot/amd-ucode.img
-        isoinfo -R -i "$i" -x /boot/intel-ucode.img > boot/intel-ucode.img
-        isoinfo -R -i "$i" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
-        isoinfo -R -i "$i" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
+        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img
+        isoinfo -R -i "${i}" -x /boot/intel-ucode.img > boot/intel-ucode.img
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
+        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
     else
-        isoinfo -R -i "$i" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img
     fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent file
 for i in *.iso; do
-    archboot-mktorrent.sh archboot/$1 $i
+    archboot-mktorrent.sh archboot/"${1}" "${i}"
 done
 # create sha256sums
 cksum -a sha256 boot/* >> boot/sha256sum.txt
