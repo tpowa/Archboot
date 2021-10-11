@@ -63,7 +63,7 @@ for i in *.iso; do
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
-# create torrent file
+# create torrent files
 for i in *.iso; do
     archboot-mktorrent.sh archboot/"${1}" "${i}"
 done
