@@ -5,15 +5,15 @@ build ()
 {
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
     apps="openssl python3 cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
-          hash-to-efi-sig-list sig-list-to-certs cert-to-efi-list sign-efi-sig-list sbattach sbkeysync \
+          hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
           sbsiglist sbsign sbvarsign sbverify "
     add_file "/etc/ssl/openssl.cnf"
     for i in $apps; do
         add_binary "$i"
     done
     # add mkkeys.sh
-    curl -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
     MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
+    curl -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
     chmod 755 ${MKKEYS}
     add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
     # add python3 files for script

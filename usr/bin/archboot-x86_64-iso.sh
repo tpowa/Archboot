@@ -121,13 +121,13 @@ _prepare_prebootloader_uefi () {
         curl -L -o "${X86_64}/EFI/BOOT/BOOTX64.EFI" https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
         curl -L -o "${X86_64}/EFI/BOOT/HashTool.efi" https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
         # add fallback if download is broken, although probably useless
-        [[ ! - f "${X86_64}/EFI/BOOT/BOOTX64.EFI" ]] && cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
-	[[ ! - f "${X86_64}/EFI/BOOT/HashTool.efi" ]] cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
+        [[ ! -f "${X86_64}/EFI/BOOT/BOOTX64.EFI" ]] && cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
+	[[ ! -f "${X86_64}/EFI/BOOT/HashTool.efi" ]] && cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
 	# keytool is not available as signed file
 	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
 }
 
-_prepare_fedora_bootloaer () {
+_prepare_fedora_bootloader () {
     # add shim signed files from fedora
     SHIM=$(mktemp -d /var/tmp/shim.XXXX)
     curl --create-dirs -L -O --output-dir ${SHIM} https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64/shim-x64-15.4-5.x86_64.rpm
