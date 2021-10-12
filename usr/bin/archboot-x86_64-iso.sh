@@ -117,15 +117,36 @@ _prepare_kernel_initramfs_files() {
 
 _prepare_prebootloader_uefi () {
         mkdir -p "${X86_64}/EFI/BOOT"
-        cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
-	cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
+        # use signed files here, although they are from 2013
+        curl -L -o "${X86_64}/EFI/BOOT/BOOTX64.EFI" https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
+        curl -L -o "${X86_64}/EFI/BOOT/HashTool.efi" https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
+        # add fallback if download is broken, although probably useless
+        [[ ! - f "${X86_64}/EFI/BOOT/BOOTX64.EFI" ]] && cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
+	[[ ! - f "${X86_64}/EFI/BOOT/HashTool.efi" ]] cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
+	# keytool is not available as signed file
 	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
+}
+
+_prepare_fedora_bootloaer () {
+    # add shim signed files from fedora
+    SHIM=$(mktemp -d /var/tmp/shim.XXXX)
+    curl --create-dirs -L -O --output-dir ${SHIM} https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64/shim-x64-15.4-5.x86_64.rpm
+    bsdtar -C ${SHIM} -xf ${SHIM}/shim-x64-15.4-5.x86_64.rpm
+    cp "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${X86_64}/EFI/BOOT/mmx64.efi"
+    cp "${SHIM}/boot/efi/EFI/fedora/shim.efi" "${X86_64}/EFI/BOOT/shim.efi"
+    cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${X86_64}/EFI/BOOT/shimx64.efi"
+    # add grub signed from fedora
+    GRUB2=$(mktemp -d /var/tmp/grub2.XXXX)
+    curl --create-dirs -L -O --output-dir ${GRUB2} https://kojipkgs.fedoraproject.org/packages/grub2/2.06/8.fc36/x86_64/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
+    bsdtar -C ${GRUB2} -xf ${GRUB2}/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
+    cp ${GRUB2}/boot/efi/EFI/fedora/grubx64.efi "${X86_64}/EFI/BOOT/grubx64.efi"
 }
 
 _prepare_lockdown_ms_uefi () {
         mkdir -p "${X86_64}/EFI/BOOT"
         cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${X86_64}/EFI/BOOT/LockDown_ms.efi"
 }
+
 _prepare_uefi_image() {
         
         ## get size of boot x86_64 files
