@@ -340,6 +340,8 @@ _prepare_lockdown_ms_uefi
 
 _prepare_prebootloader_uefi
 
+_prepare_fedora_bootloader
+
 _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
