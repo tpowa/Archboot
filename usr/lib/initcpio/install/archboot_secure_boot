@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    apps="openssl python3 cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var hash-to-efi-sig-list sig-list-to-certs cert-to-efi-list sign-efi-sig-list sbattach sbkeysync sbsiglist sbsign sbvarsign sbverify "
+    add_file "/etc/ssl/openssl.cnf"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    # add mkkeys.sh curl -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
+    curl -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
+    MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
+    chmod 755 ${MKKEYS}
+    add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
+    # add python3 files for script
+    add_full_dir /usr/lib/python3.9/encodings
+    add_full_dir /usr/lib/python3.9/collections
+    add_full_dir /usr/lib/python3.9/logging
+    PYTHON_DYN="select.cpython-39-x86_64-linux-gnu.so math.cpython-39-x86_64-linux-gnu.so _random.cpython-39-x86_64-linux-gnu.so _sha512.cpython-39-x86_64-linux-gnu.so _posixsubprocess.cpython-39-x86_64-linux-gnu.so"
+    PYTHON_FILES="_collections_abc.py keyword.py heapq.py collections.py platform.py  types.py enum.py uuid.py _sitebuiltins.py genericpath.py posixpath.py _collections_abc.py  stat.py os.py site.py abc.py io.py codecs.py operator.py reprlib.py re.py sre_compile.py sre_parse.py sre_constants.py functools.py copyreg.py subprocess.py signal.py threading.py _weakrefset.py warnings.py contextlib.py random.py bisect.py hashlib.py traceback.py linecache.py tokenize.py token.py weakref.py string.py"
+    for i in "${PYTHON_FILES}"; do
+        add_file "/usr/lib/python3.9/"$i""
+    done
+    for i in "${PYTHON_DYN}"; do
+        add_file "/usr/lib/python3.9/lib-dynload/"${i}""
+    done
+    # add preloader files
+    add_file "/usr/share/efitools/efi/PreLoader.efi"
+    add_file "/usr/share/efitools/efi/HashTool.efi"
+    add_file "/usr/share/efitools/efi/KeyTool.efi"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes secure boot tools on an archboot image.
+HELPEOF
+} 
