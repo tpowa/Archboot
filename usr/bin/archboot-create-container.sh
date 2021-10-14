@@ -55,7 +55,7 @@ mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid
 mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
 mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
-pacman --root "${_DIR}" -Sy base archboot --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}"
+pacman --root "${_DIR}" -Sy base archboot --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}"
 # umount special filesystems
 umount -R ""${_DIR}"/proc"
 umount -R ""${_DIR}"/sys"
