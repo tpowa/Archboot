@@ -3,7 +3,11 @@
 
 usage () {
 	echo "Generate Secure Boot Keys and MOK files:"
-	echo "----------------------------------------"
+	echo "--------------------------------------------------------------"
+	echo "This script generates all needed keys for a Secure Boot setup."
+	echo "It includes already the 2 neded Microsoft certificates, in order"
+	echo "to avoid soft bricking of devices."
+	echo ""
         echo "Usage: -g <directory>"
         echo ""
 	echo "PARAMETERS:"
