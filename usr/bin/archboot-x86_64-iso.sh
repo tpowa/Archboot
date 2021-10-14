@@ -2,6 +2,11 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
+X86_64="$(mktemp -d X86_64.XXX)"
+_SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
+_SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
+_SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
+
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -97,13 +102,12 @@ fi
 
 if ! [[ "${TARBALL_NAME}" == "" ]]; then
         CORE64="$(mktemp -d core64.XXX)"
-        tar xvf ${TARBALL_NAME} -C "${CORE64}" || exit 1
+        tar xf ${TARBALL_NAME} -C "${CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
         exit 1
 fi
 
-X86_64="$(mktemp -d X86_64.XXX)"
 mkdir -p "${X86_64}/EFI/BOOT"
 
 _prepare_kernel_initramfs_files() {
@@ -115,36 +119,55 @@ _prepare_kernel_initramfs_files() {
         
 }
 
-_prepare_prebootloader_uefi () {
-        mkdir -p "${X86_64}/EFI/BOOT"
-        # use signed files here, although they are from 2013
-        curl -L -o "${X86_64}/EFI/BOOT/BOOTX64.EFI" https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
-        curl -L -o "${X86_64}/EFI/BOOT/HashTool.efi" https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
-        # add fallback if download is broken, although probably useless
-        [[ ! -f "${X86_64}/EFI/BOOT/BOOTX64.EFI" ]] && cp -f "/usr/share/efitools/efi/PreLoader.efi" "${X86_64}/EFI/BOOT/BOOTX64.EFI"
-	[[ ! -f "${X86_64}/EFI/BOOT/HashTool.efi" ]] && cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/BOOT/HashTool.efi"
-	# keytool is not available as signed file
-	cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
+_prepare_keytool_uefi () {
+    cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
 }
 
-_prepare_fedora_bootloader () {
-    # add shim signed files from fedora
-    SHIM=$(mktemp -d /var/tmp/shim.XXXX)
-    curl --create-dirs -L -O --output-dir ${SHIM} https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64/shim-x64-15.4-5.x86_64.rpm
-    bsdtar -C ${SHIM} -xf ${SHIM}/shim-x64-15.4-5.x86_64.rpm
+_prepare_fedora_shim_bootloaders () {
+    # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
+    # add shim x64 signed files from fedora
+    SHIM=$(mktemp -d shim.XXXX)
+    curl --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
     cp "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${X86_64}/EFI/BOOT/mmx64.efi"
-    cp "${SHIM}/boot/efi/EFI/fedora/shim.efi" "${X86_64}/EFI/BOOT/shim.efi"
-    cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${X86_64}/EFI/BOOT/shimx64.efi"
-    # add grub signed from fedora
-    GRUB2=$(mktemp -d /var/tmp/grub2.XXXX)
-    curl --create-dirs -L -O --output-dir ${GRUB2} https://kojipkgs.fedoraproject.org/packages/grub2/2.06/8.fc36/x86_64/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
-    bsdtar -C ${GRUB2} -xf ${GRUB2}/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
-    cp ${GRUB2}/boot/efi/EFI/fedora/grubx64.efi "${X86_64}/EFI/BOOT/grubx64.efi"
+    cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${X86_64}/EFI/BOOT/BOOTX64.efi"
+    # add shim ia32 signed files from fedora
+    SHIM32=$(mktemp -d shim32.XXXX)
+    curl --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
+    bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
+    cp "${SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${X86_64}/EFI/BOOT/mmia32.efi"
+    cp "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${X86_64}/EFI/BOOT/BOOTIA32.efi"
+    ### adding this causes boot loop in ovmf and only tries create a boot entry
+    #cp "${SHIM}/boot/efi/EFI/BOOT/fbx64.efi" "${X86_64}/EFI/BOOT/fbx64.efi"
 }
 
-_prepare_lockdown_ms_uefi () {
-        mkdir -p "${X86_64}/EFI/BOOT"
-        cp -f "/usr/lib/lockdown-ms/LockDown_ms.efi" "${X86_64}/EFI/BOOT/LockDown_ms.efi"
+_prepare_secure_boot() {
+    # add mkkeys.sh
+    MKKEYS=$(mktemp -d mkkeys.XXXX)
+    curl -L -O --output-dir ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
+    chmod 755 ${MKKEYS}/mkkeys.sh
+    cd ${MKKEYS}
+    ./mkkeys.sh
+    curl -L -O --output-dir ${MKKEYS} https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
+    curl -L -O --output-dir ${MKKEYS} https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
+    sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_Win_db.esl MicWinProPCA2011_2011-10-19.crt
+    sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_UEFI_db.esl MicCorUEFCA2011_2011-06-27.crt
+    cat MS_Win_db.esl MS_UEFI_db.esl > MS_db.esl
+    sign-efi-sig-list -a -g 77fa9abd-0359-4d32-bd60-28f4e78f784b -k KEK.key -c KEK.crt db MS_db.esl add_MS_db.auth
+    cd ..
+    cp -v ${MKKEYS}/* "${X86_64}"/EFI/
+    sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/boot/vmlinuz-linux ${X86_64}/boot/vmlinuz_x86_64
+    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/boot/vmlinuz-linux ${X86_64}/EFI/grubx64.efi
+    # move in shim
+    #cp -v /usr/share/shim/BOOTX64.CSV ${X86_64}/EFI/BOOT
+    #cp -v /usr/share/shim/fbx64.efi ${X86_64}/EFI/BOOT
+    #cp -v /usr/share/shim/mmx64.efi ${X86_64}/EFI/BOOT
+    #cp -v /usr/share/shim/shimx64.efi ${X86_64}/EFI/BOOT/BOOTX64.efi
+    #cp -v /usr/share/shim/shimx64.efi ${X86_64}/EFI/BOOT/shimx64.efi
+    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/BOOTX64.efi ${X86_64}/EFI/BOOT/BOOTX64.efi
+    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/grubx64.efi ${X86_64}/EFI/BOOT/grubx64.efi
+    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/shimx64.efi ${X86_64}/EFI/BOOT/shimx64.efi
+    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/BOOTIA32.EFI ${X86_64}/EFI/BOOT/BOOTIA32.EFI
 }
 
 _prepare_uefi_image() {
@@ -161,7 +184,7 @@ _prepare_uefi_image() {
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
-	mcopy -i "${VFAT_IMAGE}" -s "${X86_64}"/{EFI,loader,boot} ::/
+	mcopy -i "${VFAT_IMAGE}" -s "${X86_64}"/{EFI,boot} ::/
 	
 }
 
@@ -182,58 +205,13 @@ _download_uefi_shell_tianocore() {
 	cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${X86_64}/EFI/tools/shellia32_v1.efi" 
 }
 
-_prepare_uefi_systemd-boot_USB_files() {
-	
-	mkdir -p "${X86_64}/EFI/BOOT"
-	cp -f "/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${X86_64}/EFI/BOOT/loader.efi"
-	
-	mkdir -p "${X86_64}/loader/entries"
-	
-	cat << GUMEOF > "${X86_64}/loader/loader.conf"
-timeout  4
-default  default-*
-GUMEOF
-	
-	cat << GUMEOF > "${X86_64}/loader/entries/archboot-x86_64-efistub.conf"
-title           Arch Linux x86_64 Archboot EFISTUB
-linux           /boot/vmlinuz_x86_64
-initrd          /boot/intel-ucode.img
-initrd          /boot/amd-ucode.img
-initrd          /boot/initramfs_x86_64.img
-options         cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
-architecture    x64
-GUMEOF
-	
-	cat << GUMEOF > "${X86_64}/loader/entries/uefi-shell-x64-v2.conf"
-title           UEFI Shell X64 v2
-efi             /EFI/tools/shellx64_v2.efi
-architecture    x64
-GUMEOF
-	
-	cat << GUMEOF > "${X86_64}/loader/entries/uefi-shell-x64-v1.conf"
-title           UEFI Shell X64 v1
-efi             /EFI/tools/shellx64_v1.efi
-architecture    x64
-GUMEOF
-	
-	cat << GUMEOF > "${X86_64}/loader/entries/grub-x64-systemd-boot.conf"
-title           GRUB X64 - if EFISTUB boot fails
-efi             /EFI/grub/grubx64.efi
-architecture    x64
-GUMEOF
-	
-	mv "${X86_64}/loader/entries/archboot-x86_64-efistub.conf" "${X86_64}/loader/entries/default-x64.conf"
-	
-}
-
+# build grubXXX with all modules: http://bugs.archlinux.org/task/71382
+# If you don't use shim use --disable-shim-lock
 _prepare_uefi_X64_GRUB_USB_files() {
 	
-	mkdir -p "${X86_64}/EFI/grub"
-	
-	echo 'configfile ${cmdpath}/grubx64.cfg' > ${X86_64}/grubx64.cfg
-	grub-mkstandalone -d /usr/lib/grub/x86_64-efi/ -O x86_64-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/grub/grubx64.efi" "boot/grub/grub.cfg=${X86_64}/grubx64.cfg" -v
-	
-	cat << GRUBEOF > "${X86_64}/EFI/grub/grubx64.cfg"
+	mkdir -p "${X86_64}/EFI/BOOT"	
+	cp "/usr/share/archboot/grub//grubx64.efi" "${X86_64}/EFI/BOOT/grubx64.efi" 
+	cat << GRUBEOF > "${X86_64}/EFI/BOOT/grubx64.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -284,9 +262,7 @@ GRUBEOF
 _prepare_uefi_IA32_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
-	
-	echo 'configfile ${cmdpath}/bootia32.cfg' > ${X86_64}/bootia32.cfg
-	grub-mkstandalone -d /usr/lib/grub/i386-efi/ -O i386-efi --modules="part_gpt part_msdos" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/BOOTIA32.EFI" "boot/grub/grub.cfg=${X86_64}/bootia32.cfg" -v
+	cp "/usr/share/archboot/grub//grubia32.efi" "${X86_64}/EFI/BOOT/grubia32.efi" 
 	
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
@@ -336,21 +312,19 @@ GRUBEOF
         
 }
 
-_prepare_lockdown_ms_uefi
-
-_prepare_prebootloader_uefi
-
-_prepare_fedora_bootloader
+_prepare_fedora_shim_bootloaders
 
 _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_prepare_uefi_systemd-boot_USB_files
+_prepare_keytool_uefi
 
 _prepare_uefi_X64_GRUB_USB_files
 
 _prepare_uefi_IA32_GRUB_USB_files
+
+#_prepare_secure_boot
 
 _prepare_uefi_image
 

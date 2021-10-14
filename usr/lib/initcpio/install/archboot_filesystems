@@ -31,7 +31,7 @@ build ()
     done
     add_file "/etc/nilfs_cleanerd.conf"
     add_file "/etc/fuse.conf"
-    add_file "etc/nvme/discovery.conf"
+    add_file "/etc/nvme/discovery.conf"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }

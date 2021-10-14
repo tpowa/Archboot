@@ -20,7 +20,7 @@ build ()
     add_full_dir /usr/lib/python3.9/encodings
     add_full_dir /usr/lib/python3.9/collections
     add_full_dir /usr/lib/python3.9/logging
-    PYTHON_FILES="_collections_abc.py keyword.py heapq.py collections.py platform.py types.py enum.py uuid.py \
+    PYTHON_FILES="_collections_abc.py keyword.py heapq.py platform.py types.py enum.py uuid.py \
                   _sitebuiltins.py genericpath.py posixpath.py _collections_abc.py stat.py os.py site.py abc.py io.py codecs.py \
                   operator.py reprlib.py re.py sre_compile.py sre_parse.py sre_constants.py functools.py copyreg.py subprocess.py \
                   signal.py threading.py _weakrefset.py warnings.py contextlib.py random.py bisect.py hashlib.py traceback.py \
@@ -37,25 +37,23 @@ build ()
     add_file "/usr/share/efitools/efi/PreLoader.efi"
     add_file "/usr/share/efitools/efi/HashTool.efi"
     add_file "/usr/share/efitools/efi/KeyTool.efi"
-    # add preloader_signed files
-    PRELOADER_SIGNED=$(mktemp /var/tmp/preloader.XXXX)
-    HASHTOOL_SIGNED=$(mktemp /var/tmp/hashtool.XXXX)
-    curl -L -o ${PRELOADER_SIGNED} https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
-    curl -L -o ${HASHTOOL_SIGNED} https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
-    add_file "${PRELOADER_SIGNED}" "/usr/share/preloader-signed/PreLoader.efi"
-    add_file "${HASHTOOL_SIGNED}" "/usr/share/preloader-signed/HashTool.efi"
     # add shim signed files from fedora
+    _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
+    _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
+    _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
     SHIM=$(mktemp -d /var/tmp/shim.XXXX)
-    curl --create-dirs -L -O --output-dir ${SHIM} https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64/shim-x64-15.4-5.x86_64.rpm
-    bsdtar -C ${SHIM} -xf ${SHIM}/shim-x64-15.4-5.x86_64.rpm
+    curl --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    bsdtar -C ${SHIM} -xf "${SHIM}"/"${_SHIM_VERSION}"
     add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/fedora-shim/mmx64.efi"
-    add_file "${SHIM}/boot/efi/EFI/fedora/shim.efi" "/usr/share/fedora-shim/shim.efi"
     add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/fedora-shim/shimx64.efi"
-    # add grub signed from fedora
-    GRUB2=$(mktemp -d /var/tmp/grub2.XXXX)
-    curl --create-dirs -L -O --output-dir ${GRUB2} https://kojipkgs.fedoraproject.org/packages/grub2/2.06/8.fc36/x86_64/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
-    bsdtar -C ${GRUB2} -xf ${GRUB2}/grub2-efi-x64-2.06-8.fc36.x86_64.rpm
-    add_file ${GRUB2}/boot/efi/EFI/fedora/grubx64.efi "/usr/share/fedora-grub2/grubx64.efi"
+    SHIM32=$(mktemp -d /var/tmp/shim32.XXXX)
+    curl --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
+    bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
+    add_file "${SHIM}/boot/efi/EFI/fedora/mmia32.efi" "/usr/share/fedora-shim/mmia32.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/shimia32.efi" "/usr/share/fedora-shim/shimia32.efi"
+    # add grub with modules builtin to boot on secure boot
+    add_file "/usr/share/archboot/grub/grubx64.efi"
+    add_file "/usr/share/archboot/grub/grubia32.efi"
 }
 
 help ()
