@@ -115,7 +115,8 @@ _prepare_kernel_initramfs_files() {
 	mkdir -p "${X86_64}/boot"
         mv "${CORE64}"/*/boot/vmlinuz "${X86_64}/boot/vmlinuz_x86_64"
         mv "${CORE64}"/*/boot/initrd.img "${X86_64}/boot/initramfs_x86_64.img"
-	mv "${CORE64}"/*/boot/{memtest,intel-ucode.img,amd-ucode.img} "${X86_64}/boot/"
+	mv "${CORE64}"/*/boot/{intel-ucode.img,amd-ucode.img} "${X86_64}/boot/"
+	[[ -f "${CORE64}/*/boot/memtest" ]] && mv "${CORE64}"/*/boot/memtest "${X86_64}/boot/"
         
 }
 
