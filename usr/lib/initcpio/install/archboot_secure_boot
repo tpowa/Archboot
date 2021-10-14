@@ -13,7 +13,7 @@ build ()
     done
     # add mkkeys.sh
     MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
-    curl -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
+    curl -s -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
     chmod 755 ${MKKEYS}
     add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
     # add python3 files for script
@@ -42,12 +42,12 @@ build ()
     _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
     _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
     SHIM=$(mktemp -d /var/tmp/shim.XXXX)
-    curl --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C ${SHIM} -xf "${SHIM}"/"${_SHIM_VERSION}"
     add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/archboot/fedora-shim/mmx64.efi"
     add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/archboot/fedora-shim/shimx64.efi"
     SHIM32=$(mktemp -d /var/tmp/shim32.XXXX)
-    curl --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
+    curl -s --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
     bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
     add_file "${SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "/usr/share/archboot/fedora-shim/mmia32.efi"
     add_file "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "/usr/share/archboot/fedora-shim/shimia32.efi"

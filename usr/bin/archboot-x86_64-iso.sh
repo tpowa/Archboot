@@ -129,13 +129,13 @@ _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     SHIM=$(mktemp -d shim.XXXX)
-    curl --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
     cp "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${X86_64}/EFI/BOOT/mmx64.efi"
     cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${X86_64}/EFI/BOOT/BOOTX64.efi"
     # add shim ia32 signed files from fedora
     SHIM32=$(mktemp -d shim32.XXXX)
-    curl --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
+    curl -s --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
     bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
     cp "${SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${X86_64}/EFI/BOOT/mmia32.efi"
     cp "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${X86_64}/EFI/BOOT/BOOTIA32.efi"
