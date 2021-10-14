@@ -34,15 +34,15 @@ if [[ "${KEYS}" == "1" ]]; then
     cd $_DIR
     # add mkkeys.sh
     if [[ ! -f /usr/bin/mkkeys.sh ]]; then
-        curl -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
+        curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
         chmod 755 mkkeys.sh
         ./mkkeys.sh
     else
         mkkeys.sh
     fi
     # download MS Certificates, else EFI might get broken!
-    curl -L -O https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
-    curl -L -O https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
+    curl -s -L -O https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
+    curl -s -L -O https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
     sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_Win_db.esl MicWinProPCA2011_2011-10-19.crt
     sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_UEFI_db.esl MicCorUEFCA2011_2011-06-27.crt
     cat MS_Win_db.esl MS_UEFI_db.esl > MS_db.esl
