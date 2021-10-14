@@ -44,13 +44,13 @@ build ()
     SHIM=$(mktemp -d /var/tmp/shim.XXXX)
     curl --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C ${SHIM} -xf "${SHIM}"/"${_SHIM_VERSION}"
-    add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/fedora-shim/mmx64.efi"
-    add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/fedora-shim/shimx64.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/archboot/fedora-shim/mmx64.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/archboot/fedora-shim/shimx64.efi"
     SHIM32=$(mktemp -d /var/tmp/shim32.XXXX)
     curl --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
     bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
-    add_file "${SHIM}/boot/efi/EFI/fedora/mmia32.efi" "/usr/share/fedora-shim/mmia32.efi"
-    add_file "${SHIM}/boot/efi/EFI/fedora/shimia32.efi" "/usr/share/fedora-shim/shimia32.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/mmia32.efi" "/usr/share/archboot/fedora-shim/mmia32.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/shimia32.efi" "/usr/share/archboot/fedora-shim/shimia32.efi"
     # add grub with modules builtin to boot on secure boot
     add_file "/usr/share/archboot/grub/grubx64.efi"
     add_file "/usr/share/archboot/grub/grubia32.efi"

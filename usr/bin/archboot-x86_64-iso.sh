@@ -210,7 +210,7 @@ _download_uefi_shell_tianocore() {
 _prepare_uefi_X64_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"	
-	cp "/usr/share/archboot/grub//grubx64.efi" "${X86_64}/EFI/BOOT/grubx64.efi" 
+	cp "/usr/share/archboot/grub/grubx64.efi" "${X86_64}/EFI/BOOT/grubx64.efi" 
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/grubx64.cfg"
 insmod part_gpt
 insmod part_msdos
@@ -262,7 +262,7 @@ GRUBEOF
 _prepare_uefi_IA32_GRUB_USB_files() {
 	
 	mkdir -p "${X86_64}/EFI/BOOT"
-	cp "/usr/share/archboot/grub//grubia32.efi" "${X86_64}/EFI/BOOT/grubia32.efi" 
+	cp "/usr/share/archboot/grub/grubia32.efi" "${X86_64}/EFI/BOOT/grubia32.efi" 
 	
 	cat << GRUBEOF > "${X86_64}/EFI/BOOT/bootia32.cfg"
 insmod part_gpt
