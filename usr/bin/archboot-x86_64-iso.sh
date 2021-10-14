@@ -119,8 +119,9 @@ _prepare_kernel_initramfs_files() {
         
 }
 
-_prepare_keytool_uefi () {
-    cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/BOOT/KeyTool.efi"
+_prepare_efitools_uefi () {
+    cp -f "/usr/share/efitools/efi/HashTool.efi" "${X86_64}/EFI/tools/HashTool.efi"
+    cp -f "/usr/share/efitools/efi/KeyTool.efi" "${X86_64}/EFI/tools/KeyTool.efi"
 }
 
 _prepare_fedora_shim_bootloaders () {
@@ -139,35 +140,6 @@ _prepare_fedora_shim_bootloaders () {
     cp "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${X86_64}/EFI/BOOT/BOOTIA32.efi"
     ### adding this causes boot loop in ovmf and only tries create a boot entry
     #cp "${SHIM}/boot/efi/EFI/BOOT/fbx64.efi" "${X86_64}/EFI/BOOT/fbx64.efi"
-}
-
-_prepare_secure_boot() {
-    # add mkkeys.sh
-    MKKEYS=$(mktemp -d mkkeys.XXXX)
-    curl -L -O --output-dir ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
-    chmod 755 ${MKKEYS}/mkkeys.sh
-    cd ${MKKEYS}
-    ./mkkeys.sh
-    curl -L -O --output-dir ${MKKEYS} https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
-    curl -L -O --output-dir ${MKKEYS} https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
-    sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_Win_db.esl MicWinProPCA2011_2011-10-19.crt
-    sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_UEFI_db.esl MicCorUEFCA2011_2011-06-27.crt
-    cat MS_Win_db.esl MS_UEFI_db.esl > MS_db.esl
-    sign-efi-sig-list -a -g 77fa9abd-0359-4d32-bd60-28f4e78f784b -k KEK.key -c KEK.crt db MS_db.esl add_MS_db.auth
-    cd ..
-    cp -v ${MKKEYS}/* "${X86_64}"/EFI/
-    sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/boot/vmlinuz-linux ${X86_64}/boot/vmlinuz_x86_64
-    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/boot/vmlinuz-linux ${X86_64}/EFI/grubx64.efi
-    # move in shim
-    #cp -v /usr/share/shim/BOOTX64.CSV ${X86_64}/EFI/BOOT
-    #cp -v /usr/share/shim/fbx64.efi ${X86_64}/EFI/BOOT
-    #cp -v /usr/share/shim/mmx64.efi ${X86_64}/EFI/BOOT
-    #cp -v /usr/share/shim/shimx64.efi ${X86_64}/EFI/BOOT/BOOTX64.efi
-    #cp -v /usr/share/shim/shimx64.efi ${X86_64}/EFI/BOOT/shimx64.efi
-    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/BOOTX64.efi ${X86_64}/EFI/BOOT/BOOTX64.efi
-    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/grubx64.efi ${X86_64}/EFI/BOOT/grubx64.efi
-    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/shimx64.efi ${X86_64}/EFI/BOOT/shimx64.efi
-    #sbsign --key ${MKKEYS}/DB.key --cert ${MKKEYS}/DB.crt --output ${X86_64}/EFI/BOOT/BOOTIA32.EFI ${X86_64}/EFI/BOOT/BOOTIA32.EFI
 }
 
 _prepare_uefi_image() {
@@ -230,14 +202,24 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
     terminal_output gfxterm
 fi
 
-set default="Arch Linux x86_64 Archboot Non-EFISTUB"
-set timeout="2"
+set default="Arch Linux x86_64 Archboot"
+set timeout="10"
 
-menuentry "Arch Linux x86_64 Archboot Non-EFISTUB" {
+menuentry "Arch Linux x86_64 Archboot" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
     linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
     initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
+}
+
+menuentry "Secure Boot KeyTool" {
+    search --no-floppy --set=root --file /EFI/tools/KeyTool.efi
+    chainloader /EFI/tools/KeyTool.efi
+}
+
+menuentry "Secure Boot HashTool" {
+    search --no-floppy --set=root --file /EFI/tools/HashTool.efi
+    chainloader /EFI/tools/HashTool.efi
 }
 
 menuentry "UEFI Shell X64 v2" {
@@ -250,13 +232,21 @@ menuentry "UEFI Shell X64 v1" {
     chainloader /EFI/tools/shellx64_v1.efi
 }
 
+if [ "${grub_platform}" == "efi" ]; then
+	menuentry "Microsoft Windows" {
+		insmod part_gpt
+		insmod fat
+		insmod chain
+		search --no-floppy --fs-uuid --set=root $hints_string $fs_uuid
+		chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+	}
+fi
+
 menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
         
-	rm ${X86_64}/grubx64.cfg
-	
 }
 
 _prepare_uefi_IA32_GRUB_USB_files() {
@@ -284,7 +274,7 @@ if loadfont "${prefix}/fonts/unicode.pf2" ; then
 fi
 
 set default="Arch Linux x86_64 Archboot - EFI MIXED MODE"
-set timeout="2"
+set timeout="10"
 
 menuentry "Arch Linux x86_64 Archboot - EFI MIXED MODE" {
     set gfxpayload=keep
@@ -303,12 +293,20 @@ menuentry "UEFI Shell IA32 v1" {
     chainloader /EFI/tools/shellia32_v1.efi
 }
 
+if [ "${grub_platform}" == "efi" ]; then
+	menuentry "Microsoft Windows" {
+		insmod part_gpt
+		insmod fat
+		insmod chain
+		search --no-floppy --fs-uuid --set=root $hints_string $fs_uuid
+		chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+	}
+fi
+
 menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
-        
-        rm ${X86_64}/bootia32.cfg
         
 }
 
@@ -318,13 +316,11 @@ _prepare_kernel_initramfs_files
 
 _download_uefi_shell_tianocore
 
-_prepare_keytool_uefi
+_prepare_efitools_uefi
 
 _prepare_uefi_X64_GRUB_USB_files
 
 _prepare_uefi_IA32_GRUB_USB_files
-
-#_prepare_secure_boot
 
 _prepare_uefi_image
 
