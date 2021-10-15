@@ -5,7 +5,7 @@ usage () {
 	echo "Generate Secure Boot Keys and MOK files:"
 	echo "--------------------------------------------------------------"
 	echo "This script generates all needed keys for a Secure Boot setup."
-	echo "It includes already the 2 neded Microsoft certificates, in order"
+	echo "It will include the 2 needed Microsoft certificates, in order"
 	echo "to avoid soft bricking of devices."
 	echo ""
         echo "Usage: -g <directory>"
@@ -16,7 +16,7 @@ usage () {
 	exit 0
 }
 
-[[ -z "${1}" ]] && usage
+[[ -z "${1}" || -z "${2}" ]] && usage
 
 _DIR="$2"
 
@@ -51,11 +51,14 @@ if [[ "${KEYS}" == "1" ]]; then
     read name
     openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -days 3650 -subj "/CN=$name/"
     openssl x509 -in MOK.crt -out MOK.cer -outform DER
-    DIRS="DB KEK MOK PK"
+    DIRS="DB KEK MOK PK noPK"
     for i in $DIRS; do
         mkdir $i
         mv $i.* $i
     done
+    mkdir {GUID,MS}
+    mv myGUID.txt GUID
+    mv *.crt *.auth *.esl MS
     cd ..
     echo "Finished: Keys created in $_DIR"
 fi

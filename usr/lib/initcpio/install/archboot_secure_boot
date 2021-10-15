@@ -20,20 +20,20 @@ build ()
     add_full_dir /usr/lib/python3.9/encodings
     add_full_dir /usr/lib/python3.9/collections
     add_full_dir /usr/lib/python3.9/logging
-    PYTHON_FILES="_collections_abc.py keyword.py heapq.py platform.py types.py enum.py uuid.py \
-                  _sitebuiltins.py genericpath.py posixpath.py _collections_abc.py stat.py os.py site.py abc.py io.py codecs.py \
-                  operator.py reprlib.py re.py sre_compile.py sre_parse.py sre_constants.py functools.py copyreg.py subprocess.py \
-                  signal.py threading.py _weakrefset.py warnings.py contextlib.py random.py bisect.py hashlib.py traceback.py \
-                  linecache.py tokenize.py token.py weakref.py string.py"
-    PYTHON_DYN="select.cpython-39-x86_64-linux-gnu.so math.cpython-39-x86_64-linux-gnu.so _random.cpython-39-x86_64-linux-gnu.so \
-                _sha512.cpython-39-x86_64-linux-gnu.so _posixsubprocess.cpython-39-x86_64-linux-gnu.so" 
+    PYTHON_FILES="_collections_abc keyword heapq platform types enum uuid \
+                  _sitebuiltins genericpath posixpath _collections_abc stat os site abc io codecs \
+                  operator reprlib re sre_compile sre_parse sre_constants functools copyreg subprocess \
+                  signal threading _weakrefset warnings contextlib random bisect hashlib traceback \
+                  linecache tokenize token weakref string selectors"
+    PYTHON_DYN="select.cpython-39-x86_64-linux-gnu math.cpython-39-x86_64-linux-gnu _random.cpython-39-x86_64-linux-gnu \
+                _sha512.cpython-39-x86_64-linux-gnu _posixsubprocess.cpython-39-x86_64-linux-gnu" 
     for i in $(echo $PYTHON_FILES); do
-        add_file "/usr/lib/python3.9/$i"
+        add_file "/usr/lib/python3.9/$i.py"
     done
     for i in $(echo $PYTHON_DYN); do
-        add_file "/usr/lib/python3.9/lib-dynload/$i"
+        add_file "/usr/lib/python3.9/lib-dynload/$i.so"
     done
-    # add preloader files
+    # add efitools files
     add_file "/usr/share/efitools/efi/PreLoader.efi"
     add_file "/usr/share/efitools/efi/HashTool.efi"
     add_file "/usr/share/efitools/efi/KeyTool.efi"
