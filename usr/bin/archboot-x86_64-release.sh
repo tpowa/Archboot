@@ -46,10 +46,10 @@ echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Relea
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "Architecture: x86_64" >>Release.txt
 echo "RAM requirement to boot: 1024 MB or greater" >>Release.txt
-echo "Archboot:$(systemd-nspawn -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" >/dev/null 2>&1)" >>Release.txt 
-echo "Kernel:$(systemd-nspawn -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" >/dev/null 2>&1)" >>Release.txt 
-echo "Pacman:$(systemd-nspawn -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" >/dev/null 2>&1)" >>Release.txt 
-echo "Systemd:$(systemd-nspawn -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" >/dev/null 2>&1)" >>Release.txt 
+echo "Archboot:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Kernel:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Pacman:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Systemd:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
 # move iso out of container
 mv "${W_DIR}"/*.iso ./
 # remove container
@@ -60,12 +60,12 @@ echo "Create boot directory ..."
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
 for i in *.iso; do
     if [[ ! "$(echo $i | grep latest)" ]]; then
-        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img
-        isoinfo -R -i "${i}" -x /boot/intel-ucode.img > boot/intel-ucode.img
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img
-        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64
+        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img >/dev/null 2>&1
+        isoinfo -R -i "${i}" -x /boot/intel-ucode.img > boot/intel-ucode.img >/dev/null 2>&1
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img >/dev/null 2>&1
+        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64 >/dev/null 2>&1
     else
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img >/dev/null 2>&1
     fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
