@@ -35,6 +35,12 @@ if [[ -z "${NAME}" ]]; then
     exit 1
 fi
 
+### check for root
+if ! [[ ${UID} -eq 0 ]]; then 
+	echo "ERROR: Please run as root user!"
+	exit 1
+fi
+
 if [[ ! -z "${_DIR}" ]]; then
     [[ ! -d $_DIR ]] && mkdir $_DIR
     cd $_DIR
