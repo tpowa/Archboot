@@ -3081,7 +3081,10 @@ detect_uefi_secure_boot() {
     
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         uefi_mount_efivarfs
-        if [[ "$(echo $(bootctl | grep 'Secure Boot:' | cut -d : -f2))" == "enabled" ]]; then
+        _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
+        _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
+        
+        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
             export _DETECTED_UEFI_SECURE_BOOT="1"
         fi
     fi
