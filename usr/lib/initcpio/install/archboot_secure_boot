@@ -55,7 +55,7 @@ build ()
     add_file "/usr/share/archboot/grub/grubx64.efi"
     add_file "/usr/share/archboot/grub/grubia32.efi"
     # add generate keys script
-    add_file "/usr/bin/archboot-create-secureboot-keys.sh" "/usr/bin/create-secureboot-keys.sh"
+    add_file "/usr/bin/archboot-secureboot-keys.sh" "/usr/bin/secureboot-keys.sh"
 }
 
 help ()
