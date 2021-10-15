@@ -65,11 +65,11 @@ chroot_mount()
     [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
     [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
     [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
-    mount --make-runbindable /sys/fs/cgroup
-    mount --make-runbindable /proc/sys/fs/binfmt_misc
-    mount --rbind "/proc" "${DESTDIR}/proc"
-    mount --rbind "/sys" "${DESTDIR}/sys"
-    mount --rbind "/dev" "${DESTDIR}/dev"
+    mount proc "${DESTDIR}/proc" -t proc -o nosuid,noexec,nodev 
+    mount sys "${DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
+    mount udev "${DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid 
+    mount devpts "${DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
+    mount shm "${DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 }
 
 # chroot_umount()
@@ -80,8 +80,6 @@ chroot_umount()
     umount -R "${DESTDIR}/proc"
     umount -R "${DESTDIR}/sys"
     umount -R "${DESTDIR}/dev"
-    mount --make-rshared /sys/fs/cgroup
-    mount --make-rshared /proc/sys/fs/binfmt_misc
 }
 
 getfstype()
@@ -3083,7 +3081,7 @@ detect_uefi_secure_boot() {
     
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         uefi_mount_efivarfs
-        if [[ "$(echo $(bootctl | grep 'Secure' | cut -d : -f2))" == "enabled" ]]; then
+        if [[ "$(echo $(bootctl | grep 'Secure Boot:' | cut -d : -f2))" == "enabled" ]]; then
             export _DETECTED_UEFI_SECURE_BOOT="1"
         fi
     fi
@@ -3125,7 +3123,8 @@ do_uefi_common() {
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
     [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        PACKAGES="${PACKAGES} efitools mokutil"
+        [[ ! -f "${DESTDIR}/usr/bin/mokutil" ]] && PACKAGES="${PACKAGES} mokutil"
+        [[ ! -f "${DESTDIR}//usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
     unset PACKAGES
@@ -3138,10 +3137,8 @@ do_uefi_efibootmgr() {
     
     uefi_mount_efivarfs
     
-    chroot_mount
-    
-    if [[ "$(chroot ${DESTDIR} /usr/bin/efivar -l)" ]]; then
-        cat << EFIBEOF > "${DESTDIR}/efibootmgr_run.sh"
+    if [[ "$(/usr/bin/efivar -l)" ]]; then
+        cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
 
 _EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
@@ -3158,14 +3155,11 @@ fi
 
 EFIBEOF
         
-        chmod a+x "${DESTDIR}/efibootmgr_run.sh"
-        chroot "${DESTDIR}" "/usr/bin/bash" "/efibootmgr_run.sh" &>"/tmp/efibootmgr_run.log"
-        mv "${DESTDIR}/efibootmgr_run.sh" "/tmp/efibootmgr_run.sh"
+        chmod a+x "/tmp/efibootmgr_run.sh"
+        /tmp/efibootmgr_run.sh &>"/tmp/efibootmgr_run.log"
     else
         DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${UEFISYS_MOUNTPOINT}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
     fi
-    
-    chroot_umount
     
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
@@ -3833,7 +3827,7 @@ do_grub_config() {
     else
         subdir=""
         # on btrfs we need to check on subvol
-        if [[ $(mount | "${DESTDIR}/boot " | grep btrfs | grep subvol) ]]; then
+        if [[ $(mount | grep "${DESTDIR}/boot " | grep btrfs | grep subvol) ]]; then
             subdir="/$(echo $(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2))"
         fi
     fi
@@ -4223,12 +4217,11 @@ do_grub_uefi() {
     do_grub_common_before
     
     chroot_mount
-    
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        [[ ! -d  ${UEFISYS_MOUNTPOINT}/EFI/Boot/ ]] && mkdir -p ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        cp /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
-        cp /usr/share/archboot/fedora-shim/mmx${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        cp /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
+        cp /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
         GRUB_PREFIX_DIR=${UEFISYS_MOUNTPOINT}/EFI/BOOT/
     else
         ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
@@ -4260,7 +4253,7 @@ do_grub_uefi() {
         cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
         GRUB_PREFIX_DIR="/boot/grub/"
     fi
-
+    chroot_umount
     GRUB_UEFI="1"
     do_grub_config
     GRUB_UEFI=""
@@ -4288,16 +4281,16 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
+        do_uefi_secure_boot_efitools
         _BOOTMGR_LABEL="SHIM/GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/shim${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        do_uefi_secure_boot_efitools
+        DIALOG --msgbox "SHIM/GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
         ### TODO: Add sign of grub and kernel image with MOK key
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
-    
 }
 
 select_source() {
@@ -4799,19 +4792,20 @@ install_bootloader() {
     _ANOTHER="1"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
+         _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
             install_bootloader_uefi
         else
             DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
+            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
         fi
-        _ANOTHER="0"
-        DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
     fi
     while [[ "${_ANOTHER}" == "1" ]]; do
         install_bootloader_menu
         _ANOTHER="0"
         DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
     done
+    NEXTITEM="8"
 }
 
 install_bootloader_menu() {
