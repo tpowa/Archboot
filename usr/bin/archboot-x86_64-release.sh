@@ -21,17 +21,21 @@ if ! [[ ${UID} -eq 0 ]]; then
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
+echo "Start release creation in $1 ..."
 mkdir -p $1
 cd $1
 # create container
 archboot-create-container.sh "${W_DIR}" -cc -cp -alf
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
+echo "Generate ISO ..."
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
 # generate iso in container
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # remove not working lvm2 from latest image
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm"
-# generate latest tarball in container
+echo "Remove lvm2 from container ..."
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
+# generate latest tarball in containe
+echo "Generate latest ISO ..."
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
 # generate latest iso in container
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
@@ -41,10 +45,10 @@ echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Relea
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "Architecture: x86_64" >>Release.txt
 echo "RAM requirement to boot: 1024 MB or greater" >>Release.txt
-echo "Archboot:$(systemd-nspawn -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
-echo "Kernel:$(systemd-nspawn -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
-echo "Pacman:$(systemd-nspawn -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
-echo "Systemd:$(systemd-nspawn -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt
+echo "Archboot:$(systemd-nspawn -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt >/dev/null 2>&1
+echo "Kernel:$(systemd-nspawn -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt >/dev/null 2>&1
+echo "Pacman:$(systemd-nspawn -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt >/dev/null 2>&1
+echo "Systemd:$(systemd-nspawn -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt >/dev/null 2>&1
 # move iso out of container
 mv "${W_DIR}"/*.iso ./
 # remove container
@@ -65,12 +69,15 @@ cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 # create torrent files
 for i in *.iso; do
-    archboot-mktorrent.sh archboot/"${1}" "${i}"
+    echo "Generating $i torrent ..."
+    archboot-mktorrent.sh archboot/"${1}" "${i}" >/dev/null 2>&1
 done
 # create sha256sums
+echo "Generating sha256sum ..."
 for i in *; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
 done
 for i in boot/*; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
 done
+echo "Finished release creation in $1 ."

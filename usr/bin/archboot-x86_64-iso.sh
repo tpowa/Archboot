@@ -311,6 +311,7 @@ GRUBEOF
         
 }
 
+echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
 _prepare_fedora_shim_bootloaders >/dev/null 2>&1
 
@@ -320,7 +321,7 @@ _prepare_kernel_initramfs_files >/dev/null 2>&1
 echo "Prepare uefi shells ..."
 _download_uefi_shell_tianocore >/dev/null 2>&1
 
-echo "Prepage efitools ..."
+echo "Prepare efitools ..."
 _prepare_efitools_uefi >/dev/null 2>&1
 
 echo "Prepare X64 Grub ..."
@@ -354,9 +355,12 @@ xorriso -as mkisofs \
         -output "${IMAGENAME}.iso" "${X86_64}/" &> "${IMAGENAME}.log"
 
 ## create sha256sums.txt
+echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
+echo "Cleanup remove ${CORE64} and ${X86_64} ..."
 rm -rf "${CORE64}"
 rm -rf "${X86_64}"
+echo "Finished ISO creation.
