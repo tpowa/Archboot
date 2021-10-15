@@ -62,16 +62,16 @@ umount -R ""${_DIR}"/proc"
 umount -R ""${_DIR}"/sys"
 umount -R ""${_DIR}"/dev"
 # generate locales
-echo " Create locales ..."
+echo "Create locales ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
 # generate pacman keyring
-echo " Generate pacman keyring ..."
+echo "Generate pacman keyring ..."
 systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux >/dev/null 2>&1
 # copy local mirrorlist to container
-echo " Create pacman config and mirrorlist ..."
+echo "Create pacman config and mirrorlist ..."
 cp /etc/pacman.d/mirrorlist "${_DIR}"/etc/pacman.d/mirrorlist
 # only copy from archboot pacman.conf, else use default file
 [[ "$(cat /etc/hostname)" == "archboot" ]] && cp /etc/pacman.conf "${_DIR}"/etc/pacman.conf
@@ -90,6 +90,7 @@ fi
 if [[ ! -z ${_LINUX_FIRMWARE} ]]; then
     echo "Installing ${_LINUX_FIRMWARE} ..."
     systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm >/dev/null 2>&1
+fi
 
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files

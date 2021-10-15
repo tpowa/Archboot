@@ -311,19 +311,26 @@ GRUBEOF
         
 }
 
-_prepare_fedora_shim_bootloaders
+echo "Prepare fedora shim ..."
+_prepare_fedora_shim_bootloaders >/dev/null 2>&1
 
-_prepare_kernel_initramfs_files
+echo "Prepare kernel and initramfs ..."
+_prepare_kernel_initramfs_files >/dev/null 2>&1
 
-_download_uefi_shell_tianocore
+echo "Prepare uefi shells ..."
+_download_uefi_shell_tianocore >/dev/null 2>&1
 
-_prepare_efitools_uefi
+echo "Prepage efitools ..."
+_prepare_efitools_uefi >/dev/null 2>&1
 
-_prepare_uefi_X64_GRUB_USB_files
+echo "Prepare X64 Grub ..."
+_prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
 
-_prepare_uefi_IA32_GRUB_USB_files
+echo "Prepare IA32 Grub ..."
+_prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
 
-_prepare_uefi_image
+echo "Prepare UEFI image ..."
+_prepare_uefi_image >/dev/null 2>&1
 
 # place syslinux files
 mkdir -p "${X86_64}/boot/syslinux"
