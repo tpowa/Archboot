@@ -29,8 +29,14 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+### check for root
+if ! [[ ${UID} -eq 0 ]]; then 
+	echo "ERROR: Please run as root user!"
+	exit 1
+fi
+
 if [[ -z "${NAME}" ]]; then
-    echo "Error: no name specified"
+    echo "ERROR: no name specified"
     usage
     exit 1
 fi
@@ -78,7 +84,7 @@ EOF
     cd ..
     echo "Finished: Keys created in $_DIR"
 else
-    echo "Error: no directory specified"
+    echo "ERROR: no directory specified"
     usage
     exit 1
 fi
