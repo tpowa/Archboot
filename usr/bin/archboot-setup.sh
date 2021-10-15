@@ -3129,8 +3129,7 @@ do_uefi_common() {
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
     [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        [[ ! -f "${DESTDIR}/usr/share/efitools/efi/PreLoader.efi" ]] && PACKAGES="${PACKAGES} efitools"
-        [[ ! -f "${DESTDIR}/usr/lib/lockdown-ms/LockDown_ms.efi" ]] && PACKAGES="${PACKAGES} lockdown-ms"
+        PACKAGES="${PACKAGES} efitools mokutil"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
     unset PACKAGES
@@ -3217,20 +3216,18 @@ do_uefi_bootmgr_setup() {
     
 }
 
-do_uefi_secure_boot_preloader() {
+do_uefi_secure_boot_efitools() {
     
     do_uefi_common
     
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        cp -r "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader"
-        
-        mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/loader.efi"
-        
-        cp -f "${DESTDIR}/usr/share/efitools/efi/PreLoader.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/PreLoader.efi"
-        cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/preloader/HashTool.efi"
-        
-        _BOOTMGR_LABEL="PreLoader (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="/EFI/preloader/PreLoader.efi"
+        cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
+        _BOOTMGR_LABEL="HashTool (Secure Boot)"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
+        do_uefi_bootmgr_setup
+        cp -f "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
+        _BOOTMGR_LABEL="KeyTool (Secure Boot)"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
         do_uefi_bootmgr_setup
     fi
     
@@ -3410,12 +3407,10 @@ GUMEOF
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-            
-            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error installing Systemd-boot..." 0 0
@@ -3476,7 +3471,7 @@ REFINDEOF
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
@@ -3486,8 +3481,6 @@ REFINDEOF
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf"
             cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/icons"
-            
-            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error setting up refind." 0 0
@@ -3640,7 +3633,7 @@ do_syslinux_uefi() {
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
@@ -3650,8 +3643,6 @@ do_syslinux_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/syslinux.cfg"
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
-            
-            do_uefi_secure_boot_preloader
         fi
     else
         DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
@@ -3854,12 +3845,16 @@ do_grub_config() {
     ########
     
     ## Move old config file, if any
-    mv "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg.bak" || true
-    
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        GRUB_CFG="grub${_SPEC_UEFI_ARCH}.cfg"
+    else
+        GRUB_CFG="grub.cfg"
+    fi
+    mv "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}.cfg.bak" || true
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
-    cat << EOF > "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF > "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 if [ "\${grub_platform}" == "efi" ]; then
     set _UEFI_ARCH="\${grub_cpu}"
@@ -3875,7 +3870,7 @@ fi
 
 EOF
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 insmod part_gpt
 insmod part_msdos
@@ -3901,10 +3896,10 @@ set locale_dir="\${prefix}/locale"
 
 EOF
     
-    [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
-    ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+    ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
@@ -3950,9 +3945,9 @@ fi
 
 EOF
     
-    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
-    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
-    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     
     if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
@@ -3976,7 +3971,7 @@ EOF
     
     NUMBER="0"
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
@@ -3991,7 +3986,7 @@ EOF
     NUMBER=$((${NUMBER}+1))
     
     ## create kernel fallback entry
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 # (${NUMBER}) Arch Linux Fallback
 menuentry "Arch Linux Fallback" {
@@ -4005,7 +4000,7 @@ EOF
     
     NUMBER=$((${NUMBER}+1))
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 if [ "\${grub_platform}" == "efi" ]; then
     
@@ -4027,7 +4022,7 @@ EOF
     
     NUMBER=$((${NUMBER}+1))
     
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
@@ -4049,7 +4044,7 @@ EOF
     
     ## TODO: Detect actual Windows installation if any
     ## create example file for windows
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 if [ "\${grub_platform}" == "pc" ]; then
     
@@ -4075,7 +4070,7 @@ EOF
     ## Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
     geteditor || return 1
-    "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/grub.cfg"
+    "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     
     unset BOOT_PART_FS_UUID
     unset BOOT_PART_FS
@@ -4233,35 +4228,43 @@ do_grub_uefi() {
     
     chroot_mount
     
-    ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
-    echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
-    chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
-        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-        --format="${_GRUB_ARCH}-efi" \
-        --modules="part_gpt part_msdos" \
-        --install-modules="all" \
-        --fonts="unicode" \
-        --locales="en@quot" \
-        --themes="" \
-        --verbose \
-        --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
-        "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        [[ ! -d  ${UEFISYS_MOUNTPOINT}/EFI/Boot/ ]] && mkdir -p ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        cp /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
+        cp /usr/share/archboot/fedora-shim/mmx${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        GRUB_PREFIX_DIR=${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+    else
+        ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
+        echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
+        chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
+            --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+            --format="${_GRUB_ARCH}-efi" \
+            --modules="part_gpt part_msdos" \
+            --install-modules="all" \
+            --fonts="unicode" \
+            --locales="en@quot" \
+            --themes="" \
+            --verbose \
+            --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
+            "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
     
-    ## Install GRUB normally
-    chroot "${DESTDIR}" "/usr/bin/grub-install" \
-        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-        --target="${_GRUB_ARCH}-efi" \
-        --efi-directory="${UEFISYS_MOUNTPOINT}" \
-        --bootloader-id="grub" \
-        --boot-directory="/boot" \
-        --no-nvram \
-        --recheck \
-        --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
+        ## Install GRUB normally
+        chroot "${DESTDIR}" "/usr/bin/grub-install" \
+            --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+            --target="${_GRUB_ARCH}-efi" \
+            --efi-directory="${UEFISYS_MOUNTPOINT}" \
+            --bootloader-id="grub" \
+            --boot-directory="/boot" \
+            --no-nvram \
+            --recheck \
+            --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     
-    cat "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log" >> "${LOG}"
-    cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
-    
-    GRUB_PREFIX_DIR="/boot/grub/"
+        cat "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log" >> "${LOG}"
+        cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
+        GRUB_PREFIX_DIR="/boot/grub/"
+    fi
+
     GRUB_UEFI="1"
     do_grub_config
     GRUB_UEFI=""
@@ -4274,9 +4277,7 @@ do_grub_uefi() {
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
-    fi
-    
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
+    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB_Normal"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
@@ -4285,13 +4286,17 @@ do_grub_uefi() {
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-            
-            do_uefi_secure_boot_preloader
         fi
+    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
+        _BOOTMGR_LABEL="SHIM/GRUB Secure Boot"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/shim${_SPEC_UEFI_ARCH}.efi"
+        do_uefi_bootmgr_setup
+        do_uefi_secure_boot_efitools
+        ### TODO: Add sign of grub and kernel image with MOK key
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -4754,16 +4759,19 @@ install_bootloader_uefi() {
         _EFISTUB_MENU_LABEL="EFISTUB"
         _EFISTUB_MENU_TEXT="EFISTUB for ${_UEFI_ARCH} UEFI"
     fi
-    
-    DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
-        "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-        "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
-        "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
-    case $(cat ${ANSWER}) in
-        "EFISTUB") do_efistub_uefi ;;
-        "GRUB_UEFI") do_grub_uefi ;;
-        "SYSLINUX_UEFI") do_syslinux_uefi ;;
-    esac
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        do_grub_uefi
+    else
+        DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
+            "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
+            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
+            "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+        case $(cat ${ANSWER}) in
+            "EFISTUB") do_efistub_uefi ;;
+            "GRUB_UEFI") do_grub_uefi ;;
+            "SYSLINUX_UEFI") do_syslinux_uefi ;;
+        esac
+    fi
     
 }
 
@@ -4790,12 +4798,15 @@ install_bootloader() {
     fi
     prepare_pacman
     CANCEL=""
-    
     detect_uefi_boot
     _ANOTHER="1"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
-        DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
+        if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
+            install_bootloader_uefi
+        else
+            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
+        fi
         _ANOTHER="0"
         DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
     fi
