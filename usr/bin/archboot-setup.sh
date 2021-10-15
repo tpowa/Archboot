@@ -3083,11 +3083,7 @@ detect_uefi_secure_boot() {
     
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         uefi_mount_efivarfs
-        
-        _SECUREBOOT_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot | tail -n -1 | awk '{print $2}')"
-        _SETUPMODE_VAR_VALUE="$(efivar -p 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode | tail -n -1 | awk '{print $2}')"
-        
-        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
+        if [[ "$(echo $(bootctl | grep 'Secure' | cut -d : -f2))" == "enabled" ]]; then
             export _DETECTED_UEFI_SECURE_BOOT="1"
         fi
     fi
@@ -4319,6 +4315,7 @@ select_source() {
     if [ -d "/var/cache/pacman/pkg" ] && [ -n "$(ls -A "/var/cache/pacman/pkg")" ]; then
         echo "Packages are already in pacman cache...  > ${LOG}"
     else
+        ### TODO don't show dialog on Secure Boot, kexec is not supported!
         UPDATE_ENVIRONMENT=""
         if [[ -e "/usr/bin/update-installer.sh" ]];then
             DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nRequires at least 4GB RAM and will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
