@@ -55,19 +55,23 @@ mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid
 mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
 mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
+echo "Installing packages base and archboot ..."
 pacman --root "${_DIR}" -Sy base archboot --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}"
 # umount special filesystems
 umount -R ""${_DIR}"/proc"
 umount -R ""${_DIR}"/sys"
 umount -R ""${_DIR}"/dev"
 # generate locales
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen"
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen"
-systemd-nspawn -D "${_DIR}" locale-gen
+echo " Create locales ..."
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
 # generate pacman keyring
-systemd-nspawn -D "${_DIR}" pacman-key --init
-systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux
+echo " Generate pacman keyring ..."
+systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux >/dev/null 2>&1
 # copy local mirrorlist to container
+echo " Create pacman config and mirrorlist ..."
 cp /etc/pacman.d/mirrorlist "${_DIR}"/etc/pacman.d/mirrorlist
 # only copy from archboot pacman.conf, else use default file
 [[ "$(cat /etc/hostname)" == "archboot" ]] && cp /etc/pacman.conf "${_DIR}"/etc/pacman.conf
@@ -77,20 +81,26 @@ sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # enable [testing] if enabled in host
 if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
+    echo "Enable [testing] repository ..."
     sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
     sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
 fi
 # install firmware package
-[[ ! -z ${_LINUX_FIRMWARE} ]] && systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm
+if [[ ! -z ${_LINUX_FIRMWARE} ]]; then
+    echo "Installing ${_LINUX_FIRMWARE} ..."
+    systemd-nspawn -D "${_DIR}" pacman -Sy "${_LINUX_FIRMWARE}" --noconfirm >/dev/null 2>&1
 
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
+    echo "Clean container, delete not needed files ..."
     rm -r "${_DIR}"/usr/include
     rm -r "${_DIR}"/usr/share/{man,doc}
 fi
 
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
+    echo "Clean pacman cache ..."
     rm -r "${_DIR}"/var/cache/pacman
 fi
+echo "Finished container setup in ${_DIR}"
