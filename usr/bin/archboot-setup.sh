@@ -4366,7 +4366,7 @@ prepare_storagedrive() {
     S_MKFS=0
     DONE=0
     NEXTITEM=""
-    detect_uefi_boot
+    detect_
     while [[ "${DONE}" = "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
@@ -4781,7 +4781,6 @@ install_bootloader_bios() {
 }
 
 install_bootloader() {
-    
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
@@ -4793,14 +4792,17 @@ install_bootloader() {
     CANCEL=""
     detect_uefi_boot
     _ANOTHER="1"
+    NEXTITEM="7"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
          _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            install_bootloader_uefi
+            DIALOG --yesno "Setup has detected that you are using Secure Boot ...\nDo you like to install SHIM/GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
+            NEXTITEM="8"
         else
             DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
             DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
+            NEXTITEM="8"
         fi
     fi
     while [[ "${_ANOTHER}" == "1" ]]; do
@@ -4808,7 +4810,6 @@ install_bootloader() {
         _ANOTHER="0"
         DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
     done
-    NEXTITEM="8"
 }
 
 install_bootloader_menu() {
