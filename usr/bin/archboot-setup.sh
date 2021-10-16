@@ -3226,6 +3226,69 @@ do_uefi_secure_boot_efitools() {
     
 }
 
+do_secureboot_keys() {
+    CN=""
+    MOK_PW=""
+    KEYDIR=""
+    while [[ "${KEYDIR}" = "" ]]; do
+        DIALOG --inputbox "Setup keys:\nEnter a directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>${ANSWER} || KEYDIR=""
+        KEYDIR=$(cat ${ANSWER})
+    done
+    while [[ "${CN}" = "" ]]; do
+        DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
+        CN=$(cat ${ANSWER})
+    done
+    secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
+    DIALOG --msgbox "Your keys with CN="${CN}" have been saved to:\n${DESTDIR}/${KEYDIR}" 8 65
+}
+
+do_mok_sign () {
+    UEFI_BOOTLOADER_DIR="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+    MOK_PW=""
+    DEST_KEYDIR="${DESTDIR}/${KEYDIR}/MOK"
+    while [[ "${MOK_PW}" = "" ]]; do
+        DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>${ANSWER} || return 1
+        PASS=$(cat ${ANSWER})
+        DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>${ANSWER} || return 1
+        PASS2=$(cat ${ANSWER})
+        if [[ "${PASS}" = "${PASS2}" ]]; then
+            MOK_PW=${PASS}
+            echo ${MOK_PW} > /tmp/.password
+            echo ${MOK_PW} >> /tmp/.password
+            MOK_PW=/tmp/.password
+        else
+            DIALOG --msgbox "Password didn't match, please enter again." 8 65
+        fi
+    done
+    mokutil -i ${DEST_KEYDIR}/MOK.cer < ${MOK_PW} > ${LOG} || return 1
+    rm /tmp/.password
+    DIALOG --msgbox "MOK keys have been installed successfully." 8 65
+    sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${DESTDIR}/boot/${VMLINUZ} ${DESTDIR}/boot/${VMLINUZ} > ${LOG} || return 1
+    sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG} || return 1
+    DIALOG --msgbox "${DESTDIR}/boot/${VMLINUZ} and${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
+}
+
+do_pacman_sign() {
+    [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  ${DESTDIR}/etc/pacman.d/hooks/
+    HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
+    cat << EOF > ${HOOKNAME}
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+
+[Action]
+Description = Signing kernel with Machine Owner Key for Secure Boot
+When = PostTransaction
+Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>/dev/null | /usr/bin/grep -q "signature certificates"; then /usr/bin/sbsign --key /${KEYDIR}/MOK.key --cert /${KEYDIR}/MOK.crt --output {} {}; fi' ;
+Depends = sbsigntools
+Depends = findutils
+Depends = grep
+EOF
+    DIALOG --msgbox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}" 8 75
+}
+
 do_efistub_copy_to_efisys() {
     
     if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
@@ -4268,13 +4331,13 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
+        DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB_Normal"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
-        DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
+        DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
         
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         
@@ -4288,8 +4351,10 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM/GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/shim${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --msgbox "SHIM/GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 0 0
-        ### TODO: Add sign of grub and kernel image with MOK key
+        do_secureboot_keys
+        do_mok_sign
+        do_pacman_sign
+        DIALOG --msgbox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 8 75
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -4797,7 +4862,7 @@ install_bootloader() {
         do_uefi_setup_env_vars
          _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            DIALOG --yesno "Setup has detected that you are using Secure Boot ...\nDo you like to install SHIM/GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
+            DIALOG --yesno "Setup has detected that you are using Secure Boot ...\nDo you like to install SHIM and GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
             if [[ "${CANCEL}" == "" ]]; then
                 install_bootloader_uefi
                 NEXTITEM="8"

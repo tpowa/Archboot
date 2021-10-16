@@ -42,10 +42,10 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 if [[ ! -z "${_DIR}" ]]; then
-    [[ ! -d $_DIR ]] && mkdir $_DIR
+    [[ ! -d $_DIR ]] && mkdir -p $_DIR
     cd $_DIR
     echo "Backup old keys in $_DIR/BACKUP ..."
-    mkdir BACKUP
+    [[ ! -d "BACKUP" ]] && mkdir BACKUP
     efi-readvar -v PK -o BACKUP/old_PK.esl
     efi-readvar -v KEK -o BACKUP/old_KEK.esl
     efi-readvar -v db -o BACKUP/old_db.esl
@@ -75,11 +75,12 @@ EOF
     openssl x509 -in MOK.crt -out MOK.cer -outform DER
     DIRS="DB KEK MOK PK noPK"
     for i in $DIRS; do
-        mkdir $i
+        [[ ! -d "$i" ]] && mkdir $i
         mv $i.* $i
     done
     mv DB db
-    mkdir {GUID,MS}
+    [[ ! -d "GUID" ]] && mkdir GUID
+    [[ ! -d "MS" ]] && mkdir MS
     mv myGUID.txt GUID
     mv *.crt *.auth *.esl MS
     cd ..
