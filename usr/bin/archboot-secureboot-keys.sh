@@ -78,10 +78,12 @@ EOF
         mkdir $i
         mv $i.* $i
     done
+    mv DB db
     mkdir {GUID,MS}
     mv myGUID.txt GUID
     mv *.crt *.auth *.esl MS
     cd ..
+    chmod 700 $_DIR
     echo "Finished: Keys created in $_DIR"
 else
     echo "ERROR: no directory specified"
