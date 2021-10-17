@@ -3151,9 +3151,9 @@ for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABE
 done
 
 if [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
-    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}"
+    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}" -e "3"
 else
-    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}"
+    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" -e "3"
 fi
 
 EFIBEOF
@@ -3216,11 +3216,11 @@ do_uefi_secure_boot_efitools() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
         _BOOTMGR_LABEL="HashTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="\EFI\BOOT\HashTool.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
         do_uefi_bootmgr_setup
         cp -f "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
         _BOOTMGR_LABEL="KeyTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="\EFI\BOOT\KeyTool.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
         do_uefi_bootmgr_setup
     fi
     
@@ -3265,7 +3265,7 @@ do_mok_sign () {
     DIALOG --msgbox "MOK keys have been installed successfully." 8 65
     sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${DESTDIR}/boot/${VMLINUZ} ${DESTDIR}/boot/${VMLINUZ} > ${LOG} || return 1
     sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG} || return 1
-    DIALOG --msgbox "${DESTDIR}/boot/${VMLINUZ} and${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
+    DIALOG --msgbox "${DESTDIR}/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
 }
 
 do_pacman_sign() {
@@ -3516,7 +3516,7 @@ REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
-        _BOOTMGR_LOADER_DIR="\EFI\refind\refind_${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "refind has been setup successfully." 0 0
@@ -3676,7 +3676,7 @@ do_syslinux_uefi() {
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
         _BOOTMGR_LABEL="Syslinux"
-        _BOOTMGR_LOADER_DIR="\EFI\syslinux\syslinux.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/syslinux/syslinux.efi"
         do_uefi_bootmgr_setup
         
         _SYSLINUX_BIOS="0"
@@ -4286,11 +4286,9 @@ do_grub_uefi() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
         [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        cp /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
-        cp /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        ### TODO internal grub.cfg is needed
-        #cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        GRUB_PREFIX_DIR=${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        cp -f /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
+        cp -f /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        GRUB_PREFIX_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
     else
         ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
         echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
@@ -4325,18 +4323,38 @@ do_grub_uefi() {
     GRUB_UEFI="1"
     do_grub_config
     GRUB_UEFI=""
-    
+    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        # generate GRUB with config embeded
+        chroot_mount
+        # create Arch Linux sbat file
+        # add sbat file: https://bugs.archlinux.org/task/72415
+        echo "sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md" > ${DESTDIR}/tmp/sbat.csv
+        echo "grub,1,Free Software Foundation,grub,2.06,https//www.gnu.org/software/grub/" >> ${DESTDIR}/tmp/sbat.csv
+        echo "arch,1,Arch Linux,\$pkgname,\$pkgver,https://archlinux.org/packages/core/x86_64/grub/" >> ${DESTDIR}/tmp/sbat.csv
+        ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
+        _GRUB_MODULES="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat \
+                        font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio \
+                        halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd \
+                        net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid \
+                        search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb \
+                        usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
+        # add -v for verbose
+        _COMMON_GRUB_OPTIONS="--sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
+        chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi ${_COMMON_GRUB_OPTIONS} -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+        cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} ${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
+        chroot_umount
+    fi
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" ]]; then
         cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub.cfg"
         
         _BOOTMGR_LABEL="GRUB_Standalone"
-        _BOOTMGR_LOADER_DIR="\EFI\grub\grub${_SPEC_UEFI_ARCH}_standalone.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB_Normal"
-        _BOOTMGR_LOADER_DIR="\EFI\grub\grub${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
@@ -4349,12 +4367,12 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
-        do_secureboot_keys
-        do_mok_sign
-        do_pacman_sign
-        do_uefi_secure_boot_efitools
+        do_secureboot_keys || return 1
+        do_mok_sign || return 1
+        do_pacman_sign || return 1
+        do_uefi_secure_boot_efitools || return 1
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
-        _BOOTMGR_LOADER_DIR="\EFI\BOOT\BOOT${_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         DIALOG --msgbox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 8 75
     else
