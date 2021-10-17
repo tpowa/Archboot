@@ -3516,7 +3516,7 @@ REFINDEOF
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
-        _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\refind\refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "refind has been setup successfully." 0 0
@@ -3676,7 +3676,7 @@ do_syslinux_uefi() {
     
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
         _BOOTMGR_LABEL="Syslinux"
-        _BOOTMGR_LOADER_DIR="/EFI/syslinux/syslinux.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\syslinux\syslinux.efi"
         do_uefi_bootmgr_setup
         
         _SYSLINUX_BIOS="0"
@@ -4284,10 +4284,12 @@ do_grub_uefi() {
     
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+        # install fedora shim
         [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
         cp /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
         cp /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        ### TODO internal grub.cfg is needed
+        #cp /usr/share/archboot/grub/grub${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
         GRUB_PREFIX_DIR=${UEFISYS_MOUNTPOINT}/EFI/BOOT/
     else
         ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
@@ -4328,13 +4330,13 @@ do_grub_uefi() {
         cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub.cfg"
         
         _BOOTMGR_LABEL="GRUB_Standalone"
-        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\grub\grub${_SPEC_UEFI_ARCH}_standalone.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB_Normal"
-        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\grub\grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         
         DIALOG --msgbox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 8 65
