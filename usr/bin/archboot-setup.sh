@@ -3216,11 +3216,11 @@ do_uefi_secure_boot_efitools() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
         _BOOTMGR_LABEL="HashTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\BOOT\HashTool.efi"
         do_uefi_bootmgr_setup
         cp -f "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
         _BOOTMGR_LABEL="KeyTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
+        _BOOTMGR_LOADER_DIR="\EFI\BOOT\KeyTool.efi"
         do_uefi_bootmgr_setup
     fi
     
@@ -4347,13 +4347,13 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
-        do_uefi_secure_boot_efitools
-        _BOOTMGR_LABEL="SHIM/GRUB Secure Boot"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/shim${_SPEC_UEFI_ARCH}.efi"
-        do_uefi_bootmgr_setup
         do_secureboot_keys
         do_mok_sign
         do_pacman_sign
+        do_uefi_secure_boot_efitools
+        _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
+        _BOOTMGR_LOADER_DIR="\EFI\BOOT\BOOT${_UEFI_ARCH}.efi"
+        do_uefi_bootmgr_setup
         DIALOG --msgbox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 8 75
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
