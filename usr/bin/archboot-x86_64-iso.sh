@@ -263,7 +263,7 @@ menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
-        grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi ${_COMMON_GRUB_OPTIONS} -o "${X86_64}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=/${X86_64}/EFI/BOOT/grubx64.cfg"
+        grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi ${_COMMON_GRUB_OPTIONS} -o "${X86_64}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubx64.cfg"
 }
 
 _prepare_uefi_IA32_GRUB_USB_files() {
@@ -323,7 +323,7 @@ menuentry "Exit GRUB" {
     exit
 }
 GRUBEOF
-        grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi ${_COMMON_GRUB_OPTIONS} -o "${X86_64}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=/${X86_64}/EFI/BOOT/grubia32.cfg"
+        grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi ${_COMMON_GRUB_OPTIONS} -o "${X86_64}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubia32.cfg"
 
 }
 
