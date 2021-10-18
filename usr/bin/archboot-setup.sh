@@ -4324,8 +4324,7 @@ do_grub_uefi() {
             --fonts="unicode" \
             --locales="en@quot" \
             --themes="" \
-            --compress lzo \
-            --core-compress xz \
+            --compress=lzo \
             --verbose \
             --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
             "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
@@ -4365,7 +4364,7 @@ do_grub_uefi() {
                         search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb \
                         usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
         # add -v for verbose
-        _COMMON_GRUB_OPTIONS="--compress lzo --core-compress xz --sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
+        _COMMON_GRUB_OPTIONS="--compress=lzo --sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
         #remove existing, else weird things are happening
         [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm ${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
         chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi ${_COMMON_GRUB_OPTIONS} -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
