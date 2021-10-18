@@ -4324,6 +4324,7 @@ do_grub_uefi() {
             --fonts="unicode" \
             --locales="en@quot" \
             --themes="" \
+            --compress xz \
             --verbose \
             --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
             "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
