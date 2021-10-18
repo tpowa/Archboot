@@ -3280,8 +3280,8 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to sign /boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi with the MOK certificate?" 0 0 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         chroot_mount
-        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK.key --cert /${KEYDIR}/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG} 
-        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK.key --cert /${KEYDIR}/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
+        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK/MOK.key --cert /${KEYDIR}/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG} 
+        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK/MOK.key --cert /${KEYDIR}/MOK/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
         chroot_umount
         DIALOG --msgbox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
     fi
