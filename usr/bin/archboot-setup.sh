@@ -3128,6 +3128,7 @@ do_uefi_common() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         [[ ! -f "${DESTDIR}/usr/bin/mokutil" ]] && PACKAGES="${PACKAGES} mokutil"
         [[ ! -f "${DESTDIR}/usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
+        [[ ! -f "${DESTDIR}/usr/bin/sbsign" ]] && PACKAGES="${PACKAGES} sbsigntools"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
     unset PACKAGES
