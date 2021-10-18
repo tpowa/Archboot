@@ -4364,6 +4364,8 @@ do_grub_uefi() {
                         usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
         # add -v for verbose
         _COMMON_GRUB_OPTIONS="--sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
+        #remove existing, else weird things are happening
+        [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm ${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
         chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi ${_COMMON_GRUB_OPTIONS} -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} ${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
         chroot_umount
