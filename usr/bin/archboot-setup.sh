@@ -3212,16 +3212,22 @@ do_uefi_bootmgr_setup() {
 do_uefi_secure_boot_efitools() {
     
     do_uefi_common
-    
+    # install helper tools and create entries in UEFI boot manager, if not present
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        cp -f "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
-        _BOOTMGR_LABEL="HashTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
-        do_uefi_bootmgr_setup
-        cp -f "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
-        _BOOTMGR_LABEL="KeyTool (Secure Boot)"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
-        do_uefi_bootmgr_setup
+        chroot_mount
+        if [[ ! -f  "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi" ]]; then 
+            chroot "${DESTDIR}" "/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
+            _BOOTMGR_LABEL="HashTool (Secure Boot)"
+            _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
+            do_uefi_bootmgr_setup
+        fi
+        if [[ ! -f  "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi" ]]; then 
+            chroot "${DESTDIR}" cp "/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
+            _BOOTMGR_LABEL="KeyTool (Secure Boot)"
+            _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
+            do_uefi_bootmgr_setup
+        fi
+        chroot_umount
     fi
     
 }
@@ -3231,47 +3237,65 @@ do_secureboot_keys() {
     MOK_PW=""
     KEYDIR=""
     while [[ "${KEYDIR}" = "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter a directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>${ANSWER} || KEYDIR=""
+        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>${ANSWER} || KEYDIR=""
         KEYDIR=$(cat ${ANSWER})
     done
-    while [[ "${CN}" = "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
-        CN=$(cat ${ANSWER})
-    done
-    secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
-    DIALOG --msgbox "Your keys with CN="${CN}" have been saved to:\n${DESTDIR}/${KEYDIR}" 8 65
+    if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then 
+        while [[ "${CN}" = "" ]]; do
+            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
+            CN=$(cat ${ANSWER})
+        done
+        secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
+         DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
+    else
+         DIALOG --inputbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n- assuming keys are already created\n-trying to use existing keys now" 8 65 "" 2>${ANSWER} || CN=""
+    fi
 }
 
 do_mok_sign () {
-    UEFI_BOOTLOADER_DIR="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+    UEFI_BOOTLOADER_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+    INSTALL_MOK=""
     MOK_PW=""
-    DEST_KEYDIR="${DESTDIR}/${KEYDIR}/MOK"
-    while [[ "${MOK_PW}" = "" ]]; do
-        DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>${ANSWER} || return 1
-        PASS=$(cat ${ANSWER})
-        DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>${ANSWER} || return 1
-        PASS2=$(cat ${ANSWER})
-        if [[ "${PASS}" = "${PASS2}" ]]; then
-            MOK_PW=${PASS}
-            echo ${MOK_PW} > /tmp/.password
-            echo ${MOK_PW} >> /tmp/.password
-            MOK_PW=/tmp/.password
-        else
-            DIALOG --msgbox "Password didn't match, please enter again." 8 65
-        fi
-    done
-    mokutil -i ${DEST_KEYDIR}/MOK.cer < ${MOK_PW} > ${LOG} || return 1
-    rm /tmp/.password
-    DIALOG --msgbox "MOK keys have been installed successfully." 8 65
-    sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${DESTDIR}/boot/${VMLINUZ} ${DESTDIR}/boot/${VMLINUZ} > ${LOG} || return 1
-    sbsign --key ${DEST_KEYDIR}/MOK.key --cert ${DEST_KEYDIR}/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG} || return 1
-    DIALOG --msgbox "${DESTDIR}/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
+    DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 0 0 && INSTALL_MOK="1"
+    if [[ "${INSTALL_MOK}" == "1" ]]; then
+        while [[ "${MOK_PW}" = "" ]]; do
+            DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>${ANSWER} || return 1
+            PASS=$(cat ${ANSWER})
+            DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>${ANSWER} || return 1
+            PASS2=$(cat ${ANSWER})
+            if [[ "${PASS}" = "${PASS2}" ]]; then
+                MOK_PW=${PASS}
+                echo ${MOK_PW} > ${DESTDIR}/tmp/.password
+                echo ${MOK_PW} >> ${DESTDIR}/tmp/.password
+                MOK_PW=/tmp/.password
+            else
+                DIALOG --msgbox "Password didn't match, please enter again." 8 65
+            fi
+        done
+        chroot_mount
+        chroot "${DESTDIR}" mokutil -i ${KEYDIR}/MOK.cer < ${MOK_PW} > ${LOG}
+        rm /tmp/.password
+        chroot_umount
+        DIALOG --msgbox "MOK keys have been installed successfully." 8 65
+    fi
+    SIGN_MOK=""
+    DIALOG --yesno "Do you want to sign /boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi with the MOK certificate?" 0 0 && SIGN_MOK="1"
+    if [[ "${SIGN_MOK}" == "1" ]]; then
+        chroot_mount
+        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK.key --cert /${KEYDIR}/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG} 
+        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK.key --cert /${KEYDIR}/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
+        chroot_umount
+        DIALOG --msgbox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
+    fi
 }
 
 do_pacman_sign() {
-    [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  ${DESTDIR}/etc/pacman.d/hooks/
-    HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
-    cat << EOF > ${HOOKNAME}
+    SIGN_KERNEL=""
+    DIALOG --yesno "Do you want to install a pacman hook for automatic signing /boot/${VMLINUZ} on updates?" 0 0 && SIGN_KERNEL="1"
+    if [[ "${SIGN_KERNEL}" == "1" ]]; then
+        [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  ${DESTDIR}/etc/pacman.d/hooks/
+        HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
+        cat << EOF > ${HOOKNAME}
 [Trigger]
 Operation = Install
 Operation = Upgrade
@@ -3286,7 +3310,8 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-    DIALOG --msgbox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}" 8 75
+        DIALOG --msgbox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}" 8 75
+    fi
 }
 
 do_efistub_copy_to_efisys() {
@@ -4367,10 +4392,10 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
-        do_secureboot_keys || return 1
-        do_mok_sign || return 1
-        do_pacman_sign || return 1
-        do_uefi_secure_boot_efitools || return 1
+        do_secureboot_keys
+        do_mok_sign
+        do_pacman_sign
+        do_uefi_secure_boot_efitools
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
