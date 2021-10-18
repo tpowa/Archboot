@@ -3127,7 +3127,7 @@ do_uefi_common() {
     [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         [[ ! -f "${DESTDIR}/usr/bin/mokutil" ]] && PACKAGES="${PACKAGES} mokutil"
-        [[ ! -f "${DESTDIR}//usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
+        [[ ! -f "${DESTDIR}/usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
     unset PACKAGES
@@ -3215,13 +3215,13 @@ do_uefi_secure_boot_efitools() {
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         chroot_mount
-        if [[ ! -f  "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi" ]]; then 
-            chroot "${DESTDIR}" "/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
+        if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi" ]]; then 
+            chroot "${DESTDIR}" cp "/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
             do_uefi_bootmgr_setup
         fi
-        if [[ ! -f  "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi" ]]; then 
+        if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi" ]]; then 
             chroot "${DESTDIR}" cp "/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
             _BOOTMGR_LABEL="KeyTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
@@ -3248,7 +3248,7 @@ do_secureboot_keys() {
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
          DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
     else
-         DIALOG --inputbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n- assuming keys are already created\n-trying to use existing keys now" 8 65 "" 2>${ANSWER} || CN=""
+         DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65 ""
     fi
 }
 
@@ -3265,17 +3265,15 @@ do_mok_sign () {
             PASS2=$(cat ${ANSWER})
             if [[ "${PASS}" = "${PASS2}" ]]; then
                 MOK_PW=${PASS}
-                echo ${MOK_PW} > ${DESTDIR}/tmp/.password
-                echo ${MOK_PW} >> ${DESTDIR}/tmp/.password
+                echo ${MOK_PW} > /tmp/.password
+                echo ${MOK_PW} >> /tmp/.password
                 MOK_PW=/tmp/.password
             else
                 DIALOG --msgbox "Password didn't match, please enter again." 8 65
             fi
         done
-        chroot_mount
-        chroot "${DESTDIR}" mokutil -i ${KEYDIR}/MOK.cer < ${MOK_PW} > ${LOG}
+        mokutil -i ${DESTDIR}/${KEYDIR}/MOK/MOK.cer < ${MOK_PW} > ${LOG}
         rm /tmp/.password
-        chroot_umount
         DIALOG --msgbox "MOK keys have been installed successfully." 8 65
     fi
     SIGN_MOK=""
