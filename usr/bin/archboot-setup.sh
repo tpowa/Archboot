@@ -4356,12 +4356,7 @@ do_grub_uefi() {
         echo "grub,1,Free Software Foundation,grub,2.06,https//www.gnu.org/software/grub/" >> ${DESTDIR}/tmp/sbat.csv
         echo "arch,1,Arch Linux,\$pkgname,\$pkgver,https://archlinux.org/packages/core/x86_64/grub/" >> ${DESTDIR}/tmp/sbat.csv
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        _GRUB_MODULES="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat \
-                        font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio \
-                        halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd \
-                        net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid \
-                        search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb \
-                        usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
+        _GRUB_MODULES="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
         # add -v for verbose
         _COMMON_GRUB_OPTIONS="--sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
         #remove existing, else weird things are happening
