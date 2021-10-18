@@ -192,7 +192,7 @@ _uefi_GRUB_common() {
                         search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb \
                         usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard"
         # add -v for verbose
-        _COMMON_GRUB_OPTIONS="--compress=lzo --sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
+        _COMMON_GRUB_OPTIONS="--sbat /tmp/sbat.csv --modules="${_GRUB_MODULES}" --fonts="unicode" --locales="en@quot" --themes="""
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
