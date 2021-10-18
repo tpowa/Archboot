@@ -35,6 +35,8 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+[[ -z "${_LINUX_FIRMWARE}" ]] && _LINUX_FIRMWARE="linux-firmware"
+
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
 	echo "ERROR: Please run as root user!"
