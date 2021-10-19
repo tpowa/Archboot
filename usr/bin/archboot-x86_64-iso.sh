@@ -333,8 +333,8 @@ _download_uefi_shell_tianocore >/dev/null 2>&1
 echo "Prepare efitools ..."
 _prepare_efitools_uefi >/dev/null 2>&1
 
-echo "Prepare UEFI common Grub ..."
-_uefi_GRUB_common
+echo "Prepare UEFI Grub sbat file..."
+_uefi_GRUB_sbat
 
 echo "Prepare X64 Grub ..."
 _prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
