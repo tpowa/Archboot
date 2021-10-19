@@ -3247,7 +3247,7 @@ do_secureboot_keys() {
             CN=$(cat ${ANSWER})
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
-         DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
+         DIALOG --msgbox "Setup keys created:\nCommon name(CN) ${CN} used for your keys in ${DESTDIR}/${KEYDIR} " 8 65
     else
          DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65 ""
     fi
@@ -3855,7 +3855,7 @@ do_grub_common_before() {
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
     if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
-        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg in 3 secons ..." 0 0
+        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg in 3 seconds ..." 0 0
         sleep 3
         PACKAGES="grub"
         run_pacman
