@@ -3930,7 +3930,7 @@ do_grub_config() {
     else
         GRUB_CFG="grub.cfg"
     fi
-    mv "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}.bak" || true
+    [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" ]] && mv "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}.bak" || true
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
