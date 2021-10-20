@@ -8,7 +8,7 @@ HOME="/home/tpowa/"
 SERVER_DIR="/srv/ftp/iso/archboot"
 USER="tobias"
 GROUP="users"
-GPG= "--detach-sign --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
+GPG="--detach-sign --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
