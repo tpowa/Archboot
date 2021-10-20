@@ -26,6 +26,9 @@ cp "${PACMAN_MIRROR}".archboot "${PACMAN_MIRROR}"
 cd "${BUILDDIR}"
 [[ -e "${DIRECTORY}" ]] && rm -r "${DIRECTORY}"
 archboot-x86_64-release.sh "${DIRECTORY}"
+# set user rights on files
+chown -R "${USER}" "${DIRECTORY}"
+chgrp -R "${GROUP}" "${DIRECTORY}"
 cd "${DIRECTORY}"
 # remove sha256sum
 rm sha256sum.txt
@@ -41,9 +44,6 @@ for i in boot/*; do
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 cd ..
-# set user rights on files
-chown -R "${USER}" "${DIRECTORY}"
-chgrp -R "${GROUP}" "${DIRECTORY}"
 # restore pacman.conf and mirrorlist
 cp "${PACMAN_MIRROR}".old "${PACMAN_MIRROR}"
 cp "${PACMAN_CONF}".old "${PACMAN_CONF}"
