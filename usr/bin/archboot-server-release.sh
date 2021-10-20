@@ -31,12 +31,12 @@ cd "${DIRECTORY}"
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
 for i in *; do
-    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
+    [[ -f "${i}" ]] && sudo -u "${USER}" gpg ${GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 for i in boot/*; do
-    [[ -f "${i}" ]] && sudo -u "${USER}" gpg "${GPG}" "${i}"
+    [[ -f "${i}" ]] && sudo -u "${USER}" gpg ${GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
@@ -52,7 +52,7 @@ sudo -u "${USER}" scp -r "${DIRECTORY}" "${SERVER}":"${HOME}"
 # move files on server, create symlink and remove 3 month old release
 sudo -u "${USER}" ssh "${SERVER}" <<EOF
 rm -r "${SERVER_DIR}"/"${DIRECTORY}"
-rm -r "${SERVER_DIR}"/"$(date -d "$(date +) - 3 month" +%Y.%m")"
+rm -r "${SERVER_DIR}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
 mv "${DIRECTORY}" "${SERVER_DIR}"/
 cd "${SERVER_DIR}"
 rm latest
