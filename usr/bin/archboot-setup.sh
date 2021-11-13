@@ -2094,7 +2094,7 @@ select_filesystem() {
     [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-    [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs-3g NTFS"
+    [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs3 NTFS"
     [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>${ANSWER} || return 1
     FSTYPE=$(cat ${ANSWER})
@@ -2334,7 +2334,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local knownfs=0
-        for fs in xfs jfs reiserfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs-3g vfat; do
+        for fs in xfs jfs reiserfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs3 vfat; do
             [[ "${_fstype}" = "${fs}" ]] && knownfs=1 && break
         done
         if [[ ${knownfs} -eq 0 ]]; then
@@ -2354,7 +2354,7 @@ _mkfs() {
                 f2fs)     mkfs.f2fs ${_fsoptions} -l ${_labelname} ${_device} >${LOG} 2>&1; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${_fsoptions} -L ${_labelname} ${_btrfsdevices} >${LOG} 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L ${_labelname} ${_device} >${LOG} 2>&1; ret=$? ;;
-                ntfs-3g)  mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >${LOG} 2>&1; ret=$? ;;
+                ntfs3)    mkfs.ntfs ${_fsoptions} -L ${_labelname} ${_device} >${LOG} 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${_fsoptions} -n ${_labelname} ${_device} >${LOG} 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
