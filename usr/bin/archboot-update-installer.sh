@@ -18,14 +18,14 @@ usage () {
 	echo ""
         echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
 	echo " -latest          Launch latest archboot environment (using kexec)."
-        echo "                  This operation needs at least 3000 MB RAM."
+        echo "                  This operation needs at least 2500 MB RAM."
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 4000 MB RAM."
+        echo "                  This operation needs at least 3400 MB RAM."
         echo ""
         echo " -latest-image    Generate latest image files in /archboot-release directory"
-        echo "                  This operation needs at least 4000 MB RAM."
+        echo "                  This operation needs at least 3400 MB RAM."
         echo ""
 	echo " -h               This message."
 	exit 0
@@ -88,6 +88,8 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
     echo "Step 3/6: Generating initramfs in "${W_DIR}" ..."
     echo "          This will need some time ..."
+    # add fix for mkinitcpio 31, remove when 32 is released
+    cp "${W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${W_DIR}"/usr/lib/initcpio/functions
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     echo "Step 4/6: Moving initramfs files from "${W_DIR}" to / ..."
     mv "${W_DIR}"/initrd.img / || exit 1
