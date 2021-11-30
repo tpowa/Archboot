@@ -34,7 +34,7 @@ systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh
 # remove not working lvm2 from latest image
 echo "Remove lvm2 from container ${W_DIR} ..."
 systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
-# generate latest tarball in containe
+# generate latest tarball in container
 echo "Generate latest ISO ..."
 systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
 # generate latest iso in container
@@ -60,12 +60,12 @@ echo "Create boot directory ..."
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
 for i in *.iso; do
     if [[ ! "$(echo $i | grep latest)" ]]; then
-        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img >/dev/null 2>&1
-        isoinfo -R -i "${i}" -x /boot/intel-ucode.img > boot/intel-ucode.img >/dev/null 2>&1
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img >/dev/null 2>&1
-        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64 >/dev/null 2>&1
+        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img 2>&1
+        isoinfo -R -i "${i}" -x /boot/intel-ucode.img > boot/intel-ucode.img 2>&1
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_x86_64.img 2>&1
+        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 > boot/vmlinuz_archboot_x86_64 2>&1
     else
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img >/dev/null 2>&1
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img > boot/initramfs_archboot_latest_x86_64.img 2>&1
     fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
