@@ -89,8 +89,10 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 3/6: Generating initramfs in "${W_DIR}" ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
+    cp "${W_DIR}"/usr/lib/initcpio/functions "${W_DIR}"/usr/lib/initcpio/functions.old
     cp "${W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${W_DIR}"/usr/lib/initcpio/functions
     systemd-nspawn -D "${W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
+    mv "${W_DIR}"/usr/lib/initcpio/functions.old "${W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from "${W_DIR}" to / ..."
     mv "${W_DIR}"/initrd.img / || exit 1
     mv "${W_DIR}"/boot/vmlinuz-linux / || exit 1

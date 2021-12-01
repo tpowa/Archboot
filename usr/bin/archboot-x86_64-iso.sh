@@ -91,13 +91,14 @@ kver() {
 [[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
 [[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-archboot-${RELEASENAME}-x86_64"
 
-# fix for mkinitcpio 31
-# https://bugs.archlinux.org/task/72882
-# remove on mkinitcpio 32 release
-[[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-
 if [[ "${TARBALL}" == "1" ]]; then
+        # fix for mkinitcpio 31
+        # https://bugs.archlinux.org/task/72882
+        # remove on mkinitcpio 32 release
+        cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
+        [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
 	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
+	mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
 	exit 0
 fi
 
