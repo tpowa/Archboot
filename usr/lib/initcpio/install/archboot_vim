@@ -17,6 +17,8 @@ build ()
     for i in ${VIM_BASIC_MODULE}; do
        [[ -e "/usr/share/vim/vim82/$i.vim" ]] && add_file "/usr/share/vim/vim82/$i.vim"
     done
+    # fix colors
+    [[ -e "/usr/share/vim/vim82/colors/lists/default.vim" ]] && add_file "/usr/share/vim/vim82/colors/lists/default.vim"
     add_file "/usr/share/vim/vim82/rgb.txt"
     add_file "/usr/share/licenses/vim/license.txt"
     add_full_dir "/usr/share/vim/vim82/autoload/dist"
