@@ -16,6 +16,7 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+### check for tpowa's build server
 if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
     echo "This script should only be run on tpowa's build server. Aborting..."
     exit 1
