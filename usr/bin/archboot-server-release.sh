@@ -16,6 +16,11 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
+if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
+    echo "This script should only be run on tpowa's build server. Aborting..."
+    exit 1
+fi
+
 # use pacman.conf with disabled [testing] repository
 cp "${PACMAN_CONF}" "${PACMAN_CONF}".old
 cp "${PACMAN_CONF}".archboot "${PACMAN_CONF}"
