@@ -11,7 +11,7 @@ build ()
     echo "  - Virtual consoles 1-6 are active." >> ${MOTD}
     echo "  - To change virtual console use ALT + F(1-6)" >> ${MOTD}
 if [ "$(echo "${HOOKS[@]}" | grep archboot_keymap)" ]; then
-    echo "Change keymap:" >> ${MOTD}
+    echo "Change keymap and console font:" >> ${MOTD}
     echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
 fi
 if [ "$(echo "${HOOKS[@]}" | grep archboot_tz)" ]; then
