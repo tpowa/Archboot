@@ -45,7 +45,7 @@ echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
 echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "Architecture: x86_64" >>Release.txt
-echo "RAM requirement to boot: 1024 MB or greater" >>Release.txt
+echo "RAM requirement to boot: 1152 MB or greater" >>Release.txt
 echo "Archboot:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
 echo "Kernel:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
 echo "Pacman:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
