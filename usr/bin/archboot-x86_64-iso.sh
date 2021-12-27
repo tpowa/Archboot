@@ -184,14 +184,6 @@ _download_uefi_shell_tianocore() {
 	cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${X86_64}/EFI/tools/shellia32_v1.efi" 
 }
 
-_uefi_GRUB_sbat() {
-	# create Arch Linux sbat file
-        # add sbat file: https://bugs.archlinux.org/task/72415
-        echo "sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md" > /tmp/sbat.csv
-        echo "grub,1,Free Software Foundation,grub,2.06,https//www.gnu.org/software/grub/" >> /tmp/sbat.csv
-        echo "arch,1,Arch Linux,\$pkgname,\$pkgver,https://archlinux.org/packages/core/x86_64/grub/" >> /tmp/sbat.csv
-}
-
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 # If you don't use shim use --disable-shim-lock
 _prepare_uefi_X64_GRUB_USB_files() {
@@ -261,7 +253,7 @@ menuentry "Exit GRUB" {
 }
 GRUBEOF
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/tmp/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubx64.cfg"
+        grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubx64.cfg"
 }
 
 _prepare_uefi_IA32_GRUB_USB_files() {
@@ -322,7 +314,7 @@ menuentry "Exit GRUB" {
 }
 GRUBEOF
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/tmp/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubia32.cfg"
+        grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${X86_64}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=${X86_64}/EFI/BOOT/grubia32.cfg"
 
 }
 
@@ -338,9 +330,6 @@ _download_uefi_shell_tianocore >/dev/null 2>&1
 
 echo "Prepare efitools ..."
 _prepare_efitools_uefi >/dev/null 2>&1
-
-echo "Prepare UEFI Grub sbat file..."
-_uefi_GRUB_sbat
 
 echo "Prepare X64 Grub ..."
 _prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1

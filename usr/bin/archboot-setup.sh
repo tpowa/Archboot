@@ -4350,16 +4350,11 @@ do_grub_uefi() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # generate GRUB with config embeded
         chroot_mount
-        # create Arch Linux sbat file
-        # add sbat file: https://bugs.archlinux.org/task/72415
-        echo "sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md" > ${DESTDIR}/tmp/sbat.csv
-        echo "grub,1,Free Software Foundation,grub,2.06,https//www.gnu.org/software/grub/" >> ${DESTDIR}/tmp/sbat.csv
-        echo "arch,1,Arch Linux,\$pkgname,\$pkgver,https://archlinux.org/packages/core/x86_64/grub/" >> ${DESTDIR}/tmp/sbat.csv
         #remove existing, else weird things are happening
         [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm ${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
         # add -v for verbose
-        chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/tmp/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+        chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} ${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
         chroot_umount
     fi
