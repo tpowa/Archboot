@@ -132,7 +132,8 @@ build ()
     done
 
     # add firmware files
-    add_full_dir /lib/firmware
+    # disable for parallels desktop, there is no need for firmware
+    # add_full_dir /lib/firmware
     
     #dbus files
     apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
