@@ -7,6 +7,7 @@ TITLE="Arch Linux Installation"
 LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/install"
+RUNNING_ARCH="$(uname -m)"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
@@ -14,7 +15,8 @@ _LSBLK="lsblk -rpno"
 # name of kernel package
 KERNELPKG="linux"
 # name of the kernel image
-VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image.gz"
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
 # name of intel ucode initramfs image
@@ -2474,15 +2476,16 @@ getsource() {
 # returns: nothing
 select_mirror() {
     NEXTITEM="4"
-    ## Download updated mirrorlist, if possible
-    dialog --infobox "Downloading latest mirrorlist ..." 0 0
-    ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>/dev/null
+    ## Download updated mirrorlist, if possible (only on x86_64)
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        dialog --infobox "Downloading latest mirrorlist ..." 0 0
+        ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>/dev/null
     
-    if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
-        mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
-        cp /tmp/pacman_mirrorlist.txt "${MIRRORLIST}"
+        if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
+            mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
+            cp /tmp/pacman_mirrorlist.txt "${MIRRORLIST}"
+        fi
     fi
-    
     # FIXME: this regex doesn't honor commenting
     MIRRORS=$(egrep -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
     DIALOG --menu "Select a mirror" 14 55 7 \
@@ -2633,8 +2636,10 @@ install_packages() {
     PACKAGES="${PACKAGES} systemd-sysvcompat"
     ### HACK:
     # always add intel-ucode
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
-    PACKAGES="${PACKAGES} intel-ucode"
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
+        PACKAGES="${PACKAGES} intel-ucode"
+    fi
     # always add amd-ucode
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
     PACKAGES="${PACKAGES} amd-ucode"

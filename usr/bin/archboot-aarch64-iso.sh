@@ -132,15 +132,12 @@ _prepare_efitools_uefi () {
 
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
-    # add shim x64 signed files from fedora
+    # add shim aa64 signed files from fedora
     SHIM=$(mktemp -d shim.XXXX)
     curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
     cp "${SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${AARCH64}/EFI/BOOT/mmaa64.efi"
     cp "${SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${AARCH64}/EFI/BOOT/BOOTAA64.efi"
-    # add shim ia32 signed files from fedora
-    ### adding this causes boot loop in ovmf and only tries create a boot entry
-    #cp "${SHIM}/boot/efi/EFI/BOOT/fbx64.efi" "${AARCH64}/EFI/BOOT/fbx64.efi"
 }
 
 _prepare_uefi_image() {
@@ -191,7 +188,7 @@ set timeout="10"
 menuentry "Arch Linux AA64 Archboot" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_aarch64
-    linux /boot/vmlinuz_aarch64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
+    linux /boot/vmlinuz_aarch64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs audit=0
     initrd /boot/amd-ucode.img /boot/initramfs_aarch64.img
 }
 
