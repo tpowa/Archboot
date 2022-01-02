@@ -39,6 +39,7 @@ if [ ! -f "${CONFIG}" ]; then
 fi
 
 . "${CONFIG}"
+export RUNPROGRAM="${APPNAME}"
 
 # begin script
 mkdir -p "${TEMPDIR}/boot"
