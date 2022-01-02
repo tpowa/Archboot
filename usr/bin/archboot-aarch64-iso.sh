@@ -232,14 +232,12 @@ _prepare_uefi_image >/dev/null 2>&1
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating AARCH64 hybrid ISO ..."
 xorriso -as mkisofs \
-        -J -joliet-long -cache-inodes \
+        -iso-level 3 \
+        -full-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
-        -no-emul-boot \
-        -append_partition 2 0xef CDEFI/cdefiboot.img \
-        -partition_cyl_align all
+        -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
         -output "${IMAGENAME}.iso" "${AARCH64}/" &> "${IMAGENAME}.log"
-   
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true
