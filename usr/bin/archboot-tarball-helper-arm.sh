@@ -50,6 +50,7 @@ echo ":: Creating initramdisk ..."
 	mkinitcpio -c ${MKINITCPIO_CONFIG} -k ${ALL_kver} -g ${TEMPDIR}/boot/initrd.img
 echo ":: Using ${ALL_kver} as image kernel ..."
 	install -m644 ${ALL_kver} ${TEMPDIR}/boot/vmlinuz
+	cp -r /boot/dtbs ${TEMPDIR}/boot
 
 # create image
 if ! [ "${TARNAME}" = "" ]; then

@@ -121,6 +121,7 @@ _prepare_kernel_initramfs_files() {
         mv "${CORE64}"/*/boot/vmlinuz "${AARCH64}/boot/vmlinuz_aarch64"
         mv "${CORE64}"/*/boot/initrd.img "${AARCH64}/boot/initramfs_aarch64.img"
 	mv "${CORE64}"/*/boot/amd-ucode.img "${AARCH64}/boot/"
+	mv "${CORE64}"/*/boot/dtbs  "${AARCH64}/boot/"
         
 }
 
