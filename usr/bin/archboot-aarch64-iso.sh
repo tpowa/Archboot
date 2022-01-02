@@ -229,13 +229,6 @@ _prepare_uefi_AA64_GRUB_USB_files >/dev/null 2>&1
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
-# place syslinux files
-mkdir -p "${AARCH64}/boot/syslinux"
-mv "${CORE64}"/*/boot/syslinux/* "${AARCH64}/boot/syslinux/"
-
-# Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${AARCH64}/boot/syslinux/boot.msg"
-
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating AARCH64 hybrid ISO ..."
 xorriso -as mkisofs \
@@ -243,10 +236,6 @@ xorriso -as mkisofs \
         -full-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
-        -eltorito-boot boot/syslinux/isolinux.bin \
-        -eltorito-catalog boot/syslinux/boot.cat \
-        -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
         -output "${IMAGENAME}.iso" "${AARCH64}/" &> "${IMAGENAME}.log"
 
