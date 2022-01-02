@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
+    apps="openssl python3 cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
+          hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
+          sbsiglist sbsign sbvarsign sbverify mokutil"
+    add_file "/etc/ssl/openssl.cnf"
+    for i in $apps; do
+        add_binary "$i"
+    done
+    # add mkkeys.sh
+    MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
+    curl -s -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
+    chmod 755 ${MKKEYS}
+    add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
+    # add python3 files for script
+    add_full_dir /usr/lib/python3.10/encodings
+    add_full_dir /usr/lib/python3.10/collections
+    add_full_dir /usr/lib/python3.10/logging
+    PYTHON_FILES="_collections_abc keyword heapq platform types enum uuid \
+                  _sitebuiltins genericpath posixpath _collections_abc stat os site abc io codecs \
+                  operator reprlib re sre_compile sre_parse sre_constants functools copyreg subprocess \
+                  signal threading _weakrefset warnings contextlib random bisect hashlib traceback \
+                  linecache tokenize token weakref string selectors"
+    PYTHON_DYN="select.cpython-39-x86_64-linux-gnu math.cpython-39-x86_64-linux-gnu _random.cpython-39-x86_64-linux-gnu \
+                _sha512.cpython-39-x86_64-linux-gnu _posixsubprocess.cpython-39-x86_64-linux-gnu" 
+    for i in $(echo $PYTHON_FILES); do
+        add_file "/usr/lib/python3.10/$i.py"
+    done
+    for i in $(echo $PYTHON_DYN); do
+        add_file "/usr/lib/python3.10/lib-dynload/$i.so"
+    done
+    # add efitools files
+    add_file "/usr/share/efitools/efi/PreLoader.efi"
+    add_file "/usr/share/efitools/efi/HashTool.efi"
+    add_file "/usr/share/efitools/efi/KeyTool.efi"
+    # add shim signed files from fedora
+    _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
+    _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
+    _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
+    SHIM=$(mktemp -d /var/tmp/shim.XXXX)
+    curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    bsdtar -C ${SHIM} -xf "${SHIM}"/"${_SHIM_VERSION}"
+    add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/archboot/fedora-shim/mmx64.efi"
+    add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/archboot/fedora-shim/shimx64.efi"
+    SHIM32=$(mktemp -d /var/tmp/shim32.XXXX)
+    curl -s --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
+    bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
+    add_file "${SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "/usr/share/archboot/fedora-shim/mmia32.efi"
+    add_file "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "/usr/share/archboot/fedora-shim/shimia32.efi"
+    # add generate keys script
+    add_file "/usr/bin/archboot-secureboot-keys.sh" "/usr/bin/secureboot-keys.sh"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes secure boot tools on an archboot image.
+HELPEOF
+} 
