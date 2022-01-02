@@ -41,7 +41,7 @@ fi
 . "${CONFIG}"
 
 # begin script
-mkdir -p "${TEMPDIR}/${BOOTDIRNAME}/"
+mkdir -p "${TEMPDIR}/"
 
 # generate initramdisk
 echo ":: Calling mkinitcpio CONFIG=${MKINITCPIO_CONFIG} ..." 
