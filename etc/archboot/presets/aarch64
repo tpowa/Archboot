@@ -9,5 +9,5 @@ KERNEL_BOOT_OPTIONS="cgroup_disable=memory rootdelay=10 rootfstype=ramfs"
 MKINITCPIO_CONFIG="/etc/archboot/aarch64.conf"
 
 # kernel version, defaulted to build for runtime kernel
-ALL_kver="/boot/Image.gz"
+ALL_kver="/boot/Image"
 
