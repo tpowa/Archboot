@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_binary "vim"
+    add_file "/etc/vimrc"
+    # fix vi symlink
+    add_symlink "/usr/bin/vi" "/usr/bin/vim"
+    add_file "/usr/share/vim/vimfiles/archlinux.vim"
+    VIM_MODULE="syntax conf dosini sh grub manual synload colortest syncolor hitest whitespace nosyntax resolv fstab bash zsh exports passwd sysctl systemd vim"
+    for i in ${VIM_MODULE}; do
+        [[ -e "/usr/share/vim/vim82/syntax/$i.vim" ]] && add_file "/usr/share/vim/vim82/syntax/$i.vim"
+        [[ -e "/usr/share/vim/vim82/indent/$i.vim" ]] && add_file "/usr/share/vim/vim82/indent/$i.vim"
+    done
+    VIM_BASIC_MODULE="defaults filetype indent indoff menu scripts synmenu"
+    for i in ${VIM_BASIC_MODULE}; do
+       [[ -e "/usr/share/vim/vim82/$i.vim" ]] && add_file "/usr/share/vim/vim82/$i.vim"
+    done
+    # fix colors
+    [[ -e "/usr/share/vim/vim82/colors/lists/default.vim" ]] && add_file "/usr/share/vim/vim82/colors/lists/default.vim"
+    add_file "/usr/share/licenses/vim/license.txt"
+    add_full_dir "/usr/share/vim/vim82/autoload/dist"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes small version of vim on an archboot image.
+HELPEOF
+} 
