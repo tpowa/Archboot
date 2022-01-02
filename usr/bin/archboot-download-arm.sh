@@ -30,5 +30,6 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     wget -q "$INSTALLER_SOURCE/etc/archboot/aarch64.conf?inline=false" -O /etc/archboot/aarch64
     wget -q "$INSTALLER_SOURCE/usr/bin/archboot-aarch64-iso.sh?inline=false" -O /usr/bin/archboot-aarch64-iso.sh
     wget -q "$INSTALLER_SOURCE/usr/bin/archboot-download-arm.sh?inline=false" -O /usr/bin/archboot-download-arm.sh
+    wget -q "$INSTALLER_SOURCE/usr/bin/archboot-tarball-helper-arm.sh?inline=false" -O /usr/bin/archboot-tarball-helper-arm.sh
 fi
 
