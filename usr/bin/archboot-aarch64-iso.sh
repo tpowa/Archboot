@@ -143,7 +143,7 @@ _prepare_fedora_shim_bootloaders () {
 _prepare_uefi_image() {
         
         ## get size of boot x86_64 files
-	BOOTSIZE=$(du -bc ${AARCH64} | grep total | cut -f1)
+	BOOTSIZE=$(du -bc ${AARCH64}/EFI | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
 	mkdir -p "${AARCH64}"/CDEFI/
@@ -154,7 +154,7 @@ _prepare_uefi_image() {
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
-	mcopy -i "${VFAT_IMAGE}" -s "${AARCH64}"/{EFI,boot} ::/
+	mcopy -i "${VFAT_IMAGE}" -s "${AARCH64}"/EFI ::/
 	
 }
 
@@ -210,11 +210,6 @@ GRUBEOF
         grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${AARCH64}/EFI/BOOT/grubaa64.cfg"
 }
 
-#remove not needed files cdefi.img contains everything for UEFI boot
-_cleanup_iso() {
-  rm -r "${AARCH64}/{EFI,boot}"
-}
-
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
 _prepare_fedora_shim_bootloaders >/dev/null 2>&1
@@ -230,9 +225,6 @@ _prepare_uefi_AA64_GRUB_USB_files >/dev/null 2>&1
 
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
-
-echo "Cleanup iamge ..."
-_cleanup_iso >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating AARCH64 hybrid ISO ..."
