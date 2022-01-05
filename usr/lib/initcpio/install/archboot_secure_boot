@@ -17,21 +17,21 @@ build ()
     chmod 755 ${MKKEYS}
     add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
     # add python3 files for script
-    add_full_dir /usr/lib/python3.9/encodings
-    add_full_dir /usr/lib/python3.9/collections
-    add_full_dir /usr/lib/python3.9/logging
+    add_full_dir /usr/lib/python3.10/encodings
+    add_full_dir /usr/lib/python3.10/collections
+    add_full_dir /usr/lib/python3.10/logging
     PYTHON_FILES="_collections_abc keyword heapq platform types enum uuid \
                   _sitebuiltins genericpath posixpath _collections_abc stat os site abc io codecs \
                   operator reprlib re sre_compile sre_parse sre_constants functools copyreg subprocess \
                   signal threading _weakrefset warnings contextlib random bisect hashlib traceback \
                   linecache tokenize token weakref string selectors"
-    PYTHON_DYN="select.cpython-39-x86_64-linux-gnu math.cpython-39-x86_64-linux-gnu _random.cpython-39-x86_64-linux-gnu \
-                _sha512.cpython-39-x86_64-linux-gnu _posixsubprocess.cpython-39-x86_64-linux-gnu" 
+    PYTHON_DYN="select.cpython-310-x86_64-linux-gnu math.cpython-310-x86_64-linux-gnu _random.cpython-310-x86_64-linux-gnu \
+                _sha512.cpython-310-x86_64-linux-gnu _posixsubprocess.cpython-310-x86_64-linux-gnu" 
     for i in $(echo $PYTHON_FILES); do
-        add_file "/usr/lib/python3.9/$i.py"
+        add_file "/usr/lib/python3.10/$i.py"
     done
     for i in $(echo $PYTHON_DYN); do
-        add_file "/usr/lib/python3.9/lib-dynload/$i.so"
+        add_file "/usr/lib/python3.10/lib-dynload/$i.so"
     done
     # add efitools files
     add_file "/usr/share/efitools/efi/PreLoader.efi"
