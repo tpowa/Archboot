@@ -3865,7 +3865,7 @@ do_grub_common_before() {
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
     if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
-        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg in 3 seconds ..." 0 0
+        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub, installing grub pkg in 3 seconds ..." 0 0
         sleep 3
         PACKAGES="grub"
         run_pacman
