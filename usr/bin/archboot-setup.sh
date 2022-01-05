@@ -3108,7 +3108,7 @@ detect_uefi_boot() {
 
 do_uefi_setup_env_vars() {
     
-    if [[ "$(uname -m)" == "x86_64" ]]; then
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         if [[ "$(grep '_IA32_UEFI=1' /proc/cmdline 1>/dev/null)" ]]; then
             export _EFI_MIXED="1"
             export _UEFI_ARCH="IA32"
@@ -3118,6 +3118,11 @@ do_uefi_setup_env_vars() {
             export _UEFI_ARCH="X64"
             export _SPEC_UEFI_ARCH="x64"
         fi
+    fi
+    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        export _EFI_MIXED="0"
+        export _UEFI_ARCH="AA64"
+        export _SPEC_UEFI_ARCH="aa64"
     fi
 
 }
@@ -3859,7 +3864,7 @@ do_grub_common_before() {
     if ! [[ "$(dmraid -r | grep ^no )" ]]; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
-    if [[ ! -f "${DESTDIR}/usr/lib/grub/i386-pc/kernel.img" ]]; then
+    if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
         DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub/i386-pc/kernel.img , installing grub pkg in 3 seconds ..." 0 0
         sleep 3
         PACKAGES="grub"
@@ -3950,6 +3955,9 @@ if [ "\${grub_platform}" == "efi" ]; then
     
     if [ "\${grub_cpu}" == "i386" ]; then
         set _SPEC_UEFI_ARCH="ia32"
+    fi
+    if [ "\${grub_cpu}" == "aarch64" ]; then
+        set _SPEC_UEFI_ARCH="aa64"
     fi
 fi
 
@@ -4308,6 +4316,7 @@ do_grub_uefi() {
     
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
+    [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     
     do_grub_common_before
     
@@ -4359,7 +4368,11 @@ do_grub_uefi() {
         [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm ${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
         # add -v for verbose
-        chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+                chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+            else
+                chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+            fi
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} ${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
         chroot_umount
     fi
@@ -4859,10 +4872,16 @@ install_bootloader_uefi() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_grub_uefi
     else
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
-            "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+        else    
+            DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
+                "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
+                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
+                "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+        fi
         case $(cat ${ANSWER}) in
             "EFISTUB") do_efistub_uefi ;;
             "GRUB_UEFI") do_grub_uefi ;;
@@ -4922,13 +4941,17 @@ install_bootloader() {
 }
 
 install_bootloader_menu() {
-    DIALOG --menu "What is your boot system type?" 10 40 2 \
-        "UEFI" "UEFI" \
-        "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1 
-    case $(cat ${ANSWER}) in
-        "UEFI") install_bootloader_uefi ;;
-        "BIOS") install_bootloader_bios ;;
-    esac
+    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            ANSWER="UEFI"
+    else
+        DIALOG --menu "What is your boot system type?" 10 40 2 \
+            "UEFI" "UEFI" \
+            "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1 
+        case $(cat ${ANSWER}) in
+            "UEFI") install_bootloader_uefi ;;
+            "BIOS") install_bootloader_bios ;;
+        esac
+    fi
     
     if [[ "${CANCEL}" = "1" ]]; then
         NEXTITEM="7"
