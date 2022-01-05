@@ -16,7 +16,10 @@ _LSBLK="lsblk -rpno"
 KERNELPKG="linux"
 # name of the kernel image
 [[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
-[[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image.gz"
+if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+    VMLINUZ="Image.gz"
+    VMLINUZ_EFISTUB="Image"
+fi
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
 # name of intel ucode initramfs image
@@ -3329,8 +3332,12 @@ EOF
 do_efistub_copy_to_efisys() {
     
     if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-        _EFISTUB_KERNEL="${VMLINUZ/linux/arch}.efi"
-        _EFISTUB_INITRAMFS="${INITRAMFS/linux/arch}"
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            _EFISTUB_KERNEL="linux/arch/${VMLINUZ_EFISTUB}.efi"
+        else
+            _EFISTUB_KERNEL="linux/arch/${VMLINUZ}.efi"
+        fi
+        _EFISTUB_INITRAMFS="linux/arch/${INITRAMFS}"
         
         ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
         
@@ -3388,7 +3395,7 @@ CONFEOF
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-             _KERNEL_NORMAL="/Image"
+             _KERNEL_NORMAL="/${VMLINUZ_EFISTUB}"
         else
             _KERNEL_NORMAL="/${VMLINUZ}"
             _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
@@ -3401,7 +3408,7 @@ CONFEOF
         _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL_NORMAL="/EFI/arch/Image"
+            _KERNEL_NORMAL="/EFI/arch/${VMLINUZ_EFISTUB}"
         else
             _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
             _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
