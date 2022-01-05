@@ -3438,16 +3438,20 @@ do_efistub_uefi() {
         fi
     fi
     
-    if [[ "${_CONTINUE}" == "1" ]]; then        
-        DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-            "Systemd-boot" "Systemd-boot for ${UEFI_ARCH} UEFI" \
-            "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
-            "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
-        case $(cat ${ANSWER}) in
-            "Systemd-boot") do_systemd_boot_uefi ;;
-            "rEFInd") do_refind_uefi;;
-            "NONE") return 0 ;;
-        esac
+    if [[ "${_CONTINUE}" == "1" ]]; then
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            do_systemd_boot_uefi
+        else
+            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
+                "Systemd-boot" "Systemd-boot for ${UEFI_ARCH} UEFI" \
+                "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
+                "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
+            case $(cat ${ANSWER}) in
+                "Systemd-boot") do_systemd_boot_uefi ;;
+                "rEFInd") do_refind_uefi;;
+                "NONE") return 0 ;;
+            esac
+        fi
     fi
     
 }
