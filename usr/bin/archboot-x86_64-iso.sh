@@ -152,7 +152,7 @@ _prepare_fedora_shim_bootloaders () {
 _prepare_uefi_image() {
         
         ## get size of boot x86_64 files
-	BOOTSIZE=$(du -bc ${X86_64} | grep total | cut -f1)
+	BOOTSIZE=$(du -bc ${X86_64}/EFI | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
 	mkdir -p "${X86_64}"/CDEFI/
@@ -163,7 +163,7 @@ _prepare_uefi_image() {
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
-	mcopy -i "${VFAT_IMAGE}" -s "${X86_64}"/{EFI,boot} ::/
+	mcopy -i "${VFAT_IMAGE}" -s "${X86_64}"/EFI ::/
 	
 }
 
