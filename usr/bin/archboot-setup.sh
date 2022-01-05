@@ -4066,7 +4066,36 @@ EOF
     ## create default kernel entry
     
     NUMBER="0"
+
+if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+
+# (${NUMBER}) Arch Linux
+menuentry "Arch Linux" {
+    set gfxpayload="keep"
+    ${GRUB_ROOT_DRIVE}
+    ${LINUX_MOD_COMMAND}
+    initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}.img
+}
+
+EOF
     
+    NUMBER=$((${NUMBER}+1))
+    
+    ## create kernel fallback entry
+    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+
+# (${NUMBER}) Arch Linux Fallback
+menuentry "Arch Linux Fallback" {
+    set gfxpayload="keep"
+    ${GRUB_ROOT_DRIVE}
+    ${LINUX_MOD_COMMAND}
+    initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}-fallback.img
+}
+
+EOF
+
+else
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
 # (${NUMBER}) Arch Linux
@@ -4157,7 +4186,8 @@ if [ "\${grub_platform}" == "pc" ]; then
 fi
 
 EOF
-    
+
+fi
     ## copy unicode.pf2 font file
     cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB_PREFIX_DIR}/fonts/unicode.pf2"
     
@@ -4469,7 +4499,11 @@ run_mkinitcpio() {
     ( \
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
-    chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
+    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG}-${RUNNING_ARCH} >>/tmp/mkinitcpio.log 2>&1
+    else
+        chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
+    fi
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running
     ) &
