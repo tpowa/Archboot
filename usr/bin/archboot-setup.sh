@@ -3387,9 +3387,12 @@ CONFEOF
     UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        _KERNEL_NORMAL="/${VMLINUZ}"
-
-        _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+             _KERNEL_NORMAL="/Image"
+        else
+            _KERNEL_NORMAL="/${VMLINUZ}"
+            _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
+        fi
         
         _INITRD_AMD_UCODE="/${AMD_UCODE}"
         
@@ -3397,10 +3400,12 @@ CONFEOF
         
         _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
     else
-        _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
-        
-        _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
-        
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            _KERNEL_NORMAL="/EFI/arch/Image"
+        else
+            _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
+            _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
+        fi
         _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
 
         _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
