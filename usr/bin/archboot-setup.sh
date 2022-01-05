@@ -3474,11 +3474,18 @@ do_systemd_boot_uefi() {
     
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
-    
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL_NORMAL}
+GUMEOF
+
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 initrd   ${_INITRD_INTEL_UCODE}
+GUMEOF
+    fi
+    
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
@@ -3487,7 +3494,15 @@ GUMEOF
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 title    Arch Linux Fallback
 linux    ${_KERNEL_NORMAL}
+GUMEOF
+
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 initrd   ${_INITRD_INTEL_UCODE}
+GUMEOF
+    fi
+    
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD_FALLBACK_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
