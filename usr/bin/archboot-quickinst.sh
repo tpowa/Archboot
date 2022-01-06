@@ -102,8 +102,10 @@ install_packages() {
     PACKAGES="${PACKAGES} systemd-sysvcompat"
     ### HACK:
     # always add intel-ucode
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
-    PACKAGES="${PACKAGES} intel-ucode"
+    if [[ "$(uname -m)" == "x86_&4" ]]; then
+        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
+        PACKAGES="${PACKAGES} intel-ucode"
+    fi
     # always add amd-ucode
     PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
     PACKAGES="${PACKAGES} amd-ucode"
