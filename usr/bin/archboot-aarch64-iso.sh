@@ -32,7 +32,7 @@ usage () {
 
 
 PRESET_DIR="/etc/archboot/presets"
-TARBALL_HELPER="/usr/bin/archboot-tarball-helper-arm.sh"
+TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 
 # change to english locale!
 export LANG="en_US"
