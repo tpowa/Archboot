@@ -35,11 +35,14 @@ build ()
         add_file "$i"
     done
     symlinks="/usr/bin/depmod /usr/bin/awk /usr/bin/halt /usr/bin/shutdown /usr/bin/reboot \
-              /usr/bin/poweroff /usr/bin/insmod /usr/bin/i386 /usr/bin/linux32 /usr/bin/linux64 \
+              /usr/bin/poweroff /usr/bin/insmod /usr/bin/linux32 /usr/bin/linux64 \
               /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
               /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
               /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
               /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb /usr/bin/sh"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        symlinks="$symlinks /usr/bin/i386"
+    fi
     for i in $symlinks; do
         # echo "Checking $i"
         # if [ -e $i ]; then
@@ -130,9 +133,14 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-
-    # add firmware files
-    add_full_dir /lib/firmware
+    
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        # add firmware files
+        add_full_dir /lib/firmware
+    fi
+    
+    # disable for parallels desktop, there is no need for firmware
+    # add_full_dir /lib/firmware
     
     #dbus files
     apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
@@ -228,9 +236,15 @@ build ()
     add_file "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
     add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
-    add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
-    add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
     add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
+        add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
+    fi
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init-arm.service" "/etc/systemd/system/pacman-init-arm.service"
+        add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init-arm.service" "/etc/systemd/system/pacman-init-arm.service"
+    fi
     add_full_dir "/usr/share/pacman/keyrings"
     add_full_dir "/usr/share/makepkg"
     # add local installed pacman database in container mode
