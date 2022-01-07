@@ -63,11 +63,12 @@ sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # fix network in container
 rm "${_DIR}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
-# remove linux hook to soeedup
-rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
 # update container to latest packages
 echo "Update container to latest packages..."
 systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
+# remove linux hook to speedup
+echo "Remove 60-linux-aarch64.hook from container..."
+rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
 echo "Copy archboot-linux-firmware to container..."
 cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${_DIR}/"
 # install archboot-arm
