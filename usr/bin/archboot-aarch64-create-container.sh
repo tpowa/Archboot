@@ -63,15 +63,18 @@ sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # fix network in container
 rm "${_DIR}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
+# remove linux hook to soeedup
+rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
 # update container to latest packages
 echo "Update container to latest packages..."
 systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
 echo "Copy archboot-linux-firmware to container..."
 cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${_DIR}/"
 # install archboot-arm
-echo "Install archboot-arm and archboot-linux-firmware to container..."
+echo "Installing archboot-linux-firmware to container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" pacman -S archboot-arm >/dev/null 2>&1
+echo "Installing archboot-arm  container..."
+systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
