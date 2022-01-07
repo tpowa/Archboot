@@ -57,10 +57,10 @@ cp "${PACMAN_CONF}".old "${PACMAN_CONF}"
 sudo -u "${USER}" scp -r "${DIRECTORY}" "${SERVER}":"${HOME}"
 # move files on server, create symlink and remove 3 month old release
 sudo -u "${USER}" ssh "${SERVER}" <<EOF
-rm -r "${SERVER_DIR}"/"${DIRECTORY}"
-rm -r "${SERVER_DIR}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${DIRECTORY}" "${SERVER_DIR}"/
-cd "${SERVER_DIR}"
+rm -r "${SERVER_DIR}"/x86_64/"${DIRECTORY}"
+rm -r "${SERVER_DIR}"/x86_64/"$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${DIRECTORY}" "${SERVER_DIR}"/x86_64
+cd "${SERVER_DIR}"/x86_64
 rm latest
 ln -s "${DIRECTORY}" latest
 EOF
