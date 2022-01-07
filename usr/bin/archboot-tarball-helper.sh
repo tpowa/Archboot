@@ -98,5 +98,7 @@ if ! [ "${TARNAME}" = "" ]; then
 fi
 # clean directory
 rm -r ${TEMPDIR}
-rm ${BOOTMESSAGE}
-rm ${OPTIONSBOOTMESSAGE}
+if [[ "$(uname -m)" == "x86_64" ]]; then
+    rm ${BOOTMESSAGE}
+    rm ${OPTIONSBOOTMESSAGE}
+fi

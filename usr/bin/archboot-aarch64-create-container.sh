@@ -72,7 +72,7 @@ cp "${AARCH64_ARCHBOOT}" "${_DIR}/"
 cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${_DIR}/"
 # install archboot-arm
 echo "Install archboot-arm and archboot-linux-firmware to container..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-firmware-latest.tar.zst" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-arm-latest.tar.zst" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
