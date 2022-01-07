@@ -3,7 +3,7 @@
 # config file for mkisolinux
 
 # mkinitcpio config file, defaulted to stock config file
-MKINITCPIO_CONFIG="/etc/archboot/aarch64.conf"
+MKINITCPIO_CONFIG="/etc/archboot/aarch64-latest.conf"
 
 # kernel version, defaulted to build for runtime kernel
 ALL_kver="/boot/Image"
