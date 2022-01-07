@@ -7,7 +7,6 @@ _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
-QEMU_STATIC="https://github.com/multiarch/qemu-user-static/releases/download/v6.1.0-8/qemu-aarch64-static"
 LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 AARCH64_ARCHBOOT="/etc/archboot/archboot-arm-latest.tar.zst"
 AARCH64_ARCHBOOT_FIRMWARE="/etc/archboot/archboot-firmware-latest.tar.zst"
@@ -44,13 +43,8 @@ fi
 # prepare pacman dirs
 echo "Starting container creation ..."
 if [[ "$(uname -m)" == "x86_64" ]]; then
-    echo "Downloading archlinuxarm aarch64 and qemu aarch64 static..."
-    ! [[ -f qemu-aarch64-static ]] && wget ${QEMU_STATIC}
+    echo "Downloading archlinuxarm aarch64..."
     ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64}
-    # copy binary to /usr/bin
-    ! [[ -f /usr/bin/qemu-aarch64-static ]] && cp qemu-aarch64-static /usr/bin/
-    # restart binfmt service
-    systemctl restart systemd-binfmt
 fi
 echo "Create directories in ${_DIR} ..."
 mkdir "${_DIR}"
