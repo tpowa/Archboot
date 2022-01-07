@@ -241,7 +241,7 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${CORE64} and ${AARCH64} ..."
+echo "Cleanup remove ${CORE64}, ${AARCH64} and ${SHIM} ..."
 rm -rf "${CORE64}"
 rm -rf "${AARCH64}"
 rm -rf "${SHIM}"
