@@ -9,6 +9,8 @@ _LINUX_FIRMWARE=""
 _DIR=""
 QEMU_STATIC="https://github.com/multiarch/qemu-user-static/releases/download/v6.1.0-8/qemu-aarch64-static"
 LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+AARCH64_ARCHBOOT="/etc/archboot/archboot-arm-latest.tar.zst"
+AARCH64_ARCHBOOT_FIRMWARE="/etc/archboot/archboot-firmware-latest.tar.zst"
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -66,22 +68,20 @@ sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 # enable parallel downloads
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # enable [testing] if enabled in host
+### TODO: correct the check
 if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
     echo "Enable [testing] repository in container ..."
-    sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
-    sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${_DIR}/etc/pacman.conf
-    sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
 fi
 # fix network in container
 rm "${_DIR}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
-# download archboot-arm from x86_64 repository
-pacman --root "${_DIR}" -Sw archboot-arm --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
-rm "${_DIR}/var/lib/pacman/sync/*"
 # update container to latest packages
-systemd-nspawn -D "${_DIR}" pacman -Syu >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
+cp "${AARCH64_ARCHBOOT}" "${DIR}/"
+cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${DIR}/"
 # install archboot-arm
-systemd-nspawn -D "${_DIR}" pacman -U /var/cache/pacman/pkg/archboot-arm*.zstd >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman -U --noconfirm /archboot-firmware-latest.tar.zst --noconfirm >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman -U --noconfirm /archboot-arm-latest.tar.zst --noconfirm >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."

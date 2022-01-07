@@ -134,13 +134,9 @@ build ()
         add_binary "$i"
     done
     
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        # add firmware files
-        add_full_dir /lib/firmware
-    fi
-    
-    # disable for parallels desktop, there is no need for firmware
-    # add_full_dir /lib/firmware
+
+    # add firmware files
+    add_full_dir /lib/firmware
     
     #dbus files
     apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
