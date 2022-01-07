@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
 done
 
 ### check for root
-if ! [[ ${UID} -eq 0 ]]; then 
+if ! [[ ${UID} -eq 0 ]]; then |
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
@@ -74,8 +74,8 @@ systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
 cp "${AARCH64_ARCHBOOT}" "${DIR}/"
 cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${DIR}/"
 # install archboot-arm
-systemd-nspawn -D "${_DIR}" pacman -U --noconfirm /archboot-firmware-latest.tar.zst --noconfirm >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" pacman -U --noconfirm /archboot-arm-latest.tar.zst --noconfirm >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" yes | pacman -U /archboot-firmware-latest.tar.zst >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" yes | pacman -U /archboot-arm-latest.tar.zst  >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
