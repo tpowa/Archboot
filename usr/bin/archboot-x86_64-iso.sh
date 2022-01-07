@@ -367,7 +367,9 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${CORE64} and ${X86_64} ..."
+echo "Cleanup remove ${CORE64}, ${X86_64}, ${SHIM} and ${SHIM32} ..."
 rm -rf "${CORE64}"
 rm -rf "${X86_64}"
+rm -rf "${SHIM}"
+rm -rf "${SHIM32}"
 echo "Finished ISO creation."
