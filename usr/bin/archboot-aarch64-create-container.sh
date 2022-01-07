@@ -9,7 +9,7 @@ _LINUX_FIRMWARE=""
 _DIR=""
 LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 AARCH64_ARCHBOOT="/etc/archboot/archboot-arm-latest.tar.zst"
-AARCH64_ARCHBOOT_FIRMWARE="/etc/archboot/archboot-firmware-latest.tar.zst"
+AARCH64_ARCHBOOT_FIRMWARE="/etc/archboot/archboot-linux-firmware-latest.tar.zst"
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -61,19 +61,17 @@ systemd-nspawn -D "${_DIR}" pacman-key --populate archlinuxarm >/dev/null 2>&1
 sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 # enable parallel downloads
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
-# enable [testing] if enabled in host
-### TODO: correct the check
-if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
-    echo "Enable [testing] repository in container ..."
-fi
 # fix network in container
 rm "${_DIR}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
 # update container to latest packages
+echo "Update container to latest packages..."
 systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
-cp "${AARCH64_ARCHBOOT}" "${DIR}/"
-cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${DIR}/"
+echo "Copy archboot-arm and archboot-linux-firmware to container..."
+cp "${AARCH64_ARCHBOOT}" "${_DIR}/"
+cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${_DIR}/"
 # install archboot-arm
+echo "Install archboot-arm and archboot-linux-firmware to container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-firmware-latest.tar.zst" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-arm-latest.tar.zst" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
