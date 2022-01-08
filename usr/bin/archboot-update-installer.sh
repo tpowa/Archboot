@@ -5,7 +5,7 @@ D_SCRIPTS=""
 L_COMPLETE=""
 L_INSTALL_COMPLETE=""
 G_RELEASE=""
-CONFIG="/etc/archboot/x86_64.conf"
+CONFIG="/etc/archboot/$(uname -m).conf"
 W_DIR="/archboot"
 INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 LOG="/dev/tty7"
@@ -59,6 +59,8 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/tz ]] && wget -q "$INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
     [[ -e /usr/bin/archboot-x86_64-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-create-container.sh?inline=false" -O /usr/bin/archboot-x86_64-create-container.sh >/dev/null 2>&1
     [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-aarch64-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-aarch64-create-container.sh?inline=false" -O /usr/bin/archboot-aarch64-create-container.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-aarch64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-aarch64-release.sh?inline=false" -O /usr/bin/archboot-aarch64-release.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0
@@ -76,13 +78,13 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ "${L_COMPLETE}" == "1" ]]; then
         echo "Step 2/6: Generating archboot container in "${W_DIR}" ..."
         echo "          This will need some time ..."
-        archboot-x86_64-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
+        archboot-$(uname -m)-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
         echo "Step 2/6: Generating archboot container in "${W_DIR}" ..."
         echo "          This will need some time ..."
-        archboot-x86_64-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
+        archboot-$(uname -m)-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
     fi
     
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
@@ -95,15 +97,25 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     mv "${W_DIR}"/usr/lib/initcpio/functions.old "${W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from "${W_DIR}" to / ..."
     mv "${W_DIR}"/initrd.img / || exit 1
-    mv "${W_DIR}"/boot/vmlinuz-linux / || exit 1
-    mv "${W_DIR}"/boot/intel-ucode.img / || exit 1
+    if [[ "$(uname -m)" == "x86_64" ]]; then 
+        mv "${W_DIR}"/boot/vmlinuz-linux / || exit 1
+        mv "${W_DIR}"/boot/intel-ucode.img / || exit 1
+    fi
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        mv "${W_DIR}"/boot/Image / || exit 1
+    fi
     mv "${W_DIR}"/boot/amd-ucode.img / || exit 1
     # remove "${W_DIR}"
     echo "Step 5/6: Remove ${W_DIR} ..."
     rm -r "${W_DIR}" || exit 1
     echo "Step 6/6: Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
-    kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
+    if [[ "$(uname -m)" == "x86_64" ]]; then 
+        kexec -l /vmlinuz-linux --initrd=/intel-ucode.img --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
+    fi
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        kexec -l /Image --initrd=/amd-ucode.img --initrd=/initrd.img --reuse-cmdline
+    fi
     echo "Finished: Rebooting ..."
     # restart environment
     systemctl kexec
@@ -113,6 +125,6 @@ fi
 if [[ "${G_RELEASE}" == "1" ]]; then
     echo "Step 1/1: Generating new iso files now in "${W_DIR}" ..."
     echo "          This will need some time ..."
-    archboot-x86_64-release.sh "${W_DIR}" >/dev/tty7 2>&1 || exit 1
+    archboot-$(uname -m)-release.sh "${W_DIR}" >/dev/tty7 2>&1 || exit 1
     echo "Finished: New isofiles are located in "${W_DIR}""
 fi
