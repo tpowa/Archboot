@@ -2510,7 +2510,7 @@ select_mirror() {
         SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     echo "Using mirror: ${SYNC_URL}" >${LOG}
-#     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
+    echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if [[ "${DOTESTING}" == "yes" ]]; then
         echo "[testing]" >> /etc/pacman.conf
         echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
