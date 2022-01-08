@@ -43,10 +43,8 @@ fi
 
 # prepare pacman dirs
 echo "Starting container creation ..."
-if [[ "$(uname -m)" == "x86_64" ]]; then
-    echo "Downloading archlinuxarm aarch64..."
-    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} >/dev/null 2>&1
-fi
+echo "Downloading archlinuxarm aarch64..."
+! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} >/dev/null 2>&1
 echo "Create directories in ${_DIR} ..."
 mkdir "${_DIR}"
 bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${_DIR}"
