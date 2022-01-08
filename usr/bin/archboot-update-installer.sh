@@ -57,10 +57,8 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
     [[ -e /usr/bin/km ]] && wget -q "$INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
     [[ -e /usr/bin/tz ]] && wget -q "$INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-x86_64-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-create-container.sh?inline=false" -O /usr/bin/archboot-x86_64-create-container.sh >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-aarch64-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-aarch64-create-container.sh?inline=false" -O /usr/bin/archboot-aarch64-create-container.sh >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-aarch64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-aarch64-release.sh?inline=false" -O /usr/bin/archboot-aarch64-release.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-$(uname -m)-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-$(uname -m)-create-container.sh?inline=false" -O /usr/bin/archboot-$(uname -m)-create-container.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-$(uname -m)-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-$(uname -m)-release.sh?inline=false" -O /usr/bin/archboot-$(uname -m)-release.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0

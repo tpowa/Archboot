@@ -4,7 +4,7 @@
 build ()
 {
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
-    add_file "/usr/bin/archboot-create-container.sh"
+    add_file "/usr/bin/archboot-$(uname -m)-create-container.sh"
     add_file "/usr/share/archboot/installer_latest/etc/profile.d/latest-installer.sh" "/etc/profile.d/latest-installer.sh"
 }
 
