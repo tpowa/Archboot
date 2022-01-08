@@ -214,7 +214,7 @@ set timeout="10"
 menuentry "Arch Linux x86_64 Archboot" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory add_efi_memmap rootfstype=ramfs
     initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 

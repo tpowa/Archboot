@@ -188,7 +188,7 @@ set timeout="10"
 menuentry "Arch Linux AA64 Archboot" {
     set gfxpayload=keep
     search --no-floppy --set=root --file /boot/vmlinuz_aarch64
-    linux /boot/vmlinuz_aarch64 cgroup_disable=memory add_efi_memmap _X64_UEFI=1 rootfstype=ramfs audit=0
+    linux /boot/vmlinuz_aarch64 cgroup_disable=memory add_efi_memmap rootfstype=ramfs audit=0 nr_cpus=1
     initrd /boot/amd-ucode.img /boot/initramfs_aarch64.img
 }
 

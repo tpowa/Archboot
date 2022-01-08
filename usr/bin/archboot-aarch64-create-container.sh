@@ -76,7 +76,7 @@ if [[ "${_LINUX_FIRMWARE}" == "archboot-linux-firmware" ]]; then
     echo "Installing archboot-linux-firmware to container..."
     systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
 fi
-echo "Installing archboot-arm  container..."
+echo "Installing archboot-arm to container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm" >/dev/null 2>&1
 echo "Setting hostname to archboot ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
