@@ -57,7 +57,7 @@ if [[ "${D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/setup ]] && wget -q "$INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
     [[ -e /usr/bin/km ]] && wget -q "$INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
     [[ -e /usr/bin/tz ]] && wget -q "$INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-create-container.sh?inline=false" -O /usr/bin/archboot-create-container.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-x86_64-create-container.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-create-container.sh?inline=false" -O /usr/bin/archboot-x86_64-create-container.sh >/dev/null 2>&1
     [[ -e /usr/bin/archboot-x86_64-release.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-x86_64-release.sh?inline=false" -O /usr/bin/archboot-x86_64-release.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
@@ -76,13 +76,13 @@ if [[ "${L_COMPLETE}" == "1" || "${L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ "${L_COMPLETE}" == "1" ]]; then
         echo "Step 2/6: Generating archboot container in "${W_DIR}" ..."
         echo "          This will need some time ..."
-        archboot-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
+        archboot-x86_64-create-container.sh "${W_DIR}" -cc -cp -alf >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ "${L_INSTALL_COMPLETE}" == "1" ]]; then 
         echo "Step 2/6: Generating archboot container in "${W_DIR}" ..."
         echo "          This will need some time ..."
-        archboot-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
+        archboot-x86_64-create-container.sh "${W_DIR}" -cc -alf >/dev/tty7 2>&1 || exit 1
     fi
     
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd

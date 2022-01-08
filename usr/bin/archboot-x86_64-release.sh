@@ -25,7 +25,7 @@ echo "Start release creation in $1 ..."
 mkdir -p $1
 cd $1
 # create container
-archboot-create-container.sh "${W_DIR}" -cc -cp -alf
+archboot-x86_64-create-container.sh "${W_DIR}" -cc -cp -alf
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
 systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"

@@ -8,7 +8,7 @@ _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
 LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
-AARCH64_ARCHBOOT_FIRMWARE="/etc/archboot/archboot-linux-firmware-latest.tar.zst"
+AARCH64_ARCHBOOT_FIRMWARE="https://mirror.rackspace.com/archlinux/iso/archboot/aarch64/firmware/archboot-linux-firmware-latest.tar.zst"
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -43,7 +43,7 @@ fi
 echo "Starting container creation ..."
 if [[ "$(uname -m)" == "x86_64" ]]; then
     echo "Downloading archlinuxarm aarch64..."
-    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64}
+    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} >/dev/null 2>&1
 fi
 echo "Create directories in ${_DIR} ..."
 mkdir "${_DIR}"
@@ -69,13 +69,15 @@ systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
 # remove linux hook to speedup
 echo "Remove 60-linux-aarch64.hook from container..."
 rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
-echo "Copy archboot-linux-firmware to container..."
-cp "${AARCH64_ARCHBOOT_FIRMWARE}" "${_DIR}/"
+echo "Download archboot-linux-firmware to container..."
+wget -P "${_DIR}/" "${AARCH64_ARCHBOOT_FIRMWARE}" >/dev/null 2>&1
 # install archboot-arm
 echo "Installing archboot-linux-firmware to container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
 echo "Installing archboot-arm  container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm" >/dev/null 2>&1
+echo "Setting hostname to archboot ..."
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
