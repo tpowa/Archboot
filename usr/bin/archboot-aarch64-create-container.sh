@@ -18,6 +18,7 @@ usage () {
 	echo " Options:"
 	echo "  -cc    Cleanup container eg. remove manpages, includes ..."
 	echo "  -cp    Cleanup container package cache"
+	echo "  -alf   add archboot-linux-firmware to container"
 	exit 0
 }
 
@@ -29,6 +30,7 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-cc|--cc) _SAVE_RAM="1" ;;
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
+		-alf|-alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
         esac
 	shift
 done
@@ -69,11 +71,13 @@ systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
 # remove linux hook to speedup
 echo "Remove 60-linux-aarch64.hook from container..."
 rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
-echo "Download archboot-linux-firmware to container..."
-wget -P "${_DIR}/" "${AARCH64_ARCHBOOT_FIRMWARE}" >/dev/null 2>&1
-# install archboot-arm
-echo "Installing archboot-linux-firmware to container..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
+if [[ "${_LINUX_FIRMWARE}" == "archboot-linux-firmware" ]]; then
+    echo "Download archboot-linux-firmware to container..."
+    wget -P "${_DIR}/" "${AARCH64_ARCHBOOT_FIRMWARE}" >/dev/null 2>&1
+    # install archboot-arm
+    echo "Installing archboot-linux-firmware to container..."
+    systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
+fi
 echo "Installing archboot-arm  container..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm" >/dev/null 2>&1
 echo "Setting hostname to archboot ..."

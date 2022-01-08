@@ -29,8 +29,9 @@ archboot-"${ARCH}"-release.sh "${DIRECTORY}"
 chown -R "${USER}" "${DIRECTORY}"
 chgrp -R "${GROUP}" "${DIRECTORY}"
 cd "${DIRECTORY}"
-# remove sha256sum
+# remove sha256sum and install image
 rm sha256sum.txt
+rm ArchLinuxARM-aarch64-latest.tar.gz
 # sign files and create new sha256sum.txt
 for i in *; do
     [[ -f "${i}" ]] && sudo -u "${USER}" gpg ${GPG} "${i}"
