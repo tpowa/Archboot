@@ -252,6 +252,16 @@ menuentry "Enter Firmware Setup" {
     fwsetup
 }
 
+menuentry "System restart" {
+	echo "System rebooting..."
+	reboot
+}
+
+menuentry "System shutdown" {
+	echo "System shutting down..."
+	halt
+}
+
 menuentry "Exit GRUB" {
     exit
 }
@@ -315,6 +325,16 @@ fi
 
 menuentry "Enter Firmware Setup" {
     fwsetup
+}
+
+menuentry "System restart" {
+	echo "System rebooting..."
+	reboot
+}
+
+menuentry "System shutdown" {
+	echo "System shutting down..."
+	halt
 }
 
 menuentry "Exit GRUB" {
