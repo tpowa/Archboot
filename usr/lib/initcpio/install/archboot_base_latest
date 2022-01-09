@@ -14,7 +14,7 @@ build ()
     
     apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
-          find wc nano wget uname bsdtar" 
+          find wc nano wget uname bsdtar yes" 
     for i in $apps; do
         add_binary "$i"
     done
