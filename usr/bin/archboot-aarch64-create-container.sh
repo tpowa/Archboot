@@ -8,7 +8,6 @@ _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
 LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
-AARCH64_ARCHBOOT_FIRMWARE="https://mirror.rackspace.com/archlinux/iso/archboot/aarch64/firmware/archboot-linux-firmware-latest.tar.zst"
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -18,6 +17,7 @@ usage () {
 	echo " Options:"
 	echo "  -cc    Cleanup container eg. remove manpages, includes ..."
 	echo "  -cp    Cleanup container package cache"
+        echo "  -lf    add linux-firmware to container"
 	echo "  -alf   add archboot-linux-firmware to container"
 	exit 0
 }
@@ -30,10 +30,13 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-cc|--cc) _SAVE_RAM="1" ;;
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
+		-lf|--lf) _LINUX_FIRMWARE="linux-firmware" ;;
 		-alf|-alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
         esac
 	shift
 done
+
+[[ -z "${_LINUX_FIRMWARE}" ]] && _LINUX_FIRMWARE="linux-firmware"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then
@@ -69,15 +72,8 @@ systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
 # remove linux hook to speedup
 echo "Remove 60-linux-aarch64.hook from container..."
 rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
-if [[ "${_LINUX_FIRMWARE}" == "archboot-linux-firmware" ]]; then
-    echo "Download archboot-linux-firmware to container..."
-    wget -P "${_DIR}/" "${AARCH64_ARCHBOOT_FIRMWARE}" >/dev/null 2>&1
-    # install archboot-arm
-    echo "Installing archboot-linux-firmware to container..."
-    systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -U /archboot-linux-firmware-latest.tar.zst" >/dev/null 2>&1
-fi
-echo "Installing archboot-arm to container..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm" >/dev/null 2>&1
+echo "Installing archboot-arm and firmware to container..."
+systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm ${_LINUX_FIRMWARE}" >/dev/null 2>&1
 echo "Setting hostname to archboot ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
@@ -86,12 +82,13 @@ if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     rm -r "${_DIR}"/usr/include
     rm -r "${_DIR}"/usr/share/{man,doc}
 fi
-
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
     echo "Clean pacman cache from ${_DIR} ..."
     rm -r "${_DIR}"/var/cache/pacman
 fi
+echo "Removing installation tarball ..."
+rm ArchLinuxARM-aarch64-latest.tar.gz
 echo "Finished container setup in ${_DIR} ."
 
 
