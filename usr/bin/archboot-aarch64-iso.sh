@@ -202,6 +202,10 @@ menuentry "Secure Boot HashTool" {
     chainloader /EFI/tools/HashTool.efi
 }
 
+menuentry "Enter Firmware Setup" {
+    fwsetup
+}
+
 menuentry "Exit GRUB" {
     exit
 }

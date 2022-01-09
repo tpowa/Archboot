@@ -248,6 +248,10 @@ if [ "${grub_platform}" == "efi" ]; then
 	}
 fi
 
+menuentry "Enter Firmware Setup" {
+    fwsetup
+}
+
 menuentry "Exit GRUB" {
     exit
 }
@@ -308,6 +312,10 @@ if [ "${grub_platform}" == "efi" ]; then
 		chainloader /EFI/Microsoft/Boot/bootmgfw.efi
 	}
 fi
+
+menuentry "Enter Firmware Setup" {
+    fwsetup
+}
 
 menuentry "Exit GRUB" {
     exit
