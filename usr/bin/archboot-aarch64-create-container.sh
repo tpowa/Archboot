@@ -45,7 +45,7 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 echo "Starting container creation ..."
-echo "Create directories in ${_DIR} ..."
+echo "Create directory ${_DIR} ..."
 mkdir "${_DIR}"
 if [[ "$(uname -m)" == "aarch64" ]]; then
     # prepare pacman dirs
