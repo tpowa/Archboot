@@ -16,7 +16,7 @@ Archboot options and troubleshooting:
 
 Archboot resourses:
 - Homepage:         https://wiki.archlinux.org/index.php/Archboot
-- Latest version:   https://mirror.rackspace.com/archlinux/iso/archboot/latest
+- Latest version:   https://pkgbuild.com/~tpowa/archboot-images
 - Development tree: https://gitlab.archlinux.org/tpowa/archboot
 - Developer:        Tobias Powalowski <tpowa@archlinux.org>
 
