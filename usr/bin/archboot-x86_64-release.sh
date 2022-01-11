@@ -32,8 +32,8 @@ systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh
 # generate iso in container
 systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # remove not working lvm2 from latest image
-echo "Remove lvm2 from container ${W_DIR} ..."
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
+echo "Remove lvm2 and openssh from container ${W_DIR} ..."
+systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
 systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
