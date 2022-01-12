@@ -1,8 +1,8 @@
 #! /bin/bash
 DIRECTORY="$(date +%Y.%m)"
 ARCH="aarch64"
-BUILDDIR="/home/tobias/Arch/iso/ARM"
-SERVER="repos.archlinux.org"
+BUILDDIR="/home/tobias/Arch/iso/${ARCH}"
+SERVER="pkgbuild.com"
 HOME="/home/tpowa/"
 SERVER_DIR="/home/tpowa/public_html/archboot-images"
 USER="tobias"

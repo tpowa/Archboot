@@ -1,10 +1,10 @@
 #! /bin/bash
 DIRECTORY="$(date +%Y.%m)"
 ARCH="x86_64"
-BUILDDIR="/home/tobias/Arch/iso"
+BUILDDIR="/home/tobias/Arch/iso/${ARCH}"
 PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 PACMAN_CONF="/etc/pacman.conf"
-SERVER="repos.archlinux.org"
+SERVER="pkgbuild.com"
 HOME="/home/tpowa/"
 SERVER_DIR="/home/tpowa/public_html/archboot-images"
 USER="tobias"
