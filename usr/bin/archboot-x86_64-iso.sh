@@ -48,7 +48,6 @@ while [ $# -gt 0 ]; do
 		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
                 -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-                -log|--log) _LOG="yes" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -59,12 +58,6 @@ done
 if ! [[ ${UID} -eq 0 ]]; then 
 	echo "ERROR: Please run as root user!"
 	exit 1
-fi
-
-if [[ "${_LOG}" == "yes" ]]; then
-    _LOG=""
-else
-    _LOG="$(echo >/dev/null 2>&1)"
 fi
 
 #set PRESET
@@ -356,25 +349,25 @@ GRUBEOF
 
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
-_prepare_fedora_shim_bootloaders ${_LOG}
+_prepare_fedora_shim_bootloaders >/dev/null 2>&1
 
 echo "Prepare kernel and initramfs ..."
-_prepare_kernel_initramfs_files ${_LOG}
+_prepare_kernel_initramfs_files >/dev/null 2>&1
 
 echo "Prepare uefi shells ..."
-_download_uefi_shell_tianocore ${_LOG}
+_download_uefi_shell_tianocore >/dev/null 2>&1
 
 echo "Prepare efitools ..."
-_prepare_efitools_uefi ${_LOG}
+_prepare_efitools_uefi >/dev/null 2>&1
 
 echo "Prepare X64 Grub ..."
-_prepare_uefi_X64_GRUB_USB_files ${_LOG}
+_prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
 
 echo "Prepare IA32 Grub ..."
-_prepare_uefi_IA32_GRUB_USB_files ${_LOG}
+_prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
 
 echo "Prepare UEFI image ..."
-_prepare_uefi_image ${_LOG}
+_prepare_uefi_image >/dev/null 2>&1
 
 # place syslinux files
 mkdir -p "${X86_64}/boot/syslinux"

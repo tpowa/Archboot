@@ -34,16 +34,9 @@ while [ $# -gt 0 ]; do
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
 		-lf|--lf) _LINUX_FIRMWARE="linux-firmware" ;;
 		-alf|--alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
-                -log|--log) _LOG="yes" ;;
         esac
 	shift
 done
-
-if [[ "${_LOG}" == "yes" ]]; then
-    _LOG=""
-else
-    _LOG="$(echo >/dev/null 2>&1)"
-fi
 
 [[ -z "${_LINUX_FIRMWARE}" ]] && _LINUX_FIRMWARE="linux-firmware"
 
@@ -73,7 +66,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     # install archboot
     echo "Installing packages base firmware and archboot to ${_DIR} ..."
-    pacman --root "${_DIR}" -Sy base archboot-arm "${_LINUX_FIRMWARE}" --noconfirm --ignore systemd-resolvconf --cachedir "${_PWD}"/"${_CACHEDIR}" ${_LOG}
+    pacman --root "${_DIR}" -Sy base archboot-arm "${_LINUX_FIRMWARE}" --noconfirm --ignore systemd-resolvconf --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
     # umount special filesystems
     echo "Umount special filesystems in to ${_DIR} ..."
     umount -R ""${_DIR}"/proc"
@@ -82,20 +75,20 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
 fi
 if [[ "$(uname -m)" == "x86_64" ]]; then
     echo "Downloading archlinuxarm aarch64..."
-    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} ${_LOG}
+    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} >/dev/null 2>&1
     bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${_DIR}"
     echo "Removing installation tarball ..."
     rm ArchLinuxARM-aarch64-latest.tar.gz
 fi
 # generate locales
 echo "Create locales in container ..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" ${_LOG}
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" ${_LOG}
-systemd-nspawn -D "${_DIR}" locale-gen ${_LOG}
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
 # generate pacman keyring
 echo "Generate pacman keyring in container ..."
-systemd-nspawn -D "${_DIR}" pacman-key --init ${_LOG}
-systemd-nspawn -D "${_DIR}" pacman-key --populate archlinuxarm ${_LOG}
+systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman-key --populate archlinuxarm >/dev/null 2>&1
 # disable checkspace option in pacman.conf, to allow to install packages in environment
 sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
 # enable parallel downloads
@@ -106,15 +99,15 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
     # update container to latest packages
     echo "Update container to latest packages..."
-    systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm ${_LOG}
+    systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
     # remove linux hook to speedup
     echo "Remove 60-linux-aarch64.hook from container..."
     rm "${_DIR}/usr/share/libalpm/hooks/60-linux-aarch64.hook"
     echo "Installing archboot-arm and firmware to container..."
-    systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm ${_LINUX_FIRMWARE}" ${_LOG}
+    systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm ${_LINUX_FIRMWARE}" >/dev/null 2>&1
 fi
 echo "Setting hostname to archboot ..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" ${_LOG}
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
