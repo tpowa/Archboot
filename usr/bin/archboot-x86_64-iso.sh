@@ -64,7 +64,7 @@ fi
 if [[ "${_LOG}" == "yes" ]]; then
     _LOG=""
 else
-    _LOG=">/dev/null 2>&1"
+    _LOG="$(echo >/dev/null 2>&1)"
 fi
 
 #set PRESET
