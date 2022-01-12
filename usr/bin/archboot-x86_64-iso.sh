@@ -287,7 +287,7 @@ insmod part_gpt
 insmod part_msdos
 insmod fat
 
-insmod efi_gop ${_LOG}
+insmod efi_gop
 insmod efi_uga
 insmod video_bochs
 insmod video_cirrus
