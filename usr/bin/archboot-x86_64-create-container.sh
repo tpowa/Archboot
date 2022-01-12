@@ -7,6 +7,7 @@ _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
+_LOG=""
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -18,6 +19,7 @@ usage () {
 	echo "  -cp    Cleanup container package cache"
 	echo "  -lf    add linux-firmware to container"
 	echo "  -alf   add archboot-linux-firmware to container"
+        echo "  -log   show logging on active tty"
 	exit 0
 }
 
@@ -30,10 +32,17 @@ while [ $# -gt 0 ]; do
 		-cc|--cc) _SAVE_RAM="1" ;;
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
 		-lf|--lf) _LINUX_FIRMWARE="linux-firmware" ;;
-		-alf|-alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
+		-alf|--alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
+                -log|--log) _LOG="yes" ;;
         esac
 	shift
 done
+
+if [[ "${_LOG}" == "yes" ]]; then
+    _LOG=""
+else
+    _LOG=">/dev/null 2>&1"
+fi
 
 [[ -z "${_LINUX_FIRMWARE}" ]] && _LINUX_FIRMWARE="linux-firmware"
 
@@ -42,7 +51,6 @@ if ! [[ ${UID} -eq 0 ]]; then
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
-
 
 # prepare pacman dirs
 echo "Starting container creation ..."
@@ -61,7 +69,7 @@ mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
 mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
 echo "Installing packages base firmware and archboot to ${_DIR} ..."
-pacman --root "${_DIR}" -Sy base archboot "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
+pacman --root "${_DIR}" -Sy base archboot "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" ${_LOG}
 # umount special filesystems
 echo "Umount special filesystems in to ${_DIR} ..."
 umount -R ""${_DIR}"/proc"
@@ -69,13 +77,13 @@ umount -R ""${_DIR}"/sys"
 umount -R ""${_DIR}"/dev"
 # generate locales
 echo "Create locales in container ..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" ${_LOG}
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" ${_LOG}
+systemd-nspawn -D "${_DIR}" locale-gen ${_LOG}
 # generate pacman keyring
 echo "Generate pacman keyring in container ..."
-systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" pacman-key --init ${_LOG}
+systemd-nspawn -D "${_DIR}" pacman-key --populate archlinux ${_LOG}
 # copy local mirrorlist to container
 echo "Create pacman config and mirrorlist in container..."
 cp /etc/pacman.d/mirrorlist "${_DIR}"/etc/pacman.d/mirrorlist
@@ -93,14 +101,13 @@ if [[ "$(grep "^\[testing" /etc/pacman.conf)" ]]; then
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${_DIR}/etc/pacman.conf
 fi
 echo "Setting hostname to archboot ..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
+systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" ${_LOG}
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
     rm -r "${_DIR}"/usr/include
     rm -r "${_DIR}"/usr/share/{man,doc}
 fi
-
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
     echo "Clean pacman cache from ${_DIR} ..."

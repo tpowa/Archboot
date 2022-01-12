@@ -6,7 +6,7 @@ X86_64="$(mktemp -d X86_64.XXX)"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
 _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
 _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
-
+_LOG=""
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -25,6 +25,7 @@ usage () {
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
 	echo "  -T=tarball          Use this tarball for image creation."
+        echo "  -log                show logging on active tty"
 	echo "  -h                  This message."
 	exit 0
 }
@@ -46,7 +47,8 @@ while [ $# -gt 0 ]; do
 		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
-                -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;	
+                -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+                -log|--log) _LOG="yes" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -57,6 +59,12 @@ done
 if ! [[ ${UID} -eq 0 ]]; then 
 	echo "ERROR: Please run as root user!"
 	exit 1
+fi
+
+if [[ "${_LOG}" == "yes" ]]; then
+    _LOG=""
+else
+    _LOG=">/dev/null 2>&1"
 fi
 
 #set PRESET
@@ -279,7 +287,7 @@ insmod part_gpt
 insmod part_msdos
 insmod fat
 
-insmod efi_gop
+insmod efi_gop ${_LOG}
 insmod efi_uga
 insmod video_bochs
 insmod video_cirrus
@@ -348,25 +356,25 @@ GRUBEOF
 
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
-_prepare_fedora_shim_bootloaders >/dev/null 2>&1
+_prepare_fedora_shim_bootloaders ${_LOG}
 
 echo "Prepare kernel and initramfs ..."
-_prepare_kernel_initramfs_files >/dev/null 2>&1
+_prepare_kernel_initramfs_files ${_LOG}
 
 echo "Prepare uefi shells ..."
-_download_uefi_shell_tianocore >/dev/null 2>&1
+_download_uefi_shell_tianocore ${_LOG}
 
 echo "Prepare efitools ..."
-_prepare_efitools_uefi >/dev/null 2>&1
+_prepare_efitools_uefi ${_LOG}
 
 echo "Prepare X64 Grub ..."
-_prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
+_prepare_uefi_X64_GRUB_USB_files ${_LOG}
 
 echo "Prepare IA32 Grub ..."
-_prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
+_prepare_uefi_IA32_GRUB_USB_files ${_LOG}
 
 echo "Prepare UEFI image ..."
-_prepare_uefi_image >/dev/null 2>&1
+_prepare_uefi_image ${_LOG}
 
 # place syslinux files
 mkdir -p "${X86_64}/boot/syslinux"
