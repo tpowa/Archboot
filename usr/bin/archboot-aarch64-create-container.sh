@@ -7,7 +7,6 @@ _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
-_LOG=""
 _PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
 _PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
 
@@ -21,7 +20,6 @@ usage () {
 	echo "  -cp    Cleanup container package cache"
         echo "  -lf    add linux-firmware to container"
 	echo "  -alf   add archboot-linux-firmware to container"
-	echo "  -log   show logging on active tty"
 	exit 0
 }
 
@@ -89,8 +87,9 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
     ! [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
+    sleep 1
     gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${_DIR}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
+    bsdtar -C "${_DIR}" -xf "${_PACMAN_AARCH64_CHROOT}"
     echo "Removing installation tarball ..."
     rm ${_PACMAN_AARCH64_CHROOT}{,.sig}
 fi

@@ -1,15 +1,15 @@
 #! /bin/bash
-DIRECTORY="$(date +%Y.%m)"
-ARCH="x86_64"
-BUILDDIR="/home/tobias/Arch/iso/${ARCH}"
-PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
-PACMAN_CONF="/etc/pacman.conf"
-SERVER="pkgbuild.com"
-HOME="/home/tpowa/"
-SERVER_DIR="/home/tpowa/public_html/archboot-images"
-USER="tobias"
-GROUP="users"
-GPG="--detach-sign --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
+_DIRECTORY="$(date +%Y.%m)"
+_ARCH="x86_64"
+_BUILDDIR="/home/tobias/Arch/iso/${_ARCH}"
+_PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
+_PACMAN_CONF="/etc/pacman.conf"
+_SERVER="pkgbuild.com"
+_HOME_DIR="/home/tpowa/"
+_SERVER_DIR="/home/tpowa/public_html/archboot-images"
+_USER="tobias"
+_GROUP="users"
+_GPG="--detach-sign --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
@@ -24,44 +24,44 @@ if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
 fi
 
 # use pacman.conf with disabled [testing] repository
-cp "${PACMAN_CONF}" "${PACMAN_CONF}".old
-cp "${PACMAN_CONF}".archboot "${PACMAN_CONF}"
+cp "${_PACMAN_CONF}" "${_PACMAN_CONF}".old
+cp "${_PACMAN_CONF}".archboot "${_PACMAN_CONF}"
 # use mirrorlist with enabled rackspace mirror
-cp "${PACMAN_MIRROR}" "${PACMAN_MIRROR}".old
-cp "${PACMAN_MIRROR}".archboot "${PACMAN_MIRROR}"
-# create release in "${BUILDDIR}"
-cd "${BUILDDIR}"
-[[ -e "${DIRECTORY}" ]] && rm -r "${DIRECTORY}"
-archboot-"${ARCH}"-release.sh "${DIRECTORY}"
+cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
+cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
+# create release in "${_BUILDDIR}"
+cd "${_BUILDDIR}"
+[[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
+archboot-"${_ARCH}"-release.sh "${_DIRECTORY}"
 # set user rights on files
-chown -R "${USER}" "${DIRECTORY}"
-chgrp -R "${GROUP}" "${DIRECTORY}"
-cd "${DIRECTORY}"
+chown -R "${_USER}" "${_DIRECTORY}"
+chgrp -R "${_GROUP}" "${_DIRECTORY}"
+cd "${_DIRECTORY}"
 # remove sha256sum
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
 for i in *; do
-    [[ -f "${i}" ]] && sudo -u "${USER}" gpg ${GPG} "${i}"
+    [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 for i in boot/*; do
-    [[ -f "${i}" ]] && sudo -u "${USER}" gpg ${GPG} "${i}"
+    [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 cd ..
 # restore pacman.conf and mirrorlist
-cp "${PACMAN_MIRROR}".old "${PACMAN_MIRROR}"
-cp "${PACMAN_CONF}".old "${PACMAN_CONF}"
+cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
+cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
 # copy files to server
-sudo -u "${USER}" scp -r "${DIRECTORY}" "${SERVER}":"${HOME}"
+sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_HOME_DIR}"
 # move files on server, create symlink and remove 3 month old release
-sudo -u "${USER}" ssh "${SERVER}" <<EOF
-rm -r "${SERVER_DIR}"/"${ARCH}"/"${DIRECTORY}"
-rm -r "${SERVER_DIR}"/"${ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${DIRECTORY}" "${SERVER_DIR}"/"${ARCH}"
-cd "${SERVER_DIR}"/"${ARCH}"
+sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
+rm -r "${_SERVER_DIR}"/"${_ARCH}"/"${_DIRECTORY}"
+rm -r "${_SERVER_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${_DIRECTORY}" "${_SERVER_DIR}"/"${_ARCH}"
+cd "${_SERVER_DIR}"/"${_ARCH}"
 rm latest
-ln -s "${DIRECTORY}" latest
+ln -s "${_DIRECTORY}" latest
 EOF

@@ -4,7 +4,7 @@
 _BASENAME="$(basename "${0}")"
 _PRESET_LATEST="x86_64-latest"
 
-W_DIR="archboot-release"
+_W_DIR="archboot-release"
 
 usage () {
 	echo "CREATE ARCHBOOT RELEASE IMAGE"
@@ -25,20 +25,20 @@ echo "Start release creation in $1 ..."
 mkdir -p $1
 cd $1
 # create container
-archboot-x86_64-create-container.sh "${W_DIR}" -cc -cp -alf
+archboot-x86_64-create-container.sh "${_W_DIR}" -cc -cp -alf
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
-systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=archrelease"
 # generate iso in container
-systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=archrelease.tar"
 # remove not working lvm2 from latest image
-echo "Remove lvm2 and openssh from container ${W_DIR} ..."
-systemd-nspawn -D "${W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
+echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
+systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
-systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
 # generate latest iso in container
-systemd-nspawn -q -D "${W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-x86_64-iso.sh -g -T=latest.tar -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
@@ -46,15 +46,15 @@ echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Relea
 echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
 echo "Architecture: x86_64" >>Release.txt
 echo "RAM requirement to boot: 1152 MB or greater" >>Release.txt
-echo "Archboot:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Kernel:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Pacman:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Systemd:$(systemd-nspawn -q -D "${W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
 # move iso out of container
-mv "${W_DIR}"/*.iso ./
+mv "${_W_DIR}"/*.iso ./
 # remove container
-echo "Remove container ${W_DIR} ..."
-rm -r "${W_DIR}"
+echo "Remove container ${_W_DIR} ..."
+rm -r "${_W_DIR}"
 # create boot directory with ramdisks
 echo "Create boot directory ..."
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
