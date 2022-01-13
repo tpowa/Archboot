@@ -7,7 +7,6 @@ _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
-_LOG=""
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -19,7 +18,6 @@ usage () {
 	echo "  -cp    Cleanup container package cache"
 	echo "  -lf    add linux-firmware to container"
 	echo "  -alf   add archboot-linux-firmware to container"
-        echo "  -log   show logging on active tty"
 	exit 0
 }
 
@@ -99,7 +97,7 @@ if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
     rm -r "${_DIR}"/usr/include
-    rm -r "${_DIR}"/usr/share/{man,doc}
+    rm -r "${_DIR}"/usr/share/{man,doc,info,locale}
 fi
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
