@@ -70,7 +70,7 @@ systemd-nspawn -D "${_DIR}/${_PACMAN_CHROOT}" pacman-key --populate archlinuxarm
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}/${_PACMAN_CHROOT}"/etc/pacman.conf
 # copy locale
 echo "Copying locales to container ..."
-cp "${_DIR}/usr/lib/locale/locale-archive" "${_DIR}/${_PACMAN_CHROOT}/usrusr/lib/locale/locale-archive"
+cp "${_DIR}/usr/lib/locale/locale-archive" "${_DIR}/${_PACMAN_CHROOT}/usr/lib/locale/locale-archive"
 # fix network in container
 rm "${_DIR}/${_PACMAN_CHROOT}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/${_PACMAN_CHROOT}/etc/resolv.conf"
