@@ -38,11 +38,7 @@ build ()
     fi
     
     ## add grub(2) unicode font file
-    add_file "/usr/share/grub/unicode.pf2"
-
-    ## add grub(2) en.mo locale file
-    add_file "/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "/boot/grub/locale/en.mo"
-    
+    add_file "/usr/share/grub/unicode.pf2"    
 }
 
 help ()

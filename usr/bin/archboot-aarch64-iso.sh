@@ -5,7 +5,6 @@ _BASENAME="$(basename "${0}")"
 _AARCH64="$(mktemp -d AARCH64.XXX)"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/aarch64"
 _SHIM_VERSION="shim-aa64-15.4-5.aarch64.rpm"
-_LOG=""
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -24,7 +23,6 @@ usage () {
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
 	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
 	echo "  -T=tarball          Use this tarball for image creation."
-        echo "  -log                show logging on active tty"
 	echo "  -h                  This message."
 	exit 0
 }
@@ -222,7 +220,7 @@ menuentry "Exit GRUB" {
 }
 GRUBEOF
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_AARCH64}/EFI/BOOT/grubaa64.cfg"
+        grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_AARCH64}/EFI/BOOT/grubaa64.cfg"
 }
 
 echo "Starting ISO creation ..."
