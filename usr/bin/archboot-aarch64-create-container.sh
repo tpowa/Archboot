@@ -8,7 +8,8 @@ _SAVE_RAM=""
 _LINUX_FIRMWARE=""
 _DIR=""
 _LOG=""
-LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+_PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
+_PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
 
 usage () {
 	echo "CREATE ARCHBOOT CONTAINER"
@@ -85,11 +86,13 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 fi
 if [[ "$(uname -m)" == "x86_64" ]]; then
-    echo "Downloading archlinuxarm aarch64..."
-    ! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${LATEST_ARM64} >/dev/null 2>&1
-    bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${_DIR}"
+    echo "Downloading archlinuxarm pacman aarch64 chroot..."
+    ! [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig}
+    # verify dowload
+    gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
+    bsdtar -C "${_DIR}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
     echo "Removing installation tarball ..."
-    rm ArchLinuxARM-aarch64-latest.tar.gz
+    rm ${_PACMAN_AARCH64_CHROOT}{,.sig}
 fi
     # disable checkspace option in pacman.conf, to allow to install packages in environment
     sed -i -e 's:^CheckSpace:#CheckSpace:g' "${_DIR}"/etc/pacman.conf
@@ -97,8 +100,8 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     # update container to latest packages
     echo "Update container to latest packages..."
     systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
-    echo "Installing archboot-arm and firmware to container..."
-    systemd-nspawn -D "${_DIR}" /bin/bash -c "yes | pacman -S archboot-arm ${_LINUX_FIRMWARE}" >/dev/null 2>&1
+    echo "Installing archboot-arm and ${_LINUX_FIRMWARE} to container..."
+    systemd-nspawn -D "${_DIR}" /bin/bash -c "pacman -S archboot-arm ${_LINUX_FIRMWARE} --noconfirm" >/dev/null 2>&1
 fi
 echo "Setting hostname to archboot ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
