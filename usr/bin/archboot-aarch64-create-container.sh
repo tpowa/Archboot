@@ -87,7 +87,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
 fi
 if [[ "$(uname -m)" == "x86_64" ]]; then
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    ! [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig}
+    ! [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
     gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_DIR}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
