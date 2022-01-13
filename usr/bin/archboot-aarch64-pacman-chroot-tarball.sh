@@ -62,7 +62,7 @@ echo "nameserver 8.8.8.8" > "${_DIR}/etc/resolv.conf"
 echo "Installing pacman to container ..."
 mkdir -p "${_DIR}/${_PACMAN_CHROOT}/var/lib/pacman"
 sleep 1
-systemd-nspawn -D "${_DIR}" pacman --root "/${_PACMAN_CHROOT}" -Sy awk pacman --ignore systemd-resolvconf --noconfirm
+systemd-nspawn -D "${_DIR}" pacman --root "/${_PACMAN_CHROOT}" -Sy awk pacman --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 # generate pacman keyring
 echo "Generate pacman keyring in container ..."
 systemd-nspawn -D "${_DIR}/${_PACMAN_CHROOT}" pacman-key --init >/dev/null 2>&1
