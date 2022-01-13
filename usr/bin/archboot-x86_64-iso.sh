@@ -6,7 +6,6 @@ _X86_64="$(mktemp -d X86_64.XXX)"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
 _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
 _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
-_LOG=""
 
 usage () {
 	echo "${_BASENAME}: usage"

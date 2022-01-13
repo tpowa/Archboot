@@ -32,7 +32,7 @@ cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
 # create release in "${_BUILDDIR}"
 cd "${_BUILDDIR}"
 [[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
-archboot-"${_ARCH}"-release.sh "${_DIRECTORY}"
+archboot-"${_ARCH}"-release.sh "${_DIRECTORY}" || exit 1
 # set user rights on files
 chown -R "${_USER}" "${_DIRECTORY}"
 chgrp -R "${_GROUP}" "${_DIRECTORY}"
