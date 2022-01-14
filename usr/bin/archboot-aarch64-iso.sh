@@ -17,7 +17,7 @@ _TARBALL_NAME=""
 # temporary directories
 _AARCH64="$(mktemp AARCH64.XXX)"
 _CORE64="$(mktemp core64.XXX)"
-_SHIM=$(mktemp shim.XXX)
+_SHIM="$(mktemp shim.XXX)"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -96,7 +96,7 @@ kver() {
 
     [[ $kver =~ $re ]] || return 1
 
-    KERNEL="$(printf '%s' "$kver")"
+    _KERNEL="$(printf '%s' "$kver")"
 }
 
 # set defaults, if nothing given

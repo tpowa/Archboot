@@ -2,10 +2,22 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
-_X86_64="$(mktemp -d X86_64.XXX)"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
 _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
 _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
+# covered by usage
+_GENERATE=""
+_TARBALL=""
+_PRESET=""
+_IMAGENAME=""
+_RELEASENAME=""
+_KERNEL=""
+_TARBALL_NAME=""
+# temporary directories
+_X86_64="$(mktemp X86_64.XXX)"
+_CORE64="$(mktemp core64.XXX)"
+_SHIM="$(mktemp shim.XXX)"
+_SHIM32="$(mktemp shim32.XXX)"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -40,13 +52,13 @@ export LANG="en_US"
 
 while [ $# -gt 0 ]; do
 	case ${1} in
-		-g|--g) GENERATE="1" ;;
-		-t|--t) TARBALL="1" ;;
-                -p=*|--p=*) PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
-                -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-g|--g) _GENERATE="1" ;;
+		-t|--t) _TARBALL="1" ;;
+                -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-k=*|--k=*) _KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
+                -T=*|--T=*) _TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -60,8 +72,8 @@ if ! [[ ${UID} -eq 0 ]]; then
 fi
 
 #set PRESET
-[[ -z "${PRESET}" ]] && PRESET="x86_64"
-PRESET=""${PRESET_DIR}"/"${PRESET}""
+[[ -z "${_PRESET}" ]] && _PRESET="x86_64"
+_PRESET=""${_PRESET_DIR}"/"${_PRESET}""
 
 # from initcpio functions
 kver() {
@@ -83,32 +95,32 @@ kver() {
 
     [[ $kver =~ $re ]] || return 1
 
-    KERNEL="$(printf '%s' "$kver")"
+    _KERNEL="$(printf '%s' "$kver")"
 }
 
 # set defaults, if nothing given
-[[ -z "${KERNEL}" ]] && kver
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-archboot-${RELEASENAME}-x86_64"
+[[ -z "${_KERNEL}" ]] && kver
+[[ -z "${_RELEASENAME}" ]] && _RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
+[[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archlinux-archboot-${_RELEASENAME}-x86_64"
 
-if [[ "${TARBALL}" == "1" ]]; then
+if [[ "${_TARBALL}" == "1" ]]; then
         # fix for mkinitcpio 31
         # https://bugs.archlinux.org/task/72882
         # remove on mkinitcpio 32 release
         cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
         [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
+	"${_TARBALL_HELPER}" -c="${_PRESET}" -t="${_IMAGENAME}.tar"
 	mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
 	exit 0
 fi
 
-if ! [[ "${GENERATE}" == "1" ]]; then
+if ! [[ "${_GENERATE}" == "1" ]]; then
 	usage
 fi
 
-if ! [[ "${TARBALL_NAME}" == "" ]]; then
+if ! [[ "${_TARBALL_NAME}" == "" ]]; then
         CORE64="$(mktemp -d core64.XXX)"
-        tar xf ${TARBALL_NAME} -C "${CORE64}" || exit 1
+        tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
         exit 1
@@ -119,10 +131,10 @@ mkdir -p "${_X86_64}/EFI/BOOT"
 _prepare_kernel_initramfs_files() {
 
 	mkdir -p "${_X86_64}/boot"
-        mv "${CORE64}"/*/boot/vmlinuz "${_X86_64}/boot/vmlinuz_x86_64"
-        mv "${CORE64}"/*/boot/initrd.img "${_X86_64}/boot/initramfs_x86_64.img"
-	mv "${CORE64}"/*/boot/{intel-ucode.img,amd-ucode.img} "${_X86_64}/boot/"
-	[[ -f "${CORE64}/*/boot/memtest" ]] && mv "${CORE64}"/*/boot/memtest "${_X86_64}/boot/"
+        mv "${_CORE64}"/*/boot/vmlinuz "${_X86_64}/boot/vmlinuz_x86_64"
+        mv "${_CORE64}"/*/boot/initrd.img "${_X86_64}/boot/initramfs_x86_64.img"
+	mv "${_CORE64}"/*/boot/{intel-ucode.img,amd-ucode.img} "${_X86_64}/boot/"
+	[[ -f "${_CORE64}/*/boot/memtest" ]] && mv "${_CORE64}"/*/boot/memtest "${_X86_64}/boot/"
         
 }
 
@@ -134,17 +146,17 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    SHIM=$(mktemp -d shim.XXXX)
-    curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
-    bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
+    mkdir "${_SHIM}"
+    curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
     cp "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${_X86_64}/EFI/BOOT/mmx64.efi"
     cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${_X86_64}/EFI/BOOT/BOOTX64.efi"
     # add shim ia32 signed files from fedora
-    SHIM32=$(mktemp -d shim32.XXXX)
+    mkdir "${_SHIM32}"
     curl -s --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
-    bsdtar -C "${SHIM32}" -xf "${SHIM32}/${_SHIM32_VERSION}"
-    cp "${SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${_X86_64}/EFI/BOOT/mmia32.efi"
-    cp "${SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${_X86_64}/EFI/BOOT/BOOTIA32.efi"
+    bsdtar -C "${_SHIM32}" -xf "${_SHIM32}/${_SHIM32_VERSION}"
+    cp "${_SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${_X86_64}/EFI/BOOT/mmia32.efi"
+    cp "${_SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${_X86_64}/EFI/BOOT/BOOTIA32.efi"
     ### adding this causes boot loop in ovmf and only tries create a boot entry
     #cp "${SHIM}/boot/efi/EFI/BOOT/fbx64.efi" "${_X86_64}/EFI/BOOT/fbx64.efi"
 }
@@ -370,10 +382,10 @@ _prepare_uefi_image >/dev/null 2>&1
 
 # place syslinux files
 mkdir -p "${_X86_64}/boot/syslinux"
-mv "${CORE64}"/*/boot/syslinux/* "${_X86_64}/boot/syslinux/"
+mv "${_CORE64}"/*/boot/syslinux/* "${_X86_64}/boot/syslinux/"
 
 # Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$KERNEL/g" -e "s/@@RELEASENAME@@/$RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${_X86_64}/boot/syslinux/boot.msg"
+sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$_KERNEL/g" -e "s/@@RELEASENAME@@/$_RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${_X86_64}/boot/syslinux/boot.msg"
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
@@ -387,7 +399,7 @@ xorriso -as mkisofs \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
         -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${IMAGENAME}.iso" "${_X86_64}/" &> "${IMAGENAME}.log"
+        -output "${_IMAGENAME}.iso" "${_X86_64}/" &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
@@ -395,9 +407,9 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${CORE64}, ${_X86_64}, ${SHIM} and ${SHIM32} ..."
-rm -rf "${CORE64}"
+echo "Cleanup remove ${_CORE64}, ${_X86_64}, ${_SHIM} and ${_SHIM32} ..."
+rm -rf "${_CORE64}"
 rm -rf "${_X86_64}"
-rm -rf "${SHIM}"
-rm -rf "${SHIM32}"
+rm -rf "${_SHIM}"
+rm -rf "${_SHIM32}"
 echo "Finished ISO creation."
