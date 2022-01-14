@@ -3,7 +3,6 @@
 
 _BASENAME="$(basename "${0}")"
 _PRESET_LATEST="x86_64-latest"
-
 _W_DIR="$(mktemp archboot-release.XXX)"
 
 usage () {
