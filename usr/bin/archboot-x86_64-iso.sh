@@ -119,7 +119,7 @@ if ! [[ "${_GENERATE}" == "1" ]]; then
 fi
 
 if ! [[ "${_TARBALL_NAME}" == "" ]]; then
-        CORE64="$(mktemp -d core64.XXX)"
+        mkdir "${_CORE64}"
         tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
