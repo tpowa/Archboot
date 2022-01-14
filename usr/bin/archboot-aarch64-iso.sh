@@ -2,9 +2,22 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
-_AARCH64="$(mktemp -d AARCH64.XXX)"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/aarch64"
 _SHIM_VERSION="shim-aa64-15.4-5.aarch64.rpm"
+_PRESET_DIR="/etc/archboot/presets"
+_TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
+# covered by usage
+_GENERATE=""
+_TARBALL=""
+_PRESET=""
+_IMAGENAME=""
+_RELEASENAME=""
+_KERNEL=""
+_TARBALL_NAME=""
+# temporary directories
+_AARCH64="$(mktemp AARCH64.XXX)"
+_CORE64="$(mktemp core64.XXX)"
+_SHIM=$(mktemp shim.XXX)
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -29,22 +42,18 @@ usage () {
 
 [[ -z "${1}" ]] && usage
 
-
-PRESET_DIR="/etc/archboot/presets"
-TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
-
 # change to english locale!
 export LANG="en_US"
 
 while [ $# -gt 0 ]; do
 	case ${1} in
-		-g|--g) GENERATE="1" ;;
-		-t|--t) TARBALL="1" ;;
-                -p=*|--p=*) PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-i=*|--i=*) IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-r=*|--r=*) RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-k=*|--k=*) KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
-                -T=*|--T=*) TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-g|--g) _GENERATE="1" ;;
+		-t|--t) _TARBALL="1" ;;
+                -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-k=*|--k=*) _KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
+                -T=*|--T=*) _TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -53,13 +62,19 @@ done
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
+fi
+
+### check for aarch64
+if ! [[ "$(uname -m)" == "aarch64" ]]; then
+    echo "ERROR: Please run on aarch64 hardware."
+    exit 1
 fi
 
 #set PRESET
-[[ -z "${PRESET}" ]] && PRESET="aarch64"
-PRESET=""${PRESET_DIR}"/"${PRESET}""
+[[ -z "${_PRESET}" ]] && _PRESET="aarch64"
+_PRESET="${_PRESET_DIR}/${_PRESET}"
 
 # from initcpio functions
 kver() {
@@ -85,28 +100,28 @@ kver() {
 }
 
 # set defaults, if nothing given
-[[ -z "${KERNEL}" ]] && kver
-[[ -z "${RELEASENAME}" ]] && RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
-[[ -z "${IMAGENAME}" ]] && IMAGENAME="archlinux-archboot-${RELEASENAME}-aarch64"
+[[ -z "${_KERNEL}" ]] && kver
+[[ -z "${_RELEASENAME}" ]] && _RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
+[[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archlinux-archboot-${_RELEASENAME}-aarch64"
 
-if [[ "${TARBALL}" == "1" ]]; then
+if [[ "${_TARBALL}" == "1" ]]; then
         # fix for mkinitcpio 31
         # https://bugs.archlinux.org/task/72882
         # remove on mkinitcpio 32 release
         cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
         [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-	"${TARBALL_HELPER}" -c="${PRESET}" -t="${IMAGENAME}.tar"
+	"${_TARBALL_HELPER}" -c="${_PRESET}" -t="${_IMAGENAME}.tar"
 	mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
 	exit 0
 fi
 
-if ! [[ "${GENERATE}" == "1" ]]; then
+if ! [[ "${_GENERATE}" == "1" ]]; then
 	usage
 fi
 
-if ! [[ "${TARBALL_NAME}" == "" ]]; then
-        CORE64="$(mktemp -d core64.XXX)"
-        tar xf ${TARBALL_NAME} -C "${CORE64}" || exit 1
+if ! [[ "${_TARBALL_NAME}" == "" ]]; then
+        mkdir "${_CORE64}"
+        tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
         exit 1
@@ -117,10 +132,10 @@ mkdir -p "${_AARCH64}/EFI/BOOT"
 _prepare_kernel_initramfs_files() {
 
 	mkdir -p "${_AARCH64}/boot"
-        mv "${CORE64}"/*/boot/vmlinuz "${_AARCH64}/boot/vmlinuz_aarch64"
-        mv "${CORE64}"/*/boot/initrd.img "${_AARCH64}/boot/initramfs_aarch64.img"
-	mv "${CORE64}"/*/boot/amd-ucode.img "${_AARCH64}/boot/"
-	mv "${CORE64}"/*/boot/dtbs  "${_AARCH64}/boot/"
+        mv "${_CORE64}"/*/boot/vmlinuz "${_AARCH64}/boot/vmlinuz_aarch64"
+        mv "${_CORE64}"/*/boot/initrd.img "${_AARCH64}/boot/initramfs_aarch64.img"
+	mv "${_CORE64}"/*/boot/amd-ucode.img "${_AARCH64}/boot/"
+	mv "${_CORE64}"/*/boot/dtbs  "${_AARCH64}/boot/"
         
 }
 
@@ -132,11 +147,11 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
-    SHIM=$(mktemp -d shim.XXXX)
-    curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
-    bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
-    cp "${SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${_AARCH64}/EFI/BOOT/mmaa64.efi"
-    cp "${SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${_AARCH64}/EFI/BOOT/BOOTAA64.efi"
+    mktemp "${_SHIM}"
+    curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
+    bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
+    cp "${_SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${_AARCH64}/EFI/BOOT/mmaa64.efi"
+    cp "${_SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${_AARCH64}/EFI/BOOT/BOOTAA64.efi"
 }
 
 _prepare_uefi_image() {
@@ -247,15 +262,15 @@ xorriso -as mkisofs \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
         -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${IMAGENAME}.iso" "${_AARCH64}/" &> "${IMAGENAME}.log"
+        -output "${_IMAGENAME}.iso" "${_AARCH64}/" &> "${_IMAGENAME}.log"
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${CORE64}, ${_AARCH64} and ${SHIM} ..."
-rm -rf "${CORE64}"
+echo "Cleanup remove ${_CORE64}, ${_AARCH64} and ${_SHIM} ..."
+rm -rf "${_CORE64}"
 rm -rf "${_AARCH64}"
-rm -rf "${SHIM}"
+rm -rf "${_SHIM}"
 echo "Finished ISO creation."
