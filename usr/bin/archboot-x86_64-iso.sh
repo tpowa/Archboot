@@ -2,6 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
+_PRESET_DIR="/etc/archboot/presets"
+_TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
 _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
 _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
@@ -43,10 +45,6 @@ usage () {
 
 [[ -z "${1}" ]] && usage
 
-
-PRESET_DIR="/etc/archboot/presets"
-TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
-
 # change to english locale!
 export LANG="en_US"
 
@@ -69,6 +67,12 @@ done
 if ! [[ ${UID} -eq 0 ]]; then 
 	echo "ERROR: Please run as root user!"
 	exit 1
+fi
+
+### check for aarch64
+if ! [[ "$(uname -m)" == "x86_64" ]]; then
+    echo "ERROR: Please run on x86_64 hardware."
+    exit 1
 fi
 
 #set PRESET
