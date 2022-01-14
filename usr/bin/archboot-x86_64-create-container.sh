@@ -57,9 +57,9 @@ mkdir -p "${_CACHEDIR}"
 [[ -e "${_DIR}/dev" ]] || mkdir -m 755 "${_DIR}/dev"
 # mount special filesystems to ${_DIR}
 echo "Mount special filesystems in ${_DIR} ..."
-mount proc ""${_DIR}"/proc" -t proc -o nosuid,noexec,nodev 
-mount sys ""${_DIR}"/sys" -t sysfs -o nosuid,noexec,nodev,ro 
-mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid 
+mount proc ""${_DIR}"/proc" -t proc -o nosuid,noexec,nodev
+mount sys ""${_DIR}"/sys" -t sysfs -o nosuid,noexec,nodev,ro
+mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid
 mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
 mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
