@@ -11,7 +11,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/bin/routel /usr/bin/dhcpcd /usr/bin/ifenslave /usr/bin/brctl"
+    appfiles="/usr/bin/routel /usr/bin/dhcpcd /usr/bin/brctl"
     for i in $appfiles; do
         add_file "$i"
     done

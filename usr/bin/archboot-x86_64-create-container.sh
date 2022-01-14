@@ -42,7 +42,11 @@ if ! [[ ${UID} -eq 0 ]]; then
 	echo "ERROR: Please run as root user!"
 	exit 1
 fi
-
+### check for x86_64
+if ! [[ "$(uname -m)" == "x86_64" ]]; then
+    echo "ERROR: Pleae run on x86_64 hardware."
+    exit 1
+fi
 # prepare pacman dirs
 echo "Starting container creation ..."
 echo "Create directories in ${_DIR} ..."
