@@ -4,6 +4,7 @@
 build ()
 {
     add_binary "efivar"
+    add_binary "efisecdb"
 }
 
 help ()
