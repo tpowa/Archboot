@@ -159,11 +159,9 @@ _prepare_uefi_image() {
 	BOOTSIZE=$(du -bc ${_AARCH64}/EFI | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
-	mkdir -p "${_AARCH64}"/CDEFI/
-	
 	## Create cdefiboot.img
 	dd if=/dev/zero of="${_AARCH64}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024
-	VFAT_IMAGE="${_AARCH64}/CDEFI/cdefiboot.img"
+	VFAT_IMAGE="${_AARCH64}/efi.img"
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
@@ -255,13 +253,9 @@ _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating AARCH64 hybrid ISO ..."
-xorriso -as mkisofs \
-        -iso-level 3 \
-        -full-iso9660-filenames \
         -volid "ARCHBOOT" \
         -preparer "prepared by ${_BASENAME}" \
-        -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${_IMAGENAME}.iso" "${_AARCH64}/" &> "${_IMAGENAME}.log"
+grub-mkrescue -o "${_IMAGENAME}.iso" "${_AARCH64}/" &> "${_IMAGENAME}.log"
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true

@@ -149,7 +149,6 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    mkdir -p 
     curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
     cp "${_SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${_X86_64}/EFI/BOOT/mmx64.efi"
@@ -169,11 +168,9 @@ _prepare_uefi_image() {
 	BOOTSIZE=$(du -bc ${_X86_64}/EFI | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
-	mkdir -p "${_X86_64}"/CDEFI/
-	
 	## Create cdefiboot.img
-	dd if=/dev/zero of="${_X86_64}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024
-	VFAT_IMAGE="${_X86_64}/CDEFI/cdefiboot.img"
+	dd if=/dev/zero of="${_X86_64}"/efi.img bs="${IMGSZ}" count=1024
+	VFAT_IMAGE="${_X86_64}/efi.img"
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
@@ -360,6 +357,53 @@ GRUBEOF
 
 }
 
+_prepare_bios_GRUB_USB_files() {
+	
+	mkdir -p "${_X86_64}/boot/grub"
+	
+	cat << GRUBEOF > "${_X86_64}/boot/grub/grub.cfg"
+insmod part_gpt
+insmod part_msdos
+insmod fat
+
+insmod video_bochs
+insmod video_cirrus
+
+insmod font
+
+if loadfont "${prefix}/fonts/unicode.pf2" ; then
+    insmod gfxterm
+    set gfxmode="1366x768x32;1280x800x32;1024x768x32;auto"
+    terminal_input console
+    terminal_output gfxterm
+fi
+
+set default="Arch Linux x86_64 Archboot - BIOS Mode"
+set timeout="10"
+
+menuentry "Arch Linux x86_64 Archboot - BIOS Mode" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory rootfstype=ramfs
+    initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
+}
+
+menuentry "System restart" {
+	echo "System rebooting..."
+	reboot
+}
+
+menuentry "System shutdown" {
+	echo "System shutting down..."
+	halt
+}
+
+menuentry "Exit GRUB" {
+    exit
+}
+GRUBEOF
+}
+
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
 _prepare_fedora_shim_bootloaders >/dev/null 2>&1
@@ -379,22 +423,15 @@ _prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
 echo "Prepare IA32 Grub ..."
 _prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
 
+echo "Prepare BIOS Grub ..."
+_prepare_bios_GRUB_USB_files >/dev/null 2>&1
+
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
-xorriso -as mkisofs \
-        -iso-level 3 \
-        -full-iso9660-filenames \
-        -volid "ARCHBOOT" \
-        -preparer "prepared by ${_BASENAME}" \
-        -eltorito-boot boot/syslinux/isolinux.bin \
-        -eltorito-catalog boot/syslinux/boot.cat \
-        -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${_IMAGENAME}.iso" "${_X86_64}/" &> "${_IMAGENAME}.log"
+grub-mkrescue --compress=lzo --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
