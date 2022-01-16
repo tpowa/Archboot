@@ -3,11 +3,7 @@
 
 build ()
 {
-    [ "${RUNPROGRAM}"  = "mkisolinux" ] && cp "/boot/amd-ucode.img" "${TEMPDIR}/boot/amd-ucode.img"
-    [ "${RUNPROGRAM}"  = "archboot-tarball-helper.sh" ] && cp "/boot/amd-ucode.img" "${TEMPDIR}/boot/amd-ucode.img"
-    [ "${RUNPROGRAM}"  = "archboot-tarball-helper-arm.sh" ] && cp "/boot/amd-ucode.img" "${TEMPDIR}/boot/amd-ucode.img"
-    [ "${RUNPROGRAM}"  = "mksyslinux" ] && cp "/boot/amd-ucode.img" "${TEMPDIR}/boot/amd-ucode.img"
-    [ "${RUNPROGRAM}"  = "mkpxelinux" ] && cp "/boot/amd-ucode.img" "${INSTALLDIR}/amd-ucode.img"
+    cp "/boot/amd-ucode.img" "${TEMPDIR}/boot/amd-ucode.img"
     # fix license files
     add_file "/usr/share/licenses/amd-ucode/LICENSE.amd-ucode"
 }

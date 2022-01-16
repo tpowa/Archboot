@@ -3,10 +3,7 @@
 
 build ()
 {
-    [ "${RUNPROGRAM}"  = "mkisolinux" ] && cp "/boot/intel-ucode.img" "${TEMPDIR}/boot/intel-ucode.img"
-    [ "${RUNPROGRAM}"  = "archboot-tarball-helper.sh" ] && cp "/boot/intel-ucode.img" "${TEMPDIR}/boot/intel-ucode.img"
-    [ "${RUNPROGRAM}"  = "mksyslinux" ] && cp "/boot/intel-ucode.img" "${TEMPDIR}/boot/intel-ucode.img"
-    [ "${RUNPROGRAM}"  = "mkpxelinux" ] && cp "/boot/intel-ucode.img" "${INSTALLDIR}/intel-ucode.img"
+    cp "/boot/intel-ucode.img" "${TEMPDIR}/boot/intel-ucode.img"
     # fix license files
     add_file "/usr/share/licenses/intel-ucode/LICENSE"
 }
