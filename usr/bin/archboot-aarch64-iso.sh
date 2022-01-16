@@ -15,9 +15,9 @@ _RELEASENAME=""
 _KERNEL=""
 _TARBALL_NAME=""
 # temporary directories
-_AARCH64="$(mktemp AARCH64.XXX)"
-_CORE64="$(mktemp core64.XXX)"
-_SHIM="$(mktemp shim.XXX)"
+_AARCH64="$(mktemp -d AARCH64.XXX)"
+_CORE64="$(mktemp -d core64.XXX)"
+_SHIM="$(mktemp -d shim.XXX)"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -120,7 +120,6 @@ if ! [[ "${_GENERATE}" == "1" ]]; then
 fi
 
 if ! [[ "${_TARBALL_NAME}" == "" ]]; then
-        mkdir "${_CORE64}"
         tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
