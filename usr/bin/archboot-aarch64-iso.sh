@@ -235,6 +235,53 @@ GRUBEOF
         grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_AARCH64}/EFI/BOOT/grubaa64.cfg"
 }
 
+_prepare_bios_GRUB_USB_files() {
+	
+	mkdir -p "${_X86_64}/boot/grub"
+	
+	cat << GRUBEOF > "${_X86_64}/boot/grub/grub.cfg"
+insmod part_gpt
+insmod part_msdos
+insmod fat
+
+insmod video_bochs
+insmod video_cirrus
+
+insmod font
+
+if loadfont "${prefix}/fonts/unicode.pf2" ; then
+    insmod gfxterm
+    set gfxmode="1366x768x32;1280x800x32;1024x768x32;auto"
+    terminal_input console
+    terminal_output gfxterm
+fi
+
+set default="Arch Linux aarch64 Archboot - BIOS Mode"
+set timeout="10"
+
+menuentry "Arch Linux aarch64 Archboot - BIOS Mode" {
+    set gfxpayload=keep
+    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
+    linux /boot/vmlinuz_x86_64 cgroup_disable=memory rootfstype=ramfs
+    initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
+}
+
+menuentry "System restart" {
+	echo "System rebooting..."
+	reboot
+}
+
+menuentry "System shutdown" {
+	echo "System shutting down..."
+	halt
+}
+
+menuentry "Exit GRUB" {
+    exit
+}
+GRUBEOF
+}
+
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
 _prepare_fedora_shim_bootloaders >/dev/null 2>&1
@@ -252,10 +299,8 @@ echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-echo "Generating AARCH64 hybrid ISO ..."
-        -volid "ARCHBOOT" \
-        -preparer "prepared by ${_BASENAME}" \
-grub-mkrescue -o "${_IMAGENAME}.iso" "${_AARCH64}/" &> "${_IMAGENAME}.log"
+grub-mkrescue --compress=lzo --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
+
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true
