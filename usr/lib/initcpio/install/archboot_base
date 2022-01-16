@@ -18,7 +18,7 @@ build ()
           gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \
           kill killall more ps pwd rmdir stty sync tar bsdtar bsdcpio touch uname hdparm \
           true mktemp chroot dirname expr bzip2 hwclock su cat cpio dd gzip wget top sdparm tput \
-          ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec xz last wall mesg utmpdump \
+          ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec lzop xz last wall mesg utmpdump \
           xzdec switch_root false pivot_root sleep chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt hexdump \
           ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei \

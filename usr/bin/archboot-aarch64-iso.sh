@@ -301,7 +301,7 @@ echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-grub-mkrescue --compress=lzo --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
+grub-mkrescue --compress=xz --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
