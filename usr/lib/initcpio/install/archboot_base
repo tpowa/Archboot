@@ -265,10 +265,6 @@ build ()
     add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
     add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
     
-    ### generate boot.msg
-    [ -s "${APPENDBOOTMESSAGE}" ] && cat ${APPENDBOOTMESSAGE} >> ${BOOTMESSAGE}
-    [ -s "${APPENDOPTIONSBOOTMESSAGE}" ] && cat ${APPENDOPTIONSBOOTMESSAGE} >> ${OPTIONSBOOTMESSAGE}
-    
     ### fix licenses
     add_file "/usr/share/licenses/file/COPYING"
     add_file "/usr/share/licenses/bzip2/LICENSE"
