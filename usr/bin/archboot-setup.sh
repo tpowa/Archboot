@@ -3022,42 +3022,6 @@ check_bootpart() {
     fi
 }
 
-# extlinux cannot boot from compressed btrfs
-# extlinux cannot boot from btrfs raid, compressed btrfs
-# FS60996:
-# btrfs subvolume support of /boot or / is broken as of 14.09.2021
-abort_syslinux_btrfs() {
-        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
-        if [[ "${FSTYPE}" = "btrfs" ]]; then
-            # abort on compress or subvolume on /boot
-            if [[ "$(mount | grep ${DESTDIR}/boot | grep subvol)" ]]; then
-                DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot on subvolume." 0 0
-                return 1
-            fi
-            if [[ "$(mount | grep ${DESTDIR}/boot | grep compress)" ]]; then
-                DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs partition with /boot and enabled compress option." 0 0
-                return 1
-            fi
-            # abort on compress or subvolume on / with /boot on it.
-            if [[ ! "$(mount | grep ${DESTDIR}/boot)" ]]; then
-                if [[ "$(mount | grep "${DESTDIR} " | grep subvol)" ]]; then
-                    DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs with /boot on / subvolume." 0 0
-                    return 1
-                fi
-                if [[ "$(mount | grep "${DESTDIR} " | grep compress)" ]]; then
-                    DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from btrfs with /boot on / and enabled compress option." 0 0
-                    return 1
-                fi
-            fi
-                CHECK is not perfect
-            find_btrfs_raid_bootloader_devices
-            if [[ ${BTRFS_COUNT} -ge 3 ]]; then
-                DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from any btrfs raid." 0 0
-                return 1
-            fi
-        fi
-}
-
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
         FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
@@ -3612,275 +3576,6 @@ REFINDEOF
         fi
     else
         DIALOG --msgbox "Error setting up refind." 0 0
-    fi
-    
-}
-
-do_syslinux_common_before() {
-    
-    bootdev=""
-    complexuuid=""
-    FAIL_COMPLEX=""
-    USE_DMRAID=""
-    RAID_ON_LVM=""
-    common_bootloader_checks
-    if [[ ! -f "${DESTDIR}/usr/lib/syslinux/bios/ldlinux.c32" ]]; then
-        DIALOG --infobox "Couldn't find syslinux files, installing syslinux and mtools in 3 seconds ..." 0 0
-        sleep 3
-        PACKAGES="syslinux mtools"
-        run_pacman
-        # reset PACKAGES after installing
-        unset PACKAGES
-    fi
-}
-
-do_syslinux_config() {
-    
-    if [[ "${_SYSLINUX_UEFI}" == "1" ]]; then
-        _SYSLINUX_UEFI_CONFIG_PATH="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg"
-        
-        cat << EOF > "${_SYSLINUX_UEFI_CONFIG_PATH}"
-PATH /EFI/syslinux
-
-UI menu.c32
-DEFAULT arch
-
-PROMPT 1
-TIMEOUT 100
-ONTIMEOUT arch
-
-LABEL arch
-    MENU LABEL Arch Linux
-    LINUX ${_KERNEL_NORMAL}
-    APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_AMD_UCODE},${_INITRD_NORMAL}
-
-LABEL arch-fallback
-    MENU LABEL Arch Linux Fallback
-    LINUX ${_KERNEL_NORMAL}
-    APPEND ${_KERNEL_PARAMS_UEFI_MOD}
-    INITRD ${_INITRD_INTEL_UCODE},${_INITRD_AMD_UCODE},${_INITRD_FALLBACK_NORMAL}
-
-EOF
-        
-        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
-        geteditor || return 1
-        "${EDITOR}" "${_SYSLINUX_UEFI_CONFIG_PATH}"
-    fi
-    
-    if [[ "${_SYSLINUX_BIOS}" == "1" ]]; then
-        _SYSLINUX_BIOS_CONFIG_PATH="${DESTDIR}/boot/${SYSLINUX_DIR}/syslinux.cfg"
-        
-        cat << EOF > "${_SYSLINUX_BIOS_CONFIG_PATH}"
-PATH ${subdir}/${SYSLINUX_DIR}
-UI vesamenu.c32
-
-PROMPT 1
-TIMEOUT 100
-ONTIMEOUT arch
-
-MENU TITLE Arch Linux
-MENU BACKGROUND ${subdir}/${SYSLINUX_DIR}/splash.png
-
-MENU WIDTH 78
-MENU MARGIN 4
-MENU ROWS 10
-MENU VSHIFT 10
-MENU TIMEOUTROW 15
-MENU TABMSGROW 13
-MENU CMDLINEROW 11
-MENU HELPMSGROW 17
-MENU HELPMSGENDROW 29
-
-# Refer to http://syslinux.zytor.com/wiki/index.php/Doc/menu
-
-MENU COLOR border       30;44   #40ffffff #a0000000 std
-MENU COLOR title        1;36;44 #9033ccff #a0000000 std
-MENU COLOR sel          7;37;40 #e0ffffff #20ffffff all
-MENU COLOR unsel        37;44   #50ffffff #a0000000 std
-MENU COLOR help         37;40   #c0ffffff #a0000000 std
-MENU COLOR timeout_msg  37;40   #80ffffff #00000000 std
-MENU COLOR timeout      1;37;40 #c0ffffff #00000000 std
-MENU COLOR msg07        37;40   #90ffffff #a0000000 std
-MENU COLOR tabmsg       31;40   #30ffffff #00000000 std
-
-LABEL arch
-TEXT HELP
-Boot Arch Linux
-ENDTEXT
-    MENU LABEL Arch Linux
-    LINUX ${subdir}/${VMLINUZ}
-    APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${AMD_UCODE},${subdir}/${INITRAMFS}.img
-
-LABEL arch-fallback
-TEXT HELP
-Boot Arch Linux Fallback
-ENDTEXT
-    MENU LABEL Arch Linux Fallback
-    LINUX ${subdir}/${VMLINUZ}
-    APPEND ${_KERNEL_PARAMS_BIOS_MOD}
-    INITRD ${subdir}/${INTEL_UCODE},${subdir}/${AMD_UCODE},${subdir}/${INITRAMFS}-fallback.img
-
-EOF
-        DIALOG --msgbox "You will now be put into the editor to edit syslinux.cfg . After you save your changes, exit the editor." 0 0
-        geteditor || return 1
-        "${EDITOR}" "${_SYSLINUX_BIOS_CONFIG_PATH}"
-    fi
-    
-}
-
-do_syslinux_uefi() {
-    
-    do_uefi_common
-    
-    [[ "${_UEFI_ARCH}" == "X64" ]] && _SYSLINUX_BUILD="efi64"
-    [[ "${_UEFI_ARCH}" == "IA32" ]] && _SYSLINUX_BUILD="efi32"
-    
-    DIALOG --msgbox "Setting up Syslinux EFI now ..." 0 0
-    
-    do_syslinux_common_before
-    
-    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/"
-    cp -r "${DESTDIR}/usr/lib/syslinux/${_SYSLINUX_BUILD}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"
-    
-    do_efistub_copy_to_efisys
-    
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" ]]; then
-        _BOOTMGR_LABEL="Syslinux"
-        _BOOTMGR_LOADER_DIR="/EFI/syslinux/syslinux.efi"
-        do_uefi_bootmgr_setup
-        
-        _SYSLINUX_BIOS="0"
-        _SYSLINUX_UEFI="1"
-        do_syslinux_config
-        _SYSLINUX_UEFI=""
-        _SYSLINUX_BIOS=""
-        
-        DIALOG --msgbox "Syslinux EFI has been setup successfully." 0 0
-        
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
-        
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
-            
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"/*.c32
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/syslinux.cfg"
-            
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux/syslinux.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/syslinux.cfg"
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/syslinux"/*.c32 "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
-        fi
-    else
-        DIALOG --msgbox "Error setting up Syslinux EFI." 0 0
-    fi
-}
-
-## install syslinux/extlinux bios bootloader
-do_syslinux_bios() {
-    
-    SYSLINUX="EXTLINUX"
-    SYSLINUX_PROGRAM="extlinux"
-    SYSLINUX_DIR="syslinux"
-    SYSLINUX_CONF="syslinux.cfg"
-    SYSLINUX_OPTS=""
-    
-    do_syslinux_common_before
-    
-    check_bootpart
-    abort_syslinux_btrfs || return 1
-    abort_nilfs_bootpart || return 1
-    abort_f2fs_bootpart || return 1
-    
-    # extlinux only can boot from ext2/3/4, xfs and btrfs partitions!
-    FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
-    if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "btrfs" || "${FSTYPE}" == "vfat" || "${FSTYPE}" == "xfs" ]]; then
-        DIALOG --msgbox "Error:\nCouldn't find ext2/3/4, btrfs, vfat or xfs partition with /boot on it." 0 0
-        return 1
-    fi
-    
-    # extlinux cannot boot from any raid partition, encrypted and dmraid device
-    if [[ "$(echo ${bootdev} | grep /dev/md*p)" || "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
-        DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from any raid partition, encrypted or dmraid device." 0 0
-        return 1
-    fi
-    
-    # check if raid1 device is used, else fail.
-    if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
-        if ! [[ "$(mdadm --detail ${bootdev} | grep Level | sed -e 's#.*:\ ##g')" = "raid1" ]]; then
-            DIALOG --msgbox "Error:\n${SYSLINUX} cannot boot from none raid1 devices." 0 0
-            return 1
-        else
-            SYSLINUX_OPTS="--raid"
-        fi
-    fi
-
-    DEVS="$(findbootloaderdisks _)"
-    DEVS="${DEVS} $(findbootloaderpartitions _)"
-    
-    if [[ "${DEVS}" == "" ]]; then
-        DIALOG --msgbox "No storage drives were found" 0 0
-        return 1
-    fi
-    
-    DIALOG --menu "Select the boot device where the ${SYSLINUX} BIOS bootloader will be installed (usually the MBR)" 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-    ROOTDEV=$(cat ${ANSWER})
-    
-    # check if GPT/GUID is used
-    GUID_DETECTED=""
-    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
-    
-    PARTITION_NUMBER=$(echo ${bootdev} | sed -e 's#.*[a-z]##g')
-    if [[ "${GUID_DETECTED}" == '1' ]]; then
-        # Set Legacy BIOS Bootable GPT Partition Attribute using sgdisk
-        if ! [[ "$(sgdisk -i ${PARTITION_NUMBER} ${ROOTDEV} | grep '^Attribute' | grep '4$')" ]]; then
-            sgdisk ${ROOTDEV} --attributes=${PARTITION_NUMBER}:set:2
-        fi
-    else
-        printk off
-        # mark the partition with /boot as active in MBR
-        parted -s ${ROOTDEV} set ${PARTITION_NUMBER} boot on >${LOG}
-        printk on
-    fi
-    
-    ## install syslinux/extlinux bios
-    DIALOG --infobox "Installing the ${SYSLINUX} BIOS bootloader..." 0 0
-    mkdir -p "${DESTDIR}/boot/${SYSLINUX_DIR}" || true
-    cp -f "${DESTDIR}/usr/lib/syslinux/bios"/*.c32 "${DESTDIR}/boot/${SYSLINUX_DIR}"
-    
-    chroot_mount
-    chroot "${DESTDIR}" "${SYSLINUX_PROGRAM}" ${SYSLINUX_OPTS} --install "/boot/${SYSLINUX_DIR}" &>"${LOG}"
-    chroot_umount
-    
-    MBR="${DESTDIR}/usr/lib/syslinux/bios/mbr.bin"
-    GPTMBR="${DESTDIR}/usr/lib/syslinux/bios/gptmbr.bin"
-    
-    ## Install MBR boot code only if the selected ROOTDEV is a DISC and not a partition
-    if [[ "$(${_LSBLK} TYPE -d ${ROOTDEV} | grep "disk")" ]]; then
-        ## check if GPT/GUID is used
-        GUID_DETECTED=""
-        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${ROOTDEV})" == "gpt" ]] && GUID_DETECTED="1"
-        
-        if [[ "${GUID_DETECTED}" == '1' ]]; then
-            cat "${GPTMBR}" > "${ROOTDEV}"
-        else
-            cat "${MBR}" > "${ROOTDEV}"
-        fi
-    fi
-    
-    # btrfs does not have ldlinux.sys in filesystem!
-    if [[ -e "${DESTDIR}/boot/${SYSLINUX_DIR}/ldlinux.sys" || "${FSTYPE}" == "btrfs" ]]; then
-        _SYSLINUX_UEFI="0"
-        _SYSLINUX_BIOS="1"
-        do_syslinux_config
-        _SYSLINUX_BIOS=""
-        _SYSLINUX_UEFI=""
-        
-        DIALOG --msgbox "${SYSLINUX} was successfully installed." 0 0
-    else
-        DIALOG --msgbox "Error installing ${SYSLINUX}. (see ${LOG} for output)" 0 0
-        return 1
     fi
     
 }
@@ -4955,13 +4650,11 @@ install_bootloader_uefi() {
         else    
             DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
                 "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" \
-                "SYSLINUX_UEFI" "SYSLINUX for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
         fi
         case $(cat ${ANSWER}) in
             "EFISTUB") do_efistub_uefi ;;
             "GRUB_UEFI") do_grub_uefi ;;
-            "SYSLINUX_UEFI") do_syslinux_uefi ;;
         esac
     fi
     
@@ -4970,11 +4663,9 @@ install_bootloader_uefi() {
 install_bootloader_bios() {
     
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
-        "GRUB_BIOS" "GRUB(2) BIOS" \
-        "SYSLINUX_BIOS" "SYSLINUX BIOS" 2>${ANSWER} || CANCEL=1
+        "GRUB_BIOS" "GRUB(2) BIOS" 2>${ANSWER} || CANCEL=1
     case $(cat ${ANSWER}) in
         "GRUB_BIOS") do_grub_bios ;;
-        "SYSLINUX_BIOS") do_syslinux_bios ;;
     esac
     
 }

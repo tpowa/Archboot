@@ -295,6 +295,9 @@ _prepare_efitools_uefi >/dev/null 2>&1
 echo "Prepare AA64 Grub ..."
 _prepare_uefi_AA64_GRUB_USB_files >/dev/null 2>&1
 
+echo "Prepare BIOS Grub ..."
+_prepare_bios_GRUB_USB_files >/dev/null 2>&1
+
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
