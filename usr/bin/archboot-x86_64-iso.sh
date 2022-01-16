@@ -16,10 +16,10 @@ _RELEASENAME=""
 _KERNEL=""
 _TARBALL_NAME=""
 # temporary directories
-_X86_64="$(mktemp X86_64.XXX)"
-_CORE64="$(mktemp core64.XXX)"
-_SHIM="$(mktemp shim.XXX)"
-_SHIM32="$(mktemp shim32.XXX)"
+_X86_64="$(mktemp -d X86_64.XXX)"
+_CORE64="$(mktemp -d core64.XXX)"
+_SHIM="$(mktemp -d shim.XXX)"
+_SHIM32="$(mktemp -d shim32.XXX)"
 
 usage () {
 	echo "${_BASENAME}: usage"
@@ -123,7 +123,6 @@ if ! [[ "${_GENERATE}" == "1" ]]; then
 fi
 
 if ! [[ "${_TARBALL_NAME}" == "" ]]; then
-        mkdir "${_CORE64}"
         tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
     else
         echo "Please enter a tarball name with parameter -T=tarball"
@@ -150,13 +149,11 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    mkdir "${_SHIM}"
     curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
     cp "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${_X86_64}/EFI/BOOT/mmx64.efi"
     cp "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${_X86_64}/EFI/BOOT/BOOTX64.efi"
     # add shim ia32 signed files from fedora
-    mkdir "${_SHIM32}"
     curl -s --create-dirs -L -O --output-dir "${SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
     bsdtar -C "${_SHIM32}" -xf "${_SHIM32}/${_SHIM32_VERSION}"
     cp "${_SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${_X86_64}/EFI/BOOT/mmia32.efi"
@@ -384,26 +381,21 @@ _prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
-# place syslinux files
-mkdir -p "${_X86_64}/boot/syslinux"
-mv "${_CORE64}"/*/boot/syslinux/* "${_X86_64}/boot/syslinux/"
-
-# Change parameters in boot.msg
-sed -i -e "s/@@DATE@@/$(date)/g" -e "s/@@KERNEL@@/$_KERNEL/g" -e "s/@@RELEASENAME@@/$_RELEASENAME/g" -e "s/@@BOOTLOADER@@/ISOLINUX/g" "${_X86_64}/boot/syslinux/boot.msg"
-
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
-xorriso -as mkisofs \
-        -iso-level 3 \
-        -full-iso9660-filenames \
-        -volid "ARCHBOOT" \
-        -preparer "prepared by ${_BASENAME}" \
-        -eltorito-boot boot/syslinux/isolinux.bin \
-        -eltorito-catalog boot/syslinux/boot.cat \
-        -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${_IMAGENAME}.iso" "${_X86_64}/" &> "${_IMAGENAME}.log"
+grub-mkrescue -o test.iso ${_X86_64}/
+
+#xorriso -as mkisofs \
+#        -iso-level 3 \
+#        -full-iso9660-filenames \
+#        -volid "ARCHBOOT" \
+#        -preparer "prepared by ${_BASENAME}" \
+#        -eltorito-boot boot/syslinux/isolinux.bin \
+#        -eltorito-catalog boot/syslinux/boot.cat \
+#        -no-emul-boot -boot-load-size 4 -boot-info-table \
+#        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
+#        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
+#        -output "${_IMAGENAME}.iso" "${_X86_64}/" &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
