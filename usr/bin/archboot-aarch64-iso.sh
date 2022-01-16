@@ -236,9 +236,9 @@ GRUBEOF
 
 _prepare_bios_GRUB_USB_files() {
 	
-	mkdir -p "${_X86_64}/boot/grub"
+	mkdir -p "${_AARCH64}/boot/grub"
 	
-	cat << GRUBEOF > "${_X86_64}/boot/grub/grub.cfg"
+	cat << GRUBEOF > "${_AARCH64}/boot/grub/grub.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -301,7 +301,7 @@ echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-grub-mkrescue --compress=xz --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
+grub-mkrescue --compress=xz --fonts="unicode" --product-name="Arch Linux ARCHBOOT" --product-version="${_RELEASENAME}" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_AARCH64}"/  &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
