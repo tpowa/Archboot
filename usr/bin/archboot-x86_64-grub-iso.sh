@@ -149,7 +149,6 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    mkdir -p 
     curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
     cp "${_SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${_X86_64}/EFI/BOOT/mmx64.efi"
@@ -169,11 +168,9 @@ _prepare_uefi_image() {
 	BOOTSIZE=$(du -bc ${_X86_64}/EFI | grep total | cut -f1)
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
-	mkdir -p "${_X86_64}"/CDEFI/
-	
 	## Create cdefiboot.img
-	dd if=/dev/zero of="${_X86_64}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024
-	VFAT_IMAGE="${_X86_64}/CDEFI/cdefiboot.img"
+	dd if=/dev/zero of="${_X86_64}"/efi.img bs="${IMGSZ}" count=1024
+	VFAT_IMAGE="${_X86_64}/efi.img"
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
@@ -362,7 +359,7 @@ GRUBEOF
 
 echo "Starting ISO creation ..."
 echo "Prepare fedora shim ..."
-_prepare_fedora_shim_bootloaders >/dev/null 2>&1
+_prepare_fedora_shim_bootloaders
 
 echo "Prepare kernel and initramfs ..."
 _prepare_kernel_initramfs_files >/dev/null 2>&1
@@ -384,17 +381,7 @@ _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
-xorriso -as mkisofs \
-        -iso-level 3 \
-        -full-iso9660-filenames \
-        -volid "ARCHBOOT" \
-        -preparer "prepared by ${_BASENAME}" \
-        -eltorito-boot boot/syslinux/isolinux.bin \
-        -eltorito-catalog boot/syslinux/boot.cat \
-        -no-emul-boot -boot-load-size 4 -boot-info-table \
-        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
-        -eltorito-alt-boot -e CDEFI/cdefiboot.img -isohybrid-gpt-basdat -no-emul-boot \
-        -output "${_IMAGENAME}.iso" "${_X86_64}/" &> "${_IMAGENAME}.log"
+grub-mkrescue -o test.iso "${_X86_64}"/
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
