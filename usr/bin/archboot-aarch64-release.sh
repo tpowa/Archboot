@@ -3,7 +3,7 @@
 
 _BASENAME="$(basename "${0}")"
 _PRESET_LATEST="aarch64-latest"
-_W_DIR="$(mktemp archboot-release.XXX)"
+_W_DIR="$(mktemp -d archboot-release.XXX)"
 
 usage () {
 	echo "CREATE ARCHBOOT RELEASE IMAGE"
