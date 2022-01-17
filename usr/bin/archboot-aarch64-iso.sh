@@ -126,7 +126,7 @@ if ! [[ "${_TARBALL_NAME}" == "" ]]; then
         exit 1
 fi
 
-mkdir -p "${_AARCH64}/efi/boot"
+mkdir -p "${_AARCH64}/EFI/BOOT"
 
 _prepare_kernel_initramfs_files() {
 
@@ -148,8 +148,8 @@ _prepare_fedora_shim_bootloaders () {
     # add shim aa64 signed files from fedora
     curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
-    cp "${_SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${_AARCH64}/efi/boot/mmaa64.efi"
-    cp "${_SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${_AARCH64}/efi/boot/BOOTAA64.efi"
+    cp "${_SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${_AARCH64}/EFI/BOOT/mmaa64.efi"
+    cp "${_SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${_AARCH64}/EFI/BOOT/BOOTAA64.efi"
 }
 
 _prepare_uefi_image() {
@@ -159,12 +159,12 @@ _prepare_uefi_image() {
 	IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
 	
 	## Create cdefiboot.img
-	dd if=/dev/zero of="${_AARCH64}"/CDEFI/cdefiboot.img bs="${IMGSZ}" count=1024
+	dd if=/dev/zero of="${_AARCH64}"/efi.img bs="${IMGSZ}" count=1024
 	VFAT_IMAGE="${_AARCH64}/efi.img"
 	mkfs.vfat "${VFAT_IMAGE}"
 	
 	## Copy all files to UEFI vfat image
-	mcopy -i "${VFAT_IMAGE}" -s "${_AARCH64}"/efi ::/
+	mcopy -i "${VFAT_IMAGE}" -s "${_AARCH64}"/EFI ::/
 	
 }
 
@@ -173,8 +173,8 @@ _prepare_uefi_image() {
 # If you don't use shim use --disable-shim-lock
 _prepare_uefi_AA64_GRUB_USB_files() {
 	
-	mkdir -p "${_AARCH64}/efi/boot"
-	cat << GRUBEOF > "${_AARCH64}/efi/boot/grubaa64.cfg"
+	mkdir -p "${_AARCH64}/EFI/BOOT"
+	cat << GRUBEOF > "${_AARCH64}/EFI/BOOT/grubaa64.cfg"
 insmod part_gpt
 insmod part_msdos
 insmod fat
@@ -231,7 +231,7 @@ menuentry "Exit GRUB" {
 }
 GRUBEOF
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/efi/boot/grubaa64.efi" "boot/grub/grub.cfg=${_AARCH64}/efi/boot/grubaa64.cfg"
+        grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_AARCH64}/EFI/BOOT/grubaa64.cfg"
 }
 
 _prepare_bios_GRUB_USB_files() {
