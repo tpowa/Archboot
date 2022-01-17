@@ -260,9 +260,9 @@ set timeout="10"
 
 menuentry "Arch Linux aarch64 Archboot - BIOS Mode" {
     set gfxpayload=keep
-    search --no-floppy --set=root --file /boot/vmlinuz_x86_64
-    linux /boot/vmlinuz_x86_64 cgroup_disable=memory rootfstype=ramfs
-    initrd /boot/intel-ucode.img  /boot/amd-ucode.img /boot/initramfs_x86_64.img
+    search --no-floppy --set=root --file /boot/vmlinuz_aarch64
+    linux /boot/vmlinuz_aarch64 cgroup_disable=memory rootfstype=ramfs
+    initrd /boot/amd-ucode.img /boot/initramfs_x86_64.img
 }
 
 menuentry "System restart" {
