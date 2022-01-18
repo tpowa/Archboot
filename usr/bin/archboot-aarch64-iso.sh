@@ -92,7 +92,6 @@ _prepare_kernel_initramfs_files() {
     cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_AARCH64}/share/licenses/amd-ucode"
 }
 
-
 _prepare_efitools_uefi () {
     cp -f "/usr/share/efitools/efi/HashTool.efi" "${_AARCH64}/EFI/tools/HashTool.efi"
     cp -f "/usr/share/efitools/efi/KeyTool.efi" "${_AARCH64}/EFI/tools/KeyTool.efi"
@@ -151,7 +150,7 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${_CORE64}, ${_AARCH64} and ${_SHIM} ..."
+echo "Cleanup remove ${_AARCH64} and ${_SHIM} ..."
 rm -rf "${_AARCH64}"
 rm -rf "${_SHIM}"
 echo "Finished ISO creation."
