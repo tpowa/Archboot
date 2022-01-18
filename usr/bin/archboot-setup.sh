@@ -2995,7 +2995,6 @@ bootloader_kernel_parameters() {
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP} cgroup_disable=memory"
     
     _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD} add_efi_memmap" 
     
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
