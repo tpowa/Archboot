@@ -198,7 +198,7 @@ _prepare_uefi_IA32_GRUB_USB_files() {
 
 _prepare_GRUB_config_file() {
     [[ -d "${_X86_64}/boot/grub" ]] || mkdir -p "${_X86_64}/boot/grub"
-    cp /usr/share/archboot/grub.cfg "${_X86_64}/boot/grub/grub.cfg"
+    cp /usr/share/archboot/grub/grub.cfg "${_X86_64}/boot/grub/grub.cfg"
 }
 
 echo "Starting ISO creation ..."
