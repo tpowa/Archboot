@@ -186,7 +186,7 @@ _prepare_uefi_AA64_GRUB_USB_files >/dev/null 2>&1
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
-## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
+## Generate the BIOS+ISOHYBRID+UEFI CD image
 grub-mkrescue --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_AARCH64}"/  "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
