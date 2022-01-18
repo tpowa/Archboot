@@ -6,6 +6,7 @@ _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/aarch64"
 _SHIM_VERSION="shim-aa64-15.4-5.aarch64.rpm"
 _PRESET_DIR="/etc/archboot/presets"
 _TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
+_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
 _TARBALL=""
@@ -162,17 +163,11 @@ _prepare_uefi_image() {
     mcopy -i "${VFAT_IMAGE}" -s "${_AARCH64}"/EFI ::/	
 }
 
-
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 # If you don't use shim use --disable-shim-lock
 _prepare_uefi_AA64_GRUB_USB_files() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi"
-}
-
-_prepare_GRUB_config_file() {
-    [[ -d "${_AARCH64}/boot/grub" ]] || mkdir -p "${_AARCH64}/boot/grub"
-    cp /usr/share/archboot/grub/grub.cfg "${_AARCH64}/boot/grub/grub.cfg"
+    grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_AARCH64}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
 }
 
 echo "Starting ISO creation ..."
@@ -188,14 +183,11 @@ _prepare_efitools_uefi >/dev/null 2>&1
 echo "Prepare AA64 Grub ..."
 _prepare_uefi_AA64_GRUB_USB_files >/dev/null 2>&1
 
-echo "Prepare BIOS Grub ..."
-_prepare_GRUB_config_file >/dev/null 2>&1
-
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
-grub-mkrescue --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_AARCH64}"/  &> "${_IMAGENAME}.log"
+grub-mkrescue --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_AARCH64}"/  "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."

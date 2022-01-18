@@ -7,6 +7,7 @@ _TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
 _SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
 _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
+_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
 _TARBALL=""
@@ -188,17 +189,12 @@ _download_uefi_shell_tianocore() {
 # If you don't use shim use --disable-shim-lock
 _prepare_uefi_X64_GRUB_USB_files() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_X86_64}/EFI/BOOT/grubx64.efi"
+    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_X86_64}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
 }
 
 _prepare_uefi_IA32_GRUB_USB_files() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_X86_64}/EFI/BOOT/grubia32.efi"
-}
-
-_prepare_GRUB_config_file() {
-    [[ -d "${_X86_64}/boot/grub" ]] || mkdir -p "${_X86_64}/boot/grub"
-    cp /usr/share/archboot/grub/grub.cfg "${_X86_64}/boot/grub/grub.cfg"
+    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_X86_64}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
 }
 
 echo "Starting ISO creation ..."
@@ -220,15 +216,12 @@ _prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
 echo "Prepare IA32 Grub ..."
 _prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
 
-echo "Prepare BIOS Grub ..."
-_prepare_GRUB_config_file >/dev/null 2>&1
-
 echo "Prepare UEFI image ..."
 _prepare_uefi_image >/dev/null 2>&1
 
 ## Generate the BIOS+ISOHYBRID+UEFI CD image using xorriso (extra/libisoburn package) in mkisofs emulation mode
 echo "Generating X86_64 hybrid ISO ..."
-grub-mkrescue --compress="xz" --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/  &> "${_IMAGENAME}.log"
+grub-mkrescue --compress="xz" --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_X86_64}"/ "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
