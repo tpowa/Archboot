@@ -5,38 +5,27 @@ _BASENAME="$(basename "${0}")"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/aarch64"
 _SHIM_VERSION="shim-aa64-15.4-5.aarch64.rpm"
 _PRESET_DIR="/etc/archboot/presets"
-_TARBALL_HELPER="/usr/bin/archboot-tarball-helper.sh"
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
-_TARBALL=""
 _PRESET=""
 _IMAGENAME=""
 _RELEASENAME=""
-_KERNEL=""
-_TARBALL_NAME=""
 # temporary directories
 _AARCH64="$(mktemp -d AARCH64.XXX)"
-_CORE64="$(mktemp -d core64.XXX)"
 _SHIM="$(mktemp -d shim.XXX)"
 
 usage () {
 	echo "${_BASENAME}: usage"
 	echo "CREATE AARCH64 USB/CD IMAGES"
 	echo "-----------------------------"
-	echo "Run in archboot aarch64 chroot first ..."
-	echo "archboot-aarch64-iso.sh -t"
-	echo ""
 	echo "PARAMETERS:"
-	echo "  -t                  Start generation of tarball."
 	echo "  -g                  Start generation of image."
 	echo "  -p=PRESET           Which preset should be used."
 	echo "                      /etc/archboot/presets locates the presets"
 	echo "                      default=aarch64"
 	echo "  -i=IMAGENAME        Your IMAGENAME."
 	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
-	echo "  -k=KERNELNAME       Use KERNELNAME in boot message."
-	echo "  -T=tarball          Use this tarball for image creation."
 	echo "  -h                  This message."
 	exit 0
 }
@@ -49,12 +38,9 @@ export LANG="en_US"
 while [ $# -gt 0 ]; do
 	case ${1} in
 		-g|--g) _GENERATE="1" ;;
-		-t|--t) _TARBALL="1" ;;
                 -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-k=*|--k=*) _KERNEL="$(echo ${1} | awk -F= '{print $2;}')" ;;
-                -T=*|--T=*) _TARBALL_NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
 		*) usage ;;
 		esac
@@ -73,69 +59,39 @@ if ! [[ "$(uname -m)" == "aarch64" ]]; then
     exit 1
 fi
 
+[[ "${_GENERATE}" == "1" ]] || usage
+
 #set PRESET
 [[ -z "${_PRESET}" ]] && _PRESET="aarch64"
 _PRESET="${_PRESET_DIR}/${_PRESET}"
 
-# from initcpio functions
-kver() {
-    # this is intentionally very loose. only ensure that we're
-    # dealing with some sort of string that starts with something
-    # resembling dotted decimal notation. remember that there's no
-    # requirement for CONFIG_LOCALVERSION to be set.
-    local kver re='^[[:digit:]]+(\.[[:digit:]]+)+'
-
-    # scrape the version out of the kernel image. locate the offset
-    # to the version string by reading 2 bytes out of image at at
-    # address 0x20E. this leads us to a string of, at most, 128 bytes.
-    # read the first word from this string as the kernel version.
-    local offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/boot/Image.gz")
-    [[ $offset = +([0-9]) ]] || return 1
-
-    read kver _ < \
-        <(dd if="/boot/Image.gz" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
-
-    [[ $kver =~ $re ]] || return 1
-
-    _KERNEL="$(printf '%s' "$kver")"
-}
-
 # set defaults, if nothing given
-[[ -z "${_KERNEL}" ]] && kver
 [[ -z "${_RELEASENAME}" ]] && _RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
 [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archlinux-archboot-${_RELEASENAME}-aarch64"
-
-if [[ "${_TARBALL}" == "1" ]]; then
-        # fix for mkinitcpio 31
-        # https://bugs.archlinux.org/task/72882
-        # remove on mkinitcpio 32 release
-        cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
-        [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-	"${_TARBALL_HELPER}" -c="${_PRESET}" -t="${_IMAGENAME}.tar"
-	mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
-	exit 0
-fi
 
 if ! [[ "${_GENERATE}" == "1" ]]; then
 	usage
 fi
 
-if ! [[ "${_TARBALL_NAME}" == "" ]]; then
-    tar xf ${_TARBALL_NAME} -C "${_CORE64}" || exit 1
-else
-    echo "Please enter a tarball name with parameter -T=tarball"
-    exit 1
-fi
-
-mkdir -p "${_AARCH64}/EFI/BOOT"
-
 _prepare_kernel_initramfs_files() {
+    source "${_PRESET}"
+    mkdir -p "${_AARCH64}/EFI/BOOT"
     mkdir -p "${_AARCH64}/boot"
-    mv "${_CORE64}"/*/boot/vmlinuz "${_AARCH64}/boot/vmlinuz_aarch64"
-    mv "${_CORE64}"/*/boot/initrd.img "${_AARCH64}/boot/initramfs_aarch64.img"
-    mv "${_CORE64}"/*/boot/amd-ucode.img "${_AARCH64}/boot/"
-    mv "${_CORE64}"/*/boot/dtbs  "${_AARCH64}/boot/"
+    # fix for mkinitcpio 31
+    # https://bugs.archlinux.org/task/72882
+    # remove on mkinitcpio 32 release
+    cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
+    [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_AARCH64}/boot/initramfs_aarch64.img" || exit 1
+    mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
+    install -m644 "${ALL_kver}" "${_AARCH64}/boot/vmlinuz_aarch64"
+    # install ucode files
+    cp /boot/amd-ucode.img "${_AARCH64}/boot/"
+    # fix license files
+    mkdir -p "${_AARCH64}/share/licenses/amd-ucode"
+    cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_AARCH64}/share/licenses/amd-ucode"
 }
+
 
 _prepare_efitools_uefi () {
     cp -f "/usr/share/efitools/efi/HashTool.efi" "${_AARCH64}/EFI/tools/HashTool.efi"
@@ -171,11 +127,11 @@ _prepare_uefi_AA64_GRUB_USB_files() {
 }
 
 echo "Starting ISO creation ..."
+echo "Prepare kernel and initramfs ..."
+_prepare_kernel_initramfs_files
+
 echo "Prepare fedora shim ..."
 _prepare_fedora_shim_bootloaders >/dev/null 2>&1
-
-echo "Prepare kernel and initramfs ..."
-_prepare_kernel_initramfs_files >/dev/null 2>&1
 
 echo "Prepare efitools ..."
 _prepare_efitools_uefi >/dev/null 2>&1
@@ -196,7 +152,6 @@ cksum -a sha256 *.iso > "sha256sums.txt"
 
 # cleanup
 echo "Cleanup remove ${_CORE64}, ${_AARCH64} and ${_SHIM} ..."
-rm -rf "${_CORE64}"
 rm -rf "${_AARCH64}"
 rm -rf "${_SHIM}"
 echo "Finished ISO creation."

@@ -27,17 +27,15 @@ cd $1
 archboot-aarch64-create-container.sh "${_W_DIR}" -cc -cp -alf || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -t -i=archrelease"
 # generate iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -T=archrelease.tar"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g"
 # remove not working lvm2 from latest image
 echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
 systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -t -i=latest -p="${_PRESET_LATEST}""
 # generate latest iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -T=latest.tar -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
