@@ -12,8 +12,8 @@ build ()
     done
     symlinks="/usr/bin/screen"
     for i in $symlinks; do
-        add_binary "$(which $(basename $(readlink "$i")))"
-        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+        add_binary "$(which $(readlink "$i"))"
+        add_symlink "$i" "$(which $(readlink "$i"))"
     done
     add_file "/etc/screenrc"
     add_file "/etc/ssh/ssh_config"

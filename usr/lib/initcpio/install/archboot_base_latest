@@ -27,8 +27,8 @@ build ()
     for i in $symlinks; do
         # echo "Checking $i"
         # if [ -e $i ]; then
-            add_binary "$(which "$(basename "$(readlink "$i")")")"
-            add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
+            add_binary "$(which "$(readlink "$i")")"
+            add_symlink "$i" "$(which "$(readlink "$i")")"
         # fi
     done
 
@@ -178,8 +178,8 @@ build ()
     for i in $symlinks; do
         # echo "Checking $i"
         # if [ -e $i ]; then
-            add_binary "$(which "$(basename "$(readlink "$i")")")"
-            add_symlink "$i" "$(which "$(basename "$(readlink "$i")")")"
+            add_binary "$(which "$(readlink "$i")")"
+            add_symlink "$i" "$(which "$(readlink "$i")")"
         # fi
     done
     add_dir "/var/cache/pacman/pkg"

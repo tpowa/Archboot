@@ -15,8 +15,8 @@ symlinks="/usr/bin/vgcfgbackup /usr/bin/vgcfgrestore /usr/bin/vgchange \
 	  /usr/bin/lvextend /usr/bin/lvmdiskscan /usr/bin/lvmsadc /usr/bin/lvmsar /usr/bin/lvreduce /usr/bin/lvremove \
 	  /usr/bin/lvrename /usr/bin/lvresize /usr/bin/lvs /usr/bin/lvscan"
     for i in $symlinks; do
-        add_binary "$(which $(basename $(readlink "$i")))"
-        add_symlink "$i" "$(which $(basename $(readlink "$i")))"
+        add_binary "$(which $(readlink "$i"))"
+        add_symlink "$i" "$(which $(readlink "$i"))"
     done
     add_dir "/etc/lvm/backup/"
     add_dir "/etc/lvm/archive/"
