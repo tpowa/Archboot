@@ -1,6 +1,5 @@
 # vim:set ft=sh:
 # Created by Tobias Powalowski <tpowa@archlinux.org>
-# config file for mkisolinux
 
 # mkinitcpio config file, defaulted to stock config file
 MKINITCPIO_CONFIG="/etc/archboot/x86_64.conf"
