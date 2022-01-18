@@ -84,7 +84,7 @@ _prepare_kernel_initramfs_files() {
     # install ucode files
     cp /boot/{intel-ucode.img,amd-ucode.img} "${_X86_64}/boot/"
     # fix license files
-    mkdir -p "${_X86_64}/share/licenses/{amd-ucode,intel-ucode}"
+    mkdir -p "${_X86_64}"/share/licenses/{amd-ucode,intel-ucode}
     cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_X86_64}/share/licenses/amd-ucode"
     cp /usr/share/licenses/intel-ucode/LICENSE "${_X86_64}/share/licenses/intel-ucode"
 }
