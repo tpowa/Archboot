@@ -5,7 +5,7 @@ _BASENAME="$(basename "${0}")"
 _CACHEDIR=""$1"/var/cache/pacman/pkg"
 _CLEANUP_CACHE=""
 _SAVE_RAM=""
-_LINUX_FIRMWARE=""
+_LINUX_FIRMWARE="linux-firmware"
 _DIR=""
 
 usage () {
@@ -16,8 +16,6 @@ usage () {
 	echo " Options:"
 	echo "  -cc    Cleanup container eg. remove manpages, includes ..."
 	echo "  -cp    Cleanup container package cache"
-	echo "  -lf    add linux-firmware to container"
-	echo "  -alf   add archboot-linux-firmware to container"
 	exit 0
 }
 
@@ -29,13 +27,9 @@ while [ $# -gt 0 ]; do
 	case ${1} in
 		-cc|--cc) _SAVE_RAM="1" ;;
 		-cp|--cp) _CLEANUP_CACHE="1" ;;
-		-lf|--lf) _LINUX_FIRMWARE="linux-firmware" ;;
-		-alf|--alf) _LINUX_FIRMWARE="archboot-linux-firmware" ;;
         esac
 	shift
 done
-
-[[ -z "${_LINUX_FIRMWARE}" ]] && _LINUX_FIRMWARE="linux-firmware"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
