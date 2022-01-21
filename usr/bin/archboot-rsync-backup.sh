@@ -16,7 +16,7 @@ usage()
     echo " - --numeric-ids option is invoked to preserve users"
     echo ""
     echo "usage: ${APPNAME} <backupdir> <backupdestination>"
-    exit $1
+    exit "$1"
 }
 
 ##################################################
@@ -28,5 +28,5 @@ fi
 BACKUPDESTINATION="${2}"
 BACKUPDIR="${1}"
 
-rsync -aAXv --numeric-ids --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} $BACKUPDIR $BACKUPDESTINATION
+rsync -aAXv --numeric-ids --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} "$BACKUPDIR" "$BACKUPDESTINATION"
 
