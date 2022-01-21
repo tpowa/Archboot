@@ -174,10 +174,10 @@ activate_luks()
     ACTIVATE_LUKS=""
     if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
-        if [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]]; then
+        if "${_LSBLK}" FSTYPE | grep -q "crypto_LUKS"; then
             for PART in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
-                if ! [[ "$(${_LSBLK} TYPE ${PART} | grep "crypt$")" ]]; then
+                if ! "${_LSBLK}" TYPE "${PART}" | grep -q "crypt$"; then
                     RUN_LUKS=""
                     DIALOG --yesno "Setup detected luks encrypted device, do you want to activate ${PART} ?" 0 0 && RUN_LUKS="1"
                     [[ "${RUN_LUKS}" = "1" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
@@ -231,16 +231,16 @@ blockdevices() {
      for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
          # exclude checks:
          #- dmraid_devices
-         #  $(${_LSBLK} TYPE ${dev} | grep dmraid
+         #  ${_LSBLK} TYPE ${dev} | grep "dmraid"
          #- iso9660 devices
-         #  "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")
+         #  (${_LSBLK} FSTYPE ${dev} | grep "iso9660"
          #- fakeraid isw devices
-         #  $(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member")
+         #  ${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member"
          #- fakeraid ddf devices
-         #  $(${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member")
-         if ! [[ "$(${_LSBLK} TYPE ${dev} | grep "dmraid")" || "$(${_LSBLK} FSTYPE ${dev} | grep "iso9660")" || "$(${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member")" ]]; then
+         #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
+         if ! ${_LSBLK} TYPE "${dev}" | grep -q "dmraid" || ${_LSBLK} FSTYPE "${dev}" | grep -q "iso9660" || ${_LSBLK} FSTYPE "${dev}" | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" | grep -q "ddf_raid_member"; then
              echo "${dev}"
-             [[ "${1}" ]] && echo ${1}
+             [[ "${1}" ]] && echo "${1}"
          fi
      done
 }
