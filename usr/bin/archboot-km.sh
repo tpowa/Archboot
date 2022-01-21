@@ -44,16 +44,16 @@ dokeymap() {
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
-    DIALOG --menu "Select A Keymap" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap" 22 60 16 "${KEYMAPS}" 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
     fi
     keymap=$(cat ${ANSWER})
-    echo ${keymap} > /tmp/.keymap
+    echo "${keymap}" > /tmp/.keymap
     if [[ "${keymap}" ]]; then
         DIALOG --infobox "Loading keymap: ${keymap}" 0 0
-        localectl set-keymap ${keymap} || error_kmset 
+        localectl set-keymap "${keymap}" || error_kmset 
     fi
 S_NEXTITEM=2
 }
@@ -66,22 +66,22 @@ doconsolefont() {
         FONTS="${FONTS} ${i} -"
     done
     CANCEL=""
-    DIALOG --menu "Select A Console Font" 22 60 16 ${FONTS} 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "Select A Console Font" 22 60 16 "${FONTS}" 2>${ANSWER} || CANCEL=1
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="2"
         return 1
     fi
     font=$(cat ${ANSWER})
-    echo ${font} > /tmp/.font
+    echo "${font}" > /tmp/.font
     if [[ "${font}" ]]; then
         DIALOG --infobox "Loading font: ${font}" 0 0
         for i in $(seq 1 6); do
-            setfont ${BASEDIR}/consolefonts/${font} -C /dev/tty${i} > /dev/null 2>&1
+            setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/tty${i}" > /dev/null 2>&1
         done
         # set serial console if used too!
-        if [[ "$(tty | grep /dev/ttyS)" ]]; then
+        if tty | grep -q /dev/ttyS; then
             SERIAL="$(tty)"
-            setfont ${BASEDIR}/consolefonts/${font} -C /dev/${SERIAL} > /dev/null 2>&1
+            setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/${SERIAL}" > /dev/null 2>&1
         fi
     fi
 S_NEXTITEM=3
@@ -93,7 +93,7 @@ mainmenu() {
     else
         DEFAULT=""
     fi
-    DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
+    DIALOG "${DEFAULT}" --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
         "1" "Set Keymap" \
         "2" "Set Consolefont" \
