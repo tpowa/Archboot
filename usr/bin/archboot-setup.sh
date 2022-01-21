@@ -507,7 +507,7 @@ set_device_name_scheme() {
     fi
     
     NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
-    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
+    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 "${NAME_SCHEME_LEVELS}" 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -532,7 +532,7 @@ set_guid() {
 _getavaildisks()
 {
     for i in $(finddisks); do
-        ${_LSBLK} NAME,SIZE -d ${i}
+        ${_LSBLK} NAME,SIZE -d "${i}"
     done
 }
 
@@ -542,7 +542,7 @@ _getavaildisks()
 _getavailpartitions()
 {
     for i in $(findpartitions); do
-        ${_LSBLK} NAME,SIZE -d ${i}
+        ${_LSBLK} NAME,SIZE -d "${i}"
     done
 }
 
@@ -552,35 +552,35 @@ _umountall()
 {
     DIALOG --infobox "Disabling swapspace, unmounting already mounted disk devices..." 0 0
     swapoff -a >/dev/null 2>&1
-    for i in $(findmnt --list --submounts ${DESTDIR} -o TARGET -n | tac); do
-        umount $i
+    for i in $(findmnt --list --submounts "${DESTDIR}" -o TARGET -n | tac); do
+        umount "$i"
     done
 }
 
 # Disable all software raid devices
 _stopmd()
 {
-    if [[ "$(cat /proc/mdstat 2>/dev/null | grep ^md)" ]]; then
+    if grep -q ^md /proc/mdstat; then
         DISABLEMD=""
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
-            for i in $(cat /proc/mdstat 2>/dev/null | grep ^md | sed -e 's# :.*##g'); do
-                mdadm --manage --stop /dev/${i} > ${LOG}
+            for i in $(grep -q ^md /proc/mdstat | sed -e 's# :.*##g'); do
+                mdadm --manage --stop "/dev/${i}" > ${LOG}
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-                mdadm --zero-superblock ${i} > ${LOG}
+                mdadm --zero-superblock "${i}" > ${LOG}
             done
         fi
     fi
     DISABLEMDSB=""
-    if [[ "$(${_LSBLK} FSTYPE | grep "linux_raid_member")" ]]; then
+    if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
         if [[ "${DISABLEMDSB}" = "1" ]]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-                mdadm --zero-superblock ${i} > ${LOG}
+                mdadm --zero-superblock "${i}" > ${LOG}
             done
         fi
     fi
@@ -603,15 +603,15 @@ _stoplvm()
     if [[ "${DISABLELVM}" = "1" ]]; then
         DIALOG --infobox "Removing logical volumes ..." 0 0
         for i in ${LV_VOLUMES}; do
-            lvremove -f /dev/mapper/${i} 2>/dev/null> ${LOG}
+            lvremove -f "/dev/mapper/${i}" 2>/dev/null> ${LOG}
         done
         DIALOG --infobox "Removing logical groups ..." 0 0
         for i in ${LV_GROUPS}; do
-            vgremove -f ${i} 2>/dev/null > ${LOG}
+            vgremove -f "${i}" 2>/dev/null > ${LOG}
         done
         DIALOG --infobox "Removing physical volumes ..." 0 0
         for i in ${LV_PHYSICAL}; do
-            pvremove -f ${i} 2>/dev/null > ${LOG}
+            pvremove -f "${i}" 2>/dev/null > ${LOG}
         done
     fi
 }
@@ -633,9 +633,9 @@ _stopluks()
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${LUKSDEVICE}; do
             LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
-            cryptsetup remove ${i} > ${LOG}
+            cryptsetup remove "${i}" > ${LOG}
             # delete header from device
-            wipefs -a ${LUKS_REAL_DEVICE} >/dev/null 2>&1
+            wipefs -a "${LUKS_REAL_DEVICE}" >/dev/null 2>&1
         done
     fi
     
@@ -643,7 +643,7 @@ _stopluks()
     DETECTED_LUKS=""
 
     # detect not running luks devices
-    [[ "$(${_LSBLK} FSTYPE | grep "crypto_LUKS")" ]] && DETECTED_LUKS=1
+    ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
@@ -651,7 +651,7 @@ _stopluks()
         DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a ${i} >/dev/null 2>&1
+           wipefs -a "${i}" >/dev/null 2>&1
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
@@ -745,10 +745,10 @@ _raid()
         # check for devices
         # Remove all raid devices with children
         RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f1 | sort -u); do 
-                    echo $(${_LSBLK} NAME ${i}) _
+                    echo "$(${_LSBLK} NAME "${i}")" _
                     done)"
         PARTS="$(for i in $(findpartitions); do 
-                ! [[ "$(echo "${RAID_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                ! echo "${RAID_BLACKLIST}" | grep -qE "${i} _" && echo "${i}" _ 
                 done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
@@ -765,36 +765,36 @@ _raid()
                 DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>${ANSWER} || return 1
             fi
             RAIDDEVICE=$(cat ${ANSWER})
-            if [[ "$(cat /proc/mdstat 2>/dev/null | grep "^$(echo ${RAIDDEVICE} | sed -e 's#/dev/##g')")" ]]; then
+            if grep -q "^$(echo "${RAIDDEVICE}" | sed -e 's#/dev/##g')" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
-        DIALOG --menu "Select the raid level you want to use" 21 50 11 ${RAIDLEVELS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select the raid level you want to use" 21 50 11 "${RAIDLEVELS}" 2>${ANSWER} || return 1
         LEVEL=$(cat ${ANSWER})
         # raid5 and raid10 support parity parameter
         PARITY=""
         if [[ "${LEVEL}" = "raid5" || "${LEVEL}" = "raid6" || "${LEVEL}" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>${ANSWER} || return 1
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 "${PARITYLEVELS}" 2>${ANSWER} || return 1
             PARITY=$(cat ${ANSWER})
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
-        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.raid
         while [[ "${PART}" != "DONE" ]]; do
-            RAIDNUMBER=$((${RAIDNUMBER} + 1))
+            RAIDNUMBER=$((RAIDNUMBER + 1))
             # clean loop from used partition and options
-            PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
-            DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 "${PARTS}" "${MDEXTRA}" DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             SPARE=""
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && DIALOG --yesno --defaultno "Would you like to use ${PART} as spare device?" 0 0 && SPARE="1"
