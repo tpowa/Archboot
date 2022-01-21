@@ -3,7 +3,7 @@
 # install mktorrent from http://mktorrent.sourceforge.net/
 # check result on e.g. http://torrenteditor.com/
 
-if [ "${1}" = "" -o "${2}" = "" ]; then
+if [[ "${1}" = "" ]] || [[  "${2}" = "" ]]; then
 	echo "Usage: ${0} <version> <iso file>"
 	echo -e "\tversion:\te.g. 2009.05 or archboot/2009.05"
 	echo -e "\tiso file:\te.g. ./archlinux-2009.05-core-x86_64.iso"
@@ -26,5 +26,5 @@ mktorrent \
 	-a 'http://tracker.archlinux.org:6969/announce' \
         -a 'http://linuxtracker.org:2710/announce' \
 	-c "Arch Linux ${archver} (www.archlinux.org)" \
-	${httpmirrorlist} \
+	"${httpmirrorlist}" \
 	"${isofile}"
