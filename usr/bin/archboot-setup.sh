@@ -966,7 +966,7 @@ findvg()
 
 getavailablevg()
 {
-    for i in "$(vgs -o vg_name,vg_free --noheading --units m)"; do
+    for i in $(vgs -o vg_name,vg_free --noheading --units m); do
         if ! echo "${i}" | grep -q " 0m$"; then
             echo "${i}\n"
         fi
@@ -1014,15 +1014,11 @@ _createvg()
             echo "${PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create Volume Group like this?\n\n${VGDEVICE}\n\nPhysical Volumes:\n$(cat /tmp/.pvs | sed -e 's#$#\\n#g')" 0 0 && VGFINISH="DONE"
+        DIALOG --yesno "Would you like to create Volume Group like this?\n\n${VGDEVICE}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && VGFINISH="DONE"
     done
     DIALOG --infobox "Creating Volume Group ${VGDEVICE}..." 0 0
-    PV="$(echo -n $(cat /tmp/.pvs))"
-    vgcreate ${VGDEVICE} ${PV} >${LOG} 2>&1
-    if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${LOG} for details)." 0 0
-        return 1
-    fi
+    PV="$(echo -n "$(cat /tmp/.pvs)")"
+    vgcreate "${VGDEVICE}" "${PV}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${LOG} for details)." 0 0; return 1)
 }
 
 # Creates logical volume
@@ -1040,21 +1036,21 @@ _createlv()
         fi
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
-        DIALOG --menu "Select Volume Group" 21 50 13 ${LVS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select Volume Group" 21 50 13 "${LVS}" 2>${ANSWER} || return 1
         LV=$(cat ${ANSWER})
         # enter logical volume name
         LVDEVICE=""
         while [[ "${LVDEVICE}" = "" ]]; do
             DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>${ANSWER} || return 1
             LVDEVICE=$(cat ${ANSWER})
-            if [[ "$(lvs -o lv_name,vg_name --noheading 2>/dev/null | grep " $(echo ${LVDEVICE}) $(echo ${LV})"$)" ]]; then
+            if lvs -o lv_name,vg_name --noheading 2>/dev/null | grep -q " ${LVDEVICE} ${LV}$"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 LVDEVICE=""
             fi
         done
         while [[ "${LV_SIZE_SET}" = "" ]]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m ${LV})B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>${ANSWER} || return 1
                 LV_SIZE=$(cat ${ANSWER})
                 if [[ "${LV_SIZE}" = "" ]]; then
                     DIALOG --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && LV_ALL="1"
@@ -1088,9 +1084,9 @@ _createlv()
     done
     DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
-        lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >${LOG} 2>&1
+        lvcreate "${LV_EXTRA}" -l +100%FREE "${LV}" -n "${LVDEVICE}" >${LOG} 2>&1
     else
-        lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >${LOG} 2>&1
+        lvcreate "${LV_EXTRA}" -L "${LV_SIZE} ${LV}" -n "${LVDEVICE}" >${LOG} 2>&1
     fi
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
