@@ -5,7 +5,7 @@ _BUILDDIR="/home/tobias/Arch/iso/${_ARCH}"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _SERVER="pkgbuild.com"
-_HOME_DIR="/home/tpowa/"
+_SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
 _USER="tobias"
 _GROUP="users"
@@ -55,7 +55,7 @@ cd ..
 cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
 cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
 # copy files to server
-sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_HOME_DIR}"
+sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}"
 # move files on server, create symlink and remove 3 month old release
 sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_DIR}"/"${_ARCH}"/"${_DIRECTORY}"
