@@ -30,13 +30,13 @@ cp "${_PACMAN_CONF}".archboot "${_PACMAN_CONF}"
 cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
 cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
 # create release in "${_BUILDDIR}"
-cd "${_BUILDDIR}"
+cd "${_BUILDDIR}" || exit 1
 [[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
-archboot-"${_ARCH}"-release.sh "${_DIRECTORY}" || exit 1
+"archboot-${_ARCH}-release.sh" "${_DIRECTORY}" || exit 1
 # set user rights on files
 chown -R "${_USER}" "${_DIRECTORY}"
 chgrp -R "${_GROUP}" "${_DIRECTORY}"
-cd "${_DIRECTORY}"
+cd "${_DIRECTORY}" || exit 1
 # remove sha256sum
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
