@@ -87,7 +87,7 @@ chroot_umount()
 
 getfstype()
 {
-    "${_LSBLK}" FSTYPE "${1}"
+    ${_LSBLK} FSTYPE "${1}"
 }
 
 # getfsuuid()
@@ -99,7 +99,7 @@ getfstype()
 # returns:    nothing
 getfsuuid()
 {
-    "${_LSBLK}" UUID "${1}"
+    ${_LSBLK} UUID "${1}"
 }
 
 # parameters: device file
@@ -108,17 +108,17 @@ getfsuuid()
 # returns:    nothing
 getfslabel()
 {
-    "${_LSBLK}" LABEL "${1}"
+    ${_LSBLK} LABEL "${1}"
 }
 
 getpartuuid()
 {
-    "${_LSBLK}" PARTUUID "${1}"
+    ${_LSBLK} PARTUUID "${1}"
 }
 
 getpartlabel()
 {
-    "${_LSBLK}" PARTLABEL "${1}"
+    ${_LSBLK} PARTLABEL "${1}"
 }
 
 # list all net devices with mac adress
@@ -174,10 +174,10 @@ activate_luks()
     ACTIVATE_LUKS=""
     if [[ -e /usr/bin/cryptsetup ]]; then
         DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
-        if "${_LSBLK}" FSTYPE | grep -q "crypto_LUKS"; then
+        if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
             for PART in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
-                if ! "${_LSBLK}" TYPE "${PART}" | grep -q "crypt$"; then
+                if ! ${_LSBLK} TYPE "${PART}" | grep -q "crypt$"; then
                     RUN_LUKS=""
                     DIALOG --yesno "Setup detected luks encrypted device, do you want to activate ${PART} ?" 0 0 && RUN_LUKS="1"
                     [[ "${RUN_LUKS}" = "1" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
