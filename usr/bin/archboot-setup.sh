@@ -297,7 +297,7 @@ raid_devices() {
 partitionable_raid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep "_d.*$" | sort -u); do
         echo "${dev}"
-        [[ "${1}" ]] && echo ${1}
+        [[ "${1}" ]] && echo "${1}"
     done
 }
 
@@ -306,20 +306,20 @@ partitionable_raid_devices_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
-        #   ${_LSBLK} FSTYPE ${part} | grep "LVM2_member")
+        #   ${_LSBLK} FSTYPE ${part} | grep "LVM2_member"
         # - part of luks device
-        #   $(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")
+        #   ${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS"
         # - extended partition
-        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
+        #   sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$"
         # - extended partition (LBA)
-        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")")
+        #   sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$"
         # - part of isw fakeraid
-        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")
+        #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
-        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"  || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" || $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member") || "$(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")" ]]; then
+        #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
+        if ! ${_LSBLK} FSTYPE "${part}" | grep "LVM2_member" || ${_LSBLK} FSTYPE "${part}" | grep "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$" || ${_LSBLK} FSTYPE "${dev}" -s | grep "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s | grep "ddf_raid_member"; then
             echo "${part}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
@@ -328,20 +328,20 @@ partitionable_raid_devices_partitions() {
 dmraid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
     done
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "isw_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "ddf_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
