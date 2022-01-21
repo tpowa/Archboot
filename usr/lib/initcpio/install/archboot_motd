@@ -10,15 +10,15 @@ build ()
     echo "Consoles:" >> "${MOTD}"
     echo "  - Virtual consoles 1-6 are active." >> "${MOTD}"
     echo "  - To change virtual console use ALT + F(1-6)" >> "${MOTD}"
-if grep -q archboot_keymap "${HOOKS[@]}"; then
+if  echo "${HOOKS[@]}" | grep -q archboot_keymap ; then
     echo "Change keymap and console font:" >> "${MOTD}"
     echo "  - To change to a non-US keymap, type 'km' at the console." >> "${MOTD}"
 fi
-if grep -q archboot_tz "${HOOKS[@]}"; then
+if  echo "${HOOKS[@]}" | grep -q archboot_tz; then
     echo "Change time and date:" >> "${MOTD}"
     echo "  - To change your time and date, type 'tz' at the console." >> "${MOTD}"
 fi
-if grep -q archboot_installer "${HOOKS[@]}"; then
+if  echo "${HOOKS[@]}" | grep -q archboot_installer; then
     echo "Normal Setup:" >> "${MOTD}"
     echo "  - On first login setup is launched automatically." >> "${MOTD}"
     echo "  - Please run 'setup' again to install Arch Linux if you left setup." >> "${MOTD}"
