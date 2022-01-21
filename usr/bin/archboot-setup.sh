@@ -1455,7 +1455,7 @@ autoprepare() {
         parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) >${LOG}
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >${LOG}
         else
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >${LOG}
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
@@ -4359,7 +4359,7 @@ auto_hwdetect() {
     HWPARAMETER=""
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
-    HWKVER==
+    HWKVER=""
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on used keymap
