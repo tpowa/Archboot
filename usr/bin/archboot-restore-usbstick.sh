@@ -9,12 +9,12 @@ usage()
 {
     echo "Restoring an USB device to its original state (FAT32):"
     echo "usage: ${APPNAME} <device>"
-    exit $1
+    exit "$1"
 }
 
 ##################################################
 
-[[ -z "${1}" ]] && usage
+[[ -z "${1}" ]] && usage "$@"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
