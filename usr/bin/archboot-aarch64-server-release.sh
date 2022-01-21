@@ -16,8 +16,8 @@ _PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
 fi
 
 ### check for tpowa's build server

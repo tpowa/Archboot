@@ -9,14 +9,14 @@ _LINUX_FIRMWARE="linux-firmware"
 _DIR=""
 
 usage () {
-	echo "CREATE ARCHBOOT CONTAINER"
-	echo "-----------------------------"
-	echo "This will create an archboot container for an archboot image."
-	echo "Usage: ${_BASENAME} <directory> <options>"
-	echo " Options:"
-	echo "  -cc    Cleanup container eg. remove manpages, includes ..."
-	echo "  -cp    Cleanup container package cache"
-	exit 0
+    echo "CREATE ARCHBOOT CONTAINER"
+    echo "-----------------------------"
+    echo "This will create an archboot container for an archboot image."
+    echo "Usage: ${_BASENAME} <directory> <options>"
+    echo " Options:"
+    echo "  -cc    Cleanup container eg. remove manpages, includes ..."
+    echo "  -cp    Cleanup container package cache"
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
@@ -24,17 +24,17 @@ usage () {
 _DIR="$1"
 
 while [ $# -gt 0 ]; do
-	case ${1} in
-		-cc|--cc) _SAVE_RAM="1" ;;
-		-cp|--cp) _CLEANUP_CACHE="1" ;;
-        esac
-	shift
+    case ${1} in
+        -cc|--cc) _SAVE_RAM="1" ;;
+        -cp|--cp) _CLEANUP_CACHE="1" ;;
+    esac
+    shift
 done
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
 fi
 ### check for x86_64
 if ! [[ "$(uname -m)" == "x86_64" ]]; then

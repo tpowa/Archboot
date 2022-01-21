@@ -18,39 +18,39 @@ _SHIM="$(mktemp -d shim.XXX)"
 _SHIM32="$(mktemp -d shim32.XXX)"
 
 usage () {
-	echo "${_BASENAME}: usage"
-	echo "CREATE X86_64 USB/CD IMAGES"
-	echo "-----------------------------"
-	echo "PARAMETERS:"
-        echo "  -g                  Start generation of image."
-	echo "  -p=PRESET           Which preset should be used."
-	echo "                      /etc/archboot/presets locates the presets"
-	echo "                      default=x86_64"
-	echo "  -i=IMAGENAME        Your IMAGENAME."
-	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
-	echo "  -h                  This message."
-	exit 0
+    echo "${_BASENAME}: usage"
+    echo "CREATE X86_64 USB/CD IMAGES"
+    echo "-----------------------------"
+    echo "PARAMETERS:"
+    echo "  -g                  Start generation of image."
+    echo "  -p=PRESET           Which preset should be used."
+    echo "                      /etc/archboot/presets locates the presets"
+    echo "                      default=x86_64"
+    echo "  -i=IMAGENAME        Your IMAGENAME."
+    echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
+    echo "  -h                  This message."
+    exit 0
 }
 
 # change to english locale!
 export LANG="en_US"
 
 while [ $# -gt 0 ]; do
-	case ${1} in
-                -g|--g) _GENERATE="1" ;;
-                -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-h|--h|?) usage ;; 
-		*) usage ;;
-		esac
-	shift
+    case ${1} in
+        -g|--g) _GENERATE="1" ;;
+        -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -h|--h|?) usage ;; 
+        *) usage ;;
+        esac
+    shift
 done
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
 fi
 
 ### check for aarch64

@@ -16,18 +16,18 @@ _AARCH64="$(mktemp -d AARCH64.XXX)"
 _SHIM="$(mktemp -d shim.XXX)"
 
 usage () {
-	echo "${_BASENAME}: usage"
-	echo "CREATE AARCH64 USB/CD IMAGES"
-	echo "-----------------------------"
-	echo "PARAMETERS:"
-	echo "  -g                  Start generation of image."
-	echo "  -p=PRESET           Which preset should be used."
-	echo "                      /etc/archboot/presets locates the presets"
-	echo "                      default=aarch64"
-	echo "  -i=IMAGENAME        Your IMAGENAME."
-	echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
-	echo "  -h                  This message."
-	exit 0
+    echo "${_BASENAME}: usage"
+    echo "CREATE AARCH64 USB/CD IMAGES"
+    echo "-----------------------------"
+    echo "PARAMETERS:"
+    echo "  -g                  Start generation of image."
+    echo "  -p=PRESET           Which preset should be used."
+    echo "                      /etc/archboot/presets locates the presets"
+    echo "                      default=aarch64"
+    echo "  -i=IMAGENAME        Your IMAGENAME."
+    echo "  -r=RELEASENAME      Use RELEASENAME in boot message."
+    echo "  -h                  This message."
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
@@ -36,15 +36,15 @@ usage () {
 export LANG="en_US"
 
 while [ $# -gt 0 ]; do
-	case ${1} in
-		-g|--g) _GENERATE="1" ;;
-                -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-		-h|--h|?) usage ;; 
-		*) usage ;;
-		esac
-	shift
+    case ${1} in
+        -g|--g) _GENERATE="1" ;;
+        -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -h|--h|?) usage ;; 
+        *) usage ;;
+        esac
+    shift
 done
 
 ### check for root

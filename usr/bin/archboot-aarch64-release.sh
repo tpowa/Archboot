@@ -6,19 +6,19 @@ _PRESET_LATEST="aarch64-latest"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {
-	echo "CREATE ARCHBOOT RELEASE IMAGE"
-	echo "-----------------------------"
-	echo "Usage: ${_BASENAME} <directory>"
-	echo "This will create an archboot release image in <directory>."
-	exit 0
+    echo "CREATE ARCHBOOT RELEASE IMAGE"
+    echo "-----------------------------"
+    echo "Usage: ${_BASENAME} <directory>"
+    echo "This will create an archboot release image in <directory>."
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
 fi
 echo "Start release creation in $1 ..."
 mkdir -p $1

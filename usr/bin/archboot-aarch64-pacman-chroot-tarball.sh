@@ -7,11 +7,11 @@ LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _PACMAN_CHROOT="pacman-aarch64-chroot"
 
 usage () {
-	echo "CREATE ARCHBOOT CONTAINER"
-	echo "-----------------------------"
-	echo "This will create an aarch64 pacman chroot tarball on x86_64"
-	echo "Usage: ${_BASENAME} <directory> <options>"
-	exit 0
+    echo "CREATE ARCHBOOT CONTAINER"
+    echo "-----------------------------"
+    echo "This will create an aarch64 pacman chroot tarball on x86_64"
+    echo "Usage: ${_BASENAME} <directory> <options>"
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
@@ -19,21 +19,21 @@ usage () {
 _DIR="$1"
 
 while [ $# -gt 0 ]; do
-	case ${1} in
-		-cc|--cc) _SAVE_RAM="1" ;;
-        esac
-	shift
+    case ${1} in
+        -cc|--cc) _SAVE_RAM="1" ;;
+    esac
+    shift
 done
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then
-	echo "ERROR: Please run as root user!"
-	exit 1
+    echo "ERROR: Please run as root user!"
+    exit 1
 fi
 
 if ! [[ "$(uname -m)" == "x86_64" ]]; then
-	echo "ERROR: Please run on x86_64 hardware."
-	exit 1
+    echo "ERROR: Please run on x86_64 hardware."
+    exit 1
 fi
 
 echo "Starting container creation ..."

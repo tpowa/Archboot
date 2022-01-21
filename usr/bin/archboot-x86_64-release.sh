@@ -6,11 +6,11 @@ _PRESET_LATEST="x86_64-latest"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {
-	echo "CREATE ARCHBOOT RELEASE IMAGE"
-	echo "-----------------------------"
-	echo "Usage: ${_BASENAME} <directory>"
-	echo "This will create an archboot release image in <directory>."
-	exit 0
+    echo "CREATE ARCHBOOT RELEASE IMAGE"
+    echo "-----------------------------"
+    echo "Usage: ${_BASENAME} <directory>"
+    echo "This will create an archboot release image in <directory>."
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
