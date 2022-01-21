@@ -279,16 +279,16 @@ raid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep -v "_d.*$" | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
         # - part of luks device
-        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
         # - part of isw fakeraid
-        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")
+        #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
-        #   $(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")
-        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")" || "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")" || "$(${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member")" || "$(${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member")" ]]; then
+        #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" | grep "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s | grep "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s | grep "ddf_raid_member"; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
