@@ -28,7 +28,7 @@ INTEL_UCODE="intel-ucode.img"
 AMD_UCODE="amd-ucode.img"
 
 # abstract the common pacman args
-PACMAN="pacman --root "${DESTDIR}" --cachedir="${DESTDIR}"/var/cache/pacman/pkg --noconfirm --noprogressbar"
+PACMAN="pacman --root ${DESTDIR} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 # downloader
 DLPROG="wget"
 # sources
@@ -43,10 +43,8 @@ ROOTFS=""
 # install stages
 S_SRC=0         # choose mirror
 S_NET=0         # network configuration
-S_PART=0        # partitioning
 S_MKFS=0        # formatting
 S_MKFSAUTO=0    # auto fs part/formatting
-S_INSTALL=0     # package installation
 S_CONFIG=0      # configuration editing
 
 # menu item tracker- autoselect the next item
@@ -89,7 +87,7 @@ chroot_umount()
 
 getfstype()
 {
-    echo "$(${_LSBLK} FSTYPE ${1})"
+    "${_LSBLK}" FSTYPE "${1}"
 }
 
 # getfsuuid()
@@ -101,7 +99,7 @@ getfstype()
 # returns:    nothing
 getfsuuid()
 {
-    echo "$(${_LSBLK} UUID ${1})"
+    "${_LSBLK}" UUID "${1}"
 }
 
 # parameters: device file
@@ -110,17 +108,17 @@ getfsuuid()
 # returns:    nothing
 getfslabel()
 {
-    echo "$(${_LSBLK} LABEL ${1})"
+    "${_LSBLK}" LABEL "${1}"
 }
 
 getpartuuid()
 {
-    echo "$(${_LSBLK} PARTUUID ${1})"
+    "${_LSBLK}" PARTUUID "${1}"
 }
 
 getpartlabel()
 {
-    echo "$(${_LSBLK} PARTLABEL ${1})"
+    "${_LSBLK}" PARTLABEL "${1}"
 }
 
 # list all net devices with mac adress
@@ -154,7 +152,7 @@ activate_lvm2()
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
         LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
-        [[ "${OLD_LVM2_GROUPS}" = "${LVM2_GROUPS}" && "${OLD_LVM2_GROUPS}" = "${LVM2_GROUPS}" ]] && ACTIVATE_LVM2="no"
+        [[ "${OLD_LVM2_GROUPS}" = "${LVM2_GROUPS}" && "${OLD_LVM2_VOLUMES}" = "${LVM2_VOLUMES}" ]] && ACTIVATE_LVM2="no"
     fi
 }
 
@@ -483,7 +481,7 @@ mapdev() {
         fi
     fi
     for  dev in ${devs}; do
-        if [[ "(" = $(echo ${dev} | cut -b1) ]]; then
+        if [[ "\(" = $(echo ${dev} | cut -b1) ]]; then
             grubdevice="${dev}"
         else
             if [[ "${dev}" = "${linuxdevice}" ]]; then
@@ -825,7 +823,7 @@ _raid()
         if [[ "${LEVEL}" = "raid5" || "${LEVEL}" = "raid6" || "${LEVEL}" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>${ANSWER} || return 1
-            PARTIY=$(cat ${ANSWER})
+            PARITY=$(cat ${ANSWER})
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
@@ -1781,7 +1779,6 @@ partition() {
     # update dmraid
     _dmraid_update
     NEXTITEM="4"
-    S_PART=1
 }
 
 # scan and update btrfs devices
@@ -1838,14 +1835,12 @@ find_btrfs_subvolume() {
 }
 
 find_btrfs_bootloader_subvolume() {
-    BTRFS_SUBVOLUME_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE ${bootdev})" = "btrfs" ]]; then
         BTRFS_SUBVOLUMES=""
         PART="${bootdev}"
         mount_btrfs
         for i in $(btrfs subvolume list ${BTRFSMP} | cut -d " " -f 7); do
             BTRFS_SUBVOLUMES="${BTRFS_SUBVOLUMES}#${i}"
-            BTRFS_SUBVOLUME_COUNT=$((${BTRFS_COUNT}+1))
         done
         umount_btrfs
     fi
@@ -2674,7 +2669,6 @@ install_packages() {
     DIALOG --infobox "Package installation will begin in 3 seconds. You can watch the output in the progress window. Please be patient." 0 0
     sleep 3
     run_pacman
-    S_INSTALL=1
     NEXTITEM="6"
     chroot_mount
     # automagic time!
@@ -2792,7 +2786,6 @@ donetwork() {
     while [[ "${NETPARAMETERS}" = "" ]]; do
         # select network interface
         INTERFACE=
-        S_DHCP=
         ifaces=$(net_interfaces)
         while [[ "${INTERFACE}" = "" ]]; do
             DIALOG --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>${ANSWER}
@@ -2841,7 +2834,7 @@ donetwork() {
             IP="dhcp"
             DIALOG --defaultno --yesno "Do you want to use dhclient instead of dhcpcd?" 5 55
             [[ $? -eq 0 ]] && DHCLIENT="yes"
-            S_DHCP=1
+
         else
             IP="static"
             DIALOG --inputbox "Enter your IP address and netmask" 7 40 "192.168.1.23/24" 2>${ANSWER} || return 1
@@ -3354,9 +3347,6 @@ CONFEOF
     _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
     
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
-    UEFISYS_PART_FS_LABEL="$(getfslabel "${_uefisysdev}")"
-    UEFISYS_PART_GPT_GUID="$(getpartuuid "${_uefisysdev}")"
-    UEFISYS_PART_GPT_LABEL="$(getpartlabel "${_uefisysdev}")"
     
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -3392,8 +3382,6 @@ do_efistub_uefi() {
     do_uefi_common
     
     bootdev=""
-    grubdev=""
-    complexuuid=""
     FAIL_COMPLEX=""
     USE_DMRAID=""
     RAID_ON_LVM=""
@@ -3587,8 +3575,6 @@ do_grub_common_before() {
     ## - Encryption is not recommended for grub(2) /boot!
     
     bootdev=""
-    grubdev=""
-    complexuuid=""
     FAIL_COMPLEX=""
     USE_DMRAID=""
     RAID_ON_LVM=""
@@ -3624,11 +3610,8 @@ do_grub_config() {
     ########
     
     ROOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/" 2>/dev/null)"
-    ROOT_PART_FS_LABEL="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/" 2>/dev/null)"
     ROOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/" 2>/dev/null)"
     ROOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/" 2>/dev/null)"
-    
-    ROOT_PART_DEVICE="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="device" "/" 2>/dev/null)"
     
     ########
     
@@ -3641,13 +3624,6 @@ do_grub_config() {
     if [[ "${GRUB_UEFI}" == "1" ]]; then
         UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
         UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-    fi
-    
-    ########
-    
-    if [[ "$(${_BLKID} -p -i  -o value -s PART_ENTRY_SCHEME ${ROOT_PART_DEVICE})" == 'gpt' ]]; then
-        ROOT_PART_GPT_GUID="$(${_LSBLK} PARTUUID ${ROOT_PART_DEVICE})"
-        ROOT_PART_GPT_LABEL="$(${_LSBLK} PARTLABEL ${ROOT_PART_DEVICE})"
     fi
     
     ########
@@ -3936,8 +3912,6 @@ fi
     
     unset ROOT_PART_FS_UUID
     unset ROOT_PART_FS
-    unset ROOT_PART_FS_LABEL
-    unset ROOT_PART_DEVICE
     
     unset GRUB_ROOT_DRIVE
     unset LINUX_UNMOD_COMMAND
@@ -3965,8 +3939,6 @@ do_grub_bios() {
         fi
         
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
-            grubdev=$(basename ${bootdev})
-            complexuuid=$(getfsuuid ${bootdev})
             # check if mapper is used
             if  [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
                 RAID_ON_LVM="0"
@@ -3991,9 +3963,6 @@ do_grub_bios() {
             if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
                 USE_RAID="1"
             fi
-        else
-            # use normal device
-            grubdev=$(mapdev ${bootdev})
         fi
     fi
     
@@ -4064,9 +4033,7 @@ do_grub_bios() {
         DIALOG --msgbox "GRUB(2) BIOS has been successfully installed." 0 0
         
         GRUB_PREFIX_DIR="/boot/grub/"
-        GRUB_BIOS="1"
         do_grub_config
-        GRUB_BIOS=""
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -4471,7 +4438,7 @@ auto_hwdetect() {
             fi
         fi
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
-        read HWKER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+        read HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
         HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
         HWDETECTHOOKS="$(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
