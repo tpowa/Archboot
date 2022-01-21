@@ -3,7 +3,7 @@
 _PWD="$(pwd)"
 _BASENAME="$(basename "${0}")"
 _DIR=""
-LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+_LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _PACMAN_CHROOT="pacman-aarch64-chroot"
 
 usage () {
@@ -40,7 +40,7 @@ echo "Starting container creation ..."
 echo "Create directory ${_DIR} ..."
 mkdir -p "${_DIR}"/"${_PACMAN_CHROOT}"
 echo "Downloading archlinuxarm aarch64..."
-! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget ${_LATEST_ARM64} >/dev/null 2>&1
+! [[ -f ArchLinuxARM-aarch64-latest.tar.gz ]] && wget "${_LATEST_ARM64}" >/dev/null 2>&1
 bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${_DIR}"
 echo "Removing installation tarball ..."
 rm ArchLinuxARM-aarch64-latest.tar.gz
