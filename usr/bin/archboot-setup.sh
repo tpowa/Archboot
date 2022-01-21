@@ -828,27 +828,24 @@ _createraid()
     SPARE_DEVICES="$(wc -l /tmp/.raid-spare)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=${LEVEL}"
-    [[ "$(echo ${RAIDDEVICE} | grep /md_d[0-9])" ]] && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
+    echo "${RAIDDEVICE}" | grep -q "/md_d[0-9]" && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
     ! [[ "${RAID_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --raid-devices=${RAID_DEVICES}"
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
     ! [[ "${PARITY}" = "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
     DIALOG --infobox "Creating ${RAIDDEVICE}..." 0 0
-    mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >${LOG} 2>&1
-    if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0
-        return 1
-    fi
-    if [[ "$(echo ${RAIDDEVICE} | grep /md_d[0-9])" ]]; then
+    mdadm --create "${RAIDDEVICE}" "${RAIDOPTIONS}" "${DEVICES}" >${LOG} 2>&1 || \
+    (DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0; return 1)
+    if echo "${RAIDDEVICE}" | grep -q "/md_d[0-9"]; then
         # switch for mbr usage
         set_guid
         if [[ "${GUIDPARAMETER}" = "" ]]; then
             DIALOG --msgbox "Now you'll be put into the parted program where you can partition your raiddevice to your needs." 18 70
-            parted -a optimal -s ${RAIDDEVICE} mktable msdos
+            parted -a optimal -s "${RAIDDEVICE}" mktable msdos
             clear
-            parted ${RAIDDEVICE} print
-            parted ${RAIDDEVICE}
+            parted "${RAIDDEVICE}" print
+            parted "${RAIDDEVICE}"
         else
-            DISC=${RAIDDEVICE}
+            DISC="${RAIDDEVICE}"
             RUN_CFDISK="1"
             CHECK_BIOS_BOOT_GRUB=""
             CHECK_UEFISYS_PART=""
@@ -888,10 +885,10 @@ _createpv()
         : >/tmp/.pvs-create
         # Remove all lvm devices with children
         LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do 
-                    echo $(${_LSBLK} NAME ${i}) _
+                    echo "$(${_LSBLK} NAME "${i}")" _
                     done)"
         PARTS="$(for i in $(findpartitions); do 
-                ! [[ "$(echo "${LVM_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                ! echo "${LVM_BLACKLIST}" | grep -E "${i} _" && echo "${i}" _ 
                 done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
@@ -902,29 +899,25 @@ _createpv()
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         DEVNUMBER=1
-        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.pvs-create
         while [[ "${PART}" != "DONE" ]]; do
-            DEVNUMBER=$((${DEVNUMBER} + 1))
+            DEVNUMBER="$((DEVNUMBER + 1))"
             # clean loop from used partition and options
-            PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g")"
+            PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
             # add more devices
-            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 "${PARTS}" DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             [[ "${PART}" = "DONE" ]] && break
             echo "${PART}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create physical volume on devices below?\n$(cat /tmp/.pvs-create | sed -e 's#$#\\n#g')" 0 0 && PVFINISH="DONE"
+        DIALOG --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && PVFINISH="DONE"
     done
     DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
-    PART="$(echo -n $(cat /tmp/.pvs-create))"
-    pvcreate ${PART} >${LOG} 2>&1
-    if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0
-        return 1
-    fi
+    PART="$(echo -n "$(cat /tmp/.pvs-create)")"
+    pvcreate "${PART}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1)
     # run udevadm to get values exported
     udevadm trigger
     udevadm settle
@@ -939,9 +932,9 @@ findpv()
          # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
          #- not part of volume group
          # $(pvs -o vg_name --noheading ${i} | grep " $")
-         if [[ ! "$(${_LSBLK} TYPE ${i} | grep "lvm")" && $(pvs -o vg_name --noheading ${i} | grep " $") ]]; then
+         if ! ${_LSBLK} TYPE "${i}" | grep -q "lvm" && pvs -o vg_name --noheading "${i}" | grep -q " $"; then
              echo "${i}"
-             [[ "${1}" ]] && echo ${1}
+             [[ "${1}" ]] && echo "${1}"
          fi
     done
 }
@@ -949,14 +942,14 @@ findpv()
 getavailablepv()
 {
     for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
-         # exclude checks:
-         #-  not part of running lvm2
-         # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
-         #- not part of volume group
-         # $(pvs -o vg_name --noheading ${i} | grep " $")
-         if [[ ! "$(${_LSBLK} TYPE ${i} | grep "lvm")" && $(pvs -o vg_name --noheading ${i} | grep " $") ]]; then
-             echo "$(${_LSBLK} NAME,SIZE ${i})"
-         fi
+        # exclude checks:
+        #-  not part of running lvm2
+        # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
+        #- not part of volume group
+        # $(pvs -o vg_name --noheading ${i} | grep " $")
+        if ! ${_LSBLK} TYPE "${i}" | grep "lvm" && pvs -o vg_name --noheading "${i}" | grep -q " $"; then
+            ${_LSBLK} NAME,SIZE "${i}"
+        fi
     done
 }
 
@@ -964,9 +957,9 @@ getavailablepv()
 findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
-        if ! [[ "$(vgs -o vg_free --noheading --units m ${dev} | grep " 0m$")" ]]; then
+        if ! vgs -o vg_free --noheading --units m "${dev}" | grep -q " 0m$"; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
@@ -974,7 +967,7 @@ findvg()
 getavailablevg()
 {
     for i in "$(vgs -o vg_name,vg_free --noheading --units m)"; do
-        if ! [[ "$(echo ${i} | grep " 0m$")" ]]; then
+        if ! echo "${i}" | grep -q " 0m$"; then
             echo "${i}\n"
         fi
     done
@@ -998,7 +991,7 @@ _createvg()
         while [[ "${VGDEVICE}" = "" ]]; do
             DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 15 65 "foogroup" 2>${ANSWER} || return 1
             VGDEVICE=$(cat ${ANSWER})
-            if [[ "$(vgs -o vg_name --noheading 2>/dev/null | grep "^  $(echo ${VGDEVICE})")" ]]; then
+            if vgs -o vg_name --noheading 2>/dev/null | grep -q "^  ${VGDEVICE}"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 VGDEVICE=""
             fi
@@ -1007,15 +1000,15 @@ _createvg()
         DIALOG --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         PVNUMBER=1
-        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 "${PVS}" 2>${ANSWER} || return 1
         PV=$(cat ${ANSWER})
         echo "${PV}" >>/tmp/.pvs
         while [[ "${PVS}" != "DONE" ]]; do
-            PVNUMBER=$((${PVNUMBER} + 1))
+            PVNUMBER=$((PVNUMBER + 1))
             # clean loop from used partition and options
-            PVS="$(echo ${PVS} | sed -e "s#${PV}\ _##g")"
+            PVS="$(echo "${PVS}" | sed -e "s#${PV}\ _##g")"
             # add more devices
-            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 "${PVS}" DONE _ 2>${ANSWER} || return 1
             PV=$(cat ${ANSWER})
             [[ "${PV}" = "DONE" ]] && break
             echo "${PV}" >>/tmp/.pvs
