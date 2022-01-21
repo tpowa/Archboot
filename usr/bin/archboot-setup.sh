@@ -1084,13 +1084,9 @@ _createlv()
     done
     DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
-        lvcreate "${LV_EXTRA}" -l +100%FREE "${LV}" -n "${LVDEVICE}" >${LOG} 2>&1
+        lvcreate "${LV_EXTRA}" -l +100%FREE "${LV}" -n "${LVDEVICE}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     else
-        lvcreate "${LV_EXTRA}" -L "${LV_SIZE} ${LV}" -n "${LVDEVICE}" >${LOG} 2>&1
-    fi
-    if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
-        return 1
+        lvcreate "${LV_EXTRA}" -L "${LV_SIZE} ${LV}" -n "${LVDEVICE}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     fi
 }
 
@@ -1100,7 +1096,7 @@ _enter_luks_name() {
     while [[ "${LUKSDEVICE}" = "" ]]; do
         DIALOG --inputbox "Enter the name for luks encrypted device ${PART}:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>${ANSWER} || return 1
         LUKSDEVICE=$(cat ${ANSWER})
-        if ! [[ "$(cryptsetup status ${LUKSDEVICE} | grep inactive)" ]]; then
+        if ! cryptsetup status "${LUKSDEVICE}" | grep -q inactive; then
             DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
             LUKSDEVICE=""
         fi
@@ -1117,8 +1113,8 @@ _enter_luks_passphrase () {
         LUKSPASS2=$(cat ${ANSWER})
         if [[ -n "${LUKSPASS}" && -n "${LUKSPASS2}" && "${LUKSPASS}" = "${LUKSPASS2}" ]]; then
             LUKSPASSPHRASE=${LUKSPASS}
-            echo ${LUKSPASSPHRASE} > /tmp/passphrase-${LUKSDEVICE}
-            LUKSPASSPHRASE=/tmp/passphrase-${LUKSDEVICE}
+            echo "${LUKSPASSPHRASE}" > "/tmp/passphrase-${LUKSDEVICE}"
+            LUKSPASSPHRASE="/tmp/passphrase-${LUKSDEVICE}"
         else
              DIALOG --msgbox "Passphrases didn't match or was empty, please enter again." 0 0
         fi
@@ -1130,14 +1126,14 @@ _opening_luks() {
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     luksOpen_success="0"
     while [[ "${luksOpen_success}" = "0" ]]; do
-        cryptsetup luksOpen ${PART} ${LUKSDEVICE} >${LOG} <${LUKSPASSPHRASE} && luksOpen_success=1
+        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" >${LOG} <${LUKSPASSPHRASE} && luksOpen_success=1
         if [[ "${luksOpen_success}" = "0" ]]; then
             DIALOG --msgbox "Error: Passphrases didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi
     done
     DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/$(basename ${LUKSPASSPHRASE})?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
-    echo ${LUKSDEVICE} ${PART} /etc/$(basename ${LUKSPASSPHRASE}) >> /tmp/.crypttab
+    echo "${LUKSDEVICE}" "${PART}" "/etc/$(basename ${LUKSPASSPHRASE})" >> /tmp/.crypttab
 }
 
 # help for luks
@@ -1172,10 +1168,10 @@ _luks()
         activate_special_devices
         # Remove all crypt devices with children
         CRYPT_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do 
-                    echo $(${_LSBLK} NAME ${i}) _
+                    ${_LSBLK} NAME "${i}" _
                     done)"
         PARTS="$(for i in $(findpartitions); do 
-                ! [[ "$(echo "${CRYPT_BLACKLIST}" | egrep "${i} _")" ]] && echo $i _ 
+                ! echo "${CRYPT_BLACKLIST}" | grep -Eq "${i} _" && echo "${i}" _ 
                 done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
@@ -1184,7 +1180,7 @@ _luks()
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
-        DIALOG --menu "Select device for luks encryption" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
+        DIALOG --menu "Select device for luks encryption" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         # enter luks name
         _enter_luks_name
@@ -1195,7 +1191,7 @@ _luks()
     done
     _enter_luks_passphrase || return 1
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup luksFormat ${PART} >${LOG} <${LUKSPASSPHRASE}
+    cryptsetup luksFormat "${PART}" >${LOG} <${LUKSPASSPHRASE}
     _opening_luks
 }
 
@@ -1211,9 +1207,9 @@ autoprepare() {
     set_guid
     : >/tmp/.device-names
     DISCS=$(blockdevices)
-    if [[ "$(echo ${DISCS} | wc -w)" -gt 1 ]]; then
+    if [[ "$(echo "${DISCS}" | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the storage drive to use" 14 55 7 "$(blockdevices _)" 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
         DISC="${DISCS}"
@@ -1234,7 +1230,7 @@ autoprepare() {
     ROOT_PART_SET=""
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
-    DISC_SIZE="$(($(${_LSBLK} SIZE -d -b ${DISC})/1000000))"
+    DISC_SIZE="$(($(${_LSBLK} SIZE -d -b "${DISC}")/1000000))"
     if [[ "${DISC_SIZE}" = "" ]]; then
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
@@ -1268,7 +1264,7 @@ autoprepare() {
             GPT_BIOS_GRUB_PART_SIZE="${GUID_PART_SIZE}"
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
-            DISC_SIZE="$((${DISC_SIZE}-${GUID_PART_SIZE}))"
+            DISC_SIZE="$((DISC_SIZE-GUID_PART_SIZE))"
         fi
         
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
@@ -1284,7 +1280,7 @@ autoprepare() {
                         else
                             BOOT_PART_SET=1
                             UEFISYS_PART_SET=1
-                            _PART_NUM="$((${_PART_NUM}+1))"
+                            _PART_NUM="$((_PART_NUM+1))"
                             _UEFISYS_PART_NUM="${_PART_NUM}"
                         fi
                     fi
@@ -1300,13 +1296,13 @@ autoprepare() {
                             DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
                             UEFISYS_PART_SET=1
-                            _PART_NUM="$((${_PART_NUM}+1))"
+                            _PART_NUM="$((_PART_NUM+1))"
                             _UEFISYS_PART_NUM="${_PART_NUM}"
                         fi
                     fi
                 done
             fi
-            DISC_SIZE="$((${DISC_SIZE}-${UEFISYS_PART_SIZE}))"
+            DISC_SIZE="$((DISC_SIZE-UEFISYS_PART_SIZE))"
             
             while [[ "${BOOT_PART_SET}" = "" ]]; do
                 DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>${ANSWER} || return 1
@@ -1314,13 +1310,13 @@ autoprepare() {
                 if [[ "${BOOT_PART_SIZE}" = "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
                         DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         BOOT_PART_SET=1
-                        _PART_NUM="$((${_UEFISYS_PART_NUM}+1))"
+                        _PART_NUM="$((_UEFISYS_PART_NUM+1))"
                         _BOOT_PART_NUM="${_PART_NUM}"
-                        DISC_SIZE="$((${DISC_SIZE}-${BOOT_PART_SIZE}))"
+                        DISC_SIZE="$((DISC_SIZE-BOOT_PART_SIZE))"
                     fi
                 fi
             done
@@ -1332,13 +1328,13 @@ autoprepare() {
                 if [[ "${BOOT_PART_SIZE}" = "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${SBOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
                         DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                          BOOT_PART_SET=1
                         _PART_NUM="1"
                         _BOOT_PART_NUM="${_PART_NUM}"
-                        DISC_SIZE="$((${DISC_SIZE}-${BOOT_PART_SIZE}))"
+                        DISC_SIZE="$((DISC_SIZE-BOOT_PART_SIZE))"
                     fi
                 fi
             done
@@ -1356,20 +1352,20 @@ autoprepare() {
                     DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     SWAP_PART_SET=1
-                    _PART_NUM="$((${_PART_NUM}+1))"
+                    _PART_NUM="$((_PART_NUM+1))"
                     _SWAP_PART_NUM="${_PART_NUM}"
                 fi
             fi
         done
         
         while [[ "${CHOSEN_FS}" = "" ]]; do
-            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>${ANSWER} || return 1
+            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 "${FSOPTS}" 2>${ANSWER} || return 1
             FSTYPE=$(cat ${ANSWER})
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
         # / and /home are subvolumes on btrfs
         if ! [[ "${FSTYPE}" = "btrfs" ]]; then
-            DISC_SIZE="$((${DISC_SIZE}-${SWAP_PART_SIZE}))"
+            DISC_SIZE="$((DISC_SIZE-SWAP_PART_SIZE))"
             ROOT_SIZE="7500"
             [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
             while [[ "${ROOT_PART_SET}" = "" ]]; do
@@ -1381,15 +1377,15 @@ autoprepare() {
                     if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
-                        DIALOG --yesno "$((${DISC_SIZE}-${ROOT_PART_SIZE})) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
+                        DIALOG --yesno "$((DISC_SIZE-ROOT_PART_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && ROOT_PART_SET=1
                     fi
                 fi
             done
         fi
-        _PART_NUM="$((${_PART_NUM}+1))"
+        _PART_NUM="$((_PART_NUM+1))"
         _ROOT_PART_NUM="${_PART_NUM}"
         if ! [[ "${FSTYPE}" = "btrfs" ]]; then            
-            _PART_NUM="$((${_PART_NUM}+1))"
+            _PART_NUM="$((_PART_NUM+1))"
         fi
         _HOME_PART_NUM="${_PART_NUM}"
         DEFAULTFS=1
@@ -1421,48 +1417,48 @@ autoprepare() {
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partition table to avoid issues!
-        sgdisk --zap ${DEVICE} &>/dev/null
+        sgdisk --zap "${DEVICE}" &>/dev/null
         # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-        dd if=/dev/zero of=${DEVICE} bs=512 count=2048 &>/dev/null
-        wipefs -a ${DEVICE} &>/dev/null
+        dd if=/dev/zero of="${DEVICE}" bs=512 count=2048 &>/dev/null
+        wipefs -a "${DEVICE}" &>/dev/null
         # create fresh GPT
-        sgdisk --clear ${DEVICE} &>/dev/null
+        sgdisk --clear "${DEVICE}" &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new=${_GPT_BIOS_GRUB_PART_NUM}:0:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=${_GPT_BIOS_GRUB_PART_NUM}:EF02 --change-name=${_GPT_BIOS_GRUB_PART_NUM}:BIOS_GRUB ${DEVICE} > ${LOG}
-        sgdisk --set-alignment="2048" --new=${_UEFISYS_PART_NUM}:0:+${UEFISYS_PART_SIZE}M --typecode=${_UEFISYS_PART_NUM}:EF00 --change-name=${_UEFISYS_PART_NUM}:UEFI_SYSTEM ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_GPT_BIOS_GRUB_PART_NUM}:0:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=${_GPT_BIOS_GRUB_PART_NUM}:EF02 --change-name=${_GPT_BIOS_GRUB_PART_NUM}:BIOS_GRUB "${DEVICE}" > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_UEFISYS_PART_NUM}:0:+"${UEFISYS_PART_SIZE}"M --typecode=${_UEFISYS_PART_NUM}:EF00 --change-name=${_UEFISYS_PART_NUM}:UEFI_SYSTEM "${DEVICE}" > ${LOG}
         
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
-            sgdisk --attributes=${_UEFISYS_PART_NUM}:set:2 ${DEVICE} > ${LOG}
+            sgdisk --attributes=${_UEFISYS_PART_NUM}:set:2 "${DEVICE}" > ${LOG}
         else
-            sgdisk --set-alignment="2048" --new=${_BOOT_PART_NUM}:0:+${BOOT_PART_SIZE}M --typecode=${_BOOT_PART_NUM}:8300 --attributes=${_BOOT_PART_NUM}:set:2 --change-name=${_BOOT_PART_NUM}:ARCHLINUX_BOOT ${DEVICE} > ${LOG}
+            sgdisk --set-alignment="2048" --new=${_BOOT_PART_NUM}:0:+"${BOOT_PART_SIZE}"M --typecode=${_BOOT_PART_NUM}:8300 --attributes=${_BOOT_PART_NUM}:set:2 --change-name=${_BOOT_PART_NUM}:ARCHLINUX_BOOT "${DEVICE}" > ${LOG}
         fi
         
-        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:0:+${SWAP_PART_SIZE}M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP ${DEVICE} > ${LOG}
+        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:0:+"${SWAP_PART_SIZE}"M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP "${DEVICE}" > ${LOG}
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:0 --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
+            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:0 --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT "${DEVICE}" > ${LOG}
         else
-            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:+${ROOT_PART_SIZE}M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT ${DEVICE} > ${LOG}
-            sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:0:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME ${DEVICE} > ${LOG}
+            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:+"${ROOT_PART_SIZE}"M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT "${DEVICE}" > ${LOG}
+            sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:0:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME "${DEVICE}" > ${LOG}
         fi
-        sgdisk --print ${DEVICE} > ${LOG}
+        sgdisk --print "${DEVICE}" > ${LOG}
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
         printk off
         DIALOG --infobox "Partitioning ${DEVICE}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
-        wipefs -a ${DEVICE} &>/dev/null
+        dd if=/dev/zero of="${DEVICE}" bs=512 count=2048 >/dev/null 2>&1
+        wipefs -a "${DEVICE}" &>/dev/null
         # create DOS MBR with parted
-        parted -a optimal -s ${DEVICE} unit MiB mktable msdos >/dev/null 2>&1
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary 1 $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB set 1 boot on >${LOG}
-        parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) >${LOG}
+        parted -a optimal -s "${DEVICE}" unit MiB mktable msdos >/dev/null 2>&1
+        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary 1 $((GUID_PART_SIZE+BOOT_PART_SIZE)) >${LOG}
+        parted -a optimal -s "${DEVICE}" unit MiB set 1 boot on >${LOG}
+        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) >${LOG}
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
         else
-            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE})) $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) >${LOG}
-            parted -a optimal -s ${DEVICE} unit MiB mkpart primary $((${GUID_PART_SIZE}+${BOOT_PART_SIZE}+${SWAP_PART_SIZE}+${ROOT_PART_SIZE})) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >${LOG}
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
         fi
     fi
     if [[ $? -gt 0 ]]; then
