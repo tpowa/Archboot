@@ -352,32 +352,32 @@ dmraid_partitions() {
     for part in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
         # exclude checks:
         # - part of lvm2 device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
         # - part of luks device
-        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
         # - part of raid device
-        #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
         # - extended partition
-        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")
+        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$"
         # - extended partition (LBA)
-        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
-        if ! [[ "$(${_LSBLK} FSTYPE ${part} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${part} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${part} | grep "linux_raid_member$")" || "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$")"|| "$(sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")" ]]; then
+        #   sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
+        if ! ${_LSBLK} FSTYPE "${part}" | grep "crypto_LUKS$" || ${_LSBLK} FSTYPE "${part}" | grep "LVM2_member$" || ${_LSBLK} FSTYPE "${part}" | grep "linux_raid_member$" || sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$"|| sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$"; then
             echo "${part}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " md$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "isw_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE ${i} | grep " md$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if [[ "$(${_LSBLK} NAME,FSTYPE -s | grep "ddf_raid_member$" | cut -d' ' -f 1)" ]]; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
@@ -390,49 +390,49 @@ dm_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
         # - part of luks device
-        #   $(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
         # - part of raid device
-        #   $(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")
+        #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
         # - part of running raid on encrypted device
-        #   $(${_LSBLK} TYPE ${dev} | grep "raid.*$
-        if ! [[ "$(${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "LVM2_member$")" || "$(${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$")" || "$(${_LSBLK} TYPE ${dev} | grep "raid.*$")" ]]; then
+        #   ${_LSBLK} TYPE ${dev} | grep "raid.*$
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep "crypto_LUKS$" || ${_LSBLK} FSTYPE "${dev}" | grep "LVM2_member$" || ${_LSBLK} FSTYPE "${dev}" | grep "linux_raid_member$" || ${_LSBLK} TYPE "${dev}" | grep "raid.*$"; then
             echo "${dev}"
-            [[ "${1}" ]] && echo ${1}
+            [[ "${1}" ]] && echo "${1}"
         fi
     done
 }
 
 finddisks() {
-    blockdevices ${1}
-    dmraid_devices ${1}
-    partitionable_raid_devices ${1}
+    blockdevices "${1}"
+    dmraid_devices "${1}"
+    partitionable_raid_devices "${1}"
 }
 
 findpartitions() {
-    blockdevices_partitions ${1}
-    dm_devices ${1}
-    dmraid_partitions ${1}
-    raid_devices ${1}
-    partitionable_raid_devices_partitions ${1}
+    blockdevices_partitions "${1}"
+    dm_devices "${1}"
+    dmraid_partitions "${1}"
+    raid_devices "${1}"
+    partitionable_raid_devices_partitions "${1}"
 }
 
 # don't check on raid devices!
 findbootloaderdisks() {
     if ! [[ "${USE_DMRAID}" = "1" ]]; then
-        blockdevices ${1}
+        blockdevices "${1}"
     else
-        dmraid_devices ${1}
+        dmraid_devices "${1}"
     fi
 }
 
 # don't list raid devices, lvm2 and devicemapper!
 findbootloaderpartitions() {
     if ! [[ "${USE_DMRAID}" = "1" ]]; then
-        blockdevices_partitions ${1}
+        blockdevices_partitions "${1}"
     else
-        dmraid_partitions ${1}
+        dmraid_partitions "${1}"
     fi
 }
 
@@ -440,7 +440,7 @@ findbootloaderpartitions() {
 find_gpt() {
     GUID_DETECTED=""
     for i in $(finddisks); do
-        [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${i})" == "gpt" ]] && GUID_DETECTED="1"
+        [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${i}")" == "gpt" ]] && GUID_DETECTED="1"
     done
 }
 
@@ -448,59 +448,14 @@ find_gpt() {
 freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
-        if [[ "$(cat /proc/mounts | grep "${DESTDIR}/boot " | grep " xfs ")" ]]; then
+        if grep -q "${DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
             xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
             xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
         fi
-        if [[ "$(cat /proc/mounts | grep "${DESTDIR} " | grep " xfs ")" ]]; then
+        if grep -q "${DESTDIR} " /proc/mounts | grep -q " xfs "; then
             xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
             xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
         fi
-    fi
-}
-
-mapdev() {
-    partition_flag=0
-    device_found=0
-    # check if we use sd or vd device
-    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
-        linuxdevice=$(echo ${1} | sed -e 's#p[0-9].*$##')
-    else
-        linuxdevice=$(echo ${1} | sed -e 's#[0-9].*$##g')
-    fi
-    if ! [[ "$(echo ${1} | grep /dev/sd)" || "$(echo ${1} | grep /dev/vd)" ]]; then
-        if [[ "$(echo ${1} | egrep 'p[0-9].*$')" ]]; then
-            pnum=$(echo ${1} | sed -e 's#.*p##g')
-            partition_flag=1
-        fi
-    else
-        if [[ "$(echo ${1} | egrep '[0-9]$')" ]]; then
-            # /dev/sdX and /dev/vdX
-            pnum=$(echo ${1} | cut -b9-)
-            partition_flag=1
-        fi
-    fi
-    for  dev in ${devs}; do
-        if [[ "\(" = $(echo ${dev} | cut -b1) ]]; then
-            grubdevice="${dev}"
-        else
-            if [[ "${dev}" = "${linuxdevice}" ]]; then
-                device_found=1
-                break
-            fi
-        fi
-    done
-    if [[ "${device_found}" = "1" ]]; then
-        if [[ "${partition_flag}" = "0" ]]; then
-            echo "${grubdevice}"
-        else
-            grubdevice_stringlen=${#grubdevice}
-            grubdevice_stringlen=$((${grubdevice_stringlen} - 1))
-            grubdevice=$(echo ${grubdevice} | cut -b1-${grubdevice_stringlen})
-            echo "${grubdevice},${pnum})"
-        fi
-    else
-        echo "DEVICE NOT FOUND"
     fi
 }
 
