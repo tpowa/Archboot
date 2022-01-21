@@ -3,20 +3,13 @@
 
 build ()
 {
-    apps="lvmdump lvmconfig vgimportclone fsadm"
+    apps="lvmdump lvmconfig vgimportclone fsadm vgcfgbackup vgcfgrestore vgchange \
+          vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes \
+          vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay \
+          pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay \
+          lvextend lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs lvscan"
     for i in $apps; do
         add_binary "$i"
-    done
-symlinks="/usr/bin/vgcfgbackup /usr/bin/vgcfgrestore /usr/bin/vgchange \
-          /usr/bin/vgck /usr/bin/vgconvert /usr/bin/vgcreate /usr/bin/vgdisplay /usr/bin/vgexport /usr/bin/vgextend /usr/bin/vgimport \
-	  /usr/bin/vgmerge /usr/bin/vgmknodes /usr/bin/vgreduce /usr/bin/vgremove /usr/bin/vgrename /usr/bin/vgs /usr/bin/vgscan \
-	  /usr/bin/vgsplit /usr/bin/pvchange /usr/bin/pvck /usr/bin/pvcreate /usr/bin/pvdisplay /usr/bin/pvmove /usr/bin/pvremove \
-	  /usr/bin/pvresize /usr/bin/pvs /usr/bin/pvscan /usr/bin/lvchange /usr/bin/lvconvert /usr/bin/lvcreate /usr/bin/lvdisplay \
-	  /usr/bin/lvextend /usr/bin/lvmdiskscan /usr/bin/lvmsadc /usr/bin/lvmsar /usr/bin/lvreduce /usr/bin/lvremove \
-	  /usr/bin/lvrename /usr/bin/lvresize /usr/bin/lvs /usr/bin/lvscan"
-    for i in $symlinks; do
-        add_binary "$(which $(readlink "$i"))"
-        add_symlink "$i" "$(which $(readlink "$i"))"
     done
     add_dir "/etc/lvm/backup/"
     add_dir "/etc/lvm/archive/"

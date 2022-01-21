@@ -23,32 +23,22 @@ build ()
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt hexdump \
           ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei \
           prlimit rename renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
-          uuidgen whereis write addpart delpart \
-          ldattach partx readprofile rtcwake uuidd sysctl pgrep pkill pmap pwdx slabtop tload \
-          vmstat watch file eject keyctl request-key kmod zsh hostname tac sulogin \
-          resizepart lslocks wdctl zless zgrep fold od ldd pidof shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff"
+          uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
+          sysctl pgrep pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
+          kmod zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd pidof \
+          shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff depmod awk halt \
+          shutdown reboot poweroff insmod linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep \
+          lzgrep lzegrep lzfgrep lzgrep lzless lzmore lzma modinfo modprobe nc reset rmmod \
+          unlzma unxz xzcat lastb sh"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        apps="$apps i386"
+    fi
     for i in $apps; do
         add_binary "$i"
     done
     appfiles="/usr/lib/libkmod.so /usr/bin/gunzip /usr/bin/zcat"
     for i in $appfiles; do
         add_file "$i"
-    done
-    symlinks="/usr/bin/depmod /usr/bin/awk /usr/bin/halt /usr/bin/shutdown /usr/bin/reboot \
-              /usr/bin/poweroff /usr/bin/insmod /usr/bin/linux32 /usr/bin/linux64 \
-              /usr/bin/lsmod /usr/bin/lzcat /usr/bin/lzcmp /usr/bin/lzdiff /usr/bin/lzegrep /usr/bin/lzfgrep \
-              /usr/bin/lzgrep /usr/bin/lzegrep /usr/bin/lzfgrep /usr/bin/lzgrep /usr/bin/lzless /usr/bin/lzmore \
-              /usr/bin/lzma /usr/bin/modinfo /usr/bin/modprobe /usr/bin/nc /usr/bin/reset /usr/bin/rmmod \
-              /usr/bin/unlzma /usr/bin/unxz /usr/bin/xzcat /usr/bin/lastb /usr/bin/sh"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        symlinks="$symlinks /usr/bin/i386"
-    fi
-    for i in $symlinks; do
-        # echo "Checking $i"
-        # if [ -e $i ]; then
-            add_binary "$(which "$(readlink "$i")")"
-            add_symlink "$i" "$(which "$(readlink "$i")")"
-        # fi
     done
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
@@ -109,17 +99,9 @@ build ()
     ### add shadow
     apps="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg"
+          newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
     for i in $apps; do
         add_binary "$i"
-    done
-    symlinks="/usr/bin/vigr"
-    for i in $symlinks; do
-        # echo "Checking $i"
-        # if [ -e $i ]; then
-            add_binary "$(which "$(readlink "$i")")"
-            add_symlink "$i" "$(which "$(readlink "$i")")"
-        # fi
     done
     add_file "/etc/login.defs"
     
@@ -212,18 +194,9 @@ build ()
 
     ### add pacman
     apps="pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
-          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg"
+          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg repo-remove"
     for i in $apps; do
         add_binary "$i"
-    done
-
-    symlinks="/usr/bin/repo-remove"
-    for i in $symlinks; do
-        # echo "Checking $i"
-        # if [ -e $i ]; then
-            add_binary "$(which "$(readlink "$i")")"
-            add_symlink "$i" "$(which "$(readlink "$i")")"
-        # fi
     done
     add_dir "/var/cache/pacman/pkg"
     add_dir "/var/lib/pacman"

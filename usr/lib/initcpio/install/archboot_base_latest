@@ -14,22 +14,13 @@ build ()
     
     apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
-          find wc nano wget uname bsdtar yes" 
+          find wc nano wget uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh" 
     for i in $apps; do
         add_binary "$i"
     done
     appfiles="/usr/lib/libkmod.so"
     for i in $appfiles; do
         add_file "$i"
-    done
-    symlinks="/usr/bin/awk /usr/bin/halt /usr/bin/shutdown /usr/bin/reboot \
-              /usr/bin/poweroff /usr/bin/insmod /usr/bin/modprobe /usr/bin/sh"
-    for i in $symlinks; do
-        # echo "Checking $i"
-        # if [ -e $i ]; then
-            add_binary "$(which "$(readlink "$i")")"
-            add_symlink "$i" "$(which "$(readlink "$i")")"
-        # fi
     done
 
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
@@ -169,18 +160,9 @@ build ()
 
     ### add pacman
     apps="pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
-          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg"
+          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg repo-remove"
     for i in $apps; do
         add_binary "$i"
-    done
-
-    symlinks="/usr/bin/repo-remove"
-    for i in $symlinks; do
-        # echo "Checking $i"
-        # if [ -e $i ]; then
-            add_binary "$(which "$(readlink "$i")")"
-            add_symlink "$i" "$(which "$(readlink "$i")")"
-        # fi
     done
     add_dir "/var/cache/pacman/pkg"
     add_dir "/var/lib/pacman"

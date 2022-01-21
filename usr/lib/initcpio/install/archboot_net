@@ -8,18 +8,13 @@ build ()
 	  slattach traceroute arping clockdiff rarpd rdisc tracepath route \
 	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon ss \
 	  tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma ss tipc vdpa \
-	  ip ping ethtool elinks"
+	  ip ping ethtool elinks ctstat rtstat"
     for i in $apps; do
         add_binary "$i"
     done
     appfiles="/usr/bin/routel /usr/bin/dhcpcd /usr/bin/brctl"
     for i in $appfiles; do
         add_file "$i"
-    done
-    symlinks="/usr/bin/ctstat /usr/bin/rtstat"
-    for i in $symlinks; do
-        add_binary "$(which $(readlink "$i"))"
-        add_symlink "$i" "$(which $(readlink "$i"))"
     done
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
