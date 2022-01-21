@@ -21,8 +21,8 @@ if ! [[ ${UID} -eq 0 ]]; then
     exit 1
 fi
 echo "Start release creation in $1 ..."
-mkdir -p $1
-cd $1
+mkdir -p "$1"
+cd "$1" || exit 1
 # create container
 archboot-aarch64-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
@@ -35,7 +35,7 @@ systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm
 # generate latest tarball in container
 echo "Generate latest ISO ..."
 # generate latest iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -p="${_PRESET_LATEST}" -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
 echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
@@ -56,7 +56,7 @@ rm -r "${_W_DIR}"
 echo "Create boot directory ..."
 mkdir -p boot/licenses/amd-ucode
 for i in *.iso; do
-    if [[ ! "$(echo $i | grep latest)" ]]; then
+    if ! grep -q latest "$i"; then
         isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img 2>&1
         isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img > boot/initramfs_archboot_aarch64.img 2>&1
         isoinfo -R -i "${i}" -x /boot/vmlinuz_aarch64 > boot/vmlinuz_archboot_aarch64 2>&1
