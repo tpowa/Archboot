@@ -57,8 +57,8 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/setup ]] && wget -q "$_INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
     [[ -e /usr/bin/km ]] && wget -q "$_INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
     [[ -e /usr/bin/tz ]] && wget -q "$_INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O /usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-release.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O /usr/bin/archboot-${_RUNNING_ARCH}-release.sh >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-release.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0
@@ -74,26 +74,26 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     rm -r /usr/share/{efitools,file,grub,hwdata,kbd,licenses,makepkg,nmap,openvpn,pacman,refind,tc,usb_modeswitch,vim,zoneinfo,zsh} >/dev/tty7 2>&1
     # create container without package cache
     if [[ "${_L_COMPLETE}" == "1" ]]; then
-        echo "Step 2/6: Generating archboot container in "${_W_DIR}" ..."
+        echo "Step 2/6: Generating archboot container in ${_W_DIR} ..."
         echo "          This will need some time ..."
-        archboot-${_RUNNING_ARCH}-create-container.sh "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then 
-        echo "Step 2/6: Generating archboot container in "${_W_DIR}" ..."
+        echo "Step 2/6: Generating archboot container in ${_W_DIR} ..."
         echo "          This will need some time ..."
-        archboot-${_RUNNING_ARCH}-create-container.sh "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
     fi
     
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
-    echo "Step 3/6: Generating initramfs in "${_W_DIR}" ..."
+    echo "Step 3/6: Generating initramfs in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
     cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
-    echo "Step 4/6: Moving initramfs files from "${_W_DIR}" to / ..."
+    echo "Step 4/6: Moving initramfs files from ${_W_DIR} to / ..."
     mv "${_W_DIR}"/initrd.img / || exit 1
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
         mv "${_W_DIR}"/boot/vmlinuz-linux / || exit 1
@@ -121,8 +121,8 @@ fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
-    echo "Step 1/1: Generating new iso files now in "${_W_DIR}" ..."
+    echo "Step 1/1: Generating new iso files now in ${_W_DIR} ..."
     echo "          This will need some time ..."
-    archboot-${_RUNNING_ARCH}-release.sh "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
-    echo "Finished: New isofiles are located in "${_W_DIR}""
+    "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
+    echo "Finished: New isofiles are located in ${_W_DIR}"
 fi
