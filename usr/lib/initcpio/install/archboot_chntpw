@@ -5,7 +5,7 @@ build ()
 {
     apps="chntpw reged cpnt"
     for i in $apps; do
-        add_binary $i
+        add_binary "$i"
     done
 }
 

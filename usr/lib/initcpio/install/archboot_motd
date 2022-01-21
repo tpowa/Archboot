@@ -5,29 +5,29 @@ build ()
 {
     ### generate motd
     MOTD=$(mktemp /var/tmp/motd.XXXX)
-    echo "Welcome to Arch Linux (archboot environment)" >> ${MOTD}
-    echo "--------------------------------------------" >> ${MOTD}
-    echo "Consoles:" >> ${MOTD}
-    echo "  - Virtual consoles 1-6 are active." >> ${MOTD}
-    echo "  - To change virtual console use ALT + F(1-6)" >> ${MOTD}
-if [ "$(echo "${HOOKS[@]}" | grep archboot_keymap)" ]; then
-    echo "Change keymap and console font:" >> ${MOTD}
-    echo "  - To change to a non-US keymap, type 'km' at the console." >> ${MOTD}
+    echo "Welcome to Arch Linux (archboot environment)" >> "${MOTD}"
+    echo "--------------------------------------------" >> "${MOTD}"
+    echo "Consoles:" >> "${MOTD}"
+    echo "  - Virtual consoles 1-6 are active." >> "${MOTD}"
+    echo "  - To change virtual console use ALT + F(1-6)" >> "${MOTD}"
+if grep -q archboot_keymap "${HOOKS[@]}"; then
+    echo "Change keymap and console font:" >> "${MOTD}"
+    echo "  - To change to a non-US keymap, type 'km' at the console." >> "${MOTD}"
 fi
-if [ "$(echo "${HOOKS[@]}" | grep archboot_tz)" ]; then
-    echo "Change time and date:" >> ${MOTD}
-    echo "  - To change your time and date, type 'tz' at the console." >> ${MOTD}
+if grep -q archboot_tz "${HOOKS[@]}"; then
+    echo "Change time and date:" >> "${MOTD}"
+    echo "  - To change your time and date, type 'tz' at the console." >> "${MOTD}"
 fi
-if [ "$(echo "${HOOKS[@]}" | grep archboot_installer)" ]; then
-    echo "Normal Setup:" >> ${MOTD}
-    echo "  - On first login setup is launched automatically." >> ${MOTD}
-    echo "  - Please run 'setup' again to install Arch Linux if you left setup." >> ${MOTD}
-    echo "  - vc7 is used for setup logging." >> ${MOTD}
-    echo "  - Run update-installer.sh to get update options of installer." >> ${MOTD}
-    echo "For Experts:" >> ${MOTD}
-    echo "  - Use 'quickinst' to install and bypass the setup routine." >> ${MOTD}
+if grep -q archboot_installer "${HOOKS[@]}"; then
+    echo "Normal Setup:" >> "${MOTD}"
+    echo "  - On first login setup is launched automatically." >> "${MOTD}"
+    echo "  - Please run 'setup' again to install Arch Linux if you left setup." >> "${MOTD}"
+    echo "  - vc7 is used for setup logging." >> "${MOTD}"
+    echo "  - Run update-installer.sh to get update options of installer." >> "${MOTD}"
+    echo "For Experts:" >> "${MOTD}"
+    echo "  - Use 'quickinst' to install and bypass the setup routine." >> "${MOTD}"
 fi
-    chmod 644 ${MOTD}
+    chmod 644 "${MOTD}"
     add_file "${MOTD}" "/etc/motd"
 }
 

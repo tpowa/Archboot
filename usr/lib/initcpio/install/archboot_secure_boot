@@ -13,8 +13,8 @@ build ()
     done
     # add mkkeys.sh
     MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
-    curl -s -L -o ${MKKEYS} https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
-    chmod 755 ${MKKEYS}
+    curl -s -L -o "${MKKEYS}" https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh 
+    chmod 755 "${MKKEYS}"
     add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
     # add python3 files for script
     add_full_dir /usr/lib/python3.10/encodings
@@ -33,10 +33,10 @@ build ()
        PYTHON_DYN="select.cpython-310-aarch64-linux-gnu math.cpython-310-aarch64-linux-gnu _random.cpython-310-aarch64-linux-gnu \
                   _sha512.cpython-310-aarch64-linux-gnu _posixsubprocess.cpython-310-aarch64-linux-gnu"
     fi  
-    for i in $(echo $PYTHON_FILES); do
+    for i in ${PYTHON_FILES}; do
         add_file "/usr/lib/python3.10/$i.py"
     done
-    for i in $(echo $PYTHON_DYN); do
+    for i in ${PYTHON_DYN}; do
         add_file "/usr/lib/python3.10/lib-dynload/$i.so"
     done
     # add efitools files
@@ -52,7 +52,7 @@ build ()
         _SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
         SHIM=$(mktemp -d /var/tmp/shim.XXXX)
         curl -s --create-dirs -L -O --output-dir "${SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
-        bsdtar -C ${SHIM} -xf "${SHIM}"/"${_SHIM_VERSION}"
+        bsdtar -C "${SHIM}" -xf "${SHIM}"/"${_SHIM_VERSION}"
         add_file "${SHIM}/boot/efi/EFI/fedora/mmx64.efi" "/usr/share/archboot/fedora-shim/mmx64.efi"
         add_file "${SHIM}/boot/efi/EFI/fedora/shimx64.efi" "/usr/share/archboot/fedora-shim/shimx64.efi"
         SHIM32=$(mktemp -d /var/tmp/shim32.XXXX)
@@ -66,7 +66,7 @@ build ()
         _SHIM_AA64_VERSION="shim-aa64-15.4-5.aarch64.rpm"
         SHIMAA64=$(mktemp -d /var/tmp/shimaa64.XXXX)
         curl -s --create-dirs -L -O --output-dir "${SHIMAA64}" "${_SHIM_AA64_URL}/${_SHIM_AA64_VERSION}"
-        bsdtar -C ${SHIMAA64} -xf "${SHIMAA64}"/"${_SHIM_AA64_VERSION}"
+        bsdtar -C "${SHIMAA64}" -xf "${SHIMAA64}"/"${_SHIM_AA64_VERSION}"
         add_file "${SHIMAA64}/boot/efi/EFI/fedora/mmaa64.efi" "/usr/share/archboot/fedora-shim/mmaa64.efi"
         add_file "${SHIMAA64}/boot/efi/EFI/fedora/shimaa64.efi" "/usr/share/archboot/fedora-shim/shimaa64.efi"
     fi
