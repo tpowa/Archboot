@@ -819,13 +819,13 @@ _raid()
 # create raid device
 _createraid()
 {
-    DEVICES="$(echo -n $(cat /tmp/.raid))"
-    SPARES="$(echo -n $(cat /tmp/.raid-spare))"
+    DEVICES="$(echo -n "$(cat /tmp/.raid)")"
+    SPARES="$(echo -n "$(cat /tmp/.raid-spare)")"
     # combine both if spares are available, spares at the end!
     [[ -n ${SPARES} ]] && DEVICES="${DEVICES} ${SPARES}"
     # get number of devices
-    RAID_DEVICES="$(cat /tmp/.raid | wc -l)"
-    SPARE_DEVICES="$(cat /tmp/.raid-spare | wc -l)"
+    RAID_DEVICES="$(wc -l /tmp/.raid)"
+    SPARE_DEVICES="$(wc -l /tmp/.raid-spare)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=${LEVEL}"
     [[ "$(echo ${RAIDDEVICE} | grep /md_d[0-9])" ]] && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
