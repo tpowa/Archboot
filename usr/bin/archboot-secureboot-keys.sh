@@ -23,7 +23,7 @@ _DIR="$2"
 
 while [ $# -gt 0 ]; do
 	case ${1} in
-		-name=*|--name=*) NAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+		-name=*|--name=*) NAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
 		-h|--h|?) usage ;; 
         esac
 	shift
@@ -41,20 +41,20 @@ if ! [[ ${UID} -eq 0 ]]; then
 	exit 1
 fi
 
-if [[ ! -z "${_DIR}" ]]; then
-    [[ ! -d $_DIR ]] && mkdir -p $_DIR
-    cd $_DIR
+if [[ -n "${_DIR}" ]]; then
+    [[ ! -d "${_DIR}" ]] && mkdir -p "${_DIR}"
+    cd "${_DIR}" || exit 1
     echo "Backup old keys in $_DIR/BACKUP ..."
     [[ ! -d "BACKUP" ]] && mkdir BACKUP
     efi-readvar -v PK -o BACKUP/old_PK.esl
     efi-readvar -v KEK -o BACKUP/old_KEK.esl
     efi-readvar -v db -o BACKUP/old_db.esl
     efi-readvar -v dbx -o BACKUP/old_dbx.esl
-    cd BACKUP; mokutil --export; cd ..
+    cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in $_DIR"
     # add mkkeys.sh
     if [[ ! -f /usr/bin/mkkeys.sh ]]; then
-        curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
+        curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh || exit 1
         chmod 755 mkkeys.sh
         ./mkkeys.sh <<EOF 
 ${NAME} 
@@ -75,17 +75,17 @@ EOF
     openssl x509 -in MOK.crt -out MOK.cer -outform DER
     DIRS="DB KEK MOK PK noPK"
     for i in $DIRS; do
-        [[ ! -d "$i" ]] && mkdir $i
-        mv $i.* $i
+        [[ ! -d "$i" ]] && mkdir "$i"
+        mv "$i.*" "$i"
     done
     mv DB db
     [[ ! -d "GUID" ]] && mkdir GUID
     [[ ! -d "MS" ]] && mkdir MS
     mv myGUID.txt GUID
-    mv *.crt *.auth *.esl MS
+    mv ./*.crt ./*.auth ./*.esl MS
     cd ..
-    chmod 700 $_DIR
-    echo "Finished: Keys created in $_DIR"
+    chmod 700 "${_DIR}"
+    echo "Finished: Keys created in ${_DIR}"
 else
     echo "ERROR: no directory specified"
     usage
