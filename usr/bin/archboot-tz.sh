@@ -48,7 +48,7 @@ if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
     echo UTC > /tmp/.hardwareclock
 else
     timedatectl set-local-rtc 1
-    DATE_PROGRAM=date
+    DATE_PROGRAM="$(date)"
     # for setup script
     echo LOCAL > /tmp/.hardwareclock
 fi
@@ -61,12 +61,12 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
     for i in $(timedatectl --no-pager list-timezones); do
         ZONES="${ZONES} ${i} -"
     done
-    DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
+    DIALOG --menu "Please Select A Timezone:" 22 60 16 "${ZONES}" 2>${ANSWER} && SET_ZONE="1"
     zone=$(cat ${ANSWER})
     if [[ "${SET_ZONE}" = "1" ]]; then
         DIALOG --infobox "Setting Timezone to ${zone} ..." 0 0
-        echo ${zone} > /tmp/.timezone
-        timedatectl set-timezone ${zone}
+        echo "${zone}" > /tmp/.timezone
+        timedatectl set-timezone "${zone}"
         S_NEXTITEM="2"
     else
         S_NEXTITEM="1"
@@ -109,16 +109,16 @@ if [[ "${SET_TIME}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
         fi
-        local _date="$(cat ${ANSWER})"
+        _date="$(cat ${ANSWER})"
         dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${ANSWER} || CANCEL="1"
         if [[ "${CANCEL}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
         fi
-        local _time="$(cat ${ANSWER})"
+        _time="$(cat ${ANSWER})"
         # save the time
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
-        local _datetime="$(echo "${_date}" "${_time}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
+        _datetime="$(echo "${_date}" "${_time}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_datetime}"
         DIALOG --cr-wrap --msgbox "Your current time is now:\n$(${DATE_PROGRAM})" 0 0
     fi
@@ -132,7 +132,7 @@ mainmenu() {
     else
         DEFAULT=""
     fi
-    DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
+    DIALOG "${DEFAULT}" --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
         "1" "Select Timezone" \
         "2" "Set Time and Date" \
