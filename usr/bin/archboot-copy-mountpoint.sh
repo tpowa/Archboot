@@ -14,7 +14,7 @@ usage()
     echo "  for each additional mountpoint eg. /boot or /home."
     echo ""
     echo "usage: ${APPNAME} <oldmountpoint> <newmountpoint>"
-    exit $1
+    exit "$1"
 }
 
 ##################################################
@@ -26,4 +26,4 @@ fi
 NEWMOUNTPOINT="${2}"
 OLDMOUNTPOINT="${1}"
 
-tar -C $OLDMOUNTPOINT -clpf - . | tar -C $NEWMOUNTPOINT -vxlspf - 
+tar -C "$OLDMOUNTPOINT" -clpf - . | tar -C "$NEWMOUNTPOINT" -vxlspf - 
