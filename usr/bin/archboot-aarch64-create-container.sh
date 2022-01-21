@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _PWD="$(pwd)"
 _BASENAME="$(basename "${0}")"
-_CACHEDIR=""$1"/var/cache/pacman/pkg"
+_CACHEDIR="$1/var/cache/pacman/pkg"
 _CLEANUP_CACHE=""
 _SAVE_RAM=""
 _LINUX_FIRMWARE="linux-firmware"
@@ -52,19 +52,19 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     [[ -e "${_DIR}/dev" ]] || mkdir -m 755 "${_DIR}/dev"
     # mount special filesystems to ${_DIR}
     echo "Mount special filesystems in ${_DIR} ..."
-    mount proc ""${_DIR}"/proc" -t proc -o nosuid,noexec,nodev
-    mount sys ""${_DIR}"/sys" -t sysfs -o nosuid,noexec,nodev,ro
-    mount udev ""${_DIR}"/dev" -t devtmpfs -o mode=0755,nosuid
-    mount devpts ""${_DIR}"/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
-    mount shm ""${_DIR}"/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
+    mount proc "${_DIR}/proc" -t proc -o nosuid,noexec,nodev
+    mount sys "${_DIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
+    mount udev "${_DIR}/dev" -t devtmpfs -o mode=0755,nosuid
+    mount devpts "${_DIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
+    mount shm "${_DIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     # install archboot
     echo "Installing packages base firmware and archboot to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy base archboot-arm "${_LINUX_FIRMWARE}" --noconfirm --ignore systemd-resolvconf --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
     # umount special filesystems
     echo "Umount special filesystems in to ${_DIR} ..."
-    umount -R ""${_DIR}"/proc"
-    umount -R ""${_DIR}"/sys"
-    umount -R ""${_DIR}"/dev"
+    umount -R "${_DIR}/proc"
+    umount -R "${_DIR}/sys"
+    umount -R "${_DIR}/dev"
     # generate locales
     echo "Create locales in container ..."
     systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
