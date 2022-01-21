@@ -38,9 +38,9 @@ export LANG="en_US"
 while [ $# -gt 0 ]; do
     case ${1} in
         -g|--g) _GENERATE="1" ;;
-        -p=*|--p=*) _PRESET="$(echo ${1} | awk -F= '{print $2;}')" ;;
-        -i=*|--i=*) _IMAGENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
-        -r=*|--r=*) _RELEASENAME="$(echo ${1} | awk -F= '{print $2;}')" ;;
+        -p=*|--p=*) _PRESET="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+        -i=*|--i=*) _IMAGENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+        -r=*|--r=*) _RELEASENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
         -h|--h|?) usage ;; 
         *) usage ;;
         esac
@@ -108,7 +108,7 @@ _prepare_fedora_shim_bootloaders () {
 
 _prepare_uefi_image() {
     ## get size of boot x86_64 files
-    BOOTSIZE=$(du -bc ${_AARCH64}/EFI | grep total | cut -f1)
+    BOOTSIZE=$(du -bc "${_AARCH64}"/EFI | grep total | cut -f1)
     IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors	
     ## Create cdefiboot.img
     dd if=/dev/zero of="${_AARCH64}"/efi.img bs="${IMGSZ}" count=1024
@@ -147,7 +147,7 @@ grub-mkrescue --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IM
 ## create sha256sums.txt
 echo "Generating sha256sum ..."
 rm -f "sha256sums.txt" || true
-cksum -a sha256 *.iso > "sha256sums.txt"
+cksum -a sha256 ./*.iso > "sha256sums.txt"
 
 # cleanup
 echo "Cleanup remove ${_AARCH64} and ${_SHIM} ..."
