@@ -26,7 +26,7 @@ if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
     exit 1
 fi
 # update aarch64 pacman chroot
-cd "${_PACMAN_AARCH__BUILDDIR}"
+cd "${_PACMAN_AARCH__BUILDDIR}" || exit 1
 mkdir "${_PACMAN_AARCH64}"
 echo "Downloading archlinuxarm pacman aarch64 chroot..."
 [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
@@ -60,13 +60,13 @@ chown "${_USER}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 chgrp "${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR}
 # create release in "${_BUILDDIR}"
-cd "${_BUILDDIR}"
+cd "${_BUILDDIR}" || exit 1
 [[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
 archboot-"${_ARCH}"-release.sh "${_DIRECTORY}" || exit 1
 # set user rights on files
 chown -R "${_USER}" "${_DIRECTORY}"
 chgrp -R "${_GROUP}" "${_DIRECTORY}"
-cd "${_DIRECTORY}"
+cd "${_DIRECTORY}" || exit 1
 # remove sha256sum and install image
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
