@@ -128,7 +128,7 @@ install_packages() {
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="${PACKAGES//\ filesystem\ / }"
     PACKAGES="filesystem ${PACKAGES}"
-    "${PACMAN}" -S "${PACKAGES}"
+    ${PACMAN} -S ${PACKAGES}
 }
 
 if [[ -z "${1}" ]]; then
