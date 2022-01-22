@@ -634,7 +634,7 @@ add_binary() {
     # check if binary is a symlink
     if [[ -L $binary ]]; then
         # add the binary
-        add_file "$(type -P $(readlink $binary))" "$dest" "$mode"
+        add_file "$(type -P $(readlink $binary))"
         # create the symlink
         add_symlink "$binary" "$(type -P $(readlink $binary))"
     else
