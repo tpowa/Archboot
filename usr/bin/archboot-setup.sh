@@ -4372,9 +4372,9 @@ auto_hwdetect() {
         fi
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
         read HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
-        HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller 
-        HWDETECTMODULES="$HWDETECTMODULES $(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --filesystem
-        [[ -n "${FBPARAMETER}" ]] && HWDETECTMODULES="$HWDETECTMODULES $(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" ${FBPARAMETER}
+        HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller)"
+        HWDETECTMODULES="$HWDETECTMODULES $(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --filesystem)"
+        [[ -n "${FBPARAMETER}" ]] && HWDETECTMODULES="$HWDETECTMODULES $(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" ${FBPARAMETER})"
         HWDETECTMODULES="$(echo $HWDETECTMODULES | sed -e 's#MODULES="##g' -e 's#"##g')"
         HWDETECTHOOKS="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${DESTDIR}"/usr/lib/initcpio/install ${FBPARAMETER} "${HWPARAMETER}" --hooks)"
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/MODULES=\(${HWDETECTMODULES}\)/g" "${DESTDIR}"/etc/mkinitcpio.conf
