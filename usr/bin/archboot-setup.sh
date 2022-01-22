@@ -1789,7 +1789,7 @@ find_btrfs_bootloader_subvolume() {
 # subvolumes already in use
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
-    for i in $(grep ""${PART}"[:#]" /tmp/.parts); do
+    for i in $(grep "${PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
         fi
@@ -1829,7 +1829,7 @@ check_btrfs_filesystem_creation() {
     DETECT_CREATE_FILESYSTEM="no"
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
-    for i in $(grep ""${PART}"[:#]" /tmp/.parts); do
+    for i in $(grep "${PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             FSTYPE="btrfs"
             SKIP_FILESYSTEM="yes"
@@ -2855,7 +2855,7 @@ getrootflags() {
 getraidarrays() {
     RAIDARRAYS=""
     if ! grep -q ^ARRAY "${DESTDIR}"/etc/mdadm.conf; then
-        RAIDARRAYS="$(echo -n $(grep ^md /proc/mdstat 2>/dev/null | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g'))"
+        RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>/dev/null | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
     fi
 }
 
@@ -2865,9 +2865,9 @@ getcryptsetup() {
         #avoid clash with dmraid here
         if cryptsetup status "$(basename "${PART_ROOT}")"; then
             if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')))"
+                CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
             else
                 CRYPTDEVICE="$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g'))"    
             fi
@@ -2923,9 +2923,9 @@ bootloader_kernel_parameters() {
     [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
     
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP} cgroup_disable=memory"
-    
+    # add uncommonn options here
     _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
-    
+    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
     _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     
@@ -2953,7 +2953,7 @@ check_bootpart() {
 
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
-        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
+        FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
         if [[ "${FSTYPE}" = "nilfs2" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
@@ -2962,7 +2962,7 @@ abort_nilfs_bootpart() {
 
 # check for f2fs bootpart and abort if detected
 abort_f2fs_bootpart() {
-        FSTYPE="$(${_LSBLK} FSTYPE ${bootdev})"
+        FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
         if [[ "${FSTYPE}" = "f2fs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
@@ -2972,7 +2972,7 @@ abort_f2fs_bootpart() {
 uefi_mount_efivarfs() {
     
     ## Mount efivarfs if it is not already mounted
-    if [[ ! "$(mount | grep /sys/firmware/efi/efivars)" ]]; then
+    if ! mount | grep -q /sys/firmware/efi/efivars; then
         modprobe -q efivarfs
         mount -t efivarfs efivarfs /sys/firmware/efi/efivars
     fi
@@ -3008,7 +3008,7 @@ detect_uefi_boot() {
 do_uefi_setup_env_vars() {
     
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        if [[ "$(grep '_IA32_UEFI=1' /proc/cmdline 1>/dev/null)" ]]; then
+        if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
             export _EFI_MIXED="1"
             export _UEFI_ARCH="IA32"
             export _SPEC_UEFI_ARCH="ia32"
@@ -3175,14 +3175,14 @@ do_mok_sign () {
             PASS2=$(cat ${ANSWER})
             if [[ "${PASS}" = "${PASS2}" ]]; then
                 MOK_PW=${PASS}
-                echo ${MOK_PW} > /tmp/.password
-                echo ${MOK_PW} >> /tmp/.password
+                echo "${MOK_PW}" > /tmp/.password
+                echo "${MOK_PW}" >> /tmp/.password
                 MOK_PW=/tmp/.password
             else
                 DIALOG --msgbox "Password didn't match, please enter again." 8 65
             fi
         done
-        mokutil -i ${DESTDIR}/${KEYDIR}/MOK/MOK.cer < ${MOK_PW} > ${LOG}
+        mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > ${LOG}
         rm /tmp/.password
         DIALOG --msgbox "MOK keys have been installed successfully." 8 65
     fi
@@ -3190,8 +3190,8 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to sign /boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi with the MOK certificate?" 0 0 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         chroot_mount
-        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK/MOK.key --cert /${KEYDIR}/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG} 
-        chroot "${DESTDIR}" sbsign --key /${KEYDIR}/MOK/MOK.key --cert /${KEYDIR}/MOK/MOK.crt --output ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
+        chroot "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG} 
+        chroot "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
         chroot_umount
         DIALOG --msgbox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
     fi
@@ -3201,9 +3201,9 @@ do_pacman_sign() {
     SIGN_KERNEL=""
     DIALOG --yesno "Do you want to install a pacman hook for automatic signing /boot/${VMLINUZ} on updates?" 0 0 && SIGN_KERNEL="1"
     if [[ "${SIGN_KERNEL}" == "1" ]]; then
-        [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  ${DESTDIR}/etc/pacman.d/hooks/
+        [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${DESTDIR}"/etc/pacman.d/hooks/
         HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
-        cat << EOF > ${HOOKNAME}
+        cat << EOF > "${HOOKNAME}"
 [Trigger]
 Operation = Install
 Operation = Upgrade
@@ -3343,8 +3343,8 @@ do_efistub_uefi() {
             do_systemd_boot_uefi
         else
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-                "Systemd-boot" "Systemd-boot for ${UEFI_ARCH} UEFI" \
-                "rEFInd" "rEFInd for ${UEFI_ARCH} UEFI" \
+                "Systemd-boot" "Systemd-boot for ${_UEFI_ARCH} UEFI" \
+                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
                 "Systemd-boot") do_systemd_boot_uefi ;;
@@ -3516,7 +3516,7 @@ do_grub_common_before() {
     common_bootloader_checks
     abort_f2fs_bootpart || return 1
     
-    if ! [[ "$(dmraid -r | grep ^no )" ]]; then
+    if ! dmraid -r | grep -q ^no; then
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
     if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
@@ -3566,14 +3566,14 @@ do_grub_config() {
     if [[ "${ROOT_PART_FS_UUID}" == "${BOOT_PART_FS_UUID}" ]]; then
         subdir="/boot"
         # on btrfs we need to check on subvol
-        if [[ $(mount | grep "${DESTDIR} " | grep btrfs | grep subvol) ]]; then
-            subdir="/$(echo $(btrfs subvolume show "${DESTDIR}/" | grep Name | cut -d ":" -f2))"/boot
+        if mount | grep "${DESTDIR} " | grep btrfs | grep subvol; then
+            subdir="/$(btrfs subvolume show "${DESTDIR}/" | grep Name | cut -d ":" -f2)"/boot
         fi
     else
         subdir=""
         # on btrfs we need to check on subvol
-        if [[ $(mount | grep "${DESTDIR}/boot " | grep btrfs | grep subvol) ]]; then
-            subdir="/$(echo $(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2))"
+        if mount | grep "${DESTDIR}/boot " | grep btrfs | grep subvol; then
+            subdir="/$(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2)"
         fi
     fi
     
@@ -3585,7 +3585,7 @@ do_grub_config() {
     else
         GRUB_CFG="grub.cfg"
     fi
-    [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" ]] && mv "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}.bak" || true
+    [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" ]] && (mv "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}.bak" || true)
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     
@@ -3693,7 +3693,7 @@ EOF
         if [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] ; then
             GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_LABEL}"
         else
-            GRUB_ROOT_DRIVE="set root="${BOOT_PART_DRIVE}""
+            GRUB_ROOT_DRIVE="set root=${BOOT_PART_DRIVE}"
         fi
     fi
     
@@ -3722,7 +3722,7 @@ menuentry "Arch Linux" {
 
 EOF
     
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$((NUMBER+1))
     
     ## create kernel fallback entry
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
@@ -3750,7 +3750,7 @@ menuentry "Arch Linux" {
 
 EOF
     
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$((NUMBER+1))
     
     ## create kernel fallback entry
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
@@ -3765,7 +3765,7 @@ menuentry "Arch Linux Fallback" {
 
 EOF
     
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$((NUMBER+1))
     
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -3787,7 +3787,7 @@ fi
 
 EOF
     
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$((NUMBER+1))
     
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -3807,7 +3807,7 @@ fi
 
 EOF
     
-    NUMBER=$((${NUMBER}+1))
+    NUMBER=$((NUMBER+1))
     
     ## TODO: Detect actual Windows installation if any
     ## create example file for windows
@@ -3863,11 +3863,11 @@ do_grub_bios() {
         check_bootpart
         
         # check if raid, raid partition, dmraid or device devicemapper is used
-        if [[ "$(echo ${bootdev} | grep /dev/md)" ]] || [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
+        if echo "${bootdev}" | grep -q /dev/md || echo "${bootdev}" | grep /dev/mapper; then
             # boot from lvm, raid, partitioned raid and dmraid devices is supported
             FAIL_COMPLEX="0"
             
-            if [[ "$(cryptsetup status ${bootdev})" ]]; then
+            if cryptsetup status "${bootdev}"; then
                 # encryption devices are not supported
                 FAIL_COMPLEX="1"
             fi
@@ -3875,17 +3875,17 @@ do_grub_bios() {
         
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
             # check if mapper is used
-            if  [[ "$(echo ${bootdev} | grep /dev/mapper)" ]]; then
+            if  echo "${bootdev}" | grep -q /dev/mapper; then
                 RAID_ON_LVM="0"
                 
                 #check if mapper contains a md device!
                 for devpath in $(pvs -o pv_name --noheading); do
-                    if [[ "$(echo ${devpath} | grep -v /dev/md*p | grep /dev/md)" ]]; then
-                        detectedvolumegroup="$(echo $(pvs -o vg_name --noheading ${devpath}))"
+                    if echo "${devpath}" | grep -v "/dev/md*p" | grep /dev/md; then
+                        detectedvolumegroup="$(pvs -o vg_name --noheading "${devpath}")"
                         
-                        if [[ "$(echo /dev/mapper/${detectedvolumegroup}-* | grep ${bootdev})" ]]; then
+                        if echo /dev/mapper/"${detectedvolumegroup}"-* | grep "${bootdev}"; then
                             # change bootdev to md device!
-                            bootdev=$(pvs -o pv_name --noheading ${devpath})
+                            bootdev=$(pvs -o pv_name --noheading "${devpath}")
                             RAID_ON_LVM="1"
                             break
                         fi
@@ -3895,7 +3895,7 @@ do_grub_bios() {
             
             #check if raid is used
             USE_RAID=""
-            if [[ "$(echo ${bootdev} | grep /dev/md)" ]]; then
+            if echo "${bootdev}" | grep -q /dev/md; then
                 USE_RAID="1"
             fi
         fi
@@ -3929,7 +3929,7 @@ do_grub_bios() {
         bootdev=$(cat ${ANSWER})
     fi
     
-    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${bootdev})" == "gpt" ]]; then
+    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${bootdev}")" == "gpt" ]]; then
         CHECK_BIOS_BOOT_GRUB="1"
         CHECK_UEFISYS_PART=""
         RUN_CFDISK=""
@@ -3989,9 +3989,9 @@ do_grub_uefi() {
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
-        [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
-        cp -f /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
-        cp -f /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/
+        [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
+        cp -f /usr/share/archboot/fedora-shim/shim${_SPEC_UEFI_ARCH}.efi "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/BOOT${_UEFI_ARCH}.efi
+        cp -f /usr/share/archboot/fedora-shim/mm${_SPEC_UEFI_ARCH}.efi "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
         GRUB_PREFIX_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
     else
         ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
@@ -4031,7 +4031,7 @@ do_grub_uefi() {
         # generate GRUB with config embeded
         chroot_mount
         #remove existing, else weird things are happening
-        [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm ${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
+        [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${DESTDIR}"/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
         # add -v for verbose
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -4039,7 +4039,7 @@ do_grub_uefi() {
             else
                 chroot "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
             fi
-        cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} ${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
+        cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} "${UEFISYS_MOUNTPOINT}"/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
         chroot_umount
     fi
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" ]]; then
@@ -4089,9 +4089,7 @@ select_source() {
     if [[ ${S_NET} -eq 0 ]]; then
             donetwork || return 1
     fi
-    if [[ ${S_TESTING} -eq 0 ]]; then
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
-    fi
     TITLE="Arch Linux Installation"
     getsource || return 1
     # check for updating complete environment with packages
@@ -4103,7 +4101,7 @@ select_source() {
         if [[ -e "/usr/bin/update-installer.sh" && "${_DETECTED_UEFI_SECURE_BOOT}" == "0" && "${RUNNING_ARCH}" ==  "x86_64" ]]; then
             DIALOG --defaultno --yesno "${_DETECTED_UEFI_SECURE_BOOT} Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nRequires at least 4GB RAM and will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
             if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
-                DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer.sh -latest-install\nCheck "${LOG}" for progress...\n\nGet a cup of coffee ...\nThis needs approx. 5 minutes on a fast internet connection (100Mbit)." 0 0
+                DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer.sh -latest-install\nCheck ${LOG} for progress...\n\nGet a cup of coffee ...\nThis needs approx. 5 minutes on a fast internet connection (100Mbit)." 0 0
                 /usr/bin/update-installer.sh -latest-install > "${LOG}" 2>&1
             fi
         fi
@@ -4137,9 +4135,9 @@ run_mkinitcpio() {
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG}-${RUNNING_ARCH} >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p ${KERNELPKG}-"${RUNNING_ARCH}" >>/tmp/mkinitcpio.log 2>&1
     else
-        chroot ${DESTDIR} /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
     fi
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running
@@ -4358,62 +4356,62 @@ auto_hwdetect() {
     DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on used keymap
-        ! [[ "$(grep '^KEYMAP="us"' ${DESTDIR}/etc/vconsole.conf)" ]] && HWPARAMETER="${HWPARAMETER} --keymap"
+        ! grep -q '^KEYMAP="us"' "${DESTDIR}"/etc/vconsole.conf && HWPARAMETER="${HWPARAMETER} --keymap"
         # check on framebuffer modules and kms
-        [[ "$(grep "^radeon" /proc/modules)" ]] && FBPARAMETER="--ati-kms"
-        [[ "$(grep "^amdgpu" /proc/modules)" ]] && FBPARAMETER="--amd-kms"
-        [[ "$(grep "^i915" /proc/modules )" ]] && FBPARAMETER="--intel-kms"
-        [[ "$(grep "^nouveau" /proc/modules)" ]] && FBPARAMETER="--nvidia-kms"
-        if [[ "$(lsmod | grep ^nfs)" ]]; then
+        grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
+        grep -q "^amdgpu" /proc/modules && FBPARAMETER="--amd-kms"
+        grep -q "^i915" /proc/modules && FBPARAMETER="--intel-kms"
+        grep -q "^nouveau" /proc/modules && FBPARAMETER="--nvidia-kms"
+        if lsmod | grep -q ^nfs; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
         fi
         if [[ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
-            if ! [[ "$(dmraid -r | grep ^no )" ]]; then
+            if ! dmraid -r | grep ^no; then
                 HWPARAMETER="${HWPARAMETER} --dmraid"
             fi
         fi
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
         read HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
-        HWDETECTMODULES="$(echo $(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} ${FBPARAMETER} --hostcontroller --filesystem ${HWPARAMETER}) | sed -e 's#.*\" ##g')"
-        HWDETECTHOOKS="$(hwdetect --kernel_directory=${DESTDIR} --kernel_version=${HWKVER} --rootdevice=${PART_ROOT} --hooks-dir=${DESTDIR}/usr/lib/initcpio/install ${FBPARAMETER} ${HWPARAMETER} --hooks)"
-        [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" ${DESTDIR}/etc/mkinitcpio.conf
-        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" ${DESTDIR}/etc/mkinitcpio.conf
+        HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" ${FBPARAMETER} --hostcontroller --filesystem "${HWPARAMETER}" | sed -e 's#.*\" ##g')"
+        HWDETECTHOOKS="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${DESTDIR}"/usr/lib/initcpio/install ${FBPARAMETER} "${HWPARAMETER}" --hooks)"
+        [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" "${DESTDIR}"/etc/mkinitcpio.conf
+        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
     fi
 }
 
 auto_parameters() {
     if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
-        : >${DESTDIR}/etc/vconsole.conf
+        : >"${DESTDIR}"/etc/vconsole.conf
         if [[ -s /tmp/.keymap ]]; then
-            DIALOG --infobox "Setting the keymap: $(cat /tmp/.keymap | sed -e 's/\..*//g') in vconsole.conf ..." 0 0
-            echo KEYMAP=$(cat /tmp/.keymap | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole.conf
+            DIALOG --infobox "Setting the keymap: $(sed -e 's/\..*//g' /tmp/.keymap) in vconsole.conf ..." 0 0
+            echo KEYMAP="$(sed -e 's/\..*//g' /tmp/.keymap)" >> "${DESTDIR}"/etc/vconsole.conf
         fi
         if [[ -s /tmp/.font ]]; then
-            DIALOG --infobox "Setting the consolefont: $(cat /tmp/.font | sed -e 's/\..*//g') in vconsole.conf ..." 0 0
-            echo FONT=$(cat /tmp/.font | sed -e 's/\..*//g') >> ${DESTDIR}/etc/vconsole.conf
+            DIALOG --infobox "Setting the consolefont: $(sed -e 's/\..*//g'/tmp/.font) in vconsole.conf ..." 0 0
+            echo FONT="$(sed -e 's/\..*//g' /tmp/.font)" >> "${DESTDIR}"/etc/vconsole.conf
         fi
     fi
 }
 
 auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && "$(grep -v '^#' ${DESTDIR}/etc/crypttab)"  = "" ]]; then
+    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${DESTDIR}"/etc/crypttab)"  = "" ]]; then
         # add to temp crypttab
-        sed -i -e "/^$(basename ${PART_ROOT}) /d" /tmp/.crypttab
-        cat /tmp/.crypttab >> ${DESTDIR}/etc/crypttab
+        sed -i -e "/^$(basename "${PART_ROOT}") /d" /tmp/.crypttab
+        cat /tmp/.crypttab >> "${DESTDIR}"/etc/crypttab
         chmod 600 /tmp/passphrase-* 2>/dev/null
-        cp /tmp/passphrase-* ${DESTDIR}/etc/ 2>/dev/null
+        cp /tmp/passphrase-* "${DESTDIR}"/etc/ 2>/dev/null
     fi
 }
 
 auto_timesetting() {
-    if [[ -e /etc/localtime && ! -e ${DESTDIR}/etc/localtime ]]; then
-        cp -a /etc/localtime ${DESTDIR}/etc/localtime
+    if [[ -e /etc/localtime && ! -e "${DESTDIR}"/etc/localtime ]]; then
+        cp -a /etc/localtime "${DESTDIR}"/etc/localtime
     fi
-    if [[ ! -f ${DESTDIR}/etc/adjtime ]]; then
-        echo "0.0 0 0.0" > ${DESTDIR}/etc/adjtime
-        echo "0" >> ${DESTDIR}/etc/adjtime
-        [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>${DESTDIR}/etc/adjtime
+    if [[ ! -f "${DESTDIR}"/etc/adjtime ]]; then
+        echo "0.0 0 0.0" > "${DESTDIR}"/etc/adjtime
+        echo "0" >> "${DESTDIR}"/etc/adjtime
+        [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>"${DESTDIR}"/etc/adjtime
     fi
 }
 
@@ -4421,19 +4419,18 @@ auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [[ "${MODE}" = "network" && "${SYNC_URL}" != "" ]]; then
-        SYNC_URL="${SYNC_URL}"
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}/etc/pacman.d/mirrorlist" > /tmp/inst-mirrorlist
+        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
     fi
 }
 
 auto_system_files () {
     if [[ ! -f ${DESTDIR}/etc/hostname ]]; then
-        echo "myhostname" > ${DESTDIR}/etc/hostname
+        echo "myhostname" > "${DESTDIR}"/etc/hostname
     fi
     if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
-        echo "LANG=en_US.UTF-8" > ${DESTDIR}/etc/locale.conf
-        echo "LC_COLLATE=C" >> ${DESTDIR}/etc/locale.conf
+        echo "LANG=en_US.UTF-8" > "${DESTDIR}"/etc/locale.conf
+        echo "LC_COLLATE=C" >> "${DESTDIR}"/etc/locale.conf
     fi
 }
 
@@ -4481,8 +4478,8 @@ configure_system() {
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then    # non-file
             DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
             HOOK_ERROR=""
-            ${EDITOR} ${DESTDIR}${FILE}
-            for i in $(cat ${DESTDIR}/etc/mkinitcpio.conf | grep ^HOOKS | sed -e 's/"//g' -e 's/HOOKS=//g'); do
+            ${EDITOR} "${DESTDIR}""${FILE}"
+            for i in $(grep ^HOOKS "${DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=//g'); do
                 [[ -e ${DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
             done
             if [[ "${HOOK_ERROR}" = "1" ]]; then
@@ -4490,10 +4487,10 @@ configure_system() {
             fi
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then          # non-file
             # enable glibc locales from locale.conf
-                for i in $(grep "^LANG" ${DESTDIR}/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
-                    sed -i -e "s/^#${i}/${i}/g" ${DESTDIR}/etc/locale.gen
+                for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
+                    sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
                 done
-            ${EDITOR} ${DESTDIR}${FILE}
+            ${EDITOR} "${DESTDIR}""${FILE}"
         elif [[ "${FILE}" = "Root-Password" ]]; then            # non-file
             PASSWORD=""
             while [[ "${PASSWORD}" = "" ]]; do
@@ -4503,17 +4500,17 @@ configure_system() {
                 PASS2=$(cat ${ANSWER})
                 if [[ "${PASS}" = "${PASS2}" ]]; then
                     PASSWORD=${PASS}
-                    echo ${PASSWORD} > /tmp/.password
-                    echo ${PASSWORD} >> /tmp/.password
+                    echo "${PASSWORD}" > /tmp/.password
+                    echo "${PASSWORD}" >> /tmp/.password
                     PASSWORD=/tmp/.password
                 else
                     DIALOG --msgbox "Password didn't match, please enter again." 0 0
                 fi
             done
-            chroot ${DESTDIR} passwd root < /tmp/.password
+            chroot "${DESTDIR}" passwd root < /tmp/.password
             rm /tmp/.password
         else                                                #regular file
-            ${EDITOR} ${DESTDIR}${FILE}
+            ${EDITOR} "${DESTDIR}""${FILE}"
         fi
     done
     if [[ ${S_CONFIG} -eq 1 ]]; then
@@ -4525,8 +4522,8 @@ configure_system() {
         run_mkinitcpio
         # /etc/locale.gen
         # enable at least en_US.UTF8 if nothing was changed, else weird things happen on reboot!
-        ! [[ $(grep -q ^[a-z] ${DESTDIR}/etc/locale.gen) ]] && sed -i -e 's:^#en_US.UTF-8:en_US.UTF-8:g' ${DESTDIR}/etc/locale.gen
-        chroot ${DESTDIR} locale-gen >/dev/null 2>&1
+        ! grep -q "^[a-z]" "${DESTDIR}"/etc/locale.gen && sed -i -e 's:^#en_US.UTF-8:en_US.UTF-8:g' "${DESTDIR}"/etc/locale.gen
+        chroot "${DESTDIR}" locale-gen >/dev/null 2>&1
         ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
