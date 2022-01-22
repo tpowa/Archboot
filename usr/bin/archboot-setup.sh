@@ -1209,7 +1209,7 @@ autoprepare() {
     DISCS=$(blockdevices)
     if [[ "$(echo "${DISCS}" | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
-        DIALOG --menu "Select the storage drive to use" 14 55 7 "$(blockdevices _)" 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
         DISC="${DISCS}"
