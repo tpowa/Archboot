@@ -132,7 +132,7 @@ mainmenu() {
     else
         DEFAULT=""
     fi
-    DIALOG "${DEFAULT}" --backtitle "${TITLE}" --title " MAIN MENU " \
+    DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
         "1" "Select Timezone" \
         "2" "Set Time and Date" \
