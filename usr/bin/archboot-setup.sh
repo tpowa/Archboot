@@ -2424,13 +2424,13 @@ select_mirror() {
         dialog --infobox "Downloading latest mirrorlist ..." 0 0
         ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>/dev/null
     
-        if [[ "$(grep '#Server = http:' /tmp/pacman_mirrorlist.txt)" ]]; then
+        if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
             mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
             cp /tmp/pacman_mirrorlist.txt "${MIRRORLIST}"
         fi
     fi
     # FIXME: this regex doesn't honor commenting
-    MIRRORS=$(egrep -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
+    MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
     DIALOG --menu "Select a mirror" 14 55 7 \
         ${MIRRORS} \
         "Custom" "_" 2>${ANSWER} || return 1
@@ -2444,7 +2444,7 @@ select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(egrep -o "${_server}.*" "${MIRRORLIST}" | head -n1)
+        SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     echo "Using mirror: ${SYNC_URL}" >${LOG}
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
@@ -2468,14 +2468,10 @@ dotesting() {
 # returns: 1 on error
 prepare_pacman() {
     # Set up the necessary directories for pacman use
-    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -m 755 -p "${DESTDIR}/var/cache/pacman/pkg"
-    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -m 755 -p "${DESTDIR}/var/lib/pacman"
+    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
     DIALOG --infobox "Refreshing package database..." 6 45
-    ${PACMAN} -Sy >${LOG} 2>&1 || return 1
-    if [[ $? -ne 0 ]]; then
-        DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60
-        return 1
-    fi
+    ${PACMAN} -Sy >${LOG} 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     return 0
 }
 
@@ -2492,7 +2488,7 @@ run_pacman(){
         echo "Installing Packages..." >/tmp/pacman.log ; \
         echo >>/tmp/pacman.log ; \
         touch /tmp/setup-pacman-running ; \
-        ${PACMAN} -S ${PACKAGES} 2>&1 >> /tmp/pacman.log ; \
+        ${PACMAN} -S "${PACKAGES}" 2>&1 >> /tmp/pacman.log ; \
         echo $? > /tmp/.pacman-retcode ; \
         if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
             echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
@@ -2540,72 +2536,71 @@ install_packages() {
     PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
     if [[ -n "$(pgrep dhclient)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w dhclient)" ]] && PACKAGES="${PACKAGES} dhclient"
+        ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
     fi
     # Add filesystem packages
-    if [[ "$(${_LSBLK} FSTYPE | grep ntfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w ntfs-3g)" ]] && PACKAGES="${PACKAGES} ntfs-3g"
+    if lsblk -rnpo FSTYPE | grep -q ntfs; then
+        ! echo "${PACKAGES}" | grep -qw ntfs-3g && PACKAGES="${PACKAGES} ntfs-3g"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep btrfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w btrfs-progs)" ]] && PACKAGES="${PACKAGES} btrfs-progs"
+    if lsblk -rnpo FSTYPE | grep -q btrfs; then
+        ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep nilfs2)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w nilfs-utils)" ]] && PACKAGES="${PACKAGES} nilfs-utils"
+    if lsblk -rnpo FSTYPE | grep -q nilfs2; then
+        ! echo "${PACKAGES}" | grep -qw nilfs-utils && PACKAGES="${PACKAGES} nilfs-utils"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep ext)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w e2fsprogs)" ]] && PACKAGES="${PACKAGES} e2fsprogs"
+    if lsblk -rnpo FSTYPE | grep -q ext; then
+        ! echo "${PACKAGES}" | grep -qw e2fsprogs && PACKAGES="${PACKAGES} e2fsprogs"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep reiserfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w reiserfsprogs)" ]] && PACKAGES="${PACKAGES} reiserfsprogs"
+    if lsblk -rnpo FSTYPE | grep -q reiserfs; then
+        ! echo "${PACKAGES}" | grep -qw reiserfsprogs && PACKAGES="${PACKAGES} reiserfsprogs"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep xfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w xfsprogs)" ]] && PACKAGES="${PACKAGES} xfsprogs"
+    if lsblk -rnpo FSTYPE | grep -q xfs; then
+        ! echo "${PACKAGES}" | grep -qw xfsprogs && PACKAGES="${PACKAGES} xfsprogs"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep jfs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w jfsutils)" ]] && PACKAGES="${PACKAGES} jfsutils"
+    if lsblk -rnpo FSTYPE | grep -q jfs; then
+        ! echo "${PACKAGES}" | grep -qw jfsutils && PACKAGES="${PACKAGES} jfsutils"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep f2fs)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w f2fs-tools)" ]] && PACKAGES="${PACKAGES} f2fs-tools"
+    if lsblk -rnpo FSTYPE | grep -q f2fs; then
+        ! echo "${PACKAGES}" | grep -qw f2fs-tools && PACKAGES="${PACKAGES} f2fs-tools"
     fi
-    if [[ "$(${_LSBLK} FSTYPE | grep vfat)" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w dosfstools)" ]] && PACKAGES="${PACKAGES} dosfstools"
+    if lsblk -rnpo FSTYPE | grep -q vfat; then
+        ! echo "${PACKAGES}" | grep -qw dosfstools && PACKAGES="${PACKAGES} dosfstools"
     fi
     if ! [[ "$(dmraid_devices)" = "" ]]; then
-        ! [[ "$(echo ${PACKAGES} | grep -w dmraid)" ]] && PACKAGES="${PACKAGES} dmraid"
+        ! echo "${PACKAGES}" | grep -w dmraid && PACKAGES="${PACKAGES} dmraid"
     fi
     ### HACK:
     # always add systemd-sysvcompat components
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ systemd-sysvcompat\ # #g")"
+    PACKAGES="${PACKAGES//\ systemd-sysvcompat\ / }"
     PACKAGES="${PACKAGES} systemd-sysvcompat"
     ### HACK:
     # always add intel-ucode
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ intel-ucode\ # #g")"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        PACKAGES="${PACKAGES//\ intel-ucode\ / }"
         PACKAGES="${PACKAGES} intel-ucode"
     fi
     # always add amd-ucode
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ amd-ucode\ # #g")"
+    PACKAGES="${PACKAGES//\ amd-ucode\ / }"
     PACKAGES="${PACKAGES} amd-ucode"
     ### HACK:
     # always add netctl with optdepends
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ netctl\ # #g")"
+    PACKAGES="${PACKAGES//\ netctl\ / }"
     PACKAGES="${PACKAGES} netctl"
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ dhcpd\ # #g")"
+    PACKAGES="${PACKAGES//\ dhcpd\ / }"
     PACKAGES="${PACKAGES} dhcpcd"
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ wpa_supplicant\ # #g")"
+    PACKAGES="${PACKAGES//\ wpa_supplicant\ / }"
     PACKAGES="${PACKAGES} wpa_supplicant"
     ### HACK:
     # always add lvm2, cryptsetup and mdadm
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ lvm2\ # #g")"
+    PACKAGES="${PACKAGES//\ lvm2\ / }"
     PACKAGES="${PACKAGES} lvm2"
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ cryptsetup\ # #g")"
+    PACKAGES="${PACKAGES//\ cryptsetup\ / }"
     PACKAGES="${PACKAGES} cryptsetup"
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ mdadm\ # #g")"
+    PACKAGES="${PACKAGES//\ mdadm\ / }"
     PACKAGES="${PACKAGES} mdadm"  
     ### HACK: circular depends are possible in base, install filesystem first!
-    PACKAGES="$(echo ${PACKAGES} | sed -e "s#\ filesystem\ # #g")"
+    PACKAGES="${PACKAGES//\ filesystem\ / }"
     PACKAGES="filesystem ${PACKAGES}"
-    
     DIALOG --infobox "Package installation will begin in 3 seconds. You can watch the output in the progress window. Please be patient." 0 0
     sleep 3
     run_pacman
@@ -2633,12 +2628,12 @@ auto_fstab(){
     # Modify fstab
     if [[ "${S_MKFS}" = "1" || "${S_MKFSAUTO}" = "1" ]]; then
         if [[ -f /tmp/.device-names ]]; then
-            sort /tmp/.device-names >>${DESTDIR}/etc/fstab
+            sort /tmp/.device-names >>"${DESTDIR}"/etc/fstab
         fi
         if [[ -f /tmp/.fstab ]]; then
             # clean fstab first from entries
-            sed -i -e '/^\#/!d' ${DESTDIR}/etc/fstab
-            sort /tmp/.fstab >>${DESTDIR}/etc/fstab
+            sed -i -e '/^\#/!d' "${DESTDIR}"/etc/fstab
+            sort /tmp/.fstab >>"${DESTDIR}"/etc/fstab
         fi
     fi
 }
@@ -2647,8 +2642,8 @@ auto_fstab(){
 # add udev rule for ssd disks using the deadline scheduler by default
 # add sysctl file for swaps
 auto_ssd () {
-    [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules ]] && cp /etc/udev/rules.d/60-ioschedulers.rules ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules
-    [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]] && cp /etc/sysctl.d/99-sysctl.conf ${DESTDIR}/etc/sysctl.d/99-sysctl.conf
+    [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules ]] && cp /etc/udev/rules.d/60-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
+    [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]] && cp /etc/sysctl.d/99-sysctl.conf "${DESTDIR}"/etc/sysctl.d/99-sysctl.conf
 }
 
 # auto_mdadm()
@@ -2658,7 +2653,7 @@ auto_mdadm()
     if [[ -e ${DESTDIR}/etc/mdadm.conf ]]; then
         if [[ "$(cat /proc/mdstat | grep ^md)" ]]; then
             DIALOG --infobox "Adding raid setup to ${DESTDIR}/etc/mdadm.conf ..." 4 40
-            mdadm -Ds >> ${DESTDIR}/etc/mdadm.conf
+            mdadm -Ds >> "${DESTDIR}"/etc/mdadm.conf
         fi
     fi
 }
@@ -2674,19 +2669,19 @@ auto_network()
         return 1
     fi
     # copy netctl profiles
-    [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* ${DESTDIR}/etc/netctl/ 2>/dev/null
+    [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* "${DESTDIR}"/etc/netctl/ 2>/dev/null
     # enable netctl profiles
     for i in $(echo /etc/netctl/*); do
-         [[ -f $i ]] && chroot ${DESTDIR} /usr/bin/netctl enable $(basename $i)
+         [[ -f $i ]] && chroot "${DESTDIR}" /usr/bin/netctl enable "$(basename "${i}")"
     done
     # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
-        echo "export http_proxy=${PROXY_HTTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
-        chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
+        echo "export http_proxy=${PROXY_HTTP}" >> "${DESTDIR}"/etc/profile.d/proxy.sh;
+        chmod a+x "${DESTDIR}"/etc/profile.d/proxy.sh
     fi
     if [[ "${PROXY_FTP}" != "" ]]; then
-        echo "export ftp_proxy=${PROXY_FTP}" >> ${DESTDIR}/etc/profile.d/proxy.sh;
-        chmod a+x ${DESTDIR}/etc/profile.d/proxy.sh
+        echo "export ftp_proxy=${PROXY_FTP}" >> "${DESTDIR}"/etc/profile.d/proxy.sh;
+        chmod a+x "${DESTDIR}"/etc/profile.d/proxy.sh
     fi
 }
 
@@ -2700,7 +2695,7 @@ auto_pacman()
         DIALOG --yesno "Would you like to copy pacman's GPG files to installed system?\nDuring boot pacman GPG entropy was generated by haveged,\nif you need your own entropy answer NO." 0 0 && DO_PACMAN_GPG="yes"
         if [[ "${DO_PACMAN_GPG}" = "yes" ]]; then
             DIALOG --infobox "Copy /etc/pacman.d/gnupg directory to ${DESTDIR}/etc/pacman.d/gnupg ..." 0 0
-            cp -ar /etc/pacman.d/gnupg ${DESTDIR}/etc/pacman.d 2>&1
+            cp -ar /etc/pacman.d/gnupg "${DESTDIR}"/etc/pacman.d 2>&1
         fi
     fi
 }
@@ -2710,9 +2705,9 @@ auto_pacman()
 auto_testing()
 {  
    if [[ "${DOTESTING}" == "yes" ]]; then
-       sed -i -e '/^#\[testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
-       sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' ${DESTDIR}/etc/pacman.conf
-       sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' ${DESTDIR}/etc/pacman.conf
+       sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${DESTDIR}"/etc/pacman.conf
+       sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${DESTDIR}"/etc/pacman.conf
+       sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${DESTDIR}"/etc/pacman.conf
    fi
 }
 
