@@ -2488,7 +2488,7 @@ run_pacman(){
         echo "Installing Packages..." >/tmp/pacman.log ; \
         echo >>/tmp/pacman.log ; \
         touch /tmp/setup-pacman-running ; \
-        ${PACMAN} -S "${PACKAGES}" 2>&1 >> /tmp/pacman.log ; \
+        ${PACMAN} -S ${PACKAGES} 2>&1 >> /tmp/pacman.log ; \
         echo $? > /tmp/.pacman-retcode ; \
         if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
             echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
