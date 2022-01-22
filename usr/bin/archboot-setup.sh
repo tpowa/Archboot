@@ -1644,7 +1644,7 @@ check_efisys_part() {
         
         mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         
-        if [[ "$(${_LSBLK} FSTYPE ${UEFISYS_PART})" == "vfat" ]]; then
+        if [[ "$(${_LSBLK} FSTYPE "${UEFISYS_PART}")" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
         else
             DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
@@ -1698,21 +1698,21 @@ partition() {
                 RUN_CFDISK="1"
                 check_gpt
             else
-                [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "dos" ]] && MSDOS_DETECTED="1"
+                [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${DISC}")" == "dos" ]] && MSDOS_DETECTED="1"
                 
                 if [[ "${MSDOS_DETECTED}" == "" ]]; then
                     DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on ${DISC}.\nDo you want to create a MS-DOS partition table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
-                    dd if=/dev/zero of=${DEVICE} bs=512 count=2048 >/dev/null 2>&1
-                    wipefs -a ${DEVICE} /dev/null 2>&1
-                    parted -a optimal -s ${DISC} mktable msdos >${LOG}
+                    dd if=/dev/zero of="${DEVICE}" bs=512 count=2048 >/dev/null 2>&1
+                    wipefs -a "${DEVICE}" /dev/null 2>&1
+                    parted -a optimal -s "${DISC}" mktable msdos >${LOG}
                 fi
                 # Partition disc
                 DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70
                 clear
-                cfdisk ${DISC}
+                cfdisk "${DISC}"
                 # reread partitiontable for kernel
-                partprobe ${DISC}
+                partprobe "${DISC}"
             fi
         fi
     done
