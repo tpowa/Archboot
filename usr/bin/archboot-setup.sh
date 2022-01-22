@@ -1730,20 +1730,20 @@ btrfs_scan() {
 mount_btrfs() {
     btrfs_scan
     BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
-    mount ${PART} ${BTRFSMP}
+    mount "${PART}" "${BTRFSMP}"
 }
 
 # unmount btrfs after checks done
 umount_btrfs() {
-    umount ${BTRFSMP}
-    rm -r ${BTRFSMP}
+    umount "${BTRFSMP}"
+    rm -r "${BTRFSMP}"
 }
 
 # Set BTRFS_DEVICES on detected btrfs devices
 find_btrfs_raid_devices() {
     btrfs_scan
     if [[ "${DETECT_CREATE_FILESYSTEM}" = "no" && "${FSTYPE}" = "btrfs" ]]; then
-        for i in $(btrfs filesystem show ${PART} | cut -d " " -f 11); do
+        for i in $(btrfs filesystem show "${PART}" | cut -d " " -f 11); do
             BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
         done
     fi
@@ -1752,11 +1752,11 @@ find_btrfs_raid_devices() {
 find_btrfs_raid_bootloader_devices() {
     btrfs_scan
     BTRFS_COUNT=1
-    if [[ "$(${_LSBLK} FSTYPE ${bootdev})" = "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE "${bootdev}")" = "btrfs" ]]; then
         BTRFS_DEVICES=""
-        for i in $(btrfs filesystem show ${bootdev} | cut -d " " -f 11); do
+        for i in $(btrfs filesystem show "${bootdev}" | cut -d " " -f 11); do
             BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
-            BTRFS_COUNT=$((${BTRFS_COUNT}+1))
+            BTRFS_COUNT=$((BTRFS_COUNT+1))
         done
     fi
 }
@@ -1766,20 +1766,20 @@ find_btrfs_subvolume() {
     if [[ "${DETECT_CREATE_FILESYSTEM}" = "no" ]]; then
         # existing btrfs subvolumes
         mount_btrfs
-        for i in $(btrfs subvolume list ${BTRFSMP} | cut -d " " -f 9); do
-            echo ${i}
-            [[ "${1}" ]] && echo ${1}
+        for i in $(btrfs subvolume list "${BTRFSMP}" | cut -d " " -f 9); do
+            echo "${i}"
+            [[ "${1}" ]] && echo "${1}"
         done
         umount_btrfs
     fi
 }
 
 find_btrfs_bootloader_subvolume() {
-    if [[ "$(${_LSBLK} FSTYPE ${bootdev})" = "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE "${bootdev}")" = "btrfs" ]]; then
         BTRFS_SUBVOLUMES=""
         PART="${bootdev}"
         mount_btrfs
-        for i in $(btrfs subvolume list ${BTRFSMP} | cut -d " " -f 7); do
+        for i in $(btrfs subvolume list "${BTRFSMP}" | cut -d " " -f 7); do
             BTRFS_SUBVOLUMES="${BTRFS_SUBVOLUMES}#${i}"
         done
         umount_btrfs
@@ -1789,9 +1789,9 @@ find_btrfs_bootloader_subvolume() {
 # subvolumes already in use
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
-    for i in $(grep ${PART}[:#] /tmp/.parts); do
-        if [[ "$(echo ${i} | grep ":btrfs:")" ]]; then
-            SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo ${i} | cut -d: -f 9)"
+    for i in $(grep ""${PART}"[:#]" /tmp/.parts); do
+        if echo "${i}" | grep -q ":btrfs:"; then
+            SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
         fi
     done
 }
@@ -1829,12 +1829,12 @@ check_btrfs_filesystem_creation() {
     DETECT_CREATE_FILESYSTEM="no"
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
-    for i in $(grep ${PART}[:#] /tmp/.parts); do
-        if [[ "$(echo ${i} | grep ":btrfs:")" ]]; then
+    for i in $(grep ""${PART}"[:#]" /tmp/.parts); do
+        if echo "${i}" | grep -q ":btrfs:"; then
             FSTYPE="btrfs"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
-            [[ "$(echo ${i} | cut -d: -f 4 | grep yes)" ]] && DETECT_CREATE_FILESYSTEM="yes"
+            echo "${i}" | cut -d: -f 4 | grep -q yes && DETECT_CREATE_FILESYSTEM="yes"
             [[ "${DETECT_CREATE_FILESYSTEM}" = "yes" ]] && SKIP_ASK_SUBVOLUME="yes"
         fi
     done
@@ -1847,10 +1847,10 @@ btrfs_parts() {
          for i in $(cat /tmp/.btrfs-devices); do
              BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
              # remove device if no subvolume is used!
-             [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo ${PARTS} | sed -e "s#${i}\ _##g")"
+             [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${i}\ _##g")"
          done
      else
-         [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART}\ _##g")"
+         [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
      fi
 }
 
@@ -1884,21 +1884,21 @@ select_btrfs_raid_devices () {
     BTRFS_PART="${BTRFS_DEVICE}"
     BTRFS_PARTS="${PARTS}"
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
-    BTRFS_PARTS="$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")"
+    BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
     RAIDNUMBER=2
     DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>${ANSWER} || return 1
     BTRFS_PART=$(cat ${ANSWER})
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
     while [[ "${BTRFS_PART}" != "DONE" ]]; do
         BTRFS_DONE=""
-        RAIDNUMBER=$((${RAIDNUMBER} + 1))
+        RAIDNUMBER=$((RAIDNUMBER + 1))
         # RAID5 needs 3 devices
         # RAID6, RAID10 need 4 devices!
         [[ "${RAIDNUMBER}" -ge 3 && ! "${BTRFS_LEVEL}" = "raid10" && ! "${BTRFS_LEVEL}" = "raid6" && ! "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 4 && "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 5 && "${BTRFS_LEVEL}" = "raid10" || "${BTRFS_LEVEL}" = "raid6" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        BTRFS_PARTS="$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")"
+        BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
         # add more devices
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>${ANSWER} || return 1
         BTRFS_PART=$(cat ${ANSWER})
@@ -1941,8 +1941,8 @@ check_btrfs_subvolume(){
     [[ "${DOMKFS}" = "yes" && "${FSTYPE}" = "btrfs" ]] && DETECT_CREATE_FILESYSTEM="yes"
     if [[ "${DETECT_CREATE_FILESYSTEM}" = "no" ]]; then
         mount_btrfs
-        for i in $(btrfs subvolume list ${BTRFSMP} | cut -d " " -f 7); do
-            if [[ "$(echo ${i} | grep "${BTRFS_SUBVOLUME}"$)" ]]; then
+        for i in $(btrfs subvolume list "${BTRFSMP}" | cut -d " " -f 7); do
+            if echo "${i}" | grep -q "${BTRFS_SUBVOLUME}"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
                 BTRFS_SUBVOLUME="NONE"
             fi
@@ -1960,10 +1960,10 @@ check_btrfs_subvolume(){
 # create btrfs subvolume
 create_btrfs_subvolume() {
     mount_btrfs
-    btrfs subvolume create ${BTRFSMP}/${_btrfssubvolume} >${LOG}
+    btrfs subvolume create "${BTRFSMP}"/"${_btrfssubvolume}" >${LOG}
     # change permission from 700 to 755 
     # to avoid warnings during package installation
-    chmod 755 ${BTRFSMP}/${_btrfssubvolume}
+    chmod 755 "${BTRFSMP}"/"${_btrfssubvolume}"
     umount_btrfs
 }
 
