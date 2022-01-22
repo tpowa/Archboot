@@ -1369,9 +1369,9 @@ autoprepare() {
             ROOT_SIZE="7500"
             [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
             while [[ "${ROOT_PART_SET}" = "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2500,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
             ROOT_PART_SIZE=$(cat ${ANSWER})
-                if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" || "${ROOT_PART_SIZE}" -lt "2500" ]]; then
+                if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" || "${ROOT_PART_SIZE}" -lt "2000" ]]; then
                     DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
