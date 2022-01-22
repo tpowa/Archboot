@@ -1525,7 +1525,7 @@ autoprepare() {
         else
             DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
         fi
-        _mkfs ${DOMKFS} ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
     done
 
@@ -2212,14 +2212,14 @@ mountpoints() {
             else
                 DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs yes ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+            _mkfs yes "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         else
             if [[ "${FSTYPE}" = "swap" ]]; then
                 DIALOG --infobox "Activating swapspace on ${PART}" 0 0
             else
                 DIALOG --infobox "Mounting ${FSTYPE} on ${PART} to ${DESTDIR}${MP}" 0 0
             fi
-            _mkfs no ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+            _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi
         sleep 1
     done
@@ -2290,17 +2290,17 @@ _mkfs() {
         if [[ "${_domk}" = "yes" ]]; then
             local ret
             case ${_fstype} in
-                xfs)      mkfs.xfs "${_fsoptions}" -L "${_labelname}" -f "${_device}" >${LOG} 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs "${_fsoptions}" -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                reiserfs) yes | mkreiserfs "${_fsoptions}" -l "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L "${_fsoptions}" "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                ext3)     mke2fs -F "${_fsoptions}" -L "${_labelname}" -t ext3 "${_device}" >${LOG} 2>&1; ret=$? ;;
-                ext4)     mke2fs -F "${_fsoptions}" -L "${_labelname}" -t ext4 "${_device}" >${LOG} 2>&1; ret=$? ;;
-                f2fs)     mkfs.f2fs "${_fsoptions}" -l "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f "${_fsoptions}" -L "${_labelname}" "${_btrfsdevices}" >${LOG} 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f "${_fsoptions}" -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                ntfs3)    mkfs.ntfs "${_fsoptions}" -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -F32 "${_fsoptions}" -n "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f "${_device}" >${LOG} 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                reiserfs) yes | mkreiserfs ${_fsoptions} -l "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 "${_device}" >${LOG} 2>&1; ret=$? ;;
+                ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 "${_device}" >${LOG} 2>&1; ret=$? ;;
+                f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" "${_btrfsdevices}" >${LOG} 2>&1; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                ntfs3)    mkfs.ntfs ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
