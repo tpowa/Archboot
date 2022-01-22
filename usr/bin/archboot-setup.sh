@@ -1502,7 +1502,7 @@ autoprepare() {
         DOMKFS="yes"
         PART="${DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme controller: Uses /dev/nvme0n1pX name scheme 
-        grep -q "nvme" "${DEVICE}" && PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        echo "${DEVICE}" | grep -q "nvme" && PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
         FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
         FS_OPTIONS="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
@@ -1525,7 +1525,7 @@ autoprepare() {
         else
             DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
         fi
-        _mkfs ${DOMKFS} ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
     done
 
