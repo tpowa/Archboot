@@ -1535,7 +1535,7 @@ autoprepare() {
 
 detect_DISC() {
     
-    if [[ "${DISC}" == "" ]] || [[ ! "$(echo ${DISC} | grep '/dev/')" ]]; then
+    if [[ "${DISC}" == "" ]] || ! echo "${DISC}" | grep -q '/dev/'; then
         DISC="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${DESTDIR}/boot")")"
     fi
     
@@ -1548,22 +1548,22 @@ detect_DISC() {
 check_gpt() {
     
     GUID_DETECTED=""
-    [[ "$(${_BLKID} -p -i -o value -s PTTYPE ${DISC})" == "gpt" ]] && GUID_DETECTED="1"
+    [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${DISC}")" == "gpt" ]] && GUID_DETECTED="1"
     
     if [[ "${GUID_DETECTED}" == "" ]]; then
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt ${DISC} > ${LOG} && GUID_DETECTED="1"
+        sgdisk --mbrtogpt "${DISC}" > ${LOG} && GUID_DETECTED="1"
         # reread partitiontable for kernel
-        partprobe ${DISC} > ${LOG}
+        partprobe "${DISC}" > ${LOG}
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --defaultno --yesno "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
-            sgdisk --zap ${DISC} &>/dev/null
+            sgdisk --zap "${DISC}" &>/dev/null
             # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-            dd if=/dev/zero of=${DISC} bs=512 count=2048 &>/dev/null
-            wipefs -a ${DISC} &>/dev/null
+            dd if=/dev/zero of="${DISC}" bs=512 count=2048 &>/dev/null
+            wipefs -a "${DISC}" &>/dev/null
             # create fresh GPT
-            sgdisk --clear ${DISC} &>/dev/null
+            sgdisk --clear "${DISC}" &>/dev/null
             GUID_DETECTED="1"
         fi
     fi
@@ -1575,7 +1575,7 @@ check_gpt() {
         fi
         
         if [[ "${CHECK_BIOS_BOOT_GRUB}" == "1" ]]; then
-            if ! [[ "$(sgdisk -p ${DISC} | grep 'EF02')" ]]; then
+            if ! sgdisk -p "${DISC}" | grep -q 'EF02'; then
                 DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${DISC}. Please create a >=1 MB BIOS Boot partition for grub BIOS GPT support." 0 0
                 RUN_CFDISK="1"
             fi
@@ -1584,9 +1584,9 @@ check_gpt() {
     
     if [[ "${RUN_CFDISK}" == "1" ]]; then
         DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
-        clear && cfdisk ${DISC}
+        clear && cfdisk "${DISC}"
         # reread partitiontable for kernel
-        partprobe ${DEVICE}
+        partprobe "${DEVICE}"
     fi
 }
 
