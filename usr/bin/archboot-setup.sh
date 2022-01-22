@@ -4370,7 +4370,7 @@ auto_hwdetect() {
                 HWPARAMETER="${HWPARAMETER} --dmraid"
             fi
         fi
-        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
+        offset=$(hexdump -s 256 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
         read HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
         HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller)"
         HWDETECTMODULES="$HWDETECTMODULES $(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --filesystem)"
