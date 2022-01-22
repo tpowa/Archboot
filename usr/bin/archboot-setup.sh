@@ -1458,7 +1458,7 @@ autoprepare() {
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >${LOG}
         else
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >${LOG}
-            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) $(sgdisk -E ${DEVICE} | grep ^[0-9])S >${LOG}
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >${LOG}
         fi
     fi
     if [[ $? -gt 0 ]]; then
@@ -1467,7 +1467,7 @@ autoprepare() {
         return 1
     fi
     # reread partitiontable for kernel
-    partprobe ${DEVICE}
+    partprobe "${DEVICE}"
     printk on
     ## wait until /dev initialized correct devices
     udevadm settle
@@ -1500,14 +1500,14 @@ autoprepare() {
     ## make and mount filesystems
     for fsspec in ${FSSPECS}; do
         DOMKFS="yes"
-        PART="${DEVICE}$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
+        PART="${DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme controller: Uses /dev/nvme0n1pX name scheme 
-        [[ $(echo "${DEVICE}" | grep "nvme") ]] && PART="${DEVICE}p$(echo ${fsspec} | tr -d ' ' | cut -f1 -d:)"
-        MP="$(echo ${fsspec} | tr -d ' ' | cut -f2 -d:)"
-        FSTYPE="$(echo ${fsspec} | tr -d ' ' | cut -f3 -d:)"
-        FS_OPTIONS="$(echo ${fsspec} | tr -d ' ' | cut -f4 -d:)"
+        grep -q "nvme" "${DEVICE}" && PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
+        FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
+        FS_OPTIONS="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
         [[ "${FS_OPTIONS}" == "" ]] && FS_OPTIONS="NONE"
-        LABEL_NAME="$(echo ${fsspec} | tr -d ' ' | cut -f5 -d:)"
+        LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f5 -d:)"
         BTRFS_DEVICES="${PART}"
         if [[ "${FSTYPE}" = "btrfs" ]]; then
             BTRFS_COMPRESS="compress=lzo"
@@ -1525,7 +1525,7 @@ autoprepare() {
         else
             DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
         fi
-        _mkfs ${DOMKFS} ${PART} ${FSTYPE} ${DESTDIR} ${MP} ${LABEL_NAME} ${FS_OPTIONS} ${BTRFS_DEVICES} ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
     done
 
