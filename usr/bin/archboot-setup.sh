@@ -560,7 +560,7 @@ _umountall()
 # Disable all software raid devices
 _stopmd()
 {
-    if grep -q ^md /proc/mdstat; then
+    if grep -q ^md /proc/mdstat 2>/dev/null; then
         DISABLEMD=""
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
