@@ -771,20 +771,20 @@ _raid()
             fi
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
-        DIALOG --menu "Select the raid level you want to use" 21 50 11 "${RAIDLEVELS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select the raid level you want to use" 21 50 11 ${RAIDLEVELS} 2>${ANSWER} || return 1
         LEVEL=$(cat ${ANSWER})
         # raid5 and raid10 support parity parameter
         PARITY=""
         if [[ "${LEVEL}" = "raid5" || "${LEVEL}" = "raid6" || "${LEVEL}" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 "${PARITYLEVELS}" 2>${ANSWER} || return 1
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>${ANSWER} || return 1
             PARITY=$(cat ${ANSWER})
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
-        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.raid
         while [[ "${PART}" != "DONE" ]]; do
@@ -794,7 +794,7 @@ _raid()
             # raid0 doesn't support missing devices
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
-            DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 "${PARTS}" "${MDEXTRA}" DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             SPARE=""
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && DIALOG --yesno --defaultno "Would you like to use ${PART} as spare device?" 0 0 && SPARE="1"
@@ -899,7 +899,7 @@ _createpv()
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         DEVNUMBER=1
-        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.pvs-create
         while [[ "${PART}" != "DONE" ]]; do
@@ -907,7 +907,7 @@ _createpv()
             # clean loop from used partition and options
             PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
             # add more devices
-            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 "${PARTS}" DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             [[ "${PART}" = "DONE" ]] && break
             echo "${PART}" >>/tmp/.pvs-create
@@ -1000,7 +1000,7 @@ _createvg()
         DIALOG --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         PVNUMBER=1
-        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 "${PVS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>${ANSWER} || return 1
         PV=$(cat ${ANSWER})
         echo "${PV}" >>/tmp/.pvs
         while [[ "${PVS}" != "DONE" ]]; do
@@ -1008,7 +1008,7 @@ _createvg()
             # clean loop from used partition and options
             PVS="$(echo "${PVS}" | sed -e "s#${PV}\ _##g")"
             # add more devices
-            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 "${PVS}" DONE _ 2>${ANSWER} || return 1
+            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} DONE _ 2>${ANSWER} || return 1
             PV=$(cat ${ANSWER})
             [[ "${PV}" = "DONE" ]] && break
             echo "${PV}" >>/tmp/.pvs
@@ -1036,7 +1036,7 @@ _createlv()
         fi
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
-        DIALOG --menu "Select Volume Group" 21 50 13 "${LVS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select Volume Group" 21 50 13 ${LVS} 2>${ANSWER} || return 1
         LV=$(cat ${ANSWER})
         # enter logical volume name
         LVDEVICE=""
@@ -1180,7 +1180,7 @@ _luks()
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
-        DIALOG --menu "Select device for luks encryption" 21 50 13 "${PARTS}" 2>${ANSWER} || return 1
+        DIALOG --menu "Select device for luks encryption" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         # enter luks name
         _enter_luks_name
@@ -1359,7 +1359,7 @@ autoprepare() {
         done
         
         while [[ "${CHOSEN_FS}" = "" ]]; do
-            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 "${FSOPTS}" 2>${ANSWER} || return 1
+            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>${ANSWER} || return 1
             FSTYPE=$(cat ${ANSWER})
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
