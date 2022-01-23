@@ -2406,9 +2406,7 @@ _mkfs() {
 
 getsource() {
     S_SRC=0
-    if [[ "${MODE}" = "network" ]]; then
-        select_mirror || return 1
-    fi
+    select_mirror || return 1
     S_SRC=1
 }
 
@@ -4096,7 +4094,6 @@ do_grub_uefi() {
 
 select_source() {
     NEXTITEM="2"
-    MODE="network"
     if [[ ${S_NET} -eq 0 ]]; then
             check_nework || return 1
     fi
