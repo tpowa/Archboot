@@ -2530,6 +2530,9 @@ install_packages() {
     if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
         getdest
     fi
+    if [[ "${S_SRC}" = "0" ]]; then
+        select_source || return 1
+    fi
     prepare_pacman
     PACKAGES=""
     DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
