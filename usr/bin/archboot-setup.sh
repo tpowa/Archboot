@@ -2730,7 +2730,6 @@ check_nework() {
 donetwork() {
     NETPARAMETERS=""
     while [[ "${NETPARAMETERS}" = "" ]]; do
-        if [[ S_NET == "" ]]; then
         # select network interface
         INTERFACE=
         ifaces=$(net_interfaces)
