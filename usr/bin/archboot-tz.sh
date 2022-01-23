@@ -61,7 +61,7 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
     for i in $(timedatectl --no-pager list-timezones); do
         ZONES="${ZONES} ${i} -"
     done
-    DIALOG --menu "Please Select A Timezone:" 22 60 16 "${ZONES}" 2>${ANSWER} && SET_ZONE="1"
+    DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
     zone=$(cat ${ANSWER})
     if [[ "${SET_ZONE}" = "1" ]]; then
         DIALOG --infobox "Setting Timezone to ${zone} ..." 0 0
