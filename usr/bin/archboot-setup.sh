@@ -4383,9 +4383,10 @@ auto_hwdetect() {
         HWDETECTMODULES="$(echo "${HWDETECTMODULES}" | sed -e 's#MODULES="##g' -e 's#"##g')"
         # arrange HOOKS for mkinitcpio.conf
         HWDETECTHOOKS="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${DESTDIR}"/usr/lib/initcpio/install "${HWPARAMETER}" --hooks)"
+        HWDETECTHOOKS="$(echo "${HWDETECTHOOKS}" | sed -e 's#HOOKS="##g' -e 's#"##g')"
         # change mkinitcpio.conf
         [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/MODULES=\(${HWDETECTMODULES}\)/g" "${DESTDIR}"/etc/mkinitcpio.conf
-        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
+        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/HOOKS=\(${HWDETECTHOOKS}\)/g" "${DESTDIR}"/etc/mkinitcpio.conf
     fi
 }
 
