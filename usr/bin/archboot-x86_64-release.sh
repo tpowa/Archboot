@@ -62,12 +62,12 @@ echo "Create boot directory ..."
 mkdir -p boot/licenses/{amd-ucode,intel-ucode}
 for i in *.iso; do
     if ! grep -q latest "${i}"; then
-        isoinfo -R -i "${i}" -x /boot/amd-ucode.img 2>/dev/null > boot/amd-ucode.img 2>&1
-        isoinfo -R -i "${i}" -x /boot/intel-ucode.img 2>/dev/null > boot/intel-ucode.img 2>&1
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img 2>/dev/null > boot/initramfs_archboot_x86_64.img 2>&1
-        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 2>/dev/null > boot/vmlinuz_archboot_x86_64 2>&1
+        isoinfo -R -i "${i}" -x /boot/amd-ucode.img 2>/dev/null > boot/amd-ucode.img
+        isoinfo -R -i "${i}" -x /boot/intel-ucode.img 2>/dev/null > boot/intel-ucode.img
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img 2>/dev/null > boot/initramfs_archboot_x86_64.img
+        isoinfo -R -i "${i}" -x /boot/vmlinuz_x86_64 2>/dev/null > boot/vmlinuz_archboot_x86_64
     else
-        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img 2>/dev/null > boot/initramfs_archboot_latest_x86_64.img 2>&1
+        isoinfo -R -i "${i}" -x /boot/initramfs_x86_64.img 2>/dev/null > boot/initramfs_archboot_latest_x86_64.img
     fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
