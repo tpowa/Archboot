@@ -2598,7 +2598,13 @@ install_packages() {
     PACKAGES="${PACKAGES//\ cryptsetup\ / }"
     PACKAGES="${PACKAGES} cryptsetup"
     PACKAGES="${PACKAGES//\ mdadm\ / }"
-    PACKAGES="${PACKAGES} mdadm"  
+    PACKAGES="${PACKAGES} mdadm"
+    ### HACK
+    # always add nano and vi
+    PACKAGES="${PACKAGES//\ nano\ / }"
+    PACKAGES="${PACKAGES} nano"
+    PACKAGES="${PACKAGES//\ vi\ / }"
+    PACKAGES="${PACKAGES} vi"
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="${PACKAGES//\ filesystem\ / }"
     PACKAGES="filesystem ${PACKAGES}"
