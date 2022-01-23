@@ -4095,7 +4095,11 @@ select_source() {
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
     TITLE="Arch Linux Installation"
     getsource || return 1
-    # check for updating complete environment with packages
+    NEXTITEM="3"
+}
+
+# check for updating complete environment with packages
+update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache...  > ${LOG}"
     else
@@ -4109,7 +4113,6 @@ select_source() {
             fi
         fi
     fi
-    NEXTITEM="3"
 }
 
 set_clock() {
@@ -4665,7 +4668,8 @@ mainmenu() {
         "1")
             donetwork ;;
         "2")
-            select_source ;;
+            select_source
+            update_environment ;;
         "3")
             set_clock ;;
         "4")
