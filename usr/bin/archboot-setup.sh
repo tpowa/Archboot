@@ -2714,6 +2714,14 @@ auto_testing()
    fi
 }
 
+# check for already active profile
+check_nework() {
+    for i in /etc/netctl/*; do
+        [[ -f "${i}" ]] && netctl -is-active "${i}" && S_NET=1
+    done
+    [[ "${S_NET}" == "1" ]] || donetwork
+}
+
 # donetwork()
 # Hand-hold through setting up networking
 #
@@ -2722,6 +2730,7 @@ auto_testing()
 donetwork() {
     NETPARAMETERS=""
     while [[ "${NETPARAMETERS}" = "" ]]; do
+        if [[ S_NET == "" ]]; then
         # select network interface
         INTERFACE=
         ifaces=$(net_interfaces)
@@ -4090,7 +4099,7 @@ select_source() {
     NEXTITEM="2"
     MODE="network"
     if [[ ${S_NET} -eq 0 ]]; then
-            donetwork || return 1
+            check_nework || return 1
     fi
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
     TITLE="Arch Linux Installation"
