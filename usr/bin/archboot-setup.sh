@@ -2717,7 +2717,7 @@ auto_testing()
 # check for already active profile
 check_nework() {
     for i in /etc/netctl/*; do
-        [[ -f "${i}" ]] && netctl -is-active "$(basename "${i}")" && S_NET=1
+        [[ -f "${i}" ]] && netctl is-active "$(basename "${i}")" && S_NET=1
     done
     [[ "${S_NET}" == "1" ]] || donetwork
 }
