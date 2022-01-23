@@ -9,7 +9,7 @@ _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
 _USER="tobias"
 _GROUP="users"
-_GPG="--detach-sign --batch --no-armor --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F -z 0"
+_GPG="--detach-sign --batch --no-armor --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 

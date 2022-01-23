@@ -57,11 +57,11 @@ echo "Create boot directory ..."
 mkdir -p boot/licenses/amd-ucode
 for i in *.iso; do
     if ! grep -q latest "$i"; then
-        isoinfo -R -i "${i}" -x /boot/amd-ucode.img > boot/amd-ucode.img 2>&1
-        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img > boot/initramfs_archboot_aarch64.img 2>&1
-        isoinfo -R -i "${i}" -x /boot/vmlinuz_aarch64 > boot/vmlinuz_archboot_aarch64 2>&1
+        isoinfo -R -i "${i}" -x /boot/amd-ucode.img 2>/dev/null > boot/amd-ucode.img
+        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img >/dev/null > boot/initramfs_archboot_aarch64.img
+        isoinfo -R -i "${i}" -x /boot/vmlinuz_aarch64 2>/dev/null > boot/vmlinuz_archboot_aarch64
     else
-        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img > boot/initramfs_archboot_latest_aarch64.img 2>&1
+        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img 2>/dev/null > boot/initramfs_archboot_latest_aarch64.img
     fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
