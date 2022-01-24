@@ -32,8 +32,8 @@ if ! [[ "$(uname -m)" == "x86_64" ]]; then
     exit 1
 fi
 echo "Start release creation in $1 ..."
-mkdir -p "$1"
-cd "$1" || exit 1
+mkdir -p "${1}"
+cd "${1}" || exit 1
 # create container
 archboot-${ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then

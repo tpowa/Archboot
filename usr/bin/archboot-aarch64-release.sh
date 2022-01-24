@@ -26,8 +26,8 @@ if ! [[ ${UID} -eq 0 ]]; then
     exit 1
 fi
 echo "Start release creation in $1 ..."
-mkdir -p "$1"
-cd "$1" || exit 1
+mkdir -p "${1}"
+cd "${1}" || exit 1
 # create container
 archboot-${_ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
