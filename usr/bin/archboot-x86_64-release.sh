@@ -3,12 +3,12 @@
 
 _BASENAME="$(basename "${0}")"
 _ARCH="x86_64"
-_PRESET_LATEST="${ARCH}-latest"
+_PRESET_LATEST="${_ARCH}-latest"
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
-_INITRAMFS="boot/initramfs_${ARCH}.img"
-_INITRAMFS_LATEST="boot/initramfs_${ARCH}-latest.img"
-_KERNEL="vmlinuz_${_ARCH}"
+_INITRAMFS="boot/initramfs_${_ARCH}.img"
+_INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
+_KERNEL="vmlinuz_${__ARCH}"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {
@@ -35,24 +35,24 @@ echo "Start release creation in $1 ..."
 mkdir -p "${1}"
 cd "${1}" || exit 1
 # create container
-archboot-${ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
+archboot-${_ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
 # generate iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${ARCH}-iso.sh -g"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g"
 # remove not working lvm2 from latest image
 echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
 systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
 # generate latest iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${ARCH}-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
-(echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
+(echo "Welcome to _ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
  echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
  echo "Homepage: https://wiki.archlinux.org/title/Archboot";\
- echo "Architecture: ${ARCH}";\
+ echo "Architecture: ${_ARCH}";\
  echo "RAM requirement to boot: 1152 MB or greater";\
  echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi archboot | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
  echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
