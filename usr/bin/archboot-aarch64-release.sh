@@ -62,7 +62,7 @@ rm -r "${_W_DIR}"
 echo "Create boot directory ..."
 mkdir -p boot/licenses/amd-ucode
 for i in *.iso; do
-    if ! echo "${i}" | grep -q latest "${i}"; then
+    if ! echo "${i}" | grep -q latest; then
         isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
         isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS}"
         isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL_ARCHBOOT}"
