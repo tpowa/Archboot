@@ -67,6 +67,7 @@ for i in *.iso; do
         isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL}"
     else
         isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
+    fi
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 # create torrent files

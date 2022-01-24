@@ -8,7 +8,7 @@ _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs_${_ARCH}.img"
 _INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
-_KERNEL="vmlinuz_${__ARCH}"
+_KERNEL="vmlinuz_${_ARCH}"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {

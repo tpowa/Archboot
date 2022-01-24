@@ -113,7 +113,7 @@ _prepare_fedora_shim_bootloaders () {
 _prepare_uefi_image() {
     ## get size of boot x86_64 files
     BOOTSIZE=$(du -bc "${_X86_64}"/EFI | grep total | cut -f1)
-    IMGSZ=$(( (${BOOTSIZE}*102)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$(( (BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
     ## Create cdefiboot.img
     dd if=/dev/zero of="${_X86_64}"/efi.img bs="${IMGSZ}" count=1024
     VFAT_IMAGE="${_X86_64}/efi.img"
