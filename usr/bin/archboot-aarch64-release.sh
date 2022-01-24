@@ -2,7 +2,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
-_PRESET_LATEST="aarch64-latest"
+_ARCH="aarch64"
+_PRESET_LATEST="${_ARCH}-latest"
+_AMD_UCODE="boot/amd-ucode.img"
+_INITRAMFS="boot/initramfs_${_ARCH}.img"
+_INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
+_KERNEL="vmlinuz_${_ARCH}"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {
@@ -24,29 +29,29 @@ echo "Start release creation in $1 ..."
 mkdir -p "$1"
 cd "$1" || exit 1
 # create container
-archboot-aarch64-create-container.sh "${_W_DIR}" -cc -cp || exit 1
+archboot-${_ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
 # generate iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g"
 # remove not working lvm2 from latest image
 echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
 systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
 # generate latest iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-aarch64-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
-echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM" >>Release.txt
-echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>" >>Release.txt
-echo "Homepage: https://wiki.archlinux.org/title/Archboot" >>Release.txt
-echo "Architecture: aarch64" >>Release.txt
-echo "RAM requirement to boot: 1152 MB or greater" >>Release.txt
-echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi archboot-arm | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
-echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")" >>Release.txt 
+(echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
+ echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
+ echo "Homepage: https://wiki.archlinux.org/title/Archboot";\
+ echo "Architecture: ${_ARCH}";\
+ echo "RAM requirement to boot: 1152 MB or greater";\
+ echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi archboot-arm | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+ echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+ echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+ echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
 # move iso out of container
 mv "${_W_DIR}"/*.iso ./
 # remove container
@@ -56,18 +61,17 @@ rm -r "${_W_DIR}"
 echo "Create boot directory ..."
 mkdir -p boot/licenses/amd-ucode
 for i in *.iso; do
-    if ! grep -q latest "$i"; then
-        isoinfo -R -i "${i}" -x /boot/amd-ucode.img 2>/dev/null > boot/amd-ucode.img
-        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img >/dev/null > boot/initramfs_archboot_aarch64.img
-        isoinfo -R -i "${i}" -x /boot/vmlinuz_aarch64 2>/dev/null > boot/vmlinuz_archboot_aarch64
+    if ! echo "${i}" | grep -q latest "${i}"; then
+        isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
+        isoinfo -R -i "${i}" -x /"${_INITRAMFS}" >/dev/null > "${_INITRAMFS}"
+        isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL}"
     else
-        isoinfo -R -i "${i}" -x /boot/initramfs_aarch64.img 2>/dev/null > boot/initramfs_archboot_latest_aarch64.img
-    fi
+        isoinfo -R -i "${i}" -x /boot/"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
 done
 cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
 # create torrent files
 for i in *.iso; do
-    echo "Generating $i torrent ..."
+    echo "Generating ${i} torrent ..."
     archboot-mktorrent.sh archboot/"${1}" "${i}" >/dev/null 2>&1
 done
 # create sha256sums
@@ -78,4 +82,4 @@ done
 for i in boot/*; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
 done
-echo "Finished release creation in $1 ."
+echo "Finished release creation in ${1} ."
