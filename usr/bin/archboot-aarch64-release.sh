@@ -7,7 +7,8 @@ _PRESET_LATEST="${_ARCH}-latest"
 _AMD_UCODE="boot/amd-ucode.img"
 _INITRAMFS="boot/initramfs_${_ARCH}.img"
 _INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
-_KERNEL="vmlinuz_${_ARCH}"
+_KERNEL="boot/vmlinuz_${_ARCH}"
+_KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 usage () {
@@ -64,7 +65,7 @@ for i in *.iso; do
     if ! echo "${i}" | grep -q latest "${i}"; then
         isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
         isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS}"
-        isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL}"
+        isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL_ARCHBOOT}"
     else
         isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
     fi
