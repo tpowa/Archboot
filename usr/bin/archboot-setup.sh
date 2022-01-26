@@ -1841,28 +1841,28 @@ check_btrfs_filesystem_creation() {
     DETECT_CREATE_FILESYSTEM="no"
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
-    for i in $(grep "${PART}[:#]" /tmp/.parts); do
-        if echo "${i}" | grep -q ":btrfs:"; then
+    while read -r i; do
+        if grep "${PART}[:#]" "${i}" | grep -q ":btrfs:"; then
             FSTYPE="btrfs"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
             echo "${i}" | cut -d: -f 4 | grep -q yes && DETECT_CREATE_FILESYSTEM="yes"
             [[ "${DETECT_CREATE_FILESYSTEM}" = "yes" ]] && SKIP_ASK_SUBVOLUME="yes"
         fi
-    done
+    done < /tmp/.parts
 }
 
 # remove devices with no subvolume from list and generate raid device list
 btrfs_parts() {
      if [[ -s /tmp/.btrfs-devices ]]; then
          BTRFS_DEVICES=""
-         for i in $(cat /tmp/.btrfs-devices); do
+         while read -r i; do
              BTRFS_DEVICES="${BTRFS_DEVICES}#${i}"
              # remove device if no subvolume is used!
-             [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${i}\ _##g")"
-         done
+             [[ "${BTRFS_SUBVOLUME}" = "NONE" ]] && PARTS="${PARTS//${i}\ _/}"
+         done < /tmp/.btrfs-devices
      else
-         [[ "${BTRFS_SUBVOLUME}" = "NONE"  ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
+         [[ "${BTRFS_SUBVOLUME}" = "NONE" ]] && PARTS="${PARTS//${PART}\ _/}"
      fi
 }
 
@@ -1897,7 +1897,7 @@ select_btrfs_raid_devices () {
     BTRFS_PART="${BTRFS_DEVICE}"
     BTRFS_PARTS="${PARTS}"
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
-    BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
+    BTRFS_PARTS="${BTRFS_PARTS//${BTRFS_PART}\ _/}"
     RAIDNUMBER=2
     #shellcheck disable=SC2086
     DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>${ANSWER} || return 1
@@ -1912,7 +1912,7 @@ select_btrfs_raid_devices () {
         [[ "${RAIDNUMBER}" -ge 4 && "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 5 && "${BTRFS_LEVEL}" = "raid10" || "${BTRFS_LEVEL}" = "raid6" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
+        BTRFS_PARTS="${BTRFS_PARTS//${BTRFS_PART}\ _/}"
         # add more devices
         #shellcheck disable=SC2086
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>${ANSWER} || return 1
@@ -1921,7 +1921,7 @@ select_btrfs_raid_devices () {
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
-     DIALOG --yesno "Would you like to create btrfs raid data like this?\n\nLEVEL:\n${BTRFS_LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.btrfs-devices); do echo "${i}\n"; done)" 0 0 && BTRFS_RAID_FINISH="DONE"
+     DIALOG --yesno "Would you like to create btrfs raid data like this?\n\nLEVEL:\n${BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && BTRFS_RAID_FINISH="DONE"
 }
 
 # prepare new btrfs device
@@ -1991,7 +1991,7 @@ choose_btrfs_subvolume () {
     [[ -n "${SUBVOLUMES}" ]] && SUBVOLUMES_DETECTED="yes"
     subvolumes_in_use
     for i in ${SUBVOLUME_IN_USE}; do
-        SUBVOLUMES=$(echo "${SUBVOLUMES}" | sed -e "s#${i}\ _##g")
+        SUBVOLUMES=${SUBVOLUMES//${i}\ _/}
     done
     if [[ -n "${SUBVOLUMES}" ]]; then
     #shellcheck disable=SC2086
@@ -2146,7 +2146,7 @@ mountpoints() {
         done
         check_mkfs_values
         if [[ "${PART}" != "NONE" ]]; then
-            PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
+            PARTS="${PARTS//${PART}\ _/}"
             echo "${PART}:swap:swap:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         DO_ROOT=""
@@ -2171,7 +2171,7 @@ mountpoints() {
         btrfs_parts
         check_mkfs_values
         echo "${PART}:${FSTYPE}:/:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
-        ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
+        ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
         #
         # Additional partitions
         #
@@ -2203,7 +2203,7 @@ mountpoints() {
                 btrfs_parts
                 check_mkfs_values
                 echo "${PART}:${FSTYPE}:${MP}:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
-                ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
+                ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
             fi
         done
         DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts | sed -e 's, ,#,g'); do echo "${i}\n";done)" 0 0 && PARTFINISH="DONE"
