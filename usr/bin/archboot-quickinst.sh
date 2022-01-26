@@ -134,6 +134,7 @@ install_packages() {
     ### HACK: circular depends are possible in base, install filesystem first!
     PACKAGES="${PACKAGES//\ filesystem\ / }"
     PACKAGES="filesystem ${PACKAGES}"
+    #shellcheck disable=SC2086
     ${PACMAN} -S ${PACKAGES}
 }
 
