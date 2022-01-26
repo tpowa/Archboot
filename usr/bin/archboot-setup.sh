@@ -565,7 +565,7 @@ _stopmd()
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             while read -r i; do
-               mdadm --manage --stop "/dev/$(grep -q ^md "${i}" | sed -e 's# :.*##g')" > ${LOG}
+               mdadm --manage --stop "/dev/$(grep ^md "${i}" | sed -e 's# :.*##g')" > ${LOG}
             done < /proc/mdstat 
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
