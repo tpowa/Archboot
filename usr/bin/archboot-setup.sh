@@ -264,7 +264,7 @@ blockdevices_partitions() {
         #  "echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$"
         #- iso9660 devices
         #  "${_LSBLK} FSTYPE -s ${part} | grep "iso9660"
-        if ! ${_LSBLK} FSTYPE "${part}" | grep "linux_raid_member" || ${_LSBLK} FSTYPE "${part}" | grep "LVM2_member" || ${_LSBLK} FSTYPE "${part}" | grep "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$" || echo "${part}" | grep "[a-z]$(parted -s "$(${_LSBLK} PKNAME "${part}")" print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$" || ${_LSBLK} FSTYPE -s "${part}" | grep "iso9660"; then
+        if ! (${_LSBLK} FSTYPE "${part}" | grep -q "linux_raid_member" || ${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS" || sfdisk -l 2>/dev/null | grep -q "${part}" | grep "Extended$" || sfdisk -l 2>/dev/null | grep -q "${part}" | grep "(LBA)$" || echo "${part}" | grep -q "[a-z]$(parted -s "$(${_LSBLK} PKNAME "${part}")" print 2>/dev/null | grep -q bios_grub | cut -d " " -f 2)$" || ${_LSBLK} FSTYPE -s "${part}" | grep -q "iso9660"); then
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi           
