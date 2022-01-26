@@ -836,7 +836,7 @@ _createraid()
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
     ! [[ "${PARITY}" = "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
     DIALOG --infobox "Creating ${RAIDDEVICE}..." 0 0
-    mdadm --create "${RAIDDEVICE}" "${RAIDOPTIONS}" "${DEVICES}" >${LOG} 2>&1 || \
+    mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >${LOG} 2>&1 || \
     (DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0; return 1)
     if echo "${RAIDDEVICE}" | grep -q "/md_d[0-9"]; then
         # switch for mbr usage
