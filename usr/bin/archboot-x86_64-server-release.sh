@@ -41,11 +41,13 @@ cd "${_DIRECTORY}" || exit 1
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
 for i in *; do
+    #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 for i in boot/*; do
+    #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
