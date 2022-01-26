@@ -564,9 +564,9 @@ _stopmd()
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
-            for i in $(grep -q ^md /proc/mdstat | sed -e 's# :.*##g'); do
-                mdadm --manage --stop "/dev/${i}" > ${LOG}
-            done
+            while read -r i; do
+               mdadm --manage --stop "/dev/$(grep -q ^md "${i}" | sed -e 's# :.*##g')" > ${LOG}
+            done < /proc/mdstat 
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 mdadm --zero-superblock "${i}" > ${LOG}
@@ -764,7 +764,7 @@ _raid()
                 DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>${ANSWER} || return 1
             fi
             RAIDDEVICE=$(cat ${ANSWER})
-            if grep -q "^$(echo "${RAIDDEVICE}" | sed -e 's#/dev/##g')" /proc/mdstat; then
+            if grep -q "^$${${RAIDDEVICE}//\/dev//}" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
@@ -814,7 +814,7 @@ _raid()
             fi
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(for i in $(cat /tmp/.raid); do echo "${i}\n";done)\nSPARES:\n$(for i in $(cat /tmp/.raid-spare); do echo "${i}\n";done)" 0 0 && MDFINISH="DONE"
+        DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && MDFINISH="DONE"
     done
     _createraid
 }
@@ -909,7 +909,7 @@ _createpv()
         while [[ "${PART}" != "DONE" ]]; do
             DEVNUMBER="$((DEVNUMBER + 1))"
             # clean loop from used partition and options
-            PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
+            PARTS="${PARTS//${PART}\ _//}"
             # add more devices
             #shellcheck disable=SC2086
             DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
@@ -1013,7 +1013,7 @@ _createvg()
         while [[ "${PVS}" != "DONE" ]]; do
             PVNUMBER=$((PVNUMBER + 1))
             # clean loop from used partition and options
-            PVS="$(echo "${PVS}" | sed -e "s#${PV}\ _##g")"
+            PVS="${PVS}//${PV} _/}"
             # add more devices
             #shellcheck disable=SC2086
             DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} DONE _ 2>${ANSWER} || return 1
@@ -1219,6 +1219,7 @@ autoprepare() {
     DISCS=$(blockdevices)
     if [[ "$(echo "${DISCS}" | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+        #shellcheck disable=SC2046
         DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat ${ANSWER})
     else
@@ -1801,10 +1802,8 @@ find_btrfs_bootloader_subvolume() {
 # subvolumes already in use
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
-    for i in $(grep "${PART}[:#]" /tmp/.parts); do
-        if echo "${i}" | grep -q ":btrfs:"; then
-            SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
-        fi
+    while read -r i; do
+        grep -q ":btrfs:" "${i}" && SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
     done
 }
 
