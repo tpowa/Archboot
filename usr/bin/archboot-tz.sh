@@ -61,6 +61,7 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
     for i in $(timedatectl --no-pager list-timezones); do
         ZONES="${ZONES} ${i} -"
     done
+    #shellcheck disable=SC2086
     DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
     zone=$(cat ${ANSWER})
     if [[ "${SET_ZONE}" = "1" ]]; then
@@ -132,6 +133,7 @@ mainmenu() {
     else
         DEFAULT=""
     fi
+    #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
         "1" "Select Timezone" \
