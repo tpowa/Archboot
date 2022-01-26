@@ -922,7 +922,7 @@ _createpv()
     done
     DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
-    pvcreate "${PART}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1)
+    pvcreate ${PART} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1)
     # run udevadm to get values exported
     udevadm trigger
     udevadm settle
