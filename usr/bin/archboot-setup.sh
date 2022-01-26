@@ -505,6 +505,7 @@ set_device_name_scheme() {
     fi
     
     NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
+    #shellcheck disable=SC2086
     DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>${ANSWER} || return 1
     NAME_SCHEME_PARAMETER=$(cat ${ANSWER})
     NAME_SCHEME_PARAMETER_RUN="1"
@@ -769,12 +770,14 @@ _raid()
             fi
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the raid level you want to use" 21 50 11 ${RAIDLEVELS} 2>${ANSWER} || return 1
         LEVEL=$(cat ${ANSWER})
         # raid5 and raid10 support parity parameter
         PARITY=""
         if [[ "${LEVEL}" = "raid5" || "${LEVEL}" = "raid6" || "${LEVEL}" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
+            #shellcheck disable=SC2086
             DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>${ANSWER} || return 1
             PARITY=$(cat ${ANSWER})
         fi
@@ -782,6 +785,7 @@ _raid()
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
+        #shellcheck disable=SC2086
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.raid
@@ -792,6 +796,7 @@ _raid()
             # raid0 doesn't support missing devices
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
+            #shellcheck disable=SC2086
             DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             SPARE=""
@@ -897,6 +902,7 @@ _createpv()
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         DEVNUMBER=1
+        #shellcheck disable=SC2086
         DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         echo "${PART}" >>/tmp/.pvs-create
@@ -905,6 +911,7 @@ _createpv()
             # clean loop from used partition and options
             PARTS="$(echo "${PARTS}" | sed -e "s#${PART}\ _##g")"
             # add more devices
+            #shellcheck disable=SC2086
             DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             [[ "${PART}" = "DONE" ]] && break
@@ -995,9 +1002,11 @@ _createvg()
             fi
         done
         # show all devices with sizes, which are not in use
+        #shellcheck disable=SC2086
         DIALOG --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         PVNUMBER=1
+        #shellcheck disable=SC2086
         DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>${ANSWER} || return 1
         PV=$(cat ${ANSWER})
         echo "${PV}" >>/tmp/.pvs
@@ -1006,6 +1015,7 @@ _createvg()
             # clean loop from used partition and options
             PVS="$(echo "${PVS}" | sed -e "s#${PV}\ _##g")"
             # add more devices
+            #shellcheck disable=SC2086
             DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} DONE _ 2>${ANSWER} || return 1
             PV=$(cat ${ANSWER})
             [[ "${PV}" = "DONE" ]] && break
@@ -1034,6 +1044,7 @@ _createlv()
         fi
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
+        #shellcheck disable=SC2086
         DIALOG --menu "Select Volume Group" 21 50 13 ${LVS} 2>${ANSWER} || return 1
         LV=$(cat ${ANSWER})
         # enter logical volume name
@@ -1178,6 +1189,7 @@ _luks()
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        #shellcheck disable=SC2086
         DIALOG --menu "Select device for luks encryption" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
         PART=$(cat ${ANSWER})
         # enter luks name
@@ -1357,6 +1369,7 @@ autoprepare() {
         done
         
         while [[ "${CHOSEN_FS}" = "" ]]; do
+            #shellcheck disable=SC2086
             DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>${ANSWER} || return 1
             FSTYPE=$(cat ${ANSWER})
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
@@ -1680,6 +1693,7 @@ partition() {
     DISC=""
     while true; do
         # Prompt the user with a list of known disks
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the disk you want to partition\n(select DONE when finished)" 14 55 7 ${DISCS} 2>${ANSWER} || return 1
         DISC=$(cat ${ANSWER})
         if [[ "${DISC}" == "OTHER" ]]; then
@@ -1804,6 +1818,7 @@ btrfs_compress() {
         DIALOG --yesno "Would you like to compress the data on ${PART} subvolume=${BTRFS_SUBVOLUME}?" 0 0 && BTRFS_COMPRESS="compress"
     fi
     if [[ "${BTRFS_COMPRESS}" = "compress" ]]; then
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the compression method you want to use" 21 50 9 ${BTRFS_COMPRESSLEVELS} 2>${ANSWER} || return 1
         BTRFS_COMPRESS="compress=$(cat ${ANSWER})"
     fi
@@ -1861,6 +1876,7 @@ btrfs_raid_level() {
     : >/tmp/.btrfs-devices
     DIALOG --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${BTRFS_RAID_FINISH}" != "DONE" ]]; do
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the raid data level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>${ANSWER} || return 1
         BTRFS_LEVEL=$(cat ${ANSWER})
         if [[ "${BTRFS_LEVEL}" = "NONE" ]]; then
@@ -1884,6 +1900,7 @@ select_btrfs_raid_devices () {
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
     BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
     RAIDNUMBER=2
+    #shellcheck disable=SC2086
     DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>${ANSWER} || return 1
     BTRFS_PART=$(cat ${ANSWER})
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
@@ -1898,6 +1915,7 @@ select_btrfs_raid_devices () {
         # clean loop from used partition and options
         BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
         # add more devices
+        #shellcheck disable=SC2086
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>${ANSWER} || return 1
         BTRFS_PART=$(cat ${ANSWER})
         [[ "${BTRFS_PART}" = "DONE" ]] && break
@@ -1977,6 +1995,7 @@ choose_btrfs_subvolume () {
         SUBVOLUMES=$(echo "${SUBVOLUMES}" | sed -e "s#${i}\ _##g")
     done
     if [[ -n "${SUBVOLUMES}" ]]; then
+    #shellcheck disable=SC2086
         DIALOG --menu "Select the subvolume to mount" 21 50 13 ${SUBVOLUMES} 2>${ANSWER} || return 1
         BTRFS_SUBVOLUME=$(cat ${ANSWER})
     else
@@ -2039,6 +2058,7 @@ select_filesystem() {
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
     [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs3 NTFS"
     [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
+    #shellcheck disable=SC2086
     DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>${ANSWER} || return 1
     FSTYPE=$(cat ${ANSWER})
 }
@@ -2110,6 +2130,7 @@ mountpoints() {
         DO_SWAP=""
         while [[ "${DO_SWAP}" != "DONE" ]]; do
             FSTYPE="swap"
+            #shellcheck disable=SC2086
             DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - ${PARTS} 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             if [[ "${PART}" != "NONE" ]]; then
@@ -2131,6 +2152,7 @@ mountpoints() {
         fi
         DO_ROOT=""
         while [[ "${DO_ROOT}" != "DONE" ]]; do
+            #shellcheck disable=SC2086
             DIALOG --menu "Select the partition to mount as /" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
             PART=$(cat ${ANSWER})
             PART_ROOT=${PART}
@@ -2157,6 +2179,7 @@ mountpoints() {
         while [[ "${PART}" != "DONE" ]]; do
             DO_ADDITIONAL=""
             while [[ "${DO_ADDITIONAL}" != "DONE" ]]; do
+                #shellcheck disable=SC2086
                 DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
                 PART=$(cat ${ANSWER})
                 if [[ "${PART}" != "DONE" ]]; then
@@ -2287,6 +2310,7 @@ _mkfs() {
         # if we were tasked to create the filesystem, do so
         if [[ "${_domk}" = "yes" ]]; then
             local ret
+            #shellcheck disable=SC2086
             case ${_fstype} in
                 xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f "${_device}" >${LOG} 2>&1; ret=$? ;;
                 jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
@@ -2736,6 +2760,7 @@ donetwork() {
         INTERFACE=
         ifaces=$(net_interfaces)
         while [[ "${INTERFACE}" = "" ]]; do
+            #shellcheck disable=SC2086
             DIALOG --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>${ANSWER}
             case $? in
                 1) return 1 ;;
@@ -3924,7 +3949,7 @@ do_grub_bios() {
             DIALOG --msgbox "No storage drives were found" 0 0
             return 1
         fi
-        
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
         bootdev=$(cat ${ANSWER})
     else
@@ -3937,7 +3962,7 @@ do_grub_bios() {
             DIALOG --msgbox "No storage drives were found" 0 0
             return 1
         fi
-        
+        #shellcheck disable=SC2086
         DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
         bootdev=$(cat ${ANSWER})
     fi
@@ -4178,6 +4203,7 @@ prepare_storagedrive() {
             DEFAULT=""
         fi
         CANCEL=""
+        #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE storage drive)" \
             "2" "Partition Storage Drives" \
@@ -4221,6 +4247,7 @@ create_special() {
             DEFAULT=""
         fi
         CANCEL=""
+        #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Software Raid, LVM2 and Luks encryption" 14 60 5 \
             "1" "Create Software Raid" \
             "2" "Create LVM2" \
@@ -4256,6 +4283,7 @@ _createmd() {
             DEFAULT=""
         fi
         CANCEL=""
+        #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Software Raid" 12 60 5 \
             "1" "Raid Help" \
             "2" "Reset Software Raid completely" \
@@ -4296,6 +4324,7 @@ _createlvm() {
             DEFAULT=""
         fi
         CANCEL=""
+        #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create physical volume, volume group or logical volume" 13 60 7 \
             "1" "LVM Help" \
             "2" "Reset Logical Volume completely" \
@@ -4337,6 +4366,7 @@ _createluks() {
             DEFAULT=""
         fi
         CANCEL=""
+        #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Luks Encryption" 12 60 5 \
             "1" "Luks Help" \
             "2" "Reset Luks Encryption completely" \
@@ -4479,6 +4509,7 @@ configure_system() {
         else
             DEFAULT=""
         fi
+        #shellcheck disable=SC2086
         DIALOG ${DEFAULT} --menu "Configuration" 21 80 16 \
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
@@ -4655,6 +4686,7 @@ mainmenu() {
     else
         DEFAULT=""
     fi
+    #shellcheck disable=SC2086
     dialog ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 18 58 14 \
     "0" "Set Keyboard And Console Font" \
