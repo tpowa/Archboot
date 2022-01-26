@@ -822,8 +822,8 @@ _raid()
 # create raid device
 _createraid()
 {
-    DEVICES="$(echo -n $(cat /tmp/.raid))"
-    SPARES="$(echo -n $(cat /tmp/.raid-spare))"
+    DEVICES="$(echo -n "$(cat /tmp/.raid)")"
+    SPARES="$(echo -n "$(cat /tmp/.raid-spare)")"
     # combine both if spares are available, spares at the end!
     [[ -n ${SPARES} ]] && DEVICES="${DEVICES} ${SPARES}"
     # get number of devices
