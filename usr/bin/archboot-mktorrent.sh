@@ -14,6 +14,7 @@ archver="${1}"
 isofile="${2}"
 
 echo 'Creating webseeds...'
+#shellcheck disable=SC2016
 httpmirrorlist=$(wget http://www.archlinux.org/mirrorlist/all/http/ -q -O - \
 	- | grep 'http://' \
 	| awk "{print \$3\"/iso/${archver}/\";}" \
