@@ -2206,7 +2206,7 @@ mountpoints() {
                 ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
             fi
         done
-        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(for i in $(cat /tmp/.parts | sed -e 's, ,#,g'); do echo "${i}\n";done)" 0 0 && PARTFINISH="DONE"
+        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
@@ -2214,7 +2214,7 @@ mountpoints() {
         set_device_name_scheme || return 1
     fi
     printk off
-    for line in $(cat /tmp/.parts); do
+    while read -r line; do
         PART=$(echo "${line}" | cut -d: -f 1)
         FSTYPE=$(echo "${line}" | cut -d: -f 2)
         MP=$(echo "${line}" | cut -d: -f 3)
@@ -2242,7 +2242,7 @@ mountpoints() {
             _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi
         sleep 1
-    done
+    done < /tmp/.parts
     printk on
     DIALOG --msgbox "Partitions were successfully mounted." 0 0
     NEXTITEM="5"
@@ -2268,7 +2268,7 @@ _mkfs() {
     local _mountpoint=${5}
     local _labelname=${6}
     local _fsoptions=${7}
-    local _btrfsdevices="$(echo "${8}" | sed -e 's|#| |g')"
+    local _btrfsdevices="${8//#/ /}"
     local _btrfslevel=${9}
     local _btrfssubvolume=${10}
     local _dosubvolume=${11}
