@@ -55,6 +55,7 @@ tar -acf "${_PACMAN_AARCH64_CHROOT}" -C "${_PACMAN_AARCH64}" .
 echo "Removing ${_PACMAN_AARCH64} ..."
 rm -r "${_PACMAN_AARCH64}"
 echo "Finished container tarball."
+#shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
 chown "${_USER}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 chgrp "${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
@@ -71,11 +72,13 @@ cd "${_DIRECTORY}" || exit 1
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
 for i in *; do
+    #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 for i in boot/*; do
+    #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
