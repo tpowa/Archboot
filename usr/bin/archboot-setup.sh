@@ -764,7 +764,7 @@ _raid()
                 DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>${ANSWER} || return 1
             fi
             RAIDDEVICE=$(cat ${ANSWER})
-            if grep -q "^${${RAIDDEVICE}//\/dev\//}" /proc/mdstat; then
+            if grep -q "^${${RAIDDEVICE}//\/dev\/}" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
             fi
