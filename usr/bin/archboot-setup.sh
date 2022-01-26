@@ -123,9 +123,7 @@ getpartlabel()
 
 # list all net devices with mac adress
 net_interfaces() {
-    for i in $(ls /sys/class/net); do 
-        echo "$i $(cat /sys/class/net/$i/address)"
-    done
+    find /sys/class/net/* -type l -printf '%f ' -exec cat {}/address \;
 }
 
 # activate_dmraid()
