@@ -1841,15 +1841,15 @@ check_btrfs_filesystem_creation() {
     DETECT_CREATE_FILESYSTEM="no"
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
-    while read -r i; do
-        if grep "${PART}[:#]" "${i}" | grep -q ":btrfs:"; then
+    for i in $(grep "${PART}[:#]" /tmp/.parts); do
+        if echo "${i}" | grep -q ":btrfs:"; then
             FSTYPE="btrfs"
             SKIP_FILESYSTEM="yes"
             # check on filesystem creation, skip subvolume asking then!
             echo "${i}" | cut -d: -f 4 | grep -q yes && DETECT_CREATE_FILESYSTEM="yes"
             [[ "${DETECT_CREATE_FILESYSTEM}" = "yes" ]] && SKIP_ASK_SUBVOLUME="yes"
         fi
-    done < /tmp/.parts
+    done
 }
 
 # remove devices with no subvolume from list and generate raid device list
