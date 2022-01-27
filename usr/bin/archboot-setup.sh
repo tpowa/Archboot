@@ -916,7 +916,7 @@ _createpv()
     done
     DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
-    #shellcheck disable=SC2028
+    #shellcheck disable=SC2028,SC2086
     pvcreate -y ${PART} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1)
     # run udevadm to get values exported
     udevadm trigger
@@ -968,6 +968,7 @@ getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units m); do
         if ! echo "${i}" | grep -q " 0m$"; then
+            #shellcheck disable=SC2028
             echo "${i}\n"
         fi
     done
@@ -1008,6 +1009,7 @@ _createvg()
         while [[ "${PVS}" != "DONE" ]]; do
             PVNUMBER=$((PVNUMBER + 1))
             # clean loop from used partition and options
+            #shellcheck disable=SC2001,SC2086
             PVS="$(echo ${PVS} | sed -e "s#${PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
@@ -1021,6 +1023,7 @@ _createvg()
     done
     DIALOG --infobox "Creating Volume Group ${VGDEVICE}..." 0 0
     PV="$(echo -n "$(cat /tmp/.pvs)")"
+    #shellcheck disable=SC2086
     vgcreate ${VGDEVICE} ${PV} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${LOG} for details)." 0 0; return 1)
 }
 
@@ -1088,8 +1091,10 @@ _createlv()
     done
     DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
+        #shellcheck disable=SC2086
         lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     else
+        #shellcheck disable=SC2086
         lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     fi
 }
@@ -1468,6 +1473,7 @@ autoprepare() {
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >${LOG}
         fi
     fi
+    #shellcheck disable=SC2181
     if [[ $? -gt 0 ]]; then
         DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
         printk on
@@ -1836,6 +1842,7 @@ check_btrfs_filesystem_creation() {
     DETECT_CREATE_FILESYSTEM="no"
     SKIP_FILESYSTEM="no"
     SKIP_ASK_SUBVOLUME="no"
+    #shellcheck disable=SC2013
     for i in $(grep "${PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             FSTYPE="btrfs"
@@ -1916,6 +1923,7 @@ select_btrfs_raid_devices () {
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
+     #shellcheck disable=SC2028
      DIALOG --yesno "Would you like to create btrfs raid data like this?\n\nLEVEL:\n${BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && BTRFS_RAID_FINISH="DONE"
 }
 
@@ -2201,6 +2209,7 @@ mountpoints() {
                 ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
             fi
         done
+        #shellcheck disable=SC2028
         DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
@@ -2263,7 +2272,7 @@ _mkfs() {
     local _mountpoint=${5}
     local _labelname=${6}
     local _fsoptions=${7}
-    local _btrfsdevices="${8//#/ /}"
+    local _btrfsdevices="${8//#/ }"
     local _btrfslevel=${9}
     local _btrfssubvolume=${10}
     local _dosubvolume=${11}
@@ -2281,12 +2290,14 @@ _mkfs() {
         swapoff "${_device}" >/dev/null 2>&1
         if [[ "${_domk}" = "yes" ]]; then
             mkswap -L "${_labelname}" "${_device}" >${LOG} 2>&1
+            #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
                 DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
                 return 1
             fi
         fi
         swapon "${_device}" >${LOG} 2>&1
+        #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
             return 1
@@ -2343,6 +2354,7 @@ _mkfs() {
         _mountoptions="$(echo "${_mountoptions}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
         mount -t "${_fstype}" -o "${_mountoptions}" "${_device}" "${_dest}""${_mountpoint}" >${LOG} 2>&1
+        #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
@@ -2360,11 +2372,15 @@ _mkfs() {
         fi
     fi
     # add to .device-names for config files
+    #shellcheck disable=SC2155
     local _fsuuid="$(getfsuuid "${_device}")"
+    #shellcheck disable=SC2155
     local _fslabel="$(getfslabel "${_device}")"
     
     if [[ "${GUID_DETECTED}" == "1" ]]; then
+        #shellcheck disable=SC2155
         local _partuuid="$(getpartuuid "${_device}")"
+        #shellcheck disable=SC2155
         local _partlabel="$(getpartlabel "${_device}")"
         
         echo "# DEVICE DETAILS: ${_device} PARTUUID=${_partuuid} PARTLABEL=${_partlabel} UUID=${_fsuuid} LABEL=${_fslabel}" >> /tmp/.device-names
