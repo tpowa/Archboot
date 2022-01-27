@@ -734,7 +734,7 @@ _raid()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f1 | sort -u); do 
+        RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | grep "^md.p" | cut -d' ' -f1 | sort -u); do 
                     echo "$(${_LSBLK} NAME "${i}")" _
                     done)"
         PARTS="$(for i in $(findpartitions); do 
@@ -817,7 +817,6 @@ _createraid()
     SPARE_DEVICES="$(wc -l < /tmp/.raid-spare)"
     # generate options for mdadm
     RAIDOPTIONS="--force --run --level=${LEVEL}"
-    echo "${RAIDDEVICE}" | grep -q "/md_d[0-9]" && RAIDOPTIONS="${RAIDOPTIONS} -a mdp"
     ! [[ "${RAID_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --raid-devices=${RAID_DEVICES}"
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
     ! [[ "${PARITY}" = "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
