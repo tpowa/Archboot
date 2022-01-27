@@ -1093,9 +1093,9 @@ _createlv()
     done
     DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
-        lvcreate "${LV_EXTRA}" -l +100%FREE "${LV}" -n "${LVDEVICE}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
+        lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     else
-        lvcreate "${LV_EXTRA}" -L "${LV_SIZE} ${LV}" -n "${LVDEVICE}" >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
+        lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0; return 1)
     fi
 }
 
