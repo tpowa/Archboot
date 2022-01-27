@@ -555,6 +555,7 @@ _stopmd()
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
+            # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
                 wipefs -a --force "/dev/${i}" > ${LOG}  2>&1
@@ -806,6 +807,7 @@ _raid()
             fi
         done
         # final step ask if everything is ok?
+        # shellcheck disable=SC2028
         DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && MDFINISH="DONE"
     done
     _createraid
@@ -827,6 +829,7 @@ _createraid()
     ! [[ "${SPARE_DEVICES}" = "0" ]] && RAIDOPTIONS="${RAIDOPTIONS} --spare-devices=${SPARE_DEVICES}"
     ! [[ "${PARITY}" = "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
     DIALOG --infobox "Creating ${RAIDDEVICE}..." 0 0
+    #shellcheck disable=SC2086
     mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >${LOG} 2>&1 || \
     (DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0; return 1)
     if [[ ${RAID_PARTITION} == "1" ]]; then
@@ -913,6 +916,7 @@ _createpv()
     done
     DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
+    #shellcheck disable=SC2028
     pvcreate -y ${PART} >${LOG} 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1)
     # run udevadm to get values exported
     udevadm trigger
