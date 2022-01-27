@@ -291,14 +291,6 @@ raid_devices() {
     done
 }
 
-# lists default linux partitionable raid devices
-partitionable_raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep "_d.*$" | sort -u); do
-        echo "${dev}"
-        [[ "${1}" ]] && echo "${1}"
-    done
-}
-
 # lists linux partitionable raid devices partitions
 partitionable_raid_devices_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md.p" | cut -d' ' -f 1 | sort -u) ; do
@@ -329,14 +321,14 @@ dmraid_devices() {
             [[ "${1}" ]] && echo "${1}"
     done
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE "${i}" 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if $(${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE "${i}" 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if $(${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
@@ -347,7 +339,7 @@ dmraid_devices() {
 # dmraid_partitions
 # - show dmraid partitions
 dmraid_partitions() {
-    for part in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
+    for part in $(${_LSBLK} NAME,TYPE | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
         # exclude checks:
         # - part of lvm2 device
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
@@ -365,14 +357,14 @@ dmraid_partitions() {
         fi
     done
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " md$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if $(${_LSBLK} NAME,FSTYPE -s "${dev}" 2>/dev/null | grep "isw_raid_member$" | cut -d' ' -f 1); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE "${i}" | grep " md$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if $(${_LSBLK} NAME,FSTYPE -s "${dev}" 2>/dev/null | grep "ddf_raid_member$" | cut -d' ' -f 1); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
@@ -405,7 +397,6 @@ dm_devices() {
 finddisks() {
     blockdevices "${1}"
     dmraid_devices "${1}"
-    partitionable_raid_devices "${1}"
 }
 
 findpartitions() {
