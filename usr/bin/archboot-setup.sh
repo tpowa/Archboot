@@ -4206,7 +4206,7 @@ prepare_storagedrive() {
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE storage drive)" \
             "2" "Partition Storage Drives" \
-            "3" "Create Software Raid, Lvm2 and Luks encryption" \
+            "3" "Manage Software Raid, Lvm2 and Luks encryption" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>${ANSWER} || CANCEL="1"
         NEXTITEM="$(cat ${ANSWER})"
@@ -4247,10 +4247,10 @@ create_special() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Software Raid, LVM2 and Luks encryption" 14 60 5 \
-            "1" "Create Software Raid" \
-            "2" "Create LVM2" \
-            "3" "Create Luks encryption" \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 14 60 5 \
+            "1" "Manage Software Raid" \
+            "2" "Manage LVM2" \
+            "3" "Manage Luks encryption" \
             "4" "Return to Previous Menu" 2>${ANSWER} || CANCEL="1"
         NEXTITEM="$(cat ${ANSWER})"
         case $(cat ${ANSWER}) in
@@ -4283,7 +4283,7 @@ _createmd() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Software Raid" 12 60 5 \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Software Raid" 12 60 5 \
             "1" "Raid Help" \
             "2" "Reset Software Raid completely" \
             "3" "Create Software Raid" \
@@ -4324,7 +4324,7 @@ _createlvm() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create physical volume, volume group or logical volume" 13 60 7 \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage physical volume, volume group or logical volume" 13 60 7 \
             "1" "LVM Help" \
             "2" "Reset Logical Volume completely" \
             "3" "Create Physical Volume" \
@@ -4366,7 +4366,7 @@ _createluks() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Create Luks Encryption" 12 60 5 \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Luks Encryption" 12 60 5 \
             "1" "Luks Help" \
             "2" "Reset Luks Encryption completely" \
             "3" "Create Luks" \
