@@ -556,14 +556,14 @@ _stopmd()
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
-                wipefs -a "${i}" > ${LOG}
+                wipefs -a --force "${i}" > ${LOG}
                 mdadm --manage --stop "/dev/${i}" > ${LOG}
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
                 sgdisk --zap "${i}" > ${LOG}
-                wipefs -a "${i}" > ${LOG}
+                wipefs -a --force "${i}" > ${LOG}
                 dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}
             done
         fi
