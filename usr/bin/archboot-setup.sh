@@ -236,7 +236,7 @@ blockdevices() {
          #  ${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member"
          #- fakeraid ddf devices
          #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
-         if ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "dmraid" || {_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "^raid" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "iso9660" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "ddf_raid_member"; then
+         if ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "dmraid" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "iso9660" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "ddf_raid_member"; then
              echo "${dev}"
              [[ "${1}" ]] && echo "${1}"
          fi
@@ -322,14 +322,14 @@ dmraid_devices() {
     done
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$"; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$"; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
