@@ -560,7 +560,10 @@ _stopmd()
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-               wipefs -a "${i}" > ${LOG}
+                # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
+                sgdisk --zap "${i}" > ${LOG}
+                wipefs -a "${i}" > ${LOG}
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}
             done
         fi
     fi
@@ -570,7 +573,10 @@ _stopmd()
         if [[ "${DISABLEMDSB}" = "1" ]]; then
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
+                # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
+                sgdisk --zap "${i}" > ${LOG}
                 wipefs -a "${i}" > ${LOG}
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}
             done
         fi
     fi
