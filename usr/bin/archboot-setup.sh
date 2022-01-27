@@ -736,7 +736,7 @@ _raid()
         # Remove all raid devices with children
         RAID_BLACKLIST="$(raid_devices;partitionable_raid_devices_partitions)"
         PARTS="$(for i in $(findpartitions); do 
-                ! echo "${RAID_BLACKLIST}" | grep -qE "${i} _" && echo "${i}" _ 
+                echo "${RAID_BLACKLIST}" | grep -qw "${i}" || echo "${i}" _ 
                 done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
