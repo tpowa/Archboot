@@ -274,7 +274,7 @@ blockdevices_partitions() {
 
 # list none partitionable raid md devices
 raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | grep -v "_d.*$" | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
@@ -284,7 +284,7 @@ raid_devices() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! (${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member"); then
+        if ! (${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member" || find $dev* 2>&1 /dev/null); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
