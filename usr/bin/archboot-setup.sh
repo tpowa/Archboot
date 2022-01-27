@@ -4495,7 +4495,7 @@ auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [[ "${SYNC_URL}" != "" ]]; then
-        #shellchecl disable=SC2027,SC2086
+        #shellcheck disable=SC2027,SC2086
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
     fi
