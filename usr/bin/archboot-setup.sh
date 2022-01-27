@@ -2272,7 +2272,7 @@ _mkfs() {
     local _mountpoint=${5}
     local _labelname=${6}
     local _fsoptions=${7}
-    local _btrfsdevices="${8//#/ }"
+    local _btrfsdevices="${8//#/\ /}"
     local _btrfslevel=${9}
     local _btrfssubvolume=${10}
     local _dosubvolume=${11}
