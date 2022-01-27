@@ -236,7 +236,7 @@ blockdevices() {
          #  ${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member"
          #- fakeraid ddf devices
          #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
-         if ! ${_LSBLK} TYPE "${dev}" | grep -q "dmraid" || ${_LSBLK} FSTYPE "${dev}" | grep -q "iso9660" || ${_LSBLK} FSTYPE "${dev}" | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" | grep -q "ddf_raid_member"; then
+         if ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "dmraid" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "iso9660" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "ddf_raid_member"; then
              echo "${dev}"
              [[ "${1}" ]] && echo "${1}"
          fi
@@ -264,7 +264,7 @@ blockdevices_partitions() {
         #  "echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$"
         #- iso9660 devices
         #  "${_LSBLK} FSTYPE -s ${part} | grep "iso9660"
-        if ! (${_LSBLK} FSTYPE "${part}" | grep -q "linux_raid_member" || ${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" || echo "${part}" | grep -q "[a-z]$(parted -s "$(${_LSBLK} PKNAME "${part}")" print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$" || ${_LSBLK} FSTYPE -s "${part}" | grep -q "iso9660"); then
+        if ! (${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "linux_raid_member" || ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" || echo "${part}" | grep -q "[a-z]$(parted -s "$(${_LSBLK} PKNAME "${part}")" print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$" || ${_LSBLK} FSTYPE -s "${part}" 2>/dev/null | grep -q "iso9660"); then
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi           
@@ -284,7 +284,7 @@ raid_devices() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! (${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"); then
+        if ! (${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member"); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -315,7 +315,7 @@ partitionable_raid_devices_partitions() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! (${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" || ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"); then
+        if ! (${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "crypto_LUKS" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member"); then
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -359,7 +359,7 @@ dmraid_partitions() {
         #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$"
         # - extended partition (LBA)
         #   sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
-        if ! (${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS$" || ${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member$" || ${_LSBLK} FSTYPE "${part}" | grep -q "linux_raid_member$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$"|| sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$"); then
+        if ! (${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "crypto_LUKS$" || ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "LVM2_member$" || ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "linux_raid_member$" || sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$"|| sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$"); then
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -395,7 +395,7 @@ dm_devices() {
         #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
         # - part of running raid on encrypted device
         #   ${_LSBLK} TYPE ${dev} | grep "raid.*$
-        if ! (${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" || ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" || ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member$" || ${_LSBLK} TYPE "${dev}" | grep -q "raid.*$"); then
+        if ! (${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" 2>/dev/null || ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" 2>/dev/null || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "linux_raid_member$" || ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "raid.*$"); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
