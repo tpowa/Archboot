@@ -2,12 +2,12 @@
 # we rely on some output which is parsed in english!
 unset LANG
 ANSWER="/tmp/.setup"
-TITLE="Arch Linux Installation"
 # use the first VT not dedicated to a running console
 LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
 DESTDIR="/install"
 RUNNING_ARCH="$(uname -m)"
+TITLE="Arch Linux Installation System:${RUNNING_ARCH} https://wiki.archlinux.org/Archboot"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
