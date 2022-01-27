@@ -1177,10 +1177,10 @@ _luks()
         activate_special_devices
         # Remove all crypt devices with children
         CRYPT_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do 
-                    ${_LSBLK} NAME "${i}" _
+                    ${_LSBLK} NAME "${i}"
                     done)"
         PARTS="$(for i in $(findpartitions); do 
-                ! echo "${CRYPT_BLACKLIST}" | grep -Eq "${i} _" && echo "${i}" _ 
+                echo "${CRYPT_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
                 done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
