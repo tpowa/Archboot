@@ -757,12 +757,7 @@ _raid()
         # enter raid device name
         RAIDDEVICE=""
         while [[ "${RAIDDEVICE}" = "" ]]; do
-            if [[ "${RAID_PARTITION}" = "" ]]; then
-                DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>${ANSWER} || return 1
-            fi
-            if [[ "${RAID_PARTITION}" = "1" ]]; then
-                DIALOG --inputbox "Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1" 15 65 "/dev/md_d0" 2>${ANSWER} || return 1
-            fi
+            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 15 65 "/dev/md0" 2>${ANSWER} || return 1
             RAIDDEVICE=$(cat ${ANSWER})
             if grep -q "^${RAIDDEVICE//\/dev\//}" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
@@ -1563,7 +1558,7 @@ check_gpt() {
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${DISC}")" == "gpt" ]] && GUID_DETECTED="1"
     
     if [[ "${GUID_DETECTED}" == "" ]]; then
-        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
+        DIALOG --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt "${DISC}" > ${LOG} && GUID_DETECTED="1"
         # reread partitiontable for kernel
         partprobe "${DISC}" > ${LOG}
