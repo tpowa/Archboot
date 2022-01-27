@@ -557,15 +557,15 @@ _stopmd()
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                wipefs -a --force "/dev/${i}" > ${LOG}
-                mdadm --manage --stop "/dev/${i}" > ${LOG}
+                wipefs -a --force "/dev/${i}" > ${LOG}  2>&1
+                mdadm --manage --stop "/dev/${i}" > ${LOG} 2>&1
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > ${LOG}
-                wipefs -a --force "${i}" > ${LOG}
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}
+                sgdisk --zap "${i}" > ${LOG} 2>&1
+                wipefs -a --force "${i}" > ${LOG} 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG} 2>&1
             done
         fi
     fi
@@ -576,9 +576,9 @@ _stopmd()
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > ${LOG}
-                wipefs -a "${i}" > ${LOG}
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}
+                sgdisk --zap "${i}" > ${LOG} 2>&1
+                wipefs -a "${i}" > ${LOG} 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > ${LOG}  2>&1
             done
         fi
     fi
