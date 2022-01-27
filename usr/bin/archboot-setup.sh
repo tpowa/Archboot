@@ -284,7 +284,7 @@ raid_devices() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! (${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member" || find $dev*p* -type f -exec echo {} \; 2>/dev/null ); then
+        if ! (${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member" || ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "isw_raid_member" || ${_LSBLK} FSTYPE "${dev}" -s 2>/dev/null | grep -q "ddf_raid_member" || find "$dev"*p* -type f -exec echo {} \; 2>/dev/null ); then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -316,20 +316,20 @@ partitionable_raid_devices_partitions() {
 
 # lists dmraid devices
 dmraid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
+    for dev in ${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u; do
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
     done
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if $(${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1); then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if $(${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1); then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
