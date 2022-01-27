@@ -2522,6 +2522,7 @@ run_pacman(){
         echo "Installing Packages..." >/tmp/pacman.log ; \
         echo >>/tmp/pacman.log ; \
         touch /tmp/setup-pacman-running ; \
+        #shellcheck disable=SC2086,SC2069 
         ${PACMAN} -S ${PACKAGES} 2>&1 >> /tmp/pacman.log ; \
         echo $? > /tmp/.pacman-retcode ; \
         if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
