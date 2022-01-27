@@ -316,7 +316,7 @@ partitionable_raid_devices_partitions() {
 
 # lists dmraid devices
 dmraid_devices() {
-    for dev in ${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u; do
+    for dev in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
     done
