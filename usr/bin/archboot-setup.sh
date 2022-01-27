@@ -556,6 +556,7 @@ _stopmd()
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
+                wipefs -a "${i}" > ${LOG}
                 mdadm --manage --stop "/dev/${i}" > ${LOG}
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
