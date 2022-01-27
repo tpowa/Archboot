@@ -29,7 +29,7 @@ build ()
           shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff depmod awk halt \
           shutdown reboot poweroff insmod linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep \
           lzgrep lzegrep lzfgrep lzgrep lzless lzmore lzma modinfo modprobe nc reset rmmod \
-          unlzma unxz xzcat lastb sh"
+          unlzma unxz xzcat lastb sh stat"
     if [[ "$(uname -m)" == "x86_64" ]]; then
         apps="$apps i386"
     fi
