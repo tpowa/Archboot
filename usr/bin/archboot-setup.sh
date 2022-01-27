@@ -301,7 +301,7 @@ partitionable_raid_devices() {
 
 # lists linux partitionable raid devices partitions
 partitionable_raid_devices_partitions() {
-    for part in $(${_LSBLK} NAME,TYPE | grep "md$" | cut -d' ' -f 1 | sort -u) ; do
+    for part in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md?p" | cut -d' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${part} | grep "LVM2_member"
