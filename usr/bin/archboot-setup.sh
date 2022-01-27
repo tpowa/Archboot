@@ -555,9 +555,9 @@ _stopmd()
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
             DIALOG --infobox "Disabling all software raid devices..." 0 0
-            while read -r i; do
-               mdadm --manage --stop "/dev/$(echo "${i}" | sed -e 's# :.*##g')" > ${LOG}
-            done < /proc/mdstat 
+            for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
+                mdadm --manage --stop "/dev/${i}" > ${LOG}
+            done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 mdadm --zero-superblock "${i}" > ${LOG}
