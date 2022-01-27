@@ -650,7 +650,7 @@ _stopluks()
         DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a "${i}" >/dev/null 2>&1
+           wipefs -a "${i}" > ${LOG} 2>&1
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
