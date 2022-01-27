@@ -248,7 +248,7 @@ blockdevices_partitions() {
     # all available block devices partitions
     # printk off needed cause of parted usage
     printk off
-    for part in $(${_LSBLK} NAME,TYPE | grep -v '^md' | grep "part$"| cut -d' ' -f1); do
+    for part in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
         #  ${_LSBLK} FSTYPE ${part} | grep "linux_raid_member"
