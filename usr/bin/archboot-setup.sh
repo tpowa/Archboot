@@ -624,7 +624,7 @@ _stopluks()
 
     # detect already running luks devices
     LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
-    ! [[ "${LUKSDEVICE}" = "" ]] && DETECTED_LUKS=1
+    [[ "${LUKSDEVICE}" == "" ]] || DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
         DIALOG --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
@@ -634,7 +634,7 @@ _stopluks()
             LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
             cryptsetup remove "${i}" > ${LOG}
             # delete header from device
-            wipefs -a "${LUKS_REAL_DEVICE}" >/dev/null 2>&1
+            wipefs -a "${LUKS_REAL_DEVICE}" > ${LOG} 2>&1
         done
     fi
     
