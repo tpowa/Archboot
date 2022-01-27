@@ -734,9 +734,7 @@ _raid()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        RAID_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | grep "^md.p" | cut -d' ' -f1 | sort -u); do 
-                    echo "$(${_LSBLK} NAME "${i}")" _
-                    done)"
+        RAID_BLACKLIST="$(raid_devices;partitionable_raid_devices_partitions)"
         PARTS="$(for i in $(findpartitions); do 
                 ! echo "${RAID_BLACKLIST}" | grep -qE "${i} _" && echo "${i}" _ 
                 done)"
