@@ -2272,7 +2272,7 @@ _mkfs() {
     local _mountpoint=${5}
     local _labelname=${6}
     local _fsoptions=${7}
-    local _btrfsdevices="${8//#/\ /}"
+    local _btrfsdevices="${8//#/\ }"
     local _btrfslevel=${9}
     local _btrfssubvolume=${10}
     local _dosubvolume=${11}
@@ -2324,7 +2324,7 @@ _mkfs() {
                 ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 "${_device}" >${LOG} 2>&1; ret=$? ;;
                 ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 "${_device}" >${LOG} 2>&1; ret=$? ;;
                 f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" "${_btrfsdevices}" >${LOG} 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >${LOG} 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
                 ntfs3)    mkfs.ntfs ${_fsoptions} -L "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" "${_device}" >${LOG} 2>&1; ret=$? ;;
