@@ -8,7 +8,9 @@ build ()
         done
     add_file /usr/bin/archboot-km.sh /usr/bin/km
     #add kbd binaries
-    apps="dumpkeys kbd_mode chvt deallocvt fgconsole getkeycodes kbdinfo kbdrate loadunimap mapscrn openvt psfaddtable psfgettable psfstriptable psfxtable resizecons setkeycodes setleds setmetamode setvtrgb showconsolefont showkey unicode_start unicode_stop vlock"
+    apps="dumpkeys kbd_mode chvt deallocvt fgconsole getkeycodes kbdinfo kbdrate loadunimap mapscrn openvt psfaddtable psfgettable psfstriptable psfxtable setkeycodes setleds setmetamode setvtrgb showconsolefont showkey unicode_start unicode_stop vlock"
+    # only add resizecons on x86_64 
+    [[ "$(uname -m)" == "x86_64" ]] && apps="$apps resizecons"
     for i in $apps; do
         add_binary "$i"
     done
