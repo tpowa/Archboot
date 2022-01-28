@@ -1,7 +1,8 @@
 #! /bin/bash
 _DIRECTORY="$(date +%Y.%m)"
 _ARCH="aarch64"
-_BUILDDIR="/home/tobias/Arch/iso/${_ARCH}"
+_ISODIR="/home/tobias/Arch/iso/${_ARCH}"
+_BUILDDIR="$(mktemp -d ${_ISODIR}/server-release.XXX)"
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
@@ -38,7 +39,7 @@ echo "Removing installation tarball ..."
 rm ${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
 # update container to latest packages
 echo "Update container to latest packages..."
-systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1
+systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
 # remove package cache
 echo "Remove package cache from container ..."
 systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Scc --noconfirm >/dev/null 2>&1
@@ -59,15 +60,15 @@ echo "Finished container tarball."
 sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
 chown "${_USER}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 chgrp "${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
-sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR}
-# create release in "${_BUILDDIR}"
-cd "${_BUILDDIR}" || exit 1
-[[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
-archboot-"${_ARCH}"-release.sh "${_DIRECTORY}" || exit 1
+sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR} || exit 1
+# create release in "${_ISODIR}"
+cd "${_ISODIR}" || exit 1
+"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || (rm -r "${_BUILDDIR}"; exit 1)
 # set user rights on files
-chown -R "${_USER}" "${_DIRECTORY}"
-chgrp -R "${_GROUP}" "${_DIRECTORY}"
-cd "${_DIRECTORY}" || exit 1
+# set user rights on files
+chown -R "${_USER}" "${_BUILDDIR}"
+chgrp -R "${_GROUP}" "${_BUILDDIR}"
+cd "${_BUILDDIR}" || exit 1
 # remove sha256sum and install image
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
@@ -84,8 +85,12 @@ for i in boot/*; do
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 cd ..
+[[ -d "archive" ]] || mkdir archive
+[[ -d "archive/${_DIRECTORY}" ]] && rm -r "archive/${_DIRECTORY}"
+[[ -d "${_DIRECTORY}" ]] && mv "${_DIRECTORY}" archive/
+mv "${_BUILDDIR}" "${_DIRECTORY}"
 # copy files to server
-sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}"
+sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
 # move files on server, create symlink and remove 3 month old release
 sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_DIR}"/"${_ARCH}"/"${_DIRECTORY}"

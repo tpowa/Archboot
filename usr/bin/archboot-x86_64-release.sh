@@ -40,14 +40,14 @@ archboot-${_ARCH}-create-container.sh "${_W_DIR}" -cc -cp || exit 1
 # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
 echo "Generate ISO ..."
 # generate iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g" || exit 1
 # remove not working lvm2 from latest image
 echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
 systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
 # generate latest tarball in container
 echo "Generate latest ISO ..."
 # generate latest iso in container
-systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest"
+systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} -r=$(date +%Y.%m.%d-%H.%M)-latest" || exit 1
 # create Release.txt with included main archlinux packages
 echo "Generate Release.txt ..."
 (echo "Welcome to _ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\

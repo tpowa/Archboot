@@ -1,7 +1,8 @@
 #! /bin/bash
 _DIRECTORY="$(date +%Y.%m)"
 _ARCH="x86_64"
-_BUILDDIR="/home/tobias/Arch/iso/${_ARCH}"
+_ISODIR="/home/tobias/Arch/iso/${_ARCH}"
+_BUILDDIR="$(mktemp -d ${_ISODIR}/server-release.XXX)"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _SERVER="pkgbuild.com"
@@ -29,14 +30,18 @@ cp "${_PACMAN_CONF}".archboot "${_PACMAN_CONF}"
 # use mirrorlist with enabled rackspace mirror
 cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
 cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
-# create release in "${_BUILDDIR}"
-cd "${_BUILDDIR}" || exit 1
-[[ -e "${_DIRECTORY}" ]] && rm -r "${_DIRECTORY}"
-"archboot-${_ARCH}-release.sh" "${_DIRECTORY}" || exit 1
+# create release in "${_ISODIR}"
+cd "${_ISODIR}" || exit 1
+"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" ||\
+(rm -r "${_BUILDDIR}"; cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}";\
+cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"; exit 1)
+# restore pacman.conf and mirrorlist
+cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
+cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
 # set user rights on files
-chown -R "${_USER}" "${_DIRECTORY}"
-chgrp -R "${_GROUP}" "${_DIRECTORY}"
-cd "${_DIRECTORY}" || exit 1
+chown -R "${_USER}" "${_BUILDDIR}"
+chgrp -R "${_GROUP}" "${_BUILDDIR}"
+cd "${_BUILDDIR}" || exit 1
 # remove sha256sum
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
@@ -53,11 +58,12 @@ for i in boot/*; do
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
 cd ..
-# restore pacman.conf and mirrorlist
-cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
-cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
+[[ -d "archive" ]] || mkdir archive
+[[ -d "archive/${_DIRECTORY}" ]] && rm -r "archive/${_DIRECTORY}"
+[[ -d "${_DIRECTORY}" ]] && mv "${_DIRECTORY}" archive/
+mv "${_BUILDDIR}" "${_DIRECTORY}"
 # copy files to server
-sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}"
+sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
 # move files on server, create symlink and remove 3 month old release
 sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_DIR}"/"${_ARCH}"/"${_DIRECTORY}"
