@@ -36,7 +36,8 @@ build ()
           runcon sha1sum sha224sum sha256sum sha384sum sha512sum shuf split stdbuf sum timeout truncate \
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
-          bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore"
+          bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
+          setfattr tzselect pzstd unzstd zstd zstdcat zstdgrep zstdless zstdmt"
     if [[ "$(uname -m)" == "x86_64" ]]; then
         apps="$apps i386 x86_64"
     fi

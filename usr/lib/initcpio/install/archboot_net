@@ -8,7 +8,7 @@ build ()
 	  slattach traceroute arping clockdiff rarpd rdisc tracepath route \
 	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon ss \
 	  tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma ss tipc vdpa \
-	  ip ping ethtool elinks ctstat rtstat"
+	  ip ping ethtool elinks ctstat rtstat dhcp_lease_time dhcp_release dhcp_release6"
     for i in $apps; do
         add_binary "$i"
     done

@@ -11,8 +11,6 @@ usage () {
     echo "Usage: ${_BASENAME} <package>" 
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.txt"
-    echo ""
-    echo "  -h This message."
     exit 0
 }
 
@@ -23,14 +21,7 @@ if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
     exit 1
 fi
 
-while [ $# -gt 0 ]; do
-    case ${1} in
-        -h|--h|?) usage; exit 0 ;;
-        esac
-    shift
-done
-
 echo $1 >binary.txt
-for i in $(pacman -Ql $1 | grep "/usr/bin/..*");do
+for i in $(pacman -Ql $1 | grep "/usr/bin/..*"$ | cut -d' ' -f2);do
 	which $i >/dev/null || echo $i>>binary.txt 
 done
