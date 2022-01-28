@@ -89,6 +89,8 @@ build ()
     add_file "/usr/bin/archboot-copy-mountpoint.sh"
     ### add rsync-backup.sh
     add_file "/usr/bin/archboot-rsync-backup.sh"
+    ### add binary add_check
+    add_file "/usr/bin/archboot-binary-check.sh"
 
     ### add pam
     apps="mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update"

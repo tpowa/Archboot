@@ -59,7 +59,9 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     [[ -e /usr/bin/tz ]] && wget -q "$_INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
     [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
     [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-release.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
+    [[ -e /usr/bin/archboot-binary-check.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
     [[ -e /usr/bin/update-installer.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
+    
     echo "Finished: Downloading scripts done."
     exit 0
 fi
