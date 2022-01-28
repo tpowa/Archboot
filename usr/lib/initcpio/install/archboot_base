@@ -37,7 +37,7 @@ build ()
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
-          setfattr tzselect pzstd unzstd zstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4"
+          setfattr pzstd unzstd zstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4"
     if [[ "$(uname -m)" == "x86_64" ]]; then
         apps="$apps i386 x86_64"
     fi

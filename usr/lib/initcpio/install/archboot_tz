@@ -4,7 +4,7 @@
 build ()
 {
     apps="hwclock date ntpdate ntpd ntp-keygen ntp-wait ntpdc ntpq \
-          ntptime ntptrace"
+          ntptime ntptrace tzselect"
     for i in $apps; do
         add_binary "$i"
     done
