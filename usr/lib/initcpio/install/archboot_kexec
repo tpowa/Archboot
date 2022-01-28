@@ -4,6 +4,7 @@
 build ()
 {
     add_binary "kexec"
+    add_binary "vmcore-dmesg"
 }
 
 help ()
