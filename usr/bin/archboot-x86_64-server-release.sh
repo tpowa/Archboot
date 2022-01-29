@@ -39,6 +39,7 @@ cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"; exit 1)
 cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
 cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
 # set user rights on files
+chmod 755 "${_BUILDDIR}"
 chown -R "${_USER}" "${_BUILDDIR}"
 chgrp -R "${_GROUP}" "${_BUILDDIR}"
 cd "${_BUILDDIR}" || exit 1
