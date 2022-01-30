@@ -50,6 +50,7 @@ rm -r "${_SHIM}" "${_SHIM32}" "${_SHIMAA64}"
 echo "Sign files and upload ..."
 #shellcheck disable=SC2086
 cd shim-fedora/ || exit 1
+chmod 644 ./*
 chown "${_USER}" ./*
 chgrp "${_GROUP}" ./*
 for i in *.efi; do
