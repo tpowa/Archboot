@@ -2,8 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _BASENAME="$(basename "${0}")"
-_SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/aarch64"
-_SHIM_VERSION="shim-aa64-15.4-5.aarch64.rpm"
+_SHIM_URL="https://pkgbuild.com/~tpowa/archboot-helper/fedora-shim"
 _PRESET_DIR="/etc/archboot/presets"
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
@@ -13,7 +12,6 @@ _IMAGENAME=""
 _RELEASENAME=""
 # temporary directories
 _AARCH64="$(mktemp -d AARCH64.XXX)"
-_SHIM="$(mktemp -d shim.XXX)"
 
 usage () {
     echo "${_BASENAME}: usage"
@@ -100,10 +98,8 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
-    curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
-    bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
-    cp "${_SHIM}/boot/efi/EFI/fedora/mmaa64.efi" "${_AARCH64}/EFI/BOOT/mmaa64.efi"
-    cp "${_SHIM}/boot/efi/EFI/fedora/shimaa64.efi" "${_AARCH64}/EFI/BOOT/BOOTAA64.efi"
+    curl -s --create-dirs -L -O --output-dir "${_AARCH64}/EFI/BOOT/" "${_SHIM_URL}/mmaa64.efi"
+    curl -s --create-dirs -L -O --output-dir "${_AARCH64}/EFI/BOOT/" "${_SHIM_URL}/BOOTAA64.efi"
 }
 
 _prepare_uefi_image() {
@@ -150,7 +146,7 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 ./*.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${_AARCH64} and ${_SHIM} ..."
+echo "Cleanup remove ${_AARCH64} ..."
 rm -rf "${_AARCH64}"
 rm -rf "${_SHIM}"
 echo "Finished ISO creation."

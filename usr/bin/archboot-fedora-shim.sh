@@ -1,6 +1,5 @@
 #!/bin/bash
 _FEDORA_SERVER="https://kojipkgs.fedoraproject.org"
-_FEDORA_DIR="boot/efi/EFI/fedora"
 _SHIM_VERSION="15.4"
 _SHIM_RELEASE="5"
 _SHIM_URL="${_FEDORA_SERVER}/packages/shim/${_SHIM_VERSION}/${_SHIM_RELEASE}"
@@ -38,11 +37,14 @@ bsdtar -C "${_SHIM32}" -xf "${_SHIM32}"/*.rpm
 bsdtar -C "${_SHIMAA64}" -xf "${_SHIMAA64}"/*.rpm 
 echo "Copy shim files ..."
 mkdir -m 777 shim-fedora
-cp "${_SHIM}/${_FEDORA_DIR}/"{mmx64.efi,shimx64.efi} shim-fedora/
-cp "${_SHIM32}/${_FEDORA_DIR}/"{mmia32.efi,shimia32.efi} shim-fedora/
-cp "${_SHIMAA64}/${_FEDORA_DIR}/"{mmaa64.efi,shimaa64.efi} shim-fedora/
+cp "${_SHIM}"/boot/efi/EFI/fedora/{mmx64.efi,shimx64.efi} shim-fedora/
+cp "${_SHIM}/boot/efi/EFI/fedora/shimx64.efi" shim-fedora/BOOTX64.efi
+cp "${_SHIM32}"/boot/efi/EFI/fedora/{mmia32.efi,shimia32.efi} shim-fedora/
+cp "${_SHIM32}/boot/efi/EFI/fedora/shimia32.efi" shim-fedora/BOOTIA32.efi
+cp "${_SHIMAA64}"/boot/efi/EFI/fedora/{mmaa64.efi,shimaa64.efi} shim-fedora/
+cp "${_SHIMAA64}/boot/efi/EFI/fedora/shimaa64.efi" shim-fedora/BOOTAA64.efi
 # cleanup
-echo "Cleanup directories "$_SHIM}" "${_SHIM32}" "${_SHIMAA64}" ..."
+echo "Cleanup directories ${_SHIM} ${_SHIM32} ${_SHIMAA64} ..."
 rm -r "${_SHIM}" "${_SHIM32}" "${_SHIMAA64}"
 # sign files
 echo "Sign files and upload ..."
@@ -51,11 +53,12 @@ cd shim-fedora/ || exit 1
 chown "${_USER}" ./*
 chgrp "${_GROUP}" ./*
 for i in *.efi; do
+    #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
-sudo -u "${_USER}" scp * ${_SERVER}:${_SHIM_ARCH_SERVERDIR} || exit 1
+sudo -u "${_USER}" scp ./* "${_SERVER}:${_SHIM_ARCH_SERVERDIR}" || exit 1
 # cleanup
 echo "Remove fedora-shim directory."
 cd ..

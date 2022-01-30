@@ -3,9 +3,7 @@
 
 _BASENAME="$(basename "${0}")"
 _PRESET_DIR="/etc/archboot/presets"
-_SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/15.4/5/x86_64"
-_SHIM_VERSION="shim-x64-15.4-5.x86_64.rpm"
-_SHIM32_VERSION="shim-ia32-15.4-5.x86_64.rpm"
+_SHIM_URL="https://pkgbuild.com/~tpowa/archboot-helper/fedora-shim"
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
@@ -14,8 +12,6 @@ _IMAGENAME=""
 _RELEASENAME=""
 # temporary directories
 _X86_64="$(mktemp -d X86_64.XXX)"
-_SHIM="$(mktemp -d shim.XXX)"
-_SHIM32="$(mktemp -d shim32.XXX)"
 
 usage () {
     echo "${_BASENAME}: usage"
@@ -97,17 +93,10 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}/${_SHIM_VERSION}"
-    bsdtar -C "${_SHIM}" -xf "${_SHIM}"/"${_SHIM_VERSION}"
-    cp "${_SHIM}/boot/efi/EFI/fedora/mmx64.efi" "${_X86_64}/EFI/BOOT/mmx64.efi"
-    cp "${_SHIM}/boot/efi/EFI/fedora/shimx64.efi" "${_X86_64}/EFI/BOOT/BOOTX64.efi"
-    # add shim ia32 signed files from fedora
-    curl -s --create-dirs -L -O --output-dir "${_SHIM32}" "${_SHIM_URL}/${_SHIM32_VERSION}"
-    bsdtar -C "${_SHIM32}" -xf "${_SHIM32}/${_SHIM32_VERSION}"
-    cp "${_SHIM32}/boot/efi/EFI/fedora/mmia32.efi" "${_X86_64}/EFI/BOOT/mmia32.efi"
-    cp "${_SHIM32}/boot/efi/EFI/fedora/shimia32.efi" "${_X86_64}/EFI/BOOT/BOOTIA32.efi"
-    ### adding this causes boot loop in ovmf and only tries create a boot entry
-    #cp "${SHIM}/boot/efi/EFI/BOOT/fbx64.efi" "${_X86_64}/EFI/BOOT/fbx64.efi"
+    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/mmx64.efi"
+    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/BOOTX64.efi"
+    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/mmia32.efi"
+    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/BOOTIA32.efi"
 }
 
 _prepare_uefi_image() {
@@ -178,8 +167,6 @@ rm -f "sha256sums.txt" || true
 cksum -a sha256 ./*.iso > "sha256sums.txt"
 
 # cleanup
-echo "Cleanup remove ${_X86_64}, ${_SHIM} and ${_SHIM32} ..."
+echo "Cleanup remove ${_X86_64} ..."
 rm -rf "${_X86_64}"
-rm -rf "${_SHIM}"
-rm -rf "${_SHIM32}"
 echo "Finished ISO creation."
