@@ -642,7 +642,8 @@ add_binary() {
     fi
 
     # negate this so that the RETURN trap is not fired on non-binaries
-    ! lddout=$(ldd "$binary" 2>/dev/null) && return 0
+    # add_file if ldd fails, eg. shell scripts
+    ! lddout=$(ldd "$binary" 2>/dev/null) && return 0 || add_file "$binary" 
 
     # resolve sodeps
     regex='^(|.+ )(/.+) \(0x[a-fA-F0-9]+\)'
