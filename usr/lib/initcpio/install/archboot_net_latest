@@ -8,10 +8,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/bin/dhcpcd"
-    for i in $appfiles; do
-        add_file "$i"
-    done
+    add_binary "/usr/bin/dhcpcd"
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
     done
