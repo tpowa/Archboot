@@ -18,10 +18,7 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/lib/libkmod.so"
-    for i in $appfiles; do
-        add_file "$i"
-    done
+    add_file "/usr/lib/libkmod.so"
 
     add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"

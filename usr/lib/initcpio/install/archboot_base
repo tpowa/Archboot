@@ -44,7 +44,9 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/lib/libkmod.so /usr/bin/gunzip /usr/bin/zcat"
+    add_file "/usr/lib/libkmod.so"
+    
+    appfiles="/usr/bin/gunzip /usr/bin/zcat"
     for i in $appfiles; do
         add_file "$i"
     done
