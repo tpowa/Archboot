@@ -13,7 +13,7 @@ build ()
     done
     # add mkkeys.sh
     MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
-    curl -s -L -o "${MKKEYS}" https://pkgbuild.com/~tpowa/archboot-helper/mkkeys//mkkeys.sh 
+    curl -s -L -o "${MKKEYS}" https://pkgbuild.com/~tpowa/archboot-helper/mkkeys/mkkeys.sh 
     chmod 755 "${MKKEYS}"
     add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
     # add python3 files for script
