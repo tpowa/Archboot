@@ -93,10 +93,9 @@ _prepare_efitools_uefi () {
 _prepare_fedora_shim_bootloaders () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/mmx64.efi"
-    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/BOOTX64.efi"
-    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/mmia32.efi"
-    curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/BOOTIA32.efi"
+    for i in mmx64.efi BOOTX64.efi mmia32.efi BOOTIA32.efi; do
+        curl -s --create-dirs -L -O --output-dir "${_X86_64}/EFI/BOOT/" "${_SHIM_URL}/${i}"
+    done
 }
 
 _prepare_uefi_image() {
