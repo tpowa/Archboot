@@ -18,14 +18,10 @@ build ()
           mount.ntfs-3g umount.nfs umount.nfs4 fsck.btrfs dosfslabel e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs \
           dump.f2fs f2fs_io f2fscrypt f2fstat fibmap.f2fs fsck.f2fs parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld \
           nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune ntfsdecrypt ntfsrecover ntfssecaudit \
-          ntfstruncate ntfsusermap ntfswipe xfs_growfs xfs_quota xfs_scrub xfs_scrub_all xfs_spaceman ntfs-3g.probe"
+          ntfstruncate ntfsusermap ntfswipe xfs_growfs xfs_quota xfs_scrub xfs_scrub_all xfs_spaceman ntfs-3g.probe \
+          compile_et mk_cmds fsck.xfs xfs_admin /usr/bin/xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in $apps; do
         add_binary "$i"
-    done
-    appfiles="/usr/bin/compile_et /usr/bin/mk_cmds /usr/bin/fsck.xfs /usr/bin/xfs_admin /usr/bin/xfs_bmap \
-              /usr/bin/xfs_freeze /usr/bin/xfs_info /usr/bin/xfs_metadump /usr/bin/xfs_mkfile /usr/bin/xfs_ncheck" 
-    for i in $appfiles; do
-        add_file "$i"
     done
     add_file "/etc/nilfs_cleanerd.conf"
     add_file "/etc/fuse.conf"

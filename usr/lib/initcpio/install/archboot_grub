@@ -6,16 +6,11 @@ build ()
     apps="grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
           grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath \
 	  grub-mount grub-script-check grub-bios-setup \
-	  grub-ofpathname grub-probe"
+	  grub-ofpathname grub-probe grub-kbdcomp grub-mkrescue grub-mkstandalone grub-install \
+              grub-mkconfig grub-mknetdir grub-reboot grub-set-default"
     for i in $apps; do
         add_binary "$i"
     done
-    appfiles="/usr/bin/grub-kbdcomp /usr/bin/grub-mkrescue /usr/bin/grub-mkstandalone /usr/bin/grub-install \
-              /usr/bin/grub-mkconfig /usr/bin/grub-mknetdir /usr/bin/grub-reboot /usr/bin/grub-set-default"
-    for i in $appfiles; do
-        add_file "$i"
-    done    
-    
     ## add grub-mkconfig helper scripts
     add_file "/usr/share/grub/grub-mkconfig_lib"
     add_file "/etc/default/grub"

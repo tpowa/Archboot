@@ -8,13 +8,10 @@ build ()
 	  slattach traceroute arping clockdiff rarpd rdisc tracepath route \
 	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon ss \
 	  tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma ss tipc vdpa dhcpcd \
-	  ip ping ethtool elinks ctstat rtstat dhcp_lease_time dhcp_release dhcp_release6"
+	  ip ping ethtool elinks ctstat rtstat dhcp_lease_time dhcp_release dhcp_release6 \
+	  routel brctl"
     for i in $apps; do
         add_binary "$i"
-    done
-    appfiles="/usr/bin/routel /usr/bin/brctl"
-    for i in $appfiles; do
-        add_file "$i"
     done
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
