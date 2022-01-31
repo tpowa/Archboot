@@ -12,7 +12,7 @@ build ()
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
-    apps="getent agetty mount umount basename du clear env head id cksum nano printf tail \
+    apps="init getent agetty mount umount basename du clear env head id cksum nano printf tail \
           tee test tr tty uptime w who wc which whoami xargs yes \
           bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted partprobe \
           gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \
@@ -45,8 +45,6 @@ build ()
         add_binary "$i"
     done
     add_file "/usr/lib/libkmod.so"
-    
-    add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
     add_symlink "/init" "/usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
