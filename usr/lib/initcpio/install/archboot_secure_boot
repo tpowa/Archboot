@@ -4,6 +4,7 @@
 build ()
 {
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
+    _PYTHON_ARCH="$(uname -m)"
     apps="openssl python3 cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
           hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
           sbsiglist sbsign sbvarsign sbverify mokutil"
@@ -25,17 +26,12 @@ build ()
                   operator reprlib re sre_compile sre_parse sre_constants functools copyreg subprocess \
                   signal threading _weakrefset warnings contextlib random bisect hashlib traceback \
                   linecache tokenize token weakref string selectors"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        PYTHON_DYN="select.cpython-310-x86_64-linux-gnu math.cpython-310-x86_64-linux-gnu _random.cpython-310-x86_64-linux-gnu \
-                    _sha512.cpython-310-x86_64-linux-gnu _posixsubprocess.cpython-310-x86_64-linux-gnu"
-    fi
-    if [[ "$(uname -m)" == "aarch64" ]]; then
-       PYTHON_DYN="select.cpython-310-aarch64-linux-gnu math.cpython-310-aarch64-linux-gnu _random.cpython-310-aarch64-linux-gnu \
-                  _sha512.cpython-310-aarch64-linux-gnu _posixsubprocess.cpython-310-aarch64-linux-gnu"
-    fi  
     for i in ${PYTHON_FILES}; do
         add_file "/usr/lib/python3.10/$i.py"
     done
+    PYTHON_DYN="select.cpython-310-${_PYTHON_ARCH}-linux-gnu math.cpython-310-${_PYTHON_ARCH}-linux-gnu \
+                _random.cpython-310-${_PYTHON_ARCH}-linux-gnu _sha512.cpython-310-${_PYTHON_ARCH}-linux-gnu \
+                _posixsubprocess.cpython-310-${_PYTHON_ARCH}-linux-gnu"
     for i in ${PYTHON_DYN}; do
         add_file "/usr/lib/python3.10/lib-dynload/$i.so"
     done
