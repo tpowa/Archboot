@@ -3,30 +3,21 @@
 
 build ()
 {
-    add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' '/drivers/net/'
     apps="dnsdomainname netstat arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
-	  slattach traceroute arping clockdiff rarpd rdisc tracepath route \
+	  slattach traceroute arping clockdiff rarpd rdisc tracepath \
 	  dig host nslookup telnet ssh arpd genl ifstat lnstat nstat rtacct rtmon ss \
 	  tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma ss tipc vdpa dhcpcd \
-	  ip ping ethtool elinks ctstat rtstat dhcp_lease_time dhcp_release dhcp_release6 \
+	  ping ethtool elinks ctstat rtstat dhcp_lease_time dhcp_release dhcp_release6 \
 	  routel brctl"
     for i in $apps; do
         add_binary "$i"
     done
-    for i in $(find /usr/lib/dhcpcd -type f); do
-        add_file "$i"
-    done
-    # start dhcpcd on startup
-    add_symlink "/etc/systemd/system/multi-user.target.wants/dhcpcd.service" "/usr/lib/systemd/system/dhcpcd.service"
-    add_file "/usr/share/archboot/net/etc/system/dhcpcd@.service.d/no-wait.conf" "/etc/system/dhcpcd@.service.d/no-wait.conf"
-    add_file "/etc/dhcpcd.conf"
-    add_dir "/var/lib/dhcpcd"
+    # add iproute 2
     add_full_dir "/usr/lib/tc"
     add_full_dir "/usr/share/tc"
     add_full_dir "/etc/iproute2"
     # add openssl helper libraries
     add_full_dir "/usr/lib/engines"
-
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add dhclient support
@@ -37,7 +28,6 @@ build ()
     add_full_dir "/etc/ifplugd"
     # fixing licenses
     add_file "/usr/share/licenses/db/LICENSE"
-    add_file "/usr/share/licenses/dhcpcd/LICENSE"
     add_file "/usr/share/licenses/dhclient/LICENSE"
     add_file "/usr/share/licenses/bind/LICENSE"
     add_file "/usr/share/licenses/krb5/LICENSE"

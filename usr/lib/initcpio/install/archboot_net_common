@@ -4,11 +4,10 @@
 build ()
 {
     add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' '/drivers/net/'
-    apps="route ip"
+    apps="route ip dhcpcd"
     for i in $apps; do
         add_binary "$i"
     done
-    add_binary "/usr/bin/dhcpcd"
     for i in $(find /usr/lib/dhcpcd -type f); do
         add_file "$i"
     done
@@ -17,7 +16,6 @@ build ()
     add_file "/usr/share/archboot/net/etc/system/dhcpcd@.service.d/no-wait.conf" "/etc/system/dhcpcd@.service.d/no-wait.conf"
     add_file "/etc/dhcpcd.conf"
     add_dir "/var/lib/dhcpcd"
-
     # fixing licenses
     add_file "/usr/share/licenses/dhcpcd/LICENSE"
 }
@@ -25,6 +23,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the network on an archboot stripped down for latest image.
+  This hook includes the basic network on an archboot image.
 HELPEOF
 }
