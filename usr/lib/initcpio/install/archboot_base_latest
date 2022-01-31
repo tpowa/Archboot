@@ -12,15 +12,14 @@ build ()
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
     
-    apps="agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
+    apps="init agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc nano wget uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh" 
     for i in $apps; do
         add_binary "$i"
     done
     add_file "/usr/lib/libkmod.so"
-
-    add_symlink "/usr/bin/init" "/usr/lib/systemd/systemd"
+    
     add_symlink "/init" "/usr/lib/systemd/systemd"
     
     ### adding needed files from running system
