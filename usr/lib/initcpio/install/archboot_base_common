@@ -3,6 +3,9 @@
 
 build ()
 {
+    ### add virtio modules
+    add_checked_modules 'virtio'
+    
     ### setting up base structure
     add_dir "/mnt"
     add_dir "/install"
@@ -47,7 +50,7 @@ build ()
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
-    ### fixing network support
+    ### fixing network support from glibc
     add_file "/lib/libnss_files.so.2"
     add_file "/lib/libnss_dns.so.2"
 
@@ -70,9 +73,6 @@ build ()
         add_binary "$i"
     done
     add_file "/etc/login.defs"
-    
-    ### add virtio modules
-    add_checked_modules 'virtio'
     
     ### add systemd
     # add systemd kernel modules
