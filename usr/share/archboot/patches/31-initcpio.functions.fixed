@@ -572,6 +572,7 @@ add_file() {
         quiet "adding file: %s" "$dest"
     fi
     
+    #check if $src is a symlink
     if [[ -L $src ]]; then
         # add the symlink
         add_file "$(realpath $src)"
@@ -642,15 +643,14 @@ add_binary() {
     # check if binary is a symlink
     if [[ -L $binary ]]; then
         # add the binary
-        add_file "$(type -P $(readlink $binary))"
+        add_file "$(realpath $binary)"
         # create the symlink
-        add_symlink "$binary" "$(type -P $(readlink $binary))"
+        add_symlink "$binary" "$(realpath $binary)"
     else
         add_file "$binary" "$dest" "$mode"
     fi
 
     # negate this so that the RETURN trap is not fired on non-binaries
-    # add_file if ldd fails, eg. shell scripts
     ! lddout=$(ldd "$binary" 2>/dev/null) && return 0
 
     # resolve sodeps
