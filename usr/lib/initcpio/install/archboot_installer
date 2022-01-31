@@ -15,6 +15,12 @@ build ()
     add_file "/usr/bin/archboot-restore-usbstick.sh"
     add_binary "/usr/bin/isoinfo" 
     add_binary "/usr/bin/mktorrent"
+    ### add copy-mountpoint.sh
+    add_file "/usr/bin/archboot-copy-mountpoint.sh"
+    ### add rsync-backup.sh
+    add_file "/usr/bin/archboot-rsync-backup.sh"
+    ### add binary add_check
+    add_file "/usr/bin/archboot-binary-check.sh"
     # only include cachedir on booted archboot or container
     if [[ -e "/etc/hostname" ]]; then
         [[ "$(cat /etc/hostname)" == "archboot" ]] && add_full_dir "/var/cache/pacman/pkg"

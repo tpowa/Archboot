@@ -3,36 +3,25 @@
 
 build ()
 {
-    ### setting up base structure
-    add_dir "/mnt"
-    add_dir "/install"
-    add_dir "/var/log"
-    add_dir "/home"
-
-    add_symlink /var/run ../run
-    add_symlink /var/lock ../run/lock
-    
-    apps="init getent agetty mount umount basename du clear env head id cksum nano printf tail \
-          tee test tr tty uptime w who wc which whoami xargs yes \
-          bash swapon uniq cut seq snarf find sort fdisk sfdisk cfdisk parted partprobe \
-          gawk cp mv free ls rm sed less chgrp chmod chown date df dialog dmesg egrep fgrep grep \
-          kill killall more ps pwd rmdir stty sync tar bsdtar bsdcpio touch uname hdparm \
-          true mktemp chroot dirname expr bzip2 hwclock su cat cpio dd gzip wget top sdparm tput \
-          ifconfig ln losetup mkdir mkfifo mknod readlink echo dir lzmadec lzop xz last wall mesg utmpdump \
-          xzdec switch_root false pivot_root sleep chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
+    apps="getent head id cksum tail tee test tr uptime w who which whoami xargs \
+          swapon uniq cut seq snarf sort fdisk sfdisk cfdisk parted free less \
+          chgrp chown date df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
+          mktemp chroot dirname expr bzip2 hwclock su cpio dd gzip top sdparm tput \
+          ifconfig ln losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
+          xzdec switch_root pivot_root chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt hexdump \
-          ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei \
-          prlimit rename renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
+          ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei prlimit rename \
+          renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
           sysctl pgrep pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
-          kmod zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd pidof \
-          shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff depmod awk halt \
-          shutdown reboot poweroff insmod linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep \
-          lzgrep lzegrep lzfgrep lzgrep lzless lzmore lzma modinfo modprobe nc reset rmmod \
-          unlzma unxz xzcat lastb sh stat blkzone chmem choom fincore hardlink irqtop lsipc lsirq \
-          lslogins lsmem lsns mkfs scriptlive setpriv  uclampset uname26 uuidparse zramctl [ b2sum \
-          base32 base64 basenc chcon comm csplit dircolors expand factor fmt hostid install join \
-          link logname md5sum nice nl nohup nproc numfmt paste pathchk pinky pr printenv ptx realpath \
+          zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
+          shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff depmod \
+          linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep lzfgrep \
+          lzgrep lzless lzmore lzma modinfo nc reset rmmod unlzma unxz xzcat lastb stat \
+          blkzone chmem choom fincore hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs \
+          scriptlive setpriv  uclampset uname26 uuidparse zramctl [ b2sum base32 base64 \
+          basenc chcon comm csplit dircolors expand factor fmt hostid install join link \
+          logname md5sum nice nl nohup nproc numfmt paste pathchk pinky pr printenv ptx realpath \
           runcon sha1sum sha224sum sha256sum sha384sum sha512sum shuf split stdbuf sum timeout truncate \
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
@@ -44,8 +33,6 @@ build ()
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/usr/lib/libkmod.so"
-    add_symlink "/init" "/usr/lib/systemd/systemd"
     ### add zsh
     add_full_dir "/etc/zsh"
     add_full_dir "/usr/share/zsh"
@@ -54,195 +41,21 @@ build ()
     ### add en_US.utf8 locale
     add_file "/usr/lib/locale/locale-archive"
 
-    ### adding needed files from running system
-    add_symlink "/etc/mtab" "/proc/self/mounts"
-    add_file "/usr/share/terminfo/l/linux"
-    add_full_dir "/etc/profile.d"
-    systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
-                 services wgetrc"
-    for i in $systemfiles; do
-        add_file "/etc/$i"
-    done
-    ### add nano files
-    add_full_dir /usr/share/nano
-
     ### adding config files of installation system
     for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
         add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
     done
-    add_file "/etc/profile"
-    add_file "/etc/group"
-    add_file "/etc/gshadow"
 
-    ### add kmod related config file(s)
-    add_file "/usr/lib/depmod.d/search.conf"
-
-    ### fixing network support
-    add_file "/lib/libnss_files.so.2"
-    add_file "/lib/libnss_dns.so.2"
-
-    ### add copy-mountpoint.sh
-    add_file "/usr/bin/archboot-copy-mountpoint.sh"
-    ### add rsync-backup.sh
-    add_file "/usr/bin/archboot-rsync-backup.sh"
-    ### add binary add_check
-    add_file "/usr/bin/archboot-binary-check.sh"
-
-    ### add pam
-    apps="mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_full_dir "/etc/security"
-    add_full_dir "/etc/default"
-    add_full_dir "/etc/pam.d"
-    add_file "/etc/environment"
-    add_full_dir "/usr/lib/security"
-    #fix cracklib support!
-    add_file /usr/lib/libcrack.so.2
-
+    ### fix file
+    add_file "/usr/share/file/misc/magic.mgc"
+    
     ### add shadow
-    apps="groups login nologin chage chfn chsh expiry faillog gpasswd lastlog passwd \
+    apps="groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
           newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
     for i in $apps; do
         add_binary "$i"
     done
-    add_file "/etc/login.defs"
-    
-    ### add virtio modules
-    add_checked_modules 'virtio'
-    
-    ### add systemd
-    # add systemd kernel modules
-    add_checked_modules 'nfs|autofs4|loop'
-    apps="mount.nfs setfont loadkeys"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    
-    # add firmware files
-    add_full_dir /lib/firmware
-    
-    #dbus files
-    apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
-          dbus-update-activation-environment dbus-uuidgen"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
-    add_dir "/var/lib/dbus"
-    add_full_dir "/etc/dbus-1"
-    add_full_dir "/usr/share/dbus-1"
-    #systemd files
-    apps="busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
-          loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
-          systemd-cat systemd-cgls systemd-cgtop \
-          systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
-          systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
-          systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
-          systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
-          systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext systemd-umount"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_dir "/etc/tmpfiles.d"
-    add_dir "/etc/modules-load.d"
-    add_dir "/etc/binfmt.d/"
-    add_full_dir "/etc/sysctl.d/"
-    add_file "/usr/lib/os-release"
-    add_full_dir "/etc/systemd"
-    add_full_dir "/etc/xdg"
-    add_full_dir "/usr/lib/systemd"
-    add_full_dir "/usr/share/systemd"
-    add_full_dir "/usr/share/factory"
-    add_full_dir "/usr/share/polkit-1"
-    add_full_dir "/usr/lib/tmpfiles.d"
-    add_full_dir "/usr/lib/modules-load.d"
-    add_dir "/var/lib/systemd"
-    add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
-    add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
-    add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
-    add_file "/usr/share/archboot/base/etc/systemd/system/local-fs.target.wants/var-tmp.mount" \
-             "/usr/lib/systemd/system/var-tmp.mount"
-             
-    add_symlink "/etc/systemd/system/local-fs.target.wants/var-tmp.mount" "/usr/lib/systemd/system/var-tmp.mount"
-    
-    add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
-    add_file "/usr/share/archboot/base/etc/systemd/system/autovt@.service" "/etc/systemd/system/autovt@.service"
-    add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
-             "/usr/lib/systemd/system/getty@tty1.service"
-             
-    add_symlink "/etc/systemd/system/getty.target.wants/getty@tty1.service" "/usr/lib/systemd/system/getty@tty1.service"
-    
-    add_file "/usr/share/archboot/base/etc/machine-id" "/etc/machine-id"
-    ### add missing libsystemd files
-    add_file "/usr/lib/libnss_myhostname.so.2"
-    add_file "/usr/lib/libnss_mymachines.so.2"
-    add_file "/usr/lib/libnss_resolve.so.2"
-    add_file "/usr/lib/libnss_systemd.so.2"
-    ### fix tmpfiles startup
-    add_file "/usr/lib/libnss_compat.so.2"
-    add_file "/usr/lib/libnsl.so.1"
-    ## fix for systemd >=245 set default target
-    add_symlink "/etc/systemd/system/initrd.target" "/usr/lib/systemd/system/multi-user.target"
-
-    ### add udev, which is not covered by udev hook
-    add_binary "logger"
-    # add rule files
-    add_full_dir "/usr/lib/udev"
-    # add schedule rules file
-    add_file "/usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules" "/etc/udev/rules.d/60-ioschedulers.rules" 
-
-    # add swapiness sysctl config file
-    add_file "/usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf" "/etc/sysctl.d/99-sysctl.conf"
-
-    ### add pacman
-    apps="pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
-          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg repo-remove"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_dir "/var/cache/pacman/pkg"
-    add_dir "/var/lib/pacman"
-    add_file "/etc/pacman.conf"
-    add_file "/etc/makepkg.conf"
-    add_file "/etc/pacman.d/mirrorlist"
-    # add pacman initialisation of gpg keys
-    add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
-    add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
-        add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
-    fi
-    if [[ "$(uname -m)" == "aarch64" ]]; then
-        add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init-arm.service" "/etc/systemd/system/pacman-init-arm.service"
-        add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init-arm.service" "/etc/systemd/system/pacman-init-arm.service"
-    fi
-    add_full_dir "/usr/share/pacman/keyrings"
-    add_full_dir "/usr/share/makepkg"
-    # add local installed pacman database in container mode
-    if [[ -e "/etc/hostname" ]]; then
-       [[ "$(cat /etc/hostname )" == "archboot" ]] && add_full_dir "/var/lib/pacman/local"
-    else
-        add_full_dir "/var/lib/pacman/local"
-    fi
-
-    ### fix file
-    add_file "/usr/share/file/misc/magic.mgc"
-
-    ### add ca certificates
-    cafile="tls-ca-bundle.pem"
-    cert="cert.pem"
-    cert2="ca-certificates.crt"
-    ca_dir="/etc/ca-certificates/extracted"
-    cert_dir="/etc/ssl"
-    cert2_dir="/etc/ssl/certs"
-    add_full_dir "$ca_dir"
-    add_full_dir "$cert2_dir"
-    add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
-    add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
     
     ### fix licenses
     add_file "/usr/share/licenses/file/COPYING"
@@ -250,19 +63,13 @@ build ()
     add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
     add_file "/usr/share/licenses/ncurses/COPYING"
     add_file "/usr/share/licenses/pcre/LICENSE"
-    add_file "/usr/share/licenses/shadow/LICENSE"
     add_file "/usr/share/licenses/sdparm/LICENSE" 
     add_file "/usr/share/licenses/zlib/LICENSE"
-    add_file "/usr/share/licenses/iana-etc/LICENSE"
-    add_file "/usr/share/licenses/dbus/COPYING"
 }
 
 help ()
 {
 cat <<HELPEOF
-  This hook sets up all initial directories and installs base, kmod,
-  pam, pacman, shadow, systemd, udev utilities and libraries 
-  for a archboot image.
-  DO NOT remove this one unless you know what you're doing.
+  This hook sets up base for a normal archboot image.
 HELPEOF
 }
