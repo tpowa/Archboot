@@ -42,7 +42,7 @@ build ()
     add_file "/usr/lib/locale/locale-archive"
 
     ### adding passwd file for correct shell
-    add_file "/usr/share/archboot/base/passwd" "/etc/passwd"
+    add_file "/usr/share/archboot/base/etc/passwd" "/etc/passwd"
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"
     
