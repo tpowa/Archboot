@@ -573,10 +573,10 @@ add_file() {
     fi
     
     if [[ -L $src ]]; then
-        # add the binary
-        add_file "$(type -P $(readlink $src))"
+        # add the symlink
+        add_file "$(realpath $src)"
         # create the symlink
-        add_symlink "$src" "$(type -P $(readlink $src))"
+        add_symlink "$src" "$(realpath $src)"
     else
         command install -Dm$mode "$src" "$BUILDROOT$dest"
     fi
