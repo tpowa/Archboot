@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
+    add_file "/usr/bin/archboot-$(uname -m)-create-container.sh"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook adds basic installer files on an archboot image.
+HELPEOF
+}
