@@ -40,7 +40,10 @@ build ()
     add_file "/etc/profile"
     add_file "/etc/group"
     add_file "/etc/gshadow"
-
+    basic_config="hostname modprobe.d/modprobe.conf profile.d/launch-setup shadow shells"
+    for i in $basic_config; do
+        add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
+    done
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 

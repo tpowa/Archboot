@@ -41,11 +41,8 @@ build ()
     ### add en_US.utf8 locale
     add_file "/usr/lib/locale/locale-archive"
 
-    ### adding config files of installation system
-    for i in $(find /usr/share/archboot/base/etc/* ! -type d); do
-        add_file "$i" "$(echo $i | sed -e 's#/usr/share/archboot/base##g')"
-    done
-
+    ### adding passwd file for correct shell
+    add_file "/usr/share/archboot/base/passwd" "/etc/passwd"
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"
     
