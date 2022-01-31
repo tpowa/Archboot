@@ -571,7 +571,15 @@ add_file() {
     else
         quiet "adding file: %s" "$dest"
     fi
-    command install -Dm$mode "$src" "$BUILDROOT$dest"
+    
+    if [[ -L $src ]]; then
+        # add the binary
+        add_file "$(type -P $(readlink $src))"
+        # create the symlink
+        add_symlink "$src" "$(type -P $(readlink $src))"
+    else
+        command install -Dm$mode "$src" "$BUILDROOT$dest"
+    fi
 }
 
 add_runscript() {
