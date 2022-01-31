@@ -122,7 +122,6 @@ build ()
         add_binary "$i"
     done
     
-
     # add firmware files
     add_full_dir /lib/firmware
     
