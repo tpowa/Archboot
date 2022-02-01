@@ -1804,7 +1804,7 @@ find_btrfs_bootloader_subvolume() {
 subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
     while read -r i; do
-        grep -q ":btrfs:" "${i}" && SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
+        echo "${i}" | grep -q ":btrfs:" && SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
     done < /tmp/.parts
 }
 
