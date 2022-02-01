@@ -14,10 +14,8 @@ build ()
     ## add grub-mkconfig helper scripts
     add_file "/usr/share/grub/grub-mkconfig_lib"
     add_file "/etc/default/grub"
-    
-    for i in $(find /etc/grub.d/* ! -type d); do
-        add_file "$i"
-    done
+
+    add_full_dir "/etc/grub.d"
     
     if [[ "$(uname -m)" == "x86_64" ]]; then
         # add bios and x86_64-efi files
