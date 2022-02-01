@@ -16,9 +16,9 @@ build ()
     add_file "/etc/ssh/moduli"
     add_file "/etc/rsyncd.conf"
     add_file "/etc/exports"
-    for i in $(find /usr/share/terminfo/ ! -type d); do
-    	add_file "$i"
-    done
+
+    add_full_dir "/usr/share/terminfo"
+
     add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
     add_file "/usr/lib/ssh/sftp-server"
     add_file "/usr/lib/ssh/ssh-keysign"
