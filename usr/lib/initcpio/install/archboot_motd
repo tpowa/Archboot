@@ -5,6 +5,7 @@ build ()
 {
     ### generate motd
     MOTD=$(mktemp /var/tmp/motd.XXXX)
+    #shellcheck disable=SC2129 
     echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m" >> "${MOTD}"
     echo -e "\033[1m--------------------------------------------\033[0m" >> "${MOTD}"
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
@@ -19,6 +20,7 @@ if  echo "${HOOKS[@]}" | grep -q archboot_tz; then
     echo -e "  - To change your time and date, type \033[32m'tz'\033[0m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -q archboot_installer; then
+    #shellcheck disable=SC2129 
     echo -e "\033[1mNormal Setup:\033[0m" >> "${MOTD}"
     echo -e "  - On first login \033[1msetup\033[0m is launched automatically." >> "${MOTD}"
     echo -e "  - Please run \033[32m'setup'\033[0m again to install Arch Linux if you left setup." >> "${MOTD}"
