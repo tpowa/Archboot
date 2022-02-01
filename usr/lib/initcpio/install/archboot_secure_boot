@@ -36,7 +36,7 @@ build ()
         add_file "/usr/lib/python3.10/lib-dynload/$i.so"
     done
     # add efitools files
-    [[ ""${_RUNNING_ARCH}"" == "x86_64" ]] && add_file "/usr/share/efitools/efi/PreLoader.efi"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && add_file "/usr/share/efitools/efi/PreLoader.efi"
     add_file "/usr/share/efitools/efi/HashTool.efi"
     add_file "/usr/share/efitools/efi/KeyTool.efi"
     # add shim signed files from fedora
