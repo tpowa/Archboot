@@ -1805,7 +1805,7 @@ subvolumes_in_use() {
     SUBVOLUME_IN_USE=""
     while read -r i; do
         grep -q ":btrfs:" "${i}" && SUBVOLUME_IN_USE="${SUBVOLUME_IN_USE} $(echo "${i}" | cut -d: -f 9)"
-    done
+    done < /tmp/.parts
 }
 
 # ask for btrfs compress option
