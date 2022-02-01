@@ -9,9 +9,7 @@ build ()
         add_binary "$i"
     done
     add_file "/etc/ntp.conf"
-    for i in $(find /usr/share/zoneinfo ! -type d); do
-        add_file "$i"
-    done
+    add_full_dir "/usr/share/zoneinfo"
     add_dir "/var/lib/ntp"
     chown ntp:root "$BUILDROOT/var/lib/ntp"
     add_file "/usr/bin/archboot-tz.sh" "/usr/bin/tz"
