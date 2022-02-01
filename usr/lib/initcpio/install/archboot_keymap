@@ -3,7 +3,7 @@
 
 build ()
 {
-        for i in $(find /usr/share/kbd/ ! -type d ! -name "mac*"  ! -name "ppc" ! -name "ppc" ! -name "atari*" ! -name "sun*" ! -name "README*" ! -name "amiga*"); do
+        for i in $(find /usr/share/kbd/ ! -type d ! -name "mac*"  ! -name "ppc" ! -name "atari*" ! -name "sun*" ! -name "README*" ! -name "amiga*"); do
             add_file "$i"
         done
     add_file /usr/bin/archboot-km.sh /usr/bin/km
