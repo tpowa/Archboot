@@ -66,7 +66,7 @@ cd "${_ISODIR}" || exit 1
 "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || rm -r "${_BUILDDIR}"
 # set user rights on files
 # set user rights on files
-[[ -d "${_BUILDDIR}"  ]] && exit 1
+[[ -d "${_BUILDDIR}" ]] && exit 1
 chmod 755 "${_BUILDDIR}"
 chown -R "${_USER}" "${_BUILDDIR}"
 chgrp -R "${_GROUP}" "${_BUILDDIR}"
