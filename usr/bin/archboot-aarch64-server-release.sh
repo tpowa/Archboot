@@ -42,7 +42,7 @@ echo "Update container to latest packages..."
 systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
 # remove package cache
 echo "Remove package cache from container ..."
-systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Scc --noconfirm >/dev/null 2>&1
+rm ${_PACMAN_AARCH64}/var/cache/pacman/pkg/*
 # enable parallel downloads
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_PACMAN_AARCH64}"/etc/pacman.conf
 # fix network in container
