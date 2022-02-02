@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' '/drivers/net/'
+    add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' -f 'bnx2x' -f 'qed' '/drivers/net/'
     apps="route ip dhcpcd"
     for i in $apps; do
         add_binary "$i"
