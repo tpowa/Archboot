@@ -63,7 +63,7 @@ chgrp "${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR} || exit 1
 # create release in "${_ISODIR}"
 cd "${_ISODIR}" || exit 1
-"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || (rm -r "${_BUILDDIR}"; exit 1)
+"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || rm -r "${_BUILDDIR}"; exit 1
 # set user rights on files
 # set user rights on files
 chmod 755 "${_BUILDDIR}"
