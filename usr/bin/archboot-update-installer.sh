@@ -89,7 +89,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # add fix for mkinitcpio 31, remove when 32 is released
     cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;mkinitcpio -c ${_CONFIG} -g /initrd.img" >/dev/tty7 2>&1 || exit 1
+    # switch compression
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;sed -i -e 's#zstd#lz4#g' /etc/archboot/${CONFIG}; mkinitcpio -c ${_CONFIG} -g /initrd.img" >/dev/tty7 2>&1 || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from ${_W_DIR} to / ..."
     mv "${_W_DIR}"/initrd.img / || exit 1
