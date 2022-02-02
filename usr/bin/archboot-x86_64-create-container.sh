@@ -94,6 +94,7 @@ systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/n
 if [[ "${_SAVE_RAM}" ==  "1" ]]; then
     # clean container from not needed files
     echo "Clean container, delete not needed files from ${_DIR} ..."
+    rm  "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
     rm -r "${_DIR}"/usr/include
     rm -r "${_DIR}"/usr/share/{man,doc,info,locale}
 fi
