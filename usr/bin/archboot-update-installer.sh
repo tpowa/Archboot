@@ -80,9 +80,9 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 2/6: Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # create container without package cache
-    [[ "${_L_COMPLETE}" == "1" ]] && "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
+    [[ "${_L_COMPLETE}" == "1" ]] && archboot-${_RUNNING_ARCH}-create-container.sh "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
     # create container with package cache
-    [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
+    [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && archboot-${_RUNNING_ARCH}-create-container.sh "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
     echo "Step 3/6: Generating initramfs in ${_W_DIR} ..."
     echo "          This will need some time ..."
