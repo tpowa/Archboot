@@ -32,9 +32,7 @@ cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
 cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
 # create release in "${_ISODIR}"
 cd "${_ISODIR}" || exit 1
-"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" ||\
-(rm -r "${_BUILDDIR}"; cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}";\
-cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"; exit 1)
+"archboot-${_ARCH}-release.sh" "${_BUILDDIR}" ||rm -r "${_BUILDDIR}"
 # restore pacman.conf and mirrorlist
 cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
 cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
