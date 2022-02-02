@@ -91,7 +91,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     # switch compression
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;sed -i -e 's#zstd#lz4#g' ${_CONFIG}; mkinitcpio -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;sed -i -e 's#zstd#gzip#g' ${_CONFIG}; mkinitcpio -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from ${_W_DIR} to / ..."
     mv "${_W_DIR}"/initrd.img / || exit 1
