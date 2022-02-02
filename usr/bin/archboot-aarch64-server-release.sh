@@ -70,7 +70,7 @@ cd "${_ISODIR}" || exit 1
 chmod 755 "${_BUILDDIR}"
 chown -R "${_USER}" "${_BUILDDIR}"
 chgrp -R "${_GROUP}" "${_BUILDDIR}"
-cd "${_BUILDDIR}"
+cd "${_BUILDDIR}" || exit 1
 # remove sha256sum and install image
 rm sha256sum.txt
 # sign files and create new sha256sum.txt
