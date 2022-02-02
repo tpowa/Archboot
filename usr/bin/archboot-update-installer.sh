@@ -71,8 +71,9 @@ echo "Information: Logging is done on /dev/tty7 ..."
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # remove everything not necessary
-    echo "Step 1/6: Removing not necessary files from /usr ..."
-    rm -r /lib/{firmware,modules} >/dev/tty7 2>&1
+    echo "Step 1/6: Removing not necessary files from / ..."
+    [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
+    [[ -d "/usr/lib/modules" ]] && rm -r "/usr/lib/modules"
     _SHARE_DIRS="efitools file grub hwdata kbd licenses makepkg nmap openvpn pacman refind tc usb_modeswitch vim zoneinfo zsh"
     for i in "${_SHARE_DIRS}"; do
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
@@ -90,7 +91,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     # switch compression
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;sed -i -e 's#zstd#lz4#g' /etc/archboot/${CONFIG}; mkinitcpio -c ${_CONFIG} -g /initrd.img" >/dev/tty7 2>&1 || exit 1
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "rm /var/cache/pacman/pkg/archboot-*; umount /tmp;sed -i -e 's#zstd#lz4#g' ${_CONFIG}; mkinitcpio -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from ${_W_DIR} to / ..."
     mv "${_W_DIR}"/initrd.img / || exit 1
