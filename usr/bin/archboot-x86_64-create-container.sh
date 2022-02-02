@@ -57,7 +57,7 @@ mount udev "${_DIR}/dev" -t devtmpfs -o mode=0755,nosuid
 mount devpts "${_DIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
 mount shm "${_DIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
-echo "Installing packages base firmware and archboot to ${_DIR} ..."
+echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
 pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
 echo "Installing archboot to ${_DIR} ..."
 pacman --root "${_DIR}" -Sy archboot --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
