@@ -82,9 +82,6 @@ build ()
         add_binary "$i"
     done
     
-    # add firmware files
-    add_full_dir /lib/firmware
-    
     #dbus files
     apps="dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
           dbus-update-activation-environment dbus-uuidgen"
