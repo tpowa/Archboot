@@ -121,7 +121,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     rm -r "${_W_DIR}" || exit 1
     echo "Step 6/8: Create initramfs /initrd.img ..."
     find initrd/. -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
-    LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img
+    LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
     echo "Step 7/8: Remove /initrd ..."
     rm -r "/initrd" || exit 1
