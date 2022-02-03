@@ -53,17 +53,9 @@ if [[ -n "${_DIR}" ]]; then
     cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in $_DIR"
     # add mkkeys.sh
-    if [[ ! -f /usr/bin/mkkeys.sh ]]; then
-        curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh || exit 1
-        chmod 755 mkkeys.sh
-        ./mkkeys.sh <<EOF 
+    ./mkkeys.sh <<EOF 
 ${NAME} 
 EOF
-    else
-        mkkeys.sh <<EOF 
-${NAME} 
-EOF
-    fi
     # download MS Certificates, else EFI might get broken!
     curl -s -L -O https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
     curl -s -L -O https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt

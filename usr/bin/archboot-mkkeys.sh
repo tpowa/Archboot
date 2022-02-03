@@ -1,41 +1,44 @@
 #!/bin/bash
-_MKKEYS_SERVER="https://www.rodsbooks.com/efi-bootloaders"
-_MKKEYS_URL="${_MKKEYS_SERVER}/mkkeys.sh"
-_USER="tobias"
-_GROUP="users"
-_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
-_SERVER="pkgbuild.com"
-_MKKEYS_ARCH_SERVERDIR="/home/tpowa/public_html/archboot-helper/mkkeys"
+# Copyright (c) 2015 by Roderick W. Smith
+# Licensed under the terms of the GPL v3
+# replaced GUID with uuidgen 
 
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then 
-    echo "ERROR: Please run as root user!"
-    exit 1
-fi
-### check for tpowa's build server
-if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
-    echo "This script should only be run on tpowa's build server. Aborting..."
-    exit 1
-fi
-# download packages from fedora server
-echo "Downloading mkkeys.sh..."
-mkdir -m 777 mkkeys
-curl -s --create-dirs -L -O --output-dir ./mkkeys/ ${_MKKEYS_URL} || exit 1
-# sign files
-echo "Sign files and upload ..."
-#shellcheck disable=SC2086
-cd mkkeys/ || exit 1
-chown "${_USER}" ./*
-chgrp "${_GROUP}" ./*
-for i in *; do
-    #shellcheck disable=SC2086
-    [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
-    [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
-    [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
-done
-sudo -u "${_USER}" scp ./* "${_SERVER}:${_MKKEYS_ARCH_SERVERDIR}" || exit 1
-# cleanup
-echo "Remove mkkeys directory."
-cd ..
-rm -r mkkeys
-echo "Finished fedora Shim."
+echo -n "Enter a Common Name to embed in the keys: "
+read NAME
+
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout PK.key \
+        -out PK.crt -days 3650 -nodes -sha256
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME KEK/" -keyout KEK.key \
+        -out KEK.crt -days 3650 -nodes -sha256
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DB/" -keyout DB.key \
+        -out DB.crt -days 3650 -nodes -sha256
+openssl x509 -in PK.crt -out PK.cer -outform DER
+openssl x509 -in KEK.crt -out KEK.cer -outform DER
+openssl x509 -in DB.crt -out DB.cer -outform DER
+
+uuidgen > myGUID.txt
+
+cert-to-efi-sig-list -g $GUID PK.crt PK.esl
+cert-to-efi-sig-list -g $GUID KEK.crt KEK.esl
+cert-to-efi-sig-list -g $GUID DB.crt DB.esl
+rm -f noPK.esl
+touch noPK.esl
+
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k PK.key -c PK.crt PK PK.esl PK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k PK.key -c PK.crt PK noPK.esl noPK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k PK.key -c PK.crt KEK KEK.esl KEK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k KEK.key -c KEK.crt db DB.esl DB.auth
+
+chmod 0600 *.key
+
+echo ""
+echo ""
+echo "For use with KeyTool, copy the *.auth and *.esl files to a FAT USB"
+echo "flash drive or to your EFI System Partition (ESP)."
+echo "For use with most UEFIs' built-in key managers, copy the *.cer files;"
+echo "but some UEFIs require the *.auth files."
+echo ""

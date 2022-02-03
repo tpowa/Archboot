@@ -5,36 +5,17 @@ build ()
 {
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
     _RUNNING_ARCH="$(uname -m)"
-    apps="openssl python3 cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
+    apps="openssl cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
           hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
           sbsiglist sbsign sbvarsign sbverify mokutil"
     add_file "/etc/ssl/openssl.cnf"
     for i in $apps; do
         add_binary "$i"
     done
-    # add mkkeys.sh
-    MKKEYS=$(mktemp /var/tmp/mkkeys.XXXX)
-    curl -s -L -o "${MKKEYS}" https://pkgbuild.com/~tpowa/archboot-helper/mkkeys/mkkeys.sh 
-    chmod 755 "${MKKEYS}"
-    add_file "${MKKEYS}" "/usr/bin/mkkeys.sh"
-    # add python3 files for script
-    add_full_dir /usr/lib/python3.10/encodings
-    add_full_dir /usr/lib/python3.10/collections
-    add_full_dir /usr/lib/python3.10/logging
-    PYTHON_FILES="_collections_abc keyword heapq platform types enum uuid \
-                  _sitebuiltins genericpath posixpath _collections_abc stat os site abc io codecs \
-                  operator reprlib re sre_compile sre_parse sre_constants functools copyreg subprocess \
-                  signal threading _weakrefset warnings contextlib random bisect hashlib traceback \
-                  linecache tokenize token weakref string selectors"
-    for i in ${PYTHON_FILES}; do
-        add_file "/usr/lib/python3.10/$i.py"
-    done
-    PYTHON_DYN="select.cpython-310-${_RUNNING_ARCH}-linux-gnu math.cpython-310-${_RUNNING_ARCH}-linux-gnu \
-                _random.cpython-310-${_RUNNING_ARCH}-linux-gnu _sha512.cpython-310-${_RUNNING_ARCH}-linux-gnu \
-                _posixsubprocess.cpython-310-${_RUNNING_ARCH}-linux-gnu"
-    for i in ${PYTHON_DYN}; do
-        add_file "/usr/lib/python3.10/lib-dynload/$i.so"
-    done
+    # add mkkeys.sh, 
+    # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
+    # modiiied to use uuidgen instead of python
+    add_file "/usr/bin/archboot-mkkeys.sh" "/usr/bin/mkkeys.sh"
     # add efitools files
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && add_file "/usr/share/efitools/efi/PreLoader.efi"
     add_file "/usr/share/efitools/efi/HashTool.efi"
