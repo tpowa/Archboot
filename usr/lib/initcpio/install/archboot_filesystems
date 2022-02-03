@@ -11,21 +11,24 @@ build ()
 	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel lowntfs-3g ntfs-3g mount.cifs \
 	  cifs.upcall fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
 	  mkfs.jfs wipefs blockdev btrfs btrfs-convert btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
-	  btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd \
-	  umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs \
-	  fusermount mount.fuse ulockmgr_server fsck.exfat mkfs.exfat tune.exfat exfatlabel dump.exfat fatresize nvme \
-	  fsck.msdos fsck.vfat fsck.reiserfs mkfs.vfat mkfs.msdos mkfs.ntfs mkfs.reiserfs mount.nfs4 mount.ntfs mount.lowntfs-3g \
-          mount.ntfs-3g umount.nfs umount.nfs4 fsck.btrfs dosfslabel e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs \
-          dump.f2fs f2fs_io f2fscrypt f2fstat fibmap.f2fs fsck.f2fs parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld \
-          nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune ntfsdecrypt ntfsrecover ntfssecaudit \
-          ntfstruncate ntfsusermap ntfswipe xfs_growfs xfs_quota xfs_scrub xfs_scrub_all xfs_spaceman ntfs-3g.probe \
-          compile_et mk_cmds fsck.xfs xfs_admin /usr/bin/xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
+	  btrfsck btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.upcall cifscreds getcifsacl mount.smb3 \
+	  setcifsacl smb2-quota smbinfo umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
+	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fusermount mount.fuse ulockmgr_server fsck.exfat mkfs.exfat \
+	  tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat fsck.reiserfs mkfs.vfat mkfs.msdos mkfs.ntfs \
+	  mkfs.reiserfs mount.nfs4 mount.ntfs mount.lowntfs-3g mount.ntfs-3g umount.nfs umount.nfs4 fsck.btrfs dosfslabel \
+	  e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io f2fscrypt f2fstat fibmap.f2fs fsck.f2fs \
+	  parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean \
+	  nilfs-resize nilfs-tune ntfsdecrypt ntfsrecover ntfssecaudit ntfstruncate ntfsusermap ntfswipe xfs_growfs xfs_quota \
+	  xfs_scrub xfs_scrub_all xfs_spaceman ntfs-3g.probe compile_et mk_cmds fsck.xfs xfs_admin /usr/bin/xfs_bmap xfs_freeze \
+	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in $apps; do
         add_binary "$i"
     done
     add_file "/etc/nilfs_cleanerd.conf"
     add_file "/etc/fuse.conf"
     add_file "/etc/nvme/discovery.conf"
+    add_full_dir "/etc/cifs-utils"
+    add_full_dir "etc/request-key.d"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
@@ -36,3 +39,4 @@ cat<<HELPEOF
   This hook is responsible for including filesystems on an archboot image.
 HELPEOF
 }
+
