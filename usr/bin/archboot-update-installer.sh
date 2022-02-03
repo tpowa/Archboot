@@ -98,7 +98,6 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
     echo "Step 3/8: Moving kernel from ${_W_DIR} to / ..."
-    mv "${_W_DIR}"/initrd.img / || exit 1
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
         mv "${_W_DIR}"/boot/vmlinuz-linux / || exit 1
         ### not supported
@@ -120,6 +119,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 5/8: Remove ${_W_DIR} ..."
     rm -r "${_W_DIR}" || exit 1
     echo "Step 6/8: Create initramfs /initrd.img ..."
+    echo "          This will need some time ..."
     find initrd/. -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
     LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
