@@ -12,8 +12,8 @@ _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/
 
 kver() {
     # get kernel version from installed kernel
-    [[ "$(uname -m)" == "x86_64" ]] && VMLINUZ=/boot/vmlinuz-linux
-    [[ "$(uname -m)" == "aarch64" ]] && VMLINUZ=/boot/Image
+    [[ "$(uname -m)" == "x86_64" ]] && VMLINUZ="${_W_DIR}/boot/vmlinuz-linux"
+    [[ "$(uname -m)" == "aarch64" ]] && VMLINUZ="${_W_DIR}/boot/Image"
     if [[ -f "${VMLINUZ}" ]]; then
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
