@@ -10,6 +10,18 @@ _CONFIG="/etc/archboot/${_RUNNING_ARCH}.conf"
 _W_DIR="/archboot"
 _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 
+kver() {
+    # get kernel version from installed kernel
+    [[ "$(uname -m)" == "x86_64" ]] && VMLINUZ=/boot/vmlinuz-linux
+    [[ "$(uname -m)" == "aarch64" ]] && VMLINUZ=/boot/Image
+    if [[ -f "${VMLINUZ}" ]]; then
+        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${VMLINUZ}")
+        read -r _HWKVER _ < <(dd if="${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+    fi
+    # fallback if no detectable kernel is installed
+    [[ "${_HWKVER}" == "" ]] && _HWKVER="$(uname -r)"
+}
+
 usage () {
 	echo "Update installer, launch latest environment or create latest image files:"
 	echo "-------------------------------------------------------------------------"
@@ -91,7 +103,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     # switch compression
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k "$kver" -c ${_CONFIG} -g /tmp/initrd.img; mv /tmp/initrd.img /" >/dev/tty7 2>&1 || exit 1
     mv "${_W_DIR}"/usr/lib/initcpio/functions.old "${_W_DIR}"/usr/lib/initcpio/functions
     echo "Step 4/6: Moving initramfs files from ${_W_DIR} to / ..."
     mv "${_W_DIR}"/initrd.img / || exit 1
