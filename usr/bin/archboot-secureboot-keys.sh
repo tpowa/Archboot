@@ -53,7 +53,7 @@ if [[ -n "${_DIR}" ]]; then
     cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in $_DIR"
     # add mkkeys.sh
-    ./mkkeys.sh <<EOF 
+    mkkeys.sh <<EOF 
 ${NAME} 
 EOF
     # download MS Certificates, else EFI might get broken!
