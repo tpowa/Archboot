@@ -59,8 +59,20 @@ mount shm "${_DIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
 echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
 pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
+rm  "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
+if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
+    # clean cache
+    echo "Clean pacman cache from ${_DIR} ..."
+    rm -r "${_DIR}"/var/cache/pacman
+fi
 echo "Installing archboot to ${_DIR} ..."
 pacman --root "${_DIR}" -Sy archboot --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+if [[ "${_SAVE_RAM}" ==  "1" ]]; then
+    # clean container from not needed files
+    echo "Clean container, delete not needed files from ${_DIR} ..."
+    rm -r "${_DIR}"/usr/include
+    rm -r "${_DIR}"/usr/share/{man,doc,info}
+fi
 # Clean cache on archboot environment
 if [[ "$(cat /etc/hostname)" == "archboot" ]]; then
     echo "Cleaning /var/cache/pacman/pkg ..."
@@ -76,6 +88,7 @@ echo "Create locales in container ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
 systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
+[[ "${_SAVE_RAM}" ==  "1" ]] && rm -r "${_DIR}/usr/share/locale"
 # generate pacman keyring
 echo "Generate pacman keyring in container ..."
 systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
@@ -98,16 +111,4 @@ if grep -q "^\[testing" /etc/pacman.conf; then
 fi
 echo "Setting hostname to archboot ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
-if [[ "${_SAVE_RAM}" ==  "1" ]]; then
-    # clean container from not needed files
-    echo "Clean container, delete not needed files from ${_DIR} ..."
-    rm  "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
-    rm -r "${_DIR}"/usr/include
-    rm -r "${_DIR}"/usr/share/{man,doc,info,locale}
-fi
-if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
-    # clean cache
-    echo "Clean pacman cache from ${_DIR} ..."
-    rm -r "${_DIR}"/var/cache/pacman
-fi
 echo "Finished container setup in ${_DIR} ."
