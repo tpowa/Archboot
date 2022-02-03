@@ -68,8 +68,6 @@ cd "${_ISODIR}" || exit 1
 # set user rights on files
 [[ -d "${_BUILDDIR}" ]] || exit 1
 chmod 755 "${_BUILDDIR}"
-chown -R "${_USER}" "${_BUILDDIR}"
-chgrp -R "${_GROUP}" "${_BUILDDIR}"
 cd "${_BUILDDIR}" || exit 1
 # remove sha256sum and install image
 rm sha256sum.txt
@@ -86,6 +84,7 @@ for i in boot/*; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
+chown -R "${_USER}:${_GROUP}" "./"
 cd ..
 [[ -d "archive" ]] || mkdir archive
 [[ -d "archive/${_DIRECTORY}" ]] && rm -r "archive/${_DIRECTORY}"
