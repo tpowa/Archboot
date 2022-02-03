@@ -4,7 +4,7 @@
 build ()
 {
     apps="getent head id cksum tail tee test tr uptime w who which whoami xargs \
-          swapon uniq cut seq snarf sort fdisk sfdisk cfdisk parted free less \
+          swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp chown date df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
           mktemp chroot dirname expr bzip2 hwclock su cpio gzip top sdparm tput \
           ifconfig ln losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
@@ -26,7 +26,7 @@ build ()
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
-          setfattr pzstd unzstd zstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat"
+          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat"
     if [[ "$(uname -m)" == "x86_64" ]]; then
         apps="$apps i386 x86_64"
     fi
