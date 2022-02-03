@@ -34,7 +34,7 @@ usage () {
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 4 GB RAM."
+        echo "                  This operation needs at least 3.6 GB RAM."
         echo ""
         echo " -latest-image    Generate latest image files in /archboot-release directory"
         echo "                  This operation needs at least 3.6 GB RAM."
@@ -109,7 +109,6 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 4/8: Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
-    cp "${_W_DIR}"/usr/lib/initcpio/functions "${_W_DIR}"/usr/lib/initcpio/functions.old
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     kver
     # write initramfs to /tmp
@@ -121,6 +120,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 6/8: Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     cd initrd || exit 1
+    #from /usr/bin/mkinitpcio.conf
+    # compress image with zstd
     find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
     LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
     cd ..
