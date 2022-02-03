@@ -114,7 +114,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     kver
     # write initramfs to /tmp
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k "${_HWKVER}" -c ${_CONFIG} -d /tmp/ >/dev/tty7 2>&1 || exit 1"
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k "${_HWKVER}" -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1
     # move initramgs to /
     mv "${_W_DIR}/tmp" /initrd
     echo "Step 5/8: Remove ${_W_DIR} ..."
@@ -128,7 +128,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     ### not supported
     #mv "${_W_DIR}"/boot/amd-ucode.img / || exit 1
     # remove "${_W_DIR}"
-    echo "Step 6/8: Loading files to kexec now, reboot in a few seconds ..."
+    echo "Step 8/8: Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
         kexec -l /vmlinuz-linux --initrd=/initrd.img --reuse-cmdline
