@@ -30,7 +30,7 @@ usage () {
 	echo ""
         echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
 	echo " -latest          Launch latest archboot environment (using kexec)."
-        echo "                  This operation needs at least 3 GB RAM."
+        echo "                  This operation needs at least 2.8 GB RAM."
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
