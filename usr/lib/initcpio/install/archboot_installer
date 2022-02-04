@@ -3,14 +3,6 @@
 
 build ()
 {
-    _ARCH="$(uname -m)"
-    if [[ "${_ARCH}" == "x86_64" ]]; then
-        _ARCHINSTALL_URL="https://pkgbuild.com/~tpowa/archboot-helper/archinstall/archinstall.${_ARCH}"
-        _ARCHINSTALL=$(mktemp -d /var/tmp/archinstall.XXX)
-        curl -s --create-dirs -L -O --output-dir "${_ARCHINSTALL}" "${_ARCHINSTALL_URL}"
-        chmod 755 "${_ARCHINSTALL}/archinstall.${_ARCH}"
-        add_binary "${_ARCHINSTALL}/archinstall.${_ARCH}" "/usr/bin/archinstall"
-    fi
     apps="genfstab arch-chroot pacstrap \
           archboot-$(uname -m)-release.sh archboot-mktorrent.sh \
           archboot-restore-usbstick.sh isoinfo mktorrent archboot-copy-mountpoint.sh \
