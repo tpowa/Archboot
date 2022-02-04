@@ -72,7 +72,8 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
         # clean container from not needed files
         echo "Clean container, delete not needed files from ${_DIR} ..."
         rm -r "${_DIR}"/usr/include
-        rm -r "${_DIR}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completition,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,git-1.0,glib-2.0,gnupg,graphite2,gtk-doc,i18n,iana-etc,icons,icu,iptables,java,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl}
+        rm -r "${_DIR}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,glib-2.0,gnupg,graphite2,gtk-doc,iana-etc,icons,icu,iptables,java,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl5}
+        rm -r "${_DIR}"/usr/lib/{audit,avahi,awk,bash,bfd-plugins,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,kexec-tools,krb5,ldb,ldscripts,libnl,libproxy,named,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,perl5,pkcs11,pkgconfig,rsync,samba,sasl2,siconv,sysctl.d,sysusers.d,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables}
     fi
     # umount special filesystems
     echo "Umount special filesystems in to ${_DIR} ..."
