@@ -34,8 +34,8 @@ saveram() {
         # clean container from not needed files
         echo "Clean container, delete not needed files from ${_DIR} ..."
         rm -r "${_DIR}"/usr/include
-        rm -r "${_DIR}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,glib-2.0,gnupg,graphite2,gtk-doc,iana-etc,icons,icu,iptables,java,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl5}
-        rm -r "${_DIR}"/usr/lib/{audit,avahi,awk,bash,bfd-plugins,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,kexec-tools,krb5,ldb,ldscripts,libnl,libproxy,named,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,perl5,pkcs11,pkgconfig,rsync,samba,sasl2,siconv,sysctl.d,sysusers.d,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables}
+        rm -r "${_DIR}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,glib-2.0,gnupg,graphite2,gtk-doc,iana-etc,icons,icu,iptables,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,pixmaps,pkgconfig,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl5}
+        rm -r "${_DIR}"/usr/lib/{audit,avahi,awk,bash,bfd-plugins,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,kexec-tools,krb5,ldb,ldscripts,libnl,libproxy,named,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,perl5,pkcs11,pkgconfig,python3.10,rsync,samba,sasl2,siconv,sysctl.d,sysusers.d,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables}
     fi
 }
 
@@ -78,7 +78,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     # install archboot
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
-    rm  "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
+    rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
     saveram
     cleancache
     echo "Installing archboot to ${_DIR} ..."
@@ -125,8 +125,10 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
     echo "Installing archboot-arm and ${_LINUX_FIRMWARE} to container..."
     systemd-nspawn -D "${_DIR}" /bin/bash -c "pacman -S archboot-arm ${_LINUX_FIRMWARE} --noconfirm" >/dev/null 2>&1
+    rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
     cleancache
     saveram
+    [[ "${_SAVE_RAM}" ==  "1" ]] && rm -r "${_DIR}"/usr/share/{i18n,locale}
 fi
 echo "Setting hostname to archboot ..."
 systemd-nspawn -D "${_DIR}" /bin/bash -c "echo archboot > /etc/hostname" >/dev/null 2>&1
