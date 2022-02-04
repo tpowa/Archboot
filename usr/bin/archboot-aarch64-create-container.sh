@@ -72,7 +72,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
         # clean container from not needed files
         echo "Clean container, delete not needed files from ${_DIR} ..."
         rm -r "${_DIR}"/usr/include
-        rm -r "${_DIR}"/usr/share/{man,doc,info}
+        rm -r "${_DIR}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completition,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,git-1.0,glib-2.0,gnupg,graphite2,gtk-doc,i18n,iana-etc,icons,icu,iptables,java,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl}
     fi
     # umount special filesystems
     echo "Umount special filesystems in to ${_DIR} ..."
