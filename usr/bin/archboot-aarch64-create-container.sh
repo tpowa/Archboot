@@ -85,7 +85,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
     systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
     systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
-    [[ "${_SAVE_RAM}" ==  "1" ]] && rm -r "${_DIR}/usr/share/locale"
+    [[ "${_SAVE_RAM}" ==  "1" ]] && rm -r "${_DIR}"/usr/share/{i18n,locale}
     # generate pacman keyring
     echo "Generate pacman keyring in container ..."
     systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
