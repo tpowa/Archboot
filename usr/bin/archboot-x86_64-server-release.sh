@@ -55,7 +55,7 @@ for i in boot/*; do
     [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
 done
-chown -R "${_USER}:${_GROUP}" "./"
+chown -R "${_USER}:${_GROUP}" "./*"
 cd ..
 [[ -d "archive" ]] || mkdir archive
 [[ -d "archive/${_DIRECTORY}" ]] && rm -r "archive/${_DIRECTORY}"
