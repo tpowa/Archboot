@@ -58,8 +58,7 @@ rm -r "${_PACMAN_AARCH64}"
 echo "Finished container tarball."
 #shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
-chown "${_USER}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
-chgrp "${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
+chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
 sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR} || exit 1
 # create release in "${_ISODIR}"
 cd "${_ISODIR}" || exit 1

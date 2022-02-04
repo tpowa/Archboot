@@ -1,8 +1,7 @@
 #!/bin/bash
-_FEDORA_SERVER="https://kojipkgs.fedoraproject.org"
 _SHIM_VERSION="15.4"
 _SHIM_RELEASE="5"
-_SHIM_URL="${_FEDORA_SERVER}/packages/shim/${_SHIM_VERSION}/${_SHIM_RELEASE}"
+_SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/${_SHIM_VERSION}/${_SHIM_RELEASE}"
 _SHIM_RPM="x86_64/shim-x64-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
 _SHIM32_RPM="x86_64/shim-ia32-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
 _SHIM_AA64_RPM="aarch64/shim-aa64-${_SHIM_VERSION}-${_SHIM_RELEASE}.aarch64.rpm"
@@ -51,8 +50,7 @@ echo "Sign files and upload ..."
 #shellcheck disable=SC2086
 cd shim-fedora/ || exit 1
 chmod 644 ./*
-chown "${_USER}" ./*
-chgrp "${_GROUP}" ./*
+chown "${_USER}:${_GROUP}" ./*
 for i in *.efi; do
     #shellcheck disable=SC2086
     [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1

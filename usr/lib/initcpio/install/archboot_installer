@@ -3,6 +3,12 @@
 
 build ()
 {
+    _ARCHINSTALL_URL="https://pkgbuild.com/~tpowa/archboot-helper/archinstall/archinstall"
+    _ARCHINSTALL=$(mktemp -d /var/tmp/archinstall.XXX)
+    curl -s --create-dirs -L -O --output-dir "${_ARCHINSTALL}" "${_ARCHINSTALL_URL}"
+    chmod 755 "${_ARCHINSTALL}/archinstall"
+    add_binary "${_ARCHINSTALL}/archinstall" "/usr/bin/archinstall"
+    add_file "${_SHIM}/${i}" "/usr/share/archboot/fedora-shim/${i}"
     apps="genfstab arch-chroot pacstrap \
           archboot-$(uname -m)-release.sh archboot-mktorrent.sh \
           archboot-restore-usbstick.sh isoinfo mktorrent archboot-copy-mountpoint.sh \
@@ -23,7 +29,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the archboot installer and arch-install-scripts 
+  This hook includes the archboot installer,archinstaller and arch-install-scripts 
   on an archboot image.
 HELPEOF
 }
