@@ -66,6 +66,7 @@ cd "${_ISODIR}" || exit 1
 # set user rights on files
 # set user rights on files
 [[ -d "${_BUILDDIR}" ]] || exit 1
+chown -R "${_USER}:${_GROUP}" "${_BUILDDIR}"
 chmod 755 "${_BUILDDIR}"
 cd "${_BUILDDIR}" || exit 1
 # remove sha256sum and install image

@@ -39,6 +39,7 @@ cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
 # set user rights on files
 [[ -d "${_BUILDDIR}" ]] || exit 1
 chmod 755 "${_BUILDDIR}"
+chown -R "${_USER}:${_GROUP}" "${_BUILDDIR}"
 cd "${_BUILDDIR}" || exit 1
 # remove sha256sum
 rm sha256sum.txt
