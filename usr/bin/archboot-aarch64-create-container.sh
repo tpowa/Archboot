@@ -79,11 +79,10 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
     rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
-    saveram
     cleancache
     echo "Installing archboot to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy archboot-arm --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
-    cleancache
+    saveram
     # Clean cache on archboot environment
     if [[ "$(cat /etc/hostname)" == "archboot" ]]; then
         echo "Cleaning /var/cache/pacman/pkg ..."
