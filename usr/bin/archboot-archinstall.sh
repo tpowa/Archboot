@@ -23,7 +23,7 @@ echo "Building archinstall C version X86_64..."
 pacman -Sy nuitka gcc archinstall patchelf --noconfirm
 nuitka3 --standalone /usr/bin/archinstall || exit 1
 mv archinstall.dist/archinstall ./archinstall.x86_64
-#rm -r archinstall.{dist,build}
+rm -r archinstall.{dist,build}
 #archboot-aarch64-create-container.sh "${_AARCH64_W_DIR}"
 #systemd-nspawn -q -D "${_AARCH64_W_DIR}" /bin/bash -c "pacman -Sy nuitka gcc archinstall patchelf --noconfirm"; cd /;nuitka3 --standalone /usr/bin/archinstall || exit 1
 #mv "${_AARCH64_W_DIR}/archinstall.dist/archinstall" ./archinstall.aarch64
