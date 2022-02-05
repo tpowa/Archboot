@@ -12,13 +12,12 @@ build ()
     fi
     
     apps="iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase \
-	  wpa_supplicant iw crda regdbdump rfkill hwsim iwctl iwmon"
+	  wpa_supplicant iw crda regdbdump rfkill hwsim iwctl iwmon set-wireless-regdom"
     for i in $apps; do
         add_binary "$i"
     done
     add_dir "/etc/wpa_supplicant"
     # crda support
-    add_file "/usr/bin/set-wireless-regdom"
     add_file "/etc/conf.d/wireless-regdom"
     add_file "/usr/lib/crda/regulatory.bin"
     # fixing licenses

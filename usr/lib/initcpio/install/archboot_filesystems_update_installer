@@ -23,6 +23,7 @@ build ()
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in $apps; do
         add_binary "$i"
+        rm /usr/bin/"$i"
     done
     add_file "/etc/nilfs_cleanerd.conf"
     add_file "/etc/fuse.conf"
