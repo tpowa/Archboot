@@ -72,6 +72,7 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook sets up base for a normal archboot image.
+  This hook sets up base for a update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }

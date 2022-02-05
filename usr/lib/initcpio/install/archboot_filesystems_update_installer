@@ -40,7 +40,9 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook is responsible for including filesystems on an archboot image.
+  This hook is responsible for including filesystems 
+  on update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }
 

@@ -40,6 +40,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the network on an archboot image.
+  This hook includes the network on update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }

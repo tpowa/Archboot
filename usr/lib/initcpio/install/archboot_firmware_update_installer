@@ -14,7 +14,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes linux-firmware on an archboot image 
-  during update installer.
+  This hook includes linux-firmware on an update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }
