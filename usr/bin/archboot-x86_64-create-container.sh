@@ -59,7 +59,9 @@ mount shm "${_DIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 # install archboot
 echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
 pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
-rm  ${_DIR}/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
+rm "${_DIR}"/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook
+rm "${_DIR}"/usr/share/libalpm/hooks/90-mkinitcpio-install.hook
+rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
 if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
     # clean cache
     echo "Clean pacman cache from ${_DIR} ..."

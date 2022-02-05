@@ -78,7 +78,9 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     # install archboot
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
-    rm ${_DIR}/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
+    rm "${_DIR}"/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook
+    rm "${_DIR}"/usr/share/libalpm/hooks/90-mkinitcpio-install.hook
+    rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
     cleancache
     echo "Installing archboot to ${_DIR} ..."
     pacman --root "${_DIR}" -Sy archboot-arm --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
@@ -124,7 +126,7 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     systemd-nspawn -D "${_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1
     echo "Installing archboot-arm and ${_LINUX_FIRMWARE} to container..."
     systemd-nspawn -D "${_DIR}" /bin/bash -c "pacman -S archboot-arm ${_LINUX_FIRMWARE} --noconfirm" >/dev/null 2>&1
-    rm ${_DIR}/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
+    rm "${_DIR}"/boot/{initramfs-linux.img,initramfs-linux-fallback.img}
     cleancache
     saveram
     [[ "${_SAVE_RAM}" ==  "1" ]] && rm -r "${_DIR}"/usr/share/{i18n,locale}
