@@ -79,7 +79,7 @@ build ()
     ### add systemd
     # add systemd kernel modules
     add_checked_modules 'nfs|autofs4|loop'
-    apps="mount.nfs setfont loadkeys"
+    apps="mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys"
     for i in $apps; do
         add_binary "$i"
         rm /usr/bin/$i
@@ -97,14 +97,14 @@ build ()
     add_full_dir "/etc/dbus-1"
     add_full_dir "/usr/share/dbus-1"
     #systemd files
-    apps="busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
+    apps="systemd-umount busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop \
           systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
           systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
-          systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers systemd-tmpfiles \
+          systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers \
           systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
-          systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext systemd-umount"
+          systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext"
     for i in $apps; do
         add_binary "$i"
         rm /usr/bin/$i

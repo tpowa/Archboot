@@ -5,8 +5,8 @@ build ()
 {
     apps="getent head id cksum tail tee test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
-          chgrp chown date df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
-          mktemp chroot dirname expr bzip2 hwclock su cpio gzip top sdparm tput \
+          chgrp chown df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
+          mktemp chroot dirname expr bzip2 su cpio gzip top sdparm tput \
           ifconfig ln losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
           xzdec switch_root pivot_root chcpu ctrlaltdel raw gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt \
@@ -15,7 +15,7 @@ build ()
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
           sysctl pgrep pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
           zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
-          shred blockdev blkdiscard newgrp nsenter runuser vipw ldconfig diff depmod \
+          shred blockdev blkdiscard newgrp nsenter runuser vigr vipw ldconfig diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep lzfgrep \
           lzgrep lzless lzmore lzma modinfo nc reset rmmod unlzma unxz xzcat lastb stat \
           blkzone chmem choom fincore hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs \
@@ -24,11 +24,11 @@ build ()
           logname md5sum nice nl nohup nproc numfmt paste pathchk pinky pr printenv ptx realpath \
           runcon sha1sum sha224sum sha256sum sha384sum sha512sum shuf split stdbuf sum timeout truncate \
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
-          lzmainfo xzcmp xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
+          lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat"
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        apps="$apps i386 x86_64"
+        apps="i386 x86_64 $apps"
     fi
     for i in $apps; do
         add_binary "$i"
@@ -49,7 +49,7 @@ build ()
     ### add shadow
     apps="groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg vigr"
+          newusers pwck pwconv pwunconv useradd userdel usermod sg"
     for i in $apps; do
         add_binary "$i"
     done
