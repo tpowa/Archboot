@@ -16,8 +16,8 @@ build ()
           sysctl pgrep pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
           zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw ldconfig diff depmod \
-          linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep lzfgrep \
-          lzgrep lzless lzmore lzma modinfo nc reset rmmod unlzma unxz xzcat lastb stat \
+          linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \
+          lzless lzmore lzma modinfo nc reset rmmod unlzma unxz xzcat lastb stat \
           blkzone chmem choom fincore hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs \
           scriptlive setpriv  uclampset uname26 uuidparse zramctl [ b2sum base32 base64 \
           basenc chcon comm csplit dircolors expand factor fmt hostid install join link \
