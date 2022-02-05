@@ -14,7 +14,7 @@ build ()
     add_file "/usr/bin/archboot-quickinst.sh" "/usr/bin/quickinst"
     # only include cachedir on booted archboot or container
     add_full_dir "/var/cache/pacman/pkg"
-    rm "/var/cache/pacman/pkg"
+    rm -r "/var/cache/pacman/pkg"
 }
 
 help ()
