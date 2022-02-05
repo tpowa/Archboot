@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # cleanup before creating ramdisk to save RAM
+    rm -r "/usr/lib/modules"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes cleanup 
+  archboot image during update installer.
+HELPEOF
+}

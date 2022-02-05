@@ -6,7 +6,7 @@ _L_COMPLETE=""
 _L_INSTALL_COMPLETE=""
 _G_RELEASE=""
 _RUNNING_ARCH="$(uname -m)"
-_CONFIG="/etc/archboot/${_RUNNING_ARCH}.conf"
+_CONFIG="/etc/archboot/${_RUNNING_ARCH}-update_installer.conf"
 _W_DIR="/archboot"
 _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/bin"
 

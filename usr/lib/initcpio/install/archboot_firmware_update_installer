@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # add firmware files
+    add_full_dir "/lib/firmware"
+    rm -r "/lib/firmware"
+    
+    ### fix licenses
+    add_full_dir "/usr/share/licenses/linux-firmware"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes linux-firmware on an archboot image 
+  during update installer.
+HELPEOF
+}
