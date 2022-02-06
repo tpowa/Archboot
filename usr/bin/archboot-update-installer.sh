@@ -133,7 +133,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "Step 8/8: Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
-        kexec -l /vmlinuz-linux --initrd=$(cat < find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - | LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img &;echo /initrd.im) --reuse-cmdline
+        kexec -l /vmlinuz-linux --initrd=$(cat < find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - | LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img &;echo /initrd.img) --reuse-cmdline
     fi
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         kexec -l /Image --initrd=/initrd.img --reuse-cmdline
