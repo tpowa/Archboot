@@ -122,18 +122,18 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cd initrd || exit 1
     #from /usr/bin/mkinitpcio.conf
     # compress image with zstd
-    #find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
-    #LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
-    #cd ..
-    #echo "Step 7/8: Remove /initrd ..."
-    #rm -r "/initrd" || exit 1
+    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
+    LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
+    cd ..
+    echo "Step 7/8: Remove /initrd ..."
+    rm -r "/initrd" || exit 1
     ### not supported
     #mv "${_W_DIR}"/boot/amd-ucode.img / || exit 1
     # remove "${_W_DIR}"
     echo "Step 8/8: Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
-        kexec -l /vmlinuz-linux --initrd=$(cat < find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - | LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img &;echo /initrd.img) --reuse-cmdline
+        kexec -l /vmlinuz-linux --initrd=/initrd.img --reuse-cmdline
     fi
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         kexec -l /Image --initrd=/initrd.img --reuse-cmdline
