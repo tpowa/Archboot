@@ -34,7 +34,7 @@ usage () {
         echo ""
         echo " -latest-install  Launch latest archboot environment with downloaded"
         echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 3.0 GB RAM."
+        echo "                  This operation needs at least 2.9 GB RAM."
         echo ""
         echo " -latest-image    Generate latest image files in /archboot-release directory"
         echo "                  This operation needs at least 3.3 GB RAM."
