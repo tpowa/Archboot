@@ -4165,7 +4165,7 @@ update_environment() {
         detect_uefi_boot
         UPDATE_ENVIRONMENT=""
         if [[ -e "/usr/bin/update-installer.sh" && "${_DETECTED_UEFI_SECURE_BOOT}" == "0" && "${RUNNING_ARCH}" ==  "x86_64" ]]; then
-            DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nRequires at least 3.6 GB RAM and will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
+            DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nRequires at least 2.9 GB RAM and will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
             if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
                 DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer.sh -latest-install\nCheck ${LOG} for progress...\n\nGet a cup of coffee ...\nThis needs approx. 5 minutes on a fast internet connection (100Mbit)." 0 0
                 /usr/bin/update-installer.sh -latest-install > "${LOG}" 2>&1
