@@ -2359,8 +2359,8 @@ _mkfs() {
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
         fi
-	# btrfs needs balancing, else weird things could happen
-        [[ "${_fstype}" = "btrfs" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >${LOG} 2>&1
+	# btrfs needs balancing on fresh created raid, else weird things could happen
+        [[ "${_fstype}" = "btrfs" && "${_domk}" == "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >${LOG} 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${_mountpoint}" = "/tmp" ]]; then

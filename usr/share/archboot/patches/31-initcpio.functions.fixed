@@ -370,7 +370,7 @@ add_firmware() {
 
     for fw; do
         for fwpath in "${_d_firmware[@]}"; do
-            if [[ ! -f $BUILDROOT$dest/$fwpath/$fw.xz && ! -f$BUILDROOT$dest/$fwpath/$fw ]];then 
+            if [[ ! -f $BUILDROOT$fwpath/$fw.xz && ! -f $BUILDROOT$fwpath/$fw ]];then 
                 if [[ -f $fwpath/$fw.xz  ]]; then
                     add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz" 644 && r=0
                     break
@@ -378,6 +378,8 @@ add_firmware() {
                     add_file "$fwpath/$fw" "$fwpath/$fw" 644 && r=0
                     break
                 fi
+            else
+                r=0
             fi
         done
     done
