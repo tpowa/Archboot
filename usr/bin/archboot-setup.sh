@@ -4,13 +4,14 @@ unset LANG
 ANSWER="/tmp/.setup"
 TITLE="Arch Linux Installation --> https://wiki.archlinux.org/Archboot"
 # use the first VT not dedicated to a running console
-LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
 # check first if bootet in archboot
 if grep -qw archoot /etc/hostname; then
     DESTDIR="/install"
+    LOG="/dev/tty7"
 else
     DESTDIR="/"
+    LOG="/dev/tty8"
 fi
 RUNNING_ARCH="$(uname -m)"
 EDITOR=""
@@ -4186,6 +4187,8 @@ update_environment() {
 set_clock() {
     if [[ -e /usr/bin/tz ]]; then
         tz --setup && NEXTITEM="4"
+    elif [[ -e /usr/bin/archboot-tz.sh ]]; then
+        archboot-tz.sh --setup && NEXTITEM="4"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
@@ -4194,6 +4197,8 @@ set_clock() {
 set_keyboard() {
     if [[ -e /usr/bin/km ]]; then
         km --setup && NEXTITEM="1"
+    elif [[ -e /usr/bin/archboot-km.sh ]]; then
+        archboot-km.sh --setup && NEXTITEM="1"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
     fi
