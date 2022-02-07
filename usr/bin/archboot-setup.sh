@@ -6,7 +6,12 @@ TITLE="Arch Linux Installation --> https://wiki.archlinux.org/Archboot"
 # use the first VT not dedicated to a running console
 LOG="/dev/tty7"
 # don't use /mnt because it's intended to mount other things there!
-DESTDIR="/install"
+# check first if bootet in archboot
+if grep -qw archoot /etc/hostname; then
+    DESTDIR="/install"
+else
+    DESTDIR="/"
+fi
 RUNNING_ARCH="$(uname -m)"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
@@ -65,14 +70,16 @@ DIALOG() {
 #
 chroot_mount()
 {
-    [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
-    [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
-    [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
-    mount proc "${DESTDIR}/proc" -t proc -o nosuid,noexec,nodev 
-    mount sys "${DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
-    mount udev "${DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid 
-    mount devpts "${DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
-    mount shm "${DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
+    if grep -qw archoot /etc/hostname; then
+        [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
+        [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
+        [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
+        mount proc "${DESTDIR}/proc" -t proc -o nosuid,noexec,nodev 
+        mount sys "${DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
+        mount udev "${DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid 
+        mount devpts "${DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
+        mount shm "${DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
+    fi
 }
 
 # chroot_umount()
@@ -80,9 +87,11 @@ chroot_mount()
 #
 chroot_umount()
 {
-    umount -R "${DESTDIR}/proc"
-    umount -R "${DESTDIR}/sys"
-    umount -R "${DESTDIR}/dev"
+    if grep -qw archoot /etc/hostname; then
+        umount -R "${DESTDIR}/proc"
+        umount -R "${DESTDIR}/sys"
+        umount -R "${DESTDIR}/dev"
+    fi
 }
 
 getfstype()
