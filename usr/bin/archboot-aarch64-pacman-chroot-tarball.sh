@@ -4,7 +4,7 @@ source /usr/lib/archboot/functions
 _DIR=""
 _LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _PACMAN_CHROOT="pacman-aarch64-chroot"
-KEYRING="archlinuxarm"
+export _KEYRING="archlinuxarm"
 
 usage () {
     echo "CREATE AARCH64 PACMAN CHROOT"
@@ -67,3 +67,4 @@ tar -acf ${_PACMAN_CHROOT}-latest.tar.zst -C "${_DIR}"/"${_PACMAN_CHROOT}" .
 echo " Removing ${_DIR} ..."
 rm -r "${_DIR}"
 echo "Finished container tarball."
+unset _KEYRING
