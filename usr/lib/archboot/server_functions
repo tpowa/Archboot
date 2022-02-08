@@ -56,7 +56,7 @@ _update_aarch64_pacman_chroot() {
 _server_release() {
     # create release in "${_ISOHOME}"
     cd "${_ISOHOME}" || exit 1
-    "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || rm -r "${_BUILDDIR}"
+    "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" || (rm -r "${_BUILDDIR}"; exit 1)
     # set user rights on files
     [[ -d "${_BUILDDIR}" ]] || exit 1
     chmod 755 "${_BUILDDIR}"

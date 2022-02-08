@@ -2,8 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/container_functions
-_ARCHBOOT="archboot"
-_KEYRING="archlinux"
+export _ARCHBOOT="archboot"
+export _KEYRING="archlinux"
 [[ -z "${1}" ]] && _usage
 _DIR="$1"
 #shellcheck disable=SC2120
@@ -34,3 +34,5 @@ if grep -q "^\[testing" /etc/pacman.conf; then
 fi
 _set_hostname
 echo "Finished container setup in ${_DIR} ."
+unset _ARCHBOOT
+unset _KEYRING
