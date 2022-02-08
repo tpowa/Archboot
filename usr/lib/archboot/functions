@@ -22,7 +22,7 @@ _x86_64_check() {
 }
 
 ### check for aarch64
-_check_aarch64() {
+_aarch64_check() {
     if ! [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         echo "ERROR: Please run on aarch64 hardware."
         exit 1
@@ -30,7 +30,7 @@ _check_aarch64() {
 }
 
 ### check for tpowa's build server
-_check_buildserver() {
+_buildserver_check() {
     if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
         echo "This script should only be run on tpowa's build server. Aborting..."
         exit 1
