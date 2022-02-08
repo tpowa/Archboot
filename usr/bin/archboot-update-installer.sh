@@ -89,7 +89,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
     [[ -d "/usr/lib/modules" ]] && rm -r "/usr/lib/modules"
     _SHARE_DIRS="efitools file grub hwdata kbd licenses makepkg nmap openvpn pacman refind tc usb_modeswitch vim zoneinfo zsh"
-    for i in "${_SHARE_DIRS}"; do
+    for i in ${_SHARE_DIRS}; do
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
     done
     echo "Step 2/8: Generating archboot container in ${_W_DIR} ..."
@@ -114,7 +114,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     kver
     # write initramfs to /tmp
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k "${_HWKVER}" -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1
     # move initramfs to /
     mv "${_W_DIR}/tmp" /initrd || exit 1
     echo "Step 5/8: Remove ${_W_DIR} ..."
