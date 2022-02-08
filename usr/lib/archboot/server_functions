@@ -1,7 +1,7 @@
 #!/bin/bash
 _DIRECTORY="$(date +%Y.%m)"
 _ISOHOME="/home/tobias/Arch/iso/${_ARCH}"
-_BUILDDIR="$(mktemp -d ${_ISOHOME}/server-release.XXX)"
+_BUILDDIR="$(mktemp -d "${_ISOHOME}"/server-release.XXX)"
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
