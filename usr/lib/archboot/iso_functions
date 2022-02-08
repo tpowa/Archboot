@@ -51,6 +51,7 @@ _config() {
 
 _prepare_kernel_initramfs_files() {
     echo "Prepare kernel and initramfs ..."
+    #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}/EFI/BOOT"
     mkdir -p "${_ISODIR}/boot"
@@ -59,6 +60,7 @@ _prepare_kernel_initramfs_files() {
     # remove on mkinitcpio 32 release
     cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
     [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
+    #shellcheck disable=SC2154
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
