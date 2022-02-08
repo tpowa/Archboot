@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_PWD="$(pwd)"
-_BASENAME="$(basename "${0}")"
+source /usr/lib/archboot/functions
 _DIR=""
 _LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _PACMAN_CHROOT="pacman-aarch64-chroot"
+KEYRING="archlinuxarm"
 
 usage () {
-    echo "CREATE ARCHBOOT CONTAINER"
+    echo "CREATE AARCH64 PACMAN CHROOT"
     echo "-----------------------------"
     echo "This will create an aarch64 pacman chroot tarball on x86_64"
     echo "Usage: ${_BASENAME} <directory> <options>"
@@ -25,16 +25,8 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then
-    echo "ERROR: Please run as root user!"
-    exit 1
-fi
-
-if ! [[ "$(uname -m)" == "x86_64" ]]; then
-    echo "ERROR: Please run on x86_64 hardware."
-    exit 1
-fi
+_root_check
+_x86_64_check
 
 echo "Starting container creation ..."
 echo "Create directory ${_DIR} ..."
@@ -44,15 +36,8 @@ echo "Downloading archlinuxarm aarch64..."
 bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${_DIR}"
 echo "Removing installation tarball ..."
 rm ArchLinuxARM-aarch64-latest.tar.gz
-# generate locales
-echo "Create locales in container ..."
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US ISO-8859-1' >> /etc/locale.gen" >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
-# generate pacman keyring
-echo "Generate pacman keyring in container ..."
-systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
-systemd-nspawn -D "${_DIR}" pacman-key --populate archlinuxarm >/dev/null 2>&1
+_generate_locales
+_generate_keyring
 # enable parallel downloads
 sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_DIR}"/etc/pacman.conf
 # fix network in container

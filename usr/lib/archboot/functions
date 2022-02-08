@@ -1,0 +1,53 @@
+#!/bin/bash
+# change to english locale!
+export LANG="en_US"
+_BASENAME="$(basename "${0}")"
+_PWD="$(pwd)"
+_RUNNING_ARCH="$(uname -m)"
+
+### check for root
+_root_check() {
+    if ! [[ ${UID} -eq 0 ]]; then
+        echo "ERROR: Please run as root user!"
+        exit 1
+    fi
+}
+
+### check for x86_64
+_x86_64_check() {
+    if ! [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        echo "ERROR: Pleae run on x86_64 hardware."
+        exit 1
+    fi
+}
+
+### check for aarch64
+_check_aarch64() {
+    if ! [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        echo "ERROR: Please run on aarch64 hardware."
+        exit 1
+    fi
+}
+
+### check for tpowa's build server
+_check_buildserver() {
+    if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
+        echo "This script should only be run on tpowa's build server. Aborting..."
+        exit 1
+    fi
+}
+
+# generate locales
+_generate_locales() {
+    echo "Create locales in container ..."
+    echo 'en_US ISO-8859-1' >> "${_DIR}/etc/locale.gen" >/dev/null 2>&1
+    echo 'en_US.UTF-8 UTF-8' >> "${_DIR}/etc/locale.gen" >/dev/null 2>&1
+    systemd-nspawn -D "${_DIR}" locale-gen >/dev/null 2>&1
+}
+
+_generate_keyring() {
+    # generate pacman keyring
+    echo "Generate pacman keyring in container ..."
+    systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
+    systemd-nspawn -D "${_DIR}" pacman-key --populate "${_KEYRING}" >/dev/null 2>&1
+}
