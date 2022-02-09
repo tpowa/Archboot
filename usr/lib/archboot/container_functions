@@ -65,7 +65,7 @@ _cleanmkinitcpio() {
     echo "Clean mkinitcpio from ${_DIR} ..."
     [[ -e "${_DIR}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${_DIR}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"
     [[ -e "${_DIR}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook" ]] && rm "${_DIR}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook"
-    [[ -e "${_DIR}/boot/{initramfs-linux.img" ]] && rm "${_DIR}/boot/initramfs-linux.img"
+    [[ -e "${_DIR}/boot/initramfs-linux.img" ]] && rm "${_DIR}/boot/initramfs-linux.img"
     [[ -e "${_DIR}/boot/initramfs-linux-fallback.img" ]] && rm "${_DIR}/boot/initramfs-linux-fallback.img"
 }
 
