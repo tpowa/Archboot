@@ -74,7 +74,7 @@ _create_torrent() {
     # create torrent files
     for i in *.iso; do
         echo "Generating ${i} torrent ..."
-        archboot-mktorrent.sh archboot/"${1}" "${i}" >/dev/null 2>&1
+        archboot-mktorrent.sh archboot/"${i}" "${i}" >/dev/null 2>&1
     done
 }
 
