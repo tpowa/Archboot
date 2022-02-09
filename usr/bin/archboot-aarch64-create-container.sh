@@ -3,7 +3,7 @@
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/container_functions
 _ARCHBOOT="archboot-arm"
-_KEYRING=" archlinuxarm"
+_KEYRING="archlinuxarm"
 [[ -z "${1}" ]] && _usage
 _DIR="$1"
 #shellcheck disable=SC2120
