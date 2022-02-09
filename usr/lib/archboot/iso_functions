@@ -48,7 +48,7 @@ _prepare_kernel_initramfs_files() {
     echo "Prepare kernel and initramfs ..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
-    mkdir -p "${_ISODIR}/EFI/BOOT"
+    mkdir -p "${_ISODIR}"/EFI/{BOOT,tools}
     mkdir -p "${_ISODIR}/boot"
     # fix for mkinitcpio 31
     # https://bugs.archlinux.org/task/72882
@@ -89,13 +89,12 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
 
 _prepare_efitools_uefi () {
     echo "Prepare efitools ..."
-    cp -f "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/tools/HashTool.efi"
-    cp -f "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/tools/KeyTool.efi"
+    cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/tools/HashTool.efi"
+    cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/tools/KeyTool.efi"
 }
 
 _download_uefi_shell_tianocore() {
     echo "Prepare uefi shells ..."
-    mkdir -p "${_ISODIR}/EFI/tools/"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
     cp /usr/share/edk2-shell/x64/Shell.efi "${_ISODIR}/EFI/tools/shellx64_v2.efi" 
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
