@@ -6,7 +6,7 @@ build ()
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
     add_file "/usr/bin/archboot-$(uname -m)-create-container.sh"
     add_file "/usr/lib/archboot/functions"
-    add_file "/usr/lin/archboot/container_functions"
+    add_file "/usr/lib/archboot/container_functions"
 }
 
 help ()
