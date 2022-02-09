@@ -148,15 +148,14 @@ _grub_mkrescue() {
 }
 
 _create_cksum() {
-## create sha256sums.txt
-echo "Generating sha256sum ..."
-[[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
-cksum -a sha256 ./*.iso > "sha256sums.txt"
+    ## create sha256sums.txt
+    echo "Generating sha256sum ..."
+    [[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
+    cksum -a sha256 ./*.iso > "sha256sums.txt"
 }
 
 _cleanup_iso() {
-# cleanup
+    # cleanup
     echo "Cleanup remove ${_ISODIR} ..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
-    [[ -d "${_SHIM}" ]] && rm -r "${_SHIM}"
 }

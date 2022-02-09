@@ -17,6 +17,6 @@ _prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1 || exit 1
 _prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1 || exit 1
 _prepare_uefi_image >/dev/null 2>&1 || exit 1
 _grub_mkrescue || exit 1
-_create_cksum 
-_cleanup_iso 
+_create_cksum || exit 1
+_cleanup_iso || exit 1
 echo "Finished ISO creation."
