@@ -18,11 +18,11 @@ _clean_cache || exit 1
 _install_archboot || exit 1
 _umount_special || exit 1
 _clean_container || exit 1
-_clean_archboot_cache || exit 1
+_clean_archboot_cache
 _generate_locales || exit 1
-_clean_locale || exit 1
+_clean_locale
 _generate_keyring || exit 1
-_copy_mirrorlist_and_pacman_conf || exit 1
+_copy_mirrorlist_and_pacman_conf
 _change_pacman_conf || exit 1
 # enable [testing] if enabled in host
 if grep -q "^\[testing" /etc/pacman.conf; then

@@ -19,11 +19,11 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _install_archboot || exit 1
     _umount_special || exit 1
     _clean_container || exit 1
-    _clean_archboot_cache || exit 1
+    _clean_archboot_cache
     _generate_keyring || exit 1
     _generate_locales || exit 1
-    _clean_locale || exit 1
-    _copy_mirrorlist_and_pacman_conf || exit 1
+    _clean_locale
+    _copy_mirrorlist_and_pacman_conf
     _change_pacman_conf || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -35,7 +35,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_mkinitcpio || exit 1
     _clean_cache || exit 1
     _clean_container || exit 1
-    _clean_locale || exit 1
+    _clean_locale
 fi
 _set_hostname || exit 1
 echo "Finished container setup in ${_DIR} ."

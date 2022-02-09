@@ -140,5 +140,5 @@ _copy_mirrorlist_and_pacman_conf() {
 
 _set_hostname() {
     echo "Setting hostname to archboot ..."
-    echo 'archboot' > "${_DIR}/etc/hostname" >/dev/null 2>&1
+    echo 'archboot' > "${_DIR}/etc/hostname"
 }
