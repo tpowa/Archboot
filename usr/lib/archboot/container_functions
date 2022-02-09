@@ -119,6 +119,17 @@ _install_archboot() {
     pacman --root "${_DIR}" -Sy "${_ARCHBOOT}" --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 }
 
+_aarch64_install_base_packages() {
+    echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${_DIR} ..."
+    systemd-nspawn -q -D "${_DIR}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+}
+
+_aarch64_install_archboot() {
+    echo "Installing ${_ARCHBOOT} to ${_DIR} ..."
+    systemd-nspawn -q -D "${_DIR}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+}
+
+
 _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
     echo "Create pacman config and mirrorlist in container..."

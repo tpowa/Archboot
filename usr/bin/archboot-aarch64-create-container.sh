@@ -2,8 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/container_functions
-export _ARCHBOOT="archboot-arm"
-export _KEYRING=" archlinuxarm"
+_ARCHBOOT="archboot-arm"
+_KEYRING=" archlinuxarm"
 [[ -z "${1}" ]] && _usage
 _DIR="$1"
 #shellcheck disable=SC2120
@@ -29,10 +29,10 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot
-    _install_base_packages
+    _aarch64_install_base_packages
     _cleanmkinitcpio
     _cleancache
-    _install_archboot
+    _aarch64_install_archboot
     _cleanmkinitcpio
     _cleancache
     _cleancontainer
@@ -40,5 +40,3 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
 fi
 _set_hostname
 echo "Finished container setup in ${_DIR} ."
-unset _ARCHBOOT
-unset _KEYRING
