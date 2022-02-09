@@ -28,7 +28,7 @@ _parameters() {
     done
 }
 
-_cleancache() {
+_clean_cache() {
     if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
         # clean cache
         echo "Clean pacman cache in ${_DIR} ..."
@@ -51,7 +51,7 @@ _aarch64_pacman_chroot() {
 }
     
 # clean container from not needed files
-_cleancontainer() {
+_clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
         echo "Clean container, delete not needed files from ${_DIR} ..."
         rm -r "${_DIR}"/usr/include
@@ -61,7 +61,7 @@ _cleancontainer() {
 }
 
 # remove mkinitcpio hooks to speed up process, remove not needed initramdisks
-_cleanmkinitcpio() {
+_clean_mkinitcpio() {
     echo "Clean mkinitcpio from ${_DIR} ..."
     [[ -e "${_DIR}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${_DIR}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"
     [[ -e "${_DIR}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook" ]] && rm "${_DIR}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook"

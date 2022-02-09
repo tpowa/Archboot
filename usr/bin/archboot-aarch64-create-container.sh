@@ -6,8 +6,7 @@ _ARCHBOOT="archboot-arm"
 _KEYRING="archlinuxarm"
 [[ -z "${1}" ]] && _usage
 _DIR="$1"
-#shellcheck disable=SC2120
-_parameters
+_parameters "$@"
 _root_check
 echo "Starting container creation ..."
 echo "Create directory ${_DIR} ..."
@@ -15,11 +14,11 @@ mkdir "${_DIR}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _prepare_pacman
     _install_base_packages
-    _cleanmkinitcpio
-    _cleancache
+    _clean_mkinitcpio
+    _clean_cache
     _install_archboot
     _umount_special
-    _cleancontainer
+    _clean_container
     _clean_archboot_cache
     _generate_keyring
     _generate_locales
@@ -30,12 +29,12 @@ fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot
     _aarch64_install_base_packages
-    _cleanmkinitcpio
-    _cleancache
+    _clean_mkinitcpio
+    _clean_cache
     _aarch64_install_archboot
-    _cleanmkinitcpio
-    _cleancache
-    _cleancontainer
+    _clean_mkinitcpio
+    _clean_cache
+    _clean_container
     _clean_locale
 fi
 _set_hostname

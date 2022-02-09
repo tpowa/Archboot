@@ -2,21 +2,22 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/container_functions
+_ARCHBOOT="archboot"
+_KEYRING="archlinux"
 [[ -z "${1}" ]] && _usage
 _DIR="$1"
-#shellcheck disable=SC2120
-_parameters
+_parameters "$@"
 _root_check
 _x86_64_check
 echo "Starting container creation ..."
 echo "Create directories in ${_DIR} ..."
 _prepare_pacman
 _install_base_packages
-_cleanmkinitcpio
-_cleancache
+_clean_mkinitcpio
+_clean_cache
 _install_archboot
 _umount_special
-_cleancontainer
+_clean_container
 _clean_archboot_cache
 _generate_locales
 _clean_locale
