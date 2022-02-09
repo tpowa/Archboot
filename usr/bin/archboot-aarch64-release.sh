@@ -7,7 +7,7 @@ _ARCHBOOT="archboot-arm"
 _root_check
 _aarch64_check
 echo "Start release creation in $1 ..."
-_create_iso
+_create_iso "$@"
 _create_boot
 _create_torrent
 _create_cksum
