@@ -1,9 +1,9 @@
 #! /bin/bash
+_ARCH="x86_64"
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/server_functions
-_ARCH="x86_64"
 _root_check
 _buildserver_check
-_pacman_x86_64_use_default
+_x86_64_pacman_use_default
 _server_release
-_pacman_x86_64_restore
+_x86_64_pacman_restore

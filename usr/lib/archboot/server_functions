@@ -1,7 +1,7 @@
 #!/bin/bash
 _DIRECTORY="$(date +%Y.%m)"
 _ISOHOME="/home/tobias/Arch/iso/${_ARCH}"
-_BUILDDIR="$(mktemp -d "${_ISOHOME}"/server-release.XXX)"
+_BUILDDIR="$(mktemp -d ${_ISOHOME}/server-release.XXX)"
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
@@ -96,7 +96,7 @@ ln -s "${_DIRECTORY}" latest
 EOF
 }
 
-_pacman_x86_64_use_default() {
+_x86_64_pacman_use_default() {
     # use pacman.conf with disabled [testing] repository
     cp "${_PACMAN_CONF}" "${_PACMAN_CONF}".old
     cp "${_PACMAN_CONF}".archboot "${_PACMAN_CONF}"
@@ -105,7 +105,7 @@ _pacman_x86_64_use_default() {
     cp "${_PACMAN_MIRROR}".archboot "${_PACMAN_MIRROR}"
 }
 
-_pacman_x86_64_restore() {
+_x86_64_pacman_restore() {
     # restore pacman.conf and mirrorlist
     cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
     cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
