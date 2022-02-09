@@ -3,7 +3,7 @@
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/iso_functions
 [[ -z "${1}" ]] && _usage
-_parameters
+_parameters $*
 _root_check
 _aarch64_check
 [[ "${_GENERATE}" == "1" ]] || _usage
