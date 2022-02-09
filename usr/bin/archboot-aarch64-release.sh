@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/release_functions
-export _ARCHBOOT="archboot-arm"
+_ARCHBOOT="archboot-arm"
 [[ -z "${1}" ]] && _usage
 _root_check
 _aarch64_check
@@ -12,4 +12,3 @@ _create_boot
 _create_torrent
 _create_cksum
 echo "Finished release creation in ${1} ."
-unset _ARCHBOOT

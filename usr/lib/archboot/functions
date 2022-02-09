@@ -48,6 +48,6 @@ _generate_locales() {
 _generate_keyring() {
     # generate pacman keyring
     echo "Generate pacman keyring in container ..."
-    systemd-nspawn -D "${_DIR}" pacman-key --init >/dev/null 2>&1
-    systemd-nspawn -D "${_DIR}" pacman-key --populate "${_KEYRING}" >/dev/null 2>&1
+    systemd-nspawn -q -D "${_DIR}" pacman-key --init >/dev/null 2>&1
+    systemd-nspawn -q -D "${_DIR}" pacman-key --populate "${_KEYRING}" >/dev/null 2>&1
 }
