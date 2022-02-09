@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_ARCH="x86_64"
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/iso_functions
 [[ -z "${1}" ]] && _usage
@@ -10,14 +9,14 @@ _x86_64_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
 echo "Starting ISO creation ..."
-_prepare_kernel_initramfs_files
-_prepare_fedora_shim_bootloaders_x86_64 >/dev/null 2>&1
-_download_uefi_shell_tianocore >/dev/null 2>&1
-_prepare_efitools_uefi >/dev/null 2>&1
-_prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1
-_prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1
-_prepare_uefi_image >/dev/null 2>&1
-_grub_mkrescue
-_create_cksum
-_cleanup_iso
+_prepare_kernel_initramfs_files || exit 1
+_prepare_fedora_shim_bootloaders_x86_64 >/dev/null 2>&1 || exit 1
+_download_uefi_shell_tianocore >/dev/null 2>&1 || exit 1
+_prepare_efitools_uefi >/dev/null 2>&1 || exit 1
+_prepare_uefi_X64_GRUB_USB_files >/dev/null 2>&1 || exit 1
+_prepare_uefi_IA32_GRUB_USB_files >/dev/null 2>&1 || exit 1
+_prepare_uefi_image >/dev/null 2>&1 || exit 1
+_grub_mkrescue || exit 1
+_create_cksum || exit 1
+_cleanup_iso || exit 1
 echo "Finished ISO creation."
