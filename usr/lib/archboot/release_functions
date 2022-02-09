@@ -32,7 +32,7 @@ _create_iso() {
     echo "Generate latest ISO ..."
     # generate latest iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_RUNNING_ARCH}.iso" || exit 1
+    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_RUNNING_ARCH}" || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
     (echo "Welcome to _RUNNING_ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
