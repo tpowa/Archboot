@@ -33,7 +33,7 @@ _update_aarch64_pacman_chroot() {
     systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
     # remove package cache
     echo "Remove package cache from container ..."
-    rm ${_PACMAN_AARCH64}/var/cache/pacman/pkg/*
+    rm ${_PACMAN_AARCH64}/var/cache/pacman/pkg/* >/dev/null 2>&1
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_PACMAN_AARCH64}"/etc/pacman.conf
     # fix network in container

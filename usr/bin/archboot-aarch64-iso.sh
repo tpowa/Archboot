@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_ARCH="aarch64"
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/iso_functions
 [[ -z "${1}" ]] && _usage
