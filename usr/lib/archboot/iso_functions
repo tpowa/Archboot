@@ -38,13 +38,10 @@ _parameters() {
 }
 
 _config() {
-    #set PRESET
+    # set defaults, if nothing given
     [[ -z "${_PRESET}" ]] && _PRESET="${_RUNNING_ARCH}"
     _PRESET="${_PRESET_DIR}/${_PRESET}"
-
-    # set defaults, if nothing given
-    [[ -z "${_RELEASENAME}" ]] && _RELEASENAME="$(date +%Y.%m.%d-%H.%M)"
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archlinux-archboot-${_RELEASENAME}-${_RUNNING_ARCH}"
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-${_RUNNING_ARCH}"
 }
 
 _prepare_kernel_initramfs_files() {
