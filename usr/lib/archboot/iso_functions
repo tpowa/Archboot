@@ -65,6 +65,7 @@ _prepare_kernel_initramfs_files() {
     # fix license files
     mkdir -p "${_ISODIR}"/licenses/amd-ucode
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/boot/"
     cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
 }
