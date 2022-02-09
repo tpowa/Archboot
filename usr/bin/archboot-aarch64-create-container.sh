@@ -12,30 +12,30 @@ echo "Starting container creation ..."
 echo "Create directory ${_DIR} ..."
 mkdir "${_DIR}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-    _prepare_pacman
-    _install_base_packages
-    _clean_mkinitcpio
-    _clean_cache
-    _install_archboot
-    _umount_special
-    _clean_container
-    _clean_archboot_cache
-    _generate_keyring
-    _generate_locales
-    _clean_locale
-    _copy_mirrorlist_and_pacman_conf
-    _change_pacman_conf
+    _prepare_pacman || exit 1
+    _install_base_packages || exit 1
+    _clean_mkinitcpio || exit 1
+    _clean_cache || exit 1
+    _install_archboot || exit 1
+    _umount_special || exit 1
+    _clean_container || exit 1
+    _clean_archboot_cache || exit 1
+    _generate_keyring || exit 1
+    _generate_locales || exit 1
+    _clean_locale || exit 1
+    _copy_mirrorlist_and_pacman_conf || exit 1
+    _change_pacman_conf || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _aarch64_pacman_chroot
-    _aarch64_install_base_packages
-    _clean_mkinitcpio
-    _clean_cache
-    _aarch64_install_archboot
-    _clean_mkinitcpio
-    _clean_cache
-    _clean_container
-    _clean_locale
+    _aarch64_pacman_chroot || exit 1
+    _aarch64_install_base_packages || exit 1
+    _clean_mkinitcpio || exit 1
+    _clean_cache || exit 1
+    _aarch64_install_archboot || exit 1
+    _clean_mkinitcpio || exit 1
+    _clean_cache || exit 1
+    _clean_container || exit 1
+    _clean_locale || exit 1
 fi
-_set_hostname
+_set_hostname || exit 1
 echo "Finished container setup in ${_DIR} ."

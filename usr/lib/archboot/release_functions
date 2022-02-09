@@ -70,14 +70,6 @@ _create_boot() {
     [[ "${_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 }
 
-_create_torrent() {
-    # create torrent files
-    for i in *.iso; do
-        echo "Generating ${i} torrent ..."
-        archboot-mktorrent.sh archboot/"${i}" "${i}" >/dev/null 2>&1
-    done
-}
-
 _create_cksum() {
     # create sha256sums
     echo "Generating sha256sum ..."
