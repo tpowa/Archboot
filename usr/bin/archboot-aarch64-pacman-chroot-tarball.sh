@@ -61,7 +61,7 @@ rm "${_DIR}/${_PACMAN_CHROOT}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${_DIR}/${_PACMAN_CHROOT}/etc/resolv.conf"
 echo "Clean container, delete not needed files from ${_DIR}/${_PACMAN_CHROOT} ..."
 rm -r "${_DIR}/${_PACMAN_CHROOT}"/usr/include
-rm -r "${_DIR}/${_PACMAN_CHROOT}"/usr/share/{man,doc,info,locale}
+rm -r "${_DIR}/${_PACMAN_CHROOT}"/usr/share/{man,doc,info}
 echo "Generating tarball ..."
 tar -acf ${_PACMAN_CHROOT}-latest.tar.zst -C "${_DIR}"/"${_PACMAN_CHROOT}" .
 echo " Removing ${_DIR} ..."
