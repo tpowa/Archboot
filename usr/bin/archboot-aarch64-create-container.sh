@@ -35,6 +35,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_mkinitcpio || exit 1
     _clean_cache || exit 1
     _clean_container || exit 1
+    _generate_locales || exit 1
     _clean_locale
 fi
 _set_hostname || exit 1
