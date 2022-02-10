@@ -80,6 +80,7 @@ _clean_archboot_cache() {
 
 _prepare_pacman() {
     # prepare pacman dirs
+    echo "Create directories in ${_DIR} ..."
     mkdir -p "${_DIR}/var/lib/pacman"
     mkdir -p "${_CACHEDIR}"
     [[ -e "${_DIR}/proc" ]] || mkdir -m 555 "${_DIR}/proc"
@@ -128,7 +129,6 @@ _aarch64_install_archboot() {
     echo "Installing ${_ARCHBOOT} to ${_DIR} ..."
     systemd-nspawn -q -D "${_DIR}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
-
 
 _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
