@@ -14,6 +14,7 @@ _usage () {
     echo " Options:"
     echo "  -cc    Cleanup container eg. remove manpages, includes ..."
     echo "  -cp    Cleanup container package cache"
+    echo "  -install-source=Server add package server with archboot repository"
     exit 0
 }
 
@@ -22,6 +23,7 @@ _parameters() {
         case ${1} in
             -cc|--cc) _CLEANUP_CONTAINER="1" ;;
             -cp|--cp) _CLEANUP_CACHE="1" ;;
+            -install-source=*|--install-source=*) _INSTALL_SOURCE="$(echo "${1}" | awk -F= '{print $2;}')" ;;
         esac
         shift
     done
@@ -94,6 +96,23 @@ _prepare_pacman() {
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 }
 
+_create_pacman_conf() {
+    if [[ -z "${_INSTALL_SOURCE}" ]]; then
+        echo "Use default pacman.conf ..."
+        _PACMAN_CONF="/etc/pacman.conf"
+    else
+        echo "Use custom pacman.conf ..."
+        _PACMAN_CONF="$(mktemp ${1}/pacman.conf.XXX)"
+        echo "[options]" >> "${_PACMAN_CONF}"
+        echo "Architecture = auto" >> "${_PACMAN_CONF}"
+        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
+        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
+        echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
+        echo "[archboot]" >> "${_PACMAN_CONF}"
+        echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
+    fi
+}
+
 _change_pacman_conf() {
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
@@ -111,22 +130,22 @@ _umount_special() {
 
 _install_base_packages() {
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${1} ..."
-    pacman --root "${1}" -Sy base linux "${_LINUX_FIRMWARE}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
+    pacman --root "${1}" -Sy base linux "${_LINUX_FIRMWARE}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_PWD}"/"${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _install_archboot() {
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    pacman --root "${1}" -Sy "${_ARCHBOOT}" --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+    pacman --root "${1}" -Sy "${_ARCHBOOT}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 }
 
 _aarch64_install_base_packages() {
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --config "$(if [[ -e "$(basenme ${_PACMAN_CONF})" ]]; then $(basenme ${_PACMAN_CONF}); else ${_PACMAN_CONF};fi)" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _aarch64_install_archboot() {
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config "$(if [[ -e "$(basenme ${_PACMAN_CONF})" ]]; then $(basenme ${_PACMAN_CONF}); else ${_PACMAN_CONF};fi)" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _download_packages() {

@@ -12,8 +12,9 @@ _W_DIR="$(mktemp -u archboot-release.XXX)"
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
     echo "-----------------------------"
-    echo "Usage: ${_BASENAME} <directory>"
+    echo "Usage: ${_BASENAME} <directory> <server>"
     echo "This will create an archboot release image in <directory>."
+    echo "You can specify a certain <server> with an archboot repository."
     exit 0
 }
 
@@ -21,7 +22,7 @@ _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
     # create container
-    archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc -cp || exit 1
+    archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc -cp --install-source="${2}" || exit 1
     # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
     echo "Generate ISO ..."
     # generate iso in container
