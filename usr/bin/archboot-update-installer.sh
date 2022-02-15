@@ -64,18 +64,18 @@ fi
 # Download latest setup and quickinst script from git repository
 if [[ "${_D_SCRIPTS}" == "1" ]]; then
     echo "Downloading latest km, tz, quickinst, setup and helpers..."
-    [[ -e /usr/bin/quickinst ]] && wget -q "$_INSTALLER_SOURCE/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst >/dev/null 2>&1
-    [[ -e /usr/bin/setup ]] && wget -q "$_INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
-    [[ -e /usr/bin/km ]] && wget -q "$_INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
-    [[ -e /usr/bin/tz ]] && wget -q "$_INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-${_RUNNING_ARCH}-release.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
-    [[ -e /usr/bin/archboot-binary-check.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
-    [[ -e /usr/bin/update-installer.sh ]] && wget -q "$_INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
-    [[ -e /usr/lib/archboot/functions ]] && wget -q "$_INSTALLER_SOURCE/functions?inline=false" -O "/usr/lib/archboot/functions" >/dev/null 2>&1
-    [[ -e /usr/lib/archboot/container_functions ]] && wget -q "$_INSTALLER_SOURCE/container_functions?inline=false" -O "/usr/lib/archboot/container_functions" >/dev/null 2>&1
-    [[ -e /usr/lib/archboot/release_functions ]] && wget -q "$_INSTALLER_SOURCE/release_functions?inline=false" -O "/usr/lib/archboot/release_functions" >/dev/null 2>&1
-    [[ -e /usr/lib/archboot/iso_functions ]] && wget -q "$_INSTALLER_SOURCE/iso_functions?inline=false" -O "/usr/lib/archboot/iso_functions" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/functions?inline=false" -O "/usr/lib/archboot/functions" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/container_functions?inline=false" -O "/usr/lib/archboot/container_functions" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/release_functions?inline=false" -O "/usr/lib/archboot/release_functions" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE/iso_functions?inline=false" -O "/usr/lib/archboot/iso_functions" >/dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0
 fi

@@ -1,4 +1,5 @@
 #!/bin/bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
 _PRESET_DIR="/etc/archboot/presets"
 _SHIM_URL="https://pkgbuild.com/~tpowa/archboot-helper/fedora-shim"
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"

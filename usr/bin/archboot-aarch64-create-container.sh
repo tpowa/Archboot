@@ -5,37 +5,36 @@ source /usr/lib/archboot/container_functions
 _ARCHBOOT="archboot-arm"
 _KEYRING="archlinuxarm"
 [[ -z "${1}" ]] && _usage
-_DIR="$1"
 _parameters "$@"
 _root_check
 echo "Starting container creation ..."
-[[ -d "${_DIR}" ]] || (echo "Create directory ${_DIR} ..."; mkdir "${_DIR}")
+[[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-    _prepare_pacman || exit 1
-    _install_base_packages || exit 1
-    _clean_mkinitcpio || exit 1
-    _clean_cache || exit 1
-    _install_archboot || exit 1
-    _umount_special || exit 1
-    _generate_locales || exit 1
-    _clean_locale
-    _clean_container || exit 1
+    _prepare_pacman "${1}" || exit 1
+    _install_base_packages "${1}" || exit 1
+    _clean_mkinitcpio "${1}" || exit 1
+    _clean_cache "${1}" || exit 1
+    _install_archboot "${1}" || exit 1
+    _umount_special "${1}" || exit 1
+    _generate_locales "${1}" || exit 1
+    _clean_locale "${1}"
+    _clean_container "${1}" || exit 1
     _clean_archboot_cache
-    _generate_keyring || exit 1
-    _copy_mirrorlist_and_pacman_conf
-    _change_pacman_conf || exit 1
+    _generate_keyring "${1}" || exit 1
+    _copy_mirrorlist_and_pacman_conf "${1}"
+    _change_pacman_conf "${1}" || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _aarch64_pacman_chroot || exit 1
-    _aarch64_install_base_packages || exit 1
-    _clean_mkinitcpio || exit 1
-    _clean_cache || exit 1
-    _aarch64_install_archboot || exit 1
-    _clean_mkinitcpio || exit 1
-    _clean_cache || exit 1
-    _generate_locales || exit 1
-    _clean_locale
-    _clean_container || exit 1
+    _aarch64_pacman_chroot "${1}" || exit 1
+    _aarch64_install_base_packages "${1}" || exit 1
+    _clean_mkinitcpio "${1}" || exit 1
+    _clean_cache "${1}" || exit 1
+    _aarch64_install_archboot "${1}" || exit 1
+    _clean_mkinitcpio "${1}" || exit 1
+    _clean_cache "${1}" || exit 1
+    _generate_locales "${1}" || exit 1
+    _clean_locale "${1}"
+    _clean_container "${1}" || exit 1
 fi
-_set_hostname || exit 1
-echo "Finished container setup in ${_DIR} ."
+_set_hostname "${1}" || exit 1
+echo "Finished container setup in ${1} ."

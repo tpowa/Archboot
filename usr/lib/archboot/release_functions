@@ -1,4 +1,5 @@
 #!/bin/bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
 _PRESET_LATEST="${_ARCH}-latest"
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"

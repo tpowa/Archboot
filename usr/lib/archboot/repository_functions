@@ -1,0 +1,28 @@
+#!/bin/bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
+_usage () {
+    echo "CREATE ARCHBOOT REPOSITORY"
+    echo "-----------------------------"
+    echo "This will create an archboot repository for an archboot image."
+    echo "Usage: ${_BASENAME} <directory>"
+    exit 0
+}
+
+_cachedir_check() {
+    if grep -q ^CacheDir /etc/pacman.conf; then
+        echo "Error: CacheDir set in /etc/pacman.conf. Aborting ..."
+        exit 1
+    fi
+}
+
+_move_packages() {
+    mv "${1}"/var/cache/pacman/pkg/./* "${2}"
+}
+
+_cleanup_repodir() {
+    rm -r "${1}"
+}
+
+_create_archboot_db() {
+    repo-add "${1}"/archboot.db.tar.gz "${1}"/./*.{zst,xz}
+}
