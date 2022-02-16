@@ -36,5 +36,6 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_locale "${1}"
     _clean_container "${1}" || exit 1
 fi
+_reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."

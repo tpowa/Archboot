@@ -166,6 +166,13 @@ _copy_mirrorlist_and_pacman_conf() {
     grep -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf
 }
 
+_reproducibility() {
+    echo "Reproducibility changes ..."
+    sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}"/var/lib/pacman/local/*/desc
+    rm "${1}"/var/cache/ldconfig/aux-cache
+    rm "${1}"/etc/ssl/certs/java/cacerts
+}
+
 _set_hostname() {
     echo "Setting hostname to archboot ..."
     echo 'archboot' > "${1}/etc/hostname"
