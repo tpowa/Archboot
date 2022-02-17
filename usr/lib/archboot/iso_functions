@@ -155,7 +155,10 @@ _prepare_uefi_image() {
 _grub_mkrescue() {
     ## Generate the BIOS+ISOHYBRID+UEFI CD image
     echo "Generating ${_RUNNING_ARCH} hybrid ISO ..."
-    SOURCE_DATE_EPOCH="0" grub-mkrescue --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/  "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
+    #set date for reproducibility
+    # --set_all_file_dates for all files
+    # --modification-date= for boot.catalog
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/  "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 }
 
 _create_cksum() {
