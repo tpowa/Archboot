@@ -155,6 +155,15 @@ _grub_mkrescue() {
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/  "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 }
 
+_reproducibility_iso() {
+    echo "Create reproducable UUIDs on ${_IMAGENAME}.iso GPT ..."
+    sgdisk -u 1:1 "${_IMAGENAME}.iso"
+    sgdisk -u 2:2 "${_IMAGENAME}.iso"
+    sgdisk -u 3:3 "${_IMAGENAME}.iso"
+    sgdisk -u 4:4 "${_IMAGENAME}.iso"
+    sgdisk -U 1 "${_IMAGENAME}.iso"
+}
+
 _create_cksum() {
     ## create sha256sums.txt
     echo "Generating sha256sum ..."
