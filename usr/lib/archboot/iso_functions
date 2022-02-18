@@ -1,8 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _PRESET_DIR="/etc/archboot/presets"
-_SHIM_URL="https://pkgbuild.com/~tpowa/archboot-helper/fedora-shim"
-_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
 _PRESET=""
@@ -80,7 +78,7 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     for i in mmx64.efi BOOTX64.efi mmia32.efi BOOTIA32.efi; do
-        curl -s --create-dirs -L -O --output-dir "${_ISODIR}/EFI/BOOT/" "${_SHIM_URL}/${i}"
+        cp "/usr/share/archboot/bootloader/${i}" "${_ISODIR}/EFI/BOOT/"
     done
 }
 
@@ -89,7 +87,7 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
     for i in mmaa64.efi BOOTAA64.efi; do
-        curl -s --create-dirs -L -O --output-dir "${_ISODIR}/EFI/BOOT/" "${_SHIM_URL}/${i}"
+        cp "/usr/share/archboot/bootloader/${i}" "${_ISODIR}/EFI/BOOT/"
     done
 }
 
@@ -112,25 +110,20 @@ _download_uefi_shell_tianocore() {
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-# If you don't use shim use --disable-shim-lock
 _prepare_uefi_X64_GRUB_USB_files() {
     echo "Prepare X64 Grub ..."
-    ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_ISODIR}/EFI/BOOT/grubx64.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
+    cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 _prepare_uefi_IA32_GRUB_USB_files() {
     echo "Prepare IA32 Grub ..."
-    ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="" --themes="" -o "${_ISODIR}/EFI/BOOT/grubia32.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
+    cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-# If you don't use shim use --disable-shim-lock
 _prepare_uefi_AA64_GRUB_USB_files() {
     echo "Prepare AA64 Grub ..."
-    ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o "${_ISODIR}/EFI/BOOT/grubaa64.efi" "boot/grub/grub.cfg=${_GRUB_CONFIG}"
+    cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 _reproducibility() {
@@ -147,9 +140,9 @@ _prepare_uefi_image() {
     ## Create cdefiboot.img
     dd if=/dev/zero of="${_ISODIR}"/efi.img bs="${IMGSZ}" count=1024 status=none
     VFAT_IMAGE="${_ISODIR}/efi.img"
-    mkfs.vfat "${VFAT_IMAGE}" >/dev/null
+    mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copy all files to UEFI vfat image
-    mcopy -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
 }
 
 _grub_mkrescue() {

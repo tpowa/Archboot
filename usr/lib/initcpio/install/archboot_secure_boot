@@ -20,19 +20,14 @@ build ()
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && add_file "/usr/share/efitools/efi/PreLoader.efi"
     add_file "/usr/share/efitools/efi/HashTool.efi"
     add_file "/usr/share/efitools/efi/KeyTool.efi"
-    # add shim signed files from fedora
-    _SHIM_URL="https://pkgbuild.com/~tpowa/archboot-helper/fedora-shim"
-    _SHIM=$(mktemp -d /var/tmp/shim.XXXX)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         for i in shimx64.efi mmx64.efi mmia32.efi shimia32.efi; do
-            curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}"/"${i}"
-            add_file "${_SHIM}/${i}" "/usr/share/archboot/fedora-shim/${i}"
+            add_file "/usr/share/archboot/bootloader/${i}"
         done
     fi
      if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-             for i in mmaa64.efi shimaa64.efi; do
-            curl -s --create-dirs -L -O --output-dir "${_SHIM}" "${_SHIM_URL}"/"${i}"
-            add_file "${_SHIM}/${i}" "/usr/share/archboot/fedora-shim/${i}"
+        for i in mmaa64.efi shimaa64.efi; do
+            add_file "/usr/share/archboot/bootloader/${i}"
         done
     fi
     # add generate keys script

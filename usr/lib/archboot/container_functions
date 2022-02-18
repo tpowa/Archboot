@@ -140,12 +140,18 @@ _install_archboot() {
 
 _aarch64_install_base_packages() {
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --config "$(if [[ -e "$(basenme ${_PACMAN_CONF})" ]]; then $(basenme ${_PACMAN_CONF}); else ${_PACMAN_CONF};fi)" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    if [[ -e "$(basename ${_PACMAN_CONF})" ]]; then 
+        _PACMAN_CONF=$(basename ${_PACMAN_CONF})
+    fi
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _aarch64_install_archboot() {
+    if [[ -e "$(basename ${_PACMAN_CONF})" ]]; then 
+        _PACMAN_CONF=$(basename ${_PACMAN_CONF})
+    fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config "$(if [[ -e "$(basenme ${_PACMAN_CONF})" ]]; then $(basenme ${_PACMAN_CONF}); else ${_PACMAN_CONF};fi)" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _download_packages() {
