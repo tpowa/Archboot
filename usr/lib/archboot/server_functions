@@ -2,7 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _DIRECTORY="$(date +%Y.%m)"
 _ISOHOME="/home/tobias/Arch/iso/${_ARCH}"
-_BUILDDIR="$(mktemp -d ${_ISOHOME}/server-release.XXX)"
+_SOURCEHOME="/home/tobias/Arch/iso/${_ARCH}/sources/${_DIRECTORY}"
+_BUILDDIR="$(mktemp -d "${_ISOHOME}"/server-release.XXX)"
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
@@ -14,7 +15,7 @@ _PACMAN_AARCH_SERVERDIR="/home/tpowa/public_html/archboot-helper/pacman-chroot-a
 _PACMAN_AARCH64="pacman-aarch64-chroot"
 _PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
 _PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
-_ARCHBOOT_SOURCE="https://pkgbuild.com/~tpowa/archboot-sources/${_ARCH}/${_DIRECTORY}"
+_ARCHBOOT_SOURCE="https://pkgbuild.com/~tpowa/archboot-sources"
 
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
@@ -51,6 +52,20 @@ _update_aarch64_pacman_chroot() {
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
     chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
     sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR} || exit 1
+}
+
+_update_source() {
+    [[ -d "${_SOURCEHOME}" ]] || mkdir -p "${_SOURCEHOME}"
+    "archboot-${_ARCH}-create-repository.sh" "${_SOURCEHOME}" || exit 1
+    sudo -u "${_USER}" scp -r "${_SOURCEHOME}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
+    sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
+rm -r "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIRECTORY}"
+rm -r "${_ARCHBOOT_SOURCE}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${_DIRECTORY}" "${_ARCHBOOT_SOURCE}/${_ARCH}"
+cd "${_ARCHBOOT_SOURCE}/${_ARCH}"
+rm latest
+ln -s "${_DIRECTORY}" latest
+EOF
 }
 
 _server_release() {
