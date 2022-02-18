@@ -1,6 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _PRESET_DIR="/etc/archboot/presets"
+_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # covered by usage
 _GENERATE=""
 _PRESET=""
