@@ -15,14 +15,27 @@ _cachedir_check() {
     fi
 }
 
+_download_packages() {
+    echo "Downloading packages base linux ${_LINUX_FIRMWARE} and ${_ARCHBOOT} to ${1} ..."
+    pacman --root "${1}" -Syw base linux "${_LINUX_FIRMWARE}" "${_ARCHBOOT}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+}
+
+_aarch64_download_packages() {
+    echo "Downloading packages base linux ${_LINUX_FIRMWARE} and ${_ARCHBOOT} to ${1} ..."
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw base linux ${_LINUX_FIRMWARE} ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+}
+
 _move_packages() {
+    echo "Mpving packages to ${2} ..."
     mv "${1}"/var/cache/pacman/pkg/./* "${2}"
 }
 
 _cleanup_repodir() {
+    echo "Remove ${1}  ..."
     rm -r "${1}"
 }
 
 _create_archboot_db() {
-    repo-add "${1}"/archboot.db.tar.gz "${1}"/./*.{zst,xz}
+    echo "Creating archboot repository db ..."
+    repo-add "${1}"/archboot.db.tar.gz "${1}"/./*.{zst,xz} >/dev/null 2>&1
 }

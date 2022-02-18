@@ -7,6 +7,7 @@ _BUILDDIR="$(mktemp -d "${_ISOHOME}"/server-release.XXX)"
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa/"
 _SERVER_DIR="/home/tpowa/public_html/archboot-images"
+_SOURCE_DIR="/home/tpowa/public_html/archboot-sources"
 _USER="tobias"
 _GROUP="users"
 _GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
@@ -16,6 +17,7 @@ _PACMAN_AARCH64="pacman-aarch64-chroot"
 _PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
 _PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
 _ARCHBOOT_SOURCE="https://pkgbuild.com/~tpowa/archboot-sources"
+
 
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
@@ -55,14 +57,20 @@ _update_aarch64_pacman_chroot() {
 }
 
 _update_source() {
-    [[ -d "${_SOURCEHOME}" ]] || mkdir -p "${_SOURCEHOME}"
+    if [[ -d "${_SOURCEHOME}" ]];then
+        rm -r "${_SOURCEHOME}"
+        mkdir -p "${_SOURCEHOME}"
+    else 
+        mkdir -p "${_SOURCEHOME}"
+    fi
+    echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_SOURCEHOME}" || exit 1
     sudo -u "${_USER}" scp -r "${_SOURCEHOME}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-rm -r "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIRECTORY}"
-rm -r "${_ARCHBOOT_SOURCE}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${_DIRECTORY}" "${_ARCHBOOT_SOURCE}/${_ARCH}"
-cd "${_ARCHBOOT_SOURCE}/${_ARCH}"
+rm -r "${_SOURCE_DIR}/${_ARCH}/${_DIRECTORY}"
+rm -r "${_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${_DIRECTORY}" "${_SOURCE_DIR}/${_ARCH}"
+cd "${_SOURCE_DIR}/${_ARCH}"
 rm latest
 ln -s "${_DIRECTORY}" latest
 EOF
@@ -71,7 +79,7 @@ EOF
 _server_release() {
     # create release in "${_ISOHOME}"
     cd "${_ISOHOME}" || exit 1
-    "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" "${_ARCHBOOT_SOURCE}" || rm -r "${_BUILDDIR}"
+    "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIRECTORY}" || rm -r "${_BUILDDIR}"
     # set user rights on files
     [[ -d "${_BUILDDIR}" ]] || exit 1
     chmod 755 "${_BUILDDIR}"
