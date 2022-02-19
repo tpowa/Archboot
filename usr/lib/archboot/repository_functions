@@ -1,5 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+
 _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"
     echo "-----------------------------"
@@ -26,7 +27,7 @@ _aarch64_download_packages() {
 }
 
 _move_packages() {
-    echo "Mpving packages to ${2} ..."
+    echo "Moving packages to ${2} ..."
     mv "${1}"/var/cache/pacman/pkg/./* "${2}"
 }
 
@@ -37,5 +38,5 @@ _cleanup_repodir() {
 
 _create_archboot_db() {
     echo "Creating archboot repository db ..."
-    repo-add "${1}"/archboot.db.tar.gz "${1}"/./*.{zst,xz} >/dev/null 2>&1
+    repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
 }

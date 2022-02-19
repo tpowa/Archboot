@@ -3,7 +3,7 @@
 _CLEANUP_CACHE=""
 _CLEANUP_CONTAINER=""
 _LINUX_FIRMWARE="linux-firmware"
-_PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
+_PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-aarch64-chroot"
 _PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
 
 _usage () {

@@ -23,7 +23,7 @@ _GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passp
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
     cd "${_ISO_HOME}" || exit 1
-    mkdir "${_PACMAN_AARCH64}"
+    [[ -d "${_PACMAN_AARCH64}" ]] || mkdir "${_PACMAN_AARCH64}"
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
     [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
     wget ${_PACMAN_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
@@ -54,7 +54,8 @@ _update_aarch64_pacman_chroot() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
     chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
-    sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH64_SERVER} || exit 1
+    echo "Uploading files to ${_SERVER}:${_PACMAN_AARCH64_SERVER} ..."
+    sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH64_SERVER} || exit 1
 }
 
 _update_source() {
@@ -66,7 +67,8 @@ _update_source() {
     fi
     echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
-    sudo -u "${_USER}" scp -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
+    echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
+    sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}"/ || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
@@ -107,7 +109,8 @@ _server_release() {
     [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
     # copy files to server
-    sudo -u "${_USER}" scp -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
+    echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
+    sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
     # move files on server, create symlink and remove 3 month old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
