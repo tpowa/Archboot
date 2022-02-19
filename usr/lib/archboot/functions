@@ -3,7 +3,6 @@
 # change to english locale!
 export LANG="en_US"
 _BASENAME="$(basename "${0}")"
-_PWD="$(pwd)"
 _RUNNING_ARCH="$(uname -m)"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"

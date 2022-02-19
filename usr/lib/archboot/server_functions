@@ -1,31 +1,32 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_DIRECTORY="$(date +%Y.%m)"
-_ISOHOME="/home/tobias/Arch/iso/${_ARCH}"
-_SOURCEHOME="/home/tobias/Arch/iso/${_ARCH}/sources/${_DIRECTORY}"
-_BUILDDIR="$(mktemp -d "${_ISOHOME}"/server-release.XXX)"
+_DIR="$(date +%Y.%m)"
+_ISO_HOME="/home/tobias/Arch/iso"
+_ISO_HOME_ARCH="${_ISO_HOME}/${_ARCH}"
+_ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources/${_DIR}"
+_ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 _SERVER="pkgbuild.com"
-_SERVER_HOME="/home/tpowa/"
-_SERVER_DIR="/home/tpowa/public_html/archboot-images"
-_SOURCE_DIR="/home/tpowa/public_html/archboot-sources"
+_SERVER_HOME="/home/tpowa"
+_SERVER_PUBLIC="${_SERVER_HOME}/public_html"
+_SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/archboot-images"
+_SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/archboot-sources"
+_ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
+_ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/archboot-sources"
+_PACMAN_AARCH64="pacman-aarch64-chroot"
+_PACMAN_AARCH64_CHROOT="${_PACMAN_AARCH64}-latest.tar.zst"
+_PACMAN_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
+_PACMAN_AARCH64_SERVER="${_SERVER_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
 _USER="tobias"
 _GROUP="users"
 _GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
-_PACMAN_AARCH_BUILDDIR="/home/tobias/Arch/iso"
-_PACMAN_AARCH_SERVERDIR="/home/tpowa/public_html/archboot-helper/pacman-chroot-aarch64"
-_PACMAN_AARCH64="pacman-aarch64-chroot"
-_PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-chroot-aarch64"
-_PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
-_ARCHBOOT_SOURCE="https://pkgbuild.com/~tpowa/archboot-sources"
-
 
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
-    cd "${_PACMAN_AARCH_BUILDDIR}" || exit 1
+    cd "${_ISO_HOME}" || exit 1
     mkdir "${_PACMAN_AARCH64}"
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
     [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
-    wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+    wget ${_PACMAN_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
     sudo -u "${_USER}" gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_PACMAN_AARCH64}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
@@ -53,38 +54,37 @@ _update_aarch64_pacman_chroot() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
     chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
-    sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH_SERVERDIR} || exit 1
+    sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH64_SERVER} || exit 1
 }
 
 _update_source() {
-    if [[ -d "${_SOURCEHOME}" ]];then
-        rm -r "${_SOURCEHOME}"
-        mkdir -p "${_SOURCEHOME}"
+    if [[ -d "${_ISO_HOME_SOURCE}" ]];then
+        rm -r "${_ISO_HOME_SOURCE}"
+        mkdir -p "${_ISO_HOME_SOURCE}"
     else 
-        mkdir -p "${_SOURCEHOME}"
+        mkdir -p "${_ISO_HOME_SOURCE}"
     fi
     echo "Creating ${_ARCH} archboot repository ..."
-    "archboot-${_ARCH}-create-repository.sh" "${_SOURCEHOME}" || exit 1
-    sudo -u "${_USER}" scp -r "${_SOURCEHOME}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
+    "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
+    sudo -u "${_USER}" scp -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-rm -r "${_SOURCE_DIR}/${_ARCH}/${_DIRECTORY}"
-rm -r "${_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${_DIRECTORY}" "${_SOURCE_DIR}/${_ARCH}"
-cd "${_SOURCE_DIR}/${_ARCH}"
+rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
+rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
+cd "${_SERVER_SOURCE_DIR}/${_ARCH}"
 rm latest
-ln -s "${_DIRECTORY}" latest
+ln -s "${_DIR}" latest
 EOF
 }
 
 _server_release() {
-    # create release in "${_ISOHOME}"
-    cd "${_ISOHOME}" || exit 1
-    "archboot-${_ARCH}-release.sh" "${_BUILDDIR}" "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIRECTORY}" || rm -r "${_BUILDDIR}"
+    cd "${_ISO_HOME_ARCH}" || exit 1
+    "archboot-${_ARCH}-release.sh" "${_ISO_BUILD_DIR}" "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIR}" || rm -r "${_ISO_BUILD_DIR}"
     # set user rights on files
-    [[ -d "${_BUILDDIR}" ]] || exit 1
-    chmod 755 "${_BUILDDIR}"
-    chown -R "${_USER}:${_GROUP}" "${_BUILDDIR}"
-    cd "${_BUILDDIR}" || exit 1
+    [[ -d "${_ISO_BUILD_DIR}" ]] || exit 1
+    chmod 755 "${_ISO_BUILD_DIR}"
+    chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
+    cd "${_ISO_BUILD_DIR}" || exit 1
     # remove sha256sum
     rm sha256sum.txt
     # sign files and create new sha256sum.txt
@@ -103,19 +103,19 @@ _server_release() {
     chown -R "${_USER}:${_GROUP}" ./*
     cd ..
     [[ -d "archive" ]] || mkdir archive
-    [[ -d "archive/${_DIRECTORY}" ]] && rm -r "archive/${_DIRECTORY}"
-    [[ -d "${_DIRECTORY}" ]] && mv "${_DIRECTORY}" archive/
-    mv "${_BUILDDIR}" "${_DIRECTORY}"
+    [[ -d "archive/${_DIR}" ]] && rm -r "archive/${_DIR}"
+    [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
+    mv "${_ISO_BUILD_DIR}" "${_DIR}"
     # copy files to server
-    sudo -u "${_USER}" scp -r "${_DIRECTORY}" "${_SERVER}":"${_SERVER_HOME}" || exit 1
+    sudo -u "${_USER}" scp -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
     # move files on server, create symlink and remove 3 month old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-rm -r "${_SERVER_DIR}"/"${_ARCH}"/"${_DIRECTORY}"
-rm -r "${_SERVER_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${_DIRECTORY}" "${_SERVER_DIR}"/"${_ARCH}"
-cd "${_SERVER_DIR}"/"${_ARCH}"
+rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
+rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
+mv "${_DIR}" "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
+cd "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
 rm latest
-ln -s "${_DIRECTORY}" latest
+ln -s "${_DIR}" latest
 EOF
 }
 
