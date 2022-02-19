@@ -1,7 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # change to english locale!
-export LANG="en_US"
+export LANG="C"
 _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
@@ -42,8 +42,7 @@ _buildserver_check() {
 # generate locales
 _generate_locales() {
     echo "Generate locales in container ..."
-    echo 'en_US ISO-8859-1' >> "${1}/etc/locale.gen"
-    echo 'en_US.UTF-8 UTF-8' >> "${1}/etc/locale.gen"
+    echo 'C.UTF-8 UTF-8' >> "${1}/etc/locale.gen"
     systemd-nspawn -q -D "${1}" locale-gen >/dev/null 2>&1
 }
 
