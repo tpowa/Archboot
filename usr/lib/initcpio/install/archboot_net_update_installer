@@ -11,7 +11,7 @@ build ()
 	  routel brctl dhclient-script"
     for i in $apps; do
         add_binary "$i"
-        rm /usr/bin/$i
+        rm /usr/bin/"$i"
     done
     # add iproute 2
     add_full_dir "/usr/lib/tc"

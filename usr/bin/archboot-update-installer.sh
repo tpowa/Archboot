@@ -90,7 +90,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     [[ -d "/usr/lib/modules" ]] && rm -r "/usr/lib/modules"
     _SHARE_DIRS="efitools file grub hwdata kbd licenses makepkg nmap openvpn pacman refind tc usb_modeswitch vim zoneinfo zsh"
     for i in ${_SHARE_DIRS}; do
-        #sheclcheck disable=SC2115
+        #shellcheck disable=SC2115
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
     done
     echo "Step 2/8: Generating archboot container in ${_W_DIR} ..."

@@ -4,7 +4,7 @@
 # replaced GUID with uuidgen 
 
 echo -n "Enter a Common Name to embed in the keys: "
-read NAME
+read -r NAME
 
 openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout PK.key \
         -out PK.crt -days 3650 -nodes -sha256
@@ -18,9 +18,9 @@ openssl x509 -in DB.crt -out DB.cer -outform DER
 
 uuidgen > myGUID.txt
 
-cert-to-efi-sig-list -g $GUID PK.crt PK.esl
-cert-to-efi-sig-list -g $GUID KEK.crt KEK.esl
-cert-to-efi-sig-list -g $GUID DB.crt DB.esl
+cert-to-efi-sig-list -g "$GUID" PK.crt PK.esl
+cert-to-efi-sig-list -g "$GUID" KEK.crt KEK.esl
+cert-to-efi-sig-list -g "$GUID" DB.crt DB.esl
 rm -f noPK.esl
 touch noPK.esl
 
@@ -33,7 +33,7 @@ sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
 sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
                   -k KEK.key -c KEK.crt db DB.esl DB.auth
 
-chmod 0600 *.key
+chmod 0600 ./*.key
 
 echo ""
 echo ""

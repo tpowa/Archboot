@@ -5,7 +5,7 @@ source /usr/lib/archboot/container_functions
 source /usr/lib/archboot/repository_functions
 _ARCHBOOT="archboot-arm"
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
-_REPODIR="$(mktemp -d ${1}/repository.XXX)"
+_REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check

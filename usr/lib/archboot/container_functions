@@ -102,7 +102,8 @@ _create_pacman_conf() {
         _PACMAN_CONF="/etc/pacman.conf"
     else
         echo "Use custom pacman.conf ..."
-        _PACMAN_CONF="$(mktemp ${1}/pacman.conf.XXX)"
+        _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
+        #shellcheck disable=SC2129
         echo "[options]" >> "${_PACMAN_CONF}"
         echo "Architecture = auto" >> "${_PACMAN_CONF}"
         echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
@@ -140,18 +141,18 @@ _install_archboot() {
 
 _aarch64_install_base_packages() {
     echo "Installing packages base linux and ${_LINUX_FIRMWARE} to ${1} ..."
-    if [[ -e "$(basename ${_PACMAN_CONF})" ]]; then 
-        _PACMAN_CONF=$(basename ${_PACMAN_CONF})
+    if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
+        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_LINUX_FIRMWARE} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _aarch64_install_archboot() {
-    if [[ -e "$(basename ${_PACMAN_CONF})" ]]; then 
-        _PACMAN_CONF=$(basename ${_PACMAN_CONF})
+    if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
+        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _copy_mirrorlist_and_pacman_conf() {

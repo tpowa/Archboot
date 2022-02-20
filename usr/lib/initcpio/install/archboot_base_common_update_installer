@@ -72,7 +72,7 @@ build ()
     apps="login nologin"
     for i in $apps; do
         add_binary "$i"
-        rm /usr/bin/$i
+        rm /usr/bin/"$i"
     done
     add_file "/etc/login.defs"
     
@@ -82,7 +82,7 @@ build ()
     apps="mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys"
     for i in $apps; do
         add_binary "$i"
-        rm /usr/bin/$i
+        rm /usr/bin/"$i"
     done
     
     #dbus files
@@ -90,7 +90,7 @@ build ()
           dbus-update-activation-environment dbus-uuidgen"
     for i in $apps; do
         add_binary "$i"
-        rm /usr/bin/$i
+        rm /usr/bin/"$i"
     done
     add_binary "/usr/lib/dbus-1.0/dbus-daemon-launch-helper"
     add_dir "/var/lib/dbus"
@@ -107,7 +107,7 @@ build ()
           systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext"
     for i in $apps; do
         add_binary "$i"
-        rm /usr/bin/$i
+        rm /usr/bin/"$i"
     done
     add_dir "/etc/tmpfiles.d"
     add_dir "/etc/modules-load.d"

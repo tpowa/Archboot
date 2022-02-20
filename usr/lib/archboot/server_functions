@@ -68,11 +68,14 @@ _update_source() {
     echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
     echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
-    sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}"/ || exit 1
+    #shellcheck disable=SC2086
+    sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
+    sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
+rm -r "${_SERVER_HOME}/${_ARCH}"
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
+mv "${_ARCH}/${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
 cd "${_SERVER_SOURCE_DIR}/${_ARCH}"
 rm latest
 ln -s "${_DIR}" latest
@@ -110,12 +113,15 @@ _server_release() {
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
     # copy files to server
     echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
-    sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/" || exit 1
+    #shellcheck disable=SC2086
+    sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
+    sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     # move files on server, create symlink and remove 3 month old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
+rm -r "${_SERVER_HOME}/${_ARCH}"
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
-mv "${_DIR}" "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
+mv "${_ARCH}/${_DIR}" "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
 cd "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
 rm latest
 ln -s "${_DIR}" latest

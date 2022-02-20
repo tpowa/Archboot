@@ -21,7 +21,8 @@ if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
     exit 1
 fi
 
-echo $1 >binary.txt
-for i in $(pacman -Ql $1 | grep "/usr/bin/..*"$ | cut -d' ' -f2);do
-	which $i >/dev/null || echo $i>>binary.txt 
+echo "${1}" >binary.txt
+#shellcheck disable=SC2086
+for i in $(pacman -Ql ${1} | grep "/usr/bin/..*"$ | cut -d' ' -f2);do
+	which "${i}" >/dev/null || echo "${i}">>binary.txt 
 done
