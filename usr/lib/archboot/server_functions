@@ -67,7 +67,7 @@ _update_source() {
     fi
     echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
-    echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
+    echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
@@ -112,7 +112,7 @@ _server_release() {
     [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
     # copy files to server
-    echo "Uploading files to ${_SERVER}:${_SERVER_HOME} ..."
+    echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
