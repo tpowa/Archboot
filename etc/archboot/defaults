@@ -1,0 +1,35 @@
+# defaults for archboot
+# firmware to install
+_LINUX_FIRMWARE="linux-firmware"
+# custom pacman.conf on x86_64
+CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
+# custom mirrorlist on x86_64
+CUSTOM_MIRRORLIST="/etc/archboot/mirrorlist.archboot"
+# grub config to use
+_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
+# local user and group
+_USER="tobias"
+_GROUP="users"
+# gpg setup
+_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
+### server setup
+_DIR="$(date +%Y.%m)"
+# delete old version from server
+_PURGE_DATE="3 month"
+_PACMAN_AARCH64="pacman-aarch64-chroot"
+_PACMAN_AARCH64_CHROOT="${_PACMAN_AARCH64}-latest.tar.zst"
+# local paths
+_ISO_HOME="/home/tobias/Arch/iso"
+_ISO_HOME_ARCH="${_ISO_HOME}/${_ARCH}"
+_ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources/${_DIR}"
+# external paths
+_SERVER="pkgbuild.com"
+_SERVER_HOME="/home/tpowa"
+_SERVER_PUBLIC="${_SERVER_HOME}/public_html"
+_SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/archboot-images"
+_SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/archboot-sources"
+_SERVER_PACMAN_AARCH64="${_SERVER_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
+# public download paths
+_ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
+_ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/archboot-sources"
+_ARCHBOOT_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
