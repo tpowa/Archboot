@@ -2,9 +2,9 @@
 # firmware to install
 _LINUX_FIRMWARE="linux-firmware"
 # custom pacman.conf on x86_64
-CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
+_CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
 # custom mirrorlist on x86_64
-CUSTOM_MIRRORLIST="/etc/archboot/mirrorlist.archboot"
+_CUSTOM_MIRRORLIST="/etc/archboot/mirrorlist.archboot"
 # grub config to use
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
 # local user and group
