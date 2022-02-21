@@ -9,7 +9,6 @@ _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check
-_buildserver_check
 _x86_64_pacman_use_default || exit 1
 _cachedir_check
 _x86_64_check

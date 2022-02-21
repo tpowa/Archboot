@@ -1,10 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_CLEANUP_CACHE=""
-_CLEANUP_CONTAINER=""
-_LINUX_FIRMWARE="linux-firmware"
-_PACMAN_AARCH64_CHROOT_SERVER="https://pkgbuild.com/~tpowa/archboot-helper/pacman-aarch64-chroot"
-_PACMAN_AARCH64_CHROOT="pacman-aarch64-chroot-latest.tar.zst"
+source /etc/archboot/defaults
 
 _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
@@ -39,7 +35,7 @@ _clean_cache() {
 
 _aarch64_pacman_chroot() {
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] || wget ${_PACMAN_AARCH64_CHROOT_SERVER}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] || wget ${_PACMAN_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
     sleep 1
     gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1

@@ -1,24 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_DIR="$(date +%Y.%m)"
-_ISO_HOME="/home/tobias/Arch/iso"
-_ISO_HOME_ARCH="${_ISO_HOME}/${_ARCH}"
-_ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources/${_DIR}"
+source /etc/archboot/defaults
 _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
-_SERVER="pkgbuild.com"
-_SERVER_HOME="/home/tpowa"
-_SERVER_PUBLIC="${_SERVER_HOME}/public_html"
-_SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/archboot-images"
-_SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/archboot-sources"
-_ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
-_ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/archboot-sources"
-_PACMAN_AARCH64="pacman-aarch64-chroot"
-_PACMAN_AARCH64_CHROOT="${_PACMAN_AARCH64}-latest.tar.zst"
-_PACMAN_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
-_PACMAN_AARCH64_SERVER="${_SERVER_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
-_USER="tobias"
-_GROUP="users"
-_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
@@ -26,7 +9,7 @@ _update_aarch64_pacman_chroot() {
     [[ -d "${_PACMAN_AARCH64}" ]] || mkdir "${_PACMAN_AARCH64}"
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
     [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
-    wget ${_PACMAN_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+    wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
     sudo -u "${_USER}" gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_PACMAN_AARCH64}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
@@ -54,8 +37,8 @@ _update_aarch64_pacman_chroot() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
     chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
-    echo "Uploading files to ${_SERVER}:${_PACMAN_AARCH64_SERVER} ..."
-    sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_PACMAN_AARCH64_SERVER} || exit 1
+    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN_AARCH64} ..."
+    sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_AARCH64} || exit 1
 }
 
 _update_source() {
@@ -67,13 +50,14 @@ _update_source() {
     fi
     echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
+    chown -R "${_USER}:${_GROUP}" "${_ISO_HOME_SOURCE}"
     echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
-rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - 3 month" +%Y.%m)"
+rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)"
 mv "${_ARCH}/${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${_SERVER_SOURCE_DIR}/${_ARCH}"

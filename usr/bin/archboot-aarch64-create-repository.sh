@@ -9,7 +9,6 @@ _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check
-_buildserver_check
 _cachedir_check
 echo "Starting repository creation ..."
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then

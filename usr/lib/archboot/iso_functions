@@ -1,13 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+source /etc/archboot/defaults
 _PRESET_DIR="/etc/archboot/presets"
-_GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
-# covered by usage
-_GENERATE=""
-_PRESET=""
-_IMAGENAME=""
-_RELEASENAME=""
-# temporary directories
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 
 _usage () {

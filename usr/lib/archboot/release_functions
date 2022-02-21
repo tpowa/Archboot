@@ -1,12 +1,13 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_PRESET_LATEST="${_ARCH}-latest"
+source /etc/archboot/defaults
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs_${_ARCH}.img"
 _INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
 _KERNEL="boot/vmlinuz_${_ARCH}"
 _KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
+_PRESET_LATEST="${_ARCH}-latest"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {
