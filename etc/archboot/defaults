@@ -7,11 +7,6 @@ _CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
 _CUSTOM_MIRRORLIST="/etc/archboot/mirrorlist.archboot"
 # grub config to use
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
-# local user and group
-_USER="tobias"
-_GROUP="users"
-# gpg setup
-_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
 ### server setup
 _DIR="$(date +%Y.%m)"
 # delete old version from server
@@ -33,3 +28,8 @@ _SERVER_PACMAN_AARCH64="${_SERVER_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
 _ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
 _ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/archboot-sources"
 _ARCHBOOT_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
+# local user and group
+_USER="tobias"
+_GROUP="users"
+# gpg setup
+_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"

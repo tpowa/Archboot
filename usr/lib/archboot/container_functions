@@ -35,7 +35,7 @@ _clean_cache() {
 
 _aarch64_pacman_chroot() {
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] || wget ${_PACMAN_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] || wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify dowload
     sleep 1
     gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
