@@ -18,7 +18,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _umount_special "${1}" || exit 1
     _generate_locales "${1}" || exit 1
     _clean_locale "${1}"
-    _clean_container "${1}" || exit 1
+    _clean_container "${1}" >/dev/null 2>&1
     _clean_archboot_cache
     _generate_keyring "${1}" || exit 1
     _copy_mirrorlist_and_pacman_conf "${1}"
@@ -34,7 +34,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_cache "${1}" || exit 1
     _generate_locales "${1}" || exit 1
     _clean_locale "${1}"
-    _clean_container "${1}" || exit 1
+    _clean_container "${1}"
 fi
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1

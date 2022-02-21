@@ -53,7 +53,7 @@ _clean_container() {
         echo "Clean container, delete not needed files from ${1} ..."
         rm -r "${1}"/usr/include
         rm -r "${1}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,glib-2.0,gnupg,graphite2,gtk-doc,iana-etc,icons,icu,iptables,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,pixmaps,pkgconfig,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl5}
-        rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,krb5,ldb,ldscripts,libnl,libproxy,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,perl5,pkcs11,pkgconfig,python3.10,rsync,samba,sasl2,siconv,sysctl.d,sysusers.d,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables} || return 0
+        rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,krb5,ldb,ldscripts,libnl,libproxy,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,perl5,pkcs11,pkgconfig,python3.10,rsync,samba,sasl2,siconv,sysctl.d,sysusers.d,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables} >/dev/null 2>&1 || return 0
     fi
 }
 
