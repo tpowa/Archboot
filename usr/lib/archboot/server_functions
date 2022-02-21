@@ -1,6 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 source /etc/archboot/defaults
+source /usr/lib/archboot/container_functions
 _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 
 _update_aarch64_pacman_chroot() {
@@ -10,7 +11,7 @@ _update_aarch64_pacman_chroot() {
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
     [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
     wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
-    # verify dowload
+    # verify download
     sudo -u "${_USER}" gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_PACMAN_AARCH64}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
     echo "Removing installation tarball ..."
@@ -18,25 +19,22 @@ _update_aarch64_pacman_chroot() {
     # update container to latest packages
     echo "Update container to latest packages..."
     systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
-    # remove package cache
-    echo "Remove package cache from container ..."
-    rm ${_PACMAN_AARCH64}/var/cache/pacman/pkg/* >/dev/null 2>&1
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_PACMAN_AARCH64}"/etc/pacman.conf
     # fix network in container
     rm "${_PACMAN_AARCH64}/etc/resolv.conf"
     echo "nameserver 8.8.8.8" > "${_PACMAN_AARCH64}/etc/resolv.conf"
-    echo "Clean container, delete not needed files from ${_PACMAN_AARCH64} ..."
-    rm -r "${_PACMAN_AARCH64}"/usr/include >/dev/null 2>&1
-    rm -r "${_PACMAN_AARCH64}"/usr/share/{man,doc,info} >/dev/null 2>&1
+    _CLEANUP_CONTAINER="1" _clean_container "${_PACMAN_AARCH64}" || exit 1
+    _CLEANUP_CACHE="1" _clean_cache "${_PACMAN_AARCH64}" || exit 1
     echo "Generating tarball ..."
     tar -acf "${_PACMAN_AARCH64_CHROOT}" -C "${_PACMAN_AARCH64}" .
     echo "Removing ${_PACMAN_AARCH64} ..."
     rm -r "${_PACMAN_AARCH64}"
     echo "Finished container tarball."
     #shellcheck disable=SC2086
-    sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}"
-    chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig}
+    echo "Sign tarball ..."
+    sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}" || exit 1
+    chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig} || exit 1
     echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN_AARCH64} ..."
     sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_AARCH64} || exit 1
 }

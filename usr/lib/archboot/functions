@@ -42,7 +42,11 @@ _buildserver_check() {
 # generate locales
 _generate_locales() {
     echo "Generate locales in container ..."
-    echo 'C.UTF-8 UTF-8' >> "${1}/etc/locale.gen"
+    if [[ "${_ARCH}" == "aarch64" ]]; then 
+        echo 'en_US.UTF-8 UTF-8' >> "${1}/etc/locale.gen"
+    else
+        echo 'C.UTF-8 UTF-8' >> "${1}/etc/locale.gen"
+    fi
     systemd-nspawn -q -D "${1}" locale-gen >/dev/null 2>&1
 }
 
