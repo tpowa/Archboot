@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="aarch64"
+source /etc/archboot/defaults
 source /usr/lib/archboot/functions
 source /usr/lib/archboot/container_functions
-source /etc/archboot/defaults
 _LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _KEYRING="archlinuxarm"
 
