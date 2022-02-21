@@ -49,11 +49,11 @@ sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}/${_PACMAN_AARCH64}"/
 # fix network in container
 rm "${1}/${_PACMAN_AARCH64}/etc/resolv.conf"
 echo "nameserver 8.8.8.8" > "${1}/${_PACMAN_AARCH64}/etc/resolv.conf"
-_CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_AARCH64}" || exit 1
+_CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_AARCH64}" >/dev/null 2>&1 || exit 1
 _CLEANUP_CACHE="1" _clean_cache "${1}/${_PACMAN_AARCH64}" || exit 1
 echo "Generating tarball ..."
-tar -acf ${_PACMAN_AARCH64_CHROOT} -C "${1}"/"${_PACMAN_AARCH64}" . || exit 1
-echo " Removing ${1} ..."
+tar -acf ${_PACMAN_AARCH64_CHROOT} -C "${1}"/"${_PACMAN_AARCH64}" . >/dev/null 2>&1 || exit 1
+echo "Removing ${1} ..."
 rm -r "${1}"
 echo "Finished container tarball."
 echo "Sign tarball ..."
