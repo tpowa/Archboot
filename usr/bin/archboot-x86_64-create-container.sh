@@ -19,7 +19,6 @@ _clean_cache "${1}" || exit 1
 _install_archboot "${1}" || exit 1
 _umount_special "${1}" || exit 1
 _generate_locales "${1}" || exit 1
-_clean_locale "${1}"
 _clean_container "${1}" || exit 1
 _clean_archboot_cache
 _generate_keyring "${1}" || exit 1

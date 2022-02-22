@@ -17,7 +17,6 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _install_archboot "${1}" || exit 1
     _umount_special "${1}" || exit 1
     _generate_locales "${1}" || exit 1
-    _clean_locale "${1}"
     _clean_container "${1}"
     _clean_archboot_cache
     _generate_keyring "${1}" || exit 1
@@ -33,7 +32,6 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_mkinitcpio "${1}" || exit 1
     _clean_cache "${1}" || exit 1
     _generate_locales "${1}" || exit 1
-    _clean_locale "${1}"
     _clean_container "${1}" 2>/dev/null
 fi
 _reproducibility "${1}"
