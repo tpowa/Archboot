@@ -55,7 +55,7 @@ _update_source() {
     sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
-rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)"
+rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
 mv "${_ARCH}/${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${_SERVER_SOURCE_DIR}/${_ARCH}"
@@ -101,7 +101,7 @@ _server_release() {
     # move files on server, create symlink and remove 3 month old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
-rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - 3 month" +%Y.%m)"
+rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
 mv "${_ARCH}/${_DIR}" "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
