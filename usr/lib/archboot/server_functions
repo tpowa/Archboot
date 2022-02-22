@@ -39,29 +39,52 @@ _update_aarch64_pacman_chroot() {
     sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_AARCH64} || exit 1
 }
 
-_update_source() {
-    if [[ -d "${_ISO_HOME_SOURCE}" ]];then
-        rm -r "${_ISO_HOME_SOURCE}"
-        mkdir -p "${_ISO_HOME_SOURCE}"
-    else 
-        mkdir -p "${_ISO_HOME_SOURCE}"
-    fi
-    echo "Creating ${_ARCH} archboot repository ..."
-    "archboot-${_ARCH}-create-repository.sh" "${_ISO_HOME_SOURCE}" || exit 1
-    chown -R "${_USER}:${_GROUP}" "${_ISO_HOME_SOURCE}"
+_server_upload() {
+    # copy files to server
     echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
-    sudo -u "${_USER}" scp -q -r "${_ISO_HOME_SOURCE}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
+    sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
+    # move files on server, create symlink and remove ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/${_DIR}"
-rm -r "${_SERVER_SOURCE_DIR}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
-mv "${_ARCH}/${_DIR}" "${_SERVER_SOURCE_DIR}/${_ARCH}"
+echo "Remove old ${1}/${_ARCH}/${_DIR} directory ..."
+rm -r "${1}"/"${_ARCH}"/"${_DIR}"
+echo "Remove old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory ..."
+rm -r "${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
+echo "Move ${_ARCH}/${_DIR} to ${1}/${_ARCH} ..."
+mv "${_ARCH}/${_DIR}" "${1}"/"${_ARCH}"
+echo "Remove ${_SERVER_HOME}/${_ARCH} directory ..."
 rm -r "${_SERVER_HOME}/${_ARCH}"
-cd "${_SERVER_SOURCE_DIR}/${_ARCH}"
+cd "${1}"/"${_ARCH}"
+echo "Create new latest symlink in ${1}/${_ARCH} ..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
+}
+
+_create_archive() {
+    [[ -d "archive" ]] || mkdir archive
+    [[ -d "archive/${_DIR}" ]] && rm -r "archive/${_DIR}"
+    [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
+}
+
+# sign files and create new sha256sum.txt
+_sign_sha256sum() {
+    for i in $1; do
+        #shellcheck disable=SC2086
+        [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
+        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+        [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
+    done
+}
+
+_update_source() {
+    cd ${_ISO_HOME_SOURCE} || exit 1
+    _create_archive
+    echo "Creating ${_ARCH} archboot repository ..."
+    "archboot-${_ARCH}-create-repository.sh" "${_DIR}" || exit 1
+    chown -R "${_USER}:${_GROUP}" "${_DIR}"
+    _server_upload "${_SERVER_SOURCE_DIR}"
 }
 
 _server_release() {
@@ -74,39 +97,11 @@ _server_release() {
     cd "${_ISO_BUILD_DIR}" || exit 1
     # remove sha256sum
     rm sha256sum.txt
-    # sign files and create new sha256sum.txt
-    for i in *; do
-        #shellcheck disable=SC2086
-        [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
-        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
-        [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
-    done
-    for i in boot/*; do
-        #shellcheck disable=SC2086
-        [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
-        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
-        [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
-    done
+    _sign_sha256sum "*"
+    _sign_sha256sum "boot/*"
     chown -R "${_USER}:${_GROUP}" ./*
     cd ..
-    [[ -d "archive" ]] || mkdir archive
-    [[ -d "archive/${_DIR}" ]] && rm -r "archive/${_DIR}"
-    [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
+    _create_archive
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
-    # copy files to server
-    echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
-    #shellcheck disable=SC2086
-    sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
-    sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
-    # move files on server, create symlink and remove ${_PURGE_DATE} old release
-    sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
-rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
-mv "${_ARCH}/${_DIR}" "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
-rm -r "${_SERVER_HOME}/${_ARCH}"
-cd "${_SERVER_IMAGE_DIR}"/"${_ARCH}"
-rm latest
-ln -s "${_DIR}" latest
-EOF
+    _server_upload "${_SERVER_IMAGE_DIR}"
 }
-
