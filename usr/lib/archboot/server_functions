@@ -98,7 +98,7 @@ _server_release() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
-    # move files on server, create symlink and remove 3 month old release
+    # move files on server, create symlink and remove ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"${_DIR}"
 rm -r "${_SERVER_IMAGE_DIR}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
