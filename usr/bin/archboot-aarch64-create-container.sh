@@ -34,7 +34,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_cache "${1}" || exit 1
     _generate_locales "${1}" || exit 1
     _clean_locale "${1}"
-    _clean_container "${1}" >/dev/null 2>&1
+    _clean_container "${1}" 2>/dev/null
 fi
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
