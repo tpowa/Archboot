@@ -57,8 +57,9 @@ echo "Removing ${1} ..."
 rm -r "${1}"
 echo "Finished container tarball."
 echo "Sign tarball ..."
+#shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} ${_PACMAN_AARCH64_CHROOT} || exit 1
-chown "${_USER}":${GROUP} ${_PACMAN_AARCH64_CHROOT}{,.sig} || exit 1
+chown "${_USER}":"${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig} || exit 1
 echo "Uploading tarball to ${_SERVER}:${_SERVER_PACMAN_AARCH64} ..."
 sudo -u "${_USER}" scp ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_AARCH64} || exit 1
 echo "Finished."

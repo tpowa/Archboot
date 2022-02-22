@@ -31,8 +31,8 @@ _update_aarch64_pacman_chroot() {
     echo "Removing ${_PACMAN_AARCH64} ..."
     rm -r "${_PACMAN_AARCH64}"
     echo "Finished container tarball."
-    #shellcheck disable=SC2086
     echo "Sign tarball ..."
+    #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig} || exit 1
     echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN_AARCH64} ..."
