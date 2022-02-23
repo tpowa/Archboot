@@ -9,7 +9,7 @@ _update_aarch64_pacman_chroot() {
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_PACMAN_AARCH64}" ]] || mkdir "${_PACMAN_AARCH64}"
     echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig}
+    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig} 2>/dev/null
     wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify download
     sudo -u "${_USER}" gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
@@ -19,11 +19,8 @@ _update_aarch64_pacman_chroot() {
     # update container to latest packages
     echo "Update container to latest packages..."
     systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
-    # enable parallel downloads
-    sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${_PACMAN_AARCH64}"/etc/pacman.conf
-    # fix network in container
-    rm "${_PACMAN_AARCH64}/etc/resolv.conf"
-    echo "nameserver 8.8.8.8" > "${_PACMAN_AARCH64}/etc/resolv.conf"
+    _generate_locales "${_PACMAN_AARCH64}"
+    _fix_aarch64_network "${_PACMAN_AARCH64}"
     _CLEANUP_CONTAINER="1" _clean_container "${_PACMAN_AARCH64}" >/dev/null 2>&1
     _CLEANUP_CACHE="1" _clean_cache "${_PACMAN_AARCH64}" >/dev/null 2>&1
     echo "Generating tarball ..."
