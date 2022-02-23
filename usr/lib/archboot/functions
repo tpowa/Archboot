@@ -41,9 +41,11 @@ _buildserver_check() {
 
 # generate locales
 _generate_locales() {
-    echo "Generate locales in container ..."
-    sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
-    systemd-nspawn -q -D "${1}" locale-gen >/dev/null 2>&1
+    if [[ -d ${1}/usr/share/locale ]]; then
+        echo "Generate locales in container ..."
+        sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
+        systemd-nspawn -q -D "${1}" locale-gen >/dev/null 2>&1 || exit 1
+    fi
 }
 
 _generate_keyring() {

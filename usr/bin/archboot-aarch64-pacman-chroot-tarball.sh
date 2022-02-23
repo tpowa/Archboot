@@ -15,6 +15,15 @@ _usage () {
     exit 0
 }
 
+_fix_network() {
+    echo "Fix network settings in ${1} ..."
+    # enable parallel downloads
+    sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
+    # fix network in container
+    rm "${1}"/etc/resolv.conf
+    echo "nameserver 8.8.8.8" > "${1}"/etc/resolv.conf
+}
+
 [[ -z "${1}" ]] && _usage
 
 _root_check
@@ -28,27 +37,17 @@ echo "Downloading archlinuxarm aarch64 ..."
 bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${1}"
 echo "Removing installation tarball ..."
 rm ArchLinuxARM-aarch64-latest.tar.gz
-_generate_locales "${1}" || exit 1
+_generate_locales "${1}"
 _generate_keyring "${1}" || exit 1
-# enable parallel downloads
-sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
-# fix network in container
-rm "${1}/etc/resolv.conf"
-echo "nameserver 8.8.8.8" > "${1}/etc/resolv.conf"
+_fix_network "${1}"
 # update container to latest packages
 echo "Installing pacman to container ..."
 mkdir -p "${1}/${_PACMAN_AARCH64}/var/lib/pacman"
-systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_AARCH64}" -Sy awk pacman --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
-# copy locale
-echo "Copying locales to container ..."
-cp "${1}/usr/lib/locale/locale-archive" "${1}/${_PACMAN_AARCH64}/usr/lib/locale/locale-archive" || exit 1
-# generate pacman keyring
+# gzip and sed for locale-gen 
+systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_AARCH64}" -Sy awk sed gzip pacman --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+_generate_locales "${1}/${_PACMAN_AARCH64}"
 _generate_keyring "${1}/${_PACMAN_AARCH64}" || exit 1
-# enable parallel downloads
-sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}/${_PACMAN_AARCH64}"/etc/pacman.conf
-# fix network in container
-rm "${1}/${_PACMAN_AARCH64}/etc/resolv.conf"
-echo "nameserver 8.8.8.8" > "${1}/${_PACMAN_AARCH64}/etc/resolv.conf"
+_fix_network "${1}/${_PACMAN_AARCH64}"
 _CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_AARCH64}" 2>/dev/null
 _CLEANUP_CACHE="1" _clean_cache "${1}/${_PACMAN_AARCH64}" 2>/dev/null
 echo "Generating tarball ..."
