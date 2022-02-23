@@ -27,7 +27,6 @@ _parameters() {
 
 _clean_cache() {
     if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
-        # clean cache
         echo "Clean pacman cache in ${1} ..."
         rm -r "${1}"/var/cache/pacman
     fi
@@ -70,8 +69,8 @@ _clean_mkinitcpio() {
     [[ -e "${1}/boot/initramfs-linux-fallback.img" ]] && rm "${1}/boot/initramfs-linux-fallback.img"
 }
 
+# Clean cache on archboot environment
 _clean_archboot_cache() {
-    # Clean cache on archboot environment
     grep -qw 'archboot' /etc/hostname && (echo "Cleaning archboot /var/cache/pacman/pkg ..."; rm -r /var/cache/pacman/pkg)
 }
 
