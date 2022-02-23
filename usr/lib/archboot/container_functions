@@ -34,15 +34,20 @@ _clean_cache() {
 }
 
 _aarch64_pacman_chroot() {
-    echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] || wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
-    # verify dowload
-    sleep 1
-    gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${1}" -xf "${_PACMAN_AARCH64_CHROOT}"
-    echo "Removing installation tarball ..."
-    rm ${_PACMAN_AARCH64_CHROOT}{,.sig}
-    # update container to latest packages
+    if ! [[ -f pacman-aarch64-chroot-latest.tar.zst && -f pacman-aarch64-chroot-latest.tar.zst.sig ]]; then
+        echo "Downloading ${_PACMAN_AARCH64_CHROOT} ..."
+        wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+        echo "Verifing ${_PACMAN_AARCH64_CHROOT} ..."
+        gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
+        bsdtar -C "${1}" -xf "${_PACMAN_AARCH64_CHROOT}"
+        echo "Removing installation tarball ..."
+        rm ${_PACMAN_AARCH64_CHROOT}{,.sig}
+    else
+        echo "Using local ${_PACMAN_AARCH64_CHROOT} ..."
+        echo "Verifing ${_PACMAN_AARCH64_CHROOT} ..."
+        gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
+        bsdtar -C "${1}" -xf "${_PACMAN_AARCH64_CHROOT}"
+    fi
     echo "Update container to latest packages..."
     systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
 }
