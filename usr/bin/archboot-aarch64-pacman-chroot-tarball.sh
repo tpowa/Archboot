@@ -22,8 +22,7 @@ _x86_64_check
 
 echo "Starting container creation ..."
 # remove old files
-[[ -f ${_PACMAN_AARCH64_CHROOT} ]] && rm ${_PACMAN_AARCH64_CHROOT}
-[[ -f ${_PACMAN_AARCH64_CHROOT}.sig ]] && rm ${_PACMAN_AARCH64_CHROOT}.sig
+[[ -f ${_PACMAN_AARCH64_CHROOT} ]] && rm ${_PACMAN_AARCH64_CHROOT}{,.sig} 2>/dev/null
 echo "Create directory ${1} ..."
 mkdir -p "${1}"/"${_PACMAN_AARCH64}"
 echo "Downloading archlinuxarm aarch64 ..."
