@@ -4,7 +4,7 @@
 build ()
 {
     add_checked_modules '/kernel/fs'
-    apps="mkswap debugreiserfs mkfs.reiserfs mkreiserfs fsck.reiserfs reiserfsck reiserfstune resize_reiserfs badblocks blkid debugfs dumpe2fs e2fsck \
+    apps="mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag mkfs.ntfs mkntfs \
 	  ntfscp ntfsclone ntfslabel ntfsresize ntfsundelete ntfscat ntfscluster ntfscmp ntfsfix ntfsinfo ntfsls \
 	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \
