@@ -78,9 +78,6 @@ install_packages() {
     if lsblk -rnpo FSTYPE | grep -q ext; then
         ! echo "${PACKAGES}" | grep -qw e2fsprogs && PACKAGES="${PACKAGES} e2fsprogs"
     fi
-    if lsblk -rnpo FSTYPE | grep -q reiserfs; then
-        ! echo "${PACKAGES}" | grep -qw reiserfsprogs && PACKAGES="${PACKAGES} reiserfsprogs"
-    fi
     if lsblk -rnpo FSTYPE | grep -q xfs; then
         ! echo "${PACKAGES}" | grep -qw xfsprogs && PACKAGES="${PACKAGES} xfsprogs"
     fi

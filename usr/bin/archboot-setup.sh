@@ -1275,7 +1275,6 @@ autoprepare() {
         [[ "$(which mkfs.btrfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} btrfs Btrfs"
         [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
         [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS"
-        [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
         [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
 
@@ -2065,7 +2064,6 @@ select_filesystem() {
     [[ "$(which mkfs.btrfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} btrfs Btrfs"
     [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
     [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS"
-    [[ "$(which mkreiserfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} reiserfs Reiser3"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
     [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs3 NTFS"
@@ -2315,7 +2313,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local knownfs=0
-        for fs in xfs jfs reiserfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs3 vfat; do
+        for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs3 vfat; do
             [[ "${_fstype}" = "${fs}" ]] && knownfs=1 && break
         done
         if [[ ${knownfs} -eq 0 ]]; then
@@ -2329,7 +2327,6 @@ _mkfs() {
             case ${_fstype} in
                 xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f ${_device} >${LOG} 2>&1; ret=$? ;;
                 jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                reiserfs) yes | mkreiserfs ${_fsoptions} -l "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
                 ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
                 ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >${LOG} 2>&1; ret=$? ;;
                 ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >${LOG} 2>&1; ret=$? ;;
@@ -2599,9 +2596,6 @@ install_packages() {
     fi
     if lsblk -rnpo FSTYPE | grep -q ext; then
         ! echo "${PACKAGES}" | grep -qw e2fsprogs && PACKAGES="${PACKAGES} e2fsprogs"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q reiserfs; then
-        ! echo "${PACKAGES}" | grep -qw reiserfsprogs && PACKAGES="${PACKAGES} reiserfsprogs"
     fi
     if lsblk -rnpo FSTYPE | grep -q xfs; then
         ! echo "${PACKAGES}" | grep -qw xfsprogs && PACKAGES="${PACKAGES} xfsprogs"
