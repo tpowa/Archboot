@@ -2056,7 +2056,6 @@ ssd_optimization() {
 select_filesystem() {
     FILESYSTEM_FINISH=""
     # don't allow vfat as / filesystem, it will not work!
-    # don't allow ntfs as / filesystem, this is stupid!
     FSOPTS=""
     [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
     [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
@@ -2066,7 +2065,6 @@ select_filesystem() {
     [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
-    [[ "$(which mkfs.ntfs 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} ntfs3 NTFS"
     [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     #shellcheck disable=SC2086
     DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>${ANSWER} || return 1
@@ -2333,7 +2331,6 @@ _mkfs() {
                 f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >${LOG} 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                ntfs3)    mkfs.ntfs ${_fsoptions} -L "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
@@ -2585,9 +2582,6 @@ install_packages() {
         ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
     fi
     # Add filesystem packages
-    if lsblk -rnpo FSTYPE | grep -q ntfs; then
-        ! echo "${PACKAGES}" | grep -qw ntfs-3g && PACKAGES="${PACKAGES} ntfs-3g"
-    fi
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
         ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
     fi

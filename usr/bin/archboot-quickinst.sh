@@ -66,9 +66,6 @@ install_packages() {
 
     PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
-    if lsblk -rnpo FSTYPE | grep -q ntfs; then
-        ! echo "${PACKAGES}" | grep -qw ntfs-3g && PACKAGES="${PACKAGES} ntfs-3g"
-    fi
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
         ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
     fi
