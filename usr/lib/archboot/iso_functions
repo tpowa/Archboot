@@ -105,20 +105,26 @@ _prepare_uefi_shell_tianocore() {
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_uefi_X64_GRUB_USB_files() {
+_prepare_uefi_X64() {
     echo "Prepare X64 Grub ..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
-_prepare_uefi_IA32_GRUB_USB_files() {
+_prepare_uefi_IA32() {
     echo "Prepare IA32 Grub ..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_uefi_AA64_GRUB_USB_files() {
+_prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
+}
+
+_prepare_background() {
+    echo "Prepare Grub background ..."
+    [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
+    cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
 _reproducibility() {
@@ -146,7 +152,7 @@ _grub_mkrescue() {
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
     echo "Generating ${_RUNNING_ARCH} hybrid ISO ..."
-    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/grub.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/grub-archboot.cfg=${_GRUB_CONFIG}" &> "${_IMAGENAME}.log"
 }
 
 _reproducibility_iso() {

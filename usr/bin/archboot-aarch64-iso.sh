@@ -12,7 +12,8 @@ echo "Starting ISO creation ..."
 _prepare_kernel_initramfs_files || exit 1
 _prepare_fedora_shim_bootloaders_aarch64 || exit 1
 _prepare_efitools_uefi || exit 1
-_prepare_uefi_AA64_GRUB_USB_files || exit 1
+_prepare_uefi_AA64 || exit 1
+_prepare_background || exit 1
 _reproducibility
 _prepare_uefi_image || exit 1
 _reproducibility

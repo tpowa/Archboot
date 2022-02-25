@@ -3,6 +3,7 @@
 _LINUX_FIRMWARE="linux-firmware"
 # grub config to use
 _GRUB_CONFIG="/usr/share/archboot/grub/grub.cfg"
+_GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### server setup
 # release directory
 _DIR="$(date +%Y.%m)"
