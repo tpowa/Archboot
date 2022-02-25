@@ -11,7 +11,6 @@ _prepare_shim_files || exit 1
 _upload_efi_files shim-fedora || exit 1
 _cleanup shim-fedora || exit 1
 mkdir -m 777 grub-efi
-_grub_cfg
 _prepare_uefi_X64 || exit 1
 _prepare_uefi_IA32 || exit 1
 archboot-aarch64-create-container.sh grub-aarch64
