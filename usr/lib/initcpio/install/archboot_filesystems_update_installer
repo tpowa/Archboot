@@ -10,7 +10,7 @@ build ()
 	  xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp \
 	  mkdosfs dosfsck dosfslabel fatlabel mount.smb3 mount.cifs \
 	  fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 \
-	  mkfs.ext4 mke2fs fsck.jfs mkfs.jfs wipefs btrfs-convert btrfs-find-root btrfs-image \
+	  mkfs.ext4 mke2fs fsck.jfs mkfs.jfs wipefs btrfs-find-root btrfs-image \
 	  btrfs-map-logical btrfs-select-super btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 \
 	  nilfs_cleanerd cifs.upcall cifscreds getcifsacl setcifsacl smb2-quota smbinfo umount.nilfs2 \
 	  chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs \
