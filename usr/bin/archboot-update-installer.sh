@@ -84,11 +84,11 @@ echo "Information: Logging is done on /dev/tty7 ..."
 
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-    if ps aux | grep update-installer.sh; then
-        echo "Aborting: update-installer.sh is already running..."
+    if [[ -f /.update-installer ]]; then
+        echo "Aborting: update-installer.sh is already running on other tty ..."
         exit 0
     fi
-    touch
+    touch /.update-installer
     # remove everything not necessary
     echo "Step 1/8: Removing not necessary files from / ..."
     [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
