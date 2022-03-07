@@ -86,6 +86,7 @@ echo "Information: Logging is done on /dev/tty7 ..."
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ -f /.update-installer ]]; then
         echo "Aborting: update-installer.sh is already running on other tty ..."
+        echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 0
     fi
     touch /.update-installer
