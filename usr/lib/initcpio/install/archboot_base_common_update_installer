@@ -19,7 +19,7 @@ build ()
     apps="init agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc wget uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
-          sort zstd nano" 
+          sort zstd nano date"
     for i in $apps; do
         add_binary "$i"
     done
