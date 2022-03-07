@@ -18,13 +18,13 @@ _cachedir_check() {
 }
 
 _download_packages() {
-    echo "Downloading packages base linux ${_LINUX_FIRMWARE} and ${_ARCHBOOT} to ${1} ..."
-    pacman --root "${1}" -Syw base linux "${_LINUX_FIRMWARE}" "${_ARCHBOOT}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+    echo "Downloading packages base linux ${_PACKAGES} and ${_ARCHBOOT} to ${1} ..."
+    pacman --root "${1}" -Syw base linux "${_PACKAGES}" "${_ARCHBOOT}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _aarch64_download_packages() {
-    echo "Downloading packages base linux ${_LINUX_FIRMWARE} and ${_ARCHBOOT} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw base linux ${_LINUX_FIRMWARE} ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    echo "Downloading packages base linux ${_PACKAGES} and ${_ARCHBOOT} to ${1} ..."
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw base linux ${_PACKAGES} ${_ARCHBOOT} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _move_packages() {
