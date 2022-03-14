@@ -3,39 +3,21 @@
 
 build ()
 {
-    apps="findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
+    map add_binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
 	  sm-notify start-statd rpcbind rpcinfo rpc.gssd mountpoint mountstats \
-	  nfsdcltrack nfsiostat gssproxy screen"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_file "/etc/screenrc"
-    add_file "/etc/ssh/ssh_config"
-    add_file "/etc/ssh/sshd_config"
-    add_file "/etc/ssh/moduli"
-    add_file "/etc/rsyncd.conf"
-    add_file "/etc/exports"
+	  nfsdcltrack nfsiostat gssproxy screen
+    map add_file "/etc/screenrc" "/etc/ssh/ssh_config" "/etc/ssh/sshd_config" "/etc/ssh/moduli" \
+        "/etc/rsyncd.conf" "/etc/exports"  "/usr/lib/ssh/sftp-server" "/usr/lib/ssh/ssh-keysign" \
+        "/usr/lib/ssh/ssh-pkcs11-helper" "/etc/conf.d/rpcbind" "/etc/gssapi_mech.conf" \
+        "/etc/netconfig"
     add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
-    add_file "/usr/lib/ssh/sftp-server"
-    add_file "/usr/lib/ssh/ssh-keysign"
-    add_file "/usr/lib/ssh/ssh-pkcs11-helper"
-    add_dir  "/var/empty"
-    add_file "/etc/conf.d/rpcbind"
-    add_file "/etc/gssapi_mech.conf"
-    add_file "/etc/netconfig"
     add_full_dir "/usr/lib/libnfsidmap/"
-    add_dir "/var/lib/nfs/sm"
-    add_dir "/var/lib/nfs/sm.bak"
-    add_dir "/var/lib/nfs/v4recovery"
-    add_dir "/var/lib/nfs/rpc_pipefs"
-    add_dir "/var/lib/rpcbind"
+    map add_dir  "/var/empty" "/var/lib/nfs/sm" "/var/lib/nfs/sm.bak" "/var/lib/nfs/v4recovery" \
+        "/var/lib/nfs/rpc_pipefs" "/var/lib/rpcbind" "/var/log/gssproxy"
     chmod 700 "$BUILDROOT/var/lib/rpcbind"
     chown 32:32 "$BUILDROOT/var/lib/rpcbind"
-    add_full_dir "/etc/gss"
-    add_full_dir "/etc/gssproxy"
-    add_full_dir "/var/lib/gssproxy"
-    add_dir "/var/log/gssproxy"
+    map add_full_dir "/etc/gss" "/etc/gssproxy" "/var/lib/gssproxy"
     # start rpcbind on startup
     add_symlink "/etc/systemd/system/sockets.target.wants/rpcbind.socket" "/usr/lib/systemd/system/rpcbind.socket"
     add_dir "/var/lib/openldap"
@@ -44,11 +26,9 @@ build ()
     # start sshd on startup
     add_symlink "/etc/systemd/system/multi-user.target.wants/sshd.service" "/usr/lib/systemd/system/sshd.service"
     # fix licenses
-    add_file "/usr/share/licenses/rpcbind/COPYING"
-    add_file "/usr/share/licenses/libsasl/COPYING"
-    add_file "/usr/share/licenses/libldap/LICENSE"
-    add_file "/usr/share/licenses/nfsidmap/LICENSE"
-    add_file "/usr/share/licenses/libgssglue/COPYING"
+    map add_file "/usr/share/licenses/rpcbind/COPYING" "/usr/share/licenses/libsasl/COPYING" \
+        "/usr/share/licenses/libldap/LICENSE" "/usr/share/licenses/nfsidmap/LICENSE" \
+        "/usr/share/licenses/libgssglue/COPYING"
 }
 
 help ()

@@ -4,11 +4,8 @@
 build ()
 {
     add_checked_modules '/drivers/atm|/drivers/usb/atm'
-    apps="aread atmdiag atmdump awrite saaldump sonetdiag ttcp_atm atmaddr atmarp atmarpd atmloop atmsigd \
-          atmtcp bus enitune esi ilmid lecs les mpcd zeppelin zntune"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary aread atmdiag atmdump awrite saaldump sonetdiag ttcp_atm atmaddr atmarp atmarpd atmloop atmsigd \
+          atmtcp bus enitune esi ilmid lecs les mpcd zeppelin zntune
     add_dir "/etc/ppp/peers/plugins"
     add_file "/etc/atmsigd.conf"
 }

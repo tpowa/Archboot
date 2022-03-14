@@ -13,28 +13,19 @@ build ()
         add_binary "$i"
         rm /usr/bin/"$i"
     done
-    # add iproute 2
-    add_full_dir "/usr/lib/tc"
-    add_full_dir "/usr/share/tc"
-    add_full_dir "/etc/iproute2"
-    # add openssl helper libraries
-    add_full_dir "/usr/lib/engines"
+    # add iproute 2, add openssl helper libraries
+    map add_full_dir "/usr/lib/tc" "/usr/share/tc" "/etc/iproute2" "/usr/lib/engines"
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add dhclient support
-    add_dir "/var/lib/dhclient"
-    add_dir "/var/state/dhcp"
+    map add_dir "/var/lib/dhclient" "/var/state/dhcp"
     # add ifplugd support
     add_full_dir "/etc/ifplugd"
     # fixing licenses
-    add_file "/usr/share/licenses/db/LICENSE"
-    add_file "/usr/share/licenses/dhclient/LICENSE"
-    add_file "/usr/share/licenses/bind/LICENSE"
-    add_file "/usr/share/licenses/krb5/LICENSE"
-    add_file "/usr/share/licenses/openssh/LICENCE"
-    add_file "/usr/share/licenses/openssl/LICENSE"
-    add_file "/usr/share/licenses/sqlite/license.txt"
-    add_file "/usr/share/licenses/dnssec-anchors/LICENSE"
+    map add_file "/usr/share/licenses/db/LICENSE" "/usr/share/licenses/dhclient/LICENSE" \
+        "/usr/share/licenses/bind/LICENSE" "/usr/share/licenses/krb5/LICENSE" \
+        "/usr/share/licenses/openssh/LICENCE" "/usr/share/licenses/openssl/LICENSE" \
+        "/usr/share/licenses/sqlite/license.txt" "/usr/share/licenses/dnssec-anchors/LICENSE"
 }
 
 help ()

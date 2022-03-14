@@ -3,8 +3,7 @@
 
 build ()
 {
-    add_binary "testdisk"
-    add_binary "photorec"
+    map add_binary testdisk photorec
 }
 
 help ()

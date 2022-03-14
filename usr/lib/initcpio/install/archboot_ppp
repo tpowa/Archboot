@@ -3,12 +3,8 @@
 
 build ()
 {
-    apps="poff pon chat plog pppd pppdump pppoe-discovery pppstats"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_full_dir "/usr/lib/pppd"
-    add_full_dir "/etc/ppp"
+    map add_binary poff pon chat plog pppd pppdump pppoe-discovery pppstats
+    map add_full_dir "/usr/lib/pppd" "/etc/ppp"
     # fix license files
     add_file "/usr/share/licenses/libpcap/LICENSE"
 }

@@ -3,7 +3,7 @@
 
 build ()
 {
-    apps="getent head id cksum tail tee test tr uptime w who which whoami xargs \
+    map add_binary getent head id cksum tail tee test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp chown df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
           mktemp chroot dirname expr bzip2 su cpio gzip top sdparm tput \
@@ -26,17 +26,10 @@ build ()
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
-          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        apps="i386 x86_64 $apps"
-    fi
-    for i in $apps; do
-        add_binary "$i"
-    done
+          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat
+    [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64
     ### add zsh
-    add_full_dir "/etc/zsh"
-    add_full_dir "/usr/share/zsh"
-    add_full_dir "/usr/lib/zsh"
+    map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     
     ### add en_US.utf8 locale
     add_file "/usr/lib/locale/locale-archive"
@@ -47,21 +40,15 @@ build ()
     add_file "/usr/share/file/misc/magic.mgc"
     
     ### add shadow
-    apps="groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
+    map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    
+          newusers pwck pwconv pwunconv useradd userdel usermod sg
+
     ### fix licenses
-    add_file "/usr/share/licenses/file/COPYING"
-    add_file "/usr/share/licenses/bzip2/LICENSE"
-    add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
-    add_file "/usr/share/licenses/ncurses/COPYING"
-    add_file "/usr/share/licenses/pcre/LICENSE"
-    add_file "/usr/share/licenses/sdparm/LICENSE" 
-    add_file "/usr/share/licenses/zlib/LICENSE"
+    map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
+                 "/usr/share/licenses/hdparm/LICENSE.TXT" "/usr/share/licenses/ncurses/COPYING" \
+                 "/usr/share/licenses/pcre/LICENSE" "/usr/share/licenses/sdparm/LICENSE" \
+                 "/usr/share/licenses/zlib/LICENSE"
 }
 
 help ()

@@ -3,10 +3,7 @@
 
 build ()
 {
-    apps="stat realpath install readlink ln mktemp depmod tee modinfo chown xz ldd"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary stat realpath install readlink ln mktemp depmod tee modinfo chown xz ldd
     apps="getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
@@ -39,9 +36,7 @@ build ()
         rm /usr/bin/"$i"
     done
     ### add zsh
-    add_full_dir "/etc/zsh"
-    add_full_dir "/usr/share/zsh"
-    add_full_dir "/usr/lib/zsh"
+    map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     
     ### add en_US.utf8 locale
     add_file "/usr/lib/locale/locale-archive"
@@ -52,21 +47,15 @@ build ()
     add_file "/usr/share/file/misc/magic.mgc"
     
     ### add shadow
-    apps="groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
+    map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg "
-    for i in $apps; do
-        add_binary "$i"
-    done
+          newusers pwck pwconv pwunconv useradd userdel usermod sg
     
     ### fix licenses
-    add_file "/usr/share/licenses/file/COPYING"
-    add_file "/usr/share/licenses/bzip2/LICENSE"
-    add_file "/usr/share/licenses/hdparm/LICENSE.TXT"
-    add_file "/usr/share/licenses/ncurses/COPYING"
-    add_file "/usr/share/licenses/pcre/LICENSE"
-    add_file "/usr/share/licenses/sdparm/LICENSE" 
-    add_file "/usr/share/licenses/zlib/LICENSE"
+    map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
+        "/usr/share/licenses/hdparm/LICENSE.TXT" "/usr/share/licenses/ncurses/COPYING" \
+        "/usr/share/licenses/pcre/LICENSE" "/usr/share/licenses/sdparm/LICENSE" \
+        "/usr/share/licenses/zlib/LICENSE"
 }
 
 help ()

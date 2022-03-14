@@ -5,8 +5,7 @@ build ()
 {
     add_binary "dnsmasq"
     add_file "/etc/dnsmasq.conf"
-    add_dir "/var/db"
-    add_dir "/var/lib/misc"
+    map add_dir "/var/db" "/var/lib/misc"
 }
 
 help ()

@@ -3,13 +3,10 @@
 
 build ()
 {
-    apps="genfstab arch-chroot pacstrap \
+    map add_binary genfstab arch-chroot pacstrap \
           archboot-$(uname -m)-release.sh \
           archboot-restore-usbstick.sh isoinfo archboot-copy-mountpoint.sh \
-          archboot-rsync-backup.sh archboot-binary-check.sh"
-    for i in $apps; do
-        add_binary "$i"
-    done
+          archboot-rsync-backup.sh archboot-binary-check.sh
     add_file "/usr/lib/archboot/release_functions"
     add_file "/usr/bin/archboot-setup.sh" "/usr/bin/setup"
     add_file "/usr/bin/archboot-quickinst.sh" "/usr/bin/quickinst"

@@ -4,8 +4,7 @@
 build ()
 {
     add_checked_modules '/firmware/dmi-sysfs'
-    add_binary "dmidecode"
-    add_binary "biosdecode"
+    map add_binary dmidecode biosdecode
 }
 
 help ()

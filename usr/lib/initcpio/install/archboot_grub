@@ -3,26 +3,19 @@
 
 build ()
 {
-    apps="grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
+    map add_binary grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
           grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath \
 	  grub-mount grub-script-check grub-bios-setup \
 	  grub-ofpathname grub-probe grub-kbdcomp grub-mkrescue grub-mkstandalone grub-install \
-              grub-mkconfig grub-mknetdir grub-reboot grub-set-default"
-    for i in $apps; do
-        add_binary "$i"
-    done
+              grub-mkconfig grub-mknetdir grub-reboot grub-set-default
     ## add grub-mkconfig helper scripts
-    add_file "/usr/share/grub/grub-mkconfig_lib"
-    add_file "/etc/default/grub"
-
+    map add_file "/usr/share/grub/grub-mkconfig_lib" "/etc/default/grub"
     add_full_dir "/etc/grub.d"
-    
     if [[ "$(uname -m)" == "x86_64" ]]; then
         # add bios and x86_64-efi files
         # i386 efi is very rare. They are only used in old Macs, 
         # in which the kernel itself has issues booting in EFI mode
-        add_full_dir /usr/lib/grub/i386-pc  
-        add_full_dir /usr/lib/grub/x86_64-efi
+        map add_full_dir /usr/lib/grub/i386-pc /usr/lib/grub/x86_64-efi
     fi
     
     if [[ "$(uname -m)" == "aarch64" ]]; then

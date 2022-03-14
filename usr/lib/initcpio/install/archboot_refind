@@ -4,16 +4,11 @@
 build ()
 {
     add_file "/usr/share/refind/refind_x64.efi"
-    add_full_dir "/usr/share/refind/drivers_x64"
-    add_full_dir "/usr/share/refind/tools_x64"
-    
-    add_full_dir "/usr/share/refind/keys"
+    map add_full_dir "/usr/share/refind/drivers_x64" "/usr/share/refind/tools_x64" \
+        /usr/share/refind/keys
     add_file "/usr/share/refind/refind.conf-sample"
     
-    apps="refind-install refind-mkfont mkrlconf mvrefind"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary refind-install refind-mkfont mkrlconf mvrefind
 }
 
 help ()

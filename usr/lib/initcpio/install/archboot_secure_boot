@@ -5,21 +5,17 @@ build ()
 {
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
     _RUNNING_ARCH="$(uname -m)"
-    apps="openssl cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
+    map add_binary openssl cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
           hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
-          sbsiglist sbsign sbvarsign sbverify mokutil"
+          sbsiglist sbsign sbvarsign sbverify mokutil
     add_file "/etc/ssl/openssl.cnf"
-    for i in $apps; do
-        add_binary "$i"
-    done
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
     # modiiied to use uuidgen instead of python
     add_file "/usr/bin/archboot-mkkeys.sh" "/usr/bin/mkkeys.sh"
     # add efitools files
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && add_file "/usr/share/efitools/efi/PreLoader.efi"
-    add_file "/usr/share/efitools/efi/HashTool.efi"
-    add_file "/usr/share/efitools/efi/KeyTool.efi"
+    map add_file "/usr/share/efitools/efi/HashTool.efi" "/usr/share/efitools/efi/KeyTool.efi"
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         for i in shimx64.efi mmx64.efi mmia32.efi shimia32.efi; do
             add_file "/usr/share/archboot/bootloader/${i}"

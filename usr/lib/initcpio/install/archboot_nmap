@@ -3,10 +3,7 @@
 
 build ()
 {
-    apps="nmap ncat nping"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary nmap ncat nping
     add_full_dir "/usr/share/nmap"
     add_file "/usr/share/licenses/nmap/LICENSE"
 }

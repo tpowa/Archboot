@@ -4,10 +4,7 @@
 build ()
 {
     add_checked_modules 'md/dm-*'
-    apps="dmsetup dmeventd blkdeactivate dmstats"
-     for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary dmsetup dmeventd blkdeactivate dmstats
     add_dir "/dev/mapper"
     add_full_dir "/usr/lib/device-mapper"
     for i in /usr/lib/libdevmapper*; do

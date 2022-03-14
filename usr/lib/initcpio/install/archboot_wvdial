@@ -3,8 +3,7 @@
 
 build ()
 {
-    add_binary "wvdial"
-    add_binary "wvdialconf"
+    map add_binary wvdial wvdialconf
     # add license
     add_file "/usr/share/licenses/wvdial/LICENSE"
 }

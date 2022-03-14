@@ -26,11 +26,8 @@ build ()
         add_binary "$i"
         rm /usr/bin/"$i"
     done
-    add_file "/etc/nilfs_cleanerd.conf"
-    add_file "/etc/fuse.conf"
-    add_file "/etc/nvme/discovery.conf"
-    add_full_dir "/etc/cifs-utils"
-    add_full_dir "etc/request-key.d"
+    map add_file "/etc/nilfs_cleanerd.conf" "/etc/fuse.conf" "/etc/nvme/discovery.conf"
+    map add_full_dir "/etc/cifs-utils" "etc/request-key.d"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }

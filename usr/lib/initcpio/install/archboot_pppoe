@@ -3,11 +3,8 @@
 
 build ()
 {
-    apps="pppoe pppoe-connect pppoe-relay pppoe-server \
-          pppoe-setup pppoe-sniff pppoe-start pppoe-status pppoe-stop"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary pppoe pppoe-connect pppoe-relay pppoe-server \
+          pppoe-setup pppoe-sniff pppoe-start pppoe-status pppoe-stop
     add_full_dir "/usr/lib/rp-pppoe"
 }
 

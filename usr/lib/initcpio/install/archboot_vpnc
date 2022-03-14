@@ -3,13 +3,8 @@
 
 build ()
 {
-    apps="pcf2vpnc vpnc vpnc-disconnect"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_file "/etc/vpnc/default.conf"
-    add_file "/etc/vpnc/vpnc-script"
-
+    map add_binary pcf2vpnc vpnc vpnc-disconnect
+    map add_file "/etc/vpnc/default.conf" "/etc/vpnc/vpnc-script"
 }
 
 help ()

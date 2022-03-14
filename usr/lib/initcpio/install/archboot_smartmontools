@@ -3,12 +3,8 @@
 
 build ()
 {
-    apps="smartctl smartd update-smart-drivedb"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_file "/etc/conf.d/smartd"
-    add_file "/etc/smartd.conf"
+    map add_binary smartctl smartd update-smart-drivedb
+    map add_file "/etc/conf.d/smartd" "/etc/smartd.conf"
 }
 
 help ()

@@ -4,10 +4,7 @@
 build ()
 {
     add_checked_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' -f 'bnx2x' -f 'bna' -f 'softing_cs' -f 'qed' '/drivers/net/'
-    apps="route ip dhcpcd"
-    for i in $apps; do
-        add_binary "$i"
-    done
+    map add_binary route ip dhcpcd
     add_full_dir "/usr/lib/dhcpcd"
     # start dhcpcd on startup
     add_symlink "/etc/systemd/system/multi-user.target.wants/dhcpcd.service" "/usr/lib/systemd/system/dhcpcd.service"

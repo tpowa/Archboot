@@ -3,12 +3,9 @@
 
 build ()
 {
-    add_binary "usb_modeswitch"
-    add_binary "usb_modeswitch_dispatcher"
-    add_file "/etc/usb_modeswitch.conf"
-    add_full_dir "/etc/usb_modeswitch.d"
-    add_file "/etc/usb_modeswitch.setup"
-    add_full_dir "/usr/share/usb_modeswitch"
+    map add_binary usb_modeswitch usb_modeswitch_dispatcher
+    map add_file "/etc/usb_modeswitch.conf" "/etc/usb_modeswitch.setup"
+    map add_full_dir "/etc/usb_modeswitch.d" "/usr/share/usb_modeswitch"
     add_dir "/var/lib/usb_modeswitch"
 }
 

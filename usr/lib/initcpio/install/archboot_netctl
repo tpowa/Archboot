@@ -3,18 +3,13 @@
 
 build ()
 {
-    apps="netctl-auto wifi-menu netctl"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_full_dir "/usr/lib/netctl/"
-    add_full_dir "/etc/netctl/"
+    map add_binary netctl-auto wifi-menu netctl
+    map add_full_dir "/usr/lib/netctl/" "/etc/netctl/"
     add_file "/etc/ifplugd/netctl.action"
     # add openresolv depends
     add_binary "resolvconf"
-    add_file "/etc/resolvconf.conf"
+    map add_file "/etc/resolvconf.conf" "/usr/share/licenses/openresolv/LICENSE"
     add_full_dir "/usr/lib/resolvconf/"
-    add_file "/usr/share/licenses/openresolv/LICENSE"
 }
 
 help ()

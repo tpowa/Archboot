@@ -3,17 +3,13 @@
 
 build ()
 {
-    apps="lvmdump lvmconfig vgimportclone fsadm vgcfgbackup vgcfgrestore vgchange \
+    map add_binary lvmdump lvmconfig vgimportclone fsadm vgcfgbackup vgcfgrestore vgchange \
           vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes \
           vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay \
           pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay \
           lvextend lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs \
-          lvscan lvm_import_vdo lvmdevices lvmpolld vgimportdevices"
-    for i in $apps; do
-        add_binary "$i"
-    done
-    add_dir "/etc/lvm/backup/"
-    add_dir "/etc/lvm/archive/"
+          lvscan lvm_import_vdo lvmdevices lvmpolld vgimportdevices
+    map add_dir "/etc/lvm/backup/" "/etc/lvm/archive/"
     for i in /usr/lib/liblvm*; do
         add_file "$i"
     done
