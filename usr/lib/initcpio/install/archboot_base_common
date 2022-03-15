@@ -71,14 +71,14 @@ build ()
     map add_full_dir "/etc/dbus-1" "/usr/share/dbus-1"
 
     #systemd files
-    map add_binary busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
+    map add_binary systemd-umount busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl networkctl systemctl systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop \
           systemd-delta systemd-detect-virt systemd-escape systemd-firstboot systemd-hwdb systemd-inhibit systemd-machine-id-setup \
           systemd-mount systemd-notify systemd-nspawn systemd-path systemd-resolve \
           systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers \
           systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
-          systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext systemd-umount
+          systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext
     map add_dir "/etc/tmpfiles.d" "/etc/modules-load.d" "/etc/binfmt.d/" "/var/lib/systemd"
     map add_full_dir "/etc/sysctl.d/"  "/etc/systemd" "/etc/xdg"  "/usr/lib/systemd"  "/usr/share/systemd"  "/usr/share/factory" \
                      "/usr/share/polkit-1" "/usr/lib/tmpfiles.d" "/usr/lib/modules-load.d"
