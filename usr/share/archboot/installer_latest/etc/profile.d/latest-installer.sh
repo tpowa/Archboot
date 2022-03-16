@@ -13,8 +13,8 @@ if [[ "${TTY}" == "tty1" ]]; then
     echo "Starting assembling of latest archboot environment with package cache..."
     echo ""
     echo "Running now: update-installer.sh -latest-install"
-    update-installer.sh -latest-install
+    update-installer.sh -latest-install | tee -a >/dev/ttyS0
 elif [[ "${TTY}" == "ttyS0" ]]; then
     echo "Running update-installer.sh -latest-install on tty1, please wait ..."
-    echo "Logging is done on tty7 ..."
+    echo "Progress is shown here ..."
 fi

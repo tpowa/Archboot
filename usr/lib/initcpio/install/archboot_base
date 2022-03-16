@@ -3,7 +3,7 @@
 
 build ()
 {
-    map add_binary getent head id cksum tail tee test tr uptime w who which whoami xargs \
+    map add_binary getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp chown df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
           mktemp chroot dirname expr bzip2 su cpio gzip top sdparm tput \

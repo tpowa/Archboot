@@ -3,7 +3,7 @@
 
 build ()
 {
-    map add_binary stat realpath install readlink ln mktemp depmod tee modinfo chown xz ldd
+    map add_binary stat realpath install readlink ln mktemp depmod modinfo chown xz ldd
     apps="getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
