@@ -131,7 +131,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cd initrd || exit 1
     #from /usr/bin/mkinitpcio.conf
     # compress image with zstd
-    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |\
+    find . -mindepth 1 -printf '%P\0' | sort -z |
+    LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
     cd ..
     echo "Step 7/8: Remove /initrd ..."
