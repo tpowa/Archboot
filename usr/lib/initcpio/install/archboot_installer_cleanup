@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # save RAM with deleting already copied content
+    rm -rf "/var/cache/pacman/pkg"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook removes package cache of archboot_installer hook,
+  for update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!
+HELPEOF
+}
