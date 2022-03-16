@@ -3,7 +3,6 @@
 
 build ()
 {
-    map add_binary stat realpath install readlink ln mktemp depmod modinfo chown xz ldd
     apps="getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
@@ -32,36 +31,15 @@ build ()
         apps="i386 x86_64 $apps"
     fi
     for i in $apps; do
-        add_binary "$i"
         rm /usr/bin/"$i"
     done
-    ### add zsh
-    map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
-    
-    ### add en_US.utf8 locale
-    add_file "/usr/lib/locale/locale-archive"
-
-    ### adding passwd file for correct shell
-    add_file "/usr/share/archboot/base/etc/passwd" "/etc/passwd"
-    ### fix file
-    add_file "/usr/share/file/misc/magic.mgc"
-    
-    ### add shadow
-    map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
-          chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg
-    
-    ### fix licenses
-    map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
-        "/usr/share/licenses/hdparm/LICENSE.TXT" "/usr/share/licenses/ncurses/COPYING" \
-        "/usr/share/licenses/pcre/LICENSE" "/usr/share/licenses/sdparm/LICENSE" \
-        "/usr/share/licenses/zlib/LICENSE"
 }
 
 help ()
 {
 cat <<HELPEOF
-  This hook sets up base for a update installer routine.
+  This hook cleans up binaries of archboot_base,
+  for a update installer routine.
   DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }

@@ -3,15 +3,14 @@
 
 build ()
 {
-    # add firmware files and licenses
-    map add_full_dir "/lib/firmware" "/usr/share/licenses/linux-firmware"
     rm -r "/lib/firmware"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes linux-firmware on an update installer routine.
+  This hook cleans up binaries of archboot_firmware,
+  for update installer routine.
   DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }

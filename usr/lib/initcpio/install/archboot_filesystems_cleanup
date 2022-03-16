@@ -3,7 +3,6 @@
 
 build ()
 {
-    add_checked_modules '/kernel/fs'
     apps="mkswap badblocks blkid debugfs dumpe2fs e2fsck e2image e2undo findfs fsck \
           logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
           jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs \
@@ -23,20 +22,15 @@ build ()
 	  xfs_scrub xfs_scrub_all xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
 	  xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in $apps; do
-        add_binary "$i"
         rm /usr/bin/"$i"
     done
-    map add_file "/etc/nilfs_cleanerd.conf" "/etc/fuse.conf" "/etc/nvme/discovery.conf"
-    map add_full_dir "/etc/cifs-utils" "etc/request-key.d"
-    # fix licenses
-    add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook is responsible for including filesystems 
-  on update installer routine.
+  This hook cleans up binaries of archboot_filesystems hook,
+  for update installer routine.
   DO NOT USE ON REGULAR SYSTEM!.
 HELPEOF
 }
