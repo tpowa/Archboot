@@ -133,7 +133,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # compress image with zstd
     find . -mindepth 1 -printf '%P\0' | sort -z |
     LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 > /initrd.img || exit 1
+    LANG=C bsdtar --null -cf - --format=newc @- | lz4 -l > /initrd.img || exit 1
     cd ..
     echo "Step 7/8: Remove /initrd ..."
     rm -r "/initrd" || exit 1

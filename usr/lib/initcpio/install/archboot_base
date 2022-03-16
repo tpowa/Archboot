@@ -26,7 +26,7 @@ build ()
           tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
-          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat
+          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4c lz4cat unlz4 gunzip zcat
     [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64
     ### add zsh
     map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
