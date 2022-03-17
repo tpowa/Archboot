@@ -871,13 +871,12 @@ install_modules() {
         return 0
     fi
     for i in "$@"; do
-        install -D -m644 "$i" "$BUILDROOT"
+        install -D -m644 "$i" "$BUILDROOT/$i"
     done
 
     msg "Generating module dependencies"
     install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.builtin
     install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.order
-
     depmod -b "$BUILDROOT" "$KERNELVERSION"
 
     # remove all non-binary module.* files (except devname for on-demand module loading)
