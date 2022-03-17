@@ -876,6 +876,7 @@ install_modules() {
 
     msg "Generating module dependencies"
     install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.builtin
+    install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.order
 
     depmod -b "$BUILDROOT" "$KERNELVERSION"
 
