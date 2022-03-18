@@ -111,6 +111,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1)
+        # add the db too on reboot
+        install -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
     else
         [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
     fi
