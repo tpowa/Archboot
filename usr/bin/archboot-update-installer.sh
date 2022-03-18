@@ -101,6 +101,10 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     done
     echo "Step 2/8: Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
+    # wait until pacman-key is finished
+    while ps aux | grep pacman | grep -q batch; do
+        sleep 1
+    done
     # create container without package cache
     [[ "${_L_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1)
     # Switch offline mode
