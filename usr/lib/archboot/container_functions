@@ -131,7 +131,7 @@ _install_base_packages() {
 
 _install_archboot() {
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    pacman --root "${1}" -Sy "${_ARCHBOOT}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+    pacman --root "${1}" -Sy "${_ARCHBOOT}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _aarch64_install_base_packages() {
