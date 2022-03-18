@@ -6,13 +6,13 @@ TITLE="Arch Linux Installation --> https://wiki.archlinux.org/Archboot"
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!
 # check first if bootet in archboot
-#if grep -qw archoot /etc/hostname; then
+if grep -qw archboot /etc/hostname; then
     DESTDIR="/install"
     LOG="/dev/tty7"
-#else
-#    DESTDIR="/"
-#    LOG="/dev/tty8"
-#fi
+else
+    DESTDIR="/"
+    LOG="/dev/tty8"
+fi
 RUNNING_ARCH="$(uname -m)"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
