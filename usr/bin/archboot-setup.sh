@@ -4167,7 +4167,7 @@ do_grub_uefi() {
 
 select_source() {
     NEXTITEM="2"
-    if [[ -e "${LOCAL_DB}" ]] then
+    if [[ -e "${LOCAL_DB}" ]]; then
         getsource || return 1
     else
         if [[ ${S_NET} -eq 0 ]]; then
