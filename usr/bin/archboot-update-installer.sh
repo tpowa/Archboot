@@ -11,8 +11,8 @@ _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master"
 
 kver() {
     # get kernel version from installed kernel
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="${_W_DIR}/boot/vmlinuz-linux"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="${_W_DIR}/boot/Image"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="/vmlinuz-linux"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="/Image"
     if [[ -f "${VMLINUZ}" ]]; then
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
@@ -103,8 +103,13 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "          This will need some time ..."
     # create container without package cache
     [[ "${_L_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1)
+    # Switch offline mode
     # create container with package cache
-    [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
+    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1)
+    else
+        [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
+    fi
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
     echo "Step 3/8: Moving kernel from ${_W_DIR} to / ..."
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 

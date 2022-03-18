@@ -1,0 +1,8 @@
+# vim:set ft=sh:
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+# mkinitcpio config file, defaulted to stock config file
+MKINITCPIO_CONFIG="/etc/archboot/x86_64-offline.conf"
+
+# kernel version, defaulted to build for runtime kernel
+ALL_kver="/boot/vmlinuz-linux"
