@@ -5,7 +5,7 @@ build ()
 {
     source /etc/archboot/defaults
     # only include cachedir on booted archboot or container
-    for i in "${_ISO_HOME_SOURCE}"/"${_DIR}"/*;do
+    for i in "${_ISO_HOME_SOURCE}""${_DIR}"/*;do
         [[ ! -L "${i}" ]] && add_file "$i" "/var/cache/pacman/pkg/$(basename $i)"
     done
     # fix symlinks
