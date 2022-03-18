@@ -22,7 +22,7 @@ kver() {
 }
 
 usage () {
-	echo "Update installer, launch latest environment or create latest image files:"
+    echo "Update installer, launch latest environment or create latest image files:"
     echo "-------------------------------------------------------------------------"
     echo "PARAMETERS:"
     echo " -u             Update scripts: setup, quickinst, tz, km and helpers."
