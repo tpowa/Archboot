@@ -33,10 +33,6 @@ INTEL_UCODE="intel-ucode.img"
 # name of amd ucode initramfs image
 AMD_UCODE="amd-ucode.img"
 
-PACMAN_CONF=""
-# abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
-
 # downloader
 DLPROG="wget"
 # sources
@@ -2445,6 +2441,7 @@ _mkfs() {
 
 getsource() {
     S_SRC=0
+    PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
         custom_pacman_conf
         S_SRC=1
@@ -2452,11 +2449,13 @@ getsource() {
         select_mirror || return 1
         S_SRC=1
     fi
+    # abstract the common pacman args
+    PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 }
 
 custom_pacman_conf() {
     NEXTITEM="4"
-        _PACMAN_CONF="$(mktemp tmp/pacman.conf.XXX)"
+        _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
         #shellcheck disable=SC2129
         echo "[options]" >> "${_PACMAN_CONF}"
         echo "Architecture = auto" >> "${_PACMAN_CONF}"
