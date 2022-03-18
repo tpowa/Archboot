@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # we rely on some output which is parsed in english!
 unset LANG
+LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 ANSWER="/tmp/.setup"
-TITLE="Arch Linux Installation --> https://wiki.archlinux.org/Archboot"
+if [[ -e "${LOCAL_DB}" ]]; then
+    TITLE="Arch Linux Installation (Local mode) --> https://wiki.archlinux.org/Archboot"
+else
+    TITLE="Arch Linux Installation (Online mode) --> https://wiki.archlinux.org/Archboot"
+fi
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!
 # check first if bootet in archboot
@@ -38,7 +43,6 @@ DLPROG="wget"
 # sources
 SYNC_URL=""
 MIRRORLIST="/etc/pacman.d/mirrorlist"
-LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 unset PACKAGES
 
 # partitions

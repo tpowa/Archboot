@@ -17,6 +17,6 @@ help ()
 {
 cat<<HELPEOF
   This hook includes the archboot sources to
-  /var/cache/pacman/pkg
+  /var/cache/pacman/pkg for local installation.
 HELPEOF
 }
