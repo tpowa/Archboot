@@ -98,3 +98,9 @@ _fix_aarch64_network() {
     rm "${1}"/etc/resolv.conf
     echo "nameserver 8.8.8.8" > "${1}"/etc/resolv.conf
 }
+
+_create_archboot_db() {
+    echo "Creating archboot repository db ..."
+    #shellcheck disable=SC2046
+    LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
+}

@@ -25,7 +25,8 @@ _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
     # create container
-    archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc -cp --install-source="${2}" || exit 1
+    archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
     echo "Generate ISO ..."
     # generate iso in container
