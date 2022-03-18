@@ -156,7 +156,7 @@ _grub_mkrescue() {
 }
 
 _reproducibility_iso() {
-    echo "Create reproducable UUIDs on ${_IMAGENAME}.iso GPT ..."
+    echo "Create reproducible UUIDs on ${_IMAGENAME}.iso GPT ..."
     sgdisk -u 1:1 "${_IMAGENAME}.iso" >/dev/null 2>&1
     sgdisk -u 2:2 "${_IMAGENAME}.iso" >/dev/null 2>&1
     sgdisk -u 3:3 "${_IMAGENAME}.iso" >/dev/null 2>&1
