@@ -70,7 +70,7 @@ DIALOG() {
 #
 chroot_mount()
 {
-    if grep -qw archoot /etc/hostname; then
+    if grep -qw archboot /etc/hostname; then
         [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
         [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
         [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
@@ -87,7 +87,7 @@ chroot_mount()
 #
 chroot_umount()
 {
-    if grep -qw archoot /etc/hostname; then
+    if grep -qw archboot /etc/hostname; then
         umount -R "${DESTDIR}/proc"
         umount -R "${DESTDIR}/sys"
         umount -R "${DESTDIR}/dev"
