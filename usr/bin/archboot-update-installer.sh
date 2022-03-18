@@ -22,24 +22,24 @@ kver() {
 }
 
 usage () {
-	echo "Update installer, launch latest environment or create latest image files:"
-	echo "-------------------------------------------------------------------------"
-	echo "PARAMETERS:"
-	echo " -u             Update scripts: setup, quickinst, tz, km and helpers."
-	echo ""
-        echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
-	echo " -latest          Launch latest archboot environment (using kexec)."
-        echo "                  This operation needs at least 2.4 GB RAM."
-        echo ""
-        echo " -latest-install  Launch latest archboot environment with downloaded"
-        echo "                  package cache (using kexec)."
-        echo "                  This operation needs at least 2.9 GB RAM."
-        echo ""
-        echo " -latest-image    Generate latest image files in /archboot-release directory"
-        echo "                  This operation needs at least 3.3 GB RAM."
-        echo ""
-	echo " -h               This message."
-	exit 0
+    echo "Update installer, launch latest environment or create latest image files:"
+    echo "-------------------------------------------------------------------------"
+    echo "PARAMETERS:"
+    echo " -u             Update scripts: setup, quickinst, tz, km and helpers."
+    echo ""
+    echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
+    echo " -latest          Launch latest archboot environment (using kexec)."
+    echo "                  This operation needs at least 2.4 GB RAM."
+    echo ""
+    echo " -latest-install  Launch latest archboot environment with downloaded"
+    echo "                  package cache (using kexec)."
+    echo "                  This operation needs at least 2.9 GB RAM."
+    echo ""
+    echo " -latest-image    Generate latest image files in /archboot-release directory"
+    echo "                  This operation needs at least 3.3 GB RAM."
+    echo ""
+    echo " -h               This message."
+    exit 0
 }
 
 [[ -z "${1}" ]] && usage
@@ -110,9 +110,9 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # Switch offline mode
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1)
         # add the db too on reboot
-        install -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
+        install -D -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
+        [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1)
     else
         [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
     fi
