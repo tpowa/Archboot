@@ -33,13 +33,16 @@ INTEL_UCODE="intel-ucode.img"
 # name of amd ucode initramfs image
 AMD_UCODE="amd-ucode.img"
 
+PACMAN_CONF=""
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+
 # downloader
 DLPROG="wget"
 # sources
 SYNC_URL=""
 MIRRORLIST="/etc/pacman.d/mirrorlist"
+LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 unset PACKAGES
 
 # partitions
@@ -2442,8 +2445,26 @@ _mkfs() {
 
 getsource() {
     S_SRC=0
-    select_mirror || return 1
-    S_SRC=1
+    if [[ -e "${LOCAL_DB}" ]]; then
+        custom_pacman_conf
+        S_SRC=1
+    else
+        select_mirror || return 1
+        S_SRC=1
+    fi
+}
+
+custom_pacman_conf() {
+    NEXTITEM="4"
+        _PACMAN_CONF="$(mktemp tmp/pacman.conf.XXX)"
+        #shellcheck disable=SC2129
+        echo "[options]" >> "${_PACMAN_CONF}"
+        echo "Architecture = auto" >> "${_PACMAN_CONF}"
+        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
+        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
+        echo "[archboot]" >> "${_PACMAN_CONF}"
+        echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+        PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
 # select_mirror()
@@ -4146,12 +4167,16 @@ do_grub_uefi() {
 
 select_source() {
     NEXTITEM="2"
-    if [[ ${S_NET} -eq 0 ]]; then
+    if [[ -e "${LOCAL_DB}" ]] then
+        getsource || return 1
+    else
+        if [[ ${S_NET} -eq 0 ]]; then
             check_nework || return 1
+        fi
+        [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
+        TITLE="Arch Linux Installation"
+        getsource || return 1
     fi
-    [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
-    TITLE="Arch Linux Installation"
-    getsource || return 1
     NEXTITEM="3"
 }
 
