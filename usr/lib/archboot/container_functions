@@ -158,6 +158,11 @@ _copy_mirrorlist_and_pacman_conf() {
     grep -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf
 }
 
+_copy_archboot_defaults() {
+    echo "Copy archboot defaults to container ..."
+    ! grep -qw 'archboot' /etc/hostname && cp /etc/archboot/defaults "${1}"/etc/archboot/defaults
+}
+
 _reproducibility() {
     echo "Reproducibility changes ..."
     sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}"/var/lib/pacman/local/*/desc

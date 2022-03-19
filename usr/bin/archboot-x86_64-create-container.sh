@@ -23,6 +23,7 @@ _clean_container "${1}"
 _clean_archboot_cache
 _generate_keyring "${1}" || exit 1
 _copy_mirrorlist_and_pacman_conf "${1}"
+_copy_archboot_defaults "${1}"
 _change_pacman_conf "${1}" || exit 1
 # enable [testing] if enabled in host
 if grep -q "^\[testing" /etc/pacman.conf; then
