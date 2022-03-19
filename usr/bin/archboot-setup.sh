@@ -3,11 +3,7 @@
 unset LANG
 LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 ANSWER="/tmp/.setup"
-if [[ -e "${LOCAL_DB}" ]]; then
-    TITLE="Arch Linux Installation (Local mode) --> wiki.archlinux.org/title/Archboot"
-else
-    TITLE="Arch Linux Installation (Online mode) --> wiki.archlinux.org/title/Archboot"
-fi
+
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!
 # check first if bootet in archboot
@@ -58,6 +54,14 @@ S_CONFIG=0      # configuration editing
 
 # menu item tracker- autoselect the next item
 NEXTITEM=""
+
+set_title() {
+    if [[ -e "${LOCAL_DB}" ]]; then
+        TITLE="Arch Linux Installation (Local mode) --> wiki.archlinux.org/title/Archboot"
+    else
+        TITLE="Arch Linux Installation (Online mode) --> wiki.archlinux.org/title/Archboot"
+    fi
+}
 
 # DIALOG()
 # an el-cheapo dialog wrapper
@@ -2448,9 +2452,10 @@ getsource() {
     PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
         custom_pacman_conf
-        DIALOG --msgbox "Running in Local mode. Local package cache is used.\n\nIf you want to switch to Online mode, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 8 60
+        DIALOG --msgbox "Setup is running in Local mode. Local package cache is used.\n\nIf you want to switch to Online mode, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 8 60
         S_SRC=1
     else
+
         select_mirror || return 1
         S_SRC=1
     fi
@@ -4177,6 +4182,7 @@ do_grub_uefi() {
 
 select_source() {
     NEXTITEM="2"
+    set_title
     if [[ -e "${LOCAL_DB}" ]]; then
         getsource || return 1
     else
@@ -4805,6 +4811,8 @@ if [[ -e /tmp/.setup-running ]]; then
 fi
 : >/tmp/.setup-running
 : >/tmp/.setup
+
+set_title
 
 DIALOG --msgbox "Welcome to the Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your VC7 console (ALT-F7). ALT-F1 will bring you back here." 14 65
 
