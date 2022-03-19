@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
+LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 DESTDIR="${1}"
-
-PACMAN="pacman --root ${DESTDIR} --cachedir ${DESTDIR}/var/cache/pacman/pkg --noconfirm"
-
+RUNNING_ARCH="$(uname -m)"
 # name of kernel package
 KERNELPKG="linux"
 # name of the kernel image
-VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image.gz"
+
+custom_pacman_conf() {
+    NEXTITEM="4"
+        _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
+        #shellcheck disable=SC2129
+        echo "[options]" >> "${_PACMAN_CONF}"
+        echo "Architecture = auto" >> "${_PACMAN_CONF}"
+        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
+        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
+        echo "[archboot]" >> "${_PACMAN_CONF}"
+        echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+        PACMAN_CONF="--config ${_PACMAN_CONF}"
+}
 
 usage() {
     echo "quickinst <destdir>"
@@ -14,11 +27,14 @@ usage() {
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
     echo
-    echo "First configure /etc/pacman.conf which repositories to use"
-    echo "and set a mirror in /etc/pacman.d/mirrorlist"
-    echo ""
+    if ! [[ -e "${LOCAL_DB}" ]]; then
+        echo "First configure /etc/pacman.conf which repositories to use"
+        echo "and set a mirror in /etc/pacman.d/mirrorlist"
+    fi
+    echo
     echo "Make sure you have all your filesystems mounted under <destdir>."
-    echo "Then run this script to install all base packages to <destdir>."
+    echo "Then run this script to install all packages listed in /etc/archboot/defaults"
+    echo "to <destdir>."
     echo
     echo "Example:"
     echo "  quickinst /mnt"
@@ -142,6 +158,13 @@ if [[ -z "${1}" ]]; then
 fi
 
 ! [[ -d /tmp ]] && mkdir /tmp
+
+if [[ -e "${LOCAL_DB}" ]]; then
+    custom_pacman_conf
+else
+    PACMAN_CONF=""
+fi
+PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir ${DESTDIR}/var/cache/pacman/pkg --noconfirm"
 
 # prepare pacman
 prepare_pacman || (echo "Pacman preparation FAILED!"; return 1)
