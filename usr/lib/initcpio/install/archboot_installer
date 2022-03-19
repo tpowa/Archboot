@@ -10,6 +10,7 @@ build ()
     add_file "/usr/lib/archboot/release_functions"
     add_file "/usr/bin/archboot-setup.sh" "/usr/bin/setup"
     add_file "/usr/bin/archboot-quickinst.sh" "/usr/bin/quickinst"
+    add_file "/etc/archboot/defaults"
 }
 
 help ()
