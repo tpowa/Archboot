@@ -4,9 +4,9 @@ unset LANG
 LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 ANSWER="/tmp/.setup"
 if [[ -e "${LOCAL_DB}" ]]; then
-    TITLE="Arch Linux Installation (Local mode) --> https://wiki.archlinux.org/Archboot"
+    TITLE="Arch Linux Installation (Local mode) --> wiki.archlinux.org/title/Archboot"
 else
-    TITLE="Arch Linux Installation (Online mode) --> https://wiki.archlinux.org/Archboot"
+    TITLE="Arch Linux Installation (Online mode) --> wiki.archlinux.org/title/Archboot"
 fi
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!
