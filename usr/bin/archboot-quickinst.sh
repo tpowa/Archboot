@@ -63,7 +63,10 @@ chroot_umount()
 
 # package_installation
 install_packages() {
-    PACKAGES="base linux linux-firmware"
+    # add packages from archboot defaults
+    PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
+    # fallback if _PACKAGES is empty
+    [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
         ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"

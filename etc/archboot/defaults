@@ -1,6 +1,6 @@
 # defaults for archboot
-# additional packages to install eg. firmware
-_PACKAGES="linux-firmware"
+# packages to install eg. firmware
+_PACKAGES="base linux linux-firmware"
 # grub config to use
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"

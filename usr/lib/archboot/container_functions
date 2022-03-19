@@ -125,8 +125,8 @@ _umount_special() {
 }
 
 _install_base_packages() {
-    echo "Installing packages base linux and ${_PACKAGES} to ${1} ..."
-    pacman --root "${1}" -Sy base linux "${_PACKAGES}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+    echo "Installing packages ${_PACKAGES} to ${1} ..."
+    pacman --root "${1}" -Sy "${_PACKAGES}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _install_archboot() {
@@ -135,11 +135,11 @@ _install_archboot() {
 }
 
 _aarch64_install_base_packages() {
-    echo "Installing packages base linux and ${_PACKAGES} to ${1} ..."
+    echo "Installing packages ${_PACKAGES} to ${1} ..."
     if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy base linux ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _aarch64_install_archboot() {

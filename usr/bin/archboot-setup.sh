@@ -2599,8 +2599,11 @@ install_packages() {
     fi
     prepare_pacman
     PACKAGES=""
-    DIALOG --yesno "Next step will install base, linux, linux-firmware, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
-    PACKAGES="base linux linux-firmware"
+    # add packages from archboot defaults
+    PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
+    # fallback if _PACKAGES is empty
+    [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
+    DIALOG --yesno "Next step will install ${PACKAGES}, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
     # Add packages which are not in core repository
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
