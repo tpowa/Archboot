@@ -2448,6 +2448,7 @@ getsource() {
     PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
         custom_pacman_conf
+        DIALOG --msgbox "Running in Local mode, local package cache is used. If you want to switch to Online mode, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 6 60
         S_SRC=1
     else
         select_mirror || return 1
@@ -4183,7 +4184,6 @@ select_source() {
             check_nework || return 1
         fi
         [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
-        TITLE="Arch Linux Installation"
         getsource || return 1
     fi
     NEXTITEM="3"
