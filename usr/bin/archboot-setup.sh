@@ -2633,7 +2633,7 @@ install_packages() {
     if ! [[ "$(dmraid_devices)" = "" ]]; then
         ! echo "${PACKAGES}" | grep -qw dmraid && PACKAGES="${PACKAGES} dmraid"
     fi
-    lsmod | grep -qw wl; then
+    if lsmod | grep -qw wl; then
         ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
     ### HACK:

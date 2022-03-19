@@ -92,7 +92,7 @@ install_packages() {
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
     fi
-    lsmod | grep -qw wl; then
+    if lsmod | grep -qw wl; then
         ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
     ### HACK:
