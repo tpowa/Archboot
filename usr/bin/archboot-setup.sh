@@ -2448,7 +2448,7 @@ getsource() {
     PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
         custom_pacman_conf
-        DIALOG --msgbox "Running in Local mode. Local package cache is used.\nIf you want to switch to Online mode, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 8 60
+        DIALOG --msgbox "Running in Local mode. Local package cache is used.\n\nIf you want to switch to Online mode, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 8 60
         S_SRC=1
     else
         select_mirror || return 1
