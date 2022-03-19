@@ -1,5 +1,5 @@
 # defaults for archboot
-# packages to install eg. firmware
+# packages to install (eg. firmware, kernel packages)
 _PACKAGES="base linux linux-firmware"
 # grub config to use
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
