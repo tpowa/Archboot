@@ -90,7 +90,7 @@ install_packages() {
         ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
     fi
     lsmod | grep -qw wl; then
-        ! echo "${PACKAGES}" | grep -w broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
+        ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
     ### HACK:
     # always add systemd-sysvcompat components

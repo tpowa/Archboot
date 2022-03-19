@@ -2628,10 +2628,10 @@ install_packages() {
         ! echo "${PACKAGES}" | grep -qw dosfstools && PACKAGES="${PACKAGES} dosfstools"
     fi
     if ! [[ "$(dmraid_devices)" = "" ]]; then
-        ! echo "${PACKAGES}" | grep -w dmraid && PACKAGES="${PACKAGES} dmraid"
+        ! echo "${PACKAGES}" | grep -qw dmraid && PACKAGES="${PACKAGES} dmraid"
     fi
     lsmod | grep -qw wl; then
-        ! echo "${PACKAGES}" | grep -w broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
+        ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
     ### HACK:
     # always add systemd-sysvcompat components
