@@ -6,7 +6,7 @@ RUNNING_ARCH="$(uname -m)"
 KERNELPKG="linux"
 # name of the kernel image
 [[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
-[[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image.gz"
+[[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 custom_pacman_conf() {
     NEXTITEM="4"
