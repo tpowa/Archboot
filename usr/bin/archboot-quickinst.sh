@@ -63,7 +63,6 @@ chroot_umount()
 
 # package_installation
 install_packages() {
-
     PACKAGES="base linux linux-firmware"
     # Add packages which are not in core repository
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
@@ -89,6 +88,9 @@ install_packages() {
     fi
     if [[ -n "$(pgrep dhclient)" ]]; then
         ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
+    fi
+    lsmod | grep -qw wl; then
+        ! echo "${PACKAGES}" | grep -w broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
     ### HACK:
     # always add systemd-sysvcompat components
