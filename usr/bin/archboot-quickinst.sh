@@ -9,7 +9,6 @@ KERNELPKG="linux"
 [[ "${RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 custom_pacman_conf() {
-    NEXTITEM="4"
         _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
         #shellcheck disable=SC2129
         echo "[options]" >> "${_PACMAN_CONF}"
