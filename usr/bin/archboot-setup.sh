@@ -2,7 +2,7 @@
 source /usr/lib/archboot/installer_common_functions
 ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
-# don't use /mnt because it's intended to mount other things there!
+# don't use DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
 if grep -qw archboot /etc/hostname; then
     DESTDIR="/install"
