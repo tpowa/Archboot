@@ -1,6 +1,5 @@
 #!/bin/bash
 source /usr/lib/archboot/installer_common_functions
-# we rely on some output which is parsed in english!
 ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!

@@ -1,5 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+# we rely on some output which is parsed in english!
 LANG=C.UTF8
 LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 RUNNING_ARCH="$(uname -m)"
