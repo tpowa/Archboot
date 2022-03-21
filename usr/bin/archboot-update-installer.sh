@@ -146,7 +146,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
     cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
-    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/common.sh
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     kver
     # write initramfs to /tmp
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1
