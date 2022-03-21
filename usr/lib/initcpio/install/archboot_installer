@@ -4,7 +4,7 @@
 build ()
 {
     map add_binary genfstab arch-chroot pacstrap \
-          archboot-$(uname -m)-release.sh \
+          archboot-"$(uname -m)"-release.sh \
           archboot-restore-usbstick.sh isoinfo archboot-copy-mountpoint.sh \
           archboot-rsync-backup.sh archboot-binary-check.sh
     add_file "/usr/lib/archboot/release_functions"
