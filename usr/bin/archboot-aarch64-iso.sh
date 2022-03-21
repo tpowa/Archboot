@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /usr/lib/archboot/common.sh
-source /usr/lib/archboot/iso.sh
+. /usr/lib/archboot/common.sh
+. /usr/lib/archboot/iso.sh
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /usr/lib/archboot/common.sh
-source /usr/lib/archboot/container.sh
+. /usr/lib/archboot/common.sh
+. /usr/lib/archboot/container.sh
 _ARCHBOOT="archboot-arm"
 _KEYRING="archlinuxarm"
 [[ -z "${1}" ]] && _usage

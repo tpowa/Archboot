@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /usr/lib/archboot/common.sh
-source /usr/lib/archboot/container.sh
+. /usr/lib/archboot/common.sh
+. /usr/lib/archboot/container.sh
 _CACHEDIR="${1}/var/cache/pacman/pkg"
 _ARCHBOOT="archboot"
 _KEYRING="archlinux"
