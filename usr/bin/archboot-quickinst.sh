@@ -194,8 +194,7 @@ echo "  # mount -t sysfs none ${DESTDIR}/sys"
 echo "  # chroot ${DESTDIR} /bin/bash"
 echo
 echo "Next step, initramfs setup:"
-echo "Edit your /etc/mkinitcpio.conf and /etc/mkinitcpio.d/${KERNELPKG}-fallback.conf"
-echo "to fit your needs. After that run:"
+echo "Edit your /etc/mkinitcpio.conf to fit your needs. After that run:"
 echo "# mkinitcpio -p ${KERNELPKG}"
 echo
 echo "Then exit your chroot shell, edit ${DESTDIR}/etc/fstab and reboot!"
