@@ -3,8 +3,8 @@
 
 build ()
 {
-    map add_file "/etc/archboot/defaults" "/usr/lib/archboot/functions" \
-    "/usr/lib/archboot/container_functions" "/usr/bin/archboot-$(uname -m)-create-container.sh"
+    map add_file "/etc/archboot/defaults" "/usr/lib/archboot/common.sh" \
+    "/usr/lib/archboot/container.sh" "/usr/bin/archboot-$(uname -m)-create-container.sh"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
 }
 
