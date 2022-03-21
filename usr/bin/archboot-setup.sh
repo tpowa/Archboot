@@ -1,9 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+source /usr/lib/archboot/installer_common_functions
 # we rely on some output which is parsed in english!
-unset LANG
-LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 ANSWER="/tmp/.setup"
-
 # use the first VT not dedicated to a running console
 # don't use /mnt because it's intended to mount other things there!
 # check first if bootet in archboot
@@ -14,44 +12,29 @@ else
     DESTDIR="/"
     LOG="/dev/tty8"
 fi
-RUNNING_ARCH="$(uname -m)"
 EDITOR=""
 _BLKID="blkid -c /dev/null"
 _LSBLK="lsblk -rpno"
-
-# name of kernel package
-KERNELPKG="linux"
-# name of the kernel image
-[[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
-if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-    VMLINUZ="Image.gz"
-    VMLINUZ_EFISTUB="Image"
-fi
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
 # name of intel ucode initramfs image
 INTEL_UCODE="intel-ucode.img"
 # name of amd ucode initramfs image
 AMD_UCODE="amd-ucode.img"
-
 # downloader
 DLPROG="wget"
 # sources
 SYNC_URL=""
 MIRRORLIST="/etc/pacman.d/mirrorlist"
-unset PACKAGES
-
 # partitions
 PART_ROOT=""
 ROOTFS=""
-
 # install stages
 S_SRC=0         # choose mirror
 S_NET=0         # network configuration
 S_MKFS=0        # formatting
 S_MKFSAUTO=0    # auto fs part/formatting
 S_CONFIG=0      # configuration editing
-
 # menu item tracker- autoselect the next item
 NEXTITEM=""
 
@@ -73,34 +56,6 @@ DIALOG() {
     return $?
 }
 
-# chroot_mount()
-# prepares target system as a chroot
-#
-chroot_mount()
-{
-    if grep -qw archboot /etc/hostname; then
-        [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
-        [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
-        [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
-        mount proc "${DESTDIR}/proc" -t proc -o nosuid,noexec,nodev 
-        mount sys "${DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
-        mount udev "${DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid 
-        mount devpts "${DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
-        mount shm "${DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
-    fi
-}
-
-# chroot_umount()
-# tears down chroot in target system
-#
-chroot_umount()
-{
-    if grep -qw archboot /etc/hostname; then
-        umount -R "${DESTDIR}/proc"
-        umount -R "${DESTDIR}/sys"
-        umount -R "${DESTDIR}/dev"
-    fi
-}
 
 getfstype()
 {
@@ -2451,29 +2406,16 @@ getsource() {
     S_SRC=0
     PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
-        custom_pacman_conf
+        NEXTITEM="4"
+        local_pacman_conf
         DIALOG --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
         S_SRC=1
     else
-
         select_mirror || return 1
         S_SRC=1
     fi
     # abstract the common pacman args
     PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
-}
-
-custom_pacman_conf() {
-    NEXTITEM="4"
-        _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
-        #shellcheck disable=SC2129
-        echo "[options]" >> "${_PACMAN_CONF}"
-        echo "Architecture = auto" >> "${_PACMAN_CONF}"
-        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
-        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
-        echo "[archboot]" >> "${_PACMAN_CONF}"
-        echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
-        PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
 # select_mirror()
@@ -2610,76 +2552,7 @@ install_packages() {
     # fallback if _PACKAGES is empty
     [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
     DIALOG --yesno "Next step will install ${PACKAGES}, netctl and filesystem tools for a minimal system.\n\nDo you wish to continue?" 10 50 || return 1
-    # Add packages which are not in core repository
-    if [[ -n "$(pgrep dhclient)" ]]; then
-        ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
-    fi
-    # Add filesystem packages
-    if lsblk -rnpo FSTYPE | grep -q btrfs; then
-        ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q nilfs2; then
-        ! echo "${PACKAGES}" | grep -qw nilfs-utils && PACKAGES="${PACKAGES} nilfs-utils"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q ext; then
-        ! echo "${PACKAGES}" | grep -qw e2fsprogs && PACKAGES="${PACKAGES} e2fsprogs"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q xfs; then
-        ! echo "${PACKAGES}" | grep -qw xfsprogs && PACKAGES="${PACKAGES} xfsprogs"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q jfs; then
-        ! echo "${PACKAGES}" | grep -qw jfsutils && PACKAGES="${PACKAGES} jfsutils"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q f2fs; then
-        ! echo "${PACKAGES}" | grep -qw f2fs-tools && PACKAGES="${PACKAGES} f2fs-tools"
-    fi
-    if lsblk -rnpo FSTYPE | grep -q vfat; then
-        ! echo "${PACKAGES}" | grep -qw dosfstools && PACKAGES="${PACKAGES} dosfstools"
-    fi
-    if ! [[ "$(dmraid_devices)" = "" ]]; then
-        ! echo "${PACKAGES}" | grep -qw dmraid && PACKAGES="${PACKAGES} dmraid"
-    fi
-    if lsmod | grep -qw wl; then
-        ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
-    fi
-    ### HACK:
-    # always add systemd-sysvcompat components
-    PACKAGES="${PACKAGES//\ systemd-sysvcompat\ / }"
-    PACKAGES="${PACKAGES} systemd-sysvcompat"
-    ### HACK:
-    # always add intel-ucode
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        PACKAGES="${PACKAGES//\ intel-ucode\ / }"
-        PACKAGES="${PACKAGES} intel-ucode"
-    fi
-    # always add amd-ucode
-    PACKAGES="${PACKAGES//\ amd-ucode\ / }"
-    PACKAGES="${PACKAGES} amd-ucode"
-    ### HACK:
-    # always add netctl with optdepends
-    PACKAGES="${PACKAGES//\ netctl\ / }"
-    PACKAGES="${PACKAGES} netctl"
-    PACKAGES="${PACKAGES//\ dhcpd\ / }"
-    PACKAGES="${PACKAGES} dhcpcd"
-    PACKAGES="${PACKAGES//\ wpa_supplicant\ / }"
-    PACKAGES="${PACKAGES} wpa_supplicant"
-    ### HACK:
-    # always add lvm2, cryptsetup and mdadm
-    PACKAGES="${PACKAGES//\ lvm2\ / }"
-    PACKAGES="${PACKAGES} lvm2"
-    PACKAGES="${PACKAGES//\ cryptsetup\ / }"
-    PACKAGES="${PACKAGES} cryptsetup"
-    PACKAGES="${PACKAGES//\ mdadm\ / }"
-    PACKAGES="${PACKAGES} mdadm"
-    ### HACK
-    # always add nano and vi
-    PACKAGES="${PACKAGES//\ nano\ / }"
-    PACKAGES="${PACKAGES} nano"
-    PACKAGES="${PACKAGES//\ vi\ / }"
-    PACKAGES="${PACKAGES} vi"
-    ### HACK: circular depends are possible in base, install filesystem first!
-    PACKAGES="${PACKAGES//\ filesystem\ / }"
-    PACKAGES="filesystem ${PACKAGES}"
+    auto_packages
     DIALOG --infobox "Package installation will begin in 3 seconds. You can watch the output in the progress window. Please be patient." 0 0
     sleep 3
     run_pacman
@@ -3136,7 +3009,6 @@ do_uefi_common() {
         [[ ! -f "${DESTDIR}/usr/bin/sbsign" ]] && PACKAGES="${PACKAGES} sbsigntools"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
-    unset PACKAGES
     
     check_efisys_part
     
@@ -3538,7 +3410,6 @@ do_refind_uefi() {
         sleep 3
         PACKAGES="refind"
         run_pacman
-        unset PACKAGES
     fi
     
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
@@ -3620,8 +3491,6 @@ do_grub_common_before() {
         sleep 3
         PACKAGES="grub"
         run_pacman
-        # reset PACKAGES after installing
-        unset PACKAGES
     fi
 }
 
@@ -4643,10 +4512,7 @@ configure_system() {
         auto_timesetting
         # /etc/initcpio.conf
         run_mkinitcpio
-        # /etc/locale.gen
-        # enable at least C.UTF8 if nothing was changed, else weird things happen on reboot!
-        ! grep -q "^[a-z]" "${DESTDIR}"/etc/locale.gen && sed -i -e 's:^#C.UTF-8:C.UTF-8:g' "${DESTDIR}"/etc/locale.gen
-        chroot "${DESTDIR}" locale-gen >/dev/null 2>&1
+        locale_gen
         ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
