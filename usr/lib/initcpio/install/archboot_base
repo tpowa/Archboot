@@ -13,7 +13,7 @@ build ()
           ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei prlimit rename \
           renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
-          sysctl pgrep pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
+          sysctl pkill pmap pwdx slabtop tload vmstat watch file eject keyctl request-key \
           zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw ldconfig diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \

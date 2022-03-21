@@ -78,8 +78,8 @@ _create_boot() {
             isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LOCAL}"
         fi
     done
-    cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-    [[ "${_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+    [[ -d /usr/share/licenses/amd-ucode ]] && cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
+    [[ "${_ARCH}" == "aarch64" ]] || [[ -d /usr/share/licenses/intel-ucode ]] && cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
 }
 
 _create_cksum() {

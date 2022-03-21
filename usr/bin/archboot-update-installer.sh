@@ -84,14 +84,12 @@ echo "Information: Logging is done on /dev/tty7 ..."
 
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-    if [[ -f /.update-installer ]]; then
+    if pgrep update-installer.sh >/dev/null 2>&1; then
         echo "Aborting: update-installer.sh is already running on other tty ..."
-        echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
-        exit 0
+        exit 1
     fi
-    touch /.update-installer
     # remove everything not necessary
-    echo "Step 1/8: Removing not necessary files from / ..."
+    echo "Step 1/9: Removing not necessary files from / ..."
     [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
     [[ -d "/usr/lib/modules" ]] && rm -r "/usr/lib/modules"
     _SHARE_DIRS="efitools file grub hwdata kbd licenses makepkg nmap openvpn pacman refind tc usb_modeswitch vim zoneinfo zsh"
@@ -99,25 +97,26 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         #shellcheck disable=SC2115
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
     done
-    echo "Step 2/8: Generating archboot container in ${_W_DIR} ..."
-    echo "          This will need some time ..."
-    # wait until pacman-key is finished
-    while ps aux | grep pacman | grep -q batch; do
+    echo "Step 2/9: Waiting for pacman keyring creation to finish ..."
+    while pgreg pacman >/dev/null 2>&1; do
         sleep 1
     done
+    echo "Step 3/9: Generating archboot container in ${_W_DIR} ..."
+    echo "          This will need some time ..."
     # create container without package cache
     [[ "${_L_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1)
-    # Switch offline mode
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        # offline mode
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
         [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1)
     else
+        #online mode
         [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && ("archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1)
     fi
     # generate initrd in container, remove archboot packages from cache, not needed in normal install, umount tmp before generating initrd
-    echo "Step 3/8: Moving kernel from ${_W_DIR} to / ..."
+    echo "Step 4/9: Moving kernel from ${_W_DIR} to / ..."
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
         mv "${_W_DIR}"/boot/vmlinuz-linux / || exit 1
         ### not supported
@@ -126,18 +125,19 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         mv "${_W_DIR}"/boot/Image / || exit 1
     fi
-    echo "Step 4/8: Collect initramfs files in ${_W_DIR} ..."
+    echo "Step 5/9: Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
     cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     kver
     # write initramfs to /tmp
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1
     # move initramfs to /
     mv "${_W_DIR}/tmp" /initrd || exit 1
-    echo "Step 5/8: Remove ${_W_DIR} ..."
+    echo "Step 6/9: Remove ${_W_DIR} ..."
     rm -r "${_W_DIR}" || exit 1
-    echo "Step 6/8: Create initramfs /initrd.img ..."
+    echo "Step 7/9: Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     cd initrd || exit 1
     #from /usr/bin/mkinitpcio.conf
@@ -146,12 +146,12 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 -10> /initrd.img || exit 1
     cd ..
-    echo "Step 7/8: Remove /initrd ..."
+    echo "Step 8/9: Remove /initrd ..."
     rm -r "/initrd" || exit 1
     ### not supported
     #mv "${_W_DIR}"/boot/amd-ucode.img / || exit 1
     # remove "${_W_DIR}"
-    echo "Step 8/8: Loading files to kexec now, reboot in a few seconds ..."
+    echo "Step 9/9: Loading files to kexec now, reboot in a few seconds ..."
     # load kernel and initrds into running kernel
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then 
         kexec -l /vmlinuz-linux --initrd=/initrd.img --reuse-cmdline
