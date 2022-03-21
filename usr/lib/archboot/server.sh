@@ -1,7 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /etc/archboot/defaults
-source /usr/lib/archboot/container_functions
+. /etc/archboot/defaults
+. /usr/lib/archboot/container_functions
 _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 
 _update_aarch64_pacman_chroot() {

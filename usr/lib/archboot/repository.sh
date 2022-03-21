@@ -1,6 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /etc/archboot/defaults
+. /etc/archboot/defaults
 
 _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"

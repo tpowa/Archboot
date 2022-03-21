@@ -1,6 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /etc/archboot/defaults
+. /etc/archboot/defaults
 _PRESET_DIR="/etc/archboot/presets"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 
