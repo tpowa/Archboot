@@ -4802,7 +4802,7 @@ mainmenu() {
 
 #####################
 ## begin execution ##
-if pgrep setup.sh >/dev/null 2>&1; then
+if pgrep setup >/dev/null 2>&1; then
     echo "HINT:"
     echo "setup already runs on a different tty!"
     exit 1
