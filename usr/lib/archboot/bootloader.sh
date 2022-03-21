@@ -1,6 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /etc/archboot/defaults
+. /etc/archboot/defaults
 # fedora shim setup
 _SHIM_VERSION="15.4"
 _SHIM_RELEASE="5"

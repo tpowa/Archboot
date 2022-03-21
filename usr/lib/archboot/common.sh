@@ -1,6 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /etc/archboot/defaults
+. /etc/archboot/defaults
 LANG="C"
 _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
