@@ -99,8 +99,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         #shellcheck disable=SC2115
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
     done
-    echo "Step 2/9: Waiting for pacman keyring creation to finish ..."
-    while pgreg pacman > /dev/null 2>&1; do
+    echo "Step 2/9: Waiting for gpg pacman keyring import to finish ..."
+    while pgreg -x gpg > /dev/null 2>&1; do
         sleep 1
     done
     echo "Step 3/9: Generating archboot container in ${_W_DIR} ..."
