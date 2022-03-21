@@ -4549,7 +4549,7 @@ auto_system_files () {
         echo "myhostname" > "${DESTDIR}"/etc/hostname
     fi
     if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
-        echo "LANG=en_US.UTF-8" > "${DESTDIR}"/etc/locale.conf
+        echo "LANG=C.UTF-8" > "${DESTDIR}"/etc/locale.conf
         echo "LC_COLLATE=C" >> "${DESTDIR}"/etc/locale.conf
     fi
 }
@@ -4644,8 +4644,8 @@ configure_system() {
         # /etc/initcpio.conf
         run_mkinitcpio
         # /etc/locale.gen
-        # enable at least en_US.UTF8 if nothing was changed, else weird things happen on reboot!
-        ! grep -q "^[a-z]" "${DESTDIR}"/etc/locale.gen && sed -i -e 's:^#en_US.UTF-8:en_US.UTF-8:g' "${DESTDIR}"/etc/locale.gen
+        # enable at least C.UTF8 if nothing was changed, else weird things happen on reboot!
+        ! grep -q "^[a-z]" "${DESTDIR}"/etc/locale.gen && sed -i -e 's:^#C.UTF-8:C.UTF-8:g' "${DESTDIR}"/etc/locale.gen
         chroot "${DESTDIR}" locale-gen >/dev/null 2>&1
         ## END POSTPROCESSING ##
         NEXTITEM="7"

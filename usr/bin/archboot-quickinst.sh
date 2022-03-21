@@ -175,8 +175,8 @@ chroot_mount
 install_packages || (echo "Package installation FAILED."; chroot_umount; exit 1)
 
 # /etc/locale.gen
-# enable at least en_US.UTF8 if nothing was changed, else weird things happen on reboot!
-! grep -q "^[a-z]" "${DESTDIR}/etc/locale.gen" && sed -i -e 's:^#en_US.UTF-8:en_US.UTF-8:g' "${DESTDIR}/etc/locale.gen"
+# enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
+! grep -q "^[a-z]" "${DESTDIR}/etc/locale.gen" && sed -i -e 's:^#C.UTF-8:C.UTF-8:g' "${DESTDIR}/etc/locale.gen"
 chroot "${DESTDIR}" locale-gen >/dev/null 2>&1
 
 # umount chroot
