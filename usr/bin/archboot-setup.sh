@@ -56,7 +56,6 @@ DIALOG() {
     return $?
 }
 
-
 getfstype()
 {
     ${_LSBLK} FSTYPE "${1}"
