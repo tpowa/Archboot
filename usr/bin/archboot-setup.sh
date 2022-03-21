@@ -2414,8 +2414,6 @@ getsource() {
         select_mirror || return 1
         S_SRC=1
     fi
-    # abstract the common pacman args
-    PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 }
 
 # select_mirror()
