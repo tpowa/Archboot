@@ -4788,6 +4788,7 @@ mainmenu() {
         "7")
             install_bootloader ;;
         "8")
+            [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear
             echo ""
             echo "If the install finished successfully, you can now type 'reboot'"
@@ -4795,18 +4796,20 @@ mainmenu() {
             echo ""
             exit 0 ;;
         *)
-            DIALOG --yesno "Abort Installation?" 6 40 && clear && exit 0
+            DIALOG --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
             ;;
     esac
 }
 
 #####################
 ## begin execution ##
-if pgrep -f "bash /usr/local/sbin/setup" >/dev/null 2>&1; then
+if [[ -e /tmp/.setup-running ]]; then
     echo "HINT:"
-    echo "setup already runs on a different tty!"
+    echo "setup already runs on a different console!"
+    echo "Please remove /tmp/.setup-running first to launch setup!"
     exit 1
 fi
+: >/tmp/.setup-running
 : >/tmp/.setup
 
 set_title
