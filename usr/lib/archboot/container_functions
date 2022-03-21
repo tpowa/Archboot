@@ -126,6 +126,7 @@ _umount_special() {
 
 _install_base_packages() {
     echo "Installing packages ${_PACKAGES} to ${1} ..."
+    #shellcheck disable=SC2086
     pacman --root "${1}" -Sy ${_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
