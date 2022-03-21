@@ -76,7 +76,7 @@ _sign_sha256sum() {
 }
 
 _update_source() {
-    cd ${_ISO_HOME_SOURCE} || exit 1
+    cd "${_ISO_HOME_SOURCE}" || exit 1
     _create_archive
     echo "Creating ${_ARCH} archboot repository ..."
     "archboot-${_ARCH}-create-repository.sh" "${_DIR}" || exit 1
