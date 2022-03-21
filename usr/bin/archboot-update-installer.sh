@@ -84,10 +84,12 @@ echo "Information: Logging is done on /dev/tty7 ..."
 
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-    if pgrep update-installer.sh >/dev/null 2>&1; then
+    if [[ -f /.update-installer ]]; then
         echo "Aborting: update-installer.sh is already running on other tty ..."
+        echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
     fi
+    touch /.update-installer
     # remove everything not necessary
     echo "Step 1/9: Removing not necessary files from / ..."
     [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
@@ -98,7 +100,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         [[ -d "/usr/share/${i}" ]] && rm -r "/usr/share/${i}"
     done
     echo "Step 2/9: Waiting for pacman keyring creation to finish ..."
-    while pgreg pacman >/dev/null 2>&1; do
+    while pgreg pacman > /dev/null 2>&1; do
         sleep 1
     done
     echo "Step 3/9: Generating archboot container in ${_W_DIR} ..."
