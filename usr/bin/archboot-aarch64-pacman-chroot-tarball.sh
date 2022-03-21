@@ -2,8 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="aarch64"
 source /etc/archboot/defaults
-source /usr/lib/archboot/functions
-source /usr/lib/archboot/container_functions
+source /usr/lib/archboot/common.sh
+source /usr/lib/archboot/container.sh
 _LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 _KEYRING="archlinuxarm"
 

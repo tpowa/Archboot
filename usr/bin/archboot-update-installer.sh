@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /usr/lib/archboot/functions
+. /usr/lib/archboot/common.sh
 _D_SCRIPTS=""
 _L_COMPLETE=""
 _L_INSTALL_COMPLETE=""
@@ -8,6 +8,8 @@ _G_RELEASE=""
 _CONFIG="/etc/archboot/${_RUNNING_ARCH}-update_installer.conf"
 _W_DIR="/archboot"
 _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master"
+_LIB_PATH="/usr/lib/archboot"
+_INST_PATH="${_LIB_PATH}/installer"
 
 kver() {
     # get kernel version from installed kernel
@@ -72,10 +74,23 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     wget -q "$_INSTALLER_SOURCE/usr/bin/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
     wget -q "$_INSTALLER_SOURCE/usr/bin/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
     wget -q "$_INSTALLER_SOURCE/usr/bin/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
-    wget -q "$_INSTALLER_SOURCE/usr/lib/archboot/functions?inline=false" -O "/usr/lib/archboot/functions" >/dev/null 2>&1
-    wget -q "$_INSTALLER_SOURCE/usr/lib/archboot/container_functions?inline=false" -O "/usr/lib/archboot/container_functions" >/dev/null 2>&1
-    wget -q "$_INSTALLER_SOURCE/usr/lib/archboot/release_functions?inline=false" -O "/usr/lib/archboot/release_functions" >/dev/null 2>&1
-    wget -q "$_INSTALLER_SOURCE/usr/lib/archboot/iso_functions?inline=false" -O "/usr/lib/archboot/iso_functions" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_LIB_PATH}/common.sh?inline=false" -O "${_LIB_PATH}/common.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_LIB_PATH}/container.sh?inline=false" -O "${_LIB_PATH}/container.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_LIB_PATH}/release.sh?inline=false" -O "${_LIB_PATH}/release.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_LIB_PATH}/iso.sh?inline=false" -O "${_LIB_PATH}/iso.sh" >/dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/autoconfiguration.sh?inline=false" -O "${_INST_PATH}/autoconfiguration.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/autoprepare.sh?inline=false" -O "${_INST_PATH}/autoprepare.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/base.sh?inline=false" -O "${_INST_PATH}/base.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/blockdevices.sh?inline=false" -O "${_INST_PATH}/blockdevices.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/bootloader.sh?inline=false" -O "${_INST_PATH}/bootloader.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/btrfs.sh?inline=false" -O "${_INST_PATH}/btrfs.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/common.sh?inline=false" -O "${_INST_PATH}/common.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/configuration.sh?inline=false" -O "${_INST_PATH}/configuration.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/mountpoints.sh?inline=false" -O "${_INST_PATH}/mountpoints.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/network.sh?inline=false" -O "${_INST_PATH}/network.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/pacman.sh?inline=false" -O "${_INST_PATH}/pacman.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/partition.sh?inline=false" -O "${_INST_PATH}/partition.sh" > /dev/null 2>&1
+    wget -q "$_INSTALLER_SOURCE${_INST_PATH}/storage.sh?inline=false" -O "${_INST_PATH}/storage.sh" > /dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0
 fi
@@ -131,7 +146,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
     cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
-    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/common.sh
     kver
     # write initramfs to /tmp
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp; mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp/" >/dev/tty7 2>&1 || exit 1

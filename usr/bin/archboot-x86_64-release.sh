@@ -2,8 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="x86_64"
 _ARCHBOOT="archboot"
-source /usr/lib/archboot/functions
-source /usr/lib/archboot/release_functions
+source /usr/lib/archboot/common.sh
+source /usr/lib/archboot/release.sh
 [[ -z "${1}" ]] && _usage
 _root_check
 _x86_64_check

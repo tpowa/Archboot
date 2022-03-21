@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-source /usr/lib/archboot/functions
-source /usr/lib/archboot/container_functions
-source /usr/lib/archboot/repository_functions
+source /usr/lib/archboot/common.sh
+source /usr/lib/archboot/container.sh
+source /usr/lib/archboot/repository.sh
 _ARCHBOOT="archboot-arm"
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 _REPODIR="$(mktemp -d "${1}"/repository.XXX)"

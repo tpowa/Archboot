@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/lib/archboot/installer_common_functions
+. /usr/lib/archboot/installer/common.sh
 DESTDIR="${1}"
 
 usage() {

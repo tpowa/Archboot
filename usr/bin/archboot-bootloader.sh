@@ -1,6 +1,6 @@
 #!/bin/bash
-source /usr/lib/archboot/functions
-source /usr/lib/archboot/bootloader_functions
+source /usr/lib/archboot/common.sh
+source /usr/lib/archboot/bootloader.sh
 _SHIM=$(mktemp -d shim.XXX)
 _SHIM32=$(mktemp -d shim32.XXX)
 _SHIMAA64=$(mktemp -d shimaa64.XXX)

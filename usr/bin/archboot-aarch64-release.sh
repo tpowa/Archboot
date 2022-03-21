@@ -2,8 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="aarch64"
 _ARCHBOOT="archboot-arm"
-source /usr/lib/archboot/functions
-source /usr/lib/archboot/release_functions
+source /usr/lib/archboot/common.sh
+source /usr/lib/archboot/release.sh
 [[ -z "${1}" ]] && _usage
 _root_check
 echo "Start release creation in $1 ..."
