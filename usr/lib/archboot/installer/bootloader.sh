@@ -528,7 +528,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --infobox "Setting up Systemd-boot now ..." 0 0
+    DIALOG --infobox "Setting up Systemd-boot now..." 0 0
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -605,7 +605,7 @@ GUMEOF
 
 do_refind_uefi() {
 
-    DIALOG --msgbox "Setting up rEFInd now ..." 0 0
+    DIALOG --msgbox "Setting up rEFInd now..." 0 0
 
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
         DIALOG --infobox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg in 3 seconds ..." 0 0
@@ -1152,7 +1152,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Initializing grub bootloader..." 0 0
+    DIALOG --infobox "Setting up grub..." 0 0
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
