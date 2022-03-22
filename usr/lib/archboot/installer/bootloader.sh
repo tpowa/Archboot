@@ -621,7 +621,6 @@ do_refind_uefi() {
 
      ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
     cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"
-    mv "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/drivers_${_SPEC_UEFI_ARCH}"/ext2_x64.{,_}efi
 
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
