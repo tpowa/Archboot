@@ -1,21 +1,5 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# geteditor()
-# prompts the user to choose an editor
-# sets EDITOR global variable
-#
-geteditor() {
-    if ! [[ "${EDITOR}" ]]; then
-        DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
-        "1" "nano (easier)" \
-        "2" "vi" 2>${ANSWER} || return 1
-        case $(cat ${ANSWER}) in
-            "1") EDITOR="nano" ;;
-            "2") EDITOR="vi" ;;
-        esac
-    fi
-}
-
 set_mkinitcpio() {
     DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 18 70
     HOOK_ERROR=""

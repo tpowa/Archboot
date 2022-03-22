@@ -63,8 +63,3 @@ geteditor() {
     fi
 }
 
-getdest() {
-    [[ "${DESTDIR}" ]] && return 0
-    DIALOG --inputbox "Enter the destination directory where your target system is mounted" 8 65 "${DESTDIR}" 2>${ANSWER} || return 1
-    DESTDIR=$(cat ${ANSWER})
-}
