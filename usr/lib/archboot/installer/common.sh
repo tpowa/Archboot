@@ -11,8 +11,6 @@ if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ="Image.gz"
     VMLINUZ_EFISTUB="Image"
 fi
-# name of the initramfs filesystem
-INITRAMFS="initramfs-${KERNELPKG}"
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 

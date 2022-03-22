@@ -528,7 +528,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --msgbox "Setting up Systemd-boot now ..." 0 0
+    DIALOG --infobox "Setting up Systemd-boot now ..." 0 0
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -574,8 +574,8 @@ GUMEOF
     uefi_mount_efivarfs
 
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install > $LOG
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update > $LOG
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
