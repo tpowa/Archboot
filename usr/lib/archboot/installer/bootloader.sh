@@ -584,8 +584,10 @@ GUMEOF
 
     uefi_mount_efivarfs
 
-    systemd-nspawn -q -D "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install >$LOG 2>&1
-    systemd-nspawn -q -D "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update >$LOG 2>&1
+    chroot_mount
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install >$LOG 2>&1
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update >$LOG 2>&1
+    chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         DIALOG --msgbox "You will now be put into the editor to edit loader.conf and Systemd-boot menu entry files. After you save your changes, exit the editor." 0 0
@@ -703,32 +705,34 @@ do_grub_common_before() {
 
 do_grub_config() {
 
-    ########
-
-    BOOT_PART_FS_UUID="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    BOOT_PART_FS_LABEL="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/boot" 2>/dev/null)"
-    BOOT_PART_HINTS_STRING="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
-
-    BOOT_PART_DRIVE="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="drive" "/boot" 2>/dev/null)"
+    chroot_mount
 
     ########
 
-    ROOT_PART_FS_UUID="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/" 2>/dev/null)"
-    ROOT_PART_HINTS_STRING="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/" 2>/dev/null)"
-    ROOT_PART_FS="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
+
+    BOOT_PART_DRIVE="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="drive" "/boot" 2>/dev/null)"
 
     ########
 
-    USR_PART_FS_UUID="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
-    USR_PART_HINTS_STRING="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/usr" 2>/dev/null)"
-    USR_PART_FS="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/usr" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/" 2>/dev/null)"
+    ROOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/" 2>/dev/null)"
+
+    ########
+
+    USR_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
+    USR_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/usr" 2>/dev/null)"
+    USR_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/usr" 2>/dev/null)"
 
     ########
 
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_HINTS_STRING="$(systemd-nspawn -q -D "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
     fi
 
     ########
@@ -1003,6 +1007,8 @@ fi
     ## copy unicode.pf2 font file
     cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB_PREFIX_DIR}/fonts/unicode.pf2"
 
+    chroot_umount
+
     ## Edit grub.cfg config file
     DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
     geteditor || return 1
@@ -1117,14 +1123,17 @@ do_grub_bios() {
     DIALOG --infobox "Installing grub(2) BIOS bootloader..." 0 0
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
+    chroot_mount
 
-    systemd-nspawn -q -D "${DESTDIR}" "/usr/bin/grub-install" \
+    chroot "${DESTDIR}" "/usr/bin/grub-install" \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
         --boot-directory="/boot" \
         --recheck \
         --debug \
         "${bootdev}" &>"/tmp/grub_bios_install.log"
+
+    chroot_umount
 
     mkdir -p "${DESTDIR}/boot/grub/locale"
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
@@ -1151,6 +1160,7 @@ do_grub_uefi() {
 
     do_grub_common_before
     DIALOG --infobox "Setting up grub..." 0 0
+    chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
         [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
@@ -1161,7 +1171,7 @@ do_grub_uefi() {
         ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
         #shellcheck disable=SC2016
         echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
-        systemd-nspawn -q -D "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
+        chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --format="${_GRUB_ARCH}-efi" \
             --modules="part_gpt part_msdos" \
@@ -1174,7 +1184,7 @@ do_grub_uefi() {
             "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
 
         ## Install GRUB normally
-        systemd-nspawn -q -D "${DESTDIR}" "/usr/bin/grub-install" \
+        chroot "${DESTDIR}" "/usr/bin/grub-install" \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --target="${_GRUB_ARCH}-efi" \
             --efi-directory="${UEFISYS_MOUNTPOINT}" \
@@ -1188,6 +1198,7 @@ do_grub_uefi() {
         cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
         GRUB_PREFIX_DIR="/boot/grub/"
     fi
+    chroot_umount
     GRUB_UEFI="1"
     do_grub_config
     GRUB_UEFI=""
