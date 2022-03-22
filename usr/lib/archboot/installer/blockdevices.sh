@@ -1056,18 +1056,3 @@ _luks()
     cryptsetup luksFormat "${PART}" >${LOG} <${LUKSPASSPHRASE}
     _opening_luks
 }
-
-# freeze and unfreeze xfs, as hack for grub(2) installing
-freeze_xfs() {
-    sync
-    if [[ -x /usr/bin/xfs_freeze ]]; then
-        if grep -q "${DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
-            xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
-        fi
-        if grep -q "${DESTDIR} " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
-            xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
-        fi
-    fi
-}
