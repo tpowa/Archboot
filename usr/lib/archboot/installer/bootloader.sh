@@ -1310,7 +1310,7 @@ install_bootloader() {
         do_uefi_setup_env_vars
          _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            DIALOG --yesno "Setup has detected that you are using Secure Boot ...\nDo you like to install SHIM and GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
+            DIALOG --yesno "Setup has detected that you are using Secure Boot.\nDo you like to install SHIM and GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
             if [[ "${CANCEL}" == "" ]]; then
                 install_bootloader_uefi
                 NEXTITEM="8"
@@ -1318,7 +1318,7 @@ install_bootloader() {
                 NEXTITEM="7"
             fi
         else
-            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI ...\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
+            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI.\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
             DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
             NEXTITEM="8"
         fi
