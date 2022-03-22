@@ -543,7 +543,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --infobox "Setting up Systemd-boot now..." 0 0
+    DIALOG --infobox "Setting up systemd-boot now..." 0 0
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -619,15 +619,13 @@ GUMEOF
 }
 
 do_refind_uefi() {
-
-    DIALOG --infobox "Setting up refind now..." 0 0
-
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
-        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg in 3 seconds ..." 0 0
-        sleep 3
+        DIALOG --infobox "Installing refind..." 0 0
         PACKAGES="refind"
         run_pacman
     fi
+
+    DIALOG --infobox "Setting up refind now..." 0 0
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -664,7 +662,7 @@ REFINDEOF
 
         DIALOG --msgbox "refind has been setup successfully." 0 0
 
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf. After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         "${EDITOR}" "${_REFIND_LINUX_CONF}"
@@ -703,8 +701,7 @@ do_grub_common_before() {
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
     fi
     if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
-        DIALOG --infobox "Couldn't find ${DESTDIR}/usr/lib/grub, installing grub pkg in 3 seconds ..." 0 0
-        sleep 3
+        DIALOG --infobox "Installing grub..." 0 0
         PACKAGES="grub"
         run_pacman
     fi
@@ -1127,7 +1124,7 @@ do_grub_bios() {
         return 1
     fi
 
-    DIALOG --infobox "Installing the grub(2) BIOS bootloader..." 0 0
+    DIALOG --infobox "Installing grub(2) BIOS bootloader..." 0 0
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
