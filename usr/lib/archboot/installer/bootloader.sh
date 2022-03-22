@@ -579,7 +579,7 @@ GUMEOF
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and Systemd-boot menu entry files . After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and Systemd-boot menu entry files. After you save your changes, exit the editor." 0 0
         geteditor || return 1
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
