@@ -1,4 +1,24 @@
 #!/bin/bash
+ANSWER="/tmp/.setup"
+# use the first VT not dedicated to a running console
+# don't use DESTDIR=/mnt because it's intended to mount other things there!
+# check first if bootet in archboot
+if grep -qw archboot /etc/hostname; then
+    DESTDIR="/install"
+    LOG="/dev/tty7"
+else
+    DESTDIR="/"
+    LOG="/dev/tty8"
+fi
+# install stages
+S_SRC=0         # choose mirror
+S_NET=0         # network configuration
+S_MKFS=0        # formatting
+S_MKFSAUTO=0    # auto fs part/formatting
+S_CONFIG=0      # configuration editing
+# menu item tracker- autoselect the next item
+NEXTITEM=""
+
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/autoprepare.sh
 . /usr/lib/archboot/installer/base.sh
@@ -12,40 +32,8 @@
 . /usr/lib/archboot/installer/pacman.sh
 . /usr/lib/archboot/installer/partition.sh
 . /usr/lib/archboot/installer/storage.sh
-ANSWER="/tmp/.setup"
-# use the first VT not dedicated to a running console
-# don't use DESTDIR=/mnt because it's intended to mount other things there!
-# check first if bootet in archboot
-if grep -qw archboot /etc/hostname; then
-    DESTDIR="/install"
-    LOG="/dev/tty7"
-else
-    DESTDIR="/"
-    LOG="/dev/tty8"
-fi
-EDITOR=""
 # name of the initramfs filesystem
 INITRAMFS="initramfs-${KERNELPKG}"
-# name of intel ucode initramfs image
-INTEL_UCODE="intel-ucode.img"
-# name of amd ucode initramfs image
-AMD_UCODE="amd-ucode.img"
-# downloader
-DLPROG="wget"
-# sources
-SYNC_URL=""
-MIRRORLIST="/etc/pacman.d/mirrorlist"
-# partitions
-PART_ROOT=""
-ROOTFS=""
-# install stages
-S_SRC=0         # choose mirror
-S_NET=0         # network configuration
-S_MKFS=0        # formatting
-S_MKFSAUTO=0    # auto fs part/formatting
-S_CONFIG=0      # configuration editing
-# menu item tracker- autoselect the next item
-NEXTITEM=""
 
 set_keyboard() {
     if [[ -e /usr/bin/km ]]; then

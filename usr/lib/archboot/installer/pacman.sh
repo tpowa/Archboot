@@ -1,5 +1,9 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+# downloader
+DLPROG="wget"
+MIRRORLIST="/etc/pacman.d/mirrorlist"
+
 getsource() {
     S_SRC=0
     PACMAN_CONF=""
