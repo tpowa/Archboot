@@ -18,6 +18,8 @@ S_MKFSAUTO=0    # auto fs part/formatting
 S_CONFIG=0      # configuration editing
 # menu item tracker- autoselect the next item
 NEXTITEM=""
+# To allow choice in script set EDITOR=""
+EDITOR=""
 
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/autoprepare.sh
