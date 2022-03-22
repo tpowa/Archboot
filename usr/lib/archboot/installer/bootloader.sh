@@ -80,6 +80,21 @@ getrootfslabel() {
     fi
 }
 
+# freeze and unfreeze xfs, as hack for grub(2) installing
+freeze_xfs() {
+    sync
+    if [[ -x /usr/bin/xfs_freeze ]]; then
+        if grep -q "${DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
+            xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
+            xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
+        fi
+        if grep -q "${DESTDIR} " /proc/mounts | grep -q " xfs "; then
+            xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
+            xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
+        fi
+    fi
+}
+
 ## Setup kernel cmdline parameters to be added to bootloader configs
 bootloader_kernel_parameters() {
 
@@ -513,12 +528,12 @@ do_efistub_uefi() {
             do_systemd_boot_uefi
         else
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-                "Systemd-boot" "Systemd-boot for ${_UEFI_ARCH} UEFI" \
-                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
+                "systemd-boot" "systemd-boot for ${_UEFI_ARCH} UEFI" \
+                "refind" "refind for ${_UEFI_ARCH} UEFI" \
                 "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
             case $(cat ${ANSWER}) in
-                "Systemd-boot") do_systemd_boot_uefi ;;
-                "rEFInd") do_refind_uefi;;
+                "systemd-boot") do_systemd_boot_uefi ;;
+                "refind") do_refind_uefi;;
                 "NONE") return 0 ;;
             esac
         fi
@@ -599,7 +614,7 @@ GUMEOF
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error installing Systemd-boot..." 0 0
+        DIALOG --msgbox "Error installing systemd-boot..." 0 0
     fi
 }
 
@@ -1108,11 +1123,11 @@ do_grub_bios() {
     fi
 
     if [[ "${FAIL_COMPLEX}" == "1" ]]; then
-        DIALOG --msgbox "Error:\nGrub(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\ngrub(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
 
-    DIALOG --infobox "Installing the GRUB(2) BIOS bootloader..." 0 0
+    DIALOG --infobox "Installing the grub(2) BIOS bootloader..." 0 0
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
@@ -1131,12 +1146,12 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --msgbox "GRUB(2) BIOS has been successfully installed." 0 0
+        DIALOG --msgbox "grub(2) BIOS has been successfully installed." 0 0
 
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
     else
-        DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing grub(2) bios.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
 
@@ -1245,7 +1260,7 @@ do_grub_uefi() {
         do_uefi_bootmgr_setup
         DIALOG --msgbox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 8 75
     else
-        DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing grub(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
 
     fi
