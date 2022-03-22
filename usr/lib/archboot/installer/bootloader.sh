@@ -652,7 +652,7 @@ REFINDEOF
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf . After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
-
+        "${EDITOR}" "${_REFIND_LINUX_CONF}"
         DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
