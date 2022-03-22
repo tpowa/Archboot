@@ -38,7 +38,7 @@ set_password() {
             DIALOG --msgbox "Password didn't match, please enter again." 0 0
         fi
     done
-    systemd-nspawn -q -D "${DESTDIR}" passwd root < /tmp/.password
+    chroot "${DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
     rm /tmp/.password
 }
 
