@@ -34,8 +34,6 @@ EDITOR=""
 . /usr/lib/archboot/installer/pacman.sh
 . /usr/lib/archboot/installer/partition.sh
 . /usr/lib/archboot/installer/storage.sh
-# name of the initramfs filesystem
-INITRAMFS="initramfs-${KERNELPKG}"
 
 set_keyboard() {
     if [[ -e /usr/bin/km ]]; then
