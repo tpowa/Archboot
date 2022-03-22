@@ -1,13 +1,13 @@
 #!/bin/bash
-# source base first, contains basic parameters
+# source base and common first, contains basic parameters
 . /usr/lib/archboot/installer/base.sh
+. /usr/lib/archboot/installer/common.sh
 # source all other functions
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/autoprepare.sh
 . /usr/lib/archboot/installer/blockdevices.sh
 . /usr/lib/archboot/installer/bootloader.sh
 . /usr/lib/archboot/installer/btrfs.sh
-. /usr/lib/archboot/installer/common.sh
 . /usr/lib/archboot/installer/configuration.sh
 . /usr/lib/archboot/installer/mountpoints.sh
 . /usr/lib/archboot/installer/network.sh
