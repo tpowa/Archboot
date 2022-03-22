@@ -6,6 +6,8 @@ INTEL_UCODE="intel-ucode.img"
 AMD_UCODE="amd-ucode.img"
 PART_ROOT=""
 ROOTFS=""
+# name of the initramfs filesystem
+INITRAMFS="initramfs-${KERNELPKG}"
 
 getrootfstype() {
     ROOTFS="$(getfstype "${PART_ROOT}")"
