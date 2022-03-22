@@ -605,7 +605,7 @@ GUMEOF
 
 do_refind_uefi() {
 
-    DIALOG --infobox "Setting up rEFInd now..." 0 0
+    DIALOG --infobox "Setting up refind now..." 0 0
 
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
         DIALOG --infobox "Couldn't find ${DESTDIR}/usr/bin/refind-install, installing refind pkg in 3 seconds ..." 0 0
