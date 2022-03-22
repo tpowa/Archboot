@@ -105,6 +105,13 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         exit 1
     fi
     touch /.update-installer
+    # zram part
+    modprobe zram
+    echo zstd > /sys/block/zram0/comp_algorithm
+    echo 1400M > /sys/block/zram0/disk_size
+    mkfs.btrfs /dev/zram0
+    mkdir -p ${_W_DIR}
+    mount -o compress=zstd /dev/zram0 ${_W_DIR}
     # remove everything not necessary
     echo "Step 1/9: Removing not necessary files from / ..."
     [[ -d "/usr/lib/firmware" ]] && rm -r "/usr/lib/firmware"
