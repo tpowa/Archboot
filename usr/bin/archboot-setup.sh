@@ -1,29 +1,9 @@
 #!/bin/bash
-ANSWER="/tmp/.setup"
-# use the first VT not dedicated to a running console
-# don't use DESTDIR=/mnt because it's intended to mount other things there!
-# check first if bootet in archboot
-if grep -qw archboot /etc/hostname; then
-    DESTDIR="/install"
-    LOG="/dev/tty7"
-else
-    DESTDIR="/"
-    LOG="/dev/tty8"
-fi
-# install stages
-S_SRC=0         # choose mirror
-S_NET=0         # network configuration
-S_MKFS=0        # formatting
-S_MKFSAUTO=0    # auto fs part/formatting
-S_CONFIG=0      # configuration editing
-# menu item tracker- autoselect the next item
-NEXTITEM=""
-# To allow choice in script set EDITOR=""
-EDITOR=""
-
+# source base first, contains basic parameters
+. /usr/lib/archboot/installer/base.sh
+# source all other functions
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/autoprepare.sh
-. /usr/lib/archboot/installer/base.sh
 . /usr/lib/archboot/installer/blockdevices.sh
 . /usr/lib/archboot/installer/bootloader.sh
 . /usr/lib/archboot/installer/btrfs.sh
