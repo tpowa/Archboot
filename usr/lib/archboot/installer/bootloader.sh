@@ -1150,7 +1150,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-
+    DIALOG --infobox "Initializing grub bootloader, please wait ..." 0 0
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
