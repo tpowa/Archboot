@@ -156,9 +156,6 @@ run_pacman(){
 #
 install_packages() {
     destdir_mounts || return 1
-    if [[ "${S_MKFS}" != "1" && "${S_MKFSAUTO}" != "1" ]]; then
-        getdest
-    fi
     if [[ "${S_SRC}" = "0" ]]; then
         select_source || return 1
     fi
