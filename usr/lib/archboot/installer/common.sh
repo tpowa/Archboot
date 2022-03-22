@@ -130,5 +130,5 @@ auto_packages() {
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 locale_gen() {
 ! grep -q "^[a-z]" "${DESTDIR}/etc/locale.gen" && sed -i -e 's:^#C.UTF-8:C.UTF-8:g' "${DESTDIR}/etc/locale.gen"
-chroot "${DESTDIR}" locale-gen >/dev/null 2>&1
+systemd-nspawn -q -D "${DESTDIR}" locale-gen >/dev/null 2>&1
 }
