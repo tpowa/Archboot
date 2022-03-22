@@ -616,8 +616,8 @@ do_refind_uefi() {
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
-    cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons"
-    cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/fonts"
+    cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
+    cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
 
      ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
     cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
@@ -664,7 +664,7 @@ REFINDEOF
 
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf"
-            cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/icons"
+            cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
         fi
     else
         DIALOG --msgbox "Error setting up refind." 0 0
