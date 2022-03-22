@@ -153,7 +153,6 @@ run_pacman(){
 
 # install_packages()
 # performs package installation to the target system
-#
 install_packages() {
     destdir_mounts || return 1
     if [[ "${S_SRC}" = "0" ]]; then
