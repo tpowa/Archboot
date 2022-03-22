@@ -11,12 +11,13 @@ if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ="Image.gz"
     VMLINUZ_EFISTUB="Image"
 fi
+# name of the initramfs filesystem
+INITRAMFS="initramfs-${KERNELPKG}"
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
 # chroot_mount()
 # prepares target system as a chroot
-#
 chroot_mount()
 {
     if grep -qw archboot /etc/hostname; then
@@ -33,7 +34,6 @@ chroot_mount()
 
 # chroot_umount()
 # tears down chroot in target system
-#
 chroot_umount()
 {
     if grep -qw archboot /etc/hostname; then
