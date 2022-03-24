@@ -165,8 +165,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
-    LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    LANG=C bsdtar --null -cf - --format=newc @- | zstd -T0 -10> "${_W_DIR}"/initrd.img
+    bsdtar --uid 0 --gid 0 --null -cnf - -T - |
+    bsdtar --null -cf - --format=newc @- | zstd -T0 -10> "${_W_DIR}"/initrd.img
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
     done
