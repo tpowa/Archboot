@@ -8,9 +8,9 @@ _G_RELEASE=""
 _CONFIG="/etc/archboot/${_RUNNING_ARCH}-update_installer.conf"
 _W_DIR="/archboot"
 _INSTALLER_SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master"
-_BIN_PATH="${_INSTALLER_SOURCE}/usr/bin"
-_LIB_PATH="${_INSTALLER_SOURCE}/usr/lib/archboot"
-_INST_PATH="${_INSTALLER_SOURCE}/${_LIB_PATH}/installer"
+_BIN_PATH="/usr/bin"
+_LIB_PATH="/usr/lib/archboot"
+_INST_PATH="/${_LIB_PATH}/installer"
 
 kver() {
     # get kernel version from installed kernel
@@ -67,31 +67,31 @@ fi
 # Download latest setup and quickinst script from git repository
 if [[ "${_D_SCRIPTS}" == "1" ]]; then
     echo "Downloading latest km, tz, quickinst, setup and helpers..."
-    wget -q "${_BIN_PATH}/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
-    wget -q "${_BIN_PATH}/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
-    wget -q "${_LIB_PATH}/common.sh?inline=false" -O "${_LIB_PATH}/common.sh" >/dev/null 2>&1
-    wget -q "${_LIB_PATH}/container.sh?inline=false" -O "${_LIB_PATH}/container.sh" >/dev/null 2>&1
-    wget -q "${_LIB_PATH}/release.sh?inline=false" -O "${_LIB_PATH}/release.sh" >/dev/null 2>&1
-    wget -q "${_LIB_PATH}/iso.sh?inline=false" -O "${_LIB_PATH}/iso.sh" >/dev/null 2>&1
-    wget -q "${_INST_PATH}/autoconfiguration.sh?inline=false" -O "${_INST_PATH}/autoconfiguration.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/autoprepare.sh?inline=false" -O "${_INST_PATH}/autoprepare.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/base.sh?inline=false" -O "${_INST_PATH}/base.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/blockdevices.sh?inline=false" -O "${_INST_PATH}/blockdevices.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/bootloader.sh?inline=false" -O "${_INST_PATH}/bootloader.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/btrfs.sh?inline=false" -O "${_INST_PATH}/btrfs.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/common.sh?inline=false" -O "${_INST_PATH}/common.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/configuration.sh?inline=false" -O "${_INST_PATH}/configuration.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/mountpoints.sh?inline=false" -O "${_INST_PATH}/mountpoints.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/network.sh?inline=false" -O "${_INST_PATH}/network.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/pacman.sh?inline=false" -O "${_INST_PATH}/pacman.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/partition.sh?inline=false" -O "${_INST_PATH}/partition.sh" > /dev/null 2>&1
-    wget -q "${_INST_PATH}/storage.sh?inline=false" -O "${_INST_PATH}/storage.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-quickinst.sh?inline=false" -O /usr/bin/quickinst >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-update-installer.sh?inline=false" -O /usr/bin/update-installer.sh >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_LIB_PATH}/common.sh?inline=false" -O "${_LIB_PATH}/common.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_LIB_PATH}/container.sh?inline=false" -O "${_LIB_PATH}/container.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_LIB_PATH}/release.sh?inline=false" -O "${_LIB_PATH}/release.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_LIB_PATH}/iso.sh?inline=false" -O "${_LIB_PATH}/iso.sh" >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/autoconfiguration.sh?inline=false" -O "${_INST_PATH}/autoconfiguration.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/autoprepare.sh?inline=false" -O "${_INST_PATH}/autoprepare.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/base.sh?inline=false" -O "${_INST_PATH}/base.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/blockdevices.sh?inline=false" -O "${_INST_PATH}/blockdevices.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/bootloader.sh?inline=false" -O "${_INST_PATH}/bootloader.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/btrfs.sh?inline=false" -O "${_INST_PATH}/btrfs.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/common.sh?inline=false" -O "${_INST_PATH}/common.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/configuration.sh?inline=false" -O "${_INST_PATH}/configuration.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/mountpoints.sh?inline=false" -O "${_INST_PATH}/mountpoints.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/network.sh?inline=false" -O "${_INST_PATH}/network.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/pacman.sh?inline=false" -O "${_INST_PATH}/pacman.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/partition.sh?inline=false" -O "${_INST_PATH}/partition.sh" > /dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/storage.sh?inline=false" -O "${_INST_PATH}/storage.sh" > /dev/null 2>&1
     echo "Finished: Downloading scripts done."
     exit 0
 fi
