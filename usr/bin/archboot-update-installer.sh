@@ -29,7 +29,8 @@ zram_mount() {
     echo zstd >/sys/block/zram0/comp_algorithm
     echo ${_DISKSIZE} >/sys/block/zram0/disksize
     echo 4 >/sys/block/zram0/max_comp_streams
-    mkfs.btrfs --mixed /dev/zram0 > /dev/tty7 2>&1 || exit 1
+    echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
+    mkfs.btrfs --mixed /dev/zram0 > /dev/null 2>&1 || exit 1
     mkdir "${_W_DIR}"
     # use -o discard for RAM cleaning on delete
     # (online fstrimming the block device!)
@@ -43,7 +44,7 @@ clean_archboot() {
     rm -rf "/usr/lib/firmware"
     rm -rf "/usr/lib/modules"
     rm -rf /usr/lib/{libicu*,libstdc++*}
-    _SHARE_DIRS="archboot efitools file grub hwdata kbd licenses lshw makepkg nmap nano openvpn pacman refind systemd tc usb_modeswitch vim zoneinfo"
+    _SHARE_DIRS="archboot efitools file grub hwdata kbd licenses lshw nmap nano openvpn pacman refind systemd tc usb_modeswitch vim zoneinfo"
     for i in ${_SHARE_DIRS}; do
         #shellcheck disable=SC2115
         rm -rf "/usr/share/${i}"
