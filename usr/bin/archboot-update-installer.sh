@@ -27,7 +27,7 @@ kver() {
 zram_mount() {
     modprobe zram
     echo zstd >/sys/block/zram0/comp_algorithm
-    echo ${_DISKSIZE} >/sys/block/zram0/disksize
+    echo "${_DISKSIZE}" >/sys/block/zram0/disksize
     echo 4 >/sys/block/zram0/max_comp_streams
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
     mkfs.btrfs --mixed /dev/zram0 > /dev/null 2>&1 || exit 1
