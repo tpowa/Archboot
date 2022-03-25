@@ -163,8 +163,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
-    echo "Step 4/9: Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     kver
+    echo "Step 4/9: Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
     echo "Step 5/9: Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
