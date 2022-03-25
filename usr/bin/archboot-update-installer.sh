@@ -66,7 +66,7 @@ usage () {
     echo "                  This operation needs at least 2.5 GB RAM."
     echo ""
     echo " -latest-image    Generate latest image files in /archboot-release directory"
-    echo "                  This operation needs at least 4.6 GB RAM."
+    echo "                  This operation needs at least 3.4 GB RAM."
     echo ""
     echo " -h               This message."
     exit 0
