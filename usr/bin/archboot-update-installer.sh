@@ -150,7 +150,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     fi
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        # offline mode, for testing purposes
+        # offline mode, for local image
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
@@ -163,7 +163,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
-    echo "Step 4/9: Moving kernel ${VMLINUZ} to ${_W_DIR} ..."
+    echo "Step 4/9: Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     kver
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
     echo "Step 5/9: Collect initramfs files in ${_W_DIR} ..."
@@ -178,11 +178,15 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
     sleep 10
-    echo "Step 7/9: Create initramfs initrd.img ..."
+    echo "Step 7/9: Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     # move cache back to initramfs directory in online mode
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        [[ "${_L_INSTALL_COMPLETE}" == "1" ]] && mv /var/cache/pacman/pkg ${_W_DIR}/tmp/var/cache/pacman/
+        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
+            if [[ -d /var/cache/pacman/pkg ]]; then
+                mv /var/cache/pacman/pkg ${_W_DIR}/tmp/var/cache/pacman/
+            fi
+        fi
     fi
     #from /usr/bin/mkinitpcio.conf
     # compress image with zstd
@@ -196,7 +200,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     while pgreg -x bsdtar >/dev/null 2>&1; do
         sleep 1
     done
-    echo "Step 8/9: Cleanup ${_W_DIR}/tmp ..."
+    echo "Step 8/9: Cleanup ${_W_DIR} ..."
     cd /
     umount ${_W_DIR}
     echo 1 > /sys/block/zram0/reset
