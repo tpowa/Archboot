@@ -4,7 +4,7 @@
 build ()
 {
     ### add virtio modules
-    add_checked_modules 'virtio'
+    add_checked_modules 'virtio|zram|btrfs|libcrc32'
     
     ### setting up base structure
     map add_dir "/mnt" "/install" "/var/log" "/home"
@@ -16,7 +16,7 @@ build ()
     map add_binary init agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc wget uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
-          sort zstd nano date tee mktemp install pgrep vi ex edit view
+          sort zstd nano date tee mktemp install pgrep vi ex edit view mkfs.btrfs
 
     ### add nano files
     add_full_dir /usr/share/nano
