@@ -27,7 +27,7 @@ kver() {
 zram_mount() {
     modprobe zram
     echo zstd >/sys/block/zram0/comp_algorithm
-    echo 3G >/sys/block/zram0/disksize
+    echo ${_DISKSIZE} >/sys/block/zram0/disksize
     echo 4 >/sys/block/zram0/max_comp_streams
     mkfs.btrfs --mixed /dev/zram0 > /dev/tty7 2>&1 || exit 1
     mkdir "${_W_DIR}"
@@ -132,6 +132,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         exit 1
     fi
     touch /.update-installer
+    _DISKSIZE="3G"
     zram_mount
     echo "Step 1/9: Removing not necessary files from / ..."
     clean_archboot
@@ -216,6 +217,7 @@ fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
+    _DISKSIZE="5G"
     zram_mount
     echo "Step 1/2: Removing not necessary files from / ..."
     clean_archboot

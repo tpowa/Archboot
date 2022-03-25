@@ -36,13 +36,14 @@ _create_iso() {
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
     # generate latest tarball in container
     echo "Generate latest ISO ..."
+    # generate local iso in container
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
+    rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
     # generate latest iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_ARCH}" || exit 1
     echo "Generate local ISO ..."
-    # generate local iso in container
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
@@ -78,8 +79,14 @@ _create_boot() {
             isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LOCAL}"
         fi
     done
-    [[ -d /usr/share/licenses/amd-ucode ]] && cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-    [[ "${_ARCH}" == "aarch64" ]] || [[ -d /usr/share/licenses/intel-ucode ]] && cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+    if [[ -d /usr/share/licenses/amd-ucode ]]; then
+        cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
+    fi
+    if ! [[ "${_ARCH}" == "aarch64" ]]; then
+        if [[ -d /usr/share/licenses/intel-ucode ]]; then
+            cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+        fi
+    fi
 }
 
 _create_cksum() {
