@@ -52,23 +52,22 @@ clean_archboot() {
 }
 
 usage () {
-    echo "Update installer, launch latest environment or create latest image files:"
-    echo "-------------------------------------------------------------------------"
-    echo "PARAMETERS:"
-    echo " -u             Update scripts: setup, quickinst, tz, km and helpers."
+    echo -e "\033[1mUpdate installer, launch latest environment or create latest image files:\033[0m"
+    echo -e "\033[1m-------------------------------------------------------------------------\033[0m"
+    echo -e "\033[1mPARAMETERS:\033[0m"
+    echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+    echo -e ""
+    echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+    echo -e "                  This operation needs at least \033[1m1.8 GB RAM\033[0m."
     echo ""
-    echo "On fast internet connection (100Mbit) (approx. 5 minutes):"
-    echo " -latest          Launch latest archboot environment (using kexec)."
-    echo "                  This operation needs at least 1.8 GB RAM."
+    echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+    echo -e "                  package cache (using kexec)."
+    echo -e "                  This operation needs at least \033[1m2.5 GB RAM\033[0m."
     echo ""
-    echo " -latest-install  Launch latest archboot environment with downloaded"
-    echo "                  package cache (using kexec)."
-    echo "                  This operation needs at least 2.5 GB RAM."
+    echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
+    echo -e "                  This operation needs at least \033[1m3.4 GB RAM\033[0m."
     echo ""
-    echo " -latest-image    Generate latest image files in /archboot-release directory"
-    echo "                  This operation needs at least 3.4 GB RAM."
-    echo ""
-    echo " -h               This message."
+    echo -e " \033[1m-h\033[0m               This message."
     exit 0
 }
 
@@ -123,26 +122,27 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     exit 0
 fi
 
-echo "Information: Logging is done on /dev/tty7 ..."
+echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
 
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ -f /.update-installer ]]; then
-        echo "Aborting: update-installer.sh is already running on other tty ..."
+        echo -e "\033[91mAborting:033[0m"
+        echo "update-installer.sh is already running on other tty ..."
         echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
     fi
     touch /.update-installer
     _DISKSIZE="3G"
     zram_mount
-    echo "Step 1/9: Removing not necessary files from / ..."
+    echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
     clean_archboot
-    echo "Step 2/9: Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 2/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
     while pgrep -x gpg > /dev/null 2>&1; do
         sleep 1
     done
     systemctl stop pacman-init.service
-    echo "Step 3/9: Generating archboot container in ${_W_DIR} ..."
+    echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # create container without package cache
     if [[ "${_L_COMPLETE}" == "1" ]]; then
@@ -164,9 +164,9 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         fi
     fi
     kver
-    echo "Step 4/9: Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
+    echo -e "\033[1mStep 4/9:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
-    echo "Step 5/9: Collect initramfs files in ${_W_DIR} ..."
+    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
     cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
@@ -174,11 +174,11 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # write initramfs to "${_W_DIR}"/tmp
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     #mv "${_W_DIR}/tmp" /initrd || exit 1
-    echo "Step 6/9: Cleanup ${_W_DIR} ..."
+    echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
     sleep 10
-    echo "Step 7/9: Create initramfs /initrd.img ..."
+    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     # move cache back to initramfs directory in online mode
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -200,12 +200,12 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     while pgreg -x bsdtar >/dev/null 2>&1; do
         sleep 1
     done
-    echo "Step 8/9: Cleanup ${_W_DIR} ..."
+    echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
     cd /
     umount ${_W_DIR}
     echo 1 > /sys/block/zram0/reset
     sleep 5
-    echo "Step 9/9: Loading files through kexec into kernel now ..."
+    echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     # load kernel and initrds into running kernel in background mode!
     kexec -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
     # wait 1 seconds for getting a complete initramfs
@@ -215,7 +215,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     while pgreg -x kexec >/dev/null 2>&1; do
         sleep 1
     done
-    echo "Finished: Rebooting in a few seconds ..."
+    echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     # don't show active prompt wait for kexec to be launched
     sleep 30
 fi
@@ -224,10 +224,10 @@ fi
 if [[ "${_G_RELEASE}" == "1" ]]; then
     _DISKSIZE="5G"
     zram_mount
-    echo "Step 1/2: Removing not necessary files from / ..."
+    echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     clean_archboot
-    echo "Step 2/2: Generating new iso files now in ${_W_DIR} ..."
+    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files now in ${_W_DIR} ..."
     echo "          This will need some time ..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
-    echo "Finished: New isofiles are located in ${_W_DIR}"
+    echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
 fi
