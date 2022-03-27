@@ -226,7 +226,7 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     zram_mount
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     clean_archboot
-    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files now in ${_W_DIR} ..."
+    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
     echo "          This will need some time ..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
