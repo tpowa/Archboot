@@ -118,7 +118,7 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/pacman.sh?inline=false" -O "${_INST_PATH}/pacman.sh" > /dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/partition.sh?inline=false" -O "${_INST_PATH}/partition.sh" > /dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_INST_PATH}/storage.sh?inline=false" -O "${_INST_PATH}/storage.sh" > /dev/null 2>&1
-    echo "Finished: Downloading scripts done."
+    echo -e "033[1mFinished:033[0m Downloading scripts done."
     exit 0
 fi
 
