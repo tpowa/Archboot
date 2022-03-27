@@ -127,7 +127,7 @@ echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m .
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     if [[ -f /.update-installer ]]; then
-        echo -e "\033[91mAborting:033[0m"
+        echo -e "\033[91mAborting:\033[0m"
         echo "update-installer.sh is already running on other tty ..."
         echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
