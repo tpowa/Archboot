@@ -29,7 +29,6 @@ zram_mount() {
     # add defaults
     [[ -z "${_ZRAM_ALGORITHM}" ]] && _ZRAM_ALGORITHM="zstd"
     [[ -z "${_ZRAM_MAX_COMP_STREAMS}" ]] && _ZRAM_MAX_COMP_STREAMS="4"
-    [[ -z "${1}" ]] && 1="5G"
     modprobe zram
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
@@ -138,6 +137,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         exit 1
     fi
     touch /.update-installer
+    [[ -z "${_ZRAM_SIZE}" ]] && _ZRAM_SIZE="3G"
     zram_mount "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
     clean_archboot
@@ -226,7 +226,8 @@ fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
-    zram_mount "${_ZRAM_SIZE_RELEASE}"
+    [[ -z "${_ZRAM_IMAGE_SIZE}" ]] && _ZRAM_IMAGE_SIZE="5G"
+    zram_mount "${_ZRAM_IMAGE_SIZE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     clean_archboot
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
