@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+. /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
 _D_SCRIPTS=""
 _L_COMPLETE=""
@@ -25,12 +26,16 @@ kver() {
 }
 
 zram_mount() {
+    # add defaults
+    [[ -z "${_ZRAM_ALGORITHM}" ]] && _ZRAM_ALGORITHM="zstd"
+    [[ -z "${_ZRAM_MAX_COMP_STREAMS}" ]] && _ZRAM_MAX_COMP_STREAMS="4"
+    [[ -z "${1}" ]] && 1="5G"
     modprobe zram
-    echo zstd >/sys/block/zram0/comp_algorithm
-    echo "${_DISKSIZE}" >/sys/block/zram0/disksize
-    echo 4 >/sys/block/zram0/max_comp_streams
+    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
+    echo "${1}" >/sys/block/zram0/disksize
+    echo "${_ZRAM_MAX_COMP_STREAMS}" >/sys/block/zram0/max_comp_streams
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
-    mkfs.btrfs --mixed /dev/zram0 > /dev/null 2>&1 || exit 1
+    mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
     mkdir "${_W_DIR}"
     # use -o discard for RAM cleaning on delete
     # (online fstrimming the block device!)
@@ -133,8 +138,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         exit 1
     fi
     touch /.update-installer
-    _DISKSIZE="3G"
-    zram_mount
+    zram_mount "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
     clean_archboot
     echo -e "\033[1mStep 2/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
@@ -222,8 +226,7 @@ fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
-    _DISKSIZE="5G"
-    zram_mount
+    zram_mount "${_ZRAM_SIZE_RELEASE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     clean_archboot
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
