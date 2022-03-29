@@ -52,8 +52,8 @@ _prepare_uefi_IA32() {
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    systemd-nspawn -q -D grub-aarch64 grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o /grubaa64.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
-    mv grub-aarch64/grubaa64.efi grub-efi/
+    systemd-nspawn -q -D "${1}" grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="" --themes="" -o /grubaa64.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
+    mv "${1}"/grubaa64.efi grub-efi/
 }
 
 _upload_efi_files() {
@@ -65,7 +65,9 @@ _upload_efi_files() {
     chown "${_USER}:${_GROUP}" ./*
     for i in *.efi; do
         #shellcheck disable=SC2086
-        [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
+        if [[ -f "${i}" ]]; then
+            sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
+        fi
     done
     sudo -u "${_USER}" scp ./* "${_SERVER}:${_ARCH_SERVERDIR}" || exit 1
     cd ..

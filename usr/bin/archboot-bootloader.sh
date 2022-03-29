@@ -14,7 +14,7 @@ mkdir -m 777 grub-efi
 _prepare_uefi_X64 || exit 1
 _prepare_uefi_IA32 || exit 1
 archboot-aarch64-create-container.sh grub-aarch64
-_prepare_uefi_AA64 || exit 1
+_prepare_uefi_AA64 grub-aarch64 || exit 1
 _cleanup grub-aarch64 || exit 1
-_upload_efi_files grub-efi
+_upload_efi_files grub-efi || exit 1
 _cleanup grub-efi || exit 1
