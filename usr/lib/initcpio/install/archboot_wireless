@@ -13,12 +13,13 @@ build ()
     fi
     
     map add_binary iwconfig iwevent iwgetid iwlist iwpriv iwspy ifrename b43-fwcutter wpa_cli wpa_passphrase \
-	  wpa_supplicant iw crda regdbdump rfkill hwsim iwctl iwmon set-wireless-regdom
+	  wpa_supplicant iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
     add_dir "/etc/wpa_supplicant"
     # crda support
-    map add_file "/etc/conf.d/wireless-regdom" "/usr/lib/crda/regulatory.bin"
+    map add_file "/etc/conf.d/wireless-regdom" "/usr/lib/crda/regulatory.bin" \
+                 "/usr/lib/crda/pubkeys/sforshee.key.pub.pem"
     # fixing licenses
-    map add_file "/usr/share/licenses/expat/COPYING" "/usr/share/licenses/crda/LICENSE" \
+    map add_file "/usr/share/licenses/expat/COPYING" \
         "/usr/share/licenses/wireless-regdb/LICENSE"
 
 }
