@@ -7,6 +7,7 @@ build ()
     # add custom archboot mdadm.conf to avoid mdadm handling isw and ddf metadata devices
     # which are also covered by dmraid
     add_file "/usr/share/archboot/mdadm/etc/mdadm.conf" "/etc/mdadm.conf"
+    add_file "/usr/share/mdadm/mdcheck"
 }
 
 help ()
