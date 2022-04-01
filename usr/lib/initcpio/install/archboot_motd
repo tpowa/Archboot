@@ -19,6 +19,8 @@ if  echo "${HOOKS[@]}" | grep -q archboot_tz; then
     echo -e "\033[1mChange time and date:\033[0m" >> "${MOTD}"
     echo -e "  - To change your time and date, type \033[92m'tz'\033[0m at the console." >> "${MOTD}"
 fi
+    echo -e "\033[1mFor wifi authentification to internet access or further online help:\033[0m"
+    echo -e "  - Use the \033[92m'elinks'\033[0m text mode browser."
 if  echo "${HOOKS[@]}" | grep -q archboot_installer; then
     #shellcheck disable=SC2129 
     echo -e "\033[1mNormal Setup:\033[0m" >> "${MOTD}"
