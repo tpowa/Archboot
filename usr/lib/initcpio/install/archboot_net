@@ -17,6 +17,9 @@ build ()
     map add_dir "/var/lib/dhclient" "/var/state/dhcp"
     # add ifplugd support
     add_full_dir "/etc/ifplugd"
+    # add elinks defaults
+    add_file "/usr/share/archboot/net/etc/bookmarks" "/etc/bookmarks"
+    add_file "/usr/share/archboot/net/etc/profile.d/elinks.sh" "/etc/profile.d/elinks.sh"
     # fixing licenses
     map add_file "/usr/share/licenses/db/LICENSE" "/usr/share/licenses/dhclient/LICENSE" \
         "/usr/share/licenses/bind/LICENSE" "/usr/share/licenses/krb5/LICENSE" \
