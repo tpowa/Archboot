@@ -99,7 +99,10 @@ auto_packages() {
     marvell_modules
     # check marvell modules if already loaded
     for i in "${MARVELL}"; do
-        lsmod | grep -qw "${i}" && PACKAGES="${PACKAGES} linux-firmware-marvell"
+        if lsmod | grep -qw "${i}" ; then
+            PACKAGES="${PACKAGES} linux-firmware-marvell"
+            break
+        fi
     done
     ### HACK:
     # always add systemd-sysvcompat components
