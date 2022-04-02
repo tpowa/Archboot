@@ -7,7 +7,7 @@ build ()
 	  slattach traceroute arping clockdiff rarpd rdisc tracepath \
 	  dig host nslookup telnet ssh arpd genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss \
 	  tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma tipc vdpa \
-	  ping ethtool elinks dhcp_lease_time dhcp_release dhcp_release6 \
+	  ping ethtool elinks weechat dhcp_lease_time dhcp_release dhcp_release6 \
 	  routel brctl dhclient-script
     # add iproute 2, add openssl helper libraries
     map add_full_dir "/usr/lib/tc" "/usr/share/tc" "/etc/iproute2" "/usr/lib/engines"
@@ -17,9 +17,11 @@ build ()
     map add_dir "/var/lib/dhclient" "/var/state/dhcp"
     # add ifplugd support
     add_full_dir "/etc/ifplugd"
-    # add weechat defaults
-    add_binary "weechat"
-    add_full_dir "/usr/lib/weechat/plugins"
+    # add weechat plugins and defaults
+    PLUGINS="alias exec lua relay typing buflist fifo irc xfer charset fset logger script trigger"
+    for i in ${PLUGINS}; do
+      add_file "/usr/lib/weechat/plugins/$i.so"
+    done
     add_file "/usr/share/archboot/net/etc/weechat/irc.conf" "/etc/weechat/irc.conf"
     add_file "/usr/share/archboot/net/etc/weechat/weechat.conf" "/etc/weechat/weechat.conf"
     add_file "/usr/share/archboot/net/etc/profile.d/weechat.sh" "/etc/profile.d/weechat.sh"
