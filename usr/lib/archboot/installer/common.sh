@@ -14,6 +14,14 @@ fi
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
+
+marvell_modules() {
+    unset MARVELL
+    for i in $(find /lib/modules/$(uname -r) | grep -w wireless | grep -w marvell); do
+        [[ -f $i ]] && MARVELL="$MARVELL $(basename $i | sed -e 's#\..*$##g')"
+    done
+}
+
 # chroot_mount()
 # prepares target system as a chroot
 chroot_mount()
@@ -86,6 +94,13 @@ auto_packages() {
     if lsmod | grep -qw wl; then
         ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
+    # only add linux-firmware-marvell if already used
+    PACKAGES="$(echo ${PACKAGES} | sed -e 's#linux-firmware-marvell##g')"
+    marvell_modules
+    # check marvell modules if already loaded
+    for i in "${MARVELL}"; do
+        lsmod | grep -qw "${i}" && PACKAGES="${PACKAGES} linux-firmware-marvell"
+    done
     ### HACK:
     # always add systemd-sysvcompat components
     PACKAGES="${PACKAGES//\ systemd-sysvcompat\ / }"
