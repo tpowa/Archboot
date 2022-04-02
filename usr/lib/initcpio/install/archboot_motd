@@ -27,7 +27,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     #shellcheck disable=SC2129 
-    echo -e "\033[1mNormal Setup:\033[0m" >> "${MOTD}"
+    echo -e "\033[1mInstallation:\033[0m" >> "${MOTD}"
     echo -e "  - On first login \033[1msetup\033[0m is launched automatically." >> "${MOTD}"
     echo -e "  - Please run \033[92m'setup'\033[0m again to install Arch Linux if you left setup." >> "${MOTD}"
     echo -e "  - Virtual console \033[1m7\033[0m is used for setup logging, use \033[92mALT + F7\033[0m." >> "${MOTD}"
