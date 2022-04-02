@@ -11,17 +11,21 @@ build ()
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
     echo -e "  - Virtual consoles \033[1m1-6\033[0m are active." >> "${MOTD}"
     echo -e "  - To change virtual console use \033[92mALT + F(1-6)\033[0m" >> "${MOTD}"
-if  echo "${HOOKS[@]}" | grep -q archboot_keymap ; then
+if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
     echo -e "\033[1mChange keymap and console font:\033[0m" >> "${MOTD}"
     echo -e "  - To change to a non-US keymap, type \033[92m'km'\033[0m at the console." >> "${MOTD}"
 fi
-if  echo "${HOOKS[@]}" | grep -q archboot_tz; then
+if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\033[1mChange time and date:\033[0m" >> "${MOTD}"
     echo -e "  - To change your time and date, type \033[92m'tz'\033[0m at the console." >> "${MOTD}"
 fi
+if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     echo -e "\033[1mFor wifi authentification to internet access or further online help:\033[0m"
     echo -e "  - Use the \033[92m'elinks'\033[0m text mode browser."
-if  echo "${HOOKS[@]}" | grep -q archboot_installer; then
+    echo -e "\033[1mFor getting support on IRC channels:\033[0m"
+    echo -e "  - Use the \033[92m'weechat'\033[0m IRC client."
+fi
+if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     #shellcheck disable=SC2129 
     echo -e "\033[1mNormal Setup:\033[0m" >> "${MOTD}"
     echo -e "  - On first login \033[1msetup\033[0m is launched automatically." >> "${MOTD}"
