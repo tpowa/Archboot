@@ -1,6 +1,6 @@
 # defaults for archboot
 # packages to install (eg. firmware, kernel packages)
-_PACKAGES="base linux linux-firmware"
+_PACKAGES="base linux linux-firmware linux-firmware-marvell"
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
