@@ -114,8 +114,8 @@ btrfs_raid_level() {
     DIALOG --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid data level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>${ANSWER} || return 1
-        BTRFS_LEVEL=$(cat ${ANSWER})
+        DIALOG --menu "Select the raid data level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>"${ANSWER}" || return 1
+        BTRFS_LEVEL=$(cat "${ANSWER}")
         if [[ "${BTRFS_LEVEL}" = "NONE" ]]; then
             echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
             break
@@ -138,8 +138,8 @@ select_btrfs_raid_devices () {
     BTRFS_PARTS="${BTRFS_PARTS//${BTRFS_PART}\ _/}"
     RAIDNUMBER=2
     #shellcheck disable=SC2086
-    DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>${ANSWER} || return 1
-    BTRFS_PART=$(cat ${ANSWER})
+    DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
+    BTRFS_PART=$(cat "${ANSWER}")
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
     while [[ "${BTRFS_PART}" != "DONE" ]]; do
         BTRFS_DONE=""
@@ -153,8 +153,8 @@ select_btrfs_raid_devices () {
         BTRFS_PARTS="${BTRFS_PARTS//${BTRFS_PART}\ _/}"
         # add more devices
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>${ANSWER} || return 1
-        BTRFS_PART=$(cat ${ANSWER})
+        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
+        BTRFS_PART=$(cat "${ANSWER}")
         [[ "${BTRFS_PART}" = "DONE" ]] && break
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
      done
@@ -181,8 +181,8 @@ prepare_btrfs_subvolume() {
     if [[ "${DOSUBVOLUME}" = "yes" ]]; then
         BTRFS_SUBVOLUME="NONE"
         while [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; do
-            DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>${ANSWER} || return 1
-            BTRFS_SUBVOLUME=$(cat ${ANSWER})
+            DIALOG --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>"${ANSWER}" || return 1
+            BTRFS_SUBVOLUME=$(cat "${ANSWER}")
             check_btrfs_subvolume
         done
     else
@@ -214,7 +214,7 @@ check_btrfs_subvolume(){
 # create btrfs subvolume
 create_btrfs_subvolume() {
     mount_btrfs
-    btrfs subvolume create "${BTRFSMP}"/"${_btrfssubvolume}" >${LOG}
+    btrfs subvolume create "${BTRFSMP}"/"${_btrfssubvolume}" > "${LOG}"
     # change permission from 700 to 755
     # to avoid warnings during package installation
     chmod 755 "${BTRFSMP}"/"${_btrfssubvolume}"
@@ -234,8 +234,8 @@ choose_btrfs_subvolume () {
     done
     if [[ -n "${SUBVOLUMES}" ]]; then
     #shellcheck disable=SC2086
-        DIALOG --menu "Select the subvolume to mount" 21 50 13 ${SUBVOLUMES} 2>${ANSWER} || return 1
-        BTRFS_SUBVOLUME=$(cat ${ANSWER})
+        DIALOG --menu "Select the subvolume to mount" 21 50 13 ${SUBVOLUMES} 2>"${ANSWER}" || return 1
+        BTRFS_SUBVOLUME=$(cat "${ANSWER}")
     else
         if [[ "${SUBVOLUMES_DETECTED}" = "yes" ]]; then
             DIALOG --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
@@ -276,7 +276,7 @@ btrfs_compress() {
     fi
     if [[ "${BTRFS_COMPRESS}" = "compress" ]]; then
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the compression method you want to use" 21 50 9 ${BTRFS_COMPRESSLEVELS} 2>${ANSWER} || return 1
-        BTRFS_COMPRESS="compress=$(cat ${ANSWER})"
+        DIALOG --menu "Select the compression method you want to use" 21 50 9 ${BTRFS_COMPRESSLEVELS} 2>"${ANSWER}" || return 1
+        BTRFS_COMPRESS="compress=$(cat "${ANSWER}")"
     fi
 }

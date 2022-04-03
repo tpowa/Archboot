@@ -58,16 +58,16 @@ select_filesystem() {
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
     [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>${ANSWER} || return 1
-    FSTYPE=$(cat ${ANSWER})
+    DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>"${ANSWER}" || return 1
+    FSTYPE=$(cat "${ANSWER}")
 }
 
 enter_mountpoint() {
     FILESYSTEM_FINISH=""
     MP=""
     while [[ "${MP}" = "" ]]; do
-        DIALOG --inputbox "Enter the mountpoint for ${PART}" 8 65 "/boot" 2>${ANSWER} || return 1
-        MP=$(cat ${ANSWER})
+        DIALOG --inputbox "Enter the mountpoint for ${PART}" 8 65 "/boot" 2>"${ANSWER}" || return 1
+        MP=$(cat "${ANSWER}")
         if grep ":${MP}:" /tmp/.parts; then
             DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
             MP=""
@@ -97,8 +97,8 @@ create_filesystem() {
     if [[ "${DOMKFS}" = "yes" ]]; then
         while [[ "${LABEL_NAME}" = "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_LSBLK} LABEL "${PART}")" 2>${ANSWER} || return 1
-            LABEL_NAME=$(cat ${ANSWER})
+            "$(${_LSBLK} LABEL "${PART}")" 2>"${ANSWER}" || return 1
+            LABEL_NAME=$(cat "${ANSWER}")
             if grep ":${LABEL_NAME}$" /tmp/.parts; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
                 LABEL_NAME=""
@@ -108,8 +108,8 @@ create_filesystem() {
             prepare_btrfs || return 1
             btrfs_compress
         fi
-        DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>${ANSWER} || return 1
-        FS_OPTIONS=$(cat ${ANSWER})
+        DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${ANSWER}" || return 1
+        FS_OPTIONS=$(cat "${ANSWER}")
     fi
     FILESYSTEM_FINISH="yes"
 }
@@ -130,8 +130,8 @@ mountpoints() {
         while [[ "${DO_SWAP}" != "DONE" ]]; do
             FSTYPE="swap"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - ${PARTS} 2>${ANSWER} || return 1
-            PART=$(cat ${ANSWER})
+            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - ${PARTS} 2>"${ANSWER}" || return 1
+            PART=$(cat "${ANSWER}")
             if [[ "${PART}" != "NONE" ]]; then
                 clear_fs_values
                 if [[ "${ASK_MOUNTPOINTS}" = "1" ]]; then
@@ -152,8 +152,8 @@ mountpoints() {
         DO_ROOT=""
         while [[ "${DO_ROOT}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to mount as /" 21 50 13 ${PARTS} 2>${ANSWER} || return 1
-            PART=$(cat ${ANSWER})
+            DIALOG --menu "Select the partition to mount as /" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
+            PART=$(cat "${ANSWER}")
             PART_ROOT=${PART}
             # Select root filesystem type
             FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
@@ -179,8 +179,8 @@ mountpoints() {
             DO_ADDITIONAL=""
             while [[ "${DO_ADDITIONAL}" != "DONE" ]]; do
                 #shellcheck disable=SC2086
-                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>${ANSWER} || return 1
-                PART=$(cat ${ANSWER})
+                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
+                PART=$(cat "${ANSWER}")
                 if [[ "${PART}" != "DONE" ]]; then
                     FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
                     # clear values first!
@@ -286,14 +286,14 @@ _mkfs() {
     if [[ "${_fstype}" = "swap" ]]; then
         swapoff "${_device}" >/dev/null 2>&1
         if [[ "${_domk}" = "yes" ]]; then
-            mkswap -L "${_labelname}" "${_device}" >${LOG} 2>&1
+            mkswap -L "${_labelname}" "${_device}" >"${LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
                 DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
                 return 1
             fi
         fi
-        swapon "${_device}" >${LOG} 2>&1
+        swapon "${_device}" >"${LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
@@ -314,15 +314,15 @@ _mkfs() {
             local ret
             #shellcheck disable=SC2086
             case ${_fstype} in
-                xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f ${_device} >${LOG} 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >${LOG} 2>&1; ret=$? ;;
-                ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >${LOG} 2>&1; ret=$? ;;
-                f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >${LOG} 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >${LOG} 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >"${LOG}" 2>&1; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
@@ -348,14 +348,14 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _mountoptions="$(echo "${_mountoptions}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${_fstype}" -o "${_mountoptions}" "${_device}" "${_dest}""${_mountpoint}" >${LOG} 2>&1
+        mount -t "${_fstype}" -o "${_mountoptions}" "${_device}" "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_fstype}" = "btrfs" && "${_domk}" = "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >${LOG} 2>&1
+        [[ "${_fstype}" = "btrfs" && "${_domk}" = "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${_mountpoint}" = "/tmp" ]]; then

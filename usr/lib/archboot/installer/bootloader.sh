@@ -85,12 +85,12 @@ freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
         if grep -q "${DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f ${DESTDIR}/boot >/dev/null 2>&1
-            xfs_freeze -u ${DESTDIR}/boot >/dev/null 2>&1
+            xfs_freeze -f "${DESTDIR}"/boot >/dev/null 2>&1
+            xfs_freeze -u "${DESTDIR}"/boot >/dev/null 2>&1
         fi
         if grep -q "${DESTDIR} " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f ${DESTDIR} >/dev/null 2>&1
-            xfs_freeze -u ${DESTDIR} >/dev/null 2>&1
+            xfs_freeze -f "${DESTDIR}" >/dev/null 2>&1
+            xfs_freeze -u "${DESTDIR}" >/dev/null 2>&1
         fi
     fi
 }
@@ -330,15 +330,15 @@ do_secureboot_keys() {
     MOK_PW=""
     KEYDIR=""
     while [[ "${KEYDIR}" = "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>${ANSWER} || KEYDIR=""
-        KEYDIR=$(cat ${ANSWER})
+        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>"${ANSWER}" || KEYDIR=""
+        KEYDIR=$(cat "${ANSWER}")
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
         while [[ "${CN}" = "" ]]; do
-            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>${ANSWER} || CN=""
-            CN=$(cat ${ANSWER})
+            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${ANSWER}" || CN=""
+            CN=$(cat "${ANSWER}")
         done
-        secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > ${LOG} 2>&1 || return 1
+        secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
          DIALOG --msgbox "Setup keys created:\nCommon name(CN) ${CN} used for your keys in ${DESTDIR}/${KEYDIR} " 8 65
     else
          DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65 ""
@@ -352,10 +352,10 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 0 0 && INSTALL_MOK="1"
     if [[ "${INSTALL_MOK}" == "1" ]]; then
         while [[ "${MOK_PW}" = "" ]]; do
-            DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>${ANSWER} || return 1
-            PASS=$(cat ${ANSWER})
-            DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>${ANSWER} || return 1
-            PASS2=$(cat ${ANSWER})
+            DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${ANSWER}" || return 1
+            PASS=$(cat "${ANSWER}")
+            DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${ANSWER}" || return 1
+            PASS2=$(cat "${ANSWER}")
             if [[ "${PASS}" = "${PASS2}" ]]; then
                 MOK_PW=${PASS}
                 echo "${MOK_PW}" > /tmp/.password
@@ -365,15 +365,15 @@ do_mok_sign () {
                 DIALOG --msgbox "Password didn't match, please enter again." 8 65
             fi
         done
-        mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > ${LOG}
+        mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
         rm /tmp/.password
         DIALOG --msgbox "MOK keys have been installed successfully." 8 65
     fi
     SIGN_MOK=""
     DIALOG --yesno "Do you want to sign /boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi with the MOK certificate?" 0 0 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
-        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/${VMLINUZ} > ${LOG}
-        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > ${LOG}
+        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
+        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
         DIALOG --msgbox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully." 8 65
     fi
 }
@@ -526,8 +526,8 @@ do_efistub_uefi() {
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
                 "systemd-boot" "systemd-boot for ${_UEFI_ARCH} UEFI" \
                 "refind" "refind for ${_UEFI_ARCH} UEFI" \
-                "NONE" "No Boot Manager" 2>${ANSWER} || CANCEL=1
-            case $(cat ${ANSWER}) in
+                "NONE" "No Boot Manager" 2>"${ANSWER}" || CANCEL=1
+            case $(cat "${ANSWER}") in
                 "systemd-boot") do_systemd_boot_uefi ;;
                 "refind") do_refind_uefi;;
                 "NONE") return 0 ;;
@@ -585,8 +585,8 @@ GUMEOF
     uefi_mount_efivarfs
 
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install >$LOG 2>&1
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update >$LOG 2>&1
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install >"${LOG}" 2>&1
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update >"${LOG}" 2>&1
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -1086,8 +1086,8 @@ do_grub_bios() {
             return 1
         fi
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-        bootdev=$(cat ${ANSWER})
+        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
+        bootdev=$(cat "${ANSWER}")
     else
         DEVS="$(findbootloaderdisks _)"
 
@@ -1099,8 +1099,8 @@ do_grub_bios() {
             return 1
         fi
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>${ANSWER} || return 1
-        bootdev=$(cat ${ANSWER})
+        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
+        bootdev=$(cat "${ANSWER}")
     fi
 
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${bootdev}")" == "gpt" ]]; then
@@ -1274,13 +1274,13 @@ install_bootloader_uefi() {
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         else
             DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 12 55 5 \
                 "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>${ANSWER} || CANCEL=1
+                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         fi
-        case $(cat ${ANSWER}) in
+        case $(cat "${ANSWER}") in
             "EFISTUB") do_efistub_uefi ;;
             "GRUB_UEFI") do_grub_uefi ;;
         esac
@@ -1291,8 +1291,8 @@ install_bootloader_uefi() {
 install_bootloader_bios() {
 
     DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
-        "GRUB_BIOS" "GRUB(2) BIOS" 2>${ANSWER} || CANCEL=1
-    case $(cat ${ANSWER}) in
+        "GRUB_BIOS" "GRUB(2) BIOS" 2>"${ANSWER}" || CANCEL=1
+    case $(cat "${ANSWER}") in
         "GRUB_BIOS") do_grub_bios ;;
     esac
 

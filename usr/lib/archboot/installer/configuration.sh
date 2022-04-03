@@ -25,10 +25,10 @@ set_locale() {
 set_password() {
     PASSWORD=""
     while [[ "${PASSWORD}" = "" ]]; do
-        DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>${ANSWER} || return 1
-        PASS=$(cat ${ANSWER})
-        DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>${ANSWER} || return 1
-        PASS2=$(cat ${ANSWER})
+        DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>"${ANSWER}" || return 1
+        PASS=$(cat "${ANSWER}")
+        DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>"${ANSWER}" || return 1
+        PASS2=$(cat "${ANSWER}")
         if [[ "${PASS}" = "${PASS2}" ]]; then
             PASSWORD=${PASS}
             echo "${PASSWORD}" > /tmp/.password
@@ -52,9 +52,9 @@ run_mkinitcpio() {
     touch /tmp/setup-mkinitcpio-running
     echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p ${KERNELPKG}-"${RUNNING_ARCH}" >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" >>/tmp/mkinitcpio.log 2>&1
     else
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p ${KERNELPKG} >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" >>/tmp/mkinitcpio.log 2>&1
     fi
     echo >> /tmp/mkinitcpio.log
     rm -f /tmp/setup-mkinitcpio-running

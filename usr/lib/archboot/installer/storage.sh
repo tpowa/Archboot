@@ -16,9 +16,9 @@ create_special() {
             "1" "Manage Software Raid" \
             "2" "Manage LVM2" \
             "3" "Manage Luks encryption" \
-            "4" "Return to Previous Menu" 2>${ANSWER} || CANCEL="1"
-        NEXTITEM="$(cat ${ANSWER})"
-        case $(cat ${ANSWER}) in
+            "4" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${ANSWER}")"
+        case $(cat "${ANSWER}") in
             "1")
                 _createmd ;;
             "2")
@@ -53,9 +53,9 @@ _createmd() {
             "2" "Reset Software Raid completely" \
             "3" "Create Software Raid" \
             "4" "Create Partitionable Software Raid" \
-            "5" "Return to Previous Menu" 2>${ANSWER} || CANCEL="1"
-        NEXTITEM="$(cat ${ANSWER})"
-        case $(cat ${ANSWER}) in
+            "5" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${ANSWER}")"
+        case $(cat "${ANSWER}") in
             "1")
                 _helpraid ;;
             "2")
@@ -95,9 +95,9 @@ _createlvm() {
             "3" "Create Physical Volume" \
             "4" "Create Volume Group" \
             "5" "Create Logical Volume" \
-            "6" "Return to Previous Menu" 2>${ANSWER} || CANCEL="1"
-        NEXTITEM="$(cat ${ANSWER})"
-        case $(cat ${ANSWER}) in
+            "6" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${ANSWER}")"
+        case $(cat "${ANSWER}") in
             "1")
                 _helplvm ;;
             "2")
@@ -135,9 +135,9 @@ _createluks() {
             "1" "Luks Help" \
             "2" "Reset Luks Encryption completely" \
             "3" "Create Luks" \
-            "4" "Return to Previous Menu" 2>${ANSWER} || CANCEL="1"
-        NEXTITEM="$(cat ${ANSWER})"
-        case $(cat ${ANSWER}) in
+            "4" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${ANSWER}")"
+        case $(cat "${ANSWER}") in
             "1")
                 _helpluks ;;
             "2")

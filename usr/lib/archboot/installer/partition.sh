@@ -19,9 +19,9 @@ check_gpt() {
 
     if [[ "${GUID_DETECTED}" == "" ]]; then
         DIALOG --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt "${DISC}" > ${LOG} && GUID_DETECTED="1"
+        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
         # reread partitiontable for kernel
-        partprobe "${DISC}" > ${LOG}
+        partprobe "${DISC}" > "${LOG}"
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --defaultno --yesno "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
@@ -66,8 +66,8 @@ check_efisys_part() {
         GUID_DETECTED=""
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         DIALOG --msgbox "Setup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
-        sgdisk --mbrtogpt "${DISC}" > ${LOG} && GUID_DETECTED="1"
-        partprobe "${DISC}" > ${LOG}
+        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
+        partprobe "${DISC}" > "${LOG}"
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --msgbox "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1
@@ -98,8 +98,8 @@ check_efisys_part() {
         #autodetect efisys mountpoint, on fail ask for mountpoint
         UEFISYS_MOUNTPOINT="/$(basename "$(mount | grep "${UEFISYS_PART}" | cut -d " " -f 3)")"
         if [[ "${UEFISYS_MOUNTPOINT}" == "/" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>${ANSWER} || return 1
-            UEFISYS_MOUNTPOINT="$(cat ${ANSWER})"
+            DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${ANSWER}" || return 1
+            UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
         fi
 
         umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
@@ -150,11 +150,11 @@ partition() {
     while true; do
         # Prompt the user with a list of known disks
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the disk you want to partition\n(select DONE when finished)" 14 55 7 ${DISCS} 2>${ANSWER} || return 1
-        DISC=$(cat ${ANSWER})
+        DIALOG --menu "Select the disk you want to partition\n(select DONE when finished)" 14 55 7 ${DISCS} 2>"${ANSWER}" || return 1
+        DISC=$(cat "${ANSWER}")
         if [[ "${DISC}" == "OTHER" ]]; then
-            DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>${ANSWER} || DISC=""
-            DISC=$(cat ${ANSWER})
+            DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${ANSWER}" || DISC=""
+            DISC=$(cat "${ANSWER}")
         fi
         # Leave our loop if the user is done partitioning
         [[ "${DISC}" == "DONE" ]] && break
@@ -173,7 +173,7 @@ partition() {
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of="${DEVICE}" bs=512 count=2048 >/dev/null 2>&1
                     wipefs -a "${DEVICE}" /dev/null 2>&1
-                    parted -a optimal -s "${DISC}" mktable msdos >${LOG}
+                    parted -a optimal -s "${DISC}" mktable msdos >"${LOG}"
                 fi
                 # Partition disc
                 DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70

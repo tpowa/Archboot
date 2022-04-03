@@ -28,7 +28,7 @@ select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         dialog --infobox "Downloading latest mirrorlist ..." 3 40
-        ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o ${LOG} 2>/dev/null
+        ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt -o "${LOG}" 2>/dev/null
 
         if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
             mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
@@ -42,11 +42,11 @@ select_mirror() {
         ${MIRRORS} \
         "Custom" "_" 2>${ANSWER} || return 1
     #shellcheck disable=SC2155
-    local _server=$(cat ${ANSWER})
+    local _server=$(cat "${ANSWER}")
     if [[ "${_server}" = "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to repositories." 8 65 \
-            "" 2>${ANSWER} || return 1
-            SYNC_URL=$(cat ${ANSWER})
+            "" 2>"${ANSWER}" || return 1
+            SYNC_URL=$(cat "${ANSWER}")
     else
         # Form the full URL for our mirror by grepping for the server name in
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
@@ -54,7 +54,7 @@ select_mirror() {
         # only return one line for the mirror.
         SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
-    echo "Using mirror: ${SYNC_URL}" >${LOG}
+    echo "Using mirror: ${SYNC_URL}" > "${LOG}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if [[ "${DOTESTING}" == "yes" ]]; then
@@ -76,7 +76,7 @@ dotesting() {
 # check for updating complete environment with packages
 update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
-        echo "Packages are already in pacman cache...  > ${LOG}"
+        echo "Packages are already in pacman cache..."  > "${LOG}"
     else
         detect_uefi_boot
         UPDATE_ENVIRONMENT=""
@@ -98,7 +98,7 @@ prepare_pacman() {
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
     DIALOG --infobox "Refreshing package database..." 3 40
-    ${PACMAN} -Sy >${LOG} 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
+    ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     return 0
 }
 
@@ -129,12 +129,12 @@ run_pacman(){
     # display pacman output while it's running
     sleep 2
     dialog --backtitle "${TITLE}" --title " Installing... Please Wait " \
-        --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>${ANSWER}
+        --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2> "${ANSWER}"
     while [[ -f /tmp/setup-pacman-running ]]; do
         /usr/bin/true
     done
     #shellcheck disable=SC2046
-    kill $(cat ${ANSWER})
+    kill $(cat "${ANSWER}")
 
     # pacman finished, display scrollable output
     local _result=''
