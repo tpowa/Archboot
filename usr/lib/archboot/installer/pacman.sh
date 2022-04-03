@@ -97,7 +97,7 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
-    DIALOG --infobox "Refreshing package database..." 6 45
+    DIALOG --infobox "Refreshing package database..." 3 40
     ${PACMAN} -Sy >${LOG} 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     return 0
 }
