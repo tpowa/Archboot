@@ -164,8 +164,10 @@ install_packages() {
     PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
     # fallback if _PACKAGES is empty
     [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
-    DIALOG --yesno "Next step will install ${PACKAGES}, netctl and filesystem tools for a minimal system.\n\nYou can watch the output in the progress window.\nPlease be patient.\n\nDo you wish to continue?" 11 60 || return 1
     auto_packages
+    # fix double spaces
+    PACKAGES="${PACKAGES//  / }"
+    DIALOG --yesno "Next step will install for a minimal system:\n\n${PACKAGES}\n\nYou can watch the output in the progress window.\nPlease be patient.\n\nDo you wish to continue?" 14 60 || return 1
     run_pacman
     NEXTITEM="6"
     chroot_mount
