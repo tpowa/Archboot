@@ -50,7 +50,7 @@ _create_iso() {
     echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
     echo "Homepage: https://wiki.archlinux.org/title/Archboot";\
     echo "Architecture: ${_ARCH}";\
-    echo "RAM requirement to boot: 1152 MB or greater";\
+    echo "RAM requirement to boot: 1300 MB or greater";\
     echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
