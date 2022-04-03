@@ -16,9 +16,10 @@ PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/
 
 
 linux_firmware() {
-    PACKAGES="$(echo ${PACKAGES} | sed -e 's#\ linux-firmware\ # #g')"
-    for i in $(cat /proc/modules | cut -d ' ' -f1); do
-        if modinfo $i | grep -w 'firmware:'; then
+    PACKAGES="${PACKAGES//\ linux-firmware\ / }"
+    #shellcheck disable=SC2013
+    for i in $(cut -d ' ' -f1</proc/modules); do
+        if modinfo "${i}" | grep -w 'firmware:'; then
             PACKAGES="${PACKAGES} linux-firmware"
             break
         fi
@@ -27,12 +28,12 @@ linux_firmware() {
 
 marvell_firmware() {
     unset MARVELL
-    PACKAGES="$(echo ${PACKAGES} | sed -e 's# linux-firmware-marvell# #g')"
-    for i in $(find /lib/modules/$(uname -r) | grep -w wireless | grep -w marvell); do
-        [[ -f $i ]] && MARVELL="$MARVELL $(basename $i | sed -e 's#\..*$##g')"
+    PACKAGES="${PACKAGES// linux-firmware-marvell/ }"
+    for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
+        [[ -f $i ]] && MARVELL="$MARVELL $(basename "${i}" | sed -e 's#\..*$##g')"
     done
     # check marvell modules if already loaded
-    for i in "${MARVELL}"; do
+    for i in ${MARVELL}; do
         if lsmod | grep -qw "${i}"; then
             PACKAGES="${PACKAGES} linux-firmware-marvell"
             break
