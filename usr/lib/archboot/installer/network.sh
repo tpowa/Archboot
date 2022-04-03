@@ -143,7 +143,7 @@ donetwork() {
         export ftp_proxy=${PROXY_FTP}
     fi
     # add sleep here dhcp can need some time to get link
-    DIALOG --infobox "Please wait 5 seconds for network link to come up ..." 0 0
+    DIALOG --infobox "Please wait 5 seconds for network link to come up ..." 3 60
     sleep 5
     NEXTITEM="2"
     S_NET=1

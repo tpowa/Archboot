@@ -24,7 +24,7 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
-    NEXTITEM="4"
+    NEXTITEM="2"
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         dialog --infobox "Downloading latest mirrorlist ..." 3 40
@@ -54,6 +54,7 @@ select_mirror() {
         # only return one line for the mirror.
         SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
+    NEXTITEM="4"
     echo "Using mirror: ${SYNC_URL}" > "${LOG}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist

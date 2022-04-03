@@ -206,7 +206,7 @@ mainmenu() {
         "1")
             donetwork ;;
         "2")
-            select_source
+            select_source || return 1
             update_environment ;;
         "3")
             set_clock ;;
