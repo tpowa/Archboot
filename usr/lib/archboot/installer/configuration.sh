@@ -60,8 +60,8 @@ run_mkinitcpio() {
     else
         echo -e "\nMkinitcpio Complete." >>/tmp/mkinitcpio.log
     fi
-    # pacman finished, display scrollable output
     local _result=''
+    # mkinitcpio finished, display scrollable output on error
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
         _result="Mkinitcpio Failed (see errors below)"
         DIALOG --title "${_result}" --exit-label "Continue" \
