@@ -122,12 +122,10 @@ run_pacman(){
     local _result=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         _result="Installation Failed (see errors below)"
-    else
-        _result="Installation Complete"
+        DIALOG --title "${_result}" --exit-label "Continue" \
+        --textbox "/tmp/pacman.log" 18 70 || return 1
     fi
     rm /tmp/.pacman-retcode
-    DIALOG --title "${_result}" --exit-label "Continue" \
-        --textbox "/tmp/pacman.log" 18 70 || return 1
     # ensure the disk is synced
     sync
     chroot_umount
