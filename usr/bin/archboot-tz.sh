@@ -71,7 +71,7 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
         S_NEXTITEM="2"
     else
         S_NEXTITEM="1"
-        break
+        return 1
     fi
 done
 }
