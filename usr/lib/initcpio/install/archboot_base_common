@@ -26,7 +26,10 @@ build ()
     
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
-    map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
+    _path="/usr/share/terminfo"
+    map add_file "${_path}/l/linux" "${_path}/v/vt102" "${_path}/s/screen" \
+    "${_path}/s/screen.linux" "${_path}/s/screen.xterm-256color" "${_path}/x/xterm-256color"
+    add_full_dir "/etc/profile.d"
     systemfiles="bash.bashrc bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
                  services wgetrc"
