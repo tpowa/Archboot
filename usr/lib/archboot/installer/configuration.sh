@@ -63,7 +63,7 @@ run_mkinitcpio() {
     # pacman finished, display scrollable output
     local _result=''
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
-        _result="Mkinitpcio Failed (see errors below)"
+        _result="Mkinitcpio Failed (see errors below)"
         DIALOG --title "${_result}" --exit-label "Continue" \
         --textbox "/tmp/mkinitcpio.log" 18 70 || return 1
     fi
