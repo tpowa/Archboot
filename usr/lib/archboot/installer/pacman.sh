@@ -108,35 +108,16 @@ run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-
-    # execute pacman in a subshell so we can follow its progress
-    # pacman output goes /tmp/pacman.log
-    # /tmp/setup-pacman-running acts as a lockfile
-    ( \
-        echo "Installing Packages..." >/tmp/pacman.log ; \
-        echo >>/tmp/pacman.log ; \
-        touch /tmp/setup-pacman-running ; \
-        #shellcheck disable=SC2086,SC2069
-        ${PACMAN} -S ${PACKAGES} 2>&1 >> /tmp/pacman.log ; \
-        echo $? > /tmp/.pacman-retcode ; \
-        if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
-            echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
-        else
-            echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
-        fi
-        rm /tmp/setup-pacman-running
-    ) &
-
-    # display pacman output while it's running
-    sleep 2
-    dialog --backtitle "${TITLE}" --title " Installing... Please Wait " \
-        --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2> "${ANSWER}"
-    while [[ -f /tmp/setup-pacman-running ]]; do
-        /usr/bin/true
-    done
-    #shellcheck disable=SC2046
-    kill $(cat "${ANSWER}")
-
+    DIALOG --infobox "Installing ... Please be patient-" 3 40
+    echo "Installing Packages..." >/tmp/pacman.log
+    #shellcheck disable=SC2086,SC2069
+    ${PACMAN} -S ${PACKAGES} |& tee -a "${LOG}" /tmp/pacman.log >/dev/null 2>&1
+    echo $? > /tmp/.pacman-retcode
+    if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
+        echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
+    else
+        echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
+    fi
     # pacman finished, display scrollable output
     local _result=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
