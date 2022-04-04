@@ -189,7 +189,7 @@ mainmenu() {
     fi
     #shellcheck disable=SC2086
     dialog ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
-    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 18 58 14 \
+    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Set Keyboard And Console Font" \
     "1" "Set up Network" \
     "2" "Select Source" \
