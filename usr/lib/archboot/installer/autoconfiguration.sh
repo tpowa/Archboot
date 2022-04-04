@@ -99,7 +99,7 @@ auto_hwdetect() {
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
     HWKVER=""
-    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 18 70 && HWDETECT="yes"
+    DIALOG --yesno "PRECONFIGURATION?\n-----------------\n\nDo you want to use 'hwdetect' for:\n'/etc/mkinitcpio.conf'?\n\nThis ensures consistent ordering of your storage disk / usb controllers.\n\nIt is recommended to say 'YES' here." 14 70 && HWDETECT="yes"
     if [[ "${HWDETECT}" = "yes" ]]; then
         # check on framebuffer modules and kms FBPARAMETER
         grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
