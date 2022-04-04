@@ -125,7 +125,7 @@ run_pacman(){
         DIALOG --title "${_result}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        DIALOG --msgbox "Package installation complete." 3 40
+        DIALOG --msgbox "Package installation complete." 10 40
     fi
     rm /tmp/.pacman-retcode
     # ensure the disk is synced
