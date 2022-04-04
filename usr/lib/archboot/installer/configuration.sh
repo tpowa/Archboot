@@ -50,9 +50,9 @@ run_mkinitcpio() {
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" | tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     else
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" | tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     fi
     chroot_umount
 }
