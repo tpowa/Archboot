@@ -125,7 +125,7 @@ run_pacman(){
         DIALOG --title "${_result}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        DIALOG --infobox "Package installation complete." 5 40
+        DIALOG --infobox "Package installation complete." 3 40
         sleep 3
     fi
     rm /tmp/.pacman-retcode
