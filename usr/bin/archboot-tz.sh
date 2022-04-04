@@ -135,7 +135,7 @@ mainmenu() {
     fi
     #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
-                --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 13 \
+                --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
         "1" "Select Timezone" \
         "2" "Set Time and Date" \
         "3" "${EXIT}" 2>${ANSWER}
