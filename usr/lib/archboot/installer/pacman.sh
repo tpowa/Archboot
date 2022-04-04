@@ -108,7 +108,7 @@ run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-    DIALOG --infobox "Please be patient. Installing packages ..." 3 50
+    DIALOG --infobox "Please be patient.\n\nInstalling packages:\n${PACKAGES} ..." 10 70
     echo "Installing Packages..." >/tmp/pacman.log
     #shellcheck disable=SC2086,SC2069
     ${PACMAN} -S ${PACKAGES} |& tee -a "${LOG}" /tmp/pacman.log >/dev/null 2>&1
