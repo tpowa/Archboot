@@ -149,7 +149,7 @@ install_packages() {
     auto_packages
     # fix double spaces
     PACKAGES="${PACKAGES//  / }"
-    DIALOG --yesno "For a minimal system next step will install:\n\n${PACKAGES}\n\nYou can watch the progress on ${LOG}.\n\nDo you wish to continue?" 13 60 || return 1
+    DIALOG --yesno "For a minimal system next step will install:\n\n${PACKAGES}\n\nYou can watch the progress on ${LOG}.\n\nDo you wish to continue?" 14 60 || return 1
     run_pacman
     NEXTITEM="6"
     chroot_mount
