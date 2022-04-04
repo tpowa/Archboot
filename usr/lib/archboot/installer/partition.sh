@@ -50,7 +50,7 @@ check_gpt() {
     fi
 
     if [[ "${RUN_CFDISK}" == "1" ]]; then
-        DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive.\nYou should make a swap partition and as many data partitions as you will need." 18 70
+        DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
         clear && cfdisk "${DISC}"
         # reread partitiontable for kernel
         partprobe "${DEVICE}"
