@@ -12,8 +12,7 @@ if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
-
+PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm"
 
 linux_firmware() {
     PACKAGES="${PACKAGES//\ linux-firmware\ / }"
