@@ -46,23 +46,13 @@ set_password() {
 # runs mkinitcpio on the target system, displays output
 #
 run_mkinitcpio() {
+    DIALOG --infobox "Rebuilding initramfs ..." 3 40
     chroot_mount
-    # all mkinitcpio output goes to /tmp/mkinitcpio.log, which we tail into a dialog
-    ( \
-    touch /tmp/setup-mkinitcpio-running
-    echo "Initramfs progress ..." > /tmp/initramfs.log; echo >> /tmp/mkinitcpio.log
+    echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" | tee -a "${LOG}" /tmp/mkinitcpio.log
     else
-        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" >>/tmp/mkinitcpio.log 2>&1
+        chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" | tee -a "${LOG}" /tmp/mkinitcpio.log
     fi
-    echo >> /tmp/mkinitcpio.log
-    rm -f /tmp/setup-mkinitcpio-running
-    ) &
-    sleep 2
-    dialog --backtitle "${TITLE}" --title "Rebuilding initramfs images ..." --no-kill --tailboxbg "/tmp/mkinitcpio.log" 18 70
-    while [[ -f /tmp/setup-mkinitcpio-running ]]; do
-        /usr/bin/true
-    done
     chroot_umount
 }

@@ -155,6 +155,7 @@ configure_system() {
         auto_timesetting
         # /etc/initcpio.conf
         run_mkinitcpio
+        DIALOG --infobox "Rebuilding glibc locales ..." 3 40
         locale_gen
         ## END POSTPROCESSING ##
         NEXTITEM="7"
