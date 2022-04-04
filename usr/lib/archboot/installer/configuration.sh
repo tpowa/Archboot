@@ -54,5 +54,19 @@ run_mkinitcpio() {
     else
         chroot "${DESTDIR}" /usr/bin/mkinitcpio -p "${KERNELPKG}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     fi
+    echo $? > /tmp/.mkinitcpio-retcode
+    if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
+        echo -e "\nMkinitcpio FAILED." >>/tmp/mkinitcpio.log
+    else
+        echo -e "\nMkinitcpio Complete." >>/tmp/mkinitcpio.log
+    fi
+    # pacman finished, display scrollable output
+    local _result=''
+    if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
+        _result="Mkinitpcio Failed (see errors below)"
+        DIALOG --title "${_result}" --exit-label "Continue" \
+        --textbox "/tmp/mkinitcpio.log" 18 70 || return 1
+    fi
+    rm /tmp/.mkinitcpio-retcode
     chroot_umount
 }
