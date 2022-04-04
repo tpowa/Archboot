@@ -230,7 +230,8 @@ choose_btrfs_subvolume () {
     [[ -n "${SUBVOLUMES}" ]] && SUBVOLUMES_DETECTED="yes"
     subvolumes_in_use
     for i in ${SUBVOLUME_IN_USE}; do
-        SUBVOLUMES="$(echo $SUBVOLUMES | sed -e "s#${i} _##g")"
+        #shellcheck disable=SC2001
+        SUBVOLUMES="$(echo "${SUBVOLUMES}" | sed -e "s#${i} _##g")"
     done
     if [[ -n "${SUBVOLUMES}" ]]; then
     #shellcheck disable=SC2086
