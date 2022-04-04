@@ -146,7 +146,8 @@ mountpoints() {
         done
         check_mkfs_values
         if [[ "${PART}" != "NONE" ]]; then
-            PARTS="${PARTS//${PART}\ _/}"
+            #shellcheck disable=SC2001,SC2086
+            PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
             echo "${PART}:swap:swap:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         DO_ROOT=""
@@ -171,7 +172,8 @@ mountpoints() {
         btrfs_parts
         check_mkfs_values
         echo "${PART}:${FSTYPE}:/:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
-        ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
+        #shellcheck disable=SC2001,SC2086
+        ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
         #
         # Additional partitions
         #
@@ -203,7 +205,8 @@ mountpoints() {
                 btrfs_parts
                 check_mkfs_values
                 echo "${PART}:${FSTYPE}:${MP}:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
-                ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="${PARTS//${PART}\ _/}"
+                #shellcheck disable=SC2001,SC2086
+                ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
             fi
         done
         #shellcheck disable=SC2028
