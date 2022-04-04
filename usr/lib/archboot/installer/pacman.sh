@@ -110,6 +110,7 @@ run_pacman(){
     chroot_mount
     DIALOG --infobox "Please be patient.\n\nInstalling packages:\n${PACKAGES}..." 10 70
     echo "Installing Packages..." >/tmp/pacman.log
+    sleep 5
     #shellcheck disable=SC2086,SC2069
     ${PACMAN} -S ${PACKAGES} |& tee -a "${LOG}" /tmp/pacman.log >/dev/null 2>&1
     echo $? > /tmp/.pacman-retcode
