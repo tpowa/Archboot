@@ -60,29 +60,35 @@ else
     PACMAN_CONF=""
 fi
 
-prepare_pacman || (echo "Pacman preparation FAILED!"; return 1)
+if ! prepare_pacman; then
+    echo "Pacman preparation FAILED!"
+    return 1
+fi
 chroot_mount
-install_packages || (echo "Package installation FAILED."; chroot_umount; exit 1)
+if ! install_packages; then
+    echo "Package installation FAILED."
+    chroot_umount
+    exit 1
+fi
 locale_gen
 chroot_umount
 
 echo
-echo "Package installation complete."
+echo -e "\033[1mPackage installation complete.\033[0m"
 echo
-echo "Please install a bootloader.  Edit the appropriate config file for"
-echo "your loader. Please use ${VMLINUZ} as kernel image."
-echo "Chroot into your system to install it into the boot sector:"
-echo "  # mount -o bind /dev ${DESTDIR}/dev"
-echo "  # mount -t proc none ${DESTDIR}/proc"
-echo "  # mount -t sysfs none ${DESTDIR}/sys"
-echo "  # chroot ${DESTDIR} /bin/bash"
+echo -e "Please install a \033[1mbootloader\033[0m. Edit the appropriate config file for"
+echo -e "your loader. Please use \033[1m${VMLINUZ}\033[0m as kernel image."
+echo -e "Chroot into your system to install it:"
+echo -e "  \033[1m# mount -o bind /dev ${DESTDIR}/dev\033[0m"
+echo -e "  \033[1m# mount -t proc none ${DESTDIR}/proc\033[0m"
+echo -e "  \033[1m# mount -t sysfs none ${DESTDIR}/sys\033[0m"
+echo -e "  \033[1m# chroot ${DESTDIR} /bin/bash\033[0m"
 echo
 echo "Next step, initramfs setup:"
-echo "Edit your /etc/mkinitcpio.conf to fit your needs. After that run:"
-echo "# mkinitcpio -p ${KERNELPKG}"
+echo -e "Edit your \033[1m/etc/mkinitcpio.conf\033[0m to fit your needs. After that run:"
+echo -e "  \033[1m# mkinitcpio -p ${KERNELPKG}\033[0m"
 echo
-echo "Then exit your chroot shell, edit ${DESTDIR}/etc/fstab and reboot!"
-echo
+echo -e "Then \033[1mexit\033[0m your chroot shell, edit \033[1m${DESTDIR}/etc/fstab\033[0m and \033[1mreboot\033[0m\!"
 exit 0
 
 # vim: set ts=4 sw=4 et:
