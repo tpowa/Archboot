@@ -246,7 +246,7 @@ fi
 
 set_title
 
-DIALOG --msgbox "Welcome to the Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your VC7 console (ALT-F7). ALT-F1 will bring you back here." 14 65
+DIALOG --msgbox "Welcome to the Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${VC} console (ALT-F${VC_NUM}). ALT-F1 will bring you back here." 14 65
 
 while true; do
     mainmenu
