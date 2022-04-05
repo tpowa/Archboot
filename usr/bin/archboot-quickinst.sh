@@ -31,8 +31,12 @@ usage() {
 # returns: 1 on error
 prepare_pacman() {
     # Set up the necessary directories for pacman use
-    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
-    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
+    if [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]]; then
+        mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
+    fi
+    if [[ ! -d "${DESTDIR}/var/lib/pacman" ]]; then
+        mkdir -p "${DESTDIR}/var/lib/pacman"
+    fi
     ${PACMAN} -Sy
 }
 
@@ -61,12 +65,12 @@ else
 fi
 
 if ! prepare_pacman; then
-    echo "Pacman preparation \033[91mFAILED\033[0m."
+    echo -e "Pacman preparation \033[91mFAILED\033[0m."
     exit 1
 fi
 chroot_mount
 if ! install_packages; then
-    echo "Package installation \033[91mFAILED\033[0m."
+    echo -e "Package installation \033[91mFAILED\033[0m."
     chroot_umount
     exit 1
 fi
