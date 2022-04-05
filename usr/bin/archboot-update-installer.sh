@@ -101,6 +101,8 @@ if [[ "${_D_SCRIPTS}" == "1" ]]; then
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-setup.sh?inline=false" -O /usr/bin/setup >/dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-km.sh?inline=false" -O /usr/bin/km >/dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-tz.sh?inline=false" -O /usr/bin/tz >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-copy-mountpoint.sh?inline=false" -O /usr/bin/copy-mountpoint.sh >/dev/null 2>&1
+    wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-rsync-backup.sh?inline=false" -O /usr/bin/rsync-backup.sh >/dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-${_RUNNING_ARCH}-create-container.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-create-container.sh" >/dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-${_RUNNING_ARCH}-release.sh?inline=false" -O "/usr/bin/archboot-${_RUNNING_ARCH}-release.sh" >/dev/null 2>&1
     wget -q "${_INSTALLER_SOURCE}${_BIN_PATH}/archboot-binary-check.sh?inline=false" -O /usr/bin/archboot-binary-check.sh >/dev/null 2>&1
