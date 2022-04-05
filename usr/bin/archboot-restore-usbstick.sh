@@ -13,7 +13,7 @@ usage()
     echo -e "\033[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \033[0m"
     echo ""
     echo -e "usage: \033[1m${APPNAME} <device>\033[0m"
-    exit "$1"
+    exit "1"
 }
 
 ##################################################
