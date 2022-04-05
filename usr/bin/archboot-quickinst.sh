@@ -3,7 +3,7 @@
 DESTDIR="${1}"
 
 usage() {
-    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mquickinst installer:\033[0m"
+    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1m QUICKINST INSTALLER:\033[0m"
     echo -e "\033[1m-------------------------------------------\033[0m"
     echo -e "Usage:"
     echo -e "\033[1mquickinst <destdir>\033[0m"
