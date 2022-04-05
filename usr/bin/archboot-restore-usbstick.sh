@@ -10,7 +10,7 @@ usage()
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mRESTORE USB STICK:\033[0m"
     echo -e "\033[1m----------------------------------------\033[0m"
     echo -e "This script restores an USB device to a \033[1mFAT32\033[0m device."
-    echo -e "\033[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE\!\033[0m"
+    echo -e "\033[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \033[0m"
     echo ""
     echo -e "usage: \033[1m${APPNAME} <device>\033[0m"
     exit "$1"
@@ -25,7 +25,7 @@ if ! [[ ${UID} -eq 0 ]]; then
     echo "ERROR: Please run as root user!"
     exit 1
 fi
-echo -e "\033[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${1} now\!\033[0m"
+echo -e "\033[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${1} now! \033[0m"
 sleep 10
 # clean partitiontable
 echo -e "\033[1mRestoring USB STICK...\033[0m"
