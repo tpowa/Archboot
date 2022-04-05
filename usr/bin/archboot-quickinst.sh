@@ -3,22 +3,25 @@
 DESTDIR="${1}"
 
 usage() {
-    echo "quickinst <destdir>"
-    echo
+    echo -e "\033[1mWelcome to the \033[34mArchboot\033[0m \033[1mquickinstall installer:\033[0m"
+    echo -e "\033[1m-----------------------------------------------\033[0m"
+    echo -e "Usage:"
+    echo -e "\033[1mquickinst <destdir>\033[0m"
+    echo ""
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
     echo
     if ! [[ -e "${LOCAL_DB}" ]]; then
-        echo "First configure /etc/pacman.conf which repositories to use"
-        echo "and set a mirror in /etc/pacman.d/mirrorlist"
+        echo -e "First configure \033[1m/etc/pacman.conf\033[0m which repositories to use"
+        echo -e "and set a mirror in \033[1m/etc/pacman.d/mirrorlist\033[0m"
     fi
     echo
-    echo "Make sure you have all your filesystems mounted under <destdir>."
-    echo "Then run this script to install all packages listed in /etc/archboot/defaults"
-    echo "to <destdir>."
+    echo -e "Make sure you have all your filesystems mounted under \033[1m<destdir>\033[0m."
+    echo -e "Then run this script to install all packages listed in \033[1m/etc/archboot/defaults\033[0m"
+    echo -e "to \033[1m<destdir>\033[0m."
     echo
     echo "Example:"
-    echo "  quickinst /mnt"
+    echo -e "  \033[1mquickinst /mnt\033[0m"
     echo ""
     exit 0
 }

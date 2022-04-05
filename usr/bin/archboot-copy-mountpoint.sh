@@ -7,13 +7,15 @@
 APPNAME=$(basename "${0}")
 usage()
 {
-    echo "COPY MOUNTPOINTS:"
+    echo -e "\033[1mWelcome to the \033[34mArchboot\033[0m \033[1m${APPNAME}:\033[0m"
+    echo -e "\033[1m----------------------------------------------------\033[0m"
+    echo -e "\033[1mCOPY MOUNTPOINTS:\033[0m"
     echo "- Copy mountpoint recursivly from one mountpoint to an other one,"
     echo "  using tar utility."
-    echo "- For system copying start with mounted / and then invoke this script"
-    echo "  for each additional mountpoint eg. /boot or /home."
+    echo -e "- For system copying start with mounted \033[1m/\033[0m and then invoke this script"
+    echo -e "  for each additional mountpoint eg. \033[1m/boot\033[0m or \033[1m/home\033[0m."
     echo ""
-    echo "usage: ${APPNAME} <oldmountpoint> <newmountpoint>"
+    echo -e "usage: \033[1m${APPNAME} <oldmountpoint> <newmountpoint>\033[0m"
     exit "$1"
 }
 
