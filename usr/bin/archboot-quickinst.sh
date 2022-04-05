@@ -93,7 +93,7 @@ echo "Next step, initramfs setup:"
 echo -e "Edit your \033[1m/etc/mkinitcpio.conf\033[0m to fit your needs. After that run:"
 echo -e "  \033[1m# mkinitcpio -p ${KERNELPKG}\033[0m"
 echo
-echo -e "Then \033[1mexit\033[0m your chroot shell, edit \033[1m${DESTDIR}/etc/fstab\033[0m and \033[1mreboot\033[0m\!"
+echo -e "Then \033[1mexit\033[0m your chroot shell, edit \033[1m${DESTDIR}/etc/fstab\033[0m and \033[1mreboot\033[0m! "
 exit 0
 
 # vim: set ts=4 sw=4 et:
