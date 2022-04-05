@@ -61,12 +61,12 @@ else
 fi
 
 if ! prepare_pacman; then
-    echo "Pacman preparation FAILED!"
+    echo "Pacman preparation \033[91mFAILED\033[0m."
     return 1
 fi
 chroot_mount
 if ! install_packages; then
-    echo "Package installation FAILED."
+    echo "Package installation \033[91mFAILED\033[0m."
     chroot_umount
     exit 1
 fi
