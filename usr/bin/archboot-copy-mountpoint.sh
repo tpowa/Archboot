@@ -7,9 +7,8 @@
 APPNAME=$(basename "${0}")
 usage()
 {
-    echo -e "\033[1mWelcome to the \033[34mArchboot\033[0m \033[1m${APPNAME}:\033[0m"
-    echo -e "\033[1m----------------------------------------------------\033[0m"
-    echo -e "\033[1mCOPY MOUNTPOINTS:\033[0m"
+    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mCOPY MOUNTPOINTS:\033[0m"
+    echo -e "\033[1m---------------------------------------\033[0m"
     echo "- Copy mountpoint recursivly from one mountpoint to an other one,"
     echo "  using tar utility."
     echo -e "- For system copying start with mounted \033[1m/\033[0m and then invoke this script"

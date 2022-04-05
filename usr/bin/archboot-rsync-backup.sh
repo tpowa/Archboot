@@ -7,12 +7,10 @@
 APPNAME=$(basename "${0}")
 usage()
 {
-    echo -e "\033[1mWelcome to the \033[34mArchboot\033[0m \033[1m${APPNAME}:\033[0m"
-    echo -e "\033[1m-------------------------------------------------\033[0m"
-    echo -e "\033[1mRSYNC BACKUP:\033[0m"
+    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mRSYNC BACKUP:\033[0m"
+    echo -e "\033[1m-----------------------------------\033[0m"
     echo -e "- Copy \033[1mbackupdir\033[0m to \033[1mbackupdestination\033[0m using rsync."
-    echo ""
-    echo -e "- For system backup start with \033[1mfull\033[0m mounted system and then invoke this script"
+    echo -e "- For system backup, start with \033[1mfull\033[0m mounted system and then invoke this script"
     echo -e "  with system's root directory as \033[1mbackupdir\033[0m."
     echo -e "- \033[1mexcluded\033[0m directories are \033[1m/dev /tmp /proc /sys /run /mnt /media /lost+found\033[0m"
     echo -e "- \033[1m--numeric-ids\033[0m option is invoked to \033[1mpreserve\033[0m users"
