@@ -332,7 +332,7 @@ do_secureboot_keys() {
     while [[ "${KEYDIR}" = "" ]]; do
         DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "etc/secureboot/keys" 2>"${ANSWER}" || return 1
         KEYDIR=$(cat "${ANSWER}")
-        KEYDIR="${KEYDIR//^\//}"
+        KEYDIR="$(echo ${KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
         while [[ "${CN}" = "" ]]; do
@@ -1226,7 +1226,7 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        do_secureboot_keys
+        do_secureboot_keys || return 1
         do_mok_sign
         do_pacman_sign
         do_uefi_secure_boot_efitools
