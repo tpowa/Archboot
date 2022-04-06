@@ -404,7 +404,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}\n\nContinuing in 5 seconds..." 5 70
+        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}\n\nContinuing in 5 seconds..." 7 70
         sleep 5
     fi
 }
