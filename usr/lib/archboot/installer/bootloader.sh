@@ -1014,7 +1014,7 @@ fi
     chroot_umount
 
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 50
+    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -1124,7 +1124,7 @@ do_grub_bios() {
         return 1
     fi
 
-    DIALOG --infobox "Installing grub(2) BIOS. This needs some time..." 3 55
+    DIALOG --infobox "Setting up grub(2) BIOS. This needs some time..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
@@ -1149,7 +1149,7 @@ do_grub_bios() {
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
     else
-        DIALOG --msgbox "Error installing grub(2) bios.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing grub(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
 
@@ -1164,7 +1164,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up grub UEFI. This needs some time..." 3 55
+    DIALOG --infobox "Setting up grub(2) UEFI. This needs some time..." 3 55
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
