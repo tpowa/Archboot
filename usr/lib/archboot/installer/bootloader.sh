@@ -367,7 +367,7 @@ do_mok_sign () {
         done
         mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
         rm /tmp/.password
-        DIALOG --infobox "MOK keys have been installed successfully.\nContinuing in 3 seconds..." 8 65
+        DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 3 seconds..." 6 65
         sleep 3
     fi
     SIGN_MOK=""
@@ -375,7 +375,7 @@ do_mok_sign () {
     if [[ "${SIGN_MOK}" == "1" ]]; then
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\nContinuing in 3 seconds..." 8 65
+        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\n\nContinuing in 3 seconds..." 9 65
         sleep 3
     fi
 }
@@ -401,7 +401,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\nContinuing in 3 seconds..." 6 60
+        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 7 60
         sleep 3
     fi
 }
@@ -659,7 +659,7 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "refind has been setup successfully.\nContinuing in 3 seconds..." 5 40
+        DIALOG --infobox "refind has been setup successfully.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf. After you save your changes, exit the editor." 0 0
@@ -1143,7 +1143,7 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --infobox "grub(2) BIOS has been successfully installed.\nContinuing in 3 seconds..." 5 40
+        DIALOG --infobox "grub(2) BIOS has been successfully installed.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
         GRUB_PREFIX_DIR="/boot/grub/"
@@ -1208,7 +1208,7 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 3 seconds..." 5 40
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -1230,7 +1230,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\nContinuing in 3 seconds..." 5 60
+        DIALOG --infobox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 6 60
         sleep 3
     else
         DIALOG --msgbox "Error installing grub(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
