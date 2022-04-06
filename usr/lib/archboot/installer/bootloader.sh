@@ -401,7 +401,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}\nContinuing in 3 seconds..." 8 75
+        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\nContinuing in 3 seconds..." 6 60
         sleep 3
     fi
 }
@@ -542,7 +542,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --infobox "Setting up systemd-boot now..." 0 0
+    DIALOG --infobox "Setting up systemd-boot now..." 3 40
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -604,7 +604,7 @@ GUMEOF
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi\nto ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi?\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 8 70 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
@@ -624,7 +624,7 @@ do_refind_uefi() {
         run_pacman
     fi
 
-    DIALOG --infobox "Setting up refind now..." 0 0
+    DIALOG --infobox "Setting up refind now..." 3 40
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -659,14 +659,14 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "refind has been setup successfully.\nContinuing in 3 seconds..." 0 0
+        DIALOG --infobox "refind has been setup successfully.\nContinuing in 3 seconds..." 5 40
         sleep 3
 
         DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf. After you save your changes, exit the editor." 0 0
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         "${EDITOR}" "${_REFIND_LINUX_CONF}"
-        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi\nto ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi?\n\nThis might be needed in some systems\nwhere efibootmgr may not work due to firmware issues." 8 70 && _UEFISYS_EFI_BOOT_DIR="1"
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
@@ -680,7 +680,7 @@ REFINDEOF
             cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
         fi
     else
-        DIALOG --msgbox "Error setting up refind." 0 0
+        DIALOG --msgbox "Error setting up refind." 3 40
     fi
 
 }
@@ -1014,7 +1014,7 @@ fi
     chroot_umount
 
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor. After you save your changes, exit the editor." 0 0
+    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\After you save your changes, exit the editor." 0 0
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -1143,7 +1143,7 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --infobox "grub(2) BIOS has been successfully installed.\nContinuing in 3 seconds..." 0 0
+        DIALOG --infobox "grub(2) BIOS has been successfully installed.\nContinuing in 3 seconds..." 5 40
         sleep 3
 
         GRUB_PREFIX_DIR="/boot/grub/"
@@ -1164,7 +1164,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up grub..." 0 0
+    DIALOG --infobox "Setting up grub..." 3 40
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
@@ -1208,7 +1208,7 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 3 seconds..." 8 65
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 3 seconds..." 5 40
         sleep 3
 
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -1230,7 +1230,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 3 seconds..." 8 75
+        DIALOG --infobox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\nContinuing in 3 seconds..." 5 60
         sleep 3
     else
         DIALOG --msgbox "Error installing grub(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
