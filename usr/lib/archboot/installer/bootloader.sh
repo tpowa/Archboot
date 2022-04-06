@@ -365,7 +365,7 @@ do_mok_sign () {
                 echo "${MOK_PW}" >> /tmp/.password
                 MOK_PW=/tmp/.password
             else
-                DIALOG --msgbox "Password didn't match or was empty, please enter again." 8 65
+                DIALOG --msgbox "Password didn't match or was empty, please enter again." 6 65
             fi
         done
         mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
