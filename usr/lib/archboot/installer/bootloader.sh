@@ -371,7 +371,7 @@ do_mok_sign () {
         sleep 3
     fi
     SIGN_MOK=""
-    DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 5 65 && SIGN_MOK="1"
+    DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 65 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
@@ -382,7 +382,7 @@ do_mok_sign () {
 
 do_pacman_sign() {
     SIGN_KERNEL=""
-    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 8 50 && SIGN_KERNEL="1"
+    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 6 60 && SIGN_KERNEL="1"
     if [[ "${SIGN_KERNEL}" == "1" ]]; then
         [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${DESTDIR}"/etc/pacman.d/hooks/
         HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
@@ -401,7 +401,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 5 60
+        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 5 70
         sleep 3
     fi
 }
