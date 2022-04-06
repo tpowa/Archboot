@@ -349,7 +349,7 @@ do_mok_sign () {
     UEFI_BOOTLOADER_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT"
     INSTALL_MOK=""
     MOK_PW=""
-    DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 0 0 && INSTALL_MOK="1"
+    DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 3 65 && INSTALL_MOK="1"
     if [[ "${INSTALL_MOK}" == "1" ]]; then
         while [[ "${MOK_PW}" = "" ]]; do
             DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${ANSWER}" || return 1
@@ -371,18 +371,18 @@ do_mok_sign () {
         sleep 3
     fi
     SIGN_MOK=""
-    DIALOG --yesno "Do you want to sign /boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi with the MOK certificate?" 0 0 && SIGN_MOK="1"
+    DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 5 65 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\n\nContinuing in 3 seconds..." 9 65
+        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\n\nContinuing in 3 seconds..." 6 65
         sleep 3
     fi
 }
 
 do_pacman_sign() {
     SIGN_KERNEL=""
-    DIALOG --yesno "Do you want to install a pacman hook for automatic signing /boot/${VMLINUZ} on updates?" 0 0 && SIGN_KERNEL="1"
+    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 5 50 && SIGN_KERNEL="1"
     if [[ "${SIGN_KERNEL}" == "1" ]]; then
         [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${DESTDIR}"/etc/pacman.d/hooks/
         HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
@@ -401,7 +401,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 7 60
+        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 5 60
         sleep 3
     fi
 }
@@ -1230,7 +1230,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 6 60
+        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 4 60
         sleep 3
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
