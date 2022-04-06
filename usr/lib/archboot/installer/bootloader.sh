@@ -593,7 +593,7 @@ GUMEOF
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and SYSTEMD-BOOT menu entry files\n\nAfter you save your changes, exit the editor." 8 50
+        DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
@@ -1143,7 +1143,7 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 6 40
+        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 6 55
         sleep 3
 
         GRUB_PREFIX_DIR="/boot/grub/"
@@ -1208,7 +1208,7 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 6 40
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 6 55
         sleep 3
 
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
