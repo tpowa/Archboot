@@ -68,7 +68,7 @@ EOF
     DIRS="DB KEK MOK PK noPK"
     for i in $DIRS; do
         [[ ! -d "$i" ]] && mkdir "$i"
-        mv "$i.*" "$i"
+        mv "${i}".* "${i}"
     done
     mv DB db
     [[ ! -d "GUID" ]] && mkdir GUID
