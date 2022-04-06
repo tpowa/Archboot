@@ -1203,7 +1203,7 @@ do_grub_uefi() {
         fi
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} "${UEFISYS_MOUNTPOINT}"/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
     fi
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]] || [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" || "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
@@ -1222,7 +1222,7 @@ do_grub_uefi() {
             rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
-    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys
         do_mok_sign
         do_pacman_sign
