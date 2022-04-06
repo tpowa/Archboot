@@ -404,7 +404,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}\n\nContinuing in 5 seconds..." 7 70
+        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n${HOOKNAME}\n\nContinuing in 5 seconds..." 6 70
         sleep 5
     fi
 }
@@ -1233,7 +1233,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds..." 6 60
+        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds..." 6 50
         sleep 5
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
