@@ -340,7 +340,7 @@ do_secureboot_keys() {
             CN=$(cat "${ANSWER}")
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
-         DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN} used for your keys in\n${DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds..." 8 50
+         DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN}\nused for your keys in ${DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds..." 8 60
          sleep 10
     else
          DIALOG --infobox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now\n\nContinuing in 10 seconds..." 8 50
