@@ -593,7 +593,7 @@ GUMEOF
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit loader.conf and Systemd-boot menu entry files. After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and systemd-boot menu entry files\n\nAfter you save your changes, exit the editor." 8 60
         geteditor || return 1
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
@@ -662,7 +662,7 @@ REFINDEOF
         DIALOG --infobox "refind has been setup successfully.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
-        DIALOG --msgbox "You will now be put into the editor to edit refind.conf and refind_linux.conf. After you save your changes, exit the editor." 0 0
+        DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf and refind_linux.conf\n\nAfter you save your changes, exit the editor." 8 60
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         "${EDITOR}" "${_REFIND_LINUX_CONF}"
@@ -1014,7 +1014,7 @@ fi
     chroot_umount
 
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 0 0
+    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 60
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
