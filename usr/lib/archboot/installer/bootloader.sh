@@ -604,7 +604,7 @@ GUMEOF
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 10 75 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
