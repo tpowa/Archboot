@@ -1254,7 +1254,7 @@ install_bootloader_uefi() {
         do_grub_uefi
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 5 \
+        DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 7 55 5 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         else
@@ -1272,7 +1272,7 @@ install_bootloader_uefi() {
 
 install_bootloader_bios() {
 
-    DIALOG --menu "Which BIOS bootloader would you like to use?" 11 50 4 \
+    DIALOG --menu "Which BIOS bootloader would you like to use?" 9 50 1 \
         "GRUB_BIOS" "GRUB(2) BIOS" 2>"${ANSWER}" || CANCEL=1
     case $(cat "${ANSWER}") in
         "GRUB_BIOS") do_grub_bios ;;
