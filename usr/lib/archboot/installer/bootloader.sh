@@ -330,7 +330,7 @@ do_secureboot_keys() {
     MOK_PW=""
     KEYDIR=""
     while [[ "${KEYDIR}" = "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "etc/secureboot/keys" 2>"${ANSWER}" || return 1
+        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${ANSWER}" || return 1
         KEYDIR=$(cat "${ANSWER}")
         KEYDIR="$(echo ${KEYDIR} | sed -e 's#^/##g')"
     done
@@ -378,7 +378,7 @@ do_mok_sign () {
     if [[ "${SIGN_MOK}" == "1" ]]; then
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 50
+        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
         sleep 5
     fi
 }
@@ -1226,7 +1226,6 @@ do_grub_uefi() {
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        NEXTITEM="7"
         do_secureboot_keys || return 1
         do_mok_sign
         do_pacman_sign
@@ -1303,7 +1302,7 @@ install_bootloader() {
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
             DIALOG --yesno "Setup has detected that you are using Secure Boot.\n\nDo you like to install SHIM and GRUB(2) ${_UEFI_ARCH} UEFI bootloader?" 7 70 || CANCEL="1"
             if [[ "${CANCEL}" == "" ]]; then
-                install_bootloader_uefi
+                install_bootloader_uefi || return 1
                 NEXTITEM="8"
             else
                 NEXTITEM="7"
