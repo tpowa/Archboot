@@ -330,7 +330,7 @@ do_secureboot_keys() {
     MOK_PW=""
     KEYDIR=""
     while [[ "${KEYDIR}" = "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 8 65 "etc/secureboot/keys" 2>"${ANSWER}" || KEYDIR=""
+        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}.\nPlease leave the leading slash \"/\"." 9 65 "etc/secureboot/keys" 2>"${ANSWER}" || KEYDIR=""
         KEYDIR=$(cat "${ANSWER}")
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
@@ -341,7 +341,7 @@ do_secureboot_keys() {
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
          DIALOG --msgbox "Setup keys created:\nCommon name(CN) ${CN} used for your keys in ${DESTDIR}/${KEYDIR} " 8 65
     else
-         DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65 ""
+         DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65
     fi
 }
 
@@ -349,7 +349,7 @@ do_mok_sign () {
     UEFI_BOOTLOADER_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT"
     INSTALL_MOK=""
     MOK_PW=""
-    DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 3 65 && INSTALL_MOK="1"
+    DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && INSTALL_MOK="1"
     if [[ "${INSTALL_MOK}" == "1" ]]; then
         while [[ "${MOK_PW}" = "" ]]; do
             DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${ANSWER}" || return 1
@@ -382,7 +382,7 @@ do_mok_sign () {
 
 do_pacman_sign() {
     SIGN_KERNEL=""
-    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 5 50 && SIGN_KERNEL="1"
+    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 8 50 && SIGN_KERNEL="1"
     if [[ "${SIGN_KERNEL}" == "1" ]]; then
         [[ ! -d "${DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${DESTDIR}"/etc/pacman.d/hooks/
         HOOKNAME="${DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
