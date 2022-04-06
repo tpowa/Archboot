@@ -1173,22 +1173,7 @@ do_grub_uefi() {
         cp -f /usr/share/archboot/bootloader/mm${_SPEC_UEFI_ARCH}.efi "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
         GRUB_PREFIX_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
     else
-        ## Create GRUB Standalone EFI image - https://wiki.archlinux.org/index.php/GRUB#GRUB_Standalone
-        #shellcheck disable=SC2016
-        echo 'configfile ${cmdpath}/grub.cfg' > /tmp/grub.cfg
-        chroot "${DESTDIR}" "/usr/bin/grub-mkstandalone" \
-            --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-            --format="${_GRUB_ARCH}-efi" \
-            --modules="part_gpt part_msdos" \
-            --install-modules="all" \
-            --fonts="unicode" \
-            --locales="en@quot" \
-            --themes="" \
-            --verbose \
-            --output="${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" \
-            "/boot/grub/grub.cfg=/tmp/grub.cfg" &> "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log"
-
-        ## Install GRUB normally
+        ## Install GRUB
         chroot "${DESTDIR}" "/usr/bin/grub-install" \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --target="${_GRUB_ARCH}-efi" \
@@ -1198,8 +1183,6 @@ do_grub_uefi() {
             --no-nvram \
             --recheck \
             --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
-
-        cat "/tmp/grub_uefi_${_UEFI_ARCH}_mkstandalone.log" >> "${LOG}"
         cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
         GRUB_PREFIX_DIR="/boot/grub/"
     fi
@@ -1220,17 +1203,8 @@ do_grub_uefi() {
             fi
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} "${UEFISYS_MOUNTPOINT}"/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
     fi
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi" ]]; then
-        cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${GRUB_PREFIX_DIR}/grub.cfg" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub.cfg"
-
-        _BOOTMGR_LABEL="GRUB_Standalone"
-        _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}_standalone.efi"
-        do_uefi_bootmgr_setup
-
-        DIALOG --infobox "GRUB(2) Standalone for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 3 seconds..." 8 65
-        sleep 3
-    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
-        _BOOTMGR_LABEL="GRUB_Normal"
+    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
+        _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
