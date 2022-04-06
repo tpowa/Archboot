@@ -336,7 +336,7 @@ do_secureboot_keys() {
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
         while [[ "${CN}" = "" ]]; do
-            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${ANSWER}" || CN=""
+            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${ANSWER}" || return 1
             CN=$(cat "${ANSWER}")
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
