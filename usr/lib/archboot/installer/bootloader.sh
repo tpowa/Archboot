@@ -527,12 +527,12 @@ do_efistub_uefi() {
             do_systemd_boot_uefi
         else
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
-                "systemd-boot" "systemd-boot for ${_UEFI_ARCH} UEFI" \
-                "refind" "refind for ${_UEFI_ARCH} UEFI" \
+                "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
+                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
                 "NONE" "No Boot Manager" 2>"${ANSWER}" || CANCEL=1
             case $(cat "${ANSWER}") in
-                "systemd-boot") do_systemd_boot_uefi ;;
-                "refind") do_refind_uefi;;
+                "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
+                "rEFInd") do_refind_uefi;;
                 "NONE") return 0 ;;
             esac
         fi
@@ -624,7 +624,7 @@ do_refind_uefi() {
         run_pacman
     fi
 
-    DIALOG --infobox "Setting up refind now. This needs some time..." 3 50
+    DIALOG --infobox "Setting up rEFInd now. This needs some time..." 3 50
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -659,7 +659,7 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "refind has been setup successfully.\n\nContinuing in 3 seconds..." 6 40
+        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf and refind_linux.conf\n\nAfter you save your changes, exit the editor." 8 50
@@ -680,7 +680,7 @@ REFINDEOF
             cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
         fi
     else
-        DIALOG --msgbox "Error setting up refind." 3 40
+        DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
 
 }
@@ -1143,7 +1143,7 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --infobox "grub(2) BIOS has been successfully installed.\n\nContinuing in 3 seconds..." 6 40
+        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 6 40
         sleep 3
 
         GRUB_PREFIX_DIR="/boot/grub/"
@@ -1230,7 +1230,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 6 60
+        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 6 60
         sleep 3
     else
         DIALOG --msgbox "Error installing grub(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
@@ -1297,7 +1297,7 @@ install_bootloader() {
         do_uefi_setup_env_vars
          _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            DIALOG --yesno "Setup has detected that you are using Secure Boot.\nDo you like to install SHIM and GRUB ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
+            DIALOG --yesno "Setup has detected that you are using Secure Boot.\nDo you like to install SHIM and GRUB(2) ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
             if [[ "${CANCEL}" == "" ]]; then
                 install_bootloader_uefi
                 NEXTITEM="8"
