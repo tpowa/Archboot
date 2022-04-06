@@ -604,7 +604,7 @@ GUMEOF
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 10 75 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 75 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
@@ -624,7 +624,7 @@ do_refind_uefi() {
         run_pacman
     fi
 
-    DIALOG --infobox "Setting up refind now..." 3 40
+    DIALOG --infobox "Setting up refind now. This needs some time..." 3 50
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -666,7 +666,7 @@ REFINDEOF
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         "${EDITOR}" "${_REFIND_LINUX_CONF}"
-        DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
