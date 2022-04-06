@@ -1124,7 +1124,7 @@ do_grub_bios() {
         return 1
     fi
 
-    DIALOG --infobox "Installing grub(2) BIOS bootloader..." 0 0
+    DIALOG --infobox "Installing grub(2) BIOS. This needs some time..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
@@ -1164,7 +1164,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up grub. This needs some time..." 3 50
+    DIALOG --infobox "Setting up grub UEFI. This needs some time..." 3 55
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
