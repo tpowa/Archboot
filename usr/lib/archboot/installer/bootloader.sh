@@ -339,9 +339,11 @@ do_secureboot_keys() {
             CN=$(cat "${ANSWER}")
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
-         DIALOG --msgbox "Setup keys created:\nCommon name(CN) ${CN} used for your keys in ${DESTDIR}/${KEYDIR} " 8 65
+         DIALOG --infobox "Setup keys created:\nCommon name(CN) ${CN} used for your keys in ${DESTDIR}/${KEYDIR}\nContinuing in 10 seconds..." 9 65
+         sleep 10
     else
-         DIALOG --msgbox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 8 65
+         DIALOG --infobox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now\nContinuing in 10 seconds..." 9 65
+         sleep 10
     fi
 }
 
@@ -367,16 +369,16 @@ do_mok_sign () {
         done
         mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
         rm /tmp/.password
-        DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 3 seconds..." 6 65
-        sleep 3
+        DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 5 seconds..." 6 65
+        sleep 5
     fi
     SIGN_MOK=""
     DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 65 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\n\nContinuing in 3 seconds..." 6 65
-        sleep 3
+        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\nbeen signed successfully.\n\nContinuing in 5 seconds..." 6 65
+        sleep 5
     fi
 }
 
@@ -401,8 +403,8 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 3 seconds..." 5 70
-        sleep 3
+        DIALOG --infobox "Pacman hook for automatic signing\nhas been installed successfully:\n${HOOKNAME}\n\nContinuing in 5 seconds..." 5 70
+        sleep 5
     fi
 }
 
