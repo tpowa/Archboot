@@ -1208,7 +1208,7 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 6 55
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 6 60
         sleep 3
 
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
