@@ -542,7 +542,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --infobox "Setting up systemd-boot now..." 3 40
+    DIALOG --infobox "Setting up SYSTEMD-BOOT now..." 3 40
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -593,7 +593,7 @@ GUMEOF
     chroot_umount
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and systemd-boot menu entry files\n\nAfter you save your changes, exit the editor." 8 50
+        DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and SYSTEMD-BOOT menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
@@ -659,7 +659,7 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds..." 6 40
+        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds..." 5 40
         sleep 3
 
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf and refind_linux.conf\n\nAfter you save your changes, exit the editor." 8 50
@@ -1014,7 +1014,7 @@ fi
     chroot_umount
 
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
+    DIALOG --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -1115,16 +1115,16 @@ do_grub_bios() {
         check_gpt
     else
         if [[ "${FAIL_COMPLEX}" == "0" ]]; then
-            DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub(2) has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install grub(2) to a msdos partition table?" 0 0 || return 1
+            DIALOG --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub(2) has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install GRUB(2) to a msdos partition table?" 0 0 || return 1
         fi
     fi
 
     if [[ "${FAIL_COMPLEX}" == "1" ]]; then
-        DIALOG --msgbox "Error:\ngrub(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
+        DIALOG --msgbox "Error:\nGRUB(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
 
-    DIALOG --infobox "Setting up grub(2) BIOS. This needs some time..." 3 55
+    DIALOG --infobox "Setting up GRUB(2) BIOS. This needs some time..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
@@ -1149,7 +1149,7 @@ do_grub_bios() {
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
     else
-        DIALOG --msgbox "Error installing grub(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
     fi
 
@@ -1164,7 +1164,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up grub(2) UEFI. This needs some time..." 3 55
+    DIALOG --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
@@ -1233,7 +1233,7 @@ do_grub_uefi() {
         DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 3 seconds..." 6 60
         sleep 3
     else
-        DIALOG --msgbox "Error installing grub(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
+        DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
 
     fi
