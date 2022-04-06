@@ -359,13 +359,13 @@ do_mok_sign () {
             PASS=$(cat "${ANSWER}")
             DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${ANSWER}" || return 1
             PASS2=$(cat "${ANSWER}")
-            if [[ "${PASS}" = "${PASS2}" ]]; then
+            if [[ "${PASS}" = "${PASS2}" && ! -z "${PASS}" ]]; then
                 MOK_PW=${PASS}
                 echo "${MOK_PW}" > /tmp/.password
                 echo "${MOK_PW}" >> /tmp/.password
                 MOK_PW=/tmp/.password
             else
-                DIALOG --msgbox "Password didn't match, please enter again." 8 65
+                DIALOG --msgbox "Password didn't match or was empty, please enter again." 8 65
             fi
         done
         mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
