@@ -1198,9 +1198,9 @@ do_grub_uefi() {
         # add -v for verbose
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
                 systemd-nspawn -q -D "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-            else
+        elif [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
                 systemd-nspawn -q -D "${DESTDIR}" grub-mkstandalone -d /usr/lib/grub/${_GRUB_ARCH}-efi -O ${_GRUB_ARCH}-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-            fi
+        fi
         cp /${GRUB_PREFIX_DIR}/${GRUB_CFG} "${UEFISYS_MOUNTPOINT}"/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.cfg
     fi
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" ]] && [[ -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
@@ -1297,7 +1297,7 @@ install_bootloader() {
         do_uefi_setup_env_vars
          _ANOTHER="0"
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            DIALOG --yesno "Setup has detected that you are using Secure Boot.\nDo you like to install SHIM and GRUB(2) ${_UEFI_ARCH} UEFI bootloader?" 0 0 || CANCEL="1"
+            DIALOG --yesno "Setup has detected that you are using Secure Boot.\n\nDo you like to install SHIM and GRUB(2) ${_UEFI_ARCH} UEFI bootloader?" 5 70 || CANCEL="1"
             if [[ "${CANCEL}" == "" ]]; then
                 install_bootloader_uefi
                 NEXTITEM="8"
