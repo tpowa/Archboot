@@ -1254,11 +1254,11 @@ install_bootloader_uefi() {
         do_grub_uefi
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 7 55 2 \
+        DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 7 55 3 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         else
-            DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 7 55 2 \
+            DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 7 55 3 \
                 "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
                 "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         fi
