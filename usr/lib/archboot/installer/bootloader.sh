@@ -604,7 +604,7 @@ GUMEOF
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi\nto ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi?\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 8 70 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems\nhere efibootmgr may not work due to firmware issues." 8 70 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
@@ -698,7 +698,7 @@ do_grub_common_before() {
     abort_f2fs_bootpart || return 1
 
     if ! dmraid -r | grep -q ^no; then
-        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 0 0 && USE_DMRAID="1"
+        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 5 50 && USE_DMRAID="1"
     fi
     if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
         DIALOG --infobox "Installing grub..." 0 0
@@ -1014,7 +1014,7 @@ fi
     chroot_umount
 
     ## Edit grub.cfg config file
-    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\After you save your changes, exit the editor." 0 0
+    DIALOG --msgbox "You must now review the grub(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 0 0
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -1164,7 +1164,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up grub..." 3 40
+    DIALOG --infobox "Setting up grub. This needs some time..." 3 40
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
@@ -1214,7 +1214,7 @@ do_grub_uefi() {
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy ${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi to ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi ?\n\nThis might be needed in some systems where efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 0 0 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
 
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
@@ -1306,13 +1306,13 @@ install_bootloader() {
             fi
         else
             DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI.\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
-            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
+            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 3 40 && _ANOTHER="1"
             NEXTITEM="8"
         fi
     fi
     while [[ "${_ANOTHER}" == "1" ]]; do
         install_bootloader_menu
         _ANOTHER="0"
-        DIALOG --defaultno --yesno "Do you want to install another bootloader?" 0 0 && _ANOTHER="1"
+        DIALOG --defaultno --yesno "Do you want to install another bootloader?" 3 40 && _ANOTHER="1"
     done
 }
