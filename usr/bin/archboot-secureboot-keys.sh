@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-. /usr/lib/archboot/installer/common.sh
+. /usr/lib/archboot/common.sh
 
 usage () {
     echo -e "\033[1mGenerate Secure Boot keys,MOK files and backup existing keys:\033[0m"
@@ -38,6 +38,9 @@ fi
 
 _root_check
 
+[[ -e /usr/bin/mkkeys.sh ]] && MKKEYS="mkkeys.sh"
+[[ -e /usr/bin/archboot-mkkeys.sh ]] && MKKEYS="archboot-mkkeys.sh"
+
 if [[ -n "${_DIR}" ]]; then
     [[ ! -d "${_DIR}" ]] && mkdir -p "${_DIR}"
     cd "${_DIR}" || exit 1
@@ -50,7 +53,7 @@ if [[ -n "${_DIR}" ]]; then
     cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in $_DIR"
     # add mkkeys.sh
-    mkkeys.sh <<EOF 
+    ${MKKEYS} <<EOF
 ${NAME} 
 EOF
     # download MS Certificates, else EFI might get broken!
