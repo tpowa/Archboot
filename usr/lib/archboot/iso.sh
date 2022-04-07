@@ -57,6 +57,7 @@ _prepare_kernel_initramfs_files() {
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     mv "/usr/bin/mkinitcpio.old" "/usr/bin/mkinitcpio"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    # needed to hash the kernel for secureboot enabled systems
     install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/vmlinuz_${_RUNNING_ARCH}"
     # install ucode files
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
