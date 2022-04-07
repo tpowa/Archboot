@@ -41,6 +41,8 @@ prepare_pacman() {
     ${PACMAN} -Sy
 }
 
+_root_check
+
 # package_installation
 install_packages() {
     # add packages from archboot defaults

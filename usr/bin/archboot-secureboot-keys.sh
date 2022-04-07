@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+. /usr/lib/archboot/installer/common.sh
 
 usage () {
-	echo "Generate Secure Boot Keys,MOK files and Backup existing keys:"
-	echo "--------------------------------------------------------------"
-	echo "This script generates all needed keys for a Secure Boot setup."
-	echo "It will include the 2 needed Microsoft certificates, in order"
-	echo "to avoid soft bricking of devices."
-	echo "Backup of your existing keys are put to BACKUP directory."
-	echo ""
-        echo "Usage: -name= <directory>"
-        echo ""
-	echo "PARAMETERS:"
-	echo " -name=         your name to embed in the keys"
-	echo " -h             This message."
-	exit 0
+    echo -e "\033[1mGenerate Secure Boot keys,MOK files and backup existing keys:\033[0m"
+    echo -e "\033[1m-------------------------------------------------------------\033[0m"
+    echo "This script generates all needed keys for a Secure Boot setup."
+    echo -e "It will include the \033[1m2\033[0m needed Microsoft certificates, in order"
+    echo "to avoid soft bricking of devices."
+    echo -e "Backup of your existing keys are put to \033[1mBACKUP\033[0m directory."
+    echo ""
+    echo -e "\033[1m-Usage: -name= <directory>\033[0m"
+    echo ""
+    echo -e "\033[1m-PARAMETERS:\033[0m"
+    echo " -name=         your name to embed in the keys"
+    echo " -h             This message."
+    exit 0
 }
 
 [[ -z "${1}" || -z "${2}" ]] && usage
@@ -35,11 +36,7 @@ if [[ -z "${NAME}" ]]; then
     exit 1
 fi
 
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then 
-	echo "ERROR: Please run as root user!"
-	exit 1
-fi
+_root_check
 
 if [[ -n "${_DIR}" ]]; then
     [[ ! -d "${_DIR}" ]] && mkdir -p "${_DIR}"
