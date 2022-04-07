@@ -38,7 +38,9 @@ fi
 
 _root_check
 
+# archboot
 [[ -e /usr/bin/mkkeys.sh ]] && MKKEYS="mkkeys.sh"
+# normal system
 [[ -e /usr/bin/archboot-mkkeys.sh ]] && MKKEYS="archboot-mkkeys.sh"
 
 if [[ -n "${_DIR}" ]]; then
