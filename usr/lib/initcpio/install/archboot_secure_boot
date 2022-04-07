@@ -8,7 +8,7 @@ build ()
     map add_binary openssl cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
           hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
           sbsiglist sbsign sbvarsign sbverify mokutil sbctl
-    add_file "/etc/ssl/openssl.cnf"
+    map add_file "/etc/ssl/openssl.cnf" "/usr/share/licenses/sbctl/LICENSE"
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
     # modiiied to use uuidgen instead of python
@@ -28,8 +28,6 @@ build ()
     fi
     # add generate keys script
     add_file "/usr/bin/archboot-secureboot-keys.sh" "/usr/bin/secureboot-keys.sh"
-    # add sbctl license
-    add_file "/usr/share/licenses/sbctl/LICENSE"
 }
 
 help ()
