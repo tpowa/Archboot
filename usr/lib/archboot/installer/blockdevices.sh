@@ -666,6 +666,7 @@ _raid()
         # shellcheck disable=SC2028
         DIALOG --yesno "Would you like to create ${RAIDDEVICE} like this?\n\nLEVEL:\n${LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && MDFINISH="DONE"
     done
+    _umountall
     _createraid
 }
 
@@ -774,6 +775,7 @@ _createpv()
     DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
+    _umountall
     pvcreate -y ${PART} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see "${LOG}" for details)." 0 0; return 1)
     # run udevadm to get values exported
     udevadm trigger
@@ -880,6 +882,7 @@ _createvg()
     done
     DIALOG --infobox "Creating Volume Group ${VGDEVICE}..." 0 0
     PV="$(echo -n "$(cat /tmp/.pvs)")"
+    _umountall
     #shellcheck disable=SC2086
     vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0; return 1)
 }
@@ -946,6 +949,7 @@ _createlv()
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create Logical Volume ${LVDEVICE} like this?\nVolume Group:\n${LV}\nVolume Size:\n${LV_SIZE}\nContiguous Volume:\n${CONTIGUOUS}" 0 0 && LVFINISH="DONE"
     done
+    _umountall
     DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
         #shellcheck disable=SC2086
@@ -1058,6 +1062,7 @@ _luks()
         DIALOG --yesno "Would you like to encrypt luks device below?\nName:${LUKSDEVICE}\nDevice:${PART}\n" 0 0 && LUKSFINISH="DONE"
     done
     _enter_luks_passphrase || return 1
+    _umountall
     DIALOG --infobox "Encrypting ${PART}..." 0 0
     cryptsetup -q luksFormat "${PART}" <${LUKSPASSPHRASE} >"${LOG}"
     _opening_luks

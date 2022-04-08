@@ -55,7 +55,6 @@ prepare_storagedrive() {
     S_MKFS=0
     DONE=0
     NEXTITEM=""
-    _umountall
     while [[ "${DONE}" = "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
