@@ -323,7 +323,7 @@ _mkfs() {
                 ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                f2fs)     mkfs.f2fs ${_fsoptions} -l "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                f2fs)     mkfs.f2fs ${_fsoptions} -f -l "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >"${LOG}" 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
