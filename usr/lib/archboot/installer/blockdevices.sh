@@ -409,6 +409,7 @@ _stopmd()
         DISABLEMD=""
         DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && DISABLEMD="1"
         if [[ "${DISABLEMD}" = "1" ]]; then
+            _umountall
             DIALOG --infobox "Disabling all software raid devices..." 0 0
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
@@ -429,6 +430,7 @@ _stopmd()
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
         DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && DISABLEMDSB="1"
         if [[ "${DISABLEMDSB}" = "1" ]]; then
+            _umountall
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
@@ -455,6 +457,7 @@ _stoplvm()
         DIALOG --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && DISABLELVM="1"
     fi
     if [[ "${DISABLELVM}" = "1" ]]; then
+        _umountall
         DIALOG --infobox "Removing logical volumes ..." 0 0
         for i in ${LV_VOLUMES}; do
             lvremove -f "/dev/mapper/${i}" 2>/dev/null> "${LOG}"
@@ -484,6 +487,7 @@ _stopluks()
         DIALOG --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && DISABLELUKS="1"
     fi
     if [[ "${DISABLELUKS}" = "1" ]]; then
+        _umountall
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${LUKSDEVICE}; do
             LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
