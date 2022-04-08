@@ -52,7 +52,7 @@ auto_network()
     [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* "${DESTDIR}"/etc/netctl/ 2>/dev/null
     # enable netctl profiles
     for i in $(echo /etc/netctl/*); do
-         [[ -f $i ]] && systemd-nspawn -q -D "${DESTDIR}" netctl enable "$(basename "${i}")"
+         [[ -f $i ]] && systemd-nspawn -q -D "${DESTDIR}" netctl enable "$(basename "${i}")" >/dev/null 2>&1
     done
     # copy proxy settings
     if [[ "${PROXY_HTTP}" != "" ]]; then
