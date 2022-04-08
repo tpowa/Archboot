@@ -130,17 +130,10 @@ donetwork() {
     # http/ftp proxy settings
     DIALOG --inputbox "Enter your HTTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
     PROXY_HTTP=$(cat "${ANSWER}")
-    DIALOG --inputbox "Enter your FTP proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
-    PROXY_FTP=$(cat "${ANSWER}")
     if [[ "${PROXY_HTTP}" = "" ]]; then
         unset http_proxy
     else
         export http_proxy=${PROXY_HTTP}
-    fi
-    if [[ "${PROXY_FTP}" = "" ]]; then
-        unset ftp_proxy
-    else
-        export ftp_proxy=${PROXY_FTP}
     fi
     # add sleep here dhcp can need some time to get link
     DIALOG --infobox "Please wait 5 seconds for network link to come up ..." 3 60
