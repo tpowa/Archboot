@@ -133,11 +133,9 @@ auto_parameters() {
     if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
         : >"${DESTDIR}"/etc/vconsole.conf
         if [[ -s /tmp/.keymap ]]; then
-            DIALOG --infobox "Setting the keymap: $(sed -e 's/\..*//g' /tmp/.keymap) in vconsole.conf ..." 0 0
             echo KEYMAP="$(sed -e 's/\..*//g' /tmp/.keymap)" >> "${DESTDIR}"/etc/vconsole.conf
         fi
         if [[ -s /tmp/.font ]]; then
-            DIALOG --infobox "Setting the consolefont: $(sed -e 's/\..*//g'/tmp/.font) in vconsole.conf ..." 0 0
             echo FONT="$(sed -e 's/\..*//g' /tmp/.font)" >> "${DESTDIR}"/etc/vconsole.conf
         fi
     fi
