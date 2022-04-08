@@ -1146,11 +1146,10 @@ do_grub_bios() {
     cp -f "${DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${DESTDIR}/boot/grub/locale/en.mo"
 
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 5 55
-        sleep 3
-
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
+        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 5 55
+        sleep 3
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
