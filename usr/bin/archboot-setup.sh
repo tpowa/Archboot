@@ -101,6 +101,7 @@ configure_system() {
     ## PREPROCESSING ##
     # only done on first invocation of configure_system and redone on canceled configure system
     if [[ ${S_CONFIG} -eq 0 ]]; then
+        DIALOG --infobox "Preconfiguring system ..." 3 40
         auto_pacman_mirror
         auto_network
         auto_parameters
