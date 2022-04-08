@@ -33,7 +33,6 @@ auto_mdadm()
 {
     if [[ -e ${DESTDIR}/etc/mdadm.conf ]]; then
         if grep -q ^md /proc/mdstat 2>/dev/null; then
-            DIALOG --infobox "Adding raid setup to ${DESTDIR}/etc/mdadm.conf ..." 4 40
             mdadm -Ds >> "${DESTDIR}"/etc/mdadm.conf
         fi
     fi
