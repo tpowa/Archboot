@@ -1059,6 +1059,6 @@ _luks()
     done
     _enter_luks_passphrase || return 1
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup luksFormat "${PART}" <${LUKSPASSPHRASE} >"${LOG}"
+    cryptsetup -q luksFormat "${PART}" <${LUKSPASSPHRASE} >"${LOG}"
     _opening_luks
 }
