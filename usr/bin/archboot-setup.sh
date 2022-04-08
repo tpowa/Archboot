@@ -105,7 +105,7 @@ configure_system() {
         auto_network
         auto_parameters
         auto_system_files
-        auto_hwdetect
+        auto_mkinitcpio
     fi
     ## END PREPROCESS ##
     geteditor || return 1
