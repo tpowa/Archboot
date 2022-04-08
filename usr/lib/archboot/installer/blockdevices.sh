@@ -977,7 +977,7 @@ _enter_luks_passphrase () {
         LUKSPASS=$(cat "${ANSWER}")
         DIALOG --insecure --passwordbox "Retype passphrase for luks encrypted device ${PART}:" 0 0 2>"${ANSWER}" || return 1
         LUKSPASS2=$(cat "${ANSWER}")
-        if [[ -n "${LUKSPASS}" && -n "${LUKSPASS2}" && "${LUKSPASS}" = "${LUKSPASS2}" ]]; then
+        if [[ -n "${LUKSPASS}" && -n "${LUKSPASS2}" && "${LUKSPASS}" == "${LUKSPASS2}" ]]; then
             LUKSPASSPHRASE=${LUKSPASS}
             echo "${LUKSPASSPHRASE}" > "/tmp/passphrase-${LUKSDEVICE}"
             LUKSPASSPHRASE="/tmp/passphrase-${LUKSDEVICE}"
@@ -992,9 +992,9 @@ _opening_luks() {
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     luksOpen_success="0"
     while [[ "${luksOpen_success}" = "0" ]]; do
-        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" >"${LOG}" <${LUKSPASSPHRASE} && luksOpen_success=1
+        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" <${LUKSPASSPHRASE} >"${LOG}" && luksOpen_success=1
         if [[ "${luksOpen_success}" = "0" ]]; then
-            DIALOG --msgbox "Error: Passphrases didn't match, please enter again." 0 0
+            DIALOG --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi
     done
@@ -1059,6 +1059,6 @@ _luks()
     done
     _enter_luks_passphrase || return 1
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup luksFormat "${PART}" >"${LOG}" <${LUKSPASSPHRASE}
+    cryptsetup luksFormat "${PART}" <${LUKSPASSPHRASE} >"${LOG}"
     _opening_luks
 }
