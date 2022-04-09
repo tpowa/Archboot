@@ -860,7 +860,7 @@ _createvg()
         # enter volume group name
         VGDEVICE=""
         while [[ "${VGDEVICE}" = "" ]]; do
-            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 15 65 "foogroup" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${ANSWER}" || return 1
             VGDEVICE=$(cat "${ANSWER}")
             if vgs -o vg_name --noheading 2>/dev/null | grep -q "^  ${VGDEVICE}"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
