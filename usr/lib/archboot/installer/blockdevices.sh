@@ -873,7 +873,7 @@ _createvg()
         # select the first device to use, no missing option available!
         PVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 11 50 5 ${PVS} 2>"${ANSWER}" || return 1
         PV=$(cat "${ANSWER}")
         echo "${PV}" >>/tmp/.pvs
         while [[ "${PVS}" != "DONE" ]]; do
@@ -883,7 +883,7 @@ _createvg()
             PVS="$(echo ${PVS} | sed -e "s#${PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 21 50 13 ${PVS} DONE _ 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 11 50 5 ${PVS} DONE _ 2>"${ANSWER}" || return 1
             PV=$(cat "${ANSWER}")
             [[ "${PV}" = "DONE" ]] && break
             echo "${PV}" >>/tmp/.pvs
