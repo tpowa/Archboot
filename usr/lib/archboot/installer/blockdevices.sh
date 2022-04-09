@@ -970,7 +970,7 @@ _createlv()
     if [[ "${LV_ALL}" = "1" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume  ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
             sleep 5
         else
             DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
@@ -979,7 +979,7 @@ _createlv()
     else
         #shellcheck disable=SC2086
         if lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume  ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
             sleep 5
         else
             DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
