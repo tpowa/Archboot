@@ -691,17 +691,18 @@ _createraid()
     ! [[ "${PARITY}" = "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
     DIALOG --infobox "Creating ${RAIDDEVICE}..." 0 0
     #shellcheck disable=SC2086
-    mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >"${LOG}" 2>&1 || \
-    (DIALOG --msgbox "Error creating ${RAIDDEVICE} (see "${LOG}" for details)." 0 0; return 1)
+    if mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >"${LOG}" 2>&1; then
+        DIALOG --infobox "${RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
+    else
+        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see "${LOG}" for details)." 0 0
+        return 1
+    fi
     if [[ ${RAID_PARTITION} == "1" ]]; then
         # switch for mbr usage
         set_guid
         if [[ "${GUIDPARAMETER}" = "" ]]; then
-            DIALOG --msgbox "Now you'll be put into the parted program where you can partition your raiddevice to your needs." 18 70
-            parted -a optimal -s "${RAIDDEVICE}" mktable msdos
-            clear
-            parted "${RAIDDEVICE}" print
-            parted "${RAIDDEVICE}"
+            DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
+            cfdisk "${RAIDDEVICE}"
         else
             DISC="${RAIDDEVICE}"
             RUN_CFDISK="1"
