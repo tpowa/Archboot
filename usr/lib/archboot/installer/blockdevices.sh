@@ -624,7 +624,7 @@ _raid()
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid level you want to use" 21 50 11 ${RAIDLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the raid level you want to use" 11 50 7 ${RAIDLEVELS} 2>"${ANSWER}" || return 1
         LEVEL=$(cat "${ANSWER}")
         # raid5 and raid10 support parity parameter
         PARITY=""
