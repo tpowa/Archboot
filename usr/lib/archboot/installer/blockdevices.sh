@@ -770,7 +770,7 @@ _createpv()
             PARTS="${PARTS//${PART}\ _/}"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 21 50 13 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 11 50 8 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
             PART=$(cat "${ANSWER}")
             [[ "${PART}" = "DONE" ]] && break
             echo "${PART}" >>/tmp/.pvs-create
