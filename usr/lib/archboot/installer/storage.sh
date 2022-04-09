@@ -12,7 +12,7 @@ create_special() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 14 60 5 \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 11 60 5 \
             "1" "Manage Software Raid" \
             "2" "Manage LVM2" \
             "3" "Manage Luks encryption" \
