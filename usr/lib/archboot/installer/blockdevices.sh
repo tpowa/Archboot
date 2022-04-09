@@ -742,7 +742,6 @@ _createpv()
     PVFINISH=""
     while [[ "${PVFINISH}" != "DONE" ]]; do
         activate_special_devices
-        sleep 2
         : >/tmp/.pvs-create
         # Remove all lvm devices with children
         LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
@@ -779,7 +778,6 @@ _createpv()
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && PVFINISH="DONE"
     done
-    DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
     _umountall
