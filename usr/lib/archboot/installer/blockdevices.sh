@@ -84,6 +84,7 @@ blockdevices_partitions() {
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi
+        sleep 0.1
     done
     printk on
 }
@@ -744,18 +745,13 @@ _createpv()
         activate_special_devices
         : >/tmp/.pvs-create
         # Remove all lvm devices with children
-        LVM_BLACKLIST=""
-        for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
-            LVM_BLACKLIST="${LVM_BLACKLIST} $(${_LSBLK} NAME "${i}")"
-        done
-        #LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
-        #            echo "$(${_LSBLK} NAME "${i}")" _
-        #            done)"
+        LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
+                    echo "$(${_LSBLK} NAME "${i}")" _
+                    done)"
         #shellcheck disable=SC2119
-        PARTS=""
-        for i in $(findpartitions); do
-            ! echo "${LVM_BLACKLIST}" | grep -E "${i}" && PARTS="${PARTS} "${i}" _"
-        done
+        PARTS="$(for i in $(findpartitions); do
+                ! echo "${LVM_BLACKLIST}" | grep -E "${i} _" && echo "${i}" _
+                done)"
         # break if all devices are in use
         if [[ "${PARTS}" = "" ]]; then
             DIALOG --msgbox "No devices left for physical volume creation." 0 0
