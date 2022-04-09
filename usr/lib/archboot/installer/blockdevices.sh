@@ -967,13 +967,24 @@ _createlv()
         DIALOG --yesno "Would you like to create Logical Volume ${LVDEVICE} like this?\nVolume Group:\n${LV}\nVolume Size:\n${LV_SIZE}\nContiguous Volume:\n${CONTIGUOUS}" 0 0 && LVFINISH="DONE"
     done
     _umountall
-    DIALOG --infobox "Creating Logical Volume ${LVDEVICE}..." 0 0
     if [[ "${LV_ALL}" = "1" ]]; then
         #shellcheck disable=SC2086
-        lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0; return 1)
+        if lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
+            DIALOG --infobox "Creating Logical Volume  ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+            sleep 5
+        else
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
+            return 1
+        fi
     else
         #shellcheck disable=SC2086
-        lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0; return 1)
+        if lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
+            DIALOG --infobox "Creating Logical Volume  ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+            sleep 5
+        else
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
+            return 1
+        fi
     fi
 }
 
