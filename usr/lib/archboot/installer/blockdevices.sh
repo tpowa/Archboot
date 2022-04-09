@@ -778,6 +778,7 @@ _createpv()
         # final step ask if everything is ok?
         DIALOG --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && PVFINISH="DONE"
     done
+    DIALOG --infobox "Creating physical volume on ${PART}..." 0 0
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
     _umountall
@@ -895,7 +896,7 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1; then
-        DIALOG "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+        DIALOG --infobox "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
         sleep 5
     else
         DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0
