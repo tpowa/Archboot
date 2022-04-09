@@ -895,7 +895,13 @@ _createvg()
     PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
-    vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0; return 1)
+    if vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1; then
+        DIALOG "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
+        sleep 5
+    else
+        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0
+        return 1
+    fi
 }
 
 # Creates logical volume
