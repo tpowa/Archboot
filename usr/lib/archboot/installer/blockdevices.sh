@@ -615,7 +615,7 @@ _raid()
         # enter raid device name
         RAIDDEVICE=""
         while [[ "${RAIDDEVICE}" = "" ]]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 65 "/dev/md0" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${ANSWER}" || return 1
             RAIDDEVICE=$(cat "${ANSWER}")
             if grep -q "^${RAIDDEVICE//\/dev\//}" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
