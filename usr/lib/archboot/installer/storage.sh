@@ -131,7 +131,7 @@ _createluks() {
         fi
         CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Luks Encryption" 12 60 5 \
+        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Luks Encryption" 11 60 5 \
             "1" "Luks Help" \
             "2" "Reset Luks Encryption completely" \
             "3" "Create Luks" \
