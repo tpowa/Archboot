@@ -1024,9 +1024,9 @@ far more confidence in the event of you selling or discarding\n
 your drive.\n
 Basically, it supplements the access control mechanisms of the operating\n
 system (like file permissions) by making it harder to bypass the operating\n
-system by inserting a boot CD, for example. Encrypting the root partition\n
-prevents anyone from using this method to insert viruses or trojans onto\n
-your computer.\n\n
+system by inserting a bootable medium, for example. Encrypting the root\n
+partition prevents anyone from using this method to insert viruses or\n
+trojans onto your computer.\n\n
 ATTENTION:\n
 Having encrypted partitions does not protect you from all possible\n
 attacks. The encryption is only as good as your key management, and there\n
