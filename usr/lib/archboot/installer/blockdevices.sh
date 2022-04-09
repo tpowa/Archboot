@@ -693,6 +693,7 @@ _createraid()
     #shellcheck disable=SC2086
     if mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >"${LOG}" 2>&1; then
         DIALOG --infobox "${RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
+        sleep 3
     else
         DIALOG --msgbox "Error creating ${RAIDDEVICE} (see "${LOG}" for details)." 0 0
         return 1
