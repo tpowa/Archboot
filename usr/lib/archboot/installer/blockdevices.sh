@@ -742,6 +742,7 @@ _createpv()
     PVFINISH=""
     while [[ "${PVFINISH}" != "DONE" ]]; do
         activate_special_devices
+        sleep 2
         : >/tmp/.pvs-create
         # Remove all lvm devices with children
         LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
