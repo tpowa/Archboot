@@ -783,7 +783,7 @@ _createpv()
     #shellcheck disable=SC2028,SC2086
     _umountall
     if pvcreate -y ${PART} >"${LOG}" 2>&1; then
-        DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 5 seconds..." 5 70
+        DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 5 seconds..." 6 75
         sleep 5
     else
         DIALOG --msgbox "Error creating physical volume on ${PART} (see "${LOG}" for details)." 0 0; return 1
