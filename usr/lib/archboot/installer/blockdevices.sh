@@ -782,7 +782,12 @@ _createpv()
     PART="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
     _umountall
-    pvcreate -y ${PART} >"${LOG}" 2>&1 || (DIALOG --msgbox "Error creating physical volume on ${PART} (see "${LOG}" for details)." 0 0; return 1)
+    if pvcreate -y ${PART} >"${LOG}" 2>&1; then
+        DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 3 seconds..." 5 50
+        sleep 3
+    else
+        DIALOG --msgbox "Error creating physical volume on ${PART} (see "${LOG}" for details)." 0 0; return 1
+    fi
     # run udevadm to get values exported
     udevadm trigger
     udevadm settle
