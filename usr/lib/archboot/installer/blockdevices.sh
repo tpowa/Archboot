@@ -920,12 +920,12 @@ _createlv()
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Volume Group" 21 50 13 ${LVS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select Volume Group" 11 50 5 ${LVS} 2>"${ANSWER}" || return 1
         LV=$(cat "${ANSWER}")
         # enter logical volume name
         LVDEVICE=""
         while [[ "${LVDEVICE}" = "" ]]; do
-            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 15 65 "fooname" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${ANSWER}" || return 1
             LVDEVICE=$(cat "${ANSWER}")
             if lvs -o lv_name,vg_name --noheading 2>/dev/null | grep -q " ${LVDEVICE} ${LV}$"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
