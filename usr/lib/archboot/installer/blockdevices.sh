@@ -761,7 +761,7 @@ _createpv()
         # select the first device to use
         DEVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 11 50 8 ${PARTS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 8 50 5 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         echo "${PART}" >>/tmp/.pvs-create
         while [[ "${PART}" != "DONE" ]]; do
