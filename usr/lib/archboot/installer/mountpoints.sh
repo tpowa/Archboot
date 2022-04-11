@@ -130,7 +130,7 @@ mountpoints() {
         while [[ "${DO_SWAP}" != "DONE" ]]; do
             FSTYPE="swap"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to use as swap" 21 50 13 NONE - ${PARTS} 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select the partition to use as swap" 15 50 12 NONE - ${PARTS} 2>"${ANSWER}" || return 1
             PART=$(cat "${ANSWER}")
             if [[ "${PART}" != "NONE" ]]; then
                 clear_fs_values
@@ -153,7 +153,7 @@ mountpoints() {
         DO_ROOT=""
         while [[ "${DO_ROOT}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to mount as /" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select the partition to mount as /" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
             PART=$(cat "${ANSWER}")
             PART_ROOT=${PART}
             # Select root filesystem type
@@ -181,7 +181,7 @@ mountpoints() {
             DO_ADDITIONAL=""
             while [[ "${DO_ADDITIONAL}" != "DONE" ]]; do
                 #shellcheck disable=SC2086
-                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 21 52 13 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
+                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished)" 15 52 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
                 PART=$(cat "${ANSWER}")
                 if [[ "${PART}" != "DONE" ]]; then
                     FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
