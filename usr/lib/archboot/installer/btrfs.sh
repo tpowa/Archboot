@@ -114,7 +114,7 @@ btrfs_raid_level() {
     DIALOG --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid data level you want to use" 21 50 9 ${BTRFS_RAIDLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the raid data level you want to use" 15 50 10 ${BTRFS_RAIDLEVELS} 2>"${ANSWER}" || return 1
         BTRFS_LEVEL=$(cat "${ANSWER}")
         if [[ "${BTRFS_LEVEL}" = "NONE" ]]; then
             echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
@@ -135,7 +135,7 @@ select_btrfs_raid_devices () {
     BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_DEVICE}\ _##g")
     RAIDNUMBER=2
     #shellcheck disable=SC2086
-    DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
+    DIALOG --menu "Select device ${RAIDNUMBER}" 15 50 10 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
     BTRFS_PART=$(cat "${ANSWER}")
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
     while [[ "${BTRFS_PART}" != "DONE" ]]; do
@@ -151,7 +151,7 @@ select_btrfs_raid_devices () {
         BTRFS_PARTS=$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
         # add more devices
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device ${RAIDNUMBER}" 15 50 10 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
         BTRFS_PART=$(cat "${ANSWER}")
         [[ "${BTRFS_PART}" = "DONE" ]] && break
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
