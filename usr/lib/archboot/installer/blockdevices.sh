@@ -993,7 +993,7 @@ _createlv()
 _enter_luks_name() {
     LUKSDEVICE=""
     while [[ "${LUKSDEVICE}" = "" ]]; do
-        DIALOG --inputbox "Enter the name for luks encrypted device ${PART}:\nfooname\n<yourname>\n\n" 15 65 "fooname" 2>"${ANSWER}" || return 1
+        DIALOG --inputbox "Enter the name for luks encrypted device ${PART}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${ANSWER}" || return 1
         LUKSDEVICE=$(cat "${ANSWER}")
         if ! cryptsetup status "${LUKSDEVICE}" | grep -q inactive; then
             DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
