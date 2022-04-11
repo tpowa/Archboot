@@ -58,7 +58,7 @@ select_filesystem() {
     [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
     [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select a filesystem for ${PART}" 21 50 13 ${FSOPTS} 2>"${ANSWER}" || return 1
+    DIALOG --menu "Select a filesystem for ${PART}" 12 50 9 ${FSOPTS} 2>"${ANSWER}" || return 1
     FSTYPE=$(cat "${ANSWER}")
 }
 
