@@ -784,8 +784,8 @@ _createpv()
     #shellcheck disable=SC2028,SC2086
     _umountall
     if pvcreate -y ${PART} >"${LOG}" 2>&1; then
-        DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 5 seconds..." 6 75
-        sleep 5
+        DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 3 seconds..." 6 75
+        sleep 3
     else
         DIALOG --msgbox "Error creating physical volume on ${PART} (see "${LOG}" for details)." 0 0; return 1
     fi
@@ -897,8 +897,8 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1; then
-        DIALOG --infobox "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
-        sleep 5
+        DIALOG --infobox "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+        sleep 3
     else
         DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0
         return 1
@@ -971,8 +971,8 @@ _createlv()
     if [[ "${LV_ALL}" = "1" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
-            sleep 5
+            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+            sleep 3
         else
             DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
             return 1
@@ -980,8 +980,8 @@ _createlv()
     else
         #shellcheck disable=SC2086
         if lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 5 seconds..." 5 50
-            sleep 5
+            DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+            sleep 3
         else
             DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
             return 1
