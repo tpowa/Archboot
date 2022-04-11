@@ -128,14 +128,10 @@ btrfs_raid_level() {
 
 # select btrfs raid devices
 select_btrfs_raid_devices () {
-    # show all devices with sizes
-    # DIALOG --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
-    BTRFS_PART="${BTRFS_DEVICE}"
-    BTRFS_PARTS="${PARTS}"
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
-    BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
+    BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
     RAIDNUMBER=2
     #shellcheck disable=SC2086
     DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
@@ -150,7 +146,7 @@ select_btrfs_raid_devices () {
         [[ "${RAIDNUMBER}" -ge 4 && "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 5 && "${BTRFS_LEVEL}" = "raid10" || "${BTRFS_LEVEL}" = "raid6" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
+        BTRFS_PARTS=$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
         # add more devices
         #shellcheck disable=SC2086
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
