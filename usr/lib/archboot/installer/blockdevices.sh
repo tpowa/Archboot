@@ -1081,7 +1081,7 @@ _luks()
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device for luks encryption" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device for luks encryption" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         # enter luks name
         _enter_luks_name
