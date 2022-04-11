@@ -114,7 +114,7 @@ btrfs_raid_level() {
     DIALOG --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid data level you want to use" 15 50 10 ${BTRFS_RAIDLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the raid data level you want to use" 12 50 9 ${BTRFS_RAIDLEVELS} 2>"${ANSWER}" || return 1
         BTRFS_LEVEL=$(cat "${ANSWER}")
         if [[ "${BTRFS_LEVEL}" = "NONE" ]]; then
             echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
