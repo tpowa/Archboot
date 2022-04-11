@@ -135,7 +135,7 @@ select_btrfs_raid_devices () {
     BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_DEVICE}\ _##g")
     RAIDNUMBER=2
     #shellcheck disable=SC2086
-    DIALOG --menu "Select device ${RAIDNUMBER}" 15 50 10 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
+    DIALOG --menu "Select device ${RAIDNUMBER}" 13 50 10 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
     BTRFS_PART=$(cat "${ANSWER}")
     echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
     while [[ "${BTRFS_PART}" != "DONE" ]]; do
@@ -151,7 +151,7 @@ select_btrfs_raid_devices () {
         BTRFS_PARTS=$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
         # add more devices
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${RAIDNUMBER}" 15 50 10 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device ${RAIDNUMBER}" 13 50 10 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
         BTRFS_PART=$(cat "${ANSWER}")
         [[ "${BTRFS_PART}" = "DONE" ]] && break
         echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
