@@ -1084,7 +1084,7 @@ _luks()
         DIALOG --menu "Select device for luks encryption" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         # enter luks name
-        _enter_luks_name
+        _enter_luks_name || return 1
         ### TODO: offer more options for encrypt!
         ###       defaults are used only
         # final step ask if everything is ok?
