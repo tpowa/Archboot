@@ -131,6 +131,7 @@ select_btrfs_raid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
     echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
+    #shellcheck disable=SC2001,SC2086
     BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_DEVICE}\ _##g")
     RAIDNUMBER=2
     #shellcheck disable=SC2086
@@ -146,6 +147,7 @@ select_btrfs_raid_devices () {
         [[ "${RAIDNUMBER}" -ge 4 && "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 5 && "${BTRFS_LEVEL}" = "raid10" || "${BTRFS_LEVEL}" = "raid6" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
+        #shellcheck disable=SC2001,SC2086
         BTRFS_PARTS=$(echo ${BTRFS_PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
         # add more devices
         #shellcheck disable=SC2086
