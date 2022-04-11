@@ -130,8 +130,8 @@ btrfs_raid_level() {
 select_btrfs_raid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
-    echo "${BTRFS_PART}" >>/tmp/.btrfs-devices
-    BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_PART}\ _##g")
+    echo "${BTRFS_DEVICE}" >>/tmp/.btrfs-devices
+    BTRFS_PARTS=$(echo ${PARTS} | sed -e "s#${BTRFS_DEVICE}\ _##g")
     RAIDNUMBER=2
     #shellcheck disable=SC2086
     DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} 2>"${ANSWER}" || return 1
