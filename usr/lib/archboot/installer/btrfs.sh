@@ -150,7 +150,7 @@ select_btrfs_raid_devices () {
         [[ "${RAIDNUMBER}" -ge 4 && "${BTRFS_LEVEL}" = "raid5" ]] && BTRFS_DONE="DONE _"
         [[ "${RAIDNUMBER}" -ge 5 && "${BTRFS_LEVEL}" = "raid10" || "${BTRFS_LEVEL}" = "raid6" ]] && BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        BTRFS_PARTS="${BTRFS_PARTS//${BTRFS_PART}\ _/}"
+        BTRFS_PARTS="$(echo "${BTRFS_PARTS}" | sed -e "s#${BTRFS_PART}\ _##g")"
         # add more devices
         #shellcheck disable=SC2086
         DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${BTRFS_PARTS} ${BTRFS_DONE} 2>"${ANSWER}" || return 1
