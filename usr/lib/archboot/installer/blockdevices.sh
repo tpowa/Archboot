@@ -400,7 +400,7 @@ _umountall()
     for i in $(findmnt --list --submounts "${DESTDIR}" -o TARGET -n | tac); do
         umount "$i"
     done
-    DIALOG --infobox "Disabled swapspace, unmounted already mounted disk devices in ${DESTDIR} ...\n\nContinuing in 3 seconds..." 5 60
+    DIALOG --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
     sleep 3
 }
 
