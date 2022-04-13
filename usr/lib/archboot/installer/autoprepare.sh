@@ -317,7 +317,7 @@ autoprepare() {
         LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f5 -d:)"
         BTRFS_DEVICES="${PART}"
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            BTRFS_COMPRESS="compress=lzo"
+            BTRFS_COMPRESS="compress=zstd"
             [[ "${MP}" = "/" ]] && BTRFS_SUBVOLUME="root"
             [[ "${MP}" = "/home" ]] && BTRFS_SUBVOLUME="home" && DOMKFS="no"
             DOSUBVOLUME="yes"
