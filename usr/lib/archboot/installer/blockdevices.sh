@@ -396,7 +396,7 @@ _getavailpartitions()
 # the destination root partition last!
 _umountall()
 {
-    if [[ "${DESTDIR}" == "/install" && $(mountpoint -q "${DESTDIR}") -eq "0" ]]; then
+    if [[ "${DESTDIR}" == "/install" ]] && mountpoint -q "${DESTDIR}"; then
         swapoff -a >/dev/null 2>&1
         for i in $(findmnt --list --submounts "${DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
