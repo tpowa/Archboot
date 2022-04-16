@@ -332,6 +332,7 @@ do_secureboot_keys() {
     while [[ "${KEYDIR}" = "" ]]; do
         DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${ANSWER}" || return 1
         KEYDIR=$(cat "${ANSWER}")
+        #shellcheck disable=SC2086,SC2001
         KEYDIR="$(echo ${KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
@@ -359,7 +360,7 @@ do_mok_sign () {
             PASS=$(cat "${ANSWER}")
             DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${ANSWER}" || return 1
             PASS2=$(cat "${ANSWER}")
-            if [[ "${PASS}" = "${PASS2}" && ! -z "${PASS}" ]]; then
+            if [[ "${PASS}" = "${PASS2}" && -n "${PASS}" ]]; then
                 MOK_PW=${PASS}
                 echo "${MOK_PW}" > /tmp/.password
                 echo "${MOK_PW}" >> /tmp/.password
@@ -376,7 +377,7 @@ do_mok_sign () {
     SIGN_MOK=""
     DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
-        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/${VMLINUZ} /boot/"${VMLINUZ}" > "${LOG}"
+        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}"
         systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
         DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
         sleep 5
