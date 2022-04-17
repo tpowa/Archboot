@@ -7,7 +7,7 @@ _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # size for --latest and --latest-install option
-_ZRAM_SIZE="4G"
+_ZRAM_SIZE="3G"
 # size used for --latest-image option
 _ZRAM_IMAGE_SIZE="5G"
 ### server setup
