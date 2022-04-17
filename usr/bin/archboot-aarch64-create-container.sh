@@ -2,7 +2,6 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
-_CACHEDIR="${1}/var/cache/pacman/pkg"
 _ARCHBOOT="archboot-arm"
 _KEYRING="archlinuxarm"
 [[ -z "${1}" ]] && _usage

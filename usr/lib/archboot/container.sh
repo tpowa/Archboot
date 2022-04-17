@@ -1,6 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
+_CACHEDIR="${1}/var/cache/pacman/pkg"
 
 _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
