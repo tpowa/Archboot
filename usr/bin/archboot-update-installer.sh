@@ -32,7 +32,6 @@ zram_mount() {
     modprobe zram
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
-    echo "${_ZRAM_MAX_COMP_STREAMS}" >/sys/block/zram0/max_comp_streams
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
     mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
     mkdir "${_W_DIR}"
