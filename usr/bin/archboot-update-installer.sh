@@ -28,7 +28,6 @@ kver() {
 zram_mount() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    _ZRAM_MAX_COMP_STREAMS=${_ZRAM_MAX_COMP_STREAMS:-"4"}
     modprobe zram
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
@@ -149,7 +148,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     while pgrep -x gpg > /dev/null 2>&1; do
         sleep 1
     done
-    systemctl stop pacman-init.service
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && systemctl stop pacman-init.service
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && systemctl stop pacman-init-arm.service
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # create container without package cache
