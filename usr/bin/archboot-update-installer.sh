@@ -10,6 +10,7 @@ _CONFIG="/etc/archboot/${_RUNNING_ARCH}-update_installer.conf"
 _W_DIR="/archboot"
 _SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master"
 _BIN="/usr/bin"
+_ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
 
@@ -97,6 +98,7 @@ fi
 # Download latest setup and quickinst script from git repository
 if [[ "${_D_SCRIPTS}" == "1" ]]; then
     echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
+    wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
     wget -q "${_SOURCE}${_BIN}/archboot-quickinst.sh?inline=false" -O "${_BIN}/quickinst"
     wget -q "${_SOURCE}${_BIN}/archboot-setup.sh?inline=false" -O "${_BIN}/setup"
     wget -q "${_SOURCE}${_BIN}/archboot-km.sh?inline=false" -O "${_BIN}/km"
