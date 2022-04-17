@@ -80,7 +80,7 @@ build ()
           systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext
     map add_dir "/etc/tmpfiles.d" "/etc/modules-load.d" "/etc/binfmt.d/" "/var/lib/systemd"
     map add_full_dir "/etc/sysctl.d/"  "/etc/systemd" "/etc/xdg"  "/usr/lib/systemd"  "/usr/share/systemd"  "/usr/share/factory" \
-                     "/usr/share/polkit-1" "/usr/lib/tmpfiles.d" "/usr/lib/modules-load.d" "/usr/lib/sysusers.d"
+                     "/usr/share/polkit-1" "/usr/lib/tmpfiles.d" "/usr/lib/modules-load.d" "/usr/lib/sysusers.d" "/usr/lib/sysctl.d"
     add_file "/usr/lib/os-release"
     add_file "/usr/share/archboot/base/etc/locale.conf" "/etc/locale.conf"
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
