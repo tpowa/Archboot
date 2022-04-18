@@ -217,6 +217,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     umount ${_W_DIR}
     echo 1 > /sys/block/zram0/reset
     sleep 5
+    # unload virtio-net to avoid non functional network device on aarch64
+    rmmod virtio-net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     # load kernel and initrds into running kernel in background mode!
     kexec -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
