@@ -21,7 +21,6 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _clean_archboot_cache
     _generate_keyring "${1}" || exit 1
     _copy_mirrorlist_and_pacman_conf "${1}"
-    _change_pacman_conf "${1}" || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot "${1}" || exit 1
@@ -34,6 +33,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _generate_locales "${1}"
     _clean_container "${1}" 2>/dev/null
 fi
+_change_pacman_conf "${1}" || exit 1
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."
