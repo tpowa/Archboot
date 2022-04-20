@@ -232,11 +232,16 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     done
     echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     # don't show active prompt wait for kexec to be launched
-    sleep 15
     # UEFI kexec call
-    [[ -e "/sys/firmware/efi" ]] && systemctl kexec
-    # BIOS kexec call
-    kexec -e
+    while true; do
+        if [[ -e "/sys/firmware/efi" ]]; then
+            systemctl kexec 2>/dev/null
+        else
+            # BIOS kexec call
+            kexec -e 2>/dev/null
+        fi
+        sleep 1
+    done
 fi
 
 # Generate new images
