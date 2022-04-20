@@ -98,7 +98,7 @@ fi
 # Download latest setup and quickinst script from git repository
 if [[ "${_D_SCRIPTS}" == "1" ]]; then
     echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
-    [ -d "${_INST}" ]] || mkdir "${_INST}"
+    [[ -d "${_INST}" ]] || mkdir "${_INST}"
     wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
     wget -q "${_SOURCE}${_BIN}/archboot-quickinst.sh?inline=false" -O "${_BIN}/quickinst"
     wget -q "${_SOURCE}${_BIN}/archboot-setup.sh?inline=false" -O "${_BIN}/setup"
