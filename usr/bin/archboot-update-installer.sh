@@ -227,7 +227,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
     rm /{initrd.img,${VMLINUZ}}
-    while pgreg -x kexec >/dev/null 2>&1; do
+    while pgrep -x kexec >/dev/null 2>&1; do
         sleep 1
     done
     echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
