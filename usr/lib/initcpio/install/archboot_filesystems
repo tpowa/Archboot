@@ -10,7 +10,7 @@ build ()
 	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel mount.smb3 mount.cifs \
 	  fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
 	  mkfs.jfs wipefs btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
-	  btrfstune mkfs.btrfs mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.upcall cifscreds getcifsacl \
+	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.upcall cifscreds getcifsacl \
 	  setcifsacl smb2-quota smbinfo umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
 	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fusermount mount.fuse ulockmgr_server fsck.exfat mkfs.exfat \
 	  tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos fsck.btrfs dosfslabel \

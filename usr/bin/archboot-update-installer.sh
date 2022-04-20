@@ -218,10 +218,10 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo 1 > /sys/block/zram0/reset
     sleep 5
     # unload virtio-net to avoid none functional network device on aarch64
-    cat /proc/modules | grep -qw virtio_net && modprobe -r virtio_net
+    cat /proc/modules | grep -qw virtio_net && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     # load kernel and initrds into running kernel in background mode!
-    kexec -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
+    kexec -l /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
     # wait 1 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
@@ -231,7 +231,11 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     done
     echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     # don't show active prompt wait for kexec to be launched
-    sleep 30
+    sleep 15
+    # UEFI kexec call
+    [[ -e "/sys/firmware/efi" ]] && systemctl kexec
+    # BIOS kexec call
+    kexec -e
 fi
 
 # Generate new images
