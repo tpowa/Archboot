@@ -210,7 +210,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
     done
-    while pgreg -x bsdtar >/dev/null 2>&1; do
+    while pgrep -x bsdtar >/dev/null 2>&1; do
         sleep 1
     done
     echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
