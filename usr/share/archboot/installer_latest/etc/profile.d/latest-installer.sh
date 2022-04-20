@@ -13,7 +13,7 @@ if [[ "${TTY}" == "tty1" ]]; then
     echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
     echo ""
     echo -e "\033[1mRunning now:\033[0m \033[92mupdate-installer.sh -latest-install\033[0m"
-    update-installer.sh -latest-install | tee -a /dev/ttyS0
+    update-installer.sh -latest-install | tee -a /dev/ttyS0 2>/dev/null
 elif [[ "${TTY}" == "ttyS0" ]]; then
     echo -e "\033[1mRunning\033[0m \033[92mupdate-installer.sh -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
     echo -e "\033[1mProgress is shown here ...\033[0m"
