@@ -176,9 +176,9 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
-    kver
     echo -e "\033[1mStep 4/9:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
+    kver
     echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
