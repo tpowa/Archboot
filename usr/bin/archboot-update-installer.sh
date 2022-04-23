@@ -13,11 +13,11 @@ _BIN="/usr/bin"
 _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
+[[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-linux"
+[[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 kver() {
     # get kernel version from installed kernel
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-linux"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
     if [[ -f "/${VMLINUZ}" ]]; then
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
