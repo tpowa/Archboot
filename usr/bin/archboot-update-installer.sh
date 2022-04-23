@@ -21,6 +21,7 @@ kver() {
     if [[ -f "${VMLINUZ}" ]]; then
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+        _HWKVER="${_HWKERVER}"
     fi
     # fallback if no detectable kernel is installed
     [[ "${_HWKVER}" == "" ]] && _HWKVER="$(uname -r)"
