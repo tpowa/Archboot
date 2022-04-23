@@ -210,7 +210,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     sleep 2
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
-        sleep 0.01
+        sleep 0.005
     done
     while pgrep -x bsdtar >/dev/null 2>&1; do
         sleep 1
