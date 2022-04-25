@@ -27,10 +27,21 @@ kver() {
     [[ "${_HWKVER}" == "" ]] && _HWKVER="$(uname -r)"
 }
 
+umount_w_dir() {
+    if mountpoint "${_W_DIR}"; then
+        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
+        # umount all possible mountpoints
+        umount -R "${_W_DIR}"
+        echo 1 > /sys/block/zram0/reset
+        # wait 5 seconds to get RAM cleared and set free
+        sleep 5
+    fi
+}
+
 zram_mount() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    modprobe zram
+    modprobe zram 2>/dev/null
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
@@ -146,6 +157,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     touch /.update-installer
     # disable kernel messages on aarch64
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo 0 >/proc/sys/kernel/printk
+    umount_w_dir
     zram_mount "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
     clean_archboot
@@ -217,10 +229,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     done
     echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
     cd /
-    umount ${_W_DIR}
-    echo 1 > /sys/block/zram0/reset
-    # wait 5 seconds to get RAM cleared and set free
-    sleep 5
+    umount_w_dir
     # unload virtio-net to avoid none functional network device on aarch64
     cat /proc/modules | grep -qw virtio_net && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
