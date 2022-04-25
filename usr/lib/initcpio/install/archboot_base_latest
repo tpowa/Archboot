@@ -5,6 +5,9 @@ build ()
 {
     ### adding passwd file for correct shell
     add_file "/usr/share/archboot/installer_latest/etc/passwd" "/etc/passwd"
+    ### adding default font and keymap
+    add_file "/usr/share/kbd/consolefonts/lat9w-16.psfu.gz"
+    add_file "/usr/share/kbd/keymaps/i386/qwerty/us.map.gz"
 }
 
 help ()
