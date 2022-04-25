@@ -46,7 +46,7 @@ zram_mount() {
     echo "${1}" >/sys/block/zram0/disksize
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
     mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
-    mkdir "${_W_DIR}"
+    [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
     # use -o discard for RAM cleaning on delete
     # (online fstrimming the block device!)
     # fstrim <mountpoint> for manual action
