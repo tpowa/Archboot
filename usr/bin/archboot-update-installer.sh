@@ -13,6 +13,7 @@ _BIN="/usr/bin"
 _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
+_ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
@@ -29,8 +30,6 @@ kver() {
 zram_mount() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    # disable kernel messages on aarch64
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo 0 >/proc/sys/kernel/printk
     modprobe zram
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
@@ -145,7 +144,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         exit 1
     fi
     touch /.update-installer
-    _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
+    # disable kernel messages on aarch64
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo 0 >/proc/sys/kernel/printk
     zram_mount "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
     clean_archboot
