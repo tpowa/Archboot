@@ -7,7 +7,7 @@ build ()
     for i in $apps; do
         rm /usr/bin/"$i"
     done
-    apps="mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys mkfs.btrfs rmmod"
+    apps="mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys mkfs.btrfs rmmod mountpoint"
     for i in $apps; do
         rm /usr/bin/"$i"
     done
