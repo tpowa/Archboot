@@ -219,13 +219,14 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cd /
     umount ${_W_DIR}
     echo 1 > /sys/block/zram0/reset
+    # wait 5 seconds to get RAM cleared and set free
     sleep 5
     # unload virtio-net to avoid none functional network device on aarch64
     cat /proc/modules | grep -qw virtio_net && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     # load kernel and initrds into running kernel in background mode!
     kexec -l /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
-    # wait 1 seconds for getting a complete initramfs
+    # wait 2 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
     rm /{initrd.img,${VMLINUZ}}
