@@ -56,21 +56,13 @@ _download_latest() {
         done
         LIBS="common.sh container.sh release.sh iso.sh update-installer.sh"
         for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}.sh"
+            wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done
-        wget -q "${_SOURCE}${_INST}/autoconfiguration.sh?inline=false" -O "${_INST}/autoconfiguration.sh"
-        wget -q "${_SOURCE}${_INST}/autoprepare.sh?inline=false" -O "${_INST}/autoprepare.sh"
-        wget -q "${_SOURCE}${_INST}/base.sh?inline=false" -O "${_INST}/base.sh"
-        wget -q "${_SOURCE}${_INST}/blockdevices.sh?inline=false" -O "${_INST}/blockdevices.sh"
-        wget -q "${_SOURCE}${_INST}/bootloader.sh?inline=false" -O "${_INST}/bootloader.sh"
-        wget -q "${_SOURCE}${_INST}/btrfs.sh?inline=false" -O "${_INST}/btrfs.sh"
-        wget -q "${_SOURCE}${_INST}/common.sh?inline=false" -O "${_INST}/common.sh"
-        wget -q "${_SOURCE}${_INST}/configuration.sh?inline=false" -O "${_INST}/configuration.sh"
-        wget -q "${_SOURCE}${_INST}/mountpoints.sh?inline=false" -O "${_INST}/mountpoints.sh"
-        wget -q "${_SOURCE}${_INST}/network.sh?inline=false" -O "${_INST}/network.sh"
-        wget -q "${_SOURCE}${_INST}/pacman.sh?inline=false" -O "${_INST}/pacman.sh"
-        wget -q "${_SOURCE}${_INST}/partition.sh?inline=false" -O "${_INST}/partition.sh"
-        wget -q "${_SOURCE}${_INST}/storage.sh?inline=false" -O "${_INST}/storage.sh"
+        SETUPS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
+                configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
+        for i in ${SETUPS}; do
+            wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
+        done
         echo -e "\033[1mFinished:\033[0m Downloading scripts done."
         exit 0
     fi
