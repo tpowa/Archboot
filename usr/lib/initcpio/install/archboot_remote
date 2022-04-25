@@ -5,7 +5,7 @@ build ()
 {
     map add_binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
 	  telnetd rsync exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
-	  sm-notify start-statd rpcbind rpcinfo rpc.gssd mountpoint mountstats \
+	  sm-notify start-statd rpcbind rpcinfo rpc.gssd mountstats \
 	  nfsdcltrack nfsiostat gssproxy screen tmux
     map add_file "/etc/screenrc" "/etc/ssh/ssh_config" "/etc/ssh/sshd_config" "/etc/ssh/moduli" \
         "/etc/rsyncd.conf" "/etc/exports"  "/usr/lib/ssh/sftp-server" "/usr/lib/ssh/ssh-keysign" \
