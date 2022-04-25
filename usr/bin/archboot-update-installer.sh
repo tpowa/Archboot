@@ -28,7 +28,7 @@ kver() {
 }
 
 umount_w_dir() {
-    if mountpoint "${_W_DIR}"; then
+    if mountpoint -q "${_W_DIR}"; then
         echo "Unmounting ${_W_DIR} ..." > /dev/tty7
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
