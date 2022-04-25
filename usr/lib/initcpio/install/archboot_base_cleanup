@@ -6,7 +6,7 @@ build ()
     apps="getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
-          chroot dirname expr bunzip2 bzcat bzip2 su cpio gzip top sdparm tput \
+          chroot dirname expr bunzip2 bzcat bzip2 su cpio top sdparm tput \
           ifconfig losetup mkfifo mknod  lzmadec lzop lzma lzcat unlzma unxz xzcat \
           lastb last wall mesg utmpdump xzdec switch_root pivot_root chcpu ctrlaltdel \
           raw gdisk sgdisk cgdisk fixparts findmnt lsblk swaplabel cal chrt col colcrt \
