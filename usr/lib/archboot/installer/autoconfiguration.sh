@@ -116,8 +116,16 @@ auto_mkinitcpio() {
         fi
     fi
     # get kernel version
-    offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
-    read -r HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+    if [[ ${RUNNING_ARCH} == "x86_64" ]]; then
+        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
+        read -r HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+    elif [[ ${RUNNING_ARCH} == "aarch64" ]]; then
+            read _ _ HWKVER _ < <(grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+' "${DESTDIR}/boot/${VMLINUZ}")
+            # try if the image is gzip compressed
+            if [[ -z "$HWKVER" ]]; then
+                read _ _ HWKVER _ < <(gzip -c -d "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+            fi
+    fi
     # arrange MODULES for mkinitcpio.conf
     HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller --filesystem ${FBPARAMETER})"
     # arrange HOOKS for mkinitcpio.conf
