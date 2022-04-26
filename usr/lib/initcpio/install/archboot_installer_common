@@ -7,7 +7,7 @@ build ()
     "/usr/lib/archboot/container.sh" "/usr/bin/archboot-$(uname -m)-create-container.sh" \
     "/usr/lib/archboot/update-installer.sh"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
-    add_file "/usr/share/archboot/etc/profile.d/launch-setup.sh" "/etc/profile.d/launch-setup.sh"
+    add_file "/usr/share/archboot/installer/etc/profile.d/launch-setup.sh" "/etc/profile.d/launch-setup.sh"
 }
 
 help ()
