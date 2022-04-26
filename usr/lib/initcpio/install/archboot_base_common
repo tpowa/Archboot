@@ -33,6 +33,8 @@ build ()
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
+    ### adding passwd file for correct shell
+    add_file "/usr/share/archboot/base/etc/passwd" "/etc/passwd"
 
     ### adding config files of installation system
     map add_file "/etc/profile" "/etc/group" "/etc/gshadow"
