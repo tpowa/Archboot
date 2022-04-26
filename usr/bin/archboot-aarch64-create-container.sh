@@ -10,6 +10,7 @@ _root_check
 echo "Starting container creation ..."
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+    _create_pacman_conf "${1}"
     _prepare_pacman "${1}" || exit 1
     _install_base_packages "${1}" || exit 1
     _clean_mkinitcpio "${1}"
