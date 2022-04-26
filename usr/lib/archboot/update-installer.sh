@@ -146,14 +146,27 @@ _create_container() {
     fi
 }
 
-_kver() {
+_kver_x86() {
     # get kernel version from installed kernel
     if [[ -f "/${VMLINUZ}" ]]; then
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
     fi
     # fallback if no detectable kernel is installed
-    [[ "${_HWKVER}" == "" ]] && _HWKVER="$(uname -r)"
+    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
+}
+
+_kver_generic() {
+    # get kernel version from installed kernel
+    read _ _ _HWKVER _ < <(grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+' "/${VMLINUZ}")
+
+    # try if the image is gzip compressed
+    if [[ -z "${_HWKVER}" ]]; then
+        read _ _ _HWKVER _ < <(gzip -c -d "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+    fi
+
+    # fallback if no detectable kernel is installed
+    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
 }
 
 _create_initramfs() {
