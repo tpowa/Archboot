@@ -119,8 +119,7 @@ build ()
     map add_dir "/var/cache/pacman/pkg" "/var/lib/pacman"
     map add_file "/etc/pacman.conf" "/etc/makepkg.conf" "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
-    add_file "/usr/share/archboot/pacman/etc/systemd/system/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
-    add_symlink "/etc/systemd/system/multi-user.target.wants/etc-pacman.d-gnupg.mount" "/etc/systemd/system/etc-pacman.d-gnupg.mount"
+    add_dir "/etc/pacman.d/gnupg"
     if [[ "$(uname -m)" == "x86_64" ]]; then
         add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
         add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
