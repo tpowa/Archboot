@@ -24,9 +24,9 @@ _download_packages() {
 }
 
 _aarch64_download_packages() {
-    mkdir "${1}"/tmp/blankdb
+    mkdir "${1}"/blankdb
     echo "Downloading packages ${_PACKAGES} and ${_ARCHBOOT} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} --dbpath /tmp/blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _move_packages() {
