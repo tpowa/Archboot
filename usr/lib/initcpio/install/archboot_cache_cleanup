@@ -3,7 +3,7 @@
 
 build ()
 {
-  rm -r /var/cache/pacman/pkg
+  [[ -d /var/cache/pacman/pkg ]] && rm -r /var/cache/pacman/pkg
 }
 
 help ()
