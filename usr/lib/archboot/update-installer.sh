@@ -49,8 +49,8 @@ _download_latest() {
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
         BINS="quickinst setup km tz copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
-        archboot-${_RUNNING_ARCH}-create-container.sh archboot-${_RUNNING_ARCH}-release.sh \
-        archboot-binary-check.sh update-installer.sh secureboot-keys.sh mkkeys.sh"
+        ${_RUNNING_ARCH}-create-container.sh ${_RUNNING_ARCH}-release.sh \
+        binary-check.sh update-installer.sh secureboot-keys.sh mkkeys.sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
         done
