@@ -122,7 +122,7 @@ auto_mkinitcpio() {
     elif [[ ${RUNNING_ARCH} == "aarch64" ]]; then
             read _ _ HWKVER _ < <(grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+' "${DESTDIR}/boot/${VMLINUZ}")
             # try if the image is gzip compressed
-            if [[ -z "$HWKVER" ]]; then
+            if [[ -z "${HWKVER}" ]]; then
                 read _ _ HWKVER _ < <(gzip -c -d "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
             fi
     fi
