@@ -7,7 +7,7 @@ build ()
     add_checked_modules 'virtio|zram|btrfs|libcrc32|zstd'
     
     ### setting up base structure
-    map add_dir "/mnt" "/install" "/var/log" "/home"
+    map add_dir "/mnt" "/install" "/var/log" "/home" "/var/tmp"
 
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
