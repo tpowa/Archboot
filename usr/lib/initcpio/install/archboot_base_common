@@ -36,7 +36,7 @@ build ()
 
     ### adding config files of installation system
     map add_file "/etc/profile" "/etc/group" "/etc/gshadow"
-    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf profile.d/launch-setup.sh shadow shells"
+    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf shadow shells"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done
