@@ -118,8 +118,8 @@ _clean_archboot() {
 }
 
 _gpg_check() {
-    while pgrep -x gpg > /dev/null 2>&1; do
-        sleep 1
+    while pgrep -x pacman-key > /dev/null 2>&1; do
+        sleep 2
     done
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && systemctl stop pacman-init.service
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && systemctl stop pacman-init-arm.service
