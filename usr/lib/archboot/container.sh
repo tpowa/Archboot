@@ -142,7 +142,8 @@ _aarch64_install_base_packages() {
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --dbpath /blankdb --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _aarch64_install_archboot() {
@@ -151,7 +152,8 @@ _aarch64_install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --dbpath /blankdb --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _copy_mirrorlist_and_pacman_conf() {
