@@ -30,10 +30,10 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo 0 >/proc/sys/kernel/printk
     _umount_w_dir
     _zram_mount "${_ZRAM_SIZE}"
-    echo -e "\033[1mStep 1/9:\033[0m Removing not necessary files from / ..."
-    _clean_archboot
-    echo -e "\033[1mStep 2/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
+    echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
+    _clean_archboot
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     _create_container || exit 1
