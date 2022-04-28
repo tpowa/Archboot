@@ -7,7 +7,7 @@ After=haveged.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/pacman-key --init
-ExecStart=/usr/bin/pacman-key --populate $(basename /usr/share/pacman/keyrings/*.gpg | sed -e 's#.gpg##')
+ExecStart=/usr/bin/bash -c "/usr/bin/pacman-key --populate $(basename /usr/share/pacman/keyrings/*.gpg | sed -e 's#.gpg##')"
 
 [Install]
 WantedBy=multi-user.target
