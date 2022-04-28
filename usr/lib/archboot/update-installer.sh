@@ -128,7 +128,7 @@ _gpg_check() {
     done
     while true; do
     # gpg-agent finished in background
-        if [[ "$(pgrep -x gpg-agent -c)" == "2" ]] && break
+        [[ "$(pgrep -x gpg-agent -c)" == "2" ]] && break
         sleep 1
     done
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && systemctl stop pacman-init.service
