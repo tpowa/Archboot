@@ -128,7 +128,7 @@ _gpg_check() {
     done
     while true; do
     # gpg-agent finished in background
-        [[ "$(pgrep -x gpg-agent -c)" == "2" ]] && break
+        if [[ "$(pgrep -x gpg-agent -c)" == "2" ]] && break
         sleep 1
     done
     while pgrep -x gpg-agent -c
