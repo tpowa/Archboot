@@ -119,7 +119,7 @@ build ()
     map add_file "/etc/pacman.conf" "/etc/makepkg.conf" "/etc/pacman.d/mirrorlist"
     # add pacman initialisation of gpg keys
     add_dir "/etc/pacman.d/gnupg"
-    add_file "/usr/share/archboot/pacman/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
     add_symlink "/etc/systemd/system/multi-user.target.wants/pacman-init.service" "/etc/systemd/system/pacman-init.service"
     map add_full_dir "/usr/share/pacman/keyrings" "/usr/share/makepkg"
     # add local installed pacman database in container mode
