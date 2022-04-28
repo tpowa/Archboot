@@ -131,7 +131,6 @@ _gpg_check() {
         if [[ "$(pgrep -x gpg-agent -c)" == "2" ]] && break
         sleep 1
     done
-    while pgrep -x gpg-agent -c
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && systemctl stop pacman-init.service
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && systemctl stop pacman-init-arm.service
 }
