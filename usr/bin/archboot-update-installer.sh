@@ -26,8 +26,6 @@ echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m .
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _update_installer_check
     touch /.update-installer
-    # disable kernel messages on aarch64
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo 0 >/proc/sys/kernel/printk
     _umount_w_dir
     _zram_mount "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
