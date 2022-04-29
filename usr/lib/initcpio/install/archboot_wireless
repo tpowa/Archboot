@@ -19,8 +19,10 @@ build ()
     map add_file "/etc/conf.d/wireless-regdom" "/usr/lib/crda/regulatory.bin" \
                  "/usr/lib/crda/pubkeys/sforshee.key.pub.pem"
     # fixing licenses
-    map add_file "/usr/share/licenses/expat/COPYING" \
-        "/usr/share/licenses/wireless-regdb/LICENSE"
+    map add_file "/usr/share/licenses/expat/COPYING" "/usr/share/licenses/wireless-regdb/LICENSE"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        map add_file "/usr/share/licenses/ipw2200-fw/LICENSE" "/usr/share/licenses/ipw2100-fw/LICENSE"
+    fi
 
 }
 
