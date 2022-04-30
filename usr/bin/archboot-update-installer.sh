@@ -7,15 +7,15 @@
 [[ -z "${1}" ]] && usage
 
 while [ $# -gt 0 ]; do
-	case ${1} in
-		-u|--u) _D_SCRIPTS="1" ;;
-		-latest|--latest) _L_COMPLETE="1" ;;
-		-latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
-		-latest-image|--latest-image) _G_RELEASE="1" ;;
-		-h|--h|?) usage ;; 
-		*) usage ;;
-		esac
-	shift
+    case ${1} in
+        -u|--u) _D_SCRIPTS="1" ;;
+        -latest|--latest) _L_COMPLETE="1" ;;
+        -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
+        -latest-image|--latest-image) _G_RELEASE="1" ;;
+        -h|--h|?) usage ;;
+        *) usage ;;
+        esac
+    shift
 done
 
 _archboot_check
