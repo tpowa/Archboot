@@ -89,7 +89,6 @@ auto_testing()
 }
 
 auto_mkinitcpio() {
-    HWDETECT=""
     FBPARAMETER=""
     HWPARAMETER=""
     HWDETECTMODULES=""
