@@ -20,6 +20,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "  - To change your time and date, type \033[92m'tz'\033[0m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
+    #shellcheck disable=SC2129
     echo -e "\033[1mFor wifi authentification to internet access or further online help:\033[0m" >> "${MOTD}"
     echo -e "  - Use the \033[92m'elinks'\033[0m text mode browser." >> "${MOTD}"
     echo -e "\033[1mFor getting support on IRC channels:\033[0m" >> "${MOTD}"
