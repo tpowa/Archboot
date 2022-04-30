@@ -58,7 +58,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cd /
     _umount_w_dir
     # unload virtio-net to avoid none functional network device on aarch64
-    cat /proc/modules | grep -qw virtio_net && rmmod virtio_net
+    grep -qw virtio_net < /proc/modules && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     _kexec
 fi
