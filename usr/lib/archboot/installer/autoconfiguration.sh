@@ -55,13 +55,11 @@ auto_network()
          [[ -f $i ]] && systemd-nspawn -q -D "${DESTDIR}" netctl enable "$(basename "${i}")" >/dev/null 2>&1
     done
     # copy proxy settings
-    if [[ "${PROXY_HTTP}" != "" ]]; then
-        echo "export http_proxy=${PROXY_HTTP}" >> "${DESTDIR}"/etc/profile.d/proxy.sh;
-        chmod a+x "${DESTDIR}"/etc/profile.d/proxy.sh
-    fi
-    if [[ "${PROXY_FTP}" != "" ]]; then
-        echo "export ftp_proxy=${PROXY_FTP}" >> "${DESTDIR}"/etc/profile.d/proxy.sh;
-        chmod a+x "${DESTDIR}"/etc/profile.d/proxy.sh
+    if [[ -n "${PROXY}" ]]; then
+        for i in ${PROXIES}; do
+            echo "export ${i}=${PROXY}" >> "${DESTDIR}"/etc/profile.d/proxy.sh
+            chmod a+x "${DESTDIR}"/etc/profile.d/proxy.sh
+        done
     fi
 }
 
