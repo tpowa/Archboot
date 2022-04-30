@@ -987,7 +987,7 @@ _createlv()
             DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
             return 1
         fi
     fi
