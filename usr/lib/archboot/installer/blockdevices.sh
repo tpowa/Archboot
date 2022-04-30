@@ -699,7 +699,7 @@ _createraid()
         DIALOG --infobox "${RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see "${LOG}" for details)." 0 0
+        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0
         return 1
     fi
     if [[ ${RAID_PARTITION} == "1" ]]; then
@@ -904,7 +904,7 @@ _createvg()
         DIALOG --infobox "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see "${LOG}" for details)." 0 0
+        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${LOG} for details)." 0 0
         return 1
     fi
 }
@@ -978,7 +978,7 @@ _createlv()
             DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see "${LOG}" for details)." 0 0
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
             return 1
         fi
     else
