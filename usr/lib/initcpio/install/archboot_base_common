@@ -103,6 +103,8 @@ build ()
     # remove initrd-release to allow normal systemd boot without initrd.target
     rm /tmp/*/root/etc/initrd-release
     add_symlink "/etc/systemd/system/default.target" "/usr/lib/systemd/system/multi-user.target"
+    # mask systemd-gpt-auto-generator, errors out on initramfs usage
+    add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
     ### add udev, which is not covered by udev hook
     add_binary "logger"
     # add rule files
