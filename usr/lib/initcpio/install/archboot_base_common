@@ -132,7 +132,9 @@ build ()
         add_full_dir "/var/lib/pacman/local"
     fi
 
-    ### add ca certificates
+    ### add nss p11-kit and ca certificates
+    map add_binary p11-kit trust certutil cmsutil crlutil modutil nss-config pk12util \
+                   shlibsign signtool signver ssltap symkeyutil update-ca-trust
     cafile="tls-ca-bundle.pem"
     cert="cert.pem"
     cert2="ca-certificates.crt"
@@ -142,10 +144,12 @@ build ()
     map add_full_dir "$ca_dir" "$cert2_dir"
     add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
     add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
-    
+    add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
+
     ### fix licenses
     map add_file "/usr/share/licenses/shadow/LICENSE" "/usr/share/licenses/iana-etc/LICENSE" \
-                 "/usr/share/licenses/dbus/COPYING"
+                 "/usr/share/licenses/dbus/COPYING" "/usr/share/licenses/p11-kit/COPYING"
+
 }
 
 help ()
