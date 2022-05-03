@@ -4,8 +4,11 @@
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs_${_ARCH}.img"
+_INITRAMFS_L0="boot/initramfs_${_ARCH}-0.img"
+_INITRAMFS_L1="boot/initramfs_${_ARCH}-1.img"
 _INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
-_INITRAMFS_LOCAL="boot/initramfs_${_ARCH}-local.img"
+_INITRAMFS_LOCAL0="boot/initramfs_${_ARCH}-local-0.img"
+_INITRAMFS_LOCAL1="boot/initramfs_${_ARCH}-local-1.img"
 _KERNEL="boot/vmlinuz_${_ARCH}"
 _KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
 _PRESET_LATEST="${_ARCH}-latest"
@@ -77,7 +80,8 @@ _create_boot() {
         elif echo "${i}" | grep -q latest; then
             isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
         elif echo "${i}" | grep -q local; then
-            isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LOCAL}"
+            isoinfo -R -i "${i}" -x /"${_INITRAMFS_L0}" 2>/dev/null > "${_INITRAMFS_LOCAL0}"
+            isoinfo -R -i "${i}" -x /"${_INITRAMFS_L1}" 2>/dev/null > "${_INITRAMFS_LOCAL1}"
         fi
     done
     if [[ -d /usr/share/licenses/amd-ucode ]]; then
