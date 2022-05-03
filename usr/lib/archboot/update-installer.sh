@@ -237,11 +237,13 @@ _launch_xfce() {
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
+        #shellcheck disable=SC2086
         pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm || exit 1
     else
         echo "Updating environment ..."
         pacman -Syu --ignore linux --ignore linux-firmware || exit 1
         echo "Install packages ..."
+        #shellcheck disable=SC2086
         pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
     fi
     echo "Cleanup archboot environment ..."

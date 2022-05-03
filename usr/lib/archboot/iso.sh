@@ -58,7 +58,7 @@ _prepare_kernel_initramfs_files() {
     split -b 700M -d --additional-suffix=.img -a 1 \
     "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
     rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
-    if [[ "$(find "${_ISODIR}/boot" -name *.img | wc -l)" -lt "2" ]]; then
+    if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
