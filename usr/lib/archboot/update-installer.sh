@@ -231,11 +231,18 @@ _kexec() {
 }
 
 _launch_xfce() {
-    echo "Updating environment ..."
-    pacman -Syu --ignore linux --ignore linux-firmware
-    echo "Install packages ..."
     X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz avahi nss breeze-icons tigervnc perl"
-    pacman -Sy ${X_PACKAGES} --noconfirm
+    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        echo "Install packages ..."
+        _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
+        _create_pacman_conf
+        pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm
+    else
+        echo "Updating environment ..."
+        pacman -Syu --ignore linux --ignore linux-firmware
+        echo "Install packages ..."
+        pacman -Sy ${X_PACKAGES} --noconfirm
+    fi
     echo "Cleanup archboot environment ..."
     rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
     rm -r /usr/include

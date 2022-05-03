@@ -2,6 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
+. /usr/lib/archboot/container.sh
 . /usr/lib/archboot/update-installer.sh
 
 [[ -z "${1}" ]] && usage
