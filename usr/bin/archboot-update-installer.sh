@@ -79,7 +79,9 @@ fi
 
 # Launch xfce
 if [[ "${_L_XFCE}" == "1" ]]; then
-    echo -e "\033[1mStep 1/1:\033[0m Preparing XFCE desktop now ..."
+    echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    echo -e "\033[1mStep 2/2:\033[0m Preparing XFCE desktop now ..."
     echo "          This will need some time ..."
     _launch_xfce >/dev/tty7 2>&1
 fi
