@@ -31,8 +31,8 @@ usage () {
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
-    echo -e " \033[1m-launch-xfce\033[0m     Launch X with XFCE desktop with VNC sharing enabled."
-    echo -e "                  This operation needs at least \033[1m3.0 GB RAM\033[0m."
+    echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled"
+    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -231,6 +231,9 @@ _kexec() {
 }
 
 _launch_xfce() {
+    # update environment
+    echo "Updating environment ..."
+    pacman -Syu --ignore linux --ignore linux-firmware
     X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz avahi nss breeze-icons tigervnc perl"
     pacman -Sy ${X_PACKAGES} --noconfirm
     rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
