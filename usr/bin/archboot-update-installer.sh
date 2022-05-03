@@ -12,6 +12,7 @@ while [ $# -gt 0 ]; do
         -latest|--latest) _L_COMPLETE="1" ;;
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
         -latest-image|--latest-image) _G_RELEASE="1" ;;
+        -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -73,4 +74,11 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     echo "          This will need some time ..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
+fi
+
+# Launch xfce
+if [[ "${_L_XFCE}" == "1" ]]; then
+    echo -e "\033[1mStep 1/1:\033[0m Preparing XFCE desktop ${_W_DIR} now ..."
+    echo "          This will need some time ..."
+    _launch_xfce >/dev/tty7 2>&1
 fi

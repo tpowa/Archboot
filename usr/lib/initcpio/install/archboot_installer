@@ -13,6 +13,7 @@ build ()
     add_file "/usr/bin/archboot-restore-usbstick.sh" "/usr/bin/restore-usbstick.sh"
     add_full_dir "/usr/lib/archboot/installer"
     add_file "/etc/archboot/defaults"
+    add_file "/usr/share/archboot/grub/archboot-background.png"
 }
 
 help ()

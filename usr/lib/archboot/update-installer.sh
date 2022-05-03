@@ -16,8 +16,8 @@ _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 usage () {
-    echo -e "\033[1mUpdate installer, launch latest environment or create latest image files:\033[0m"
-    echo -e "\033[1m-------------------------------------------------------------------------\033[0m"
+    echo -e "\033[1mUpdate installer, launch environments or create latest image files:\033[0m"
+    echo -e "\033[1m-------------------------------------------------------------------\033[0m"
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
@@ -30,6 +30,9 @@ usage () {
     echo ""
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
+    echo ""
+    echo -e " \033[1m-launch-xfce\033[0m     Launch X with XFCE desktop with VNC sharing enabled."
+    echo -e "                  This operation needs at least \033[1m3.0 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -221,4 +224,81 @@ _kexec() {
         fi
         sleep 1
     done
+}
+
+_launch_xfce() {
+    X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz avahi nss breeze-icons tigervnc perl"
+    pacman -Sy ${X_PACKAGES} --noconfirm
+    rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
+    rm -r /usr/include
+    # fix chromium startup
+    cat << EOF >/etc/chromium-flags.conf
+--no-sandbox
+--test-type
+wiki.archlinux.org/title/Archboot
+EOF
+    # fix xfce4 defaults
+    # breeze icons
+    sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
+    /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+    sed -i -e '/xfce4-run.desktop/i <Filename>archboot.desktop</Filename>' /etc/xdg/menus/xfce-applications.menu
+    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
+    # background image
+    cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitor0" type="empty">
+        <property name="image-path" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="last-single-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="image-show" type="bool" value="true"/>
+        <property name="image-style" type="int" value="0"/>
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+      <property name="monitorVNC-0" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+      <property name="monitorHDMI1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+    </property>
+  </property>
+EOF
+    # autostart setup
+    cat << EOF > /etc/xdg/autostart/archboot.desktop
+[Desktop Entry]
+Type=Application
+Name=Archboot Setup
+Exec=xfce4-terminal -x /usr/bin/setup
+Icon=system-software-install
+Categories=X-Xfce-Toplevel;
+EOF
+    # autostart tigervnc
+    cat << EOF > /etc/xdg/autostart/tigervnc.desktop
+[Desktop Entry]
+Type=Application
+Name=Tigervnc
+Exec=x0vncserver -SecurityTypes=None
+EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    # hide menu entries
+    for i in xfce4-mail-reader qv4l2 qvidcap bssh bvnc avahi-discover; do
+        echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
+    done
+    startxfce4
 }

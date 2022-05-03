@@ -141,7 +141,7 @@ build ()
     ca_dir="/etc/ca-certificates/extracted"
     cert_dir="/etc/ssl"
     cert2_dir="/etc/ssl/certs"
-    map add_full_dir "$ca_dir" "$cert2_dir"
+    map add_full_dir "$ca_dir" "$cert2_dir" /usr/lib/p11-kit /usr/lib/pkcs11
     add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
     add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
