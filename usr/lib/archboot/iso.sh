@@ -53,7 +53,14 @@ _prepare_kernel_initramfs_files() {
     [[ -f "/usr/share/archboot/patches/31-mkinitcpio.fixed" ]] && cp "/usr/share/archboot/patches/31-mkinitcpio.fixed" "/usr/bin/mkinitcpio"
 
     #shellcheck disable=SC2154
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
+    # grub on x86_64 reports too big if near 1GB
+    split -b 700M -d --additional-suffix=.img -a 1 \
+    "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
+    rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
+    if [[ "$(find "${_ISODIR}/boot" -name *.img | wc -l)" -lt "2" ]]; then
+        mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
+    fi
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     mv "/usr/bin/mkinitcpio.old" "/usr/bin/mkinitcpio"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
