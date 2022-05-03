@@ -51,7 +51,7 @@ _download_latest() {
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
-        BINS="quickinst setup km tz copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
+        BINS="quickinst.sh setup.sh km.sh tz.sh copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
         ${_RUNNING_ARCH}-create-container.sh ${_RUNNING_ARCH}-release.sh \
         binary-check.sh update-installer.sh secureboot-keys.sh mkkeys.sh"
         for i in ${BINS}; do
