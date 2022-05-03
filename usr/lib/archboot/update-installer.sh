@@ -231,19 +231,22 @@ _kexec() {
 }
 
 _launch_xfce() {
-    # update environment
     echo "Updating environment ..."
     pacman -Syu --ignore linux --ignore linux-firmware
+    echo "Install packages ..."
     X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz avahi nss breeze-icons tigervnc perl"
     pacman -Sy ${X_PACKAGES} --noconfirm
+    echo "Cleanup archboot environment ..."
     rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
     rm -r /usr/include
+    echo "Fix chromium startup ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
 wiki.archlinux.org/title/Archboot
 EOF
+    echo "Fix xfce4 defaults ..."
     # fix xfce4 defaults
     # breeze icons
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
@@ -286,7 +289,7 @@ EOF
     </property>
   </property>
 EOF
-    # autostart setup
+    echo "Autostart setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -295,7 +298,7 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
-    # autostart tigervnc
+    echo "Autostart tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
@@ -303,9 +306,11 @@ Name=Tigervnc
 Exec=x0vncserver -SecurityTypes=None
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    echo "Hide menu entries ..."
     # hide menu entries
     for i in xfce4-mail-reader qv4l2 qvidcap bssh bvnc avahi-discover; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
+    echo "Launching XFCE ..."
     startxfce4
 }
