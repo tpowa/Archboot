@@ -26,7 +26,6 @@ _create_iso() {
     cd "${1}" || exit 1
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
-    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
     echo "Generate normal ISO ..."
     # generate iso in container
@@ -36,7 +35,8 @@ _create_iso() {
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
     # generate latest tarball in container
     echo "Generate local ISO ..."
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "pacman -Syw xorg xfce4 tigervnc --noconfirm"
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "pacman -Syw xorg xfce4 tigervnc breeze-icons --noconfirm"
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # generate local iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
