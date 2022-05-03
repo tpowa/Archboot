@@ -31,7 +31,7 @@ usage () {
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
-    echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled"
+    echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
     echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
