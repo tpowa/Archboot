@@ -51,12 +51,16 @@ _download_latest() {
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
-        BINS="quickinst.sh setup.sh km.sh tz.sh copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
+        BINS="copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
         ${_RUNNING_ARCH}-create-container.sh ${_RUNNING_ARCH}-release.sh \
         binary-check.sh update-installer.sh secureboot-keys.sh mkkeys.sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
+        done
+        BINS="quickinst setup km tz"
+        for i in ${BINS}; do
+            [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
         LIBS="common.sh container.sh release.sh iso.sh update-installer.sh"
         for i in ${LIBS}; do
