@@ -132,6 +132,9 @@ _install_base_packages() {
 }
 
 _install_archboot() {
+    echo "Downloading ${_ARCHBOOT} ${_XFCE} to ${1} ..."
+    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
+    pacman -Syw --dbpath /blankdb ${_PACKAGES} ${_XFCE} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     pacman --root "${1}" -Sy "${_ARCHBOOT}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
@@ -142,7 +145,9 @@ _aarch64_install_base_packages() {
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
+    echo "Downloading ${_PACKAGES} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    echo "Installing ${_PACKAGES} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
@@ -150,9 +155,10 @@ _aarch64_install_archboot() {
     if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    echo "Installing ${_ARCHBOOT} to ${1} ..."
+    echo "Downloading ${_ARCHBOOT} ${_XFCE} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_XFCE} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    echo "Installing ${_ARCHBOOT} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
