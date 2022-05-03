@@ -36,6 +36,7 @@ _create_iso() {
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
     # generate latest tarball in container
     echo "Generate local ISO ..."
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "pacman -Syw xorg xfce4 tigervnc --noconfirm"
     # generate local iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
