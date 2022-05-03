@@ -147,7 +147,8 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db /archboot/var/cache/pacman/pkg/archboot.db
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1
+            mv /var/cache/pacman/pkg/* ${_W_DIR}/var/cache/pacman/pkg/
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///${_W_DIR}/var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1
         fi
     else
         #online mode
