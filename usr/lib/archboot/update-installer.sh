@@ -191,7 +191,7 @@ _create_initramfs() {
             fi
         fi
     fi
-    #from /usr/bin/mkinitpcio.conf
+    #from /usr/bin/mkinitcpio.conf
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
