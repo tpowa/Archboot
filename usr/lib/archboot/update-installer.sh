@@ -236,12 +236,12 @@ _launch_xfce() {
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
-        pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm
+        pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm || exit 1
     else
         echo "Updating environment ..."
-        pacman -Syu --ignore linux --ignore linux-firmware
+        pacman -Syu --ignore linux --ignore linux-firmware || exit 1
         echo "Install packages ..."
-        pacman -Sy ${X_PACKAGES} --noconfirm
+        pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
     fi
     echo "Cleanup archboot environment ..."
     rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}

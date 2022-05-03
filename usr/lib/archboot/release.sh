@@ -35,15 +35,15 @@ _create_iso() {
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
     # generate latest tarball in container
     echo "Generate local ISO ..."
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "pacman -Syw xorg xfce4 tigervnc breeze-icons --noconfirm"
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "pacman -Syw xorg xfce4 tigervnc chromium breeze-icons --noconfirm"
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # generate local iso in container
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
     rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
     echo "Generate latest ISO ..."
     # generate latest iso in container
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_ARCH}" || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
