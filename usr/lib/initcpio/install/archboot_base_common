@@ -4,7 +4,7 @@
 build ()
 {
     ### add virtio modules
-    add_checked_modules 'virtio|zram|btrfs|libcrc32|zstd'
+    add_checked_modules 'virtio|zram|btrfs|libcrc32|zstd|sg|pkcs8_key_parser'
     
     ### setting up base structure
     map add_dir "/mnt" "/install" "/var/log" "/home" "/var/tmp"
