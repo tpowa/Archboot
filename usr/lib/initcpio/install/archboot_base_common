@@ -49,7 +49,7 @@ build ()
     map add_file "/lib/libnss_files.so.2" "/lib/libnss_dns.so.2"
 
     ### add applications
-    add_fulldir "/usr/share/applications"
+    add_full_dir "/usr/share/applications"
 
     ### add pam
     map add_binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update
