@@ -31,6 +31,7 @@ if grep -q "^\[testing" /etc/pacman.conf; then
     sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${1}/etc/pacman.conf"
 fi
+_add_groups
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."

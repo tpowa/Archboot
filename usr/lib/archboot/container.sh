@@ -187,3 +187,9 @@ _set_hostname() {
     echo "Setting hostname to archboot ..."
     echo 'archboot' > "${1}/etc/hostname"
 }
+
+_add_groups() {
+    grep -qw network /etc/group || groupadd network
+    grep -qw tss /etc/group || groupadd tss
+    grep -qw netdev /etc/group || groupadd netdev
+}
