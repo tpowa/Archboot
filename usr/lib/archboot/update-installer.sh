@@ -241,7 +241,7 @@ _launch_xfce() {
         pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm || exit 1
     else
         echo "Updating environment ..."
-        pacman -Syu --ignore linux --ignore linux-firmware || exit 1
+        pacman -Syu --ignore linux --ignore linux-firmware --noconfirm || exit 1
         echo "Install packages ..."
         #shellcheck disable=SC2086
         pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
