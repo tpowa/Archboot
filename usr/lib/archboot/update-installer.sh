@@ -320,7 +320,7 @@ EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
     echo "Hide menu entries ..."
     # hide menu entries
-    for i in xfce4-mail-reader qv4l2 qvidcap bssh bvnc avahi-discover; do
+    for i in xfce4-mail-reader qv4l2 qvidcap bssh bvnc avahi-discover fluid; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
     echo "Launching XFCE ..."
