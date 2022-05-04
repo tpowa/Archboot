@@ -18,15 +18,15 @@ _cachedir_check() {
 }
 
 _download_packages() {
-    echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XFCE} to ${1} ..."
+    echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_DOWNLOAD_PACKAGES} to ${1} ..."
     #shellcheck disable=SC2086
-    pacman --root "${1}" -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XFCE}--ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+    pacman --root "${1}" -Syw ${_PACKAGES} ${_ARCHBOOT} ${_DOWNLOAD_PACKAGES}--ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _aarch64_download_packages() {
     mkdir "${1}"/blankdb
-    echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XFCE} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XFCE} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_DOWNLOAD_PACKAGES} to ${1} ..."
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_DOWNLOAD_PACKAGES} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _move_packages() {
