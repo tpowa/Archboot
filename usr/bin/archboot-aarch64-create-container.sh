@@ -35,7 +35,7 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _clean_container "${1}" 2>/dev/null
 fi
 _change_pacman_conf "${1}" || exit 1
-_fix_groups
+_fix_groups "${1}"
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."
