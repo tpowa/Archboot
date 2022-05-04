@@ -188,8 +188,8 @@ _set_hostname() {
     echo 'archboot' > "${1}/etc/hostname"
 }
 
-_add_groups() {
-    grep -qw network /etc/group || groupadd network
-    grep -qw tss /etc/group || groupadd tss
-    grep -qw netdev /etc/group || groupadd netdev
+_fix_groups() {
+    echo "Recreate system groups ..."
+    rm "${1}"/etc/{group,gshadow}
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy filesystem --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
