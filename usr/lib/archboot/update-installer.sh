@@ -313,7 +313,7 @@ EOF
 [Desktop Entry]
 Type=Application
 Name=Tigervnc
-Exec=x0vncserver -SecurityTypes=None
+Exec=x0vncserver -Password <9e><86>´§&<95><86>
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
     echo "Hide menu entries ..."
