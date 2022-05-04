@@ -18,6 +18,7 @@ _clean_cache "${1}"
 _install_archboot "${1}" || exit 1
 _umount_special "${1}" || exit 1
 _generate_locales "${1}"
+_fix_groups "${1}"
 _clean_container "${1}"
 _clean_archboot_cache
 _generate_keyring "${1}" || exit 1
@@ -31,7 +32,6 @@ if grep -q "^\[testing" /etc/pacman.conf; then
     sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
     sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${1}/etc/pacman.conf"
 fi
-_fix_groups "${1}"
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."
