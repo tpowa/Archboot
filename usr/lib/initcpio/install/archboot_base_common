@@ -48,6 +48,9 @@ build ()
     ### fixing network support from glibc
     map add_file "/lib/libnss_files.so.2" "/lib/libnss_dns.so.2"
 
+    ### add applications
+    add_fulldir "/usr/share/applications"
+
     ### add pam
     map add_binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update
     map add_full_dir "/etc/security" "/etc/default" "/etc/pam.d" "/usr/lib/security"
