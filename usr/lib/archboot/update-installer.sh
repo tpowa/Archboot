@@ -308,12 +308,14 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
+echo "Set VNC password ..."
+echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
     echo "Autostart tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
 Name=Tigervnc
-Exec=x0vncserver -Password <9e><86>´§&<95><86>
+Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
     echo "Hide menu entries ..."
