@@ -142,7 +142,7 @@ _install_archboot() {
 
 _aarch64_install_base_packages() {
     echo "Installing packages ${_PACKAGES} to ${1} ..."
-    if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
+    if [[ -e "${1}/$(basename "${_PACMAN_CONF}")" ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
@@ -153,7 +153,7 @@ _aarch64_install_base_packages() {
 }
 
 _aarch64_install_archboot() {
-    if [[ -e "$(basename "${_PACMAN_CONF}")" ]]; then 
+    if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
     echo "Downloading ${_ARCHBOOT} ${_DOWNLOAD_PACKAGES} to ${1} ..."
@@ -191,6 +191,7 @@ _set_hostname() {
 _fix_groups() {
     echo "Recreate system groups ..."
     rm "${1}"/etc/{group,gshadow}
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy filesystem --config $(basename ${_PACMAN_CONF}) --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd netdev >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" systemd-sysusers  >/dev/null 2>&1
+    # fix missing group in dbus
+    systemd-nspawn -q -D "${1}" groupadd netdev  >/dev/null 2>&1
 }
