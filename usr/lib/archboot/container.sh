@@ -132,11 +132,12 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    echo "Downloading ${_ARCHBOOT} ${_XFCE} to ${1} ..."
+    echo "Downloading ${_XFCE} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    pacman -Syw --dbpath /blankdb ${_PACKAGES} ${_XFCE} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+    pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_XFCE} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
-    pacman --root "${1}" -Sy "${_ARCHBOOT}" --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+    pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+    rm -r "${1}"/blankdb
 }
 
 _aarch64_install_base_packages() {
