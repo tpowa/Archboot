@@ -298,6 +298,7 @@ EOF
       </property>
     </property>
   </property>
+</channel>
 EOF
     echo "Autostart setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
