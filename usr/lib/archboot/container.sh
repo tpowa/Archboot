@@ -192,6 +192,14 @@ _fix_groups() {
     echo "Recreate system groups ..."
     rm "${1}"/etc/{group,gshadow}
     systemd-nspawn -q -D "${1}" systemd-sysusers  >/dev/null 2>&1
-    # fix missing group in dbus
+    # fix missing group in iwd FS#74646
     systemd-nspawn -q -D "${1}" groupadd netdev  >/dev/null 2>&1
+    # add missing user usbmux
+    systemd-nspawn -q -D "${1}" useradd -r usbmux -M -d / -g 140 -u 140 -s /usr/bin/nologin >/dev/null 2>&1
+    # add missing groups
+    systemd-nspawn -q -D "${1}" groupadd polkitd  >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" groupadd colord  >/dev/null 2>&1
+    # add missing groups on aarch64
+    systemd-nspawn -q -D "${1}" groupadd network  >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" groupadd tss  >/dev/null 2>&1
 }
