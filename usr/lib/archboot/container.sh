@@ -200,6 +200,7 @@ _fix_groups() {
     systemd-nspawn -q -D "${1}" groupadd polkitd  >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupadd colord  >/dev/null 2>&1
     # add missing groups on aarch64
+    systemd-nspawn -q -D "${1}" groupadd proc  >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupadd network  >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupadd tss  >/dev/null 2>&1
 }
