@@ -264,8 +264,67 @@ EOF
     # breeze icons
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    sed -i -e '/xfce4-run.desktop/i <Filename>archboot.desktop</Filename>' /etc/xdg/menus/xfce-applications.menu
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
+    # fix gparted.desktop
+    sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
+    # xfce menu
+    cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+  "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+    <Name>Xfce</Name>
+
+    <DefaultAppDirs/>
+    <DefaultDirectoryDirs/>
+
+    <Include>
+        <Category>X-Xfce-Toplevel</Category>
+    </Include>
+
+    <Layout>
+	<Filename>archboot.desktop</Filename>
+        <Filename>gparted.desktop</Filename>
+        <Filename>xfce4-run.desktop</Filename>
+        <Separator/>
+        <Filename>xfce4-terminal-emulator.desktop</Filename>
+        <Filename>xfce4-file-manager.desktop</Filename>
+	<Filename>xfce4-web-browser.desktop</Filename>
+        <Separator/>
+        <Menuname>Settings</Menuname>
+        <Separator/>
+        <Merge type="all"/>
+        <Separator/>
+        <Filename>xfce4-about.desktop</Filename>
+        <Filename>xfce4-session-logout.desktop</Filename>
+    </Layout>
+
+    <Menu>
+        <Name>Settings</Name>
+        <Directory>xfce-settings.directory</Directory>
+        <Include>
+            <Category>Settings</Category>
+        </Include>
+
+        <Layout>
+            <Filename>xfce-settings-manager.desktop</Filename>
+            <Separator/>
+            <Merge type="all"/>
+        </Layout>
+
+        <Menu>
+            <Name>Screensavers</Name>
+            <Directory>xfce-screensavers.directory</Directory>
+            <Include>
+                <Category>Screensaver</Category>
+            </Include>
+        </Menu>
+    </Menu>
+
+    <DefaultMergeDirs/>
+
+</Menu>
+EOF
     # background image
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -322,11 +381,6 @@ Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Hide menu entries ..."
-    # hide menu entries
-    for i in xfce4-mail-reader qv4l2 qvidcap bssh bvnc avahi-discover fluid; do
-        echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
-    done
     echo "Launching XFCE ..."
     startxfce4
 }
