@@ -2,7 +2,7 @@
 # packages to install (eg. firmware, kernel packages)
 _PACKAGES="base linux linux-firmware linux-firmware-marvell"
 # Download packages for pacman cache directory
-_DOWNLOAD_PACKAGES='xorg xfce4 tigervnc chromium breeze-icons'
+_DOWNLOAD_PACKAGES='xorg xfce4 tigervnc chromium breeze-icons gvfs gparted'
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"

@@ -232,7 +232,10 @@ _kexec() {
 }
 
 _launch_xfce() {
-    X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz avahi nss breeze-icons tigervnc perl p11-kit libp11-kit"
+    X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz \
+    avahi nss breeze-icons tigervnc perl p11-kit libp11-kit gvfs fuse tpm2-tss \
+    libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
+    libmd jansson libsasl gvfs-nfs"
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
