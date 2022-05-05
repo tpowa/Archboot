@@ -198,9 +198,9 @@ _fix_groups() {
     systemd-nspawn -q -D "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupadd -r -g 26 proc >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupmems -g proc -a polkitd >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r -g colord >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" groupadd -r colord >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" groupadd -r -g 140 usbmux >/dev/null 2>&1
     # add missing groups on aarch64
     systemd-nspawn -q -D "${1}" groupadd -r -g 90 network >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r -g tss >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" groupadd -r tss >/dev/null 2>&1
 }
