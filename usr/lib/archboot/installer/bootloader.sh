@@ -976,7 +976,7 @@ EOF
 if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
         ## Microsoft Windows 10/11 via x86_64 UEFI
-        #menuentry \"Microsoft Windows 10/11 x86_64 UEFI-GPT\" {
+        #menuentry Microsoft Windows 10/11 x86_64 UEFI-GPT {
         #    insmod part_gpt
         #    insmod fat
         #    insmod search_fs_uuid
@@ -998,7 +998,7 @@ EOF
 if [ "\${grub_platform}" == "pc" ]; then
 
     ## Microsoft Windows 10/11 BIOS
-    #menuentry \"Microsoft Windows 10/11 BIOS-MBR\" {
+    #menuentry Microsoft Windows 10/11 BIOS-MBR {
     #    insmod part_msdos
     #    insmod ntfs
     #    insmod search_fs_uuid
