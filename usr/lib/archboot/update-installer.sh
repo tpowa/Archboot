@@ -259,7 +259,7 @@ _launch_xfce() {
         echo "Install packages ..."
         for i in ${X_PACKAGES}; do
             #shellcheck disable=SC2086
-            pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
+            pacman -Sy ${i} --noconfirm || exit 1
             _clean_xfce
         done
     fi
