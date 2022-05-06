@@ -32,7 +32,7 @@ usage () {
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-    echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.4 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -239,32 +239,29 @@ _cleanup_xfce() {
 }
 
 _launch_xfce() {
-    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg"
-    X_PACKAGES2="xfce4 libtiff glib2 chromium libcups harfbuzz \
+    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg libtiff glib2 chromium libcups harfbuzz \
     avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
-    libmd jansson libsasl gvfs-nfs"
+    libmd jansson libsasl gvfs-nfs xfce4"
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
-        #shellcheck disable=SC2086
         for i in ${X_PACKAGES}; do
+            #shellcheck disable=SC2086
             pacman -Sy ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
             _cleanup_xfce
         done
-        pacman -Sy ${X_PACKAGES2} --config ${_PACMAN_CONF} --noconfirm || exit 1
-        _cleanup_xfce
     else
         echo "Updating environment ..."
-        pacman -Syu --ignore linux --ignore linux-firmware --noconfirm || exit 1
+        pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm || exit 1
         _clean_xfce
         echo "Install packages ..."
-        #shellcheck disable=SC2086
-        pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
-        _clean_xfce
-        pacman -Sy ${X_PACKAGES2} --noconfirm || exit 1
-        _cleanup_xfce
+        for i in ${X_PACKAGES}; do
+            #shellcheck disable=SC2086
+            pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
+            _clean_xfce
+        done
     fi
     # fix locale
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
