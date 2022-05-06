@@ -314,7 +314,6 @@ EOF
         <Separator/>
         <Merge type="all"/>
         <Separator/>
-        <Filename>xfce4-about.desktop</Filename>
         <Filename>xfce4-session-logout.desktop</Filename>
     </Layout>
 
