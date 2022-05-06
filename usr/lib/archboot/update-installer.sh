@@ -232,8 +232,8 @@ _kexec() {
 }
 _cleanup_xfce() {
     echo "Cleanup archboot environment ..."
-    rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
-    rm -r /usr/include
+    rm -rf /usr/share/{locale,man,info,doc,gtk-doc,ibus}
+    rm -rf /usr/include
 }
 
 _launch_xfce() {
