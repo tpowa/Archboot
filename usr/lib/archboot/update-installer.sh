@@ -32,7 +32,7 @@ usage () {
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -230,9 +230,15 @@ _kexec() {
         sleep 1
     done
 }
+_cleanup_xfce() {
+    echo "Cleanup archboot environment ..."
+    rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
+    rm -r /usr/include
+}
 
 _launch_xfce() {
-    X_PACKAGES="xorg xfce4 libtiff glib2 chromium libcups gcc-libs glibc harfbuzz \
+    X_PACKAGES="xorg xfce4 libtiff glib2"
+    X_PACKAGES2="chromium libcups gcc-libs glibc harfbuzz \
     avahi nss breeze-icons tigervnc perl p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
     libmd jansson libsasl gvfs-nfs"
@@ -242,16 +248,20 @@ _launch_xfce() {
         _create_pacman_conf
         #shellcheck disable=SC2086
         pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm || exit 1
+        _cleanup_xfce
+        pacman -Sy ${X_PACKAGES2} --config ${_PACMAN_CONF} --noconfirm || exit 1
+        _cleanup_xfce
     else
         echo "Updating environment ..."
         pacman -Syu --ignore linux --ignore linux-firmware --noconfirm || exit 1
+        _clean_xfce
         echo "Install packages ..."
         #shellcheck disable=SC2086
         pacman -Sy ${X_PACKAGES} --noconfirm || exit 1
+        _clean_xfce
+        pacman -Sy ${X_PACKAGES2} --noconfirm || exit 1
+        _cleanup_xfce
     fi
-    echo "Cleanup archboot environment ..."
-    rm -r /usr/share/{locale,man,info,doc,gtk-doc,ibus}
-    rm -r /usr/include
     echo "Fix chromium startup ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
