@@ -247,9 +247,10 @@ _launch_xfce() {
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
+        pacman -Sy
         for i in ${X_PACKAGES}; do
             #shellcheck disable=SC2086
-            pacman -Sy ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
+            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
             _cleanup_xfce
         done
     else
@@ -259,7 +260,7 @@ _launch_xfce() {
         echo "Install packages ..."
         for i in ${X_PACKAGES}; do
             #shellcheck disable=SC2086
-            pacman -Sy ${i} --noconfirm || exit 1
+            pacman -S ${i} --noconfirm || exit 1
             _clean_xfce
         done
     fi
