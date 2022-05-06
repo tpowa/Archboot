@@ -241,7 +241,8 @@ _launch_xfce() {
     X_PACKAGES="llvm-libs gcc-libs perl glibc xorg libtiff glib2 chromium libcups harfbuzz \
     avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
-    libmd jansson libsasl xfce4 thunar-archive-plugin thunar-volman file-roller"
+    libmd jansson libsasl xfce4 thunar-archive-plugin thunar-volman file-roller \
+    nss-mdns gnome-keyring"
     # try to save RAM by calling the cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
@@ -403,6 +404,8 @@ Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    echo "Starting avahi-daemon ..."
+    systemctl start avahi-daemon.service
     echo "Launching XFCE ..."
     startxfce4
 }
