@@ -239,8 +239,8 @@ _cleanup_xfce() {
 }
 
 _launch_xfce() {
-    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg xfce4 libtiff glib2"
-    X_PACKAGES2="chromium libcups harfbuzz \
+    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg"
+    X_PACKAGES2="xfce4 libtiff glib2 chromium libcups harfbuzz \
     avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
     libmd jansson libsasl gvfs-nfs"
@@ -266,6 +266,11 @@ _launch_xfce() {
         pacman -Sy ${X_PACKAGES2} --noconfirm || exit 1
         _cleanup_xfce
     fi
+    # fix locale
+    sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
+    locale-gen
+    # replace appfinder with archboot setup
+    sed -i -e 's#xfce4-appfinder#archboot#g' /etc/xdg/xfc4/panel/default.xml
     echo "Fix chromium startup ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
