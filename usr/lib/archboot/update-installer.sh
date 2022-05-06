@@ -232,14 +232,16 @@ _kexec() {
 }
 _cleanup_xfce() {
     echo "Cleanup archboot environment ..."
-    rm -rf /usr/share/{i18n,locale,man,info,doc,gtk-doc,ibus}
+    rm -rf /usr/share/{i18n,locale,man,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
+    rm -rf /usr/lib/libLLVM*
+    rm -rf /usr/lib/libgo.*
 }
 
 _launch_xfce() {
-    X_PACKAGES="xorg xfce4 libtiff glib2 glibc"
-    X_PACKAGES2="chromium libcups gcc-libs harfbuzz \
-    avahi nss breeze-icons tigervnc perl p11-kit libp11-kit gvfs fuse tpm2-tss \
+    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg xfce4 libtiff glib2"
+    X_PACKAGES2="chromium libcups harfbuzz \
+    avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
     libmd jansson libsasl gvfs-nfs"
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -247,8 +249,10 @@ _launch_xfce() {
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
         #shellcheck disable=SC2086
-        pacman -Sy ${X_PACKAGES} --config ${_PACMAN_CONF} --noconfirm || exit 1
-        _cleanup_xfce
+        for i in ${X_PACKAGES}; do
+            pacman -Sy ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
+            _cleanup_xfce
+        done
         pacman -Sy ${X_PACKAGES2} --config ${_PACMAN_CONF} --noconfirm || exit 1
         _cleanup_xfce
     else
