@@ -232,7 +232,7 @@ _kexec() {
 }
 _cleanup_xfce() {
     echo "Cleanup archboot environment ..."
-    rm -rf /usr/share/{i18n,locale,man,info,doc,gtk-doc,ibus,perl5}
+    rm -rf /usr/share/{i18n,man,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
     rm -rf /usr/lib/libgo.*
 }
@@ -265,8 +265,10 @@ _launch_xfce() {
         done
     fi
     # fix locale
+    echo "Fix locale ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen
+    rm -rf /usr/share/locale
     # replace appfinder with archboot setup
     sed -i -e 's#xfce4-appfinder#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Fix chromium startup ..."
