@@ -270,7 +270,7 @@ _launch_xfce() {
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen
     # replace appfinder with archboot setup
-    sed -i -e 's#xfce4-appfinder#archboot#g' /etc/xdg/xfc4/panel/default.xml
+    sed -i -e 's#xfce4-appfinder#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Fix chromium startup ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
