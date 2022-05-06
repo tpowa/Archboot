@@ -22,17 +22,17 @@ usage () {
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
     echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-    echo -e "                  This operation needs at least \033[1m1.9 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m2.3 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
     echo -e "                  package cache (using kexec)."
-    echo -e "                  This operation needs at least \033[1m2.6 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
-    echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m5.0 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-    echo -e "                  This operation needs at least \033[1m3.4 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -234,7 +234,6 @@ _cleanup_xfce() {
     echo "Cleanup archboot environment ..."
     rm -rf /usr/share/{i18n,locale,man,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
-    rm -rf /usr/lib/libLLVM*
     rm -rf /usr/lib/libgo.*
 }
 
@@ -242,7 +241,8 @@ _launch_xfce() {
     X_PACKAGES="llvm-libs gcc-libs perl glibc xorg libtiff glib2 chromium libcups harfbuzz \
     avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
-    libmd jansson libsasl gvfs-nfs xfce4"
+    libmd jansson libsasl xfce4 thunar-archive-plugin thunar-volman file-roller"
+    # try to save RAM by calling the cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
