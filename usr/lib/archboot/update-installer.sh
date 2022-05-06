@@ -381,7 +381,7 @@ EOF
 </channel>
 EOF
     # hide menu entries
-    for i in xfce4-mail-reader; do
+    for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
     echo "Autostart setup ..."
