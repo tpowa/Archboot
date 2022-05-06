@@ -232,13 +232,13 @@ _kexec() {
 }
 _cleanup_xfce() {
     echo "Cleanup archboot environment ..."
-    rm -rf /usr/share/{locale,man,info,doc,gtk-doc,ibus}
+    rm -rf /usr/share/{i18n,locale,man,info,doc,gtk-doc,ibus}
     rm -rf /usr/include
 }
 
 _launch_xfce() {
-    X_PACKAGES="xorg xfce4 libtiff glib2"
-    X_PACKAGES2="chromium libcups gcc-libs glibc harfbuzz \
+    X_PACKAGES="xorg xfce4 libtiff glib2 glibc"
+    X_PACKAGES2="chromium libcups gcc-libs harfbuzz \
     avahi nss breeze-icons tigervnc perl p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
     libmd jansson libsasl gvfs-nfs"
