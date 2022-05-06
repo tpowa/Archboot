@@ -362,6 +362,10 @@ EOF
   </property>
 </channel>
 EOF
+    # hide menu entries
+    for i in xfce4-mail-reader; do
+        echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
+    done
     echo "Autostart setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
