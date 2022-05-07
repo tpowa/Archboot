@@ -99,7 +99,7 @@ _umount_w_dir() {
 _zram_mount() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    modprobe zram 2>/dev/null
+    modprobe zram > /dev/tty7 2>&1
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
     echo "${1}" >/sys/block/zram0/disksize
     echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
@@ -109,7 +109,7 @@ _zram_mount() {
     # (online fstrimming the block device!)
     # fstrim <mountpoint> for manual action
     # it needs some seconds to get RAM free on delete!
-    mount -o discard /dev/zram0 "${_W_DIR}"
+    mount -o discard /dev/zram0 "${_W_DIR}" > /dev/tty7 2>&1
 }
 
 _clean_archboot() {
