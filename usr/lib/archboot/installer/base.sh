@@ -6,10 +6,13 @@ ANSWER="/tmp/.setup"
 # check first if bootet in archboot
 if grep -qw archboot /etc/hostname; then
     DESTDIR="/install"
-    LOG="/dev/tty7"
 else
     DESTDIR="/"
+fi
+if pgrep -x Xorg; then
     LOG="/dev/tty8"
+else
+    LOG="/dev/tty7"
 fi
 VC_NUM="$(basename ${LOG} | sed -e 's#tty##g')"
 VC="VC${VC_NUM}"
