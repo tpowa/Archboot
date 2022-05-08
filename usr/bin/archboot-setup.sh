@@ -236,11 +236,7 @@ mainmenu() {
 #####################
 ## begin execution ##
 if [[ -e /tmp/.setup-running ]]; then
-    echo "HINT:"
-    echo "setup already runs on a different console!"
-    echo "Please remove /tmp/.setup-running first to launch setup!"
-    echo "Hit ENTER to exit this message."
-    read
+    DIALOG --infobox "HINT:\n\nsetup already runs on a different console!\nPlease remove /tmp/.setup-running first to launch setup!" 5 40
     exit 1
 fi
 : >/tmp/.setup-running
