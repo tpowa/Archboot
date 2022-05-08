@@ -239,6 +239,8 @@ if [[ -e /tmp/.setup-running ]]; then
     echo "HINT:"
     echo "setup already runs on a different console!"
     echo "Please remove /tmp/.setup-running first to launch setup!"
+    echo "Hit ENTER to exit this message."
+    read
     exit 1
 fi
 : >/tmp/.setup-running
