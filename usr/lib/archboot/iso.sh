@@ -54,10 +54,13 @@ _prepare_kernel_initramfs_files() {
 
     #shellcheck disable=SC2154
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
+    # delete cachedir on archboot environment
+    [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
     # grub on x86_64 reports too big if near 1GB
-    split -b 670M -d --additional-suffix=.img -a 1 \
-    "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
-    rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
+    tail -c 300M "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" \
+    > "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-1.img"
+    truncate -s -300M "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
+    mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img"
     if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi

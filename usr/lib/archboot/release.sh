@@ -44,8 +44,9 @@ _create_iso() {
     # generate latest iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_ARCH}" || exit 1
-    echo "Generate normal ISO ..."
+    echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2 openssh --noconfirm" >/dev/null 2>&1
+    echo "Generate normal ISO ..."
     # generate iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g" || exit 1
     # create Release.txt with included main archlinux packages
