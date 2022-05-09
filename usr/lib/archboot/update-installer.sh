@@ -29,7 +29,7 @@ usage () {
     echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
-    echo -e "                  This operation needs at least \033[1m5.0 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.9 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
     echo -e "                  This operation needs at least \033[1m3.5 GB RAM\033[0m."
