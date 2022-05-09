@@ -56,7 +56,8 @@ _prepare_kernel_initramfs_files() {
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
     # grub on x86_64 reports too big if near 1GB
     split -b 670M -d --additional-suffix=.img -a 1 \
-    "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
+    "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"&
+    sleep 0.01
     rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
     if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
