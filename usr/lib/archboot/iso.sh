@@ -57,12 +57,9 @@ _prepare_kernel_initramfs_files() {
     # delete cachedir on archboot environment
     [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
     # grub on x86_64 reports too big if near 1GB
-    if [[ "$(stat -c %s ${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img)" -gt "800000000" ]] ; then
-        tail -c 300M "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" \
-        > "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-1.img"
-        truncate -s -300M "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
-    fi
-    mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img"
+     split -b 670M -d --additional-suffix=.img -a 1 "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" \
+     "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
+    rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
     if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi
