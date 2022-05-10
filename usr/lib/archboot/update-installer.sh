@@ -242,7 +242,7 @@ _launch_xfce() {
     avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
     libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
     libmd jansson libsasl xfce4 thunar-archive-plugin thunar-volman file-roller \
-    nss-mdns gnome-keyring"
+    nss-mdns gnome-keyring mousepad"
     # try to save RAM by calling the cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
