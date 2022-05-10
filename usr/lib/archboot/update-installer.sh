@@ -238,11 +238,10 @@ _cleanup_xfce() {
 }
 
 _launch_xfce() {
-    X_PACKAGES="llvm-libs gcc-libs perl glibc xorg libtiff glib2 chromium libcups harfbuzz \
-    avahi nss breeze-icons tigervnc p11-kit libp11-kit gvfs fuse tpm2-tss \
-    libsecret gparted gvfs-smb smbclient libcap tevent libbsd libldap tdb ldb \
-    libmd jansson libsasl xfce4 thunar-archive-plugin thunar-volman file-roller \
-    nss-mdns gnome-keyring mousepad"
+    # fix libs first, then install packages from defaults
+    X_PACKAGES="llvm-libs gcc-libs perl glibc libtiff glib2 libcups harfbuzz \
+    avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb \
+    libmd jansson libsasl ${_DOWNLOAD_PACKAGES}"
     # try to save RAM by calling the cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
