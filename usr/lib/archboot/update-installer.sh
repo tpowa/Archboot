@@ -256,12 +256,12 @@ _launch_xfce() {
     else
         echo "Updating environment ..."
         pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm || exit 1
-        _clean_xfce
+        _cleanup_xfce
         echo "Install packages ..."
         for i in ${X_PACKAGES}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm || exit 1
-            _clean_xfce
+            _cleanup_xfce
         done
     fi
     # fix locale
