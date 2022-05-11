@@ -429,9 +429,9 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Replace default appfinder with gparted ..."
+    echo "Replace appfinder launcher with gparted ..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Replace default directory menu with setup ..."
+    echo "Replace directory menu launcher with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Setting chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
