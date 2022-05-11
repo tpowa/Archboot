@@ -262,22 +262,18 @@ _launch_xfce() {
             _cleanup_xfce
         done
     fi
-    # remove installed packages
     echo "Removing files from cache directory: ${_X_RM_PACKAGES} ..."
     for i in ${_X_RM_PACKAGES}; do
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
-    # remove firmware
     echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
-    # fix locale
     echo "Fixing locale C.UTF-8 ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
     echo "Adding chromium flags to /etc/chromium-flags.conf ..."
-    # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
