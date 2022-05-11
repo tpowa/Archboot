@@ -280,7 +280,7 @@ _launch_xfce() {
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     # replace directorymenu with archboot setup
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Add chromium flags /etc/chromium-flags.conf ..."
+    echo "Add chromium flags to /etc/chromium-flags.conf ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
