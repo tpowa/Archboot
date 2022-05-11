@@ -278,6 +278,7 @@ _launch_xfce() {
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
+--incognito
 wiki.archlinux.org/title/Archboot
 EOF
     echo "Fix xfce4 defaults ..."
