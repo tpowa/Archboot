@@ -241,7 +241,7 @@ _launch_xfce() {
     _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo "Install ${_FULL_PACKAGES} ${_X_PACKAGES} packages ..."
+        echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
         #shellcheck disable=SC2086
@@ -252,10 +252,10 @@ _launch_xfce() {
             _cleanup_xfce
         done
     else
-        echo "Updating environment ..."
+        echo "Updating environment to latest packages ..."
         pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_xfce
-        echo "Install ${_FULL_PACKAGES} ${_X_PACKAGES} packages ..."
+        echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
@@ -263,20 +263,20 @@ _launch_xfce() {
         done
     fi
     # remove installed packages
-    echo "Remove ${_X_RM_PACKAGES} from cache directory"
+    echo "Removing files from cache directory: ${_X_RM_PACKAGES} ..."
     for i in ${_X_RM_PACKAGES}; do
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
     # remove firmware
-    echo "Remove firmware files ..."
+    echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
     # fix locale
-    echo "Fix locale C.UTF-8 ..."
+    echo "Fixing locale C.UTF-8 ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
-    echo "Add chromium flags to /etc/chromium-flags.conf ..."
+    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
@@ -284,25 +284,19 @@ _launch_xfce() {
 --incognito
 wiki.archlinux.org/title/Archboot
 EOF
-    # Set XFCE defaults
-    echo "Set XFCE defaults ..."
-    # replace xfce4-appfinder with gparted
+    echo "Setting XFCE defaults ..."
     echo "Replace default appfinder with gparted ..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    # replace directorymenu with archboot setup
     echo "Replace default directory menu with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    # breeze icons
-    echo "Set breeze icons ..."
+    echo "Setting breeze icons ..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
     echo "Set chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
-    # fix gparted.desktop
     echo "Show gparted on top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
-    # xfce panel
-    echo "Configure panel ..."
+    echo "Configuring xfce panel ..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -414,7 +408,6 @@ EOF
   </property>
 </channel>
 EOF
-    # xfce menu
     echo "Create menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
@@ -472,7 +465,6 @@ EOF
 
 </Menu>
 EOF
-    # background image
     echo "Set background image ..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -510,7 +502,6 @@ EOF
   </property>
 </channel>
 EOF
-    # hide menu entries
     echo "Hide menu entries ..."
     for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
@@ -524,7 +515,7 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
-    echo "Set VNC password /etc/tigervnc/passwd to 'archboot' ..."
+    echo "Setting VNC password /etc/tigervnc/passwd to 'archboot' ..."
     echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
     echo "Autostart tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
