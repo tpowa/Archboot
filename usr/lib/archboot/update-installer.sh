@@ -231,7 +231,6 @@ _kexec() {
     done
 }
 _cleanup_xfce() {
-    echo "Cleanup archboot environment ..."
     rm -rf /usr/share/{man,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
     rm -rf /usr/lib/libgo.*
@@ -242,24 +241,24 @@ _launch_xfce() {
     _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo "Install packages ..."
+        echo "Install ${_FULL_PACKAGES} ${_X_PACKAGES} packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
         #shellcheck disable=SC2086
-        pacman -Sy --config ${_PACMAN_CONF}
+        pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
-            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
+            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_xfce
         done
     else
         echo "Updating environment ..."
-        pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm || exit 1
+        pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_xfce
-        echo "Install packages ..."
+        echo "Install ${_FULL_PACKAGES} ${_X_PACKAGES} packages ..."
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
-            pacman -S ${i} --noconfirm || exit 1
+            pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_xfce
         done
     fi
@@ -294,12 +293,16 @@ EOF
     echo "Replace default directory menu with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     # breeze icons
+    echo "Set breeze icons ..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+    echo "Set chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
     # fix gparted.desktop
+    echo "Show gparted on top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     # xfce panel
+    echo "Configure panel ..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -412,6 +415,7 @@ EOF
 </channel>
 EOF
     # xfce menu
+    echo "Create menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
@@ -469,6 +473,7 @@ EOF
 </Menu>
 EOF
     # background image
+    echo "Set background image ..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -506,6 +511,7 @@ EOF
 </channel>
 EOF
     # hide menu entries
+    echo "Hide menu entries ..."
     for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
