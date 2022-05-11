@@ -264,10 +264,12 @@ _launch_xfce() {
         done
     fi
     # remove installed packages
+    echo "Remove ${_X_RM_PACKAGES} from cache directory"
     for i in ${_X_RM_PACKAGES}; do
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
     # remove firmware
+    echo "Remove /usr/lib/firmware ..."
     rm -rf /usr/lib/firmware
     # fix locale
     echo "Fix locale ..."
@@ -278,7 +280,7 @@ _launch_xfce() {
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     # replace directorymenu with archboot setup
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Fix chromium startup ..."
+    echo "Add chromium flags ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
@@ -504,7 +506,7 @@ EOF
     for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
-    echo "Autostart setup ..."
+    echo "Autostart setup and tigervnc ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
