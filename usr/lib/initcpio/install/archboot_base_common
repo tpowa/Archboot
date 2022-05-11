@@ -101,7 +101,8 @@ build ()
     map add_file "/usr/lib/libnss_compat.so.2" "/usr/lib/libnsl.so.1"
     ## fix for systemd >=245 set default.target
     # remove initrd-release to allow normal systemd boot without initrd.target
-    rm /tmp/*/root/etc/initrd-release
+    # don't delete on archboot environment
+    [[ "$(cat /etc/hostname)" == "archboot" ]] || rm /tmp/*/root/etc/initrd-release
     add_symlink "/etc/systemd/system/default.target" "/usr/lib/systemd/system/multi-user.target"
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
