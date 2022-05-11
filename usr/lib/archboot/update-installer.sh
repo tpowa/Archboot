@@ -271,7 +271,7 @@ _prepare_xfce() {
     rm -rf /usr/lib/firmware
     echo "Fixing locale C.UTF-8 ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
-    locale-gen
+    locale-gen >/dev/null 2>&1
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
     echo "Adding chromium flags to /etc/chromium-flags.conf ..."
