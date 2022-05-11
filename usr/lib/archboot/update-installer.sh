@@ -280,7 +280,7 @@ _launch_xfce() {
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     # replace directorymenu with archboot setup
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Add chromium flags ..."
+    echo "Add chromium flags /etc/chromium-flags.conf ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
@@ -288,7 +288,7 @@ _launch_xfce() {
 --incognito
 wiki.archlinux.org/title/Archboot
 EOF
-    echo "Fix xfce4 defaults ..."
+    echo "Set XFCE defaults ..."
     # fix xfce4 defaults
     # breeze icons
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
@@ -506,7 +506,7 @@ EOF
     for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
-    echo "Autostart setup and tigervnc ..."
+    echo "Autostart setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -515,8 +515,8 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
-echo "Set VNC password ..."
-echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
+    echo "Set VNC password ..."
+    echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
     echo "Autostart tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
