@@ -239,16 +239,15 @@ _cleanup_xfce() {
 
 _launch_xfce() {
     # fix libs first, then install packages from defaults
-    X_PACKAGES="llvm-libs gcc-libs perl glibc libtiff glib2 libcups harfbuzz \
-    avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb \
-    libmd jansson libsasl ${_DOWNLOAD_PACKAGES}"
-    # try to save RAM by calling the cleanup hook and installing each package alone
+    _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
+    # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Install packages ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
+        #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF}
-        for i in ${X_PACKAGES}; do
+        for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm || exit 1
             _cleanup_xfce
@@ -258,15 +257,14 @@ _launch_xfce() {
         pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm || exit 1
         _cleanup_xfce
         echo "Install packages ..."
-        for i in ${X_PACKAGES}; do
+        for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm || exit 1
             _cleanup_xfce
         done
     fi
     # remove installed packages
-    _RM_PACKAGE="xorg xfce4 chromium llvm-libs mesa ffmpeg"
-    for i in ${_RM_PACKAGE}; do
+    for i in ${_X_RM_PACKAGES}; do
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
     # remove firmware

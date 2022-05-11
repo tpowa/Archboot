@@ -1,11 +1,16 @@
 # defaults for archboot
 # packages to install (eg. firmware, kernel packages)
 _PACKAGES="base linux linux-firmware linux-firmware-marvell"
-# Download packages for pacman cache directory
-_DOWNLOAD_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs gvfs-smb thunar-archive-plugin thunar-volman file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
+### XFCE defaults
+# needed full installed packages in environment for X
+_FULL_PACKAGES="llvm-libs gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl"
+# X packages
+_X_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs gvfs-smb thunar-archive-plugin thunar-volman file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
+# packages to remove from cache before X startup happens
+_X_RM_PACKAGES="xorg xfce4 chromium llvm-libs mesa ffmpeg"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # size for --latest and --latest-install option
