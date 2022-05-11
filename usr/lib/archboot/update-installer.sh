@@ -270,7 +270,7 @@ _launch_xfce() {
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
     # remove firmware
-    rm -r /usr/lib/firmware
+    rm -rf /usr/lib/firmware
     # fix locale
     echo "Fix locale ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
