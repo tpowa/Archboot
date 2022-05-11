@@ -230,7 +230,8 @@ _kexec() {
         sleep 1
     done
 }
-_cleanup_xfce() {
+
+_cleanup_install() {
     rm -rf /usr/share/{man,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
     rm -rf /usr/lib/libgo.*
@@ -249,17 +250,17 @@ _launch_xfce() {
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
-            _cleanup_xfce
+            _cleanup_install
         done
     else
         echo "Updating environment to latest packages ..."
         pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm >/dev/null 2>&1 || exit 1
-        _cleanup_xfce
+        _cleanup_install
         echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
-            _cleanup_xfce
+            _cleanup_install
         done
     fi
     echo "Removing files from cache directory: ${_X_RM_PACKAGES} ..."
