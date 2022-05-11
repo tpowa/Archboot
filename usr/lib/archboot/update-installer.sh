@@ -269,17 +269,14 @@ _launch_xfce() {
         rm -f /var/cache/pacman/pkg/"${i}"-*
     done
     # remove firmware
-    echo "Remove /usr/lib/firmware ..."
+    echo "Remove firmware files ..."
     rm -rf /usr/lib/firmware
     # fix locale
-    echo "Fix locale ..."
+    echo "Fix locale C.UTF-8 ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen
+    echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
-    # replace xfce4-appfinder with gparted
-    sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    # replace directorymenu with archboot setup
-    sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Add chromium flags to /etc/chromium-flags.conf ..."
     # fix chromium startup
     cat << EOF >/etc/chromium-flags.conf
@@ -288,8 +285,14 @@ _launch_xfce() {
 --incognito
 wiki.archlinux.org/title/Archboot
 EOF
+    # Set XFCE defaults
     echo "Set XFCE defaults ..."
-    # fix xfce4 defaults
+    # replace xfce4-appfinder with gparted
+    echo "Replace default appfinder with gparted ..."
+    sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
+    # replace directorymenu with archboot setup
+    echo "Replace default directory menu with setup ..."
+    sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     # breeze icons
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
