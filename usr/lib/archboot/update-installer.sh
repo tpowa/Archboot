@@ -277,24 +277,6 @@ _prepare_xfce() {
 }
 
 _configure_xfce() {
-    echo "Setting chromium as default browser ..."
-    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
-    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
-    cat << EOF >/etc/chromium-flags.conf
---no-sandbox
---test-type
---incognito
-wiki.archlinux.org/title/Archboot
-EOF
-    echo "Replace default appfinder with gparted ..."
-    sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Replace default directory menu with setup ..."
-    sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Setting breeze as default icons..."
-    sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
-    /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Add gparted to xfce top level menu ..."
-    sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     echo "Configuring xfce panel ..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -407,6 +389,59 @@ EOF
   </property>
 </channel>
 EOF
+    echo "Setting breeze as default icons..."
+    sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
+    /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+    echo "Setting background image ..."
+    cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitor0" type="empty">
+        <property name="image-path" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="last-single-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        <property name="image-show" type="bool" value="true"/>
+        <property name="image-style" type="int" value="0"/>
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+      <property name="monitorVNC-0" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+      <property name="monitorHDMI1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
+    </property>
+  </property>
+</channel>
+EOF
+    echo "Replace default appfinder with gparted ..."
+    sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
+    echo "Replace default directory menu with setup ..."
+    sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
+    echo "Setting chromium as default browser ..."
+    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
+    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
+    cat << EOF >/etc/chromium-flags.conf
+--no-sandbox
+--test-type
+--incognito
+wiki.archlinux.org/title/Archboot
+EOF
     echo "Creating menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
@@ -464,43 +499,8 @@ EOF
 
 </Menu>
 EOF
-    echo "Setting background image ..."
-    cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<channel name="xfce4-desktop" version="1.0">
-  <property name="backdrop" type="empty">
-    <property name="screen0" type="empty">
-      <property name="monitor0" type="empty">
-        <property name="image-path" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        <property name="last-single-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        <property name="image-show" type="bool" value="true"/>
-        <property name="image-style" type="int" value="0"/>
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="3"/>
-          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        </property>
-      </property>
-      <property name="monitorVNC-0" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="3"/>
-          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        </property>
-      </property>
-      <property name="monitorHDMI1" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="3"/>
-          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
-        </property>
-      </property>
-    </property>
-  </property>
-</channel>
-EOF
+    echo "Add gparted to xfce top level menu ..."
+    sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     echo "Hiding ${_HIDE_MENU} menu entries ..."
     for i in ${_HIDE_MENU}; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
