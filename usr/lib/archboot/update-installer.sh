@@ -392,7 +392,7 @@ EOF
     echo "Setting breeze as default icons..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Setting background image ..."
+    echo "Setting archboot background image ..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
