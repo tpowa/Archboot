@@ -82,8 +82,12 @@ fi
 if [[ "${_L_XFCE}" == "1" ]]; then
     echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
-    echo -e "\033[1mStep 2/2:\033[0m Preparing XFCE desktop now ..."
+    echo -e "\033[1mStep 2/4:\033[0m Preparing XFCE desktop now ..."
     echo "          This will need some time ..."
-    _launch_xfce >/dev/tty7 2>&1
+    _prepare_xfce >/dev/tty7 2>&1
+    echo -e "\033[1mStep 3/4:\033[0m Starting avahi-daemon ..."
+    systemctl start avahi-daemon.service
+    echo -e "\033[1mStep 4/4:\033[0m Launching XFCE ..."
+    startxfce4
     echo -e "To relaunch XFCE use: \033[92mstartxfce4\033[0m"
 fi
