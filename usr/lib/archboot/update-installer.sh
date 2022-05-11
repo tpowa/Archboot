@@ -515,7 +515,7 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
-    echo "Set VNC password /etc/tigervnc/passwd to archboot ..."
+    echo "Set VNC password /etc/tigervnc/passwd to 'archboot' ..."
     echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
     echo "Autostart tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
