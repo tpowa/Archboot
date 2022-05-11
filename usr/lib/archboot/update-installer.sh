@@ -269,7 +269,7 @@ _prepare_xfce() {
     done
     echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
-    echo "Fixing locale C.UTF-8 ..."
+    echo "Recreating C.UTF-8 locale ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen >/dev/null 2>&1
     echo "Cleanup locale and i18n ..."
@@ -286,10 +286,10 @@ EOF
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     echo "Replace default directory menu with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Setting breeze icons ..."
+    echo "Setting breeze as default icons..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Set chromium as default browser ..."
+    echo "Setting chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
     echo "Show gparted on top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
@@ -405,7 +405,7 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Create menu structure ..."
+    echo "Creating menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
@@ -462,7 +462,7 @@ EOF
 
 </Menu>
 EOF
-    echo "Set background image ..."
+    echo "Setting background image ..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -499,11 +499,11 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Hide menu entries ..."
+    echo "Hiding menu entries ..."
     for i in xfce4-mail-reader xfce4-about; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
-    echo "Autostart setup ..."
+    echo "Autostarting setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -514,7 +514,7 @@ Categories=X-Xfce-Toplevel;
 EOF
     echo "Setting VNC password /etc/tigervnc/passwd to 'archboot' ..."
     echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
-    echo "Autostart tigervnc ..."
+    echo "Autostarting tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
