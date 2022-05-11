@@ -274,6 +274,9 @@ _prepare_xfce() {
     locale-gen >/dev/null 2>&1
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
+}
+
+_configure_xfce() {
     echo "Adding chromium flags to /etc/chromium-flags.conf ..."
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
@@ -281,7 +284,6 @@ _prepare_xfce() {
 --incognito
 wiki.archlinux.org/title/Archboot
 EOF
-    echo "Setting XFCE defaults ..."
     echo "Replace default appfinder with gparted ..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     echo "Replace default directory menu with setup ..."
