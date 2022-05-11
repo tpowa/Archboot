@@ -429,9 +429,9 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Replace appfinder launcher with gparted ..."
+    echo "Replacing appfinder launcher with gparted ..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Replace directory menu launcher with setup ..."
+    echo "Replacing directory menu launcher with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Setting chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
@@ -442,7 +442,7 @@ EOF
 --incognito
 wiki.archlinux.org/title/Archboot
 EOF
-    echo "Creating menu structure ..."
+    echo "Replacing menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
@@ -499,7 +499,7 @@ EOF
 
 </Menu>
 EOF
-    echo "Add gparted to xfce top level menu ..."
+    echo "Adding gparted to xfce top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     echo "Hiding ${_HIDE_MENU} menu entries ..."
     for i in ${_HIDE_MENU}; do
