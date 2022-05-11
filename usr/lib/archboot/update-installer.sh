@@ -264,6 +264,12 @@ _launch_xfce() {
             _cleanup_xfce
         done
     fi
+    # remove installed packages, to get more RAM free
+    _RM_PACKAGE="xorg xfce4 chromium llvm-libs mesa ffmpeg"
+    for i in ${_RM_PACKAGE}; do
+        rm -f /var/cache/pacman/pkg/"${i}"-*
+    done
+    rm /var/cache/pacman/pkg
     # fix locale
     echo "Fix locale ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
