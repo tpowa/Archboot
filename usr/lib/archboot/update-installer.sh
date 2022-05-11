@@ -237,7 +237,7 @@ _cleanup_install() {
     rm -rf /usr/lib/libgo.*
 }
 
-_launch_xfce() {
+_prepare_xfce() {
     # fix libs first, then install packages from defaults
     _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
     # saving RAM by calling always cleanup hook and installing each package alone
@@ -522,8 +522,4 @@ Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Starting avahi-daemon ..."
-    systemctl start avahi-daemon.service
-    echo "Launching XFCE ..."
-    startxfce4
 }
