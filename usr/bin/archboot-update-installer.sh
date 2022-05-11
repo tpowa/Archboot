@@ -85,4 +85,5 @@ if [[ "${_L_XFCE}" == "1" ]]; then
     echo -e "\033[1mStep 2/2:\033[0m Preparing XFCE desktop now ..."
     echo "          This will need some time ..."
     _launch_xfce >/dev/tty7 2>&1
+    echo "To relaunch XFCE use: \033[0mstartxfce4\033[0m"
 fi
