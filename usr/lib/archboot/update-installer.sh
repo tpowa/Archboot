@@ -277,6 +277,8 @@ _prepare_xfce() {
 }
 
 _configure_xfce() {
+    echo "Setting chromium as default browser ..."
+    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
     echo "Adding chromium flags to /etc/chromium-flags.conf ..."
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
@@ -291,9 +293,7 @@ EOF
     echo "Setting breeze as default icons..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Setting chromium as default browser ..."
-    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
-    echo "Show gparted on top level menu ..."
+    echo "Add gparted to xfce top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     echo "Configuring xfce panel ..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
@@ -501,8 +501,8 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Hiding menu entries ..."
-    for i in xfce4-mail-reader xfce4-about; do
+    echo "Hiding ${_HIDE_MENU} menu entries ..."
+    for i in ${_HIDE_MENU}; do
         echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
     done
     echo "Autostarting setup ..."
@@ -514,8 +514,7 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
-    echo "Setting VNC password /etc/tigervnc/passwd to 'archboot' ..."
-    echo 'archboot' | vncpasswd -f > /etc/tigervnc/passwd
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
     echo "Autostarting tigervnc ..."
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
@@ -523,5 +522,6 @@ Type=Application
 Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
-    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
+    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
 }
