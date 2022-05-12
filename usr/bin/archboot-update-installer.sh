@@ -80,16 +80,18 @@ fi
 
 # Launch xfce
 if [[ "${_L_XFCE}" == "1" ]]; then
-    echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
-    _gpg_check
-    echo -e "\033[1mStep 2/5:\033[0m Installing XFCE desktop now ..."
-    echo "          This will need some time ..."
-    _prepare_xfce >/dev/tty7 2>&1
-    echo -e "\033[1mStep 3/5:\033[0m Configuring XFCE desktop ..."
-    _configure_xfce >/dev/tty7 2>&1
-    echo -e "\033[1mStep 4/5:\033[0m Starting avahi-daemon ..."
-    systemctl start avahi-daemon.service
-    echo -e "\033[1mStep 5/5:\033[0m Launching XFCE logging is done on \033[1m/dev/tty8\033[0m ..."
+    if ! [[ -e /usr/bin/startxfce4 ]]; then
+        echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+        _gpg_check
+        echo -e "\033[1mStep 2/5:\033[0m Installing XFCE desktop now ..."
+        echo "          This will need some time ..."
+        _prepare_xfce >/dev/tty7 2>&1
+        echo -e "\033[1mStep 3/5:\033[0m Configuring XFCE desktop ..."
+        _configure_xfce >/dev/tty7 2>&1
+        echo -e "\033[1mStep 4/5:\033[0m Starting avahi-daemon ..."
+        systemctl start avahi-daemon.service
+        echo -e "\033[1mStep 5/5:\033[0m Launching XFCE logging is done on \033[1m/dev/tty8\033[0m ..."
+    fi
     startxfce4 >/dev/tty8 2>&1
     echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
 fi
