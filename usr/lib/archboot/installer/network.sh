@@ -123,8 +123,8 @@ donetwork() {
     ip link set dev "${INTERFACE}" down
     # run netctl
     netctl restart "$(basename "${NETWORK_PROFILE}")" >"${LOG}"
-    #shellcheck disable=SC2181
-    if [[ $? -gt 0 ]]; then
+    sleep 5
+    if ip link show dev "${INTERFACE}" | grep -qw DOWN; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
     fi
