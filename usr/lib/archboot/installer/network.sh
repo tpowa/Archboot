@@ -123,7 +123,9 @@ donetwork() {
     ip link set dev "${INTERFACE}" down
     # run netctl
     netctl restart "$(basename "${NETWORK_PROFILE}")" >"${LOG}"
-    sleep 5
+    # add sleep here dhcp can need some time to get link
+    DIALOG --infobox "Please wait 10 seconds for network link to come up ..." 3 60
+    sleep 10
     if ip link show dev "${INTERFACE}" | grep -qw DOWN; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
@@ -141,9 +143,6 @@ donetwork() {
             export "${i}"="${PROXY}"
         done
     fi
-    # add sleep here dhcp can need some time to get link
-    DIALOG --infobox "Please wait 5 seconds for network link to come up ..." 3 60
-    sleep 5
     NEXTITEM="2"
     S_NET=1
 }
