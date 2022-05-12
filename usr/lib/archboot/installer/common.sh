@@ -113,6 +113,9 @@ auto_packages() {
     if lsmod | grep -qw wl; then
         ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
+    if ls /sys/class/net | grep -q wlan; then
+        ! echo "${PACKAGES}" | grep -qw iwd && PACKAGES="${PACKAGES} iwd"
+    fi
     # only add firmware if already used
     linux_firmware
     marvell_firmware
