@@ -7,6 +7,8 @@ _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### XFCE defaults
 # needed full installed packages in environment for X
 _FULL_PACKAGES="llvm-libs gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl"
+# ignore packages to upgrade before X startup eg. kernel and firmware
+_X_IGNORE="linux linux-firmware linux-firmware-marvell"
 # X packages
 _X_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs gvfs-smb thunar-archive-plugin thunar-volman file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
 # packages to remove from cache before X startup happens

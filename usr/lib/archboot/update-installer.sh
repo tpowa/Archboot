@@ -253,8 +253,15 @@ _prepare_xfce() {
             _cleanup_install
         done
     else
-        echo "Updating environment to latest packages ..."
-        pacman -Syu --ignore linux --ignore linux-firmware --ignore linux-firmware-marvell --noconfirm >/dev/null 2>&1 || exit 1
+        echo "Updating environment to latest packages (ignoring packages: ${_X_IGNORE}) ..."
+        _IGNORE=""
+        if [[ -n "${_X_IGNORE}" ]]; then
+            for i in ${_X_IGNORE}; do
+                _IGNORE="${_IGNORE} --ignore ${i}"
+            done
+        fi
+        #shellcheck disable=SC2086
+        pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_install
         echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         for i in ${_XORG}; do
