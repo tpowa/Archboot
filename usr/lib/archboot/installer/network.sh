@@ -38,7 +38,8 @@ donetwork() {
         WLAN_ESSID=""
         WLAN_SECURITY=""
         WLAN_KEY=""
-        DIALOG --defaultno --yesno "Is your network device wireless?" 5 40
+        # iwd renames wireless devices to wlanX
+        echo "${INTERFACE}" | grep -q wlan >/dev/null
         #shellcheck disable=SC2181
         if [[ $? -eq 0 ]]; then
             CONNECTION="wireless"
