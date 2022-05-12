@@ -377,8 +377,10 @@ do_mok_sign () {
     SIGN_MOK=""
     DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
-        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}"
-        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
+        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" ||\
+        sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}"
+        systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}" ||\
+        sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
         DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
         sleep 5
     fi
