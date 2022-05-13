@@ -130,6 +130,8 @@ auto_mkinitcpio() {
     # change mkinitcpio.conf
     [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" "${DESTDIR}"/etc/mkinitcpio.conf
     [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
+    # disable fallpack preset
+    sed -i -e "s# 'fallback'##g" "${DESTDIR}"/etc/mkinitcpio.d/*.preset
 }
 
 auto_parameters() {
