@@ -846,7 +846,7 @@ fi
 EOF
 
     echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-    sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+    [[ -e "/tmp/.device-names" ]] && sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
     if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
