@@ -13,6 +13,14 @@ check_nework() {
     [[ "${S_NET}" == "1" ]] || donetwork
 }
 
+# scan for available essids
+essid_scan() {
+    for dev in $(iw dev "${INTERFACE}" scan | grep SSID | cut -d ':' -f2 | sort -u | sed -e 's#^ ##g' -e 's| |#|g'); do
+        echo "${dev}"
+        [[ "${1}" ]] && echo "${1}"
+    done
+}
+
 # donetwork()
 # Hand-hold through setting up networking
 #
@@ -39,15 +47,22 @@ donetwork() {
         WLAN_SECURITY=""
         WLAN_KEY=""
         # iwd renames wireless devices to wlanX
-        echo "${INTERFACE}" | grep -q wlan >/dev/null
-        #shellcheck disable=SC2181
-        if [[ $? -eq 0 ]]; then
+        if echo "${INTERFACE}" | grep -q wlan >/dev/null; then
             CONNECTION="wireless"
-            DIALOG --inputbox "Enter your ESSID" 7 40 "MyNetwork" 2>"${ANSWER}" || return 1
-            WLAN_ESSID=$(cat "${ANSWER}")
-            DIALOG --defaultno --yesno "Is your wireless network hidden?" 5 40
-            #shellcheck disable=SC2181
-            [[ $? -eq 0 ]] && WLAN_HIDDEN="yes"
+            # bring interface up for essid scan
+            ip link set dev "${INTERFACE}" up
+            #shellcheck disable=SC2086
+            DIALOG --menu "Choose your ESSID, spaces in name have been replaced by '#'" 14 55 7 \
+            $(essid_scan _) \
+             "Hidden" "_" 2>"${ANSWER}" || return 1
+            local WLAN_ESSID=$(cat "${ANSWER}")
+            if [[ "${WLAN_ESSID}" = "Hidden" ]]; then
+                DIALOG --inputbox "Enter the hidden ESSID" 8 65 \
+                    "secret" 2>"${ANSWER}" || return 1
+                WLAN_ESSID=$(cat "${ANSWER}")
+            fi
+            # remove spaces
+            WLAN_ESSID=$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g'
             DIALOG --yesno "Is your wireless network encrypted?" 5 40
             #shellcheck disable=SC2181
             if [[ $? -eq 0 ]]; then
