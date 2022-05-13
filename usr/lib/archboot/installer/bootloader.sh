@@ -310,13 +310,13 @@ do_uefi_secure_boot_efitools() {
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi" ]]; then
-            systemd-nspawn -q -D "${DESTDIR}" cp "/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
+            cp "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
             do_uefi_bootmgr_setup
         fi
         if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi" ]]; then
-            systemd-nspawn -q -D "${DESTDIR}" cp "/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
+            cp "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
             _BOOTMGR_LABEL="KeyTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
             do_uefi_bootmgr_setup
@@ -465,8 +465,11 @@ ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${AMD
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
-
-        systemd-nspawn -q -D "${DESTDIR}" /usr/bin/systemctl enable efistub_copy.path
+        if [[ "${DESTDIR}" == "/install" ]]; then
+            systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
+        else
+            systemctl enable efistub_copy.path
+        fi
     fi
 
     ###########################
