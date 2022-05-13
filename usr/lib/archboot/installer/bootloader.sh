@@ -378,11 +378,11 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         if [[ "${DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}"
-            systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
+            systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" 2>&1
+            systemd-nspawn -q -D "${DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}" 2>&1
         else
-            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}"
-            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}"
+            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" 2>&1
+            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}" 2>&1
         fi
         DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
         sleep 5
@@ -429,11 +429,9 @@ do_efistub_copy_to_efisys() {
 
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
 
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}-fallback.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
 
         #######################
 
@@ -446,7 +444,6 @@ PathChanged=/boot/${VMLINUZ}
 PathChanged=/boot/${INTEL_UCODE}
 PathChanged=/boot/${AMD_UCODE}
 PathChanged=/boot/${INITRAMFS}.img
-PathChanged=/boot/${INITRAMFS}-fallback.img
 Unit=efistub_copy.service
 
 [Install]
@@ -463,7 +460,6 @@ ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFIS
 ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INTEL_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${AMD_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}-fallback.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img
 CONFEOF
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
@@ -486,12 +482,9 @@ CONFEOF
             _KERNEL_NORMAL="/${VMLINUZ}"
             _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
         fi
-
         _INITRD_AMD_UCODE="/${AMD_UCODE}"
 
         _INITRD_NORMAL="/${INITRAMFS}.img"
-
-        _INITRD_FALLBACK_NORMAL="/${INITRAMFS}-fallback.img"
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL_NORMAL="/EFI/arch/${VMLINUZ_EFISTUB}"
@@ -502,8 +495,6 @@ CONFEOF
         _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
 
         _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
-
-        _INITRD_FALLBACK_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}-fallback.img"
     fi
 
 }
@@ -575,23 +566,6 @@ initrd   ${_INITRD_NORMAL}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
 
-    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-title    Arch Linux Fallback
-linux    ${_KERNEL_NORMAL}
-GUMEOF
-
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-initrd   ${_INITRD_INTEL_UCODE}
-GUMEOF
-    fi
-
-    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
-initrd   ${_INITRD_AMD_UCODE}
-initrd   ${_INITRD_FALLBACK_NORMAL}
-options  ${_KERNEL_PARAMS_UEFI_MOD}
-GUMEOF
-
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
 timeout 5
 default archlinux-core-main
@@ -609,7 +583,6 @@ GUMEOF
         geteditor || return 1
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-fallback.conf"
 
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
 
@@ -663,7 +636,6 @@ do_refind_uefi() {
 
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD_NORMAL}"
-"Boot with fallback initramfs"    "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD_FALLBACK_NORMAL}"
 REFINDEOF
 
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -914,19 +886,6 @@ EOF
 
     NUMBER=$((NUMBER+1))
 
-    ## create kernel fallback entry
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
-# (${NUMBER}) Arch Linux Fallback
-menuentry "Arch Linux Fallback" {
-    set gfxpayload="keep"
-    ${GRUB_ROOT_DRIVE}
-    ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}-fallback.img
-}
-
-EOF
-
 else
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 
@@ -936,21 +895,6 @@ menuentry "Arch Linux" {
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
     initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}.img
-}
-
-EOF
-
-    NUMBER=$((NUMBER+1))
-
-    ## create kernel fallback entry
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
-# (${NUMBER}) Arch Linux Fallback
-menuentry "Arch Linux Fallback" {
-    set gfxpayload="keep"
-    ${GRUB_ROOT_DRIVE}
-    ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}-fallback.img
 }
 
 EOF
