@@ -132,6 +132,8 @@ auto_mkinitcpio() {
     [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
     # disable fallpack preset
     sed -i -e "s# 'fallback'##g" "${DESTDIR}"/etc/mkinitcpio.d/*.preset
+    # remove fallback initramfs
+    [[ -e "${DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${DESTDIR}/boot/initramfs-linux-fallback.img"
 }
 
 auto_parameters() {
