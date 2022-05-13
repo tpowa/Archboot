@@ -52,14 +52,15 @@ donetwork() {
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
             #shellcheck disable=SC2086
-            DIALOG --menu "Choose your ESSID, spaces in name have been replaced by '#'" 14 55 7 \
+            DIALOG --menu "Choose your ESSID" 14 55 7 \
             $(essid_scan _) \
              "Hidden" "_" 2>"${ANSWER}" || return 1
             local WLAN_ESSID=$(cat "${ANSWER}")
             if [[ "${WLAN_ESSID}" = "Hidden" ]]; then
-                DIALOG --inputbox "Enter the hidden ESSID" 8 65 \
+                DIALOG --inputbox "Enter the hidden ESSID:" 8 65 \
                     "secret" 2>"${ANSWER}" || return 1
                 WLAN_ESSID=$(cat "${ANSWER}")
+                WLAN_HIDDEN="yes"
             fi
             # remove spaces
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
@@ -75,7 +76,7 @@ donetwork() {
                         0) WLAN_SECURITY=$(cat "${ANSWER}") ;;
                     esac
                 done
-                DIALOG --inputbox "Enter your KEY" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
+                DIALOG --inputbox "Enter your KEY:" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             else
                 WLAN_SECURITY="none"
@@ -96,11 +97,11 @@ donetwork() {
 
         else
             IP="static"
-            DIALOG --inputbox "Enter your IP address and netmask" 7 40 "192.168.1.23/24" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${ANSWER}" || return 1
             IPADDR=$(cat "${ANSWER}")
-            DIALOG --inputbox "Enter your gateway" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
             GW=$(cat "${ANSWER}")
-            DIALOG --inputbox "Enter your DNS server IP" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
+            DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
             DNS=$(cat "${ANSWER}")
         fi
         DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nUse dhclient:   ${DHCLIENT}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}" 0 0
@@ -111,7 +112,7 @@ donetwork() {
     done
     # profile name
     NETWORK_PROFILE=""
-    DIALOG --inputbox "Enter your network profile name" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
+    DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
     NETWORK_PROFILE=/etc/netctl/$(cat "${ANSWER}")
     # write profile
     echo "Connection=${CONNECTION}" >"${NETWORK_PROFILE}"
@@ -139,8 +140,8 @@ donetwork() {
     # run netctl
     netctl restart "$(basename "${NETWORK_PROFILE}")" >"${LOG}"
     # add sleep here dhcp can need some time to get link
-    DIALOG --infobox "Please wait 10 seconds for network link to come up ..." 3 60
-    sleep 10
+    DIALOG --infobox "Please wait 30 seconds for network link to come up ..." 3 60
+    sleep 30
     if ip link show dev "${INTERFACE}" | grep -qw DOWN; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
