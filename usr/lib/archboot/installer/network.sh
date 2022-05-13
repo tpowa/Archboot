@@ -62,7 +62,7 @@ donetwork() {
                 WLAN_ESSID=$(cat "${ANSWER}")
             fi
             # remove spaces
-            WLAN_ESSID=$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g'
+            WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
             DIALOG --yesno "Is your wireless network encrypted?" 5 40
             #shellcheck disable=SC2181
             if [[ $? -eq 0 ]]; then
