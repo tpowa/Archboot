@@ -210,7 +210,7 @@ _create_initramfs() {
 _kexec() {
     # load kernel and initrds into running kernel in background mode!
     kexec -l /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
-    # wait 3 seconds for getting a complete initramfs
+    # wait 2 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
     rm /{initrd.img,${VMLINUZ}}
