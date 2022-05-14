@@ -10,7 +10,7 @@ _FULL_PACKAGES="gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11
 # ignore packages to upgrade before X startup eg. kernel and firmware
 _X_IGNORE="linux linux-firmware linux-firmware-marvell"
 # X packages
-_X_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs-smb thunar-archive-plugin thunar-volman file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
+_X_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs gvfs-smb thunar-archive-plugin thunar-volman file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
 # don't show in xfce menu
 _HIDE_MENU="xfce4-mail-reader xfce4-about"
 # VNC password
