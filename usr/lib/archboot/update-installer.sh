@@ -278,7 +278,7 @@ _prepare_xfce() {
         fi
         # workaround unsolvable zstd bug,
         # booting with higher memory results in not having /var/lib/pacman/local/zstd-*
-        pacman -Sy zstd --noconfirm  --overwrite '*' >/dev/null 2>&1
+        pacman -Sy zstd --noconfirm  --overwrite '*' >/dev/null 2>&1 || exit 1
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_install
