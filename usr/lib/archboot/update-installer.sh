@@ -237,7 +237,7 @@ _cleanup_install() {
     rm -rf /usr/lib/libgo.*
 }
 
-_cleanup_x_cache() {
+_cleanup_cache() {
     # remove packages from cache
     for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf /var/cache/pacman/pkg/"${i}"-*
@@ -245,6 +245,8 @@ _cleanup_x_cache() {
 }
 
 _prepare_xfce() {
+    echo "Removing firmware files ..."
+    rm -rf /usr/lib/firmware
     # fix libs first, then install packages from defaults
     _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
     # saving RAM by calling always cleanup hook and installing each package alone
@@ -258,6 +260,8 @@ _prepare_xfce() {
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
+            _cleanup_cache
+            rm /var/cache/pacman.log
         done
     else
         echo "Updating environment to latest packages (ignoring packages: ${_X_IGNORE}) ..."
@@ -275,14 +279,12 @@ _prepare_xfce() {
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
+            _cleanup_cache
+            rm /var/cache/pacman.log
         done
     fi
     echo "Removing not used icons ..."
     rm -rf /usr/share/icons/breeze-dark
-    echo "Removing files from cache directory ..."
-    _cleanup_x_cache
-    echo "Removing firmware files ..."
-    rm -rf /usr/lib/firmware
     echo "Recreating C.UTF-8 locale ..."
     sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
     locale-gen >/dev/null 2>&1
