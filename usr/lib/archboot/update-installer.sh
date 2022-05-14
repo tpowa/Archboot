@@ -280,7 +280,7 @@ _prepare_xfce() {
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
             _cleanup_cache
-            rm /var/cache/pacman.log
+            rm -f /var/cache/pacman.log
         done
     fi
     echo "Removing not used icons ..."
