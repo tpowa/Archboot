@@ -237,6 +237,19 @@ _cleanup_install() {
     rm -rf /usr/lib/libgo.*
 }
 
+_cleanup_x_cache() {
+    # get last full package
+    LAST_FULL_PACKAGE="$(grep 'FULL' /etc/archboot/defaults | sed -e 's#^.*\ ##g' -e 's#\"##g')"
+    # installed packages
+    grep installed /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
+    # remove all lines above with match
+    sed "1,/^${LAST_FULL_PACKAGE}$/d" >/tmp/installed.log
+    # remove packages from cache
+    for i in $(cat /tmp/installed.log); do
+        rm -rf /var/cache/pacman/pkg/${i}-*
+    done
+}
+
 _prepare_xfce() {
     # fix libs first, then install packages from defaults
     _XORG="${_FULL_PACKAGES} ${_X_PACKAGES}"
@@ -272,10 +285,8 @@ _prepare_xfce() {
     fi
     echo "Removing not used icons ..."
     rm -rf /usr/share/icons/breeze-dark
-    echo "Removing files from cache directory: ${_X_RM_PACKAGES} ..."
-    for i in ${_X_RM_PACKAGES}; do
-        rm -f /var/cache/pacman/pkg/"${i}"-*
-    done
+    echo "Removing files from cache directory ..."
+    _cleanup_x_cache
     echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
     echo "Recreating C.UTF-8 locale ..."
