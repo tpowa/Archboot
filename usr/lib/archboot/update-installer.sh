@@ -271,7 +271,7 @@ _prepare_xfce() {
         done
     fi
     echo "Removing not used icons ..."
-    rm -rf /usr/share/icons/{Adwaita,breeze-dark}
+    rm -rf /usr/share/icons/breeze-dark
     echo "Removing files from cache directory: ${_X_RM_PACKAGES} ..."
     for i in ${_X_RM_PACKAGES}; do
         rm -f /var/cache/pacman/pkg/"${i}"-*
