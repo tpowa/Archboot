@@ -200,7 +200,7 @@ _create_initramfs() {
     sleep 2
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
-        sleep 0.002
+        sleep 0.01
     done
     while pgrep -x bsdtar >/dev/null 2>&1; do
         sleep 1
@@ -241,12 +241,12 @@ _cleanup_x_cache() {
     # get last full package
     LAST_FULL_PACKAGE="$(grep 'FULL' /etc/archboot/defaults | sed -e 's#^.*\ ##g' -e 's#\"##g')"
     # installed packages
-    grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
+    grep 'installed' /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
     # remove all lines above with match
     sed -i -e "1,/^${LAST_FULL_PACKAGE}$/d" /tmp/installed.log
     # remove packages from cache
-    for i in $(cat /tmp/installed.log); do
-        rm -rf /var/cache/pacman/pkg/${i}-*
+    while read -r /tmp/installed.log; do
+        rm -rf /var/cache/pacman/pkg/"${i}"-*
     done
 }
 
