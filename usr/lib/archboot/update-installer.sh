@@ -200,9 +200,9 @@ _create_initramfs() {
     sleep 2
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
-        sleep 0.01
+        sleep 0.002
     done
-    while pgrep -x bsdtar >/dev/null 2>&1; do
+    while pgrep -x zstd >/dev/null 2>&1; do
         sleep 1
     done
 }
@@ -258,6 +258,8 @@ _prepare_xfce() {
         echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
+        #fix unsolvable zstd bug
+        pacman -Sy zstd --config ${_PACMAN_CONF} -overwrite '*' >/dev/null 2>&1 || exit 1
         #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
         for i in ${_XORG}; do
@@ -273,6 +275,7 @@ _prepare_xfce() {
                 _IGNORE="${_IGNORE} --ignore ${i}"
             done
         fi
+        pacman -Sy zstd --noconfirm  -overwrite '*' >/dev/null 2>&1
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_install
