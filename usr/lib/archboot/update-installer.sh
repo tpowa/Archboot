@@ -210,7 +210,7 @@ _create_initramfs() {
 _kexec() {
     # load kernel and initrds into running kernel in background mode!
     kexec -l /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
-    # wait 2 seconds for getting a complete initramfs
+    # wait 3 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
     rm /{initrd.img,${VMLINUZ}}
@@ -258,11 +258,8 @@ _prepare_xfce() {
         echo "Running pacman to install packages: ${_FULL_PACKAGES} ${_X_PACKAGES} ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
-        pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
-        # workaround unsolvable zstd bug,
-        # booting with higher memory results in not having /var/lib/pacman/local/zstd-*
         #shellcheck disable=SC2086
-        pacman -S zstd --config ${_PACMAN_CONF} --noconfirm --overwrite '*' >/dev/null 2>&1 || exit 1
+        pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
         for i in ${_XORG}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
@@ -276,10 +273,6 @@ _prepare_xfce() {
                 _IGNORE="${_IGNORE} --ignore ${i}"
             done
         fi
-        # workaround unsolvable zstd bug,
-        # booting with higher memory results in not having /var/lib/pacman/local/zstd-*
-        #shellcheck disable=SC2086
-        pacman -Sy zstd --noconfirm  --overwrite '*' >/dev/null 2>&1 || exit 1
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_install
