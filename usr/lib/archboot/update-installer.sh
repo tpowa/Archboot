@@ -241,7 +241,7 @@ _cleanup_x_cache() {
     # get last full package
     LAST_FULL_PACKAGE="$(grep 'FULL' /etc/archboot/defaults | sed -e 's#^.*\ ##g' -e 's#\"##g')"
     # installed packages
-    grep installed /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
+    grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
     # remove all lines above with match
     sed -i -e "1,/^${LAST_FULL_PACKAGE}$/d" /tmp/installed.log
     # remove packages from cache
