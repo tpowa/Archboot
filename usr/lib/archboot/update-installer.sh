@@ -243,7 +243,7 @@ _cleanup_x_cache() {
     # installed packages
     grep installed /var/log/pacman.log | cut -d ' ' -f 4 >/tmp/installed.log
     # remove all lines above with match
-    sed "1,/^${LAST_FULL_PACKAGE}$/d" >/tmp/installed.log
+    sed -i -e "1,/^${LAST_FULL_PACKAGE}$/d" /tmp/installed.log
     # remove packages from cache
     for i in $(cat /tmp/installed.log); do
         rm -rf /var/cache/pacman/pkg/${i}-*
