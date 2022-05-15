@@ -149,7 +149,7 @@ _prepare_systemd-boot_X64() {
         cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
         ${_ISODIR}/boot/systemd-boot/entries/archboot-x64.conf
     else
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64-local.conf \
         ${_ISODIR}/boot/systemd-boot/entries/archboot-x64.conf
     fi
 }
@@ -165,7 +165,7 @@ _prepare_systemd-boot_AA64() {
         cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64.conf \
         ${_ISODIR}/boot/systemd-boot/entries/archboot-aa64.conf
     else
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64.conf \
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64-local.conf \
         ${_ISODIR}/boot/systemd-boot/entries/archboot-aa64.conf
     fi
 }
