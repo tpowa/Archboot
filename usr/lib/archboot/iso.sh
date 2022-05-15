@@ -138,6 +138,30 @@ _prepare_background() {
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
+_prepare_systemd-boot_X64() {
+    echo "Prepare X64 systemd-boot ..."
+    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
+    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/loader/entries
+    cp /usr/lib/systemd/boot/efi/systemd-bootx64.efi ${_ISODIR}/boot/systemd-boot/
+    cp /usr/share/archboot/systemd-boot/boot/loader/loader-x64.conf \
+    ${_ISODIR}/boot/systemd-boot/loader-x64.conf
+}
+
+_prepare_systemd-boot_AA64() {
+    echo "Prepare AA64 systemd-boot ..."
+    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
+    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/loader/entries
+    cp /usr/lib/systemd/boot/efi/systemd-bootaa64.efi ${_ISODIR}/boot/systemd-boot/
+    cp /usr/share/archboot/systemd-boot/boot/loader/loader-aa64.conf \
+    ${_ISODIR}/boot/systemd-boot/loader-aa64.conf
+}
+
+_prepare_systemd-boot_entry() {
+    echo "Prepare systemd-boot entry ..."
+    cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-${1}.conf \
+    ${_ISODIR}/boot/systemd-boot/entries/archboot-${1}.conf
+}
+
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
     # from /usr/bin/mkinitcpio
