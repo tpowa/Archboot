@@ -200,7 +200,6 @@ _create_initramfs() {
     sleep 2
     for i in $(find . -mindepth 1 -type f | sort); do
         rm "${i}" >/dev/null 2>&1
-        sleep 0.0005
     done
     while pgrep -x zstd >/dev/null 2>&1; do
         sleep 1
