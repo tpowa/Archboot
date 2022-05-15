@@ -138,46 +138,6 @@ _prepare_background() {
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
-<<<<<<< HEAD
-_prepare_systemd-boot_X64() {
-    echo "Prepare X64 systemd-boot ..."
-    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
-    [[ -d ${_ISODIR}/boot/loader ]] || mkdir -p ${_ISODIR}/boot/loader/entries
-    cp /usr/lib/systemd/boot/efi/systemd-bootx64.efi ${_ISODIR}/boot/systemd-boot/
-    cp /usr/share/archboot/systemd-boot/boot/loader/loader-x64.conf \
-    ${_ISODIR}/boot/loader/loader.conf
-    if [[ -e ${_ISODIR}/boot/initramfs_x86_64.img ]]; then
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-x64.conf
-    else
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64-local.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-x64.conf
-    fi
-}
-
-_prepare_systemd-boot_AA64() {
-    echo "Prepare AA64 systemd-boot ..."
-    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
-    [[ -d ${_ISODIR}/boot/loader ]] || mkdir -p ${_ISODIR}/boot/loader/entries
-    cp /usr/lib/systemd/boot/efi/systemd-bootaa64.efi ${_ISODIR}/boot/systemd-boot/
-    cp /usr/share/archboot/systemd-boot/boot/loader/loader-aa64.conf \
-    ${_ISODIR}/boot/loader/loader.conf
-    if [[ -e ${_ISODIR}/boot/initramfs_aarch64.img ]]; then
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-aa64.conf
-    else
-        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64-local.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-aa64.conf
-    fi
-}
-
-_prepare_systemd-boot_entry() {
-    echo "Prepare systemd-boot entry ..."
-
-}
-
-=======
->>>>>>> parent of f2c73ac3 (add EFISTUB boot option to GRUB)
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
     # from /usr/bin/mkinitcpio
