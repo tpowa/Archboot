@@ -138,6 +138,7 @@ _prepare_background() {
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
+<<<<<<< HEAD
 _prepare_systemd-boot_X64() {
     echo "Prepare X64 systemd-boot ..."
     [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
@@ -175,6 +176,8 @@ _prepare_systemd-boot_entry() {
 
 }
 
+=======
+>>>>>>> parent of f2c73ac3 (add EFISTUB boot option to GRUB)
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
     # from /usr/bin/mkinitcpio
