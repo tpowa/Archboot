@@ -53,30 +53,30 @@ _prepare_kernel_initramfs_files() {
     [[ -f "/usr/share/archboot/patches/31-mkinitcpio.fixed" ]] && cp "/usr/share/archboot/patches/31-mkinitcpio.fixed" "/usr/bin/mkinitcpio"
 
     #shellcheck disable=SC2154
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
     # delete cachedir on archboot environment
     [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
     # grub on x86_64 reports too big if near 1GB
-     split -b 670M -d --additional-suffix=.img -a 1 "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" \
-     "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
-    rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
-    if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
-        mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
+     split -b 670M -d --additional-suffix=.img -a 1 "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}-pre.img" \
+     "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}-"
+    rm "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}-pre.img"
+    if [[ "$(find "${_ISODIR}/EFI/BOOT" -name '*.img' | wc -l)" -lt "2" ]]; then
+        mv "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/EFI/BOOT/initramfs_${_RUNNING_ARCH}.img"
     fi
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     mv "/usr/bin/mkinitcpio.old" "/usr/bin/mkinitcpio"
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    # install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/vmlinuz_${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
     install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/vmlinuz_${_RUNNING_ARCH}"
     # install ucode files
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
-    cp /boot/amd-ucode.img "${_ISODIR}/boot/"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/EFI/BOOT/"
+    cp /boot/amd-ucode.img "${_ISODIR}/EFI/BOOT"
     # fix license files
     mkdir -p "${_ISODIR}"/licenses/amd-ucode
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/boot/"
-    cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || mkdir -p "${_ISODIR}"/EFI/licenses/intel-ucode
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/EFI/BOOT/"
+    cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/EFI/licenses/amd-ucode"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/EFI/licenses/intel-ucode"
 }
 
 _prepare_fedora_shim_bootloaders_x86_64 () {
@@ -134,29 +134,27 @@ _prepare_uefi_AA64() {
 
 _prepare_background() {
     echo "Prepare Grub background ..."
-    [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
-    cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
+    [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/EFI/BOOT/grub"
+    cp ${_GRUB_BACKGROUND} "${_ISODIR}/EFI/BOOT/grub/archboot-background.png"
 }
 
 _prepare_systemd-boot_X64() {
     echo "Prepare X64 systemd-boot ..."
-    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
-    [[ -d ${_ISODIR}/boot/loader ]] || mkdir -p ${_ISODIR}/boot/loader/entries
-    cp /usr/lib/systemd/boot/efi/systemd-bootx64.efi ${_ISODIR}/boot/systemd-boot/
+    [[ -d ${_ISODIR}/EFI/BOOT/loader ]] || mkdir -p ${_ISODIR}/loader/entries
+    cp /usr/lib/systemd/boot/efi/systemd-bootx64.efi ${_ISODIR}/EFI/BOOT/
     cp /usr/share/archboot/systemd-boot/boot/loader/loader-x64.conf \
-    ${_ISODIR}/boot/loader/loader.conf
+    ${_ISODIR}/loader/loader.conf
     if [[ -e ${_ISODIR}/boot/initramfs_x86_64.img ]]; then
         cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-x64.conf
+        ${_ISODIR}/loader/entries/archboot-x64.conf
     else
         cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64-local.conf \
-        ${_ISODIR}/boot/loader/entries/archboot-x64.conf
+        ${_ISODIR}/loader/entries/archboot-x64.conf
     fi
 }
 
 _prepare_systemd-boot_AA64() {
     echo "Prepare AA64 systemd-boot ..."
-    [[ -d ${_ISODIR}/boot/systemd-boot ]] || mkdir -p ${_ISODIR}/boot/systemd-boot
     [[ -d ${_ISODIR}/boot/loader ]] || mkdir -p ${_ISODIR}/boot/loader/entries
     cp /usr/lib/systemd/boot/efi/systemd-bootaa64.efi ${_ISODIR}/boot/systemd-boot/
     cp /usr/share/archboot/systemd-boot/boot/loader/loader-aa64.conf \
@@ -192,6 +190,8 @@ _prepare_uefi_image() {
     mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copy all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/loader ::/
+    rm -r "${_ISODIR}"/EFI
 }
 
 _grub_mkrescue() {
