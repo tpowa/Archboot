@@ -15,6 +15,7 @@ _prepare_uefi_shell_tianocore || exit 1
 _prepare_efitools_uefi || exit 1
 _prepare_uefi_X64 || exit 1
 _prepare_uefi_IA32 || exit 1
+_prepare_systemd-boot_X64 || exit 1
 _prepare_background || exit 1
 _reproducibility
 _prepare_uefi_image || exit 1

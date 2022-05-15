@@ -145,6 +145,13 @@ _prepare_systemd-boot_X64() {
     cp /usr/lib/systemd/boot/efi/systemd-bootx64.efi ${_ISODIR}/boot/systemd-boot/
     cp /usr/share/archboot/systemd-boot/boot/loader/loader-x64.conf \
     ${_ISODIR}/boot/systemd-boot/loader-x64.conf
+    if [[ -e ${_ISODIR}/boot/initramfs_x86_64.img ]]; then
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
+        ${_ISODIR}/boot/systemd-boot/entries/archboot-x64.conf
+    else
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-x64.conf \
+        ${_ISODIR}/boot/systemd-boot/entries/archboot-x64.conf
+    fi
 }
 
 _prepare_systemd-boot_AA64() {
@@ -154,12 +161,18 @@ _prepare_systemd-boot_AA64() {
     cp /usr/lib/systemd/boot/efi/systemd-bootaa64.efi ${_ISODIR}/boot/systemd-boot/
     cp /usr/share/archboot/systemd-boot/boot/loader/loader-aa64.conf \
     ${_ISODIR}/boot/systemd-boot/loader-aa64.conf
+    if [[ -e ${_ISODIR}/boot/initramfs_aarch64.img ]]; then
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64.conf \
+        ${_ISODIR}/boot/systemd-boot/entries/archboot-aa64.conf
+    else
+        cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-aa64.conf \
+        ${_ISODIR}/boot/systemd-boot/entries/archboot-aa64.conf
+    fi
 }
 
 _prepare_systemd-boot_entry() {
     echo "Prepare systemd-boot entry ..."
-    cp /usr/share/archboot/systemd-boot/boot/loader/entries/archboot-${1}.conf \
-    ${_ISODIR}/boot/systemd-boot/entries/archboot-${1}.conf
+
 }
 
 _reproducibility() {
