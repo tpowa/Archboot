@@ -530,6 +530,4 @@ Type=Application
 Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
-    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
 }

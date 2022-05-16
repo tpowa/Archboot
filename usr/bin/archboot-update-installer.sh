@@ -91,6 +91,8 @@ if [[ "${_L_XFCE}" == "1" ]]; then
         echo -e "\033[1mStep 4/4:\033[0m Starting avahi-daemon ..."
         systemctl start avahi-daemon.service
     fi
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
+    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
     echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
     startxfce4 >/dev/tty8 2>&1
     echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
