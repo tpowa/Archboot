@@ -6,7 +6,7 @@ _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### XFCE defaults
 # needed full installed packages in environment for X
-_FULL_PACKAGES="libunwind libelf gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl"
+_FULL_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl"
 # ignore packages to upgrade before X startup eg. kernel and firmware
 _X_IGNORE="linux linux-firmware linux-firmware-marvell"
 # X packages
