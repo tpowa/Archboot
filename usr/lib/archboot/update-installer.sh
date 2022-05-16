@@ -196,14 +196,7 @@ _create_initramfs() {
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    bsdtar --null -cf - --format=newc @- | zstd -T0> /initrd.img &
-    sleep 2
-    for i in $(find . -mindepth 1 -type f | sort); do
-        rm "${i}" >/dev/null 2>&1
-    done
-    while pgrep -x zstd >/dev/null 2>&1; do
-        sleep 1
-    done
+    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img
 }
 
 _kexec() {
