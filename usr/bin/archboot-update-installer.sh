@@ -37,6 +37,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     _create_container || exit 1
+    # 10 seconds for getting free RAM
+    sleep 10
     echo -e "\033[1mStep 4/9:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
@@ -49,7 +51,6 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # write initramfs to "${_W_DIR}"/tmp
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     rm -f "${_W_DIR}"/tmp/etc/initrd-release
-    #mv "${_W_DIR}/tmp" /initrd || exit 1
     echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
