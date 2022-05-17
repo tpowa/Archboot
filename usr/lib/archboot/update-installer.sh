@@ -88,9 +88,11 @@ _update_installer_check() {
 _zram_initialize() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    modprobe zram num_devices=2> /dev/tty7 2>&1
-    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
-    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
+    if ! lsmod | grep -qw zram; then
+        modprobe zram num_devices=2> /dev/tty7 2>&1
+        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
+        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
+    fi
 }
 
 # use -o discard for RAM cleaning on delete
