@@ -34,6 +34,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _gpg_check
     echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
     _clean_archboot
+    _zram_usr "300M"
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     _create_container || exit 1
