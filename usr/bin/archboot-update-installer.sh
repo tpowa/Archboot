@@ -34,6 +34,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _gpg_check
     echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
     _clean_archboot
+    _zram_usr "300M"
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     _create_container || exit 1
@@ -62,7 +63,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     cd /
     _umount_w_dir
     # unload virtio-net to avoid none functional network device on aarch64
-    grep -qw virtio_net < /proc/modules && rmmod virtio_net
+    grep -qw virtio_net /proc/modules && rmmod virtio_net
+    grep -qw virtio_net /proc/modules && rmmod virtio_gpu
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     _kexec
 fi
@@ -73,6 +75,7 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     _zram_w_dir "${_ZRAM_IMAGE_SIZE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
+    _zram_usr "300M"
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
     echo "          This will need some time ..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
