@@ -65,7 +65,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
-    _kexec
+    kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline
 fi
 
 # Generate new images
