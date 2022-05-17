@@ -104,6 +104,7 @@ _zram_mount() {
         cp -r /usr/* /usr.zram/
         ln -sfn /usr.zram/lib /lib
         ln -sfn /usr.zram/lib /lib64
+        [[ -d /etc/ld.so.conf.d ]] || mkdir /etc/ld.so.conf.d
         echo /usr.zram/lib > /etc/ld.so.conf.d/usr-zram.conf
         ldconfig
         ln -sfn /usr.zram/bin /bin
