@@ -230,26 +230,26 @@ _create_initramfs() {
 
 _kexec() {
     # load kernel and initrds into running kernel in background mode!
-    kexec -l /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline&
+    kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline
     # wait 2 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
     sleep 2
     rm /{initrd.img,${VMLINUZ}}
-    while pgrep -x kexec >/dev/null 2>&1; do
-        sleep 1
-    done
-    echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
+    #while pgrep -x kexec >/dev/null 2>&1; do
+    #    sleep 1
+    #done
+    #echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     # don't show active prompt wait for kexec to be launched
-    while true; do
-        if [[ -e "/sys/firmware/efi" ]]; then
+    #while true; do
+    #    if [[ -e "/sys/firmware/efi" ]]; then
             # UEFI kexec call
-            systemctl kexec 2>/dev/null
-        else
-            # BIOS kexec call
-            kexec -e 2>/dev/null
-        fi
-        sleep 1
-    done
+   #         systemctl kexec 2>/dev/null
+   #     else
+   #         # BIOS kexec call
+   #         kexec -e 2>/dev/null
+   #     fi
+   #     sleep 1
+   # done
 }
 
 _cleanup_install() {
