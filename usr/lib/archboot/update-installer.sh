@@ -101,10 +101,10 @@ _umount_w_dir() {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _zram_mount() {
-    if ! mountpoint /usr; then
+    if ! mountpoint -q /usr; then
         # add defaults
         _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-        modprobe -o num_devices=2 zram > /dev/tty7 2>&1
+        modprobe zram num_devices=2> /dev/tty7 2>&1
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
         echo "${1}" >/sys/block/zram0/disksize
         echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
