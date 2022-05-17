@@ -88,7 +88,7 @@ _update_installer_check() {
 _zram_initialize() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    if ! cat /proc/modules | grep -qw zram; then
+    if ! grep -qw zram /proc/modules; then
         modprobe zram num_devices=2> /dev/tty7 2>&1
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
