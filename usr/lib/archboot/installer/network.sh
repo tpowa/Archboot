@@ -63,6 +63,7 @@ donetwork() {
                 WLAN_HIDDEN="yes"
             fi
             # remove spaces
+            #shellcheck disable=SC2001,SC2086
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
             DIALOG --yesno "Is your wireless network encrypted?" 5 40
             #shellcheck disable=SC2181
