@@ -16,6 +16,7 @@ _install_base_packages "${1}" || exit 1
 _clean_mkinitcpio "${1}"
 _clean_cache "${1}"
 _install_archboot "${1}" || exit 1
+_clean_cache "${1}"
 _umount_special "${1}" || exit 1
 _generate_locales "${1}"
 _fix_groups "${1}"
