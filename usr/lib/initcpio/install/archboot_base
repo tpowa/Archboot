@@ -7,7 +7,7 @@ build ()
           swapon uniq cut seq snarf fdisk sfdisk cfdisk parted free less \
           chgrp chown df dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
           chroot dirname expr bzip2 su cpio top sdparm tput \
-          ifconfig ln losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
+          ifconfig losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
           xzdec switch_root pivot_root chcpu ctrlaltdel gdisk sgdisk cgdisk fixparts findmnt \
           lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt \
           ionice ipcmk ipcrm ipcs isosize swapoff look lscpu mcookie namei prlimit rename \
