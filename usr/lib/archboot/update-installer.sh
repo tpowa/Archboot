@@ -233,8 +233,8 @@ _kexec() {
     kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline
     # wait 2 seconds for getting a complete initramfs
     # remove kernel and initrd to save RAM for kexec in background
-    sleep 2
-    rm /{initrd.img,${VMLINUZ}}
+    #sleep 2
+    #rm /{initrd.img,${VMLINUZ}}
     #while pgrep -x kexec >/dev/null 2>&1; do
     #    sleep 1
     #done
