@@ -85,16 +85,20 @@ _update_installer_check() {
     fi
 }
 
+_zram_initialize() {
+    # add defaults
+    _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
+    modprobe zram num_devices=2> /dev/tty7 2>&1
+    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
+    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
+}
+
 # use -o discard for RAM cleaning on delete
 # (online fstrimming the block device!)
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
-_zram_mount() {
+_zram_usr() {
     if ! mountpoint -q /usr; then
-        # add defaults
-        _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-        modprobe zram num_devices=2> /dev/tty7 2>&1
-        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
         echo "${1}" >/sys/block/zram0/disksize
         echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
@@ -116,7 +120,6 @@ _zram_mount() {
 }
 
 _zram_w_dir() {
-    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
     echo "${1}" >/sys/block/zram1/disksize
     echo "Creating btrfs filesystem with ${1} on /dev/zram1 ..." > /dev/tty7
     mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1

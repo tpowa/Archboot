@@ -23,13 +23,12 @@ done
 _archboot_check
 _download_latest
 echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
-
+_zram_initialize
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _update_installer_check
     touch /.update-installer
     _umount_w_dir
-    _zram_mount "${_ZRAM_USR}"
     _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
@@ -71,7 +70,6 @@ fi
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
     _ZRAM_IMAGE_SIZE=${_ZRAM_IMAGE_SIZE:-"5G"}
-    _zram_mount "${_ZRAM_USR}"
     _zram_w_dir "${_ZRAM_IMAGE_SIZE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
@@ -84,15 +82,16 @@ fi
 # Launch xfce
 if [[ "${_L_XFCE}" == "1" ]]; then
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        _zram_mount "${_ZRAM_USR}"
-        echo -e "\033[1mStep 1/4:\033[0m Waiting for gpg pacman keyring import to finish ..."
+        echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
+        _zram_usr "${_ZRAM_USR}"
+        echo -e "\033[1mStep 2/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
         _gpg_check
-        echo -e "\033[1mStep 2/4:\033[0m Installing XFCE desktop now ..."
+        echo -e "\033[1mStep 3/5:\033[0m Installing XFCE desktop now ..."
         echo "          This will need some time ..."
         _prepare_xfce >/dev/tty7 2>&1
-        echo -e "\033[1mStep 3/4:\033[0m Configuring XFCE desktop ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring XFCE desktop ..."
         _configure_xfce >/dev/tty7 2>&1
-        echo -e "\033[1mStep 4/4:\033[0m Starting avahi-daemon ..."
+        echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
         systemctl start avahi-daemon.service
     fi
     echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
