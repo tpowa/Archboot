@@ -22,11 +22,11 @@ usage () {
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
     echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-    echo -e "                  This operation needs at least \033[1m2.3 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m2.6 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
     echo -e "                  package cache (using kexec)."
-    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.3 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
     echo -e "                  This operation needs at least \033[1m3.9 GB RAM\033[0m."
@@ -88,7 +88,7 @@ _update_installer_check() {
 _zram_initialize() {
     # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    if ! lsmod | grep -qw zram; then
+    if ! cat /proc/modules | grep -qw zram; then
         modprobe zram num_devices=2> /dev/tty7 2>&1
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
