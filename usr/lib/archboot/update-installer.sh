@@ -22,7 +22,7 @@ usage () {
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
     echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-    echo -e "                  This operation needs at least \033[1m2.4 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m2.0 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
     echo -e "                  package cache (using kexec)."
