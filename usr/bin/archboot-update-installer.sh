@@ -29,7 +29,8 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _update_installer_check
     touch /.update-installer
     _umount_w_dir
-    _zram_mount "${_ZRAM_SIZE}"
+    _zram_mount "${_ZRAM_USR}"
+    _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
     echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
@@ -70,7 +71,8 @@ fi
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
     _ZRAM_IMAGE_SIZE=${_ZRAM_IMAGE_SIZE:-"5G"}
-    _zram_mount "${_ZRAM_IMAGE_SIZE}"
+    _zram_mount "${_ZRAM_USR}"
+    _zram_w_dir "${_ZRAM_IMAGE_SIZE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
@@ -82,6 +84,7 @@ fi
 # Launch xfce
 if [[ "${_L_XFCE}" == "1" ]]; then
     if ! [[ -e /usr/bin/startxfce4 ]]; then
+        _zram_mount "${_ZRAM_USR}"
         echo -e "\033[1mStep 1/4:\033[0m Waiting for gpg pacman keyring import to finish ..."
         _gpg_check
         echo -e "\033[1mStep 2/4:\033[0m Installing XFCE desktop now ..."

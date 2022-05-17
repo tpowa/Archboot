@@ -17,6 +17,8 @@ _HIDE_MENU="xfce4-mail-reader xfce4-about"
 _VNC_PW="archboot"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
+# size for /usr.zram
+_ZRAM_USR="1900M"
 # size for --latest and --latest-install option
 _ZRAM_SIZE="3G"
 # size used for --latest-image option

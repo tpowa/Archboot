@@ -32,7 +32,7 @@ usage () {
     echo -e "                  This operation needs at least \033[1m3.9 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m2.5 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-h\033[0m               This message."
     exit 0
@@ -90,26 +90,49 @@ _umount_w_dir() {
         echo "Unmounting ${_W_DIR} ..." > /dev/tty7
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
-        echo 1 > /sys/block/zram0/reset
+        echo 1 > /sys/block/zram1/reset
         # wait 5 seconds to get RAM cleared and set free
         sleep 5
     fi
 }
 
+# use -o discard for RAM cleaning on delete
+# (online fstrimming the block device!)
+# fstrim <mountpoint> for manual action
+# it needs some seconds to get RAM free on delete!
 _zram_mount() {
-    # add defaults
-    _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    modprobe zram > /dev/tty7 2>&1
-    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
-    echo "${1}" >/sys/block/zram0/disksize
-    echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
-    mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
+    if ! mountpoint /usr; then
+        # add defaults
+        _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
+        modprobe -o num_devices=2 zram > /dev/tty7 2>&1
+        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
+        echo "${1}" >/sys/block/zram0/disksize
+        echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
+        mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
+        mkdir /usr.zram
+        mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
+        echo "Moving /usr to /usr.zram ..." > /dev/tty7
+        cp -r /usr/* /usr.zram/
+        ln -sfn /usr.zram/lib /lib
+        ln -sfn /usr.zram/lib /lib64
+        echo /usr.zram/lib > /etc/ld.so.conf
+        ldconfig
+        ln -sfn /usr.zram/bin /bin
+        ln -sfn /usr.zram/bin /sbin
+        rm -r /usr/*
+        /usr.new/bin/./mount --bind /usr.zram /usr
+        systemctl daemon-reload
+        systemctl restart dbus
+    fi
+}
+
+_zram_w_dir() {
+    echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
+    echo "${1}" >/sys/block/zram1/disksize
+    echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram1 ..." > /dev/tty7
+    mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
     [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
-    # use -o discard for RAM cleaning on delete
-    # (online fstrimming the block device!)
-    # fstrim <mountpoint> for manual action
-    # it needs some seconds to get RAM free on delete!
-    mount -o discard /dev/zram0 "${_W_DIR}" > /dev/tty7 2>&1
+    mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
 }
 
 _clean_archboot() {
