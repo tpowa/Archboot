@@ -134,8 +134,10 @@ _install_base_packages() {
 _install_archboot() {
     echo "Downloading ${_X_PACKAGES} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
+    #shellcheck disable=SC2086
     pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_X_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
+    #shellcheck disable=SC2086
     pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
     rm -r "${1}"/blankdb
 }
