@@ -85,17 +85,6 @@ _update_installer_check() {
     fi
 }
 
-_umount_w_dir() {
-    if mountpoint -q "${_W_DIR}"; then
-        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
-        # umount all possible mountpoints
-        umount -R "${_W_DIR}"
-        echo 1 > /sys/block/zram1/reset
-        # wait 5 seconds to get RAM cleared and set free
-        sleep 5
-    fi
-}
-
 # use -o discard for RAM cleaning on delete
 # (online fstrimming the block device!)
 # fstrim <mountpoint> for manual action
@@ -107,7 +96,7 @@ _zram_mount() {
         modprobe zram num_devices=2> /dev/tty7 2>&1
         echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
         echo "${1}" >/sys/block/zram0/disksize
-        echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram0 ..." > /dev/tty7
+        echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         mkdir /usr.zram
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
@@ -115,24 +104,35 @@ _zram_mount() {
         cp -r /usr/* /usr.zram/
         ln -sfn /usr.zram/lib /lib
         ln -sfn /usr.zram/lib /lib64
-        echo /usr.zram/lib > /etc/ld.so.conf
+        echo /usr.zram/lib > /etc/ld.so.conf.d/usr-zram.conf
         ldconfig
         ln -sfn /usr.zram/bin /bin
         ln -sfn /usr.zram/bin /sbin
         rm -r /usr/*
         /usr.zram/bin/./mount --bind /usr.zram /usr
-        systemctl daemon-reload
-        systemctl restart dbus
+        systemctl daemon-reload > /dev/tty7 2>&1
+        systemctl restart dbus > /dev/tty7 2>&1
     fi
 }
 
 _zram_w_dir() {
     echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
     echo "${1}" >/sys/block/zram1/disksize
-    echo "Creating btrfs filesystem with ${_DISKSIZE} on /dev/zram1 ..." > /dev/tty7
+    echo "Creating btrfs filesystem with ${1} on /dev/zram1 ..." > /dev/tty7
     mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
     [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
     mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
+}
+
+_umount_w_dir() {
+    if mountpoint -q "${_W_DIR}"; then
+        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
+        # umount all possible mountpoints
+        umount -R "${_W_DIR}"
+        echo 1 > /sys/block/zram1/reset
+        # wait 5 seconds to get RAM cleared and set free
+        sleep 5
+    fi
 }
 
 _clean_archboot() {
