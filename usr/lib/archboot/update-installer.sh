@@ -120,7 +120,7 @@ _zram_mount() {
         ln -sfn /usr.zram/bin /bin
         ln -sfn /usr.zram/bin /sbin
         rm -r /usr/*
-        /usr.new/bin/./mount --bind /usr.zram /usr
+        /usr.zram/bin/./mount --bind /usr.zram /usr
         systemctl daemon-reload
         systemctl restart dbus
     fi
