@@ -114,6 +114,7 @@ _zram_usr() {
         ldconfig
         ln -sfn /usr.zram/bin /bin
         ln -sfn /usr.zram/bin /sbin
+        #shellcheck disable=SC2115
         rm -r /usr/*
         /usr.zram/bin/./mount --bind /usr.zram /usr
         systemctl daemon-reload > /dev/tty7 2>&1
@@ -259,6 +260,7 @@ _cleanup_install() {
 
 _cleanup_cache() {
     # remove packages from cache
+    #shellcheck disable=SC2013
     for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
     done
@@ -539,7 +541,7 @@ EOF
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     echo "Hiding ${_HIDE_MENU} menu entries ..."
     for i in ${_HIDE_MENU}; do
-        echo 'NoDisplay=true' >> /usr/share/applications/$i.desktop
+        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
     echo "Autostarting setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
