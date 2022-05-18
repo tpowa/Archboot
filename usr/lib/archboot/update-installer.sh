@@ -26,7 +26,7 @@ usage () {
     echo ""
     echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
     echo -e "                  package cache (using kexec)."
-    echo -e "                  This operation needs at least \033[1m3.3 GB RAM\033[0m."
+    echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
     echo ""
     echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
     echo -e "                  This operation needs at least \033[1m3.9 GB RAM\033[0m."
@@ -232,10 +232,10 @@ _kexec () {
     kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     sleep 2
     rm /{${VMLINUZ},initrd.img}
-    while pgrep -x kexec; do
+    while pgrep -x kexec > /dev/null 2>&1; do
       sleep 1
     done
-    echo "Rebooting in a few seconds ..."
+    echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     while true; do
         sleep 1
     done
