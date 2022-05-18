@@ -229,13 +229,16 @@ _create_initramfs() {
 }
 
 _kexec () {
-    kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+    kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     sleep 2
     rm /{${VMLINUZ},initrd.img}
+    while pgrep -x kexec; do
+      sleep 1
+    done
+    echo "Rebooting in a few seconds ..."
     while true; do
         sleep 1
     done
-
 }
 
 _cleanup_install() {
