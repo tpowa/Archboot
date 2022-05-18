@@ -7,16 +7,18 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [ -e /tmp/.setup ]; then
         setup
     fi
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]] ; then
+    echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m"
+    echo -e "\033[1m--------------------------------------------------------------------\033[0m"
+    echo -e "\033[91mNot engough RAM detected! Please add more than 3.2GB RAM. Aborting ...\033[0;25m"
+    echo "Hit ENTER to enter the shell ..."
+    read
 else
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
     cd /
     echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m"
     echo -e "\033[1m--------------------------------------------------------------------\033[0m"
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]] ; then
-        echo -e "\033[91mNot engough RAM detected! Please add more than 3.2GB RAM. Aborting ...\033[0;25m"
-        exit 1
-    fi
     echo -e "\033[93mGo and get a cup of coffee. Depending on your system setup,\033[0m"
     echo -e "\033[93myou can start with your tasks in about 5 minutes ...\033[0m"
     echo ""
