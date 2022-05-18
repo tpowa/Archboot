@@ -229,11 +229,16 @@ _create_initramfs() {
 }
 
 _kexec () {
-    kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
-    sleep 2
-    rm /{${VMLINUZ},initrd.img}
+    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4500000 ]]; then
+        kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+    else
+        # works on systems with <4.5GB
+        kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        sleep 2
+        rm /{${VMLINUZ},initrd.img}
+    fi
     while pgrep -x kexec > /dev/null 2>&1; do
-      sleep 1
+        sleep 1
     done
     echo -e "\033[1mFinished:\033[0m Rebooting in a few seconds ..."
     while true; do
