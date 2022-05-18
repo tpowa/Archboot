@@ -141,6 +141,14 @@ _umount_w_dir() {
     fi
 }
 
+_umount_usr() {
+        echo "Unmounting /usr.zram ..." > /dev/tty7
+        # umount all possible mountpoints
+        umount "/usr"
+        /usr.zram/bin/./umount /usr.zram
+        echo 1 > /sys/block/zram1/reset
+}
+
 _clean_archboot() {
     # remove everything not necessary
     rm -rf "/usr/lib/firmware"
@@ -226,6 +234,17 @@ _create_initramfs() {
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img
+}
+
+_kexec () {
+    kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+    sleep 2
+    rm /{${VMLINUZ},initrd.img}
+    _umount_usr
+    while true; do
+        sleep 1
+    done
+
 }
 
 _cleanup_install() {
