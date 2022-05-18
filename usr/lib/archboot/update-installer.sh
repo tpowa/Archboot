@@ -229,10 +229,11 @@ _create_initramfs() {
 }
 
 _kexec () {
-    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4500000 ]]; then
+    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4096000 ]]; then
+        # works on systems with >4GB
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
-        # works on systems with <4.5GB
+        # works on systems with <4GB
         kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
         sleep 2
         rm /{${VMLINUZ},initrd.img}
