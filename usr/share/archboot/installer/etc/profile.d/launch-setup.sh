@@ -1,24 +1,43 @@
 # don't run ttyS0 as first device
-if [[ -e /usr/bin/setup ]]; then
-    cd /
-    echo "Hit ENTER to enter the zsh shell ..."
-    read
-    clear
-    if ! [ -e /tmp/.setup ]; then
-        setup
-    fi
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]] ; then
+_welcome () {
     echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m"
     echo -e "\033[1m--------------------------------------------------------------------\033[0m"
-    echo -e "\033[91mNot engough RAM detected! Please add more than 3.2GB RAM. Aborting ...\033[0;25m"
-    echo "Hit ENTER to enter the shell ..."
+}
+
+_enter_shell() {
+    cd /
+    echo -e "Hit \033[92mENTER\033[0m for \033[1mshell\033[0m login."
     read
+    clear
+}
+
+if [[ -e /usr/bin/setup ]]; then
+    _enter_shell
+    if ! [[ -e /tmp/.setup ]]; then
+        setup
+    fi
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
+    _welcome
+    echo -e "\033[91mMemory check failed ...\033[0m"
+    echo -e "\033[91m- Not engough memory detected\!\033[0m"
+    echo -e "\033[93m- Please add more than 3.2GB RAM.\033[0m"
+    echo -e "\033[91mAborting ...\033[0m"
+    _enter_shell
+elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
+        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
+    _welcome
+    echo -e "\033[91mMemory check failed ...\033[0m"
+    echo -e "\033[91m- Memory gap detected (4.0G - 4.4G RAM)\033[0m"
+    echo -e "\033[93m- Possibility of not working kexec boot.\033[0m"
+    echo -e "\033[93m- Please use more or less RAM.\033[0m"
+    echo -e "\033[91mAborting ...\033[0m"
+    _enter_shell
 else
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
     cd /
-    echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m"
-    echo -e "\033[1m--------------------------------------------------------------------\033[0m"
+    _welcome
+    echo -e "\033[92mMemory checks finished and all ok ...\033[0m"
     echo -e "\033[93mGo and get a cup of coffee. Depending on your system setup,\033[0m"
     echo -e "\033[93myou can start with your tasks in about 5 minutes ...\033[0m"
     echo ""
