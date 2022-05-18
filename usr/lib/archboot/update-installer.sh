@@ -244,9 +244,10 @@ _kexec () {
         # that causes a gap which can break qemu kexec or parallels desktop
         if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
         $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
-            echo -e "\033[91mMemory gap detected (4.0G - 4.4G RAM):\033[0m"
-            echo -e "\033[1m- Possibility of not working kexec boot.\033[0m"
-            echo -e "\033[1m- Please use more or less RAM.\033[0m"
+            echo -e "\033[91mWarning:\033[0m"
+            echo -e "\033[91m- Memory gap detected (4.0G - 4.4G RAM)\033[0m"
+            echo -e "\033[93m- Possibility of not working kexec boot.\033[0m"
+            echo -e "\033[93m- Please use more or less RAM.\033[0m"
         fi
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
