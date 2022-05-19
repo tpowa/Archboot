@@ -19,7 +19,7 @@ if [[ -e /usr/bin/setup ]]; then
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
     _welcome
     echo -e "\033[91mMemory check failed ...\033[0m"
-    echo -e "\033[91m- Not engough memory detected\!\033[0m"
+    echo -e "\033[91m- Not engough memory detected! \033[0m"
     echo -e "\033[93m- Please add more than 3.2GB RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
