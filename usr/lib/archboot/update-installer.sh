@@ -21,7 +21,7 @@ usage () {
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-h\033[0m               This message."
     echo -e ""
-    if [[ -e /usr/bin/dhcpd ]]; then
+    if [[ -e /usr/bin/dhcpcd ]]; then
         echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
         echo -e ""
     fi
@@ -31,7 +31,7 @@ usage () {
             echo ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3900000 &&\
-    -e /usr/bin/archboot-${_RUNNING_ARCH}-release.sh ]]; then
+    -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
         echo ""
     fi
@@ -43,7 +43,8 @@ usage () {
         echo -e "\033[93m   - Please add \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM to enable the missing \033[1mupdate\033[0m\033[93m options.\033[0m"
         echo ""
     else
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 &&\
+        -e /usr/bin/dhcpcd ]]; then
             echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
             echo ""
         fi
