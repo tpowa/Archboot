@@ -10,31 +10,31 @@ build ()
     echo -e "\033[1m--------------------------------------------\033[0m" >> "${MOTD}"
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
     echo -e "  - Virtual consoles \033[1m1-6\033[0m are active." >> "${MOTD}"
-    echo -e "  - To change virtual console use \033[92mALT + F(1-6)\033[0m" >> "${MOTD}"
+    echo -e "  - To change virtual console use \033[1m\033[92mALT + F(1-6)\033[0m" >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
     echo -e "\033[1mChange keymap and console font:\033[0m" >> "${MOTD}"
-    echo -e "  - To change to a non-US keymap, type \033[92m'km'\033[0m at the console." >> "${MOTD}"
+    echo -e "  - To change to a non-US keymap, type \033[1m\033[92m'km'\033[0m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\033[1mChange time and date:\033[0m" >> "${MOTD}"
-    echo -e "  - To change your time and date, type \033[92m'tz'\033[0m at the console." >> "${MOTD}"
+    echo -e "  - To change your time and date, type \033[1m\033[92m'tz'\033[0m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
     echo -e "\033[1mFor wifi authentification to internet access or further online help:\033[0m" >> "${MOTD}"
-    echo -e "  - Use the \033[92m'elinks'\033[0m text mode browser." >> "${MOTD}"
+    echo -e "  - Use the \033[1m\033[92m'elinks'\033[0m text mode browser." >> "${MOTD}"
     echo -e "\033[1mFor getting support on IRC channels:\033[0m" >> "${MOTD}"
-    echo -e "  - Use the \033[92m'weechat'\033[0m IRC client." >> "${MOTD}"
+    echo -e "  - Use the \033[1m\033[92m'weechat'\033[0m IRC client." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     #shellcheck disable=SC2129 
     echo -e "\033[1mInstallation:\033[0m" >> "${MOTD}"
     echo -e "  - On first login \033[1msetup\033[0m is launched automatically." >> "${MOTD}"
-    echo -e "  - Please run \033[92m'setup'\033[0m again to install Arch Linux if you left setup." >> "${MOTD}"
-    echo -e "  - Virtual console \033[1m7\033[0m is used for setup logging, use \033[92mALT + F7\033[0m." >> "${MOTD}"
-    echo -e "  - Run \033[92m'update-installer.sh'\033[0m to get all update options of the installer." >> "${MOTD}"
+    echo -e "  - Please run \033[1m\033[92m'setup'\033[0m again to install Arch Linux if you left setup." >> "${MOTD}"
+    echo -e "  - Virtual console \033[1m7\033[0m is used for setup logging, use \033[1m\033[92mALT + F7\033[0m." >> "${MOTD}"
+    echo -e "  - Run \033[1m\033[92m'update-installer.sh'\033[0m to get all update options of the installer." >> "${MOTD}"
     echo -e "\033[1mFor Experts:\033[0m" >> "${MOTD}"
-    echo -e "  - Use \033[92m'quickinst'\033[0m to install and bypass the setup routine." >> "${MOTD}"
+    echo -e "  - Use \033[1m\033[92m'quickinst'\033[0m to install and bypass the setup routine." >> "${MOTD}"
 fi
     chmod 644 "${MOTD}"
     add_file "${MOTD}" "/etc/motd"
