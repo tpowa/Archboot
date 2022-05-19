@@ -18,7 +18,7 @@ if [[ -e /usr/bin/setup ]]; then
     fi
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
     _welcome
-    echo -e "\033[1m\033[91mMemory check failed ...\033[0m"
+    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[1m\033[91m- Not engough memory detected! \033[0m"
     echo -e "\033[1m\033[93m- Please add more than 3.2GB RAM.\033[0m"
     echo -e "\033[1m\033[91mAborting ...\033[0m"
@@ -26,7 +26,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
 elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
         $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
     _welcome
-    echo -e "\033[1m\033[91mMemory check failed ...\033[0m"
+    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[1m\033[91m- Memory gap detected (4.0G - 4.4G RAM)\033[0m"
     echo -e "\033[1m\033[93m- Possibility of not working kexec boot.\033[0m"
     echo -e "\033[1m\033[93m- Please use more or less RAM.\033[0m"
@@ -37,7 +37,7 @@ else
     TTY=${TTY#/dev/}
     cd /
     _welcome
-    echo -e "\033[1m\033[92mMemory checks finished successfully ...\033[0m"
+    echo -e "\033[1m\033[92mMemory checks finished successfully:\033[0m"
     echo -e "\033[1m\033[93mGo and get a cup of coffee. Depending on your system setup,\033[0m"
     echo -e "\033[1m\033[93myou can start with your tasks in about 5 minutes ...\033[0m"
     echo ""
