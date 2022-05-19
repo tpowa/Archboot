@@ -239,7 +239,7 @@ _create_initramfs() {
 _kexec () {
     if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ||\
     $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 3200000 ]]; then
-        echo -e "\033[1mRunning kexec with new KEXEC_FILE_LOAD ...\033[0m"
+        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mnew\033[0m KEXEC_FILE_LOAD ..."
         # works on systems with >4GB, --latest-install needs around 4400MB RAM
         # that causes a gap which can break qemu kexec or parallels desktop
         if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
@@ -251,7 +251,7 @@ _kexec () {
         fi
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
-        echo -e "\033[1mRunning kexec with old KEXEC_LOAD ...\033[0m"
+        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
         # works on systems with <4GB
         kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
         sleep 2
