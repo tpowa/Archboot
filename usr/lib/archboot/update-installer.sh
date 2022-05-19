@@ -19,17 +19,13 @@ usage () {
     echo -e "\033[1mUpdate installer, launch environments or create latest image files:\033[0m"
     echo -e "\033[1m-------------------------------------------------------------------\033[0m"
     echo -e "\033[1mPARAMETERS:\033[0m"
+    echo -e " \033[1m-h\033[0m               This message."
+    echo -e ""
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 ]]; then
-        echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-        echo -e "                  This operation needs at least \033[1m2.0 GB RAM\033[0m."
-        echo ""
-    fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3200000 ]]; then
-        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-        echo -e "                  package cache (using kexec)."
-        echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
+        echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+        echo -e "                  This operation needs at least \033[1m2.5 GB RAM\033[0m."
         echo ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3900000 ]]; then
@@ -37,12 +33,26 @@ usage () {
         echo -e "                  This operation needs at least \033[1m3.9 GB RAM\033[0m."
         echo ""
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-        echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-        echo -e "                  This operation needs at least \033[1m2.5 GB RAM\033[0m."
+    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
+        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
+        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+        echo -e "\033[91m   - Memory gap detected: \033[1m4.0G - 4.4G RAM\033[0m"
+        echo -e "\033[91m   - Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
+        echo -e "\033[93m   - Please add \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM to enable the missing \033[1mupdate\033[0m\033[93m options.\033[0m"
         echo ""
+    else
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 ]]; then
+            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+            echo -e "                  This operation needs at least \033[1m2.0 GB RAM\033[0m."
+            echo ""
+        fi
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3200000 ]]; then
+            echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+            echo -e "                  package cache (using kexec)."
+            echo -e "                  This operation needs at least \033[1m3.2 GB RAM\033[0m."
+            echo ""
+        fi
     fi
-    echo -e " \033[1m-h\033[0m               This message."
     exit 0
 }
 
