@@ -13,7 +13,8 @@ _install_kde() {
 
 _start_kde() {
     echo -e "Launching KDE now, logging is done on \033[1m/dev/tty8\033[0m ..."
-    echo startplasma-x11 > /root/.xinitrc
+    echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
+    echo "startplasma-x11" >> /root/.xinitrc
     startx >/dev/tty8 2>&1
     echo -e "To relaunch KDE desktop use: \033[92mstartx\033[0m"
 }

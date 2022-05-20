@@ -17,7 +17,7 @@ _XFCE_PACKAGES="chromium xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin 
 # don't show in xfce menu
 _HIDE_MENU="xfce4-mail-reader xfce4-about"
 ### KDE defaults
-_KDE_PACKAGES="chromium plasma-desktop konsole kscreen kate dolphin"
+_KDE_PACKAGES="chromium plasma-desktop konsole kscreen kate dolphin powerdevil"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # size for /usr.zram
