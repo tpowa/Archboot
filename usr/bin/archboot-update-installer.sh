@@ -89,7 +89,7 @@ fi
 if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
-        _zram_usr "${_ZRAM_USR}"
+        _zram_usr "${_ZRAM_SIZE}"
     else
         echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram already done ..."
     fi

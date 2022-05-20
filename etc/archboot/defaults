@@ -20,9 +20,7 @@ _HIDE_MENU="xfce4-mail-reader xfce4-about"
 _KDE_PACKAGES="chromium plasma-desktop konsole kscreen kate dolphin powerdevil"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
-# size for /usr.zram
-_ZRAM_USR="3G"
-# size for --latest and --latest-install option
+# size for --latest, --latest-install option and /usr.zram
 _ZRAM_SIZE="3G"
 # size used for --latest-image option
 _ZRAM_IMAGE_SIZE="5G"
