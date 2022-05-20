@@ -11,7 +11,7 @@ _install_xfce() {
     fi
 }
 
-_start_xcfce() {
+_start_xfce() {
     echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
     startxfce4 >/dev/tty8 2>&1
     echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
