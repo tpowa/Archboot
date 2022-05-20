@@ -4,21 +4,24 @@ _PACKAGES="base linux linux-firmware linux-firmware-marvell"
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
-### XFCE defaults
+### X defaults
 # needed full installed packages in environment for X
-_FULL_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2"
+_X_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2 xorg tigervnc gparted nss-mdns"
 # ignore packages to upgrade before X startup eg. kernel and firmware
 _X_IGNORE="linux linux-firmware linux-firmware-marvell"
-# X packages
-_X_PACKAGES="xorg chromium xfce4 tigervnc breeze-icons gvfs gvfs-smb thunar-archive-plugin file-roller gparted gnome-keyring nss-mdns mousepad ristretto"
-# don't show in xfce menu
-_HIDE_MENU="xfce4-mail-reader xfce4-about"
 # VNC password
 _VNC_PW="archboot"
+### XFCE defaults
+# Xfce packages
+_XFCE_PACKAGES="chromium xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
+# don't show in xfce menu
+_HIDE_MENU="xfce4-mail-reader xfce4-about"
+### KDE defaults
+_KDE_PACKAGES="chromium plasma-desktop konsole kscreen kate dolphin"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # size for /usr.zram
-_ZRAM_USR="1900M"
+_ZRAM_USR="3G"
 # size for --latest and --latest-install option
 _ZRAM_SIZE="3G"
 # size used for --latest-image option

@@ -4,6 +4,8 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 . /usr/lib/archboot/update-installer.sh
+. /usr/lib/archboot/xfce.sh
+. /usr/lib/archboot/kde.sh
 
 [[ -z "${1}" ]] && usage
 
@@ -14,6 +16,7 @@ while [ $# -gt 0 ]; do
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
+        -launch-kde|--launch-kde) _L_KDE="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -82,24 +85,32 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
 fi
 
-# Launch xfce
-if [[ "${_L_XFCE}" == "1" ]]; then
-    if ! [[ -e /usr/bin/startxfce4 ]]; then
+# X launch
+if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" ]]; then
+    if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_USR}"
-        echo -e "\033[1mStep 2/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
-        _gpg_check
-        echo -e "\033[1mStep 3/5:\033[0m Installing XFCE desktop now ..."
-        echo "          This will need some time ..."
-        _prepare_xfce >/dev/tty7 2>&1
-        echo -e "\033[1mStep 4/5:\033[0m Configuring XFCE desktop ..."
-        _configure_xfce >/dev/tty7 2>&1
-        echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
-        systemctl start avahi-daemon.service
+    else
+        echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
-    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
-    echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
-    startxfce4 >/dev/tty8 2>&1
-    echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
+    echo -e "\033[1mStep 2/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    # Launch xfce
+    if [[ "${_L_XFCE}" == "1" ]]; then
+        _install_xfce
+    fi
+    if [[ "${_L_KDE}" == "1" ]]; then
+        _install_kde
+    fi
+    echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
+    systemctl start avahi-daemon.service
+    _autostart_vnc
+    if [[ "${_L_XFCE}" == "1" ]]; then
+        _start_xfce
+    fi
+    if [[ "${_L_KDE}" == "1" ]]; then
+        _start_kde
+    fi
 fi
+
+
