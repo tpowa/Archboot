@@ -21,7 +21,7 @@ _start_kde() {
 
 _configure_kde() {
     echo "Configuring KDE ..."
-    sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,gparted.desktop,archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
+    sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,applications:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
     echo "Replacing wallpaper ..."
     for i in /usr/share/wallpapers/Next/contents/images/*; do
         cp /usr/share/archboot/grub/archboot-background.png $i
