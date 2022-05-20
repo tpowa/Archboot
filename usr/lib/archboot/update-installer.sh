@@ -30,6 +30,11 @@ usage () {
             echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
             echo ""
     fi
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3500000 &&\
+    -e /usr/bin/setup && ! -e /var/cache/pacman/pkg/archboot.db ]]; then
+            echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+            echo ""
+    fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3900000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
