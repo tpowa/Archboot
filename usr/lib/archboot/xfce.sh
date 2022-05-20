@@ -176,13 +176,6 @@ EOF
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
     echo "Setting chromium as default browser ..."
     sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
-    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
-    cat << EOF >/etc/chromium-flags.conf
---no-sandbox
---test-type
---incognito
-wiki.archlinux.org/title/Archboot
-EOF
     echo "Replacing menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
