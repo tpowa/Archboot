@@ -31,7 +31,7 @@ _configure_kde() {
 [Desktop Entry]
 Type=Application
 Name=Archboot Setup
-Exec=konsole /usr/bin/setup
+Exec=konsoleprofile colors=Linux;konsole -e /usr/bin/setup
 Icon=system-software-install
 EOF
 }
