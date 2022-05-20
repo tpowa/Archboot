@@ -20,18 +20,57 @@ _start_kde() {
 }
 
 _configure_kde() {
-    echo "Configuring KDE panel ..."
-    #echo "Adding gparted to xfce top level menu ..."
-    #sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
-    #echo "Hiding ${_HIDE_MENU} menu entries ..."
-    #for i in ${_HIDE_MENU}; do
-    #    echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
-    #done
-    #echo "Autostarting setup ..."
+    echo "Configuring KDE plasma ..."
+
+    echo "Replacing wallpaper ..."
+    for i in /usr/share/wallpapers/Next/contents/images/*; do
+        cp /usr/share/archboot/grub/archboot-background.png $i
+    done
+    echo "Replacing menu structure ..."
+    cat << EOF >/etc/xdg/menus/applications.menu
+ <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+  "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+	<Name>Applications</Name>
+	<Directory>kde-main.directory</Directory>
+	<!-- Search the default locations -->
+	<DefaultAppDirs/>
+	<DefaultDirectoryDirs/>
+	<DefaultLayout>
+		<Merge type="files"/>
+		<Merge type="menus"/>
+		<Separator/>
+		<Menuname>More</Menuname>
+	</DefaultLayout>
+	<Layout>
+		<Merge type="files"/>
+		<Merge type="menus"/>
+		<Menuname>Applications</Menuname>
+	</Layout>
+	<Menu>
+		<Name>Settingsmenu</Name>
+		<Directory>kf5-settingsmenu.directory</Directory>
+		<Include>
+			<Category>Settings</Category>
+		</Include>
+	</Menu>
+	<DefaultMergeDirs/>
+	<Include>
+	<Filename>archboot.desktop</Filename>
+	<Filename>chromium.desktop</Filename>
+	<Filename>org.kde.dolphin.desktop</Filename>
+	<Filename>gparted.desktop</Filename>
+	<Filename>org.kde.konsole.desktop</Filename>
+	</Include>
+</Menu>
+EOF
+    echo "Autostarting setup ..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
 Name=Archboot Setup
+GenericName=Installer
 Exec=konsole -p colors=Linux -e /usr/bin/setup
 Icon=system-software-install
 EOF

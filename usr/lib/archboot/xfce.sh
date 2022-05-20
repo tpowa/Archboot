@@ -251,6 +251,7 @@ EOF
 [Desktop Entry]
 Type=Application
 Name=Archboot Setup
+GenericName=Installer
 Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
