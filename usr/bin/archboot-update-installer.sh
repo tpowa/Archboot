@@ -105,6 +105,7 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" ]]; then
     echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     _autostart_vnc
+    _chromium_flags
     if [[ "${_L_XFCE}" == "1" ]]; then
         _start_xfce
     fi

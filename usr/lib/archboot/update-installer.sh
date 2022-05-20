@@ -340,6 +340,16 @@ _prepare_x() {
     rm -rf /usr/share/{locale,i18n}
 }
 
+_chromium_flags() {
+    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
+    cat << EOF >/etc/chromium-flags.conf
+--no-sandbox
+--test-type
+--incognito
+wiki.archlinux.org/title/Archboot
+EOF
+}
+
 _autostart_vnc() {
     echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
