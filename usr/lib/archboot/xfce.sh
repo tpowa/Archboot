@@ -235,6 +235,7 @@ EOF
 EOF
     echo "Adding gparted to xfce top level menu ..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
+    _HIDE_MENU="xfce4-mail-reader xfce4-about"
     echo "Hiding ${_HIDE_MENU} menu entries ..."
     for i in ${_HIDE_MENU}; do
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
