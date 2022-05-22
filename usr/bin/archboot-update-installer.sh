@@ -97,7 +97,7 @@ if [[ "${_PREPARE_XORG}" == "1" ]]; then
     _gpg_check
     echo -e "\033[1mStep 3/3:\033[0m Preparing xorg ..."
     echo "          This will need some time ..."
-    _prepare_x
+    _prepare_x > /dev/tty7 2>&1
 fi
 
 # KDE/PLASMA or XFCE launch
