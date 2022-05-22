@@ -17,7 +17,7 @@ while [ $# -gt 0 ]; do
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
         -launch-kde|--launch-kde) _L_KDE="1" ;;
-        -prepare-xorg | --prepare-xort) _PREPARE_XORG="1" ;;
+        -prepare-xorg |--prepare-xorg) _PREPARE_XORG="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
