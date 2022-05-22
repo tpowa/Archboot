@@ -17,7 +17,7 @@ while [ $# -gt 0 ]; do
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
         -launch-kde|--launch-kde) _L_KDE="1" ;;
-        -custom-xorg|--custom-xorg) _CUSTOM_XORG="1" ;;
+        -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -86,7 +86,7 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
 fi
 
 # install custom xorg
-if [[ "${_CUSTOM_XORG}" == "1" ]]; then
+if [[ "${_CUSTOM_X}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
