@@ -34,7 +34,7 @@ usage () {
     -e /usr/bin/setup ]]; then
             echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
             echo ""
-            echo -e " \033[1m-prepare-xorg\033[0m    Prepare Xorg for installing custom X environment."
+            echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
             echo ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3900000 &&\

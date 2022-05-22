@@ -17,7 +17,7 @@ while [ $# -gt 0 ]; do
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
         -launch-kde|--launch-kde) _L_KDE="1" ;;
-        -prepare-xorg |--prepare-xorg) _PREPARE_XORG="1" ;;
+        -custom-xorg|--custom-xorg) _CUSTOM_XORG="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -85,8 +85,8 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
 fi
 
-# prepare xorg
-if [[ "${_PREPARE_XORG}" == "1" ]]; then
+# install custom xorg
+if [[ "${_CUSTOM_XORG}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
@@ -95,9 +95,9 @@ if [[ "${_PREPARE_XORG}" == "1" ]]; then
     fi
     echo -e "\033[1mStep 2/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
-    echo -e "\033[1mStep 3/3:\033[0m Preparing xorg ..."
+    echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
     echo "          This will need some time ..."
-    _prepare_x > /dev/tty7 2>&1
+    _prepare_x "${_CUSTOM_XORG}" > /dev/tty7 2>&1
 fi
 
 # KDE/PLASMA or XFCE launch
