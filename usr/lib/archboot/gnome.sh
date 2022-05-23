@@ -15,7 +15,7 @@ _install_gnome() {
 
 _configure_gnome() {
     echo "Configuring Gnome ..."
-    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'gparted.desktop', 'archboot.desktop']"
+    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
     echo "Setting wallpaper ..."
     gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
     echo "Autostarting setup ..."
@@ -28,6 +28,11 @@ Exec=gnome-terminal -- /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+    _HIDE_MENU="avahi-discover org.gnome.Shell.Extensions org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
+    echo "Hiding ${_HIDE_MENU} menu entries ..."
+    for i in ${_HIDE_MENU}; do
+        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+    done
 }
 
 _start_gnome() {
