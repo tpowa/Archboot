@@ -9,20 +9,20 @@ _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 _X_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2 xorg tigervnc gparted nss-mdns chromium"
 # ignore packages to upgrade before X startup eg. kernel and firmware
 _X_IGNORE="linux linux-firmware linux-firmware-marvell"
-### Custom X defaults
-# Custom packages
-_CUSTOM_XORG=""
 # VNC password
 _VNC_PW="archboot"
 ### XFCE defaults
 # Xfce packages
 _XFCE_PACKAGES="xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
+### GNOME defaults
+# GNOME packages
+_GNOME_PACKAGES="gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gedit"
 ### KDE defaults
 # KDE/Plasma packages
 _KDE_PACKAGES="plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
-### GNOME defaults
-# GNOME packages
-_GNOME_PACKAGES="gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb"
+### Custom X defaults
+# Custom packages
+_CUSTOM_XORG=""
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # default size for all operations
