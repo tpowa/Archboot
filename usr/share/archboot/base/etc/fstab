@@ -1,8 +1,0 @@
-# 
-# /etc/fstab: static file system information
-#
-# <file system>	<dir>	<type>	<options>	<dump>	<pass>
-# allow checkspace on /
-tmpfs / ramfs defaults,size=100% 0 0
-
-

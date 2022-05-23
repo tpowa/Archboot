@@ -28,7 +28,7 @@ build ()
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
-    systemfiles="bash.bash_logout crypttab host.conf hosts inputrc mke2fs.conf \
+    systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nanorc nsswitch.conf protocols request-key.conf resolv.conf securetty \
                  services wgetrc"
     for i in $systemfiles; do
@@ -37,7 +37,7 @@ build ()
 
     ### adding config files of installation system
     map add_file "/etc/profile" "/etc/group" "/etc/gshadow"
-    basic_config="bash.bashrc fstab hostname modprobe.d/modprobe.conf passwd shadow shells"
+    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf passwd shadow shells"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done

@@ -340,6 +340,11 @@ _prepare_x() {
     locale-gen >/dev/null 2>&1
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
+    # needed for environments which check disk space
+    if ! mountpoint /root; then
+        echo "Mount tmpfs on /root"
+        mount -t tmpfs tmpfs /root
+    fi
 }
 
 _chromium_flags() {
