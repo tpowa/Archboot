@@ -6,7 +6,7 @@ build ()
     map add_file "/etc/archboot/defaults" "/usr/lib/archboot/common.sh" \
     "/usr/lib/archboot/container.sh" "/usr/bin/archboot-$(uname -m)-create-container.sh" \
     "/usr/lib/archboot/update-installer.sh" "/usr/lib/archboot/xfce.sh" \
-    "/usr/lib/archboot/kde.sh" "/usr/lib/archboot/login.sh"
+    "/usr/lib/archboot/kde.sh" "/usr/lib/archboot/gnome.sh" "/usr/lib/archboot/login.sh"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
     add_symlink "/etc/profile.d/zz-archboot-login.sh" "/usr/lib/archboot/login.sh"
 }
