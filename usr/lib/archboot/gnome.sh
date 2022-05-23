@@ -11,18 +11,9 @@ _install_gnome() {
     fi
 }
 
-_start_gnome() {
-    echo -e "Launching GNOME now, logging is done on \033[1m/dev/tty8\033[0m ..."
-    echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
-    echo "export GDK_BACKEND=x11" >> /root/.xinitrc
-    echo "gnome-session" >> /root/.xinitrc
-    startx >/dev/tty8 2>&1
-    echo -e "To relaunch GNOME desktop use: \033[92mstartx\033[0m"
-}
-
 _configure_gnome() {
     echo "Configuring Gnome ..."
-    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'gparted.desktop', 'chromium.desktop']"
+    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'gparted.desktop', 'chromium.desktop',  'archboot.desktop']"
     echo "Setting wallpaper ..."
     gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
     echo "Autostarting setup ..."
@@ -34,4 +25,14 @@ GenericName=Installer
 Exec=gnome-terminal /usr/bin/setup
 Icon=system-software-install
 EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+}
+
+_start_gnome() {
+    echo -e "Launching GNOME now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
+    echo "export GDK_BACKEND=x11" >> /root/.xinitrc
+    echo "gnome-session" >> /root/.xinitrc
+    startx >/dev/tty8 2>&1
+    echo -e "To relaunch GNOME desktop use: \033[92mstartx\033[0m"
 }

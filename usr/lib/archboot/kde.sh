@@ -11,14 +11,6 @@ _install_kde() {
     fi
 }
 
-_start_kde() {
-    echo -e "Launching KDE now, logging is done on \033[1m/dev/tty8\033[0m ..."
-    echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
-    echo "startplasma-x11" >> /root/.xinitrc
-    startx >/dev/tty8 2>&1
-    echo -e "To relaunch KDE desktop use: \033[92mstartx\033[0m"
-}
-
 _configure_kde() {
     echo "Configuring KDE ..."
     sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,applications:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
@@ -74,5 +66,13 @@ GenericName=Installer
 Exec=konsole -p colors=Linux -e /usr/bin/setup
 Icon=system-software-install
 EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
 }
 
+_start_kde() {
+    echo -e "Launching KDE now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
+    echo "startplasma-x11" >> /root/.xinitrc
+    startx >/dev/tty8 2>&1
+    echo -e "To relaunch KDE desktop use: \033[92mstartx\033[0m"
+}

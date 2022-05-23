@@ -250,4 +250,5 @@ Exec=xfce4-terminal -x /usr/bin/setup
 Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
 }
