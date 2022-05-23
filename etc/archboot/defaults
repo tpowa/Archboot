@@ -20,6 +20,9 @@ _XFCE_PACKAGES="xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin file-roll
 ### KDE defaults
 # KDE/Plasma packages
 _KDE_PACKAGES="plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
+### GNOME defaults
+# GNOME packages
+_GNOME_PACKAGES="gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb"
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # default size for all operations
