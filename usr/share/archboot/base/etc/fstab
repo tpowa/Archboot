@@ -3,6 +3,6 @@
 #
 # <file system>	<dir>	<type>	<options>	<dump>	<pass>
 # allow checkspace on /
-none / ramfs defaults 0 0
+tmpfs / ramfs defaults,size=100% 0 0
 
 
