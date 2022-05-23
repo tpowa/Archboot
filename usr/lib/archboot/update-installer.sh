@@ -281,7 +281,7 @@ _kexec () {
 }
 
 _cleanup_install() {
-    rm -rf /usr/share/{man,info,doc,gtk-doc,ibus,perl5}
+    rm -rf /usr/share/{man,help,gir-1.0,info,doc,gtk-doc,ibus,perl5}
     rm -rf /usr/include
     rm -rf /usr/lib/libgo.*
 }
