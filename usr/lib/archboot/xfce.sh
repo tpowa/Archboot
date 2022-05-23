@@ -11,12 +11,6 @@ _install_xfce() {
     fi
 }
 
-_start_xfce() {
-    echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
-    startxfce4 >/dev/tty8 2>&1
-    echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
-}
-
 _configure_xfce() {
     echo "Configuring xfce panel ..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
@@ -251,4 +245,10 @@ Icon=system-software-install
 Categories=X-Xfce-Toplevel;
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+}
+
+_start_xfce() {
+    echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    startxfce4 >/dev/tty8 2>&1
+    echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
 }
