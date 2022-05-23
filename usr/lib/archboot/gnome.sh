@@ -2,6 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _install_gnome() {
+        groupadd geoclue 2>/dev/null
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
         echo "          This will need some time ..."
@@ -22,7 +23,7 @@ _configure_gnome() {
 Type=Application
 Name=Archboot Setup
 GenericName=Installer
-Exec=gnome-terminal -e /usr/bin/setup
+Exec=gnome-terminal -- /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
