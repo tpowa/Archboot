@@ -34,7 +34,7 @@ _start_gnome() {
     echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc
     echo "export LANG=C.UTF-8"  >> /root/.xinitrc
-    echo "exec dbus-launch gnome-session" >> /root/.xinitrc
+    echo "exec gnome-session" >> /root/.xinitrc
     startx >/dev/tty8 2>&1
     echo -e "To relaunch GNOME desktop use: \033[92mstartx\033[0m"
 }
