@@ -5,6 +5,7 @@
 . /usr/lib/archboot/container.sh
 . /usr/lib/archboot/update-installer.sh
 . /usr/lib/archboot/xfce.sh
+. /usr/lib/archboot/gnome.sh
 . /usr/lib/archboot/kde.sh
 
 [[ -z "${1}" ]] && usage
