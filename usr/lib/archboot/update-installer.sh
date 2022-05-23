@@ -29,6 +29,8 @@ usage () {
     -e /usr/bin/setup && ! -e /var/cache/pacman/pkg/archboot.db ]]; then
             echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
             echo ""
+            echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
+            echo ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 &&\
     -e /usr/bin/setup ]]; then
