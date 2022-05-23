@@ -13,7 +13,7 @@ _install_gnome() {
 
 _configure_gnome() {
     echo "Configuring Gnome ..."
-    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'gparted.desktop', 'chromium.desktop',  'archboot.desktop']"
+    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'gparted.desktop', 'archboot.desktop']"
     echo "Setting wallpaper ..."
     gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
     echo "Autostarting setup ..."
@@ -22,7 +22,7 @@ _configure_gnome() {
 Type=Application
 Name=Archboot Setup
 GenericName=Installer
-Exec=gnome-terminal /usr/bin/setup
+Exec=gnome-terminal -- /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
