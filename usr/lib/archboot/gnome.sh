@@ -28,9 +28,10 @@ Exec=gnome-terminal -- /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
-    _HIDE_MENU="avahi-discover org.gnome.Shell.Extensions org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
+    _HIDE_MENU="avahi-discover bssh bvnc org.gnome.Shell.Extensions org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
     echo "Hiding ${_HIDE_MENU} menu entries ..."
     for i in ${_HIDE_MENU}; do
+        echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
 }
