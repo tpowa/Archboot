@@ -22,7 +22,7 @@ _configure_gnome() {
 Type=Application
 Name=Archboot Setup
 GenericName=Installer
-Exec=gnome-terminal -- /usr/bin/setup
+Exec=gnome-terminal -e /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
