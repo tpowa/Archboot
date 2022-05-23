@@ -2,13 +2,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _install_gnome() {
-        groupadd geoclue 2>/dev/null
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
         echo "          This will need some time ..."
         _prepare_x "${_GNOME_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop ..."
         _configure_gnome >/dev/tty7 2>&1
+        systemd-sysusers
+        systemd-tmpfiles --create
     fi
 }
 
