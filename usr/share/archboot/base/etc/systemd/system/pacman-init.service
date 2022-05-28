@@ -1,5 +1,7 @@
 [Unit]
 Description=Initializes Pacman keyring
+Requires=etc-pacman.d-gnupg.mount
+After=etc-pacman.d-gnupg.mount
 
 [Service]
 Type=oneshot
