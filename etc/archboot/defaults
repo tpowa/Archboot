@@ -17,10 +17,11 @@ _XFCE_PACKAGES="xorg xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin file
 ### GNOME defaults
 # GNOME packages
 _GNOME_PACKAGES="xorg gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gedit"
-_GNOME_WAYLAND_PACKAGES="gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gedit"
+_GNOME_WAYLAND_PACKAGES="egl-wayland gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gedit"
 ### KDE defaults
 # KDE/Plasma packages
 _KDE_PACKAGES="xorg plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
+_KDE_WAYLAND_PACKAGES="plasma-wayland-session egl-wayland plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
 ### Custom X defaults
 # Custom packages
 _CUSTOM_XORG=""
