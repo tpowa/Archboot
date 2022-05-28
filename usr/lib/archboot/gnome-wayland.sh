@@ -37,7 +37,7 @@ EOF
 }
 
 _start_gnome_wayland() {
-    echo -e "Launching GNOME WAYLAND now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo -e "Launching GNOME WAYLAND now, logging is done on \033[1m/dev/tty7\033[0m ..."
     LANG=C.UTF-8 MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1
     #echo -e "To relaunch GNOME desktop use: \033[92mstartx\033[0m"
 }
