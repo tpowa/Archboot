@@ -116,7 +116,7 @@ build ()
 
     ### add pacman
     map add_binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
-          repo-add repo-elephant testpkg vercmp curl gpg-agent haveged gpg \
+          repo-add repo-elephant testpkg vercmp curl gpg-agent gpg \
           gpgconf gpg-connect-agent repo-remove
     map add_dir "/var/cache/pacman/pkg" "/var/lib/pacman"
     map add_file "/etc/pacman.conf" "/etc/makepkg.conf" "/etc/pacman.d/mirrorlist"
