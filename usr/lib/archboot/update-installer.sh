@@ -28,8 +28,9 @@ usage () {
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 &&\
     -e /usr/bin/setup && ! -e /var/cache/pacman/pkg/archboot.db ]]; then
             echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
-            echo -e " \033[1m-launch-gnome-wayland\033[0m    Launch Gnome desktop with wayland"
+            echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with wayland"
             echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
+            echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with wayland"
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 &&\
     -e /usr/bin/setup ]]; then
@@ -89,7 +90,7 @@ _download_latest() {
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
-        LIBS="common.sh container.sh release.sh iso.sh update-installer.sh xfce.sh gnome.sh gnome-wayland.sh kde.sh login.sh"
+        LIBS="common.sh container.sh release.sh iso.sh update-installer.sh xfce.sh gnome.sh gnome-wayland.sh kde.sh kde-wayland.sh login.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done
@@ -295,19 +296,19 @@ _cleanup_cache() {
     done
 }
 
-_prepare_x() {
+_prepare_graphic() {
     echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
     # fix libs first, then install packages from defaults
-    _XORG="${_X_PACKAGES} ${1}"
+    _GRAPHIC="${_GRAPHIC_PACKAGES} ${1}"
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo "Running pacman to install packages: ${_XORG} ..."
+        echo "Running pacman to install packages: ${_GRAPHIC} ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         _create_pacman_conf
         #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
-        for i in ${_XORG}; do
+        for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
@@ -315,18 +316,18 @@ _prepare_x() {
             rm -f /var/log/pacman.log
         done
     else
-        echo "Updating environment to latest packages (ignoring packages: ${_X_IGNORE}) ..."
+        echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE}) ..."
         _IGNORE=""
-        if [[ -n "${_X_IGNORE}" ]]; then
-            for i in ${_X_IGNORE}; do
+        if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
+            for i in ${_GRAPHIC_IGNORE}; do
                 _IGNORE="${_IGNORE} --ignore ${i}"
             done
         fi
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         _cleanup_install
-        echo "Running pacman to install packages: ${_XORG} ..."
-        for i in ${_XORG}; do
+        echo "Running pacman to install packages: ${_GRAPHIC} ..."
+        for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install

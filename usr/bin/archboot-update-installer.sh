@@ -8,6 +8,7 @@
 . /usr/lib/archboot/gnome.sh
 . /usr/lib/archboot/gnome-wayland.sh
 . /usr/lib/archboot/kde.sh
+. /usr/lib/archboot/kde-wayland.sh
 
 [[ -z "${1}" ]] && usage
 
@@ -19,8 +20,9 @@ while [ $# -gt 0 ]; do
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
         -launch-gnome|--launch-gnome) _L_GNOME="1";;
-        -launch-gnome-wayland|--launch-gnome-wayland) _L_GNOME_WAYLAND="1";;
+        -gnome-wayland|--gnome-wayland) _L_GNOME_WAYLAND="1";;
         -launch-kde|--launch-kde) _L_KDE="1" ;;
+        -kde-wayland|--kde-wayland) _L_KDE_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
@@ -107,7 +109,7 @@ if [[ "${_CUSTOM_X}" == "1" ]]; then
 fi
 
 # KDE/PLASMA or XFCE launch
-if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" ]]; then
+if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_GNOME_WAYLAND}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
@@ -129,6 +131,9 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
     if [[ "${_L_KDE}" == "1" ]]; then
         _install_kde
     fi
+    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
+        _install_kde_wayland
+    fi
     echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     _autostart_vnc
@@ -144,6 +149,9 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
     fi
     if [[ "${_L_KDE}" == "1" ]]; then
         _start_kde
+    fi
+    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
+        _start_kde_wayland
     fi
 fi
 
