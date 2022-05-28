@@ -103,7 +103,7 @@ if [[ "${_CUSTOM_X}" == "1" ]]; then
     _gpg_check
     echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
     echo "          This will need some time ..."
-    _prepare_x "${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    _prepare_graphic "${_CUSTOM_XORG}" > /dev/tty7 2>&1
     systemctl start avahi-daemon.service
     _chromium_flags
 fi
