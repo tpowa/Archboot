@@ -5,10 +5,13 @@ _welcome () {
 }
 
 _enter_shell() {
-    cd /
-    echo -e "Hit \033[1m\033[92mENTER\033[0m for \033[1mshell\033[0m login."
-    read
-    clear
+    # dbus sources profiles again
+    if ! pgrep -x dbus-run-session; then
+        cd /
+        echo -e "Hit \033[1m\033[92mENTER\033[0m for \033[1mshell\033[0m login."
+        read
+        clear
+    fi
 }
 
 if [[ -e /usr/bin/setup ]]; then
@@ -16,10 +19,7 @@ if [[ -e /usr/bin/setup ]]; then
         echo -e "You are running in \033[92m\033[1mLocal mode\033[0m, with \033[1mlocal package repository\033[0m enabled.\033[0m"
         echo -e "To \033[1mswitch\033[0m to \033[1mOnline mode\033[0m:# \033[1m\033[91mrm /var/cache/pacman/pkg/archboot.db\033[0m\033[1m"
     fi
-    # dbus sources profiles again
-    if ! pgrep -x dbus-run-session; then
-        _enter_shell
-    fi
+    _enter_shell
     if ! [[ -e /tmp/.setup ]]; then
         setup
     fi
