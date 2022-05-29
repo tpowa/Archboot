@@ -5,7 +5,7 @@ _install_kde_wayland() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma Wayland now ..."
         echo "          This will need some time ..."
-        _prepare_graphic "${_WAYLAND_PACKAGES} ${_STANDARD_PACKAGES} plasma-wayland-session ${_KDE_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} plasma-wayland-session ${_KDE_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring KDE/Plasma Wayland ..."
         _configure_kde_wayland >/dev/tty7 2>&1
 	else
