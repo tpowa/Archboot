@@ -8,6 +8,9 @@ _install_xfce() {
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring XFCE desktop ..."
         _configure_xfce >/dev/tty7 2>&1
+    else
+        echo -e "\033[1mStep 3/5:\033[0m Installing XFCE desktop already done ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring XFCE desktop already done ..."
     fi
 }
 

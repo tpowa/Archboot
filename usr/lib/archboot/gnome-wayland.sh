@@ -10,6 +10,9 @@ _install_gnome_wayland() {
         _configure_gnome_wayland >/dev/tty7 2>&1
         systemd-sysusers >/dev/tty7 2>&1
         systemd-tmpfiles --create >/dev/tty7 2>&1
+    else
+        echo -e "\033[1mStep 3/5:\033[0m Installing GNOME Wayland already done ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME Wayland already done ..."
     fi
 }
 

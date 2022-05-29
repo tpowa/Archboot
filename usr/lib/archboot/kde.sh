@@ -8,6 +8,9 @@ _install_kde() {
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_KDE_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop ..."
         _configure_kde >/dev/tty7 2>&1
+	else
+		echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop already done ..."
+		echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop already done ..."
     fi
 }
 

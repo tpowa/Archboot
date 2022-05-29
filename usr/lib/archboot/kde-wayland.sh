@@ -8,6 +8,9 @@ _install_kde_wayland() {
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_KDE_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring KDE/Plasma Wayland ..."
         _configure_kde_wayland >/dev/tty7 2>&1
+	else
+		echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma Wayland already done ..."
+		echo -e "\033[1mStep 4/5:\033[0m Configuring KDE/Plasma Wayland already done ..."
     fi
 }
 
