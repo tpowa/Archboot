@@ -1,7 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_XORG="${_GRAPHIC_PACKAGES} ${_XFCE_PACKAGES}"
 
 _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"

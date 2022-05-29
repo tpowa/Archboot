@@ -301,7 +301,7 @@ _prepare_graphic() {
     echo "Removing firmware files ..."
     rm -rf /usr/lib/firmware
     # fix libs first, then install packages from defaults
-    _GRAPHIC="${_GRAPHIC_PACKAGES} ${1}"
+    _GRAPHIC="${_FIX_PACKAGES} ${1}"
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Running pacman to install packages: ${_GRAPHIC} ..."

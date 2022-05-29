@@ -5,8 +5,6 @@ _PACKAGES="base linux linux-firmware linux-firmware-marvell"
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### Graphical environment defaults
-# needed full installed packages in environment
-_GRAPHIC_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2 xorg tigervnc gparted nss-mdns chromium"
 # ignore packages to upgrade before graphical startup eg. kernel and firmware
 _GRAPHIC_IGNORE="linux linux-firmware linux-firmware-marvell"
 # VNC password

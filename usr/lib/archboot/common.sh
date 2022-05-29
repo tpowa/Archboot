@@ -6,6 +6,12 @@ _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
+_FIX_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2"
+_XORG_PACKAGE="xorg"
+_VNC_PACKAGE="tigervnc"
+_WAYLAND_PACKAGE="egl-wayland"
+_STANDARD_PACKAGES="gparted nss-mdns chromium"
+_XORG="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES}"
 
 ### check for root
 _root_check() {
