@@ -24,6 +24,7 @@ while [ $# -gt 0 ]; do
         -launch-kde|--launch-kde) _L_KDE="1" ;;
         -kde-wayland|--kde-wayland) _L_KDE_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
+        -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -91,8 +92,8 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
 fi
 
-# install custom xorg
-if [[ "${_CUSTOM_X}" == "1" ]]; then
+# install custom xorg or wayland
+if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
@@ -101,14 +102,21 @@ if [[ "${_CUSTOM_X}" == "1" ]]; then
     fi
     echo -e "\033[1mStep 2/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
-    echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
-    echo "          This will need some time ..."
-    _prepare_graphic "${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
+        echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "egl-wayland ${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    fi
+    if [[ "${_CUSTOM_X}" == "1" ]]; then
+        echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "xorg ${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    fi
     systemctl start avahi-daemon.service
     _chromium_flags
 fi
 
-# KDE/PLASMA or XFCE launch
+# Gnome, KDE/PLASMA or XFCE launch
 if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_KDE_WAYLAND}" == "1" ]]; then
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."

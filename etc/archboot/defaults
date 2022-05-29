@@ -20,9 +20,10 @@ _GNOME_PACKAGES="gnome-shell gnome-terminal gnome-control-center nautilus gvfs-s
 ### KDE defaults
 # KDE/Plasma packages
 _KDE_PACKAGES="plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
-### Custom X defaults
+### Custom Graphical defaults
 # Custom packages
 _CUSTOM_XORG=""
+_CUSTOM_WAYLAND=""
 ### zram setup
 _ZRAM_ALGORITHM="zstd"
 # default size for all operations
