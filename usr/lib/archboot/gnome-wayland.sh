@@ -8,8 +8,8 @@ _install_gnome_wayland() {
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_GNOME_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop ..."
         _configure_gnome_wayland >/dev/tty7 2>&1
-        systemd-sysusers
-        systemd-tmpfiles --create
+        systemd-sysusers >/dev/tty7 2>&1
+        systemd-tmpfiles --create >/dev/tty7 2>&1
     fi
 }
 
