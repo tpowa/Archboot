@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _CACHEDIR="${1}/var/cache/pacman/pkg"
-_XORG="${_GRAPHIC_PACKAGES} xorg ${_XFCE_PACKAGES}"
+_XORG="${_GRAPHIC_PACKAGES} ${_XFCE_PACKAGES}"
 
 _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
