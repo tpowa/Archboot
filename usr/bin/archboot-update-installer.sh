@@ -144,7 +144,10 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
     fi
     echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
-    _autostart_vnc
+    # only start vnc on xorg environment
+    if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]]; then
+        _autostart_vnc
+    fi
     _chromium_flags
     if [[ "${_L_XFCE}" == "1" ]]; then
         _start_xfce
