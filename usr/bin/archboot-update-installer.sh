@@ -105,7 +105,7 @@ if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
         echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
-        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGES} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ "${_CUSTOM_X}" == "1" ]]; then
         echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
