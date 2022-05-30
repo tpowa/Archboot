@@ -9,6 +9,7 @@ build ()
     "/usr/lib/archboot/kde.sh" "/usr/lib/archboot/kde-wayland.sh" "/usr/lib/archboot/gnome.sh" \
     "/usr/lib/archboot/gnome-wayland.sh" "/usr/lib/archboot/login.sh"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer.sh"
+    add_file "/usr/share/archboot/gpg/tpowa.gpg"
     add_symlink "/etc/profile.d/zz-archboot-login.sh" "/usr/lib/archboot/login.sh"
 }
 
