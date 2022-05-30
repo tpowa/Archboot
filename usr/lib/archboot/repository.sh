@@ -20,16 +20,20 @@ _cachedir_check() {
 
 _download_packages() {
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XORG} to ${1} ..."
+    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
+    pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     #shellcheck disable=SC2086
     pacman --root "${1}" -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XORG} --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _aarch64_download_packages() {
     mkdir "${1}"/blankdb
-    [[ -d "${1}"//usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
+    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
+    [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XORG} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XORG} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
