@@ -53,7 +53,7 @@ _create_iso() {
     echo "Generate Release.txt ..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
     echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
-    echo "Homepage: https://wiki.archlinux.org/title/Archboot";\
+    echo "Homepage: https://bit.ly/archboot";\
     echo "Architecture: ${_ARCH}";\
     echo "RAM requirement to boot: 1300 MB or greater";\
     echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\

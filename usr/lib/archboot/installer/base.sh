@@ -29,9 +29,9 @@ EDITOR=""
 
 set_title() {
     if [[ -e "${LOCAL_DB}" ]]; then
-        TITLE="Arch Linux Installation (Local mode) --> wiki.archlinux.org/title/Archboot"
+        TITLE="Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
     else
-        TITLE="Arch Linux Installation (Online mode) --> wiki.archlinux.org/title/Archboot"
+        TITLE="Arch Linux Installation (Online mode) --> https://bit.ly/archboot"
     fi
 }
 

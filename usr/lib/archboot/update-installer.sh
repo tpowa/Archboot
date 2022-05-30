@@ -356,7 +356,7 @@ _chromium_flags() {
 --no-sandbox
 --test-type
 --incognito
-wiki.archlinux.org/title/Archboot
+bit.ly/archboot
 EOF
 }
 
