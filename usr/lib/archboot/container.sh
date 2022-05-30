@@ -143,7 +143,7 @@ _install_base_packages() {
 _install_archboot() {
     echo "Downloading ${_XORG} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    pacman-key --import "${_GPG_KEY}"
+    pacman-key --add "${_GPG_KEY}"
     #shellcheck disable=SC2086
     pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_XORG} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
@@ -168,7 +168,7 @@ _aarch64_install_archboot() {
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    systemd-nspawn -q -D "${1}" pacman-key --import "${_GPG_KEY}"
+    systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}"
     echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_XORG} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
