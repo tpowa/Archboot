@@ -168,7 +168,7 @@ _aarch64_install_archboot() {
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    [[ -d "${1}"//usr/share/archboot/gpg ]] || mkdir "${1}"//usr/share/archboot/gpg
+    [[ -d "${1}"//usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
