@@ -175,6 +175,7 @@ _aarch64_install_archboot() {
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+    rm "${1}"/"${_GPG_KEY}"
     echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_XORG} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
