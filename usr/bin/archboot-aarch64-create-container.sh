@@ -27,6 +27,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot "${1}" || exit 1
+    _create_pacman_conf "${1}"
     _aarch64_install_base_packages "${1}" || exit 1
     _aarch64_install_archboot "${1}" || exit 1
     _fix_groups "${1}"
