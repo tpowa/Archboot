@@ -12,12 +12,14 @@ _root_check
 _cachedir_check
 echo "Starting repository creation ..."
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+    _create_pacman_conf "${_REPODIR}"
     _prepare_pacman "${_REPODIR}" || exit 1
     _download_packages "${_REPODIR}" || exit 1
     _umount_special "${_REPODIR}" || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot "${_REPODIR}" || exit 1
+    _create_pacman_conf "${_REPODIR}"
     _aarch64_download_packages "${_REPODIR}" || exit 1
 fi
 _move_packages "${_REPODIR}" "${1}" || exit 1
