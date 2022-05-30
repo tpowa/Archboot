@@ -1,6 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
+_GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 
 _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"
@@ -19,14 +20,14 @@ _cachedir_check() {
 
 _download_packages() {
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XORG} to ${1} ..."
-    pacman-key -r 771DF6627EDF681F --keyserver hkp://keyserver.ubuntu.com
+    pacman-key --import "${_GPG_KEY}"
     #shellcheck disable=SC2086
     pacman --root "${1}" -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XORG} --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
 _aarch64_download_packages() {
     mkdir "${1}"/blankdb
-    systemd-nspawn -q -D "${1}" pacman-key -r 771DF6627EDF681F --keyserver hkp://keyserver.ubuntu.com
+    systemd-nspawn -q -D "${1}" pacman-key --import "${_GPG_KEY}"
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_XORG} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_XORG} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }

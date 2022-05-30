@@ -57,3 +57,5 @@ _USER="tobias"
 _GROUP="users"
 # gpg setup
 _GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
+# use this public gpg key to verify
+_GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
