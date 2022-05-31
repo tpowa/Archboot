@@ -175,7 +175,7 @@ _clean_archboot() {
     rm -rf "/usr/lib/firmware"
     rm -rf "/usr/lib/modules"
     rm -rf /usr/lib/{libicu*,libstdc++*}
-    _SHARE_DIRS="archboot efitools file grub hwdata kbd licenses lshw nmap nano openvpn pacman refind systemd tc usb_modeswitch vim zoneinfo"
+    _SHARE_DIRS="efitools file grub hwdata kbd licenses lshw nmap nano openvpn pacman refind systemd tc usb_modeswitch vim zoneinfo"
     for i in ${_SHARE_DIRS}; do
         #shellcheck disable=SC2115
         rm -rf "/usr/share/${i}"
