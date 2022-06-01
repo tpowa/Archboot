@@ -44,7 +44,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         mkfs.btrfs -q --mixed /dev/zram0
         mount /dev/zram0 /new_root
         echo $0 $1 > /etc/profile.d/zz-01-archboot.sh
-        tar -C / --exclude="./dev/*" --exclue="./proc/*" --exclude="./sys/*" --exclude="/tmp/*" --exclude="/run/*"\
+        tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="/tmp/*" --exclude="/run/*"\
         --exclude="/mnt/*" --exclude="/media/*" --exclude="/lost+found" --exclude="/new_root/*" -clpf - . | tar -C /new_root -vxlspf -
         systemctl switch-root /new_root
     fi
