@@ -34,16 +34,18 @@ done
 _archboot_check
 _download_latest
 echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
-_zram_initialize
+#_zram_initialize
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     if ! grep -q zram /proc/mounts; then
         modprobe zram
-        echo zstd > /sys/block/zram0/comp_algorithm > /dev/tty7 2>&1
-        echo 3500M > /sys/block/zram0/disksize > /dev/tty7 2>&1
-        mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
+        echo zstd > /sys/block/zram0/comp_algorithm
+        echo 3500M > /sys/block/zram0/disksize
+        mkfs.btrfs -q --mixed /dev/zram0
         mount /dev/zram0 /new_root
         echo $0 $1 > /etc/profile.d/zz-01-archboot.sh
+        tar -C / --exclude="./dev/*" --exclue="./proc/*" --exclude="./sys/*" --exclude="/tmp/*" --exclude="/run/*"\
+        --exclude="/mnt/*" --exclude="/media/*" --exclude="/lost+found" --exclude="/new_root/*" -clpf - . | tar -C /new_root -vxlspf -
         systemctl switch-root /new_root
     fi
     _update_installer_check
