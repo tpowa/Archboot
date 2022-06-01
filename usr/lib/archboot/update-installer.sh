@@ -125,7 +125,7 @@ _zram_initialize() {
         echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         mount -o discard /dev/zram0 /new_root
-        cat << EOF /etc/profile.d/zz-01-archboot.sh
+        cat << EOF > /etc/profile.d/zz-01-archboot.sh
 [[ -z $TTY ]] && TTY=$(tty)
 TTY=${TTY#/dev/}
 clear
