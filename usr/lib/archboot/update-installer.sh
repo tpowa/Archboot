@@ -116,7 +116,7 @@ _update_installer_check() {
 
 _zram_initialize() {
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    if ! grep -qw zram /proc/mounts; then
+    if ! grep -q zram /proc/mounts; then
         echo -e "Moving / to /dev/zram0 ..."
         echo -e "This will need some time ..."
         modprobe zram
@@ -126,7 +126,7 @@ _zram_initialize() {
         mount /dev/zram0 /new_root
         echo "update-installer.sh ${_RUN_OPTION}" > /etc/profile.d/zz-01-archboot.sh
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
-        --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -vxlspf -
+        --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -xlspf -
         systemctl switch-root /new_root
     else
         echo -e "/ already moved to /dev/zram0 ..."
