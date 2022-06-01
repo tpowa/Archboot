@@ -118,17 +118,26 @@ _zram_initialize() {
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
     _ZRAM_SIZE=${_ZRAM_SIZE:-"3500M"}
     if ! grep -q zram /proc/mounts; then
-        echo -e "Moving / to /dev/zram0 ..."
-        echo -e "This will need some time ..."
+        echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
+        echo -e "          This takes some time ..."
+        _gpg_check
+        echo -e "\033[1mStep 2/2:\033[0m Moving initramfs / to /dev/zram0 ..."
+        echo -e "          This takes some time ..."
+        # remove pacman-key init service
+        systemctl disable pacman-init.service >/dev/tty7 2>&1
         modprobe zram
         echo ${_ZRAM_ALGORITHM} > /sys/block/zram0/comp_algorithm
         echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
+        # use -o discard for RAM cleaning on delete
+        # (online fstrimming the block device!)
+        # fstrim <mountpoint> for manual action
+        # it needs some seconds to get RAM free on delete!
         mount -o discard /dev/zram0 /new_root
+        # only run next step om tty1
         cat << EOF > /etc/profile.d/zz-01-archboot.sh
 [[ -z \$TTY ]] && TTY=\$(tty)
 TTY=\${TTY#/dev/}
-clear
 if [[ "\${TTY}" == "tty1" ]]; then
     update-installer.sh ${_RUN_OPTION}
     rm /etc/profile.d/zz-01-archboot.sh
@@ -140,52 +149,6 @@ EOF
         # stop dbus before switching, else 90 seonds hang appaers
         systemctl stop dbus
         systemctl switch-root /new_root
-    fi
-}
-
-# use -o discard for RAM cleaning on delete
-# (online fstrimming the block device!)
-# fstrim <mountpoint> for manual action
-# it needs some seconds to get RAM free on delete!
-_zram_usr() {
-    if ! mountpoint -q /usr; then
-        echo "${1}" >/sys/block/zram0/disksize
-        echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
-        mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
-        mkdir /usr.zram
-        mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
-        echo "Moving /usr to /usr.zram ..." > /dev/tty7
-        cp -r /usr/* /usr.zram/
-        ln -sfn /usr.zram/lib /lib
-        ln -sfn /usr.zram/lib /lib64
-        echo /usr.zram/lib > /etc/ld.so.conf
-        ldconfig
-        ln -sfn /usr.zram/bin /bin
-        ln -sfn /usr.zram/bin /sbin
-        #shellcheck disable=SC2115
-        rm -r /usr/*
-        /usr.zram/bin/./mount --bind /usr.zram /usr
-        systemctl daemon-reload > /dev/tty7 2>&1
-        systemctl restart dbus > /dev/tty7 2>&1
-    fi
-}
-
-_zram_w_dir() {
-    echo "${1}" >/sys/block/zram1/disksize
-    echo "Creating btrfs filesystem with ${1} on /dev/zram1 ..." > /dev/tty7
-    mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
-    [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
-    mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
-}
-
-_umount_w_dir() {
-    if mountpoint -q "${_W_DIR}"; then
-        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
-        # umount all possible mountpoints
-        umount -R "${_W_DIR}"
-        echo 1 > /sys/block/zram1/reset
-        # wait 5 seconds to get RAM cleared and set free
-        sleep 5
     fi
 }
 
