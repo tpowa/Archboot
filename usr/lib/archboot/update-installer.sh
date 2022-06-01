@@ -126,7 +126,7 @@ _zram_initialize() {
         mount /dev/zram0 /new_root
         echo "update-installer.sh ${_RUN_OPTION}" > /etc/profile.d/zz-01-archboot.sh
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
-        --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -xlspf -
+        --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -vxlspf -
         systemctl switch-root /new_root
     else
         echo -e "/ already moved to /dev/zram0 ..."
