@@ -37,7 +37,7 @@ echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m .
 _zram_initialize
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-    if ! [[ grep zram /proc/mounts ]]; then
+    if ! grep -q zram /proc/mounts; then
         modprobe zram
         echo zstd > /sys/block/zram0/comp_algorithm > /dev/tty7 2>&1
         echo 3500M > /sys/block/zram0/disksize > /dev/tty7 2>&1
