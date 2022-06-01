@@ -116,6 +116,7 @@ _update_installer_check() {
 
 _zram_initialize() {
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
+    _ZRAM_SIZE=${_ZRAM_SIZE:-"3500M"}
     if ! grep -q zram /proc/mounts; then
         echo -e "Moving / to /dev/zram0 ..."
         echo -e "This will need some time ..."
@@ -124,14 +125,21 @@ _zram_initialize() {
         echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         mount -o discard /dev/zram0 /new_root
-        echo "update-installer.sh ${_RUN_OPTION}" > /etc/profile.d/zz-01-archboot.sh
+        cat << EOF /etc/profile.d/zz-01-archboot.sh
+[[ -z $TTY ]] && TTY=$(tty)
+TTY=${TTY#/dev/}
+clear
+if [[ "${TTY}" == "tty1" ]]; then
+    update-installer.sh ${_RUN_OPTION}
+    rm /etc/profile.d/zz-01-archboot.sh
+fi
+EOF
+        # copy running root to /new_root
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -xlspf -
+        # stop dbus before switching, else 90 seonds hang appaers
         systemctl stop dbus
         systemctl switch-root /new_root
-    else
-        echo -e "/ already moved to /dev/zram0 ..."
-        rm /etc/profile.d/zz-01-archboot.sh
     fi
 }
 
