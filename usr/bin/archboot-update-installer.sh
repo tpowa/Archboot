@@ -37,7 +37,7 @@ _download_latest
 echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
 _gpg_check
 # remove pacman-key init service
-rm /etc/systemd/system/pacman-init.service
+systemctl disable pacman-init.service
 _zram_initialize
 # Generate new environment and launch it with kexec
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
