@@ -126,10 +126,10 @@ _zram_initialize() {
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         mount -o discard /dev/zram0 /new_root
         cat << EOF > /etc/profile.d/zz-01-archboot.sh
-[[ -z $TTY ]] && TTY=$(tty)
-TTY=${TTY#/dev/}
+[[ -z \$TTY ]] && TTY=\$(tty)
+TTY=\${TTY#/dev/}
 clear
-if [[ "${TTY}" == "tty1" ]]; then
+if [[ "\${TTY}" == "tty1" ]]; then
     update-installer.sh ${_RUN_OPTION}
     rm /etc/profile.d/zz-01-archboot.sh
 fi
