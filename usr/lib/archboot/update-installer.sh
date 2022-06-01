@@ -123,11 +123,12 @@ _zram_initialize() {
         echo ${_ZRAM_ALGORITHM} > /sys/block/zram0/comp_algorithm
         echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
-        mount /dev/zram0 /new_root
+        mount -o discard /dev/zram0 /new_root
         echo "update-installer.sh ${_RUN_OPTION}" > /etc/profile.d/zz-01-archboot.sh
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -xlspf -
-        systemctl switch-root /new_root --force --no-block
+        systemctl stop dbus
+        systemctl switch-root /new_root
     else
         echo -e "/ already moved to /dev/zram0 ..."
         rm /etc/profile.d/zz-01-archboot.sh
