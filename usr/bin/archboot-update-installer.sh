@@ -9,6 +9,7 @@
 . /usr/lib/archboot/gnome-wayland.sh
 . /usr/lib/archboot/kde.sh
 . /usr/lib/archboot/kde-wayland.sh
+_W_DIR="/archboot"
 
 [[ -z "${1}" ]] && usage
 _RUN_OPTION="$1"
@@ -51,7 +52,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         echo "update-installer.sh ${_RUN_OPTION}" > ${_W_DIR}/etc/profile.d/zz-00-archboot.sh
         systemctl stop dbus
         echo -e "\033[1mStep 3/3:\033[0m Switching to new root ${_W_DIR} ..."
-        mount -o bind ${_W_DIR} ${_W_DIR}
+        #mount -o bind ${_W_DIR} ${_W_DIR}
         systemctl switch-root ${_W_DIR}
     fi
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
