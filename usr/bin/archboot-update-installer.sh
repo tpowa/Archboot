@@ -141,7 +141,6 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
     [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
     [[ "${_L_KDE}" == "1" ]] && _start_kde
     [[ "${_L_KDE_WAYLAND}" == "1" ]] && _start_kde_wayland
-
 fi
 
 
