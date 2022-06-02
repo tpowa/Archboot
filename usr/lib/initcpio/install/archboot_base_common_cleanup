@@ -3,11 +3,13 @@
 
 build ()
 {
+    # remove initrd-release
+    rm -f /tmp/etc/initrd-release
     # remove pacman-init.service
-    rm -f /tmp/*/root/etc/systemd/system/multi-user.target.wants/pacman-init.service
-    rm -f /tmp/*/root/etc/systemd/system/pacman-init.service
+    rm -f /tmp/etc/systemd/system/multi-user.target.wants/pacman-init.service
+    rm -f /tmp/etc/systemd/system/pacman-init.service
     # add created gpg keyring
-    cp -ar /etc/pacman.d/gnupg /tmp/*/root/etc/pacman.d
+    cp -ar /etc/pacman.d/gnupg /tmp/etc/pacman.d
     apps="login nologin"
     for i in $apps; do
         rm /usr/bin/"$i"
