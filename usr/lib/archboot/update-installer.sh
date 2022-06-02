@@ -146,7 +146,7 @@ EOF
         # copy running root to /new_root
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" -clpf - . | tar -C /new_root -xlspf -
-        # stop dbus before switching, else 90 seonds hang appaers
+        # stop dbus before switching, else 90 seconds hang appears
         systemctl stop dbus
         systemctl switch-root /new_root
     fi
