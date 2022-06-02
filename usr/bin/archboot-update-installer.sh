@@ -46,9 +46,9 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         echo -e "\033[1mStep 2/3:\033[0m Generating archboot container in ${_W_DIR} ..."
         echo "          This will need some time ..."
         _create_container || exit 1
-        rm -r ${_W_DIR}/etc
-        cp -r etc/ ${_W_DIR}/
-        echo "update-installer.sh ${_RUN_OPTION}" > /archboot/etc/profile.d/zz-00-archboot
+        cp -r /etc ${_W_DIR}/
+        cp /usr/bin/update-installer.sh ${_W_DIR}/usr/bin/
+        echo "update-installer.sh ${_RUN_OPTION}" > ${_W_DIR}/etc/profile.d/zz-00-archboot.sh
         systemctl stop dbus
         echo -e "\033[1mStep 3/3:\033[0m Switching to new root ${_W_DIR} ..."
         mount -o bind ${_W_DIR} ${_W_DIR}
