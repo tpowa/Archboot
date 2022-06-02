@@ -149,6 +149,7 @@ EOF
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" \
         --exclude="./etc/pacman.d/S.*" -clpf - . | tar -C /new_root -xlspf -
+        # stop dbus to avoid 90 seconds hanging
         echo -e "\033[1mStep 7/8:\033[0m Stopping dbus ..."
         systemctl stop dbus
         echo -e "\033[1mStep 8/8:\033[0m Switching root to /new_root ..."
