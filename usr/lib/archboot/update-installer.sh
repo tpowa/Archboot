@@ -121,18 +121,19 @@ _zram_initialize() {
         echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
         echo -e "          This takes some time ..."
         _gpg_check
-        echo -e "\033[1mStep 2/2:\033[0m Moving initramfs / to /dev/zram0 ..."
-        echo -e "          This takes some time ..."
-        # remove pacman-key init service
+        echo -e "\033[1mStep 2/8:\033[0m Disabling pacman-init.service ..."
         systemctl disable pacman-init.service >/dev/tty7 2>&1
+        echo -e "\033[1mStep 3/8:\033[0m Initializing /dev/zram0 with ${_ZRAM_ALGORITHM} and ${_ZRAM_SIZE} size ..."
         modprobe zram
         echo ${_ZRAM_ALGORITHM} > /sys/block/zram0/comp_algorithm
         echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
+        echo -e "\033[1mStep 4/8:\033[0m Creating btrfs filesystem on /dev/zram0 ..."
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         # use -o discard for RAM cleaning on delete
         # (online fstrimming the block device!)
         # fstrim <mountpoint> for manual action
         # it needs some seconds to get RAM free on delete!
+        echo -e "\033[1mStep 5/8:\033[0m Mounting /dev/zram0 to /new_root ..."
         mount -o discard /dev/zram0 /new_root
         # only run next step om tty1
         cat << EOF > /etc/profile.d/zz-01-archboot.sh
@@ -143,12 +144,14 @@ if [[ "\${TTY}" == "tty1" ]]; then
     rm /etc/profile.d/zz-01-archboot.sh
 fi
 EOF
-        # copy running root to /new_root
+        echo -e "\033[1mStep 6/8:\033[0m Copying initramfs to /new_root ..."
+        echo -e "          This takes some time ..."
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" \
         --exclude="./etc/pacman.d/S.*" -clpf - . | tar -C /new_root -xlspf -
-        # stop dbus before switching, else 90 seconds hang appears
+        echo -e "\033[1mStep 7/8:\033[0m Stopping dbus ..."
         systemctl stop dbus
+        echo -e "\033[1mStep 8/8:\033[0m Switching root to /new_root ..."
         systemctl switch-root /new_root
     fi
 }
