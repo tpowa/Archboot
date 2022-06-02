@@ -150,6 +150,7 @@ EOF
         echo -e "\033[1mStep 6/7:\033[0m Stopping dbus ..."
         systemctl stop dbus
         echo -e "\033[1mStep 7/7:\033[0m Switching root to /new_root ..."
+        echo "/dev/zram0 / btrfs defaults,discard,noatime,compress=zstd 0 0" >>/etc/fstab
         systemctl switch-root /new_root
     fi
 }
