@@ -255,6 +255,7 @@ _kexec () {
         sleep 2
         rm /boot/"${VMLINUZ}"
         rm /initrd.img
+        find . -mindepth 1 -maxdepth 1 -exec rm -rf {} \;
     fi
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1
