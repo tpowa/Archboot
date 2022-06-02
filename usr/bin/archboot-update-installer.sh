@@ -11,7 +11,6 @@
 . /usr/lib/archboot/kde-wayland.sh
 
 [[ -z "${1}" ]] && usage
-_RUN_OPTION="$1"
 
 while [ $# -gt 0 ]; do
     case ${1} in
@@ -40,48 +39,53 @@ _zram_initialize
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _update_installer_check
     touch /.update-installer
-    if ! [[ -e /.archboot_container ]]; then
-        echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
-        _clean_archboot
-        echo -e "\033[1mStep 2/3:\033[0m Generating archboot container in ${_W_DIR} ..."
-        echo "          This will need some time ..."
-        _create_container || exit 1
-        cp -r /etc ${_W_DIR}/
-        cp /usr/bin/update-installer.sh ${_W_DIR}/usr/bin/
-        cp /usr/lib/archboot/update-installer.sh ${_W_DIR}/usr/lib//archboot/
-        touch ${_W_DIR}/.archboot_container
-        systemctl stop dbus
-        echo -e "\033[1mStep 3/3:\033[0m Switching to new root ${_W_DIR} ..."
-        mount -o bind ${_W_DIR} ${_W_DIR}
-        systemctl switch-root ${_W_DIR}
-    fi
+    _umount_w_dir
+    _zram_w_dir "${_ZRAM_SIZE}"
+    echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
+    _clean_archboot
+    _zram_usr "300M"
+    echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
+    echo "          This will need some time ..."
+    _create_container || exit 1
+    # 10 seconds for getting free RAM
+    sleep 10
+    echo -e "\033[1mStep 4/9:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
+    mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" ]] && _kver_generic
-    rm /etc/profile.d/zz-01-archboot.sh
-    echo -e "\033[1mStep 1/4:\033[0m Collect initramfs files ..."
+    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
-    cp /usr/share/archboot/patches/31-mkinitcpio.fixed /usr/bin/mkinitcpio
-    cp /usr/share/archboot/patches/31-initcpio.functions.fixed /usr/lib/initcpio/functions
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     # write initramfs to "${_W_DIR}"/tmp
-    mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp >/dev/tty7 2>&1 || exit 1
-    rm -f /tmp/etc/initrd-release
-    echo -e "\033[1mStep 2/4:\033[0m Create initramfs /initrd.img ..."
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
+    rm -f "${_W_DIR}"/tmp/etc/initrd-release
+    echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
+    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
+    # 10 seconds for getting free RAM
+    sleep 10
+    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     _create_initramfs
-    echo -e "\033[1mStep 3/4:\033[0m Cleanup ${_W_DIR} ..."
+    echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
     cd /
+    _umount_w_dir
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
-    echo -e "\033[1mStep 4/4:\033[0m Loading files through kexec into kernel now ..."
+    echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
     echo "          This will need some time ..."
     _kexec
 fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
+    _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
+    _zram_usr "300M"
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
     echo "          This will need some time ..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
@@ -90,13 +94,21 @@ fi
 
 # install custom xorg or wayland
 if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
+    if ! [[ -d /usr.zram ]]; then
+        echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram ..."
+        _zram_usr "${_ZRAM_SIZE}"
+    else
+        echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram already done ..."
+    fi
+    echo -e "\033[1mStep 2/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
+        echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ "${_CUSTOM_X}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
+        echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
@@ -106,22 +118,52 @@ fi
 
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_KDE_WAYLAND}" == "1" ]]; then
+    if ! [[ -d /usr.zram ]]; then
+        echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
+        _zram_usr "${_ZRAM_SIZE}"
+    else
+        echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram already done ..."
+    fi
+    echo -e "\033[1mStep 2/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
     # Launch xfce
-    [[ "${_L_XFCE}" == "1" ]] && _install_xfce
-    [[ "${_L_GNOME}" == "1" ]] && _install_gnome
-    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
-    [[ "${_L_KDE}" == "1" ]] && _install_kde
-    [[ "${_L_KDE_WAYLAND}" == "1" ]] && _install_kde_wayland
-    echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
+    if [[ "${_L_XFCE}" == "1" ]]; then
+        _install_xfce
+    fi
+    if [[ "${_L_GNOME}" == "1" ]]; then
+        _install_gnome
+    fi
+    if [[ "${_L_GNOME_WAYLAND}" == "1" ]]; then
+        _install_gnome_wayland
+    fi
+    if [[ "${_L_KDE}" == "1" ]]; then
+        _install_kde
+    fi
+    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
+        _install_kde_wayland
+    fi
+    echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     # only start vnc on xorg environment
-    [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
+    if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]]; then
+        _autostart_vnc
+    fi
     _chromium_flags
-    [[ "${_L_XFCE}" == "1" ]] && _start_xfce
-    [[ "${_L_GNOME}" == "1" ]] && _start_gnome
-    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
-    [[ "${_L_KDE}" == "1" ]] && _start_kde
-    [[ "${_L_KDE_WAYLAND}" == "1" ]] && _start_kde_wayland
+    if [[ "${_L_XFCE}" == "1" ]]; then
+        _start_xfce
+    fi
+    if [[ "${_L_GNOME}" == "1" ]]; then
+        _start_gnome
+    fi
+    if [[ "${_L_GNOME_WAYLAND}" == "1" ]]; then
+        _start_gnome_wayland
+    fi
+    if [[ "${_L_KDE}" == "1" ]]; then
+        _start_kde
+    fi
+    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
+        _start_kde_wayland
+    fi
 fi
 
 

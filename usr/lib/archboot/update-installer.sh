@@ -115,45 +115,58 @@ _update_installer_check() {
 }
 
 _zram_initialize() {
+    # add defaults
     _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    _ZRAM_SIZE=${_ZRAM_SIZE:-"3500M"}
-    if ! grep -q zram /proc/mounts; then
-        echo -e "\033[1mStep 1/7:\033[0m Waiting for gpg pacman keyring import to finish ..."
-        echo -e "          This takes some time ..."
-        _gpg_check
-        echo -e "\033[1mStep 2/7:\033[0m Initializing /dev/zram0 with ${_ZRAM_ALGORITHM} and ${_ZRAM_SIZE} size ..."
-        modprobe zram
-        echo ${_ZRAM_ALGORITHM} > /sys/block/zram0/comp_algorithm
-        echo ${_ZRAM_SIZE} > /sys/block/zram0/disksize
-        echo -e "\033[1mStep 3/7:\033[0m Creating btrfs filesystem on /dev/zram0 ..."
+    if ! grep -qw zram /proc/modules; then
+        modprobe zram num_devices=2> /dev/tty7 2>&1
+        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
+        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
+    fi
+}
+
+# use -o discard for RAM cleaning on delete
+# (online fstrimming the block device!)
+# fstrim <mountpoint> for manual action
+# it needs some seconds to get RAM free on delete!
+_zram_usr() {
+    if ! mountpoint -q /usr; then
+        echo "${1}" >/sys/block/zram0/disksize
+        echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
-        # use -o discard for RAM cleaning on delete
-        # (online fstrimming the block device!)
-        # fstrim <mountpoint> for manual action
-        # it needs some seconds to get RAM free on delete!
-        echo -e "\033[1mStep 4/7:\033[0m Mounting /dev/zram0 to /new_root ..."
-        mount -o discard /dev/zram0 /new_root
-        # only run next step om tty1
-        cat << EOF > /etc/profile.d/zz-01-archboot.sh
-if [[ "\$(tty)" == "$(tty)" ]]; then
-    update-installer.sh ${_RUN_OPTION}
-fi
-EOF
-        # motd not needed anymore
-        rm /etc/motd
-        echo -e "\033[1mStep 5/8:\033[0m Removing not necessary files from / ..."
-        _clean_archboot
-        echo -e "\033[1mStep 6/8:\033[0m Copying initramfs to /new_root ..."
-        echo -e "          This takes some time ..."
-        tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
-        --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" \
-        --exclude="./etc/pacman.d/S.*" -clpf - . | tar -C /new_root -xlspf -
-        # stop dbus to avoid 90 seconds hanging
-        echo -e "\033[1mStep 7/8:\033[0m Stopping dbus ..."
-        systemctl stop dbus
-        echo -e "\033[1mStep 8/8:\033[0m Switching root to /new_root ..."
-        echo "/dev/zram0 / btrfs defaults,discard,noatime,compress=zstd 0 0" >>/etc/fstab
-        systemctl switch-root /new_root
+        mkdir /usr.zram
+        mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
+        echo "Moving /usr to /usr.zram ..." > /dev/tty7
+        cp -r /usr/* /usr.zram/
+        ln -sfn /usr.zram/lib /lib
+        ln -sfn /usr.zram/lib /lib64
+        echo /usr.zram/lib > /etc/ld.so.conf
+        ldconfig
+        ln -sfn /usr.zram/bin /bin
+        ln -sfn /usr.zram/bin /sbin
+        #shellcheck disable=SC2115
+        rm -r /usr/*
+        /usr.zram/bin/./mount --bind /usr.zram /usr
+        systemctl daemon-reload > /dev/tty7 2>&1
+        systemctl restart dbus > /dev/tty7 2>&1
+    fi
+}
+
+_zram_w_dir() {
+    echo "${1}" >/sys/block/zram1/disksize
+    echo "Creating btrfs filesystem with ${1} on /dev/zram1 ..." > /dev/tty7
+    mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
+    [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
+    mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
+}
+
+_umount_w_dir() {
+    if mountpoint -q "${_W_DIR}"; then
+        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
+        # umount all possible mountpoints
+        umount -R "${_W_DIR}"
+        echo 1 > /sys/block/zram1/reset
+        # wait 5 seconds to get RAM cleared and set free
+        sleep 5
     fi
 }
 
@@ -178,8 +191,7 @@ _gpg_check() {
     while pgrep -x gpg > /dev/null 2>&1; do
         sleep 1
     done
-    systemctl stop pacman-init.service >/dev/tty7 2>&1
-    systemctl disable pacman-init.service >/dev/tty7 2>&1
+    systemctl stop pacman-init.service
 }
 
 _create_container() {
@@ -200,6 +212,7 @@ _create_container() {
         #online mode
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
+            mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
 }
@@ -228,9 +241,17 @@ _kver_generic() {
 }
 
 _create_initramfs() {
+    # move cache back to initramfs directory in online mode
+    if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
+            if [[ -d /var/cache/pacman/pkg ]]; then
+                mv /var/cache/pacman/pkg ${_W_DIR}/tmp/var/cache/pacman/
+            fi
+        fi
+    fi
     #from /usr/bin/mkinitcpio.conf
     # compress image with zstd
-    cd /tmp || exit 1
+    cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img
@@ -249,15 +270,13 @@ _kexec () {
             echo -e "\033[1m\033[93m- Possibility of not working kexec boot.\033[0m"
             echo -e "\033[1m\033[93m- Please use more or less RAM.\033[0m"
         fi
-        kexec -s -f /boot/"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
         # works on systems with <4GB
-        kexec -c -f /boot/"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
         sleep 2
-        rm /boot/"${VMLINUZ}"
-        rm /initrd.img
-        find . -mindepth 1 -maxdepth 1 -exec rm -rf {} \;
+        rm /{${VMLINUZ},initrd.img}
     fi
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1

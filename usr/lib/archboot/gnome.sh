@@ -3,16 +3,16 @@
 
 _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        echo -e "\033[1mStep 1/3:\033[0m Installing GNOME desktop now ..."
+        echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_GNOME_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 2/3:\033[0m Configuring GNOME desktop ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop ..."
         _configure_gnome >/dev/tty7 2>&1
         systemd-sysusers >/dev/tty7 2>&1
         systemd-tmpfiles --create >/dev/tty7 2>&1
     else
-        echo -e "\033[1mStep 1/3:\033[0m Installing GNOME desktop already done ..."
-        echo -e "\033[1mStep 2/3:\033[0m Configuring GNOME desktop already done ..."
+        echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop already done ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop already done ..."
     fi
 }
 
