@@ -61,10 +61,6 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     # write initramfs to "${_W_DIR}"/tmp
     mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp >/dev/tty7 2>&1 || exit 1
     rm -f /tmp/etc/initrd-release
-    #echo -e "\033[1mStep 5/8:\033[0m Cleanup ${_W_DIR} ..."
-    #find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
-    # 10 seconds for getting free RAM
-    #sleep 10
     echo -e "\033[1mStep 2/4:\033[0m Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     _create_initramfs
