@@ -198,7 +198,6 @@ _create_container() {
         #online mode
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
-            mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
 }
@@ -227,17 +226,9 @@ _kver_generic() {
 }
 
 _create_initramfs() {
-    # move cache back to initramfs directory in online mode
-    if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-            if [[ -d /var/cache/pacman/pkg ]]; then
-                mv /var/cache/pacman/pkg ${_W_DIR}/tmp/var/cache/pacman/
-            fi
-        fi
-    fi
     #from /usr/bin/mkinitcpio.conf
     # compress image with zstd
-    cd  "${_W_DIR}"/tmp || exit 1
+    cd /tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img
@@ -256,13 +247,14 @@ _kexec () {
             echo -e "\033[1m\033[93m- Possibility of not working kexec boot.\033[0m"
             echo -e "\033[1m\033[93m- Please use more or less RAM.\033[0m"
         fi
-        kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -s -f /boot/"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
         # works on systems with <4GB
-        kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -c -f /boot/"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
         sleep 2
-        rm /{${VMLINUZ},initrd.img}
+        rm /boot/"${VMLINUZ}"
+        rm /initrd.img
     fi
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1

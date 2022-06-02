@@ -40,40 +40,39 @@ _zram_initialize
 if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _update_installer_check
     touch /.update-installer
-    echo -e "\033[1mStep 1/8:\033[0m Removing not necessary files from / ..."
-    _clean_archboot
-    echo -e "\033[1mStep 2/8:\033[0m Generating archboot container in ${_W_DIR} ..."
-    echo "          This will need some time ..."
-    _create_container || exit 1
-    # 10 seconds for getting free RAM
-    sleep 10
-    echo -e "\033[1mStep 3/8:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
-    mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
+    if ! [[ -e /etc/profile.d/zz-00-archboot ]]; then
+        echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
+        _clean_archboot
+        echo -e "\033[1mStep 2/3:\033[0m Generating archboot container in ${_W_DIR} ..."
+        echo "          This will need some time ..."
+        _create_container || exit 1
+        echo "update-installer.sh ${_RUN_OPTION}" > /archboot/etc/profile.d/zz-00-archboot
+        systemctl stop dbus
+        echo -e "\033[1mStep 3/3:\033[0m Switching to new root ${_W_DIR} ..."
+        systemctl switch-root ${_W_DIR}
+    fi
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" ]] && _kver_generic
-    echo -e "\033[1mStep 4/8:\033[0m Collect initramfs files in ${_W_DIR} ..."
+    echo -e "\033[1mStep 1/4:\033[0m Collect initramfs files ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
-    cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
-    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
+    cp /usr/share/archboot/patches/31-mkinitcpio.fixed /usr/bin/mkinitcpio
+    cp /usr/share/archboot/patches/31-initcpio.functions.fixed /usr/lib/initcpio/functions
     # write initramfs to "${_W_DIR}"/tmp
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    rm -f "${_W_DIR}"/tmp/etc/initrd-release
-    echo -e "\033[1mStep 5/8:\033[0m Cleanup ${_W_DIR} ..."
-    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
+    mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp >/dev/tty7 2>&1 || exit 1
+    rm -f /tmp/etc/initrd-release
+    #echo -e "\033[1mStep 5/8:\033[0m Cleanup ${_W_DIR} ..."
+    #find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
-    sleep 10
-    echo -e "\033[1mStep 6/8:\033[0m Create initramfs /initrd.img ..."
+    #sleep 10
+    echo -e "\033[1mStep 2/4:\033[0m Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
     _create_initramfs
-    echo -e "\033[1mStep 7/8:\033[0m Cleanup ${_W_DIR} ..."
-    rm -r "${_W_DIR}"
-    # wait 5 seconds to get RAM cleared and set free
-    sleep 5
+    echo -e "\033[1mStep 3/4:\033[0m Cleanup ${_W_DIR} ..."
     cd /
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
-    echo -e "\033[1mStep 8/8:\033[0m Loading files through kexec into kernel now ..."
+    echo -e "\033[1mStep 4/4:\033[0m Loading files through kexec into kernel now ..."
     echo "          This will need some time ..."
     _kexec
 fi
