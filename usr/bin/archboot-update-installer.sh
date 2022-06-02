@@ -107,43 +107,21 @@ fi
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_KDE_WAYLAND}" == "1" ]]; then
     # Launch xfce
-    if [[ "${_L_XFCE}" == "1" ]]; then
-        _install_xfce
-    fi
-    if [[ "${_L_GNOME}" == "1" ]]; then
-        _install_gnome
-    fi
-    if [[ "${_L_GNOME_WAYLAND}" == "1" ]]; then
-        _install_gnome_wayland
-    fi
-    if [[ "${_L_KDE}" == "1" ]]; then
-        _install_kde
-    fi
-    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
-        _install_kde_wayland
-    fi
+    [[ "${_L_XFCE}" == "1" ]] && _install_xfce
+    [[ "${_L_GNOME}" == "1" ]] && _install_gnome
+    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
+    [[ "${_L_KDE}" == "1" ]] && _install_kde
+    [[ "${_L_KDE_WAYLAND}" == "1" ]] && _install_kde_wayland
     echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     # only start vnc on xorg environment
-    if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]]; then
-        _autostart_vnc
-    fi
+    [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
     _chromium_flags
-    if [[ "${_L_XFCE}" == "1" ]]; then
-        _start_xfce
-    fi
-    if [[ "${_L_GNOME}" == "1" ]]; then
-        _start_gnome
-    fi
-    if [[ "${_L_GNOME_WAYLAND}" == "1" ]]; then
-        _start_gnome_wayland
-    fi
-    if [[ "${_L_KDE}" == "1" ]]; then
-        _start_kde
-    fi
-    if [[ "${_L_KDE_WAYLAND}" == "1" ]]; then
-        _start_kde_wayland
-    fi
+    [[ "${_L_XFCE}" == "1" ]] && _start_xfce
+    [[ "${_L_GNOME}" == "1" ]] && _start_gnome
+    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
+    [[ "${_L_KDE}" == "1" ]] && _start_kde
+    [[ "${_L_KDE_WAYLAND}" == "1" ]] && _start_kde_wayland
 fi
 
 
