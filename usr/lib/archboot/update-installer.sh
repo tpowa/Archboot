@@ -136,7 +136,6 @@ _zram_initialize() {
         # only run next step om tty1
         cat << EOF > /etc/profile.d/zz-01-archboot.sh
 if [[ "\$(tty)" == "$(tty)" ]]; then
-    clear
     update-installer.sh ${_RUN_OPTION}
 fi
 EOF
