@@ -146,8 +146,9 @@ _install_archboot() {
     echo "Adding "${_GPG_KEY_ID}" to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+    echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
     #shellcheck disable=SC2086
-    pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_XORG} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
+    pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_XORG} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
     pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
