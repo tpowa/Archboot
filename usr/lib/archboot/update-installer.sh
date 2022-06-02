@@ -138,9 +138,10 @@ _zram_initialize() {
 if [[ "\$(tty)" == "$(tty)" ]]; then
     clear
     update-installer.sh ${_RUN_OPTION}
-    rm /etc/profile.d/zz-01-archboot.sh
 fi
 EOF
+        # motd not needed anymore
+        rm /etc/motd
         echo -e "\033[1mStep 5/7:\033[0m Copying initramfs to /new_root ..."
         echo -e "          This takes some time ..."
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
