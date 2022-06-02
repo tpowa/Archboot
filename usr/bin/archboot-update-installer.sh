@@ -48,6 +48,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
         _create_container || exit 1
         cp -r /etc ${_W_DIR}/
         cp /usr/bin/update-installer.sh ${_W_DIR}/usr/bin/
+        cp /usr/lib/archboot/update-installer.sh ${_W_DIR}/usr/lib//archboot/
         touch ${_W_DIR}/.archboot_container
         systemctl stop dbus
         echo -e "\033[1mStep 3/3:\033[0m Switching to new root ${_W_DIR} ..."
