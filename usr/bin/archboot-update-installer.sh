@@ -91,12 +91,12 @@ fi
 # install custom xorg or wayland
 if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
-        echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ "${_CUSTOM_X}" == "1" ]]; then
-        echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
@@ -112,7 +112,7 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
     [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
     [[ "${_L_KDE}" == "1" ]] && _install_kde
     [[ "${_L_KDE_WAYLAND}" == "1" ]] && _install_kde_wayland
-    echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
+    echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     # only start vnc on xorg environment
     [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc

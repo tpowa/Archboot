@@ -3,14 +3,14 @@
 
 _install_kde() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop now ..."
+        echo -e "\033[1mStep 1/3:\033[0m Installing KDE/Plasma desktop now ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_KDE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop ..."
+        echo -e "\033[1mStep 2/3:\033[0m Configuring KDE desktop ..."
         _configure_kde >/dev/tty7 2>&1
 	else
-		echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop already done ..."
-		echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop already done ..."
+		echo -e "\033[1mStep 1/3:\033[0m Installing KDE/Plasma desktop already done ..."
+		echo -e "\033[1mStep 2/3:\033[0m Configuring KDE desktop already done ..."
     fi
 }
 
