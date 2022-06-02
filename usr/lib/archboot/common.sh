@@ -55,10 +55,16 @@ _generate_locales() {
 }
 
 _generate_keyring() {
-    # generate pacman keyring
-    echo "Generate pacman keyring in container ..."
-    systemd-nspawn -q -D "${1}" pacman-key --init >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" pacman-key --populate "${_KEYRING}" >/dev/null 2>&1
+    # use fresh one on normal systems
+    # copy existing gpg cache on archboot usage
+    if ! grep -qw archboot /etc/hostname; then
+        # generate pacman keyring
+        echo "Generate pacman keyring in container ..."
+        systemd-nspawn -q -D "${1}" pacman-key --init >/dev/null 2>&1
+        systemd-nspawn -q -D "${1}" pacman-key --populate "${_KEYRING}" >/dev/null 2>&1
+    else
+        cp -ar /etc/pacman.d/gnupg "${1}"/etc/pacman.d >/dev/null 2>&1
+    fi
 }
 
 _x86_64_pacman_use_default() {
