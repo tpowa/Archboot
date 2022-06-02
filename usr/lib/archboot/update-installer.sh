@@ -277,6 +277,7 @@ _kexec () {
         kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
         sleep 2
         rm /{${VMLINUZ},initrd.img}
+        find . -mindepth 1 -maxdepth 1 ! -name 'dev' ! -name "sys" ! -name "proc" ! -name "run"  -exec rm -rf {} \;
     fi
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1
