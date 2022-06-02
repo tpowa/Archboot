@@ -141,18 +141,15 @@ fi
 EOF
         # motd not needed anymore
         rm /etc/motd
-        echo -e "\033[1mStep 5/8:\033[0m Removing not necessary files from / ..."
-        _clean_archboot
-        echo -e "\033[1mStep 6/8:\033[0m Copying initramfs to /new_root ..."
+        echo -e "\033[1mStep 5/7:\033[0m Copying initramfs to /new_root ..."
         echo -e "          This takes some time ..."
         tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" --exclude="./tmp/*" --exclude="./run/*"\
         --exclude="./mnt/*" --exclude="./media/*" --exclude="./lost+found" --exclude="./new_root/*" \
         --exclude="./etc/pacman.d/S.*" -clpf - . | tar -C /new_root -xlspf -
         # stop dbus to avoid 90 seconds hanging
-        echo -e "\033[1mStep 7/8:\033[0m Stopping dbus ..."
+        echo -e "\033[1mStep 6/7:\033[0m Stopping dbus ..."
         systemctl stop dbus
-        echo -e "\033[1mStep 8/8:\033[0m Switching root to /new_root ..."
-        echo "/dev/zram0 / btrfs defaults,discard,noatime,compress=zstd 0 0" >>/etc/fstab
+        echo -e "\033[1mStep 7/7:\033[0m Switching root to /new_root ..."
         systemctl switch-root /new_root
     fi
 }
