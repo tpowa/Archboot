@@ -57,6 +57,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     fi
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" ]] && _kver_generic
+    rm /etc/profile.d/zz-01-archboot.sh
     echo -e "\033[1mStep 1/4:\033[0m Collect initramfs files ..."
     echo "          This will need some time ..."
     # add fix for mkinitcpio 31, remove when 32 is released
