@@ -135,9 +135,7 @@ _zram_initialize() {
         mount -o discard /dev/zram0 /new_root
         # only run next step om tty1
         cat << EOF > /etc/profile.d/zz-01-archboot.sh
-[[ -z \$TTY ]] && TTY=\$(tty)
-TTY=\${TTY#/dev/}
-if [[ "\${TTY}" == "$(tty)" ]]; then
+if [[ "\$(tty)" == "$(tty)" ]]; then
     clear
     update-installer.sh ${_RUN_OPTION}
     rm /etc/profile.d/zz-01-archboot.sh
