@@ -141,9 +141,9 @@ _install_archboot() {
     echo "Adding "${_GPG_KEY_ID}" to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
-    echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
+    echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
     #shellcheck disable=SC2086
-    pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_XORG} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
+    pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
     pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
@@ -172,9 +172,9 @@ _aarch64_install_archboot() {
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     rm "${1}"/"${_GPG_KEY}"
-    echo "Downloading ${_ARCHBOOT} ${_XORG} to ${1} ..."
+    echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_XORG} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
