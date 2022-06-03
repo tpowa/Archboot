@@ -25,10 +25,17 @@ if [[ -e /usr/bin/setup ]]; then
     fi
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
     _welcome
-    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-    echo -e "\033[91m- Not engough memory detected! \033[0m"
-    echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.2GB\033[0m\033[93m RAM.\033[0m"
-    echo -e "\033[91mAborting ...\033[0m"
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2000000 ]]; then
+        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+        echo -e "\033[91m- Not engough memory detected! \033[0m"
+        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
+        echo -e "\033[91mAborting ...\033[0m"
+    else
+        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+        echo -e "\033[91m- Not engough memory detected! \033[0m"
+        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.2GB\033[0m\033[93m RAM.\033[0m"
+        echo -e "\033[91mAborting ...\033[0m"
+    fi
     _enter_shell
 elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
         $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
