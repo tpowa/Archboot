@@ -27,7 +27,6 @@ _run_update_installer() {
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
     cd /
-    _welcome
     echo -e "\033[1m\033[92mMemory checks run successfully:\033[0m"
     echo -e "\033[93mGo and get a cup of coffee. Depending on your system setup,\033[0m"
     echo -e "\033[93myou can \033[1mstart\033[0m\033[93m with your tasks in about \033[1m5\033[0m\033[93m minutes ...\033[0m"
@@ -79,5 +78,6 @@ elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e '
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
 else
+    _welcome
     _run_update_installer
 fi
