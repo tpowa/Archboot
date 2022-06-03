@@ -95,11 +95,6 @@ _prepare_pacman() {
 _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
         echo "Use default pacman.conf ..."
-        if grep -q archboot /etc/hostname; then
-            _PACMAN_CONF="/etc/pacman.conf"
-        else
-            _PACMAN_CONF="${1}/etc/pacman.conf"
-        fi
         if ! grep -q archboot_repo "${_PACMAN_CONF}"; then
             echo "Adding archboot repository to ${_PACMAN_CONF} ..."
             echo "[archboot_repo]" >> "${_PACMAN_CONF}"
