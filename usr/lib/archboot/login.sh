@@ -14,42 +14,7 @@ _enter_shell() {
     fi
 }
 
-if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-    echo -e "You are running in \033[92m\033[1mLocal mode\033[0m, with \033[1mlocal package repository\033[0m enabled.\033[0m"
-    echo -e "To \033[1mswitch\033[0m to \033[1mOnline mode\033[0m:# \033[1m\033[91mrm /var/cache/pacman/pkg/archboot.db\033[0m\033[1m"
-fi
-if [[ -e /usr/bin/setup ]]; then
-    _enter_shell
-    if ! [[ -e /tmp/.setup ]]; then
-        setup
-    fi
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
-    _welcome
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2000000 ]]; then
-        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-        echo -e "\033[91m- Not engough memory detected! \033[0m"
-        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
-        echo -e "\033[91mAborting ...\033[0m"
-    else
-        if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-            echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-            echo -e "\033[91m- Not engough memory detected! \033[0m"
-            echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.2GB\033[0m\033[93m RAM\033[0m"
-            echo -e "\033[93m  or switch to \033[1mOnline\033[0m\033[93m mode.\033[0m"
-            echo -e "\033[91mAborting ...\033[0m"
-        fi
-    fi
-    _enter_shell
-elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
-        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
-    _welcome
-    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-    echo -e "\033[91m- Memory gap detected: \033[1m4.0G - 4.4G RAM\033[0m"
-    echo -e "\033[91m- Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
-    echo -e "\033[93m- Please use \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM.\033[0m"
-    echo -e "\033[91mAborting ...\033[0m"
-    _enter_shell
-else
+_run_update_installer() {
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
     cd /
@@ -69,4 +34,45 @@ else
         echo -e "Running \033[1m\033[92mupdate-installer.sh -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
         echo -e "\033[1mProgress is shown here ...\033[0m"
     fi
+}
+
+if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+    echo -e "You are running in \033[92m\033[1mLocal mode\033[0m, with \033[1mlocal package repository\033[0m enabled.\033[0m"
+    echo -e "To \033[1mswitch\033[0m to \033[1mOnline mode\033[0m:# \033[1m\033[91mrm /var/cache/pacman/pkg/archboot.db\033[0m\033[1m"
+fi
+if [[ -e /usr/bin/setup ]]; then
+    _enter_shell
+    if ! [[ -e /tmp/.setup ]]; then
+        setup
+    fi
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
+    _welcome
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2000000 ]]; then
+        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+        echo -e "\033[91m- Not engough memory detected! \033[0m"
+        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
+        echo -e "\033[91mAborting ...\033[0m"
+        _enter_shell
+    elif [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+        echo -e "\033[91m- Not engough memory detected! \033[0m"
+        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.2GB\033[0m\033[93m RAM\033[0m"
+        echo -e "\033[93m  or switch to \033[1mOnline\033[0m\033[93m mode.\033[0m"
+        echo -e "\033[91mAborting ...\033[0m"
+        _enter_shell
+    else
+        _run_update_installer
+    fi
+    _run_update_installer
+elif [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
+        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
+    _welcome
+    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+    echo -e "\033[91m- Memory gap detected: \033[1m4.0G - 4.4G RAM\033[0m"
+    echo -e "\033[91m- Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
+    echo -e "\033[93m- Please use \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM.\033[0m"
+    echo -e "\033[91mAborting ...\033[0m"
+    _enter_shell
+else
+    _run_update_installer
 fi
