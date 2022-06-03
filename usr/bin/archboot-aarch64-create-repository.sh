@@ -19,7 +19,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _aarch64_pacman_chroot "${_REPODIR}" || exit 1
-    _create_pacman_conf "${_REPODIR}"
+    _create_pacman_conf "${_REPODIR}" "use_container_config"
     _aarch64_download_packages "${_REPODIR}" || exit 1
 fi
 _move_packages "${_REPODIR}" "${1}" || exit 1
