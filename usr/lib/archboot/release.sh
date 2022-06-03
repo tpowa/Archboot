@@ -31,8 +31,8 @@ _create_iso() {
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
     # remove not working lvm2 from latest image
-    echo "Remove lvm2 and openssh from container ${_W_DIR} ..."
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 openssh --noconfirm" >/dev/null 2>&1
+    echo "Remove lvm2 from container ${_W_DIR} ..."
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
     # generate latest tarball in container
     echo "Generate local ISO ..."
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
@@ -44,8 +44,8 @@ _create_iso() {
     # generate latest iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
     -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_ARCH}" || exit 1
-    echo "Install lvm2 and openssh to container ${_W_DIR} ..."
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2 openssh --noconfirm" >/dev/null 2>&1
+    echo "Install lvm2 to container ${_W_DIR} ..."
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
     echo "Generate normal ISO ..."
     # generate iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g" || exit 1
