@@ -88,6 +88,7 @@ if [[ "${_G_RELEASE}" == "1" ]]; then
     _zram_w_dir "4000M"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
+    rm /var/cache/pacman/pkg/*
     _zram_usr "300M"
     echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
     echo "          This will need some time ..."
