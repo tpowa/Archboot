@@ -85,7 +85,7 @@ fi
 
 # Generate new images
 if [[ "${_G_RELEASE}" == "1" ]]; then
-    _zram_w_dir "${_ZRAM_SIZE}"
+    _zram_w_dir "4000M"
     echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
     _clean_archboot
     _zram_usr "300M"
