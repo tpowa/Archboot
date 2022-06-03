@@ -40,29 +40,20 @@ usage () {
             echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
             echo ""
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3900000 &&\
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
         echo ""
     fi
-    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
-        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
-        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-        echo -e "\033[91m   - Memory gap detected: \033[1m4.0G - 4.4G RAM\033[0m"
-        echo -e "\033[91m   - Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
-        echo -e "\033[93m   - Please add \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM to enable the missing \033[1mupdate\033[0m\033[93m options.\033[0m"
-        echo ""
-    else
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
         -e /usr/bin/dhcpcd ]]; then
-            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-            echo ""
-        fi
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
-            echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-            echo -e "                  package cache (using kexec)."
-            echo ""
-        fi
+        echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+        echo ""
+    fi
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
+        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+        echo -e "                  package cache (using kexec)."
+        echo ""
     fi
     exit 0
 }
@@ -267,22 +258,13 @@ _create_initramfs() {
 }
 
 _kexec () {
-    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ||\
+    if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 5920000 ||\
     $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 3200000 ]]; then
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mnew\033[0m KEXEC_FILE_LOAD ..."
-        # works on systems with >4GB, --latest-install needs around 4400MB RAM
-        # that causes a gap which can break qemu kexec or parallels desktop
-        if [[ $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -lt 4400000 &&\
-        $(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g') -gt 4015000 ]]; then
-            echo -e "\033[1m\033[91mWarning:\033[0m"
-            echo -e "\033[1m\033[91m- Memory gap detected (4.0G - 4.4G RAM)\033[0m"
-            echo -e "\033[1m\033[93m- Possibility of not working kexec boot.\033[0m"
-            echo -e "\033[1m\033[93m- Please use more or less RAM.\033[0m"
-        fi
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
-        # works on systems with <4GB
+        # works on systems with <6GB
         kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
     sleep 2
