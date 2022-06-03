@@ -51,9 +51,9 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.setup ]]; then
         setup
     fi
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3200000 ]]; then
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 ]]; then
     _welcome
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2000000 ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
         echo -e "\033[1m\033[91mMemory check failed:\033[0m"
         echo -e "\033[91m- Not engough memory detected! \033[0m"
         echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
@@ -62,7 +62,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     elif [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo -e "\033[1m\033[91mMemory check failed:\033[0m"
         echo -e "\033[91m- Not engough memory detected! \033[0m"
-        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.2GB\033[0m\033[93m RAM\033[0m"
+        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.3GB\033[0m\033[93m RAM\033[0m"
         echo -e "\033[93m  or switch to \033[1mOnline\033[0m\033[93m mode.\033[0m"
         echo -e "\033[91mAborting ...\033[0m"
         _enter_shell

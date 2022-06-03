@@ -53,12 +53,12 @@ usage () {
         echo -e "\033[93m   - Please add \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM to enable the missing \033[1mupdate\033[0m\033[93m options.\033[0m"
         echo ""
     else
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 &&\
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
         -e /usr/bin/dhcpcd ]]; then
             echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
             echo ""
         fi
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3200000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
             echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
             echo -e "                  package cache (using kexec)."
             echo ""
