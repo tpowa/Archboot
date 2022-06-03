@@ -278,7 +278,7 @@ _kexec () {
     fi
     sleep 2
     rm /{${VMLINUZ},initrd.img}
-    rm -rf /usr
+    rm -rf /usr/*
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1
     done
