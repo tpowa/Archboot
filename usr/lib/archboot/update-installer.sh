@@ -258,7 +258,12 @@ _create_initramfs() {
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img
+    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
+    sleep 2
+    while pgrep -x zstd > /dev/null 2>&1; do
+        _clean_kernel_cache
+        sleep 1
+    done
 }
 
 _kexec () {
