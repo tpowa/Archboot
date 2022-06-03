@@ -74,6 +74,10 @@ _archboot_check() {
     fi
 }
 
+_clean_kernel_cache () {
+    echo 3 > /proc/sys/vm/drop_caches
+}
+
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ "${_D_SCRIPTS}" == "1" ]]; then
@@ -277,6 +281,7 @@ _kexec () {
         kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
     sleep 2
+    _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
     rm -rf /usr/*
     while pgrep -x kexec > /dev/null 2>&1; do
