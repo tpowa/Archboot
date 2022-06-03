@@ -11,7 +11,7 @@ _XORG_PACKAGE="xorg"
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
 _STANDARD_PACKAGES="gparted nss-mdns chromium"
-_XORG="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_KDE_PACKAGES} wayland-egl plasma-wayland-session"
+_XORG="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_KDE_PACKAGES} egl-wayland plasma-wayland-session"
 
 ### check for root
 _root_check() {
