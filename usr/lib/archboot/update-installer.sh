@@ -285,6 +285,7 @@ _kexec () {
     rm /{${VMLINUZ},initrd.img}
     rm -rf /usr/*
     while pgrep -x kexec > /dev/null 2>&1; do
+        _clean_kernel_cache
         sleep 1
     done
 }
