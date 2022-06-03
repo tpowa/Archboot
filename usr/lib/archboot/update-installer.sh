@@ -26,7 +26,7 @@ usage () {
         echo -e ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 &&\
-    -e /usr/bin/setup && ! -e /var/cache/pacman/pkg/archboot.db ]]; then
+    -e /usr/bin/setup ]]; then
             echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
             echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
             echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
