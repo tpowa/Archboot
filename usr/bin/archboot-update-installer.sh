@@ -46,10 +46,12 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
     _clean_archboot
     _zram_usr "300M"
+    _clean_kernel_cache
     echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
     echo "          This will need some time ..."
     _create_container || exit 1
     # 10 seconds for getting free RAM
+    _clean_kernel_cache
     sleep 10
     echo -e "\033[1mStep 4/9:\033[0m Moving kernel ${VMLINUZ} to /${VMLINUZ} ..."
     mv "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
@@ -65,6 +67,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
+    _clean_kernel_cache
     sleep 10
     echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img ..."
     echo "          This will need some time ..."
@@ -72,6 +75,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
     cd /
     _umount_w_dir
+    _clean_kernel_cache
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
     echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
