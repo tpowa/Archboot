@@ -31,13 +31,13 @@ usage () {
             echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
             echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
             echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with Wayland."
-            echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
+            [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 &&\
     -e /usr/bin/setup ]]; then
             echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
             echo ""
-            echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
+            [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
             echo ""
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
