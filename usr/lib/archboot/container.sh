@@ -136,7 +136,6 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    echo "Downloading ${_XORG} to ${1} ..."
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding "${_GPG_KEY_ID}" to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
