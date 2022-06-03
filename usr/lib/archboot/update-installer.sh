@@ -278,7 +278,8 @@ _kexec () {
     fi
     sleep 2
     rm /{${VMLINUZ},initrd.img}
-    find . -mindepth 1 ! -name 'dev' ! -name "sys" ! -name "proc" ! -name "run"  ! -name "rm" -exec rm -rf {} \;
+    find . -mindepth 1 -maxdepth 1 ! -name 'dev' ! -name "sys" ! -name "proc" ! -name "run"  ! -name "usr" -exec rm -rf {} \;
+    rm -rf /usr
     while pgrep -x kexec > /dev/null 2>&1; do
         sleep 1
     done
