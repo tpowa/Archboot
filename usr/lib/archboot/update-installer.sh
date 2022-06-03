@@ -191,7 +191,7 @@ _gpg_check() {
     while pgrep -x gpg > /dev/null 2>&1; do
         sleep 1
     done
-    systemctl stop pacman-init.service
+    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
 }
 
 _create_container() {
