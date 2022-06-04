@@ -31,20 +31,20 @@ usage () {
         echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
         echo -e ""
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 &&\
-    -e /usr/bin/setup ]]; then
+    if [[ -e /usr/bin/setup ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]]; then
             echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
             echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
             echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
             echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with Wayland."
             [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
-    fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 &&\
-    -e /usr/bin/setup ]]; then
+        fi
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
             echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
             echo ""
             [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
             echo ""
+        fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
@@ -53,19 +53,20 @@ usage () {
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
         -e /usr/bin/dhcpcd ]]; then
-        if ! [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3177000 &&\
+        if ! [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 &&\
         -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
             echo ""
         fi
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2560000 &&\
-    ! -e /var/cache/pacman/pkg/archboot.db ]]; then
-        _latest_install
-    fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 &&\
-    -e /var/cache/pacman/pkg/archboot.db ]]; then
-        _latest_install
+    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
+            _latest_install
+        fi
+    else
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2560000 ]]; then
+            _latest_install
+        fi
     fi
     exit 0
 }
