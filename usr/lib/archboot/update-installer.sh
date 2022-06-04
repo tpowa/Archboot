@@ -27,10 +27,8 @@ usage () {
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-h\033[0m               This message."
     echo -e ""
-    if [[ -e /usr/bin/dhcpcd ]]; then
-        echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
-        echo -e ""
-    fi
+    echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+    echo -e ""
     if [[ -e /usr/bin/setup ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]]; then
             echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
@@ -51,8 +49,7 @@ usage () {
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
         echo ""
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
-        -e /usr/bin/dhcpcd ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
         if ! [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 &&\
         -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
