@@ -51,8 +51,6 @@ _run_update_installer() {
         else
             if [[ -e /var/cache/pacman/archboot.db ]]; then
                 if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3860000 ]]; then
-                    _run_latest
-                else
                     _run_latest_install
                 fi
             else
