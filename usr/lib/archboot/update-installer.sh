@@ -49,18 +49,18 @@ usage () {
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
         echo ""
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
-        if ! [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 &&\
-        -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-            echo ""
-        fi
-    fi
+    # local image
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
             _latest_install
         fi
     else
+    # latest image
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
+        "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 ]]; then
+            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+            echo ""
+        fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2560000 ]]; then
             _latest_install
         fi
@@ -69,7 +69,7 @@ usage () {
 }
 
 _archboot_check() {
-    if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
+    if ! grep -qw "archboot" /etc/hostname; then
         echo "This script should only be run in booted archboot environment. Aborting..."
         exit 1
     fi
