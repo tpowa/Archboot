@@ -36,10 +36,19 @@ _run_update_installer() {
         sleep 10
         echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
         echo ""
-        echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest-install\033[0m"
-        update-installer.sh -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
+            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest-install\033[0m"
+            update-installer.sh -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+        else
+            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
+            update-installer.sh -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+        fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
-        echo -e "Running \033[1m\033[92mupdate-installer.sh -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
+            echo -e "Running \033[1m\033[92mupdate-installer.sh -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
+        else
+            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
+        fi
         echo -e "\033[1mProgress is shown here ...\033[0m"
     fi
 }
@@ -50,24 +59,13 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.setup ]]; then
         setup
     fi
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3860000 ]]; then
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
     _welcome
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
-        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-        echo -e "\033[91m- Not engough memory detected! \033[0m"
-        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
-        echo -e "\033[91mAborting ...\033[0m"
-        _enter_shell
-    elif [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-        echo -e "\033[91m- Not engough memory detected! \033[0m"
-        echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.9GB\033[0m\033[93m RAM\033[0m"
-        echo -e "\033[93m  or switch to \033[1mOnline\033[0m\033[93m mode.\033[0m"
-        echo -e "\033[91mAborting ...\033[0m"
-        _enter_shell
-    else
-        _run_update_installer
-    fi
+    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+    echo -e "\033[91m- Not engough memory detected! \033[0m"
+    echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
+    echo -e "\033[91mAborting ...\033[0m"
+    _enter_shell
 else
     _welcome
     _run_update_installer
