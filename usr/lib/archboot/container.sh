@@ -72,7 +72,7 @@ _clean_mkinitcpio() {
 
 # Clean cache on archboot environment
 _clean_archboot_cache() {
-    grep -qw 'archboot' /etc/hostname && (echo "Cleaning archboot /var/cache/pacman/pkg ..."; rm -r /var/cache/pacman/pkg)
+    grep -qw 'archboot' /etc/hostname && (echo "Cleaning archboot /var/cache/pacman/pkg ..."; rm -f /var/cache/pacman/pkg/*)
 }
 
 _prepare_pacman() {
