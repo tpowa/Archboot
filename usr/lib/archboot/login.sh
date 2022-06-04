@@ -23,6 +23,16 @@ _enter_shell() {
     fi
 }
 
+_run_latest() {
+    echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
+    update-installer.sh -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+}
+
+_run_latest_install() {
+    echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest-install\033[0m"
+    update-installer.sh -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+}
+
 _run_update_installer() {
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
@@ -37,11 +47,21 @@ _run_update_installer() {
         echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
         echo ""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
-            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest-install\033[0m"
-            update-installer.sh -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+            _run_latest_install
         else
-            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
-            update-installer.sh -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+            if [[ -e /var/cache/pacman/archboot.db ]]; then
+                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3860000 ]]; then
+                    _run_latest
+                else
+                    _run_latest_install
+                fi
+            else
+                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
+                    _run_latest
+                else
+                    _run_latest_install
+                fi
+            fi
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
