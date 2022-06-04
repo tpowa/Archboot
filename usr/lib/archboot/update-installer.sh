@@ -15,6 +15,12 @@ _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
+_latest_install() {
+        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+        echo -e "                  package cache (using kexec)."
+        echo ""
+}
+
 usage () {
     echo -e "\033[1mUpdate installer, launch environments or create latest image files:\033[0m"
     echo -e "\033[1m-------------------------------------------------------------------\033[0m"
@@ -53,10 +59,13 @@ usage () {
             echo ""
         fi
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
-        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-        echo -e "                  package cache (using kexec)."
-        echo ""
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2560000 &&\
+    ! -e /var/cache/pacman/pkg/archboot.db ]]; then
+        _latest_install
+    fi
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 &&\
+    -e /var/cache/pacman/pkg/archboot.db ]]; then
+        _latest_install
     fi
     exit 0
 }
@@ -205,6 +214,8 @@ _create_container() {
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1
         fi
+        # needed for checks
+        cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
     else
         #online mode
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then

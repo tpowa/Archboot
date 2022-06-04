@@ -88,7 +88,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
 # local image, fail if less than 3.2GB RAM available
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3177000 &&\
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 &&\
 -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
