@@ -96,7 +96,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.3GB\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
-elif [[ "${_RUNNING_ARCH}" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 &&\
+elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 &&\
 "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4210000 ]]; then
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
