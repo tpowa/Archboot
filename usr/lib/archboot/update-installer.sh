@@ -47,8 +47,11 @@ usage () {
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 &&\
         -e /usr/bin/dhcpcd ]]; then
-        echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-        echo ""
+        if ! [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3177000 &&\
+        -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+            echo ""
+        fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
         echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
@@ -207,7 +210,6 @@ _create_container() {
         #online mode
         if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
-            mv "${_W_DIR}"/var/cache/pacman/pkg /var/cache/pacman/
         fi
     fi
 }
