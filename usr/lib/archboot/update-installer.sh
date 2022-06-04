@@ -16,9 +16,16 @@ _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 _latest_install() {
-        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-        echo -e "                  package cache (using kexec)."
-        echo ""
+    echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+    echo -e "                  package cache (using kexec)."
+    echo ""
+}
+
+_graphic_options() {
+    echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
+    echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
+    echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
+    echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with Wayland."
 }
 
 usage () {
@@ -30,18 +37,23 @@ usage () {
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
     if [[ -e /usr/bin/setup ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]]; then
-            echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
-            echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
-            echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
-            echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with Wayland."
-            [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
-        fi
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-            echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
-            echo ""
-            [[ -e /var/cache/pacman/pkg/archboot.db ]] || echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
-            echo ""
+        # local image
+        if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
+                _graphic_options
+                echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+            fi
+        else
+            # latest image
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] ; then
+                _graphic_options
+                echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
+            fi
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
+                echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
+                echo ""
+            fi
         fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
