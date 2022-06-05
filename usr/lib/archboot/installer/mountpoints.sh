@@ -325,7 +325,8 @@ _mkfs() {
                 ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                f2fs)     mkfs.f2fs ${_fsoptions} -f -l "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                f2fs)     mkfs.f2fs ${_fsoptions} -f -l "${_labelname}" \
+                                    -O extra_attr,inode_checksum,sb_checksum ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >"${LOG}" 2>&1; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
@@ -347,6 +348,13 @@ _mkfs() {
         # add ssd optimization before mounting
         ssd_optimization
         _mountoptions=""
+        ### f2fs mount options, taken from wiki:
+        # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
+        # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
+        # whint_mode=fs-based[7] Try to optimize fs-log management depending on file "hotness", meaning how often this data will be read/written to.
+        # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
+        # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
+        [[ "${_fstype}" = "f2fs" ]] && _mountoptions="compress_algorithm=zstd:6,compress_chksum,whint_mode=fs-based,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${_btrfssubvolume}" ]] && _mountoptions="${_mountoptions} subvol=${_btrfssubvolume}"
         [[ -n "${_btrfscompress}" ]] && _mountoptions="${_mountoptions} ${_btrfscompress}"
