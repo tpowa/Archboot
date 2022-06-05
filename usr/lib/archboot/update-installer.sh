@@ -257,14 +257,6 @@ _kver_generic() {
 }
 
 _create_initramfs() {
-    # move cache back to initramfs directory in online mode
-    if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
-            if [[ -d /var/cache/pacman/pkg ]]; then
-                mv /var/cache/pacman/pkg ${_W_DIR}/tmp/var/cache/pacman/
-            fi
-        fi
-    fi
     #from /usr/bin/mkinitcpio.conf
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
