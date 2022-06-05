@@ -351,10 +351,9 @@ _mkfs() {
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
         # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
-        # whint_mode=fs-based[7] Try to optimize fs-log management depending on file "hotness", meaning how often this data will be read/written to.
         # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
-        [[ "${_fstype}" = "f2fs" ]] && _mountoptions="compress_algorithm=zstd:6,compress_chksum,whint_mode=fs-based,atgc,gc_merge,lazytime"
+        [[ "${_fstype}" = "f2fs" ]] && _mountoptions="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${_btrfssubvolume}" ]] && _mountoptions="${_mountoptions} subvol=${_btrfssubvolume}"
         [[ -n "${_btrfscompress}" ]] && _mountoptions="${_mountoptions} ${_btrfscompress}"
