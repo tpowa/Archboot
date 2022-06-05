@@ -63,7 +63,6 @@ autoprepare() {
         [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
 
-
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             GUID_PART_SIZE="2"
