@@ -75,7 +75,7 @@ autoprepare() {
         if [[ "${GUIDPARAMETER}" = "yes" ]]; then
             if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
                 while [[ "${UEFISYS_PART_SET}" = "" ]]; do
-                    DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>"${ANSWER}" || return 1
+                    DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
                     UEFISYS_PART_SIZE="$(cat "${ANSWER}")"
                     if [[ "${UEFISYS_PART_SIZE}" = "" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
