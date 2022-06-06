@@ -124,6 +124,8 @@ fi
 if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
     if [[ -e "/.graphic_run" ]]; then
         echo -e "\033[1m\033[91mError: Graphical environment already installed ...\033[0m"
+        echo -e "You are running in \033[1mLocal mode\033[0m, which only can launch \033[1mone\033[0m environment."
+        echo -e "Please relaunch your already used graphical environment from commandline."
     else
         if ! [[ -d /usr.zram ]]; then
             echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
