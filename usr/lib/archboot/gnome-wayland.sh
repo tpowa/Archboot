@@ -41,6 +41,9 @@ EOF
 
 _start_gnome_wayland() {
     echo -e "Launching GNOME Wayland now, logging is done on \033[1m/dev/tty7\033[0m ..."
-    echo -e "To relaunch GNOME Wayland use: \033[92mupdate-installer.sh -gnome-wayland\033[0m"
-    LANG=C.UTF-8 MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1
+    echo -e "To relaunch GNOME Wayland use: \033[92mgnome-wayland\033[0m"
+
+    echo "LANG=C.UTF-8 MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/gnome-wayland
+    chmod 755 /usr/bin/gnome-wayland
+    gnome-wayland
 }

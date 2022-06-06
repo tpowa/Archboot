@@ -7,8 +7,8 @@
 . /usr/lib/archboot/xfce.sh
 . /usr/lib/archboot/gnome.sh
 . /usr/lib/archboot/gnome-wayland.sh
-. /usr/lib/archboot/kde.sh
-. /usr/lib/archboot/kde-wayland.sh
+. /usr/lib/archboot/plasma.sh
+. /usr/lib/archboot/plasma-wayland.sh
 
 [[ -z "${1}" ]] && usage
 
@@ -18,11 +18,11 @@ while [ $# -gt 0 ]; do
         -latest|--latest) _L_COMPLETE="1" ;;
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
         -latest-image|--latest-image) _G_RELEASE="1" ;;
-        -launch-xfce|--launch-xfce) _L_XFCE="1" ;;
-        -launch-gnome|--launch-gnome) _L_GNOME="1";;
+        -xfce|--xfce) _L_XFCE="1" ;;
+        -gnome|--gnome) _L_GNOME="1";;
         -gnome-wayland|--gnome-wayland) _L_GNOME_WAYLAND="1";;
-        -launch-kde|--launch-kde) _L_KDE="1" ;;
-        -kde-wayland|--kde-wayland) _L_KDE_WAYLAND="1" ;;
+        -plasma|--plasma) _L_PLASMA="1" ;;
+        -plasma-wayland|--plasma-wayland) _L_PLASMA_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
         -h|--h|?) usage ;;
@@ -121,7 +121,7 @@ if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
 fi
 
 # Gnome, KDE/PLASMA or XFCE launch
-if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_KDE_WAYLAND}" == "1" ]]; then
+if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
     if [[ -e "/.graphic_run" ]]; then
         echo -e "\033[1m\033[91mError: Graphical environment already installed ...\033[0m"
     else
@@ -137,18 +137,18 @@ if [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" || "${_L
         [[ "${_L_XFCE}" == "1" ]] && _install_xfce
         [[ "${_L_GNOME}" == "1" ]] && _install_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
-        [[ "${_L_KDE}" == "1" ]] && _install_kde
-        [[ "${_L_KDE_WAYLAND}" == "1" ]] && _install_kde_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _install_kde
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_kde_wayland
         echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
         systemctl start avahi-daemon.service
         # only start vnc on xorg environment
-        [[ "${_L_XFCE}" == "1" || "${_L_KDE}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
+        [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
         _chromium_flags
         [[ "${_L_XFCE}" == "1" ]] && _start_xfce
         [[ "${_L_GNOME}" == "1" ]] && _start_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
-        [[ "${_L_KDE}" == "1" ]] && _start_kde
-        [[ "${_L_KDE_WAYLAND}" == "1" ]] && _start_kde_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _start_kde
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_kde_wayland
     fi
 fi
 

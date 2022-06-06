@@ -22,10 +22,10 @@ _latest_install() {
 }
 
 _graphic_options() {
-    echo -e " \033[1m-launch-gnome\033[0m    Launch Gnome desktop with VNC sharing enabled."
-    echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland."
-    echo -e " \033[1m-launch-kde\033[0m      Launch KDE Plasma desktop with VNC sharing enabled."
-    echo -e " \033[1m-kde-wayland\033[0m     Launch KDE Plasma desktop with Wayland."
+    echo -e " \033[1m-gnome\033[0m           Launch Gnome desktop with VNC sharing enabled."
+    echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
+    echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
+    echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
 }
 
 usage () {
@@ -42,7 +42,7 @@ usage () {
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
                 if ! [[ -e "/.graphic_run" ]]; then
                     _graphic_options
-                    echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                    echo -e " \033[1m-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
                     echo ""
                 fi
             fi
@@ -52,7 +52,7 @@ usage () {
                 _graphic_options
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-                echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                echo -e " \033[1m-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
                 echo ""
@@ -110,7 +110,7 @@ _download_latest() {
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
-        LIBS="common.sh container.sh release.sh iso.sh update-installer.sh xfce.sh gnome.sh gnome-wayland.sh kde.sh kde-wayland.sh login.sh"
+        LIBS="common.sh container.sh release.sh iso.sh update-installer.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh login.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done

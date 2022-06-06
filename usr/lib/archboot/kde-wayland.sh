@@ -74,6 +74,8 @@ EOF
 
 _start_kde_wayland() {
     echo -e "Launching KDE/Plasma Wayland now, logging is done on \033[1m/dev/tty7\033[0m ..."
-	echo -e "To relaunch KDE/Plasma Wayland use: \033[92mupdate-installer.sh -kde-wayland\033[0m"
-    exec dbus-run-session startplasma-wayland >/dev/tty7 2>&1
+	echo -e "To relaunch KDE/Plasma Wayland use: \033[92mplasma-wayland\033[0m"
+    echo "exec dbus-run-session startplasma-wayland >/dev/tty7 2>&1" > /usr/bin/plasma-wayland
+    chmod 755 /usr/bin/plasma-wayland
+    plasma-wayland
 }
