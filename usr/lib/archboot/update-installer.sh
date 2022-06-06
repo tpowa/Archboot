@@ -40,18 +40,20 @@ usage () {
         # local image
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
-                _graphic_options
-                echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                if ! [[ -e "/.graphic_run" ]]; then
+                    _graphic_options
+                    echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                fi
             fi
         else
             # latest image
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] ; then
                 _graphic_options
-                echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
                 echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
+               [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
                 echo ""
             fi
         fi
