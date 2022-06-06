@@ -26,7 +26,6 @@ _graphic_options() {
     echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
     echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
     echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
-    echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
 }
 
 usage () {
