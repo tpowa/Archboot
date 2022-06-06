@@ -26,6 +26,7 @@ _graphic_options() {
     echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
     echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
     echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
+    echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
 }
 
 usage () {
@@ -42,7 +43,7 @@ usage () {
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
                 if ! [[ -e "/.graphic_run" ]]; then
                     _graphic_options
-                    echo -e " \033[1m-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                    echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
                     echo ""
                 fi
             fi
@@ -52,7 +53,7 @@ usage () {
                 _graphic_options
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-                echo -e " \033[1m-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \033[1m-custom-xorg\033[0m     Install custom X environment."
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
                 echo ""
