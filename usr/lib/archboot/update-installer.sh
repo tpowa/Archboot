@@ -43,6 +43,7 @@ usage () {
                 if ! [[ -e "/.graphic_run" ]]; then
                     _graphic_options
                     echo -e " \033[1m-launch-xfce\033[0m     Launch XFCE desktop with VNC sharing enabled."
+                    echo ""
                 fi
             fi
         else
