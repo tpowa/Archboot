@@ -31,8 +31,10 @@ build ()
     ### add zsh
     map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     
-    ### add en_US.utf8 locale
-    add_file "/usr/lib/locale/locale-archive"
+    ### add C.UTF-8 locale
+    add_full_dir /usr/lib/locale/C.UTF-8
+    ### add custom locale
+    [[ -e "/usr/lib/locale/locale-archive" ]] && add_file "/usr/lib/locale/locale-archive"
 
     ### fix file
     add_file "/usr/share/file/misc/magic.mgc"

@@ -348,9 +348,6 @@ _prepare_graphic() {
     fi
     echo "Removing not used icons ..."
     rm -rf /usr/share/icons/breeze-dark
-    echo "Recreating C.UTF-8 locale ..."
-    sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "/etc/locale.gen"
-    locale-gen >/dev/null 2>&1
     echo "Cleanup locale and i18n ..."
     rm -rf /usr/share/{locale,i18n}
     # needed for environments which check disk space

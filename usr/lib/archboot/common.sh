@@ -45,15 +45,6 @@ _buildserver_check() {
     fi
 }
 
-# generate locales
-_generate_locales() {
-    if [[ -d ${1}/usr/share/i18n ]]; then
-        echo "Generate locales in container ..."
-        sed -i -e 's:#C.UTF-8 UTF-8:C.UTF-8 UTF-8:g' "${1}/etc/locale.gen"
-        systemd-nspawn -q -D "${1}" locale-gen >/dev/null 2>&1 || exit 1
-    fi
-}
-
 _generate_keyring() {
     # use fresh one on normal systems
     # copy existing gpg cache on archboot usage
