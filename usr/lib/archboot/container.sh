@@ -59,7 +59,7 @@ _clean_container() {
         rm -r "${1}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,cmake,common-lisp,cracklib,dhclient,dhcpcd,dict,dnsmasq,emacs,et,fish,gdb,gettext,gettext-0.21,glib-2.0,gnupg,graphite2,gtk-doc,iana-etc,icons,icu,iptables,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,pixmaps,pkgconfig,readline,screen,smartmontools,ss,stoken,tabset,texinfo,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl5,i18n,locale}
         rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-1.1,environment.d,gawk,getconf,gettext,girepository-1.0,glib-2.0,gnupg,gssproxy,guile,icu,itcl4.2.2,iwd,krb5,ldb,ldscripts,libnl,libproxy,ntfs-3g,openconnect,openssl-1.0,p11-kit,pcsc,pkgconfig,python3.10,rsync,samba,sasl2,siconv,tar,tcl8.6,tcl8,tdbc1.1.3,tdbcmysql1.1.3,tdbcodbc1.1.3,tdbcpostgres1.1.3,terminfo,texinfo,thread2.8.7,valgrind,xfsprogs,xplc-0.3.13,xtables}
         # until vim is fixed, clean all files and leave libperl.so
-        find /usr/lib/perl5 -type f ! -name 'libperl.so' -exec rm -rf {} \;
+        find "${1}"/usr/lib/perl5 -type f ! -name 'libperl.so' -exec rm -rf {} \;
     fi
 }
 
