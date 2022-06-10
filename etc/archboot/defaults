@@ -47,11 +47,11 @@ _SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/archboot-images"
 _SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/archboot-sources"
 _PACMAN_AARCH64="pacman-aarch64-chroot"
 _PACMAN_AARCH64_CHROOT="${_PACMAN_AARCH64}-latest.tar.zst"
-_SERVER_PACMAN_AARCH64="${_SERVER_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
+_SERVER_PACMAN_AARCH64="${_SERVER_SOURCE_DIR}/${_PACMAN_AARCH64}"
 # public download paths
 _ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
 _ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/archboot-sources"
-_ARCHBOOT_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/archboot-helper/${_PACMAN_AARCH64}"
+_ARCHBOOT_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_SOURCE}/${_PACMAN_AARCH64}"
 # local user and group
 _USER="tobias"
 _GROUP="users"
