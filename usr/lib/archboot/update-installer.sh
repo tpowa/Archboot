@@ -281,7 +281,7 @@ _kexec () {
     else
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
         # works on systems with <6GB
-        kexec -c -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -c -f --mem-max=0x80000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
     sleep 2
     _clean_kernel_cache
