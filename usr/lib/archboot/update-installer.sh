@@ -323,7 +323,7 @@ _prepare_graphic() {
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
-            _cleanup_cache
+            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 5920000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
     else
@@ -342,7 +342,7 @@ _prepare_graphic() {
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
-            _cleanup_cache
+            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 5920000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
     fi
