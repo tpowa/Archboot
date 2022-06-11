@@ -40,7 +40,7 @@ usage () {
         # local image
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
-                if ! [[ -e "/.graphic_run" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4917000 ]]; then
+                if ! [[ -e "/.graphic_run" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
                     _graphic_options
                     echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
                     echo ""
@@ -323,7 +323,7 @@ _prepare_graphic() {
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
-            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4917000 ]] && _cleanup_cache
+            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
     else
@@ -342,7 +342,7 @@ _prepare_graphic() {
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
             _cleanup_install
-            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4917000 ]] && _cleanup_cache
+            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
     fi

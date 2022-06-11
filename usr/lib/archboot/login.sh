@@ -106,10 +106,10 @@ elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
 elif [[ "$(uname -m)" == "x86_64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4670000 &&\
-"$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 5019000 ]]; then
+"$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 5220000 ]]; then
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-    echo -e "\033[91m- Kexec memory gap detected: \033[1m4750M - 5099M RAM\033[0m"
+    echo -e "\033[91m- Kexec memory gap detected: \033[1m4750M - 5299M RAM\033[0m"
     echo -e "\033[91m- Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
     echo -e "\033[93m- Please use \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
