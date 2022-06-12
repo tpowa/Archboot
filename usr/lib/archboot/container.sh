@@ -101,7 +101,7 @@ _create_pacman_conf() {
         if ! grep -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding archboot repository to ${_PACMAN_CONF} ..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
-            echo "Server = https://pkgbuild.com/~tpowa/archboot-repository" >> "${_PACMAN_CONF}"
+            echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
     else
         echo "Use custom pacman.conf ..."
