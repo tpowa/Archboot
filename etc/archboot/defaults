@@ -15,9 +15,9 @@ _XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gn
 ### GNOME defaults
 # GNOME packages
 _GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit"
-### KDE defaults
+### KDE/Plasma defaults
 # KDE/Plasma packages
-_PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kwallet kio-extras kio-fuse kate dolphin powerdevil ark gwenview"
+_PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
 ### Custom Graphical defaults
 # Custom packages
 _CUSTOM_XORG=""
