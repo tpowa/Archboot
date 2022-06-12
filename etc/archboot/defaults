@@ -14,10 +14,10 @@ _VNC_PW="archboot"
 _XFCE_PACKAGES="xfce4 breeze-icons gvfs gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
 ### GNOME defaults
 # GNOME packages
-_GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gedit"
+_GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit"
 ### KDE defaults
 # KDE/Plasma packages
-_KDE_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
+_KDE_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kwallet kate dolphin powerdevil ark gwenview"
 ### Custom Graphical defaults
 # Custom packages
 _CUSTOM_XORG=""
