@@ -42,14 +42,14 @@ _ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources"
 # external paths
 _SERVER="pkgbuild.com"
 _SERVER_HOME="/home/tpowa"
-_SERVER_PUBLIC="${_SERVER_HOME}/public_html"
+_SERVER_PUBLIC="${_SERVER_HOME}/public_html/archboot"
 _SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/img"
 _SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/src/images"
 _PACMAN_AARCH64="pacman-aarch64-chroot"
 _PACMAN_AARCH64_CHROOT="${_PACMAN_AARCH64}-latest.tar.zst"
 _SERVER_PACMAN_AARCH64="${_SERVER_PUBLIC}/src/${_PACMAN_AARCH64}"
 # public download paths
-_ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa"
+_ARCHBOOT_PUBLIC="https://pkgbuild.com/~tpowa/archboot"
 _ARCHBOOT_SOURCE="${_ARCHBOOT_PUBLIC}/src/images"
 _ARCHBOOT_AARCH64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/src/${_PACMAN_AARCH64}"
 # local user and group
