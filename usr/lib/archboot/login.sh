@@ -1,6 +1,6 @@
 # don't run ttyS0 as first device
 _welcome () {
-    echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m"
+    echo -e "\033[1mWelcome to \033[36mArchboot\033[0m"
     echo -e "\033[1m--------------------------------------------------------------------\033[0m"
     _local_mode
 }

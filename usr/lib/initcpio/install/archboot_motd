@@ -6,7 +6,7 @@ build ()
     ### generate motd
     MOTD=$(mktemp /var/tmp/motd.XXXX)
     #shellcheck disable=SC2129 
-    echo -e "\033[1mWelcome to \033[36mArch Linux \033[34m(archboot environment)\033[0m" >> "${MOTD}"
+    echo -e "\033[1mWelcome to \033[36mArchboot\033[0m" >> "${MOTD}"
     echo -e "\033[1m--------------------------------------------\033[0m" >> "${MOTD}"
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
     echo -e "  - Virtual consoles \033[1m1-6\033[0m are active." >> "${MOTD}"
