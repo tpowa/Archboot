@@ -14,6 +14,7 @@ _KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
+_ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
@@ -38,12 +39,12 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # generate local iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-local-${_ARCH}" || exit 1
+    -i=${_ISONAME}-local-${_ARCH}" || exit 1
     rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
     echo "Generate latest ISO ..."
     # generate latest iso in container
     systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-    -i=archlinux-archboot-$(date +%Y.%m.%d-%H.%M)-latest-${_ARCH}" || exit 1
+    -i=${_ISONAME}-latest-${_ARCH}" || exit 1
     echo "Install lvm2 to container ${_W_DIR} ..."
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
     echo "Generate normal ISO ..."
