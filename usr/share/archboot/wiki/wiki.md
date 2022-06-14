@@ -732,7 +732,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevic
 
 * [**Archboot blog**](https://www.reddit.com/r/archboot)
 * [**Archboot project page**](https://gitlab.archlinux.org/tpowa/archboot)
-* [**Archboot download**](https://pkgbuild.com/\~tpowa/archboot/img)
+* [**Archboot download**](https://pkgbuild.com/\~tpowa/archboot/iso)
 * [**Archboot screenshots**](https://pkgbuild.com/\~tpowa/archboot/web)
 * [**Archboot build sources**](https://pkgbuild.com/\~tpowa/archboot/src)
 * [**Archboot repository**](https://gitlab.archlinux.org/tpowa/archboot-repository)
