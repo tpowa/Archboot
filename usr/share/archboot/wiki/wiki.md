@@ -20,9 +20,9 @@
 
 ### **<span dir="">Download image files</span>**
 
-* Image files are released to [**archboot home**](https://pkgbuild.com/\~tpowa/archboot/iso/).
-* Source packages with archboot repository are located at [**archboot source packages**](https://pkgbuild.com/\~tpowa/archboot/src).
-* Latest news about the package itself, are posted at the [**archboot reddit blog**](https://www.reddit.com/r/archboot/)
+* Image files are released [**here**](https://pkgbuild.com/\~tpowa/archboot/iso/).
+* Source packages with archboot repository are located [**here**](https://pkgbuild.com/\~tpowa/archboot/src/iso/).
+* Latest news about the package itself, are posted [**here**](https://www.reddit.com/r/archboot/).
 
 #### **<span dir="">x86_64 architecture</span>**
 | Release information | ISO images | SHA256SUM | Forum thread |
