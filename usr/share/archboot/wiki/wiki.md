@@ -510,7 +510,7 @@ You get the images and boot/ files in _directory_.
 #### **<span dir="">Rebuilding a release (reproducibility)</span>**
 
 ```plaintext
-# archboot-x86_64-release.sh directory https://pkgbuild.com/~tpowa/archboot/src/images/x86_64/latest/
+# archboot-x86_64-release.sh directory https://pkgbuild.com/~tpowa/archboot/src/iso/x86_64/latest/
 ```
 
 You get the rebuild image and boot/ files in _directory_.
@@ -734,6 +734,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevic
 * [**Archboot project page**](https://gitlab.archlinux.org/tpowa/archboot)
 * [**Archboot download**](https://pkgbuild.com/\~tpowa/archboot/img)
 * [**Archboot screenshots**](https://pkgbuild.com/\~tpowa/archboot/web)
-* [**Archboot build sources repository**](https://pkgbuild.com/\~tpowa/archboot/src)
+* [**Archboot build sources**](https://pkgbuild.com/\~tpowa/archboot/src)
+* [**Archboot repository**](https://gitlab.archlinux.org/tpowa/archboot-repository)
 * [**Archboot video on Parallels Macbook M1**](https://www.youtube.com/watch?v=xo_PlJHloqk)
 * [**Archboot video featuring local image**](https://www.youtube.com/watch?v=mb3ykTklnWU)
