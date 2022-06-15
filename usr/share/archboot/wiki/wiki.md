@@ -38,11 +38,11 @@
 * Supports Apple Mac M1 and higher for virtual machines eg. [**Parallels Desktop**](https://wiki.archlinux.org/title/Parallels_Desktop "Parallels Desktop") and [**VMware**](https://wiki.archlinux.org/title/VMware "VMware")
 
 ### **<span dir="">Features of the images</span>**
-| Type | RAM to boot | Secure Boot<br>support | WiFi<br>support | LAN<br>support | Rescue<br>operation | Package cache<br>for installation | Server or<br>Workstation | Size<br>X86_64 | Size<br>AARCH64 |
-|------|-------------|------------------------|-----------------|----------------|---------------------|-----------------------------------|--------------------------|----------------|-----------------|
-| _date_-latest | 2000 MB | Yes | No | DHCP server needed | Yes | Yes | Yes | 148 MB | 209 MB |
-| _date_ | 1300 MB | Yes | Yes | Yes | Yes | No | Yes | 472 MB | 432 MB |
-| _date_-local | 3300 MB | Yes | Yes | Yes | Yes | Yes | Yes | 1477 MB | 1271 MB |
+| Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 |
+|------|-------------|------------------------|----------------|--------------------------|----------------|-----------------|
+| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 148 MB | 209 MB |
+| _date_ | 1300 MB | Yes | Yes | No | 472 MB | 432 MB |
+| _date_-local | 3300 MB |  Yes | Yes | Yes | 1477 MB | 1271 MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
@@ -100,13 +100,13 @@ Hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.
 * If your network does not obtain an address, please setup the [**network**](https://wiki.archlinux.org/title/Network "Network") manually or with the setup routine.
 
 #### **<span dir="">Preconfigured environments</span>**
-| Desktop<br>Environment | Online<br>Mode | Local<br>Mode | Command Switch |
-|------------------------|----------------|---------------|----------------|
-| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") | Yes | Yes | `#` [`update-installer.sh`](http://update-installer.sh) `-gnome` |
-| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | Yes | Yes | `#` [`update-installer.sh`](http://update-installer.sh) `-gnome-wayland` |
-| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") | Yes | Yes | `#` [`update-installer.sh`](http://update-installer.sh) `-plasma` |
-| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | Yes | Yes | `#` [`update-installer.sh`](http://update-installer.sh) `-plasma-wayland` |
-| [**Xfce**](https://wiki.archlinux.org/title/Xfce "Xfce") | Yes | Yes | `#` [`update-installer.sh`](http://update-installer.sh) `-xfce` |
+| Desktop<br>Environment | Command Switch |
+|------------------------|----------------|
+| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") | `# update-installer.sh -gnome` |
+| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer.sh -gnome-wayland` |
+| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") | `# update-installer.sh -plasma` |
+| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer.sh -plasma-wayland` |
+| [**Xfce**](https://wiki.archlinux.org/title/Xfce "Xfce") | `# update-installer.sh -xfce` |
 
 * [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") is automatically launched with starting [**Xorg**](https://wiki.archlinux.org/title/Xorg "Xorg").
   * Connect with your vnc client and use password:**archboot**
@@ -417,7 +417,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Feature | archboot | archiso |
 |---------|----------|---------|
 | Developers | tpowa | arch-releng team |
-| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI") mixed mode<br>(32bit UEFI / 64bit system) | Yes | Planned |
+| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI") mixed mode<br>(32bit UEFI / 64bit system) | Yes | Yes |
 | [**archinstall**](https://wiki.archlinux.org/title/Archinstall "Archinstall") | No | Yes |
 | setup/quickinst script | Yes | No |
 | [**Arch Install Scripts**](https://wiki.archlinux.org/title/Arch_Install_Scripts "Arch Install Scripts") | Yes | Yes |
