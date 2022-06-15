@@ -417,7 +417,6 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Feature | archboot | archiso |
 |---------|----------|---------|
 | Developers | tpowa | arch-releng team |
-| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI") mixed mode<br>(32bit UEFI / 64bit system) | Yes | Yes |
 | [**archinstall**](https://wiki.archlinux.org/title/Archinstall "Archinstall") | No | Yes |
 | setup/quickinst script | Yes | No |
 | [**Arch Install Scripts**](https://wiki.archlinux.org/title/Arch_Install_Scripts "Arch Install Scripts") | Yes | Yes |
@@ -445,7 +444,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Bootup speed | 3s slower | 3s faster |
 | Build speed | faster | slower |
 | Image assembling | grub-mkrescue | xorriso |
-| Image bootloader | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") | [**systemd-boot**](https://wiki.archlinux.org/title/Systemd-boot "Systemd-boot") and [**syslinux**](https://wiki.archlinux.org/title/Syslinux "Syslinux") |
+| Image bootloader | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") | [**grub**](https://wiki.archlinux.org/title/Grub "Grub"), [**systemd-boot**](https://wiki.archlinux.org/title/Systemd-boot "Systemd-boot") and [**syslinux**](https://wiki.archlinux.org/title/Syslinux "Syslinux") |
 | Reproducibility | Yes | No |
 | Easy custom live CD creation | No | Yes |
 
