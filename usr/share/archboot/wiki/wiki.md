@@ -12,7 +12,7 @@
 **Archboot**<span dir=""> is a most advanced, modular Arch Linux boot/install image creation utility to generate reproducible bootable media for CD/USB/PXE, designed for installation or rescue operation. It is fully based on </span>[**mkinitcpio**](https://wiki.archlinux.org/title/Mkinitcpio "Mkinitcpio")<span dir="">, only runs in RAM and without any special filesystems like squashfs/erofs.</span>\
 <span dir="">The project is developed by </span>[**tpowa**](https://archlinux.org/people/developers/#tpowa)<span dir="">.</span>
 
-## <span dir="">Archboot Image Releases</span>
+## <span dir="">Image Releases</span>
 
 * **Release schedule**: on 10th, 20th and 30th of a month new images are released.
 * [**Hybrid image files**](https://wiki.syslinux.org/wiki/index.php?title=Isohybrid), [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel") and [**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd") are provided.
