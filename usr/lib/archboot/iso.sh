@@ -67,8 +67,8 @@ _prepare_kernel_initramfs_files() {
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     mv "/usr/bin/mkinitcpio.old" "/usr/bin/mkinitcpio"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" \
-    "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" \
+    "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
     # add secure boot MOK
     cp ${_KEYDIR}/* "${_ISODIR}/EFI/KEYS/"
     # install ucode files
@@ -103,54 +103,54 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
 _prepare_efitools_uefi () {
     echo "Prepare efitools ..."
     cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/tools/HashTool.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/HashTool.efi" \
-    "${_ISODIR}/EFI/tools/HashTool.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/HashTool.efi" \
+    "${_ISODIR}/EFI/tools/HashTool.efi" > /dev/null 2>&1
     cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/tools/KeyTool.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/KeyTool.efi" \
-    "${_ISODIR}/EFI/tools/KeyTool.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/KeyTool.efi" \
+    "${_ISODIR}/EFI/tools/KeyTool.efi" > /dev/null 2>&1
 }
 
 _prepare_uefi_shell_tianocore() {
     echo "Prepare uefi shells ..."
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
     cp /usr/share/edk2-shell/x64/Shell.efi "${_ISODIR}/EFI/tools/shellx64_v2.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellx64_v2.efi" \
-    "${_ISODIR}/EFI/tools/shellx64_v2.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellx64_v2.efi" \
+    "${_ISODIR}/EFI/tools/shellx64_v2.efi" > /dev/null 2>&1
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
     cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/tools/shellx64_v1.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellx64_v1.efi"\
-    "${_ISODIR}/EFI/tools/shellx64_v1.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellx64_v1.efi"\
+    "${_ISODIR}/EFI/tools/shellx64_v1.efi" > /dev/null 2>&1
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
     cp /usr/share/edk2-shell/ia32/Shell.efi "${_ISODIR}/EFI/tools/shellia32_v2.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellia32_v2.efi" \
-    "${_ISODIR}/EFI/tools/shellia32_v2.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellia32_v2.efi" \
+    "${_ISODIR}/EFI/tools/shellia32_v2.efi" > /dev/null 2>&1
     ## InstallTianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
     cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/tools/shellia32_v1.efi"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellia32_v1.efi" \
-    "${_ISODIR}/EFI/tools/shellia32_v1.efi"
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/tools/shellia32_v1.efi" \
+    "${_ISODIR}/EFI/tools/shellia32_v1.efi" > /dev/null 2>&1
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
     echo "Prepare X64 Grub ..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubx64.efi \
-    "${_ISODIR}/EFI/BOOT/"grubx64.efi
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubx64.efi \
+    "${_ISODIR}/EFI/BOOT/"grubx64.efi > /dev/null 2>&1
 }
 
 _prepare_uefi_IA32() {
     echo "Prepare IA32 Grub ..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubia32.efi \
-    "${_ISODIR}/EFI/BOOT/"grubia32.efi
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubia32.efi \
+    "${_ISODIR}/EFI/BOOT/"grubia32.efi > /dev/null 2>&1
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${KEYDIR}"/MOK.KEY --cert /"${KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi \
-    --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi
+    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi \
+    --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi > /dev/null 2>&1
 }
 
 _prepare_background() {
