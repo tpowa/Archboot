@@ -10,7 +10,7 @@ build ()
         # sign add_checked_module
         local kver="$(kver /boot/vmlinuz-linux)"
         xz -d /lib/modules/$kver/extramodules/wl.ko.xz || exit 1
-        archboot-sign-file sha256 "${_KEYDIR}"/MOK.KEY "${_KEYDIR}"/MOK.CRT /lib/modules/$kver/extramodules/wl.ko
+        archboot-sign-file sha512 "${_KEYDIR}"/MOK.KEY "${_KEYDIR}"/MOK.CRT /lib/modules/$kver/extramodules/wl.ko
         xz /lib/modules/$kver/extramodules/wl.ko
         # add broadcom wl support
         add_module 'wl.ko'
