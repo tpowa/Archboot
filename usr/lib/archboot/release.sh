@@ -14,7 +14,8 @@ _KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
-_ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
+[[ "${_ARCH}" == "x86_64" ]] && _ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
+[[ "${_ARCH}" == "aarch64" ]] && _ISONAME="archboot-archlinuxarm-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
