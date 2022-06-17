@@ -70,8 +70,9 @@ _prepare_kernel_initramfs_files() {
     sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" \
     "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
     # add secure boot MOK
+    # add with .cer, cause of DELL firmware
     mkdir -p "${_ISODIR}/EFI/KEY"
-    cp ${_KEYDIR}/MOK.CER "${_ISODIR}/EFI/KEY/"
+    cp ${_KEYDIR}/MOK.CER "${_ISODIR}/EFI/KEY/MOK.cer"
     # install ucode files
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
     cp /boot/amd-ucode.img "${_ISODIR}/boot/"
