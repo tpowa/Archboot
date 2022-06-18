@@ -244,6 +244,7 @@ _kver_x86() {
     fi
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
+    export _HWKVER="${_HWKVER}"
 }
 
 _kver_generic() {
@@ -257,6 +258,7 @@ _kver_generic() {
 
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
+    export _HWKVER="${_HWKVER}"
 }
 
 _create_initramfs() {
