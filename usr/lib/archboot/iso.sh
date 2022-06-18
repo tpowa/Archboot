@@ -3,7 +3,6 @@
 . /etc/archboot/defaults
 _PRESET_DIR="/etc/archboot/presets"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
-_KEYDIR="/usr/share/archboot/keys/MOK"
 
 _usage () {
     echo "${_BASENAME}: usage"
