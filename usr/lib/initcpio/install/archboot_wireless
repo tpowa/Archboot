@@ -7,11 +7,6 @@ build ()
     add_checked_modules '/drivers/net/wireless/|/net/wireless/|/net/ieee80211/|/net/mac80211/'
     
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        # sign add_checked_module
-        local kver="$(kver /boot/vmlinuz-linux)"
-        xz -d /lib/modules/$kver/extramodules/wl.ko.xz || exit 1
-        archboot-sign-file sha512 "${_KEYDIR}"/MOK.KEY "${_KEYDIR}"/MOK.CRT /lib/modules/$kver/extramodules/wl.ko
-        xz /lib/modules/$kver/extramodules/wl.ko
         # add broadcom wl support
         add_module 'wl.ko'
         map add_file "/usr/lib/modprobe.d/broadcom-wl.conf" \
