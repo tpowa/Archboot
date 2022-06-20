@@ -274,7 +274,6 @@ autoprepare() {
         return 1
     fi
     # reread partitiontable for kernel
-    DIALOG --infobox "Waiting 15 seconds for ${DEVICE} to initialize ..." 0 0
     partprobe "${DEVICE}"
     printk on
     ## wait until /dev initialized correct devices
@@ -309,8 +308,10 @@ autoprepare() {
     for fsspec in ${FSSPECS}; do
         DOMKFS="yes"
         PART="${DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
-        # Add check on nvme controller: Uses /dev/nvme0n1pX name scheme
-        echo "${DEVICE}" | grep -q "nvme" && PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        # Add check on nvme or mmc controller: Uses /dev/nvme0n1pX name scheme
+        if echo "${DEVICE}" | grep -q "nvme" || echo "${DEVICE}" | grep -q "mmc"
+            PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        fi
         MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
         FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
         FS_OPTIONS="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
