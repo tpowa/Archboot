@@ -66,8 +66,8 @@ _prepare_kernel_initramfs_files() {
     mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     mv "/usr/bin/mkinitcpio.old" "/usr/bin/mkinitcpio"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
-    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" \
-    "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
+    [[ ${_RUNNING_ARCH} == "x86_64" ]] && sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT \
+    --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
     # add secure boot MOK
     # add with .cer, cause of DELL firmware
     mkdir -p "${_ISODIR}/EFI/KEY"
@@ -123,14 +123,14 @@ _prepare_uefi_shell_tianocore() {
 _prepare_uefi_X64() {
     echo "Prepare X64 Grub ..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubx64.efi \
+    sbsign --key "${_KEYDIR}"/MOK.KEY --cert "${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubx64.efi \
     "${_ISODIR}/EFI/BOOT/"grubx64.efi > /dev/null 2>&1
 }
 
 _prepare_uefi_IA32() {
     echo "Prepare IA32 Grub ..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubia32.efi \
+    sbsign --key "${_KEYDIR}"/MOK.KEY --cert "${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubia32.efi \
     "${_ISODIR}/EFI/BOOT/"grubia32.efi > /dev/null 2>&1
 }
 
@@ -138,8 +138,6 @@ _prepare_uefi_IA32() {
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi \
-    --output "${_ISODIR}/EFI/BOOT/"grubaa64.efi > /dev/null 2>&1
 }
 
 _prepare_background() {
