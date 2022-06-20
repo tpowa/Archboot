@@ -333,7 +333,7 @@ autoprepare() {
             DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
         fi
         _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
-        sleep 1
+        sleep 3
     done
 
     DIALOG --infobox "Auto-prepare was successful.\nContinuing in 3 seconds..." 0 0
