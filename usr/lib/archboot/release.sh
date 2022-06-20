@@ -50,7 +50,8 @@ _create_iso() {
     systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
     echo "Generate normal ISO ..."
     # generate iso in container
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g" || exit 1
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    -i=${_ISONAME}-${_ARCH}"  || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
