@@ -142,8 +142,7 @@ $ ssh root@yourip
   * It installs a bootloader which is **not** controlled by Arch Linux and **breaks** the concept of **Secure Boot** as is.
 * Please read [**Roderick Smith's guide**](https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim) first for initial shim setup.
 * In order to boot in [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") mode on first boot:
-  * you need to add the hash of `/EFI/BOOT/grubx64.efi` to the MOK
-  * you need to add the hash of `/EFI/BOOT/vmlinuz_x86_64` to the MOK
+  * you need to enroll archboot's MOK key from disk: ```/EFI/KEY/MOK.cer```
 * Tools included for key management: KeyTool, HashTool, mokutil, sbsigntools, sbctl and [mkkeys.sh](http://mkkeys.sh)
 * setup script supports the following [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") layout:
   * shim from fedora is copied
