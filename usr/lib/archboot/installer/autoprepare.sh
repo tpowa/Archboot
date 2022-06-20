@@ -309,7 +309,7 @@ autoprepare() {
         DOMKFS="yes"
         PART="${DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller: Uses /dev/nvme0n1pX name scheme
-        if echo "${DEVICE}" | grep -q "nvme" || echo "${DEVICE}" | grep -q "mmc"
+        if echo "${DEVICE}" | grep -q "nvme" || echo "${DEVICE}" | grep -q "mmc"; then
             PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         fi
         MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
