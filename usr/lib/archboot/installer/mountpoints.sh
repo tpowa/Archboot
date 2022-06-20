@@ -247,7 +247,7 @@ mountpoints() {
             fi
             _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi
-        sleep 3
+        sleep 1
     done < /tmp/.parts
     printk on
     DIALOG --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds..." 0 0
