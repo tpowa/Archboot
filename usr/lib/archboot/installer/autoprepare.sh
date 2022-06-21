@@ -310,7 +310,7 @@ autoprepare() {
         PART="${DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
-        # MMC uses /dev/mmc0n1pX
+        # MMC uses /dev/mmcblk0pX
         if echo "${DEVICE}" | grep -q "nvme" || echo "${DEVICE}" | grep -q "mmc"; then
             PART="${DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         fi
