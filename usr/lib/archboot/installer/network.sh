@@ -151,6 +151,9 @@ donetwork() {
     if ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
+    else
+        DIALOG --infobox "Link is up. Continuing in 3 seconds ..." 3 60
+        sleep 3
     fi
     # http/ftp proxy settings
     DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
