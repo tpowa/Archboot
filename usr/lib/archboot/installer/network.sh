@@ -143,12 +143,12 @@ donetwork() {
     # add sleep here dhcp can need some time to get link
     DIALOG --infobox "Waiting 30 seconds for network link to come up ..." 3 60
     NETWORK_COUNT="0"
-    while grep -qw down /sys/class/net/"${INTERFACE}"/operstate; do
+    while ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; do
         sleep 1
         NETWORK_COUNT="$(($NETWORK_COUNT+1))"
         [[ "${NETWORK_COUNT}" == "30" ]] && break
     done
-    if grep -qw down /sys/class/net/"${INTERFACE}"/operstate; then
+    if ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; then
         DIALOG --msgbox "Error occured while running netctl. (see 'journalctl -xn' for output)" 0 0
         return 1
     fi
