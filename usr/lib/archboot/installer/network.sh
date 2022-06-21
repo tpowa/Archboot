@@ -34,7 +34,7 @@ donetwork() {
         ifaces=$(net_interfaces)
         while [[ "${INTERFACE}" = "" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --ok-label "Select" --menu "Select a network interface" 14 55 7 ${ifaces} 2>"${ANSWER}"
+            DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${ifaces} 2>"${ANSWER}"
             case $? in
                 1) return 1 ;;
                 0) INTERFACE=$(cat "${ANSWER}") ;;
@@ -52,7 +52,7 @@ donetwork() {
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
             #shellcheck disable=SC2086
-            DIALOG --menu "Choose your ESSID" 14 55 7 \
+            DIALOG --menu "Choose your ESSID:" 14 55 7 \
             $(essid_scan _) \
              "Hidden" "_" 2>"${ANSWER}" || return 1
             local WLAN_ESSID=$(cat "${ANSWER}")
@@ -67,10 +67,10 @@ donetwork() {
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
             WPA=""
             WEP=""
-            DIALOG --infobox "Checking on WPA/PSK encryption ..." 3 60
+            DIALOG --infobox "Checking on WPA/PSK encryption ..." 3 40
             iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
-            DIALOG --infobox "Checking on WEP encryption ..." 3 60
+            DIALOG --infobox "Checking on WEP encryption ..." 3 40
             iw dev "${INTERFACE}" scan | grep -q 'Privacy:' && WEP="1"
             #shellcheck disable=SC2181
             while [[ "${WLAN_SECURITY}" = "" ]]; do
