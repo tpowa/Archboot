@@ -15,7 +15,7 @@ check_nework() {
 
 # scan for available essids
 essid_scan() {
-    for dev in $(iw dev "${INTERFACE}" scan | grep SSID | cut -d ':' -f2 | sort -u | sed -e 's#^ ##g' -e 's| |#|g'); do
+    for dev in $(iw dev "${INTERFACE}" scan | grep 'SSID:' | cut -d ':' -f2 | sort -u | sed -e 's#^ ##g' -e 's| |#|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
