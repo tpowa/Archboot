@@ -65,22 +65,26 @@ donetwork() {
             # remove spaces
             #shellcheck disable=SC2001,SC2086
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
+            WPA=""
+            WEP=""
+            iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
+            iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
+            iw dev "${INTERFACE}" scan | grep -q 'Privacy:' && WEP="1"
             DIALOG --yesno "Is your wireless network encrypted?" 5 40
             #shellcheck disable=SC2181
-            if [[ $? -eq 0 ]]; then
-                while [[ "${WLAN_SECURITY}" = "" ]]; do
+            while [[ "${WLAN_SECURITY}" = "" ]]; do
                 DIALOG --ok-label "Select" --menu "Select encryption type" 9 40 7 \
-                    "wep" "WEP encryption" \
-                    "wpa" "WPA encryption" 2>"${ANSWER}"
+                    $([[ "${WPA}" == "1" ]] && echo "wpa" "WPA encryption") \
+                    $([[ "${WEP}" == "1" ]] && echo "wep" "WEP encryption") \
+                    "none" "NO encryption" 2>"${ANSWER}"
                     case $? in
                         1) return 1 ;;
                         0) WLAN_SECURITY=$(cat "${ANSWER}") ;;
                     esac
-                done
+            done
+            if [[ "${WLAN_SECURITY}" == "wpa" || "${WLAN_SECURITY}" == "wep" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
-            else
-                WLAN_SECURITY="none"
             fi
         else
             CONNECTION="ethernet"
