@@ -102,11 +102,11 @@ Hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.
 #### **<span dir="">Preconfigured environments</span>**
 | Desktop<br>Environment | Command Switch |
 |------------------------|----------------|
-| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") | `# update-installer.sh -gnome` |
-| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer.sh -gnome-wayland` |
-| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") | `# update-installer.sh -plasma` |
-| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer.sh -plasma-wayland` |
-| [**Xfce**](https://wiki.archlinux.org/title/Xfce "Xfce") | `# update-installer.sh -xfce` |
+| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") | `# update-installer -gnome` |
+| [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer -gnome-wayland` |
+| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") | `# update-installer -plasma` |
+| [**KDE Plasma**](https://wiki.archlinux.org/title/KDE_Plasma "KDE Plasma") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | `# update-installer -plasma-wayland` |
+| [**Xfce**](https://wiki.archlinux.org/title/Xfce "Xfce") | `# update-installer -xfce` |
 
 * [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") is automatically launched with starting [**Xorg**](https://wiki.archlinux.org/title/Xorg "Xorg").
   * Connect with your vnc client and use password:**archboot**
@@ -118,12 +118,12 @@ Hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.
 ##### <span dir="">Xorg</span>
 
 * [**Edit**](https://wiki.archlinux.org/title/Edit "Edit") `/etc/archboot/defaults` and change _`CUSTOM`_`XORG array` to your needs.
-* Run: [`update-installer.sh`](http://update-installer.sh) `-custom-xorg` from a console login
+* Run: `# update-installer -custom-xorg` from a console login
 
 ##### <span dir="">Wayland</span>
 
 * [**Edit**](https://wiki.archlinux.org/title/Edit "Edit") `/etc/archboot/defaults` and change _`CUSTOM`_`WAYLAND array` to your needs.
-* Run: [`update-installer.sh`](http://update-installer.sh) `-custom-wayland` from a console login
+* Run: `# update-installer -custom-wayland` from a console login
 
 ### **<span dir="">Remote installation with OpenSSH</span>**
 
@@ -226,7 +226,7 @@ You can run each point for doing the mentioned task. If you do a fresh install, 
 * You can always bump your image to **latest** available possibilities (see `-h` flag for all the options).
 
 ```plaintext
-# update-installer.sh option
+# update-installer option
 ```
 
 ### **<span dir="">Tools for backup and copying of an existing system</span>**
@@ -262,7 +262,7 @@ Archboot provides 2 additional scripts for doing those tasks.
 * Please run this script to get latest fixes from git:
 
 ```plaintext
-# update-installer.sh -u
+# update-installer -u
 ```
 
 * Package XYZ is missing in archboot environment.
