@@ -70,7 +70,6 @@ donetwork() {
             iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'Privacy:' && WEP="1"
-            DIALOG --yesno "Is your wireless network encrypted?" 5 40
             #shellcheck disable=SC2181
             while [[ "${WLAN_SECURITY}" = "" ]]; do
                 DIALOG --ok-label "Select" --menu "Select encryption type" 9 40 7 \
