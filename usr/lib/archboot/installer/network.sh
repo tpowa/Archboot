@@ -67,14 +67,16 @@ donetwork() {
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
             WPA=""
             WEP=""
+            DIALOG --infobox "Checking on WPA/PSK encryption ..." 3 60
             iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
+            DIALOG --infobox "Checking on WEP encryption ..." 3 60
             iw dev "${INTERFACE}" scan | grep -q 'Privacy:' && WEP="1"
             #shellcheck disable=SC2181
             while [[ "${WLAN_SECURITY}" = "" ]]; do
-                DIALOG --ok-label "Select" --menu "Select encryption type" 9 40 7 \
-                    $([[ "${WPA}" == "1" ]] && echo "wpa" "WPA encryption") \
-                    $([[ "${WEP}" == "1" ]] && echo "wep" "WEP encryption") \
+                DIALOG --ok-label "Select" --menu "Select encryption type:" 9 40 7 \
+                    $([[ "${WPA}" == "1" ]] && echo "wpa" "WPA/PSK") \
+                    $([[ "${WEP}" == "1" ]] && echo "wep" "WEP") \
                     "none" "NO encryption" 2>"${ANSWER}"
                     case $? in
                         1) return 1 ;;
