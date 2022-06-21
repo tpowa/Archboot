@@ -140,7 +140,7 @@ _install_base_packages() {
 
 _install_archboot() {
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
+    echo "Adding ${_GPG_KEY_ID} to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     #shellcheck disable=SC2086
@@ -179,7 +179,7 @@ _aarch64_install_archboot() {
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
-    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
+    echo "Adding ${_GPG_KEY_ID} to trusted keys"
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1

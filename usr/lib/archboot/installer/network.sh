@@ -151,7 +151,7 @@ donetwork() {
     NETWORK_COUNT="0"
     while ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; do
         sleep 1
-        NETWORK_COUNT="$(($NETWORK_COUNT+1))"
+        NETWORK_COUNT="$((NETWORK_COUNT+1))"
         [[ "${NETWORK_COUNT}" == "30" ]] && break
     done
     if ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; then

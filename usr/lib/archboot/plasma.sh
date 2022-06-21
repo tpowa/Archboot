@@ -19,7 +19,7 @@ _configure_kde() {
     sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,applications:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
     echo "Replacing wallpaper ..."
     for i in /usr/share/wallpapers/Next/contents/images/*; do
-        cp /usr/share/archboot/grub/archboot-background.png $i
+        cp /usr/share/archboot/grub/archboot-background.png "${i}"
     done
     echo "Replacing menu structure ..."
     cat << EOF >/etc/xdg/menus/applications.menu

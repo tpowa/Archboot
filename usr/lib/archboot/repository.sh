@@ -19,7 +19,7 @@ _cachedir_check() {
 }
 
 _download_packages() {
-    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
+    echo "Adding ${_GPG_KEY_ID} to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
