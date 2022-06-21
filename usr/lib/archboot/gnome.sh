@@ -41,6 +41,7 @@ EOF
 
 _start_gnome() {
     echo -e "Launching GNOME now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    #shellcheck disable=SC2129
     echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc
     echo "export LANG=C.UTF-8"  >> /root/.xinitrc

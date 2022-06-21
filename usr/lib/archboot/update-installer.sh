@@ -285,6 +285,7 @@ _kexec () {
     sleep 2
     _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
+    #shellcheck disable=SC2115
     rm -rf /usr/*
     while pgrep -x kexec > /dev/null 2>&1; do
         _clean_kernel_cache
@@ -315,6 +316,7 @@ _prepare_graphic() {
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Running pacman to install packages: ${_GRAPHIC} ..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
+        #shellcheck disable=SC2119
         _create_pacman_conf
         #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1

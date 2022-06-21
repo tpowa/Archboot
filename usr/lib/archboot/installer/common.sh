@@ -113,6 +113,7 @@ auto_packages() {
     if lsmod | grep -qw wl; then
         ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
     fi
+    #shellcheck disable=SC2010
     if ls /sys/class/net | grep -q wlan; then
         ! echo "${PACKAGES}" | grep -qw iwd && PACKAGES="${PACKAGES} iwd"
     fi

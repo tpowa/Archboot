@@ -52,7 +52,7 @@ donetwork() {
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
             DIALOG --infobox "Scanning for ESSIDs ..." 3 40
-            #shellcheck disable=SC2086
+            #shellcheck disable=SC2086,SC2046
             DIALOG --menu "Choose your ESSID:" 14 55 7 \
             $(essid_scan _) \
              "Hidden" "_" 2>"${ANSWER}" || return 1
@@ -75,6 +75,7 @@ donetwork() {
             iw dev "${INTERFACE}" scan | grep -q 'Privacy:' && WEP="1"
             #shellcheck disable=SC2181
             while [[ "${WLAN_SECURITY}" = "" ]]; do
+                #shellcheck disable=2046
                 DIALOG --ok-label "Select" --menu "Select encryption type:" 9 40 7 \
                     $([[ "${WPA}" == "1" ]] && echo "wpa" "WPA/PSK") \
                     $([[ "${WEP}" == "1" ]] && echo "wep" "WEP") \
