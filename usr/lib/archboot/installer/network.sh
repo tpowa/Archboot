@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # list all net devices with mac adress
 net_interfaces() {
-    find /sys/class/net/* -type l -printf '%f ' -exec cat {}/address \;
+    find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
 
 # check for already active profile
