@@ -51,6 +51,7 @@ donetwork() {
             CONNECTION="wireless"
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
+            DIALOG --infobox "Scanning for ESSIDs ..." 3 40
             #shellcheck disable=SC2086
             DIALOG --menu "Choose your ESSID:" 14 55 7 \
             $(essid_scan _) \
