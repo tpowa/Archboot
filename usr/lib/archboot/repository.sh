@@ -29,7 +29,7 @@ _download_packages() {
 
 _aarch64_download_packages() {
     mkdir "${1}"/blankdb
-    echo "Adding "${_GPG_KEY_ID}" to trusted keys"
+    echo "Adding ${_GPG_KEY_ID} to trusted keys"
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
