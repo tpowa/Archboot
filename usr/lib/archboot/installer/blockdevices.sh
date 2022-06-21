@@ -86,7 +86,6 @@ blockdevices_partitions() {
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi
-        sleep 0.1
     done
     printk on
 }
