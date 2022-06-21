@@ -24,13 +24,13 @@ _enter_shell() {
 }
 
 _run_latest() {
-    echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
-    update-installer.sh -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
+    update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
-    echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest-install\033[0m"
-    update-installer.sh -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    echo -e "\033[1mRunning now: \033[92mupdate-installer -latest-install\033[0m"
+    update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_update_installer() {
@@ -65,9 +65,9 @@ _run_update_installer() {
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            echo -e "Running \033[1m\033[92mupdate-installer.sh -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
+            echo -e "Running \033[1m\033[92mupdate-installer -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
         else
-            echo -e "\033[1mRunning now: \033[92mupdate-installer.sh -latest\033[0m"
+            echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
         fi
         echo -e "\033[1mProgress is shown here ...\033[0m"
     fi

@@ -101,12 +101,12 @@ _download_latest() {
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
         BINS="copy-mountpoint.sh rsync-backup.sh restore-usbstick.sh \
         ${_RUNNING_ARCH}-create-container.sh ${_RUNNING_ARCH}-release.sh \
-        binary-check.sh update-installer.sh secureboot-keys.sh mkkeys.sh"
+        binary-check.sh secureboot-keys.sh mkkeys.sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
         done
-        BINS="quickinst setup km tz"
+        BINS="quickinst setup km tz update-installer"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
@@ -127,7 +127,7 @@ _download_latest() {
 _update_installer_check() {
     if [[ -f /.update-installer ]]; then
         echo -e "\033[91mAborting:\033[0m"
-        echo "update-installer.sh is already running on other tty ..."
+        echo "update-installer is already running on other tty ..."
         echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
     fi
