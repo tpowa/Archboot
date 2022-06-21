@@ -9,6 +9,7 @@ KERNELPKG="linux"
 [[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
 if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ="Image.gz"
+    #shellcheck disable=SC2034
     VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args

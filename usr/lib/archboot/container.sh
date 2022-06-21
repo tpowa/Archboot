@@ -94,6 +94,7 @@ _prepare_pacman() {
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
 }
 
+#shellcheck disable=SC2120
 _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
         echo "Use default pacman.conf ..."
