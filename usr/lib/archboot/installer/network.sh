@@ -56,7 +56,7 @@ donetwork() {
             DIALOG --menu "Choose your ESSID:" 14 55 7 \
             $(essid_scan _) \
              "Hidden" "_" 2>"${ANSWER}" || return 1
-            local WLAN_ESSID=$(cat "${ANSWER}")
+            WLAN_ESSID=$(cat "${ANSWER}")
             if [[ "${WLAN_ESSID}" = "Hidden" ]]; then
                 DIALOG --inputbox "Enter the hidden ESSID:" 8 65 \
                     "secret" 2>"${ANSWER}" || return 1
