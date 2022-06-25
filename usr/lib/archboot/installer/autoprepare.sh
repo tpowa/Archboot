@@ -43,7 +43,7 @@ autoprepare() {
     fi
 
     if [[  "${GUIDPARAMETER}" = "yes" ]]; then
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 5 60 "/boot" 2>"${ANSWER}" || return 1
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
     fi
 
