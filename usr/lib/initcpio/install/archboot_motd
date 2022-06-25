@@ -5,9 +5,9 @@ build ()
 {
     ### generate motd
     MOTD=$(mktemp /var/tmp/motd.XXXX)
-    #shellcheck disable=SC2129
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux\033[0m" >> "${MOTD}"
     [[ "$(uname -m)" == "aarch64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux ARM\033[0m" >> "${MOTD}"
+    #shellcheck disable=SC2129
     echo -e "\033[1m--------------------------------------------\033[0m" >> "${MOTD}"
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
     echo -e "  - Virtual consoles \033[1m1-6\033[0m are active." >> "${MOTD}"
