@@ -15,7 +15,7 @@ autoprepare() {
     if [[ "$(echo "${DISCS}" | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         #shellcheck disable=SC2046
-        DIALOG --menu "Select the storage drive to use" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the storage drive to use:" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
         DISC=$(cat "${ANSWER}")
     else
         DISC="${DISCS}"
@@ -43,7 +43,7 @@ autoprepare() {
     fi
 
     if [[  "${GUIDPARAMETER}" = "yes" ]]; then
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 0 0 "/boot" 2>"${ANSWER}" || return 1
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 5 60 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
     fi
 
