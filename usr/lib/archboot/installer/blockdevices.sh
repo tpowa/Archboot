@@ -629,14 +629,14 @@ _raid()
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid level you want to use" 14 50 7 ${RAIDLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the raid level you want to use:" 14 50 7 ${RAIDLEVELS} 2>"${ANSWER}" || return 1
         LEVEL=$(cat "${ANSWER}")
         # raid5 and raid10 support parity parameter
         PARITY=""
         if [[ "${LEVEL}" = "raid5" || "${LEVEL}" = "raid6" || "${LEVEL}" = "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric)" 21 50 13 ${PARITYLEVELS} 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${PARITYLEVELS} 2>"${ANSWER}" || return 1
             PARITY=$(cat "${ANSWER}")
         fi
         # show all devices with sizes
@@ -644,7 +644,7 @@ _raid()
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${RAIDNUMBER}" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device ${RAIDNUMBER}:" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         echo "${PART}" >>/tmp/.raid
         while [[ "${PART}" != "DONE" ]]; do
@@ -655,7 +655,7 @@ _raid()
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device ${RAIDNUMBER}" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select additional device ${RAIDNUMBER}:" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>"${ANSWER}" || return 1
             PART=$(cat "${ANSWER}")
             SPARE=""
             ! [[ "${LEVEL}" = "raid0" || "${LEVEL}" = "linear" ]] && DIALOG --yesno --defaultno "Would you like to use ${PART} as spare device?" 0 0 && SPARE="1"
@@ -766,7 +766,7 @@ _createpv()
         # select the first device to use
         DEVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume:" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         echo "${PART}" >>/tmp/.pvs-create
         while [[ "${PART}" != "DONE" ]]; do
@@ -775,7 +775,7 @@ _createpv()
             PARTS="${PARTS//${PART}\ _/}"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume" 15 60 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume:" 15 60 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
             PART=$(cat "${ANSWER}")
             [[ "${PART}" = "DONE" ]] && break
             echo "${PART}" >>/tmp/.pvs-create
@@ -879,7 +879,7 @@ _createvg()
         # select the first device to use, no missing option available!
         PVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}" 13 50 10 ${PVS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} 2>"${ANSWER}" || return 1
         PV=$(cat "${ANSWER}")
         echo "${PV}" >>/tmp/.pvs
         while [[ "${PVS}" != "DONE" ]]; do
@@ -889,7 +889,7 @@ _createvg()
             PVS="$(echo ${PVS} | sed -e "s#${PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}" 13 50 10 ${PVS} DONE _ 2>"${ANSWER}" || return 1
+            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} DONE _ 2>"${ANSWER}" || return 1
             PV=$(cat "${ANSWER}")
             [[ "${PV}" = "DONE" ]] && break
             echo "${PV}" >>/tmp/.pvs
@@ -926,7 +926,7 @@ _createlv()
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Volume Group" 11 50 5 ${LVS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select Volume Group:" 11 50 5 ${LVS} 2>"${ANSWER}" || return 1
         LV=$(cat "${ANSWER}")
         # enter logical volume name
         LVDEVICE=""
@@ -1086,7 +1086,7 @@ _luks()
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device for luks encryption" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select device for luks encryption:" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
         PART=$(cat "${ANSWER}")
         # enter luks name
         _enter_luks_name || return 1
