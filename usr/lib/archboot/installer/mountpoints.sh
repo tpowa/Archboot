@@ -183,7 +183,7 @@ mountpoints() {
             DO_ADDITIONAL=""
             while [[ "${DO_ADDITIONAL}" != "DONE" ]]; do
                 #shellcheck disable=SC2086
-                DIALOG --menu "Select any additional partitions to mount under your new root (select DONE when finished):" 15 52 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
+                DIALOG --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
                 PART=$(cat "${ANSWER}")
                 if [[ "${PART}" != "DONE" ]]; then
                     FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
