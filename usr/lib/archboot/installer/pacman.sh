@@ -38,7 +38,7 @@ select_mirror() {
     # FIXME: this regex doesn't honor commenting
     MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
-    DIALOG --menu "Select a mirror" 14 55 7 \
+    DIALOG --menu "Select a mirror:" 14 55 7 \
         ${MIRRORS} \
         "Custom" "_" 2>${ANSWER} || return 1
     #shellcheck disable=SC2155
