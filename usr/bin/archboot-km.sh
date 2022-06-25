@@ -45,7 +45,7 @@ dokeymap() {
     done
     CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
@@ -68,7 +68,7 @@ doconsolefont() {
     done
     CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Console Font" 22 60 16 ${FONTS} 2>${ANSWER} || CANCEL=1
+    DIALOG --menu "Select A Console Font:" 22 60 16 ${FONTS} 2>${ANSWER} || CANCEL=1
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="2"
         return 1
