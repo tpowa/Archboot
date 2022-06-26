@@ -289,7 +289,6 @@ _kexec() {
     echo -e "\033[92mRebooting\033[0m in a few seconds ..."
     while true; do
         _clean_kernel_cache
-        true
     done
 }
 
