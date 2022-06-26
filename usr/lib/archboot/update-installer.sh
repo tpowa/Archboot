@@ -285,10 +285,11 @@ _kexec() {
     _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
     #shellcheck disable=SC2115
-    rm -rf /usr/*
+    #rm -rf /usr/*
     echo -e "\033[92mRebooting\033[0m in a few seconds ..."
     while true; do
         _clean_kernel_cache
+        sleep 1
     done
 }
 
