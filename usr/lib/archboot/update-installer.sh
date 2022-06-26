@@ -284,13 +284,13 @@ _kexec() {
     sleep 2
     _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
-    #shellcheck disable=SC2115
-    #rm -rf /usr/*
     echo -e "\033[92mRebooting\033[0m in a few seconds ..."
-    while true; do
+    while pgrep -x kexec > /dev/null 2>&1; do
         _clean_kernel_cache
         sleep 1
     done
+    #shellcheck disable=SC2115
+    rm -rf /usr/*
 }
 
 _cleanup_install() {
