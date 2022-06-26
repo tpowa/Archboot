@@ -140,6 +140,7 @@ _install_base_packages() {
 }
 
 _install_archboot() {
+    [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
@@ -176,6 +177,7 @@ _aarch64_install_base_packages() {
 }
 
 _aarch64_install_archboot() {
+    [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
