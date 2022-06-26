@@ -290,6 +290,10 @@ _kexec() {
         _clean_kernel_cache
         sleep 1
     done
+    echo -e "\033[92mRebooting\033[0m in a few seconds ..."
+    while true; do
+        sleep 1
+    done
 }
 
 _cleanup_install() {
