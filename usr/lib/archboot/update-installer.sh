@@ -273,12 +273,11 @@ _create_initramfs() {
 }
 
 _kexec() {
-    # you need approx. 4.25x size for KEXEC_FILE_LOAD
-    if [[ "$(($(stat -c %s /initrd.img)*425/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+    # you need approx. 3.39x size for KEXEC_FILE_LOAD
+    if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mnew\033[0m KEXEC_FILE_LOAD ..."
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
-        echo "$(($(stat -c %s /initrd.img)*425/100000))"
         echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
         kexec -c -f --mem-max=0xA0000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
