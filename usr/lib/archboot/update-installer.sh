@@ -284,7 +284,6 @@ _kexec() {
     sleep 2
     _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
-    echo -e "\033[92mRebooting\033[0m in a few seconds ..."
     while pgrep -x kexec > /dev/null 2>&1; do
         _clean_kernel_cache
         sleep 1
