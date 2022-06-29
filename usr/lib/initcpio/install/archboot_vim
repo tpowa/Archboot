@@ -3,6 +3,7 @@
 
 build ()
 {
+    VIM_SHARE="$(echo ${VIM_SHARE})"
     add_binary "vim"
     add_file "/etc/vimrc"
     # fix vi symlink
@@ -10,17 +11,17 @@ build ()
     add_file "/usr/share/vim/vimfiles/archlinux.vim"
     VIM_MODULE="syntax conf dosini sh grub manual synload colortest syncolor hitest whitespace nosyntax resolv fstab bash zsh exports passwd sysctl systemd vim"
     for i in ${VIM_MODULE}; do
-        [[ -e "/usr/share/vim/vim??/syntax/$i.vim" ]] && add_file "/usr/share/vim/vim??/syntax/$i.vim"
-        [[ -e "/usr/share/vim/vim??/indent/$i.vim" ]] && add_file "/usr/share/vim/vim??/indent/$i.vim"
+        [[ -e "${VIM_SHARE}/syntax/$i.vim" ]] && add_file "${VIM_SHARE}/syntax/$i.vim"
+        [[ -e "${VIM_SHARE}/indent/$i.vim" ]] && add_file "${VIM_SHARE}/indent/$i.vim"
     done
     VIM_BASIC_MODULE="defaults filetype indent indoff menu scripts synmenu"
     for i in ${VIM_BASIC_MODULE}; do
-       [[ -e "/usr/share/vim/vim??/$i.vim" ]] && add_file "/usr/share/vim/vim??/$i.vim"
+       [[ -e "${VIM_SHARE}/$i.vim" ]] && add_file "${VIM_SHARE}/$i.vim"
     done
     # fix colors
-    [[ -e "/usr/share/vim/vim??/colors/lists/default.vim" ]] && add_file "/usr/share/vim/vim??/colors/lists/default.vim"
+    [[ -e "${VIM_SHARE}/colors/lists/default.vim" ]] && add_file "${VIM_SHARE}/colors/lists/default.vim"
     add_file "/usr/share/licenses/vim/license.txt"
-    add_full_dir "/usr/share/vim/vim??/autoload/dist"
+    add_full_dir "${VIM_SHARE}/autoload/dist"
 }
 
 help ()
