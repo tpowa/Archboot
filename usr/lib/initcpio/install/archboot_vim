@@ -3,7 +3,7 @@
 
 build ()
 {
-    VIM_SHARE="$(echo /usr/share/vim/vim??)"
+    VIM_SHARE="$(echo /usr/share/vim/vim[0-9]*)"
     add_binary "vim"
     add_file "/etc/vimrc"
     # fix vi symlink
