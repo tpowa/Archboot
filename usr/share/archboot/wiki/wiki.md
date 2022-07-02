@@ -218,7 +218,7 @@ You can run each point for doing the mentioned task. If you do a fresh install, 
 * **quickinst** will autodetect the packages to install for a minimal system.
 
 ```plaintext
-# quickinst directory
+# quickinst <directory>
 ```
 
 ### **<span dir="">Keep your image up to date</span>**
@@ -226,7 +226,7 @@ You can run each point for doing the mentioned task. If you do a fresh install, 
 * You can always bump your image to **latest** available possibilities (see `-h` flag for all the options).
 
 ```plaintext
-# update-installer option
+# update-installer <option>
 ```
 
 ### **<span dir="">Tools for backup and copying of an existing system</span>**
@@ -438,12 +438,12 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Internal update feature | Yes | No |
 | Offline installation support | Yes | No |
 | [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") installation support | Yes | No |
-| Image size | <140-1477MB | >903MB |
-| RAM to boot | >1.3GB | <1.3GB |
+| Image size | <140-1477MB | >833MB |
+| RAM to boot | >1.3GB | >800MB |
 | Bootup speed | 3s slower | 3s faster |
 | Build speed | faster | slower |
 | Image assembling | grub-mkrescue | xorriso |
-| Image bootloader | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") | [**grub**](https://wiki.archlinux.org/title/Grub "Grub"), [**systemd-boot**](https://wiki.archlinux.org/title/Systemd-boot "Systemd-boot") and [**syslinux**](https://wiki.archlinux.org/title/Syslinux "Syslinux") |
+| Image bootloader | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") |
 | Reproducibility | Yes | No |
 | Easy custom live CD creation | No | Yes |
 
