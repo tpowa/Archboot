@@ -149,14 +149,14 @@ _install_archboot() {
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
             echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
+            pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
         else
             echo "Downloading ${_ARCHBOOT} to ${1} ..."
-             pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
+             pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
         fi
     else
         echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1
+        pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
