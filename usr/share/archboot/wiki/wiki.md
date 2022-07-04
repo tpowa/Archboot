@@ -94,6 +94,8 @@ Hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.
 # dd if=imagefile of=/dev/yourdevice bs=1M
 ```
 
+[**Rufus for Windows**](https://rufus.ie "Rufus for Windows"): Use dd-Mode to write the image on Windows.
+
 ### **<span dir="">Installation with a graphical environment or VNC instead of plain console</span>**
 
 * During boot all network interfaces will try to obtain an IP address through [**dhcpcd**](https://wiki.archlinux.org/title/Dhcpcd "Dhcpcd").
