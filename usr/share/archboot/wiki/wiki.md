@@ -438,7 +438,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Internal update feature | Yes | No |
 | Offline installation support | Yes | No |
 | [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") installation support | Yes | No |
-| Image size | <140-1477MB | >833MB |
+| Image size | <127-1501MB | >833MB |
 | RAM to boot | >1.3GB | >800MB |
 | Bootup speed | 8 seconds | 30 seconds |
 | Build speed | faster | slower |
