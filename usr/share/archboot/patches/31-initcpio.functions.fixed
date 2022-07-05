@@ -875,8 +875,7 @@ install_modules() {
     done
 
     msg "Generating module dependencies"
-    install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.builtin
-    install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.order
+    install -m644 -t "$moduledest" "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
     depmod -b "$BUILDROOT" "$KERNELVERSION"
 
     # remove all non-binary module.* files (except devname for on-demand module loading)
