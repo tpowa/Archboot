@@ -3,7 +3,7 @@
 . /etc/archboot/defaults
 # fedora shim setup
 _SHIM_VERSION="15.6"
-_SHIM_RELEASE="1"
+_SHIM_RELEASE="2"
 _SHIM_URL="https://kojipkgs.fedoraproject.org/packages/shim/${_SHIM_VERSION}/${_SHIM_RELEASE}"
 _SHIM_RPM="x86_64/shim-x64-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
 _SHIM32_RPM="x86_64/shim-ia32-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
