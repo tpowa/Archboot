@@ -1,7 +1,5 @@
 
-<span dir="">[![Logo](https://pkgbuild.com/~tpowa/archboot/web/logo.png)]() </span>
-
-<span dir="">[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z7GXKW4MKHK7C) You like the project? I like coffee :smile:</span>
+<span dir="">You like the project? I like coffee :smile:</span>
 
 **Table of contents**
 
@@ -39,10 +37,10 @@
 
 ### **<span dir="">Features of the images</span>**
 | Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 |
-|------|-------------|------------------------|----------------|--------------------------|----------------|-----------------|
+|------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|
 | _date_-latest | 2000 MB | No | DHCP server needed | Yes | 127 MB | 129 MB |
 | _date_ | 1300 MB | Yes | Yes | No | 451 MB | 351 MB |
-| _date_-local | 3300 MB |  Yes | Yes | Yes | 1501 MB | 1209 MB |
+| _date_-local | 3300 MB | Yes | Yes | Yes | 1501 MB | 1209 MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
@@ -144,12 +142,12 @@ $ ssh root@yourip
   * It installs a bootloader which is **not** controlled by Arch Linux and **breaks** the concept of **Secure Boot** as is.
 * Please read [**Roderick Smith's guide**](https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim) first for initial shim setup.
 * In order to boot in [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") mode on first boot:
-  * you need to enroll archboot's MOK key from disk: ```/EFI/KEY/MOK.cer```
-* Tools included for key management: KeyTool, HashTool, mokutil, sbsigntools, sbctl and [mkkeys.sh](http://mkkeys.sh)
+  * you need to enroll archboot's MOK key from disk: `/EFI/KEY/MOK.cer`
+* Tools included for key management: KeyTool, HashTool, mokutil, sbsigntools, sbctl and mkkeys.sh
 * setup script supports the following [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") layout:
   * shim from fedora is copied
   * creating new keys is supported
-  * using existing keys from `/etc/secureboot/keys` in layout [secureboot-keys.sh](http://secureboot-keys.sh) produces
+  * using existing keys from `/etc/secureboot/keys` in layout secureboot-keys.sh produces
   * MOK setup is done with keys
   * adding pacman hook for automatic signing
   * On first reboot you need to enroll the used keys to the MOK then your installed system is dual boot ready.
@@ -482,14 +480,30 @@ GIT repository can be found at [**Arch Linux Gitlab**](https://gitlab.archlinux.
 ### **<span dir="">Installation</span>**
 
 * Add archboot repository to your pacman.conf:
+
 ```plaintext
 [archboot]
 Server = https://pkgbuild.com/~tpowa/archboot/pkg
 ```
-* [**Install**](https://wiki.archlinux.org/title/Install "Install") the [**<span dir="">archboot</span>**](https://archlinux.org/packages/?name=archboot) package on **x86_64** hardware.
-* [**Install**](https://wiki.archlinux.org/title/Install "Install") the [**<span dir="">archboot-arm</span>**](https://archlinux.org/packages/?name=archboot-arm) package on **aarch64** hardware.
+
+* [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot** package on **x86_64** hardware.
+
+```plaintext
+# pacman -Sy archboot
+```
+
+* [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-arm** package on **aarch64** hardware.
+
+```plaintext
+# pacman -Sy archboot-arm
+```
+
+* You can build aarch64 images on x86_64 hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-qemu-aarch64** package.
+```plaintext
+# pacman -Sy archboot-qemu-aarch64
+```
 * If you want to build **aarch64** images replace **x86_64** with **aarch64** in the commands and files below.
-* You can build aarch64 images on x86_64 hardware. The qemu helper needs to be installed [**<span dir="">archboot-qemu-aarch64</span>**](https://archlinux.org/packages/?name=archboot-qemu-aarch64) package.
+
 
 ### **<span dir="">Requirements</span>**
 
