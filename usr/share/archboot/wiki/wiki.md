@@ -1,5 +1,6 @@
+<span dir="">[![Logo](https://pkgbuild.com/~tpowa/archboot/web/logo.png)]() </span>
 
-<span dir="">You like the project? I like coffee :smile:</span>
+<span dir="">[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z7GXKW4MKHK7C) You like the project? I like coffee :smile:</span>
 
 **Table of contents**
 
