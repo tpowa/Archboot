@@ -480,7 +480,7 @@ GIT repository can be found at [**Arch Linux Gitlab**](https://gitlab.archlinux.
 
 ### **<span dir="">Installation</span>**
 
-* Add archboot repository to your pacman.conf:
+* Add **archboot** repository to your **/etc/pacman.conf**:
 
 ```plaintext
 [archboot]
@@ -499,7 +499,7 @@ Server = https://pkgbuild.com/~tpowa/archboot/pkg
 # pacman -Sy archboot-arm
 ```
 
-* You can build aarch64 images on x86_64 hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-qemu-aarch64** package.
+* You can build **aarch64** images on **x86_64** hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-qemu-aarch64** package.
 ```plaintext
 # pacman -Sy archboot-qemu-aarch64
 ```
