@@ -100,6 +100,10 @@ prepare_pacman() {
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
     DIALOG --infobox "Refreshing package database..." 3 40
     ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
+    DIALOG --infobox "Update Arch Linux keying ..." 3 40
+    KEYRING="archlinux-keyring"
+    [[ "$(uname -m)" == aarch64 ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
+    ${PACMAN} -Sy ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     return 0
 }
 
