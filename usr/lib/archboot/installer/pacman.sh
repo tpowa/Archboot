@@ -103,7 +103,7 @@ prepare_pacman() {
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
-    pacman -Sy "${PACMAN_CONF}" --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
+    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
     return 0
 }
 
