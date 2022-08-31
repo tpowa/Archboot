@@ -95,7 +95,7 @@ _prepare_pacman() {
     echo "Update Arch Linux keying ..."
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == aarch64 ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
-    pacman -Sy ${KEYRING}
+    pacman -Sy --noconfirm ${KEYRING}
 }
 
 #shellcheck disable=SC2120
