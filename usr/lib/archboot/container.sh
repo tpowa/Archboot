@@ -94,8 +94,8 @@ _prepare_pacman() {
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     echo "Update Arch Linux keying ..."
     KEYRING="archlinux-keyring"
-    [[ "$(uname -m)" == aarch64 ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
-    pacman -Sy --noconfirm ${KEYRING}
+    [[ "$(uname -m)" == "aarch64" ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
+    pacman -Sy --noconfirm --noprogressbar ${KEYRING}
 }
 
 #shellcheck disable=SC2120
