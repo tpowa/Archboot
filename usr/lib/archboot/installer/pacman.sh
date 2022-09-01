@@ -95,6 +95,7 @@ update_environment() {
 # params: none
 # returns: 1 on error
 prepare_pacman() {
+    NEXTITEM="5"
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
@@ -104,7 +105,6 @@ prepare_pacman() {
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
     pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
-    return 0
 }
 
 # Set PACKAGES parameter before running to install wanted packages
@@ -146,7 +146,7 @@ install_packages() {
     if [[ "${S_SRC}" = "0" ]]; then
         select_source || return 1
     fi
-    prepare_pacman
+    prepare_pacman || return 1
     PACKAGES=""
     # add packages from archboot defaults
     PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
