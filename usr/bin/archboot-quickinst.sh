@@ -2,7 +2,6 @@
 DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 
-
 usage() {
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1m QUICKINST INSTALLER:\033[0m"
     echo -e "\033[1m-------------------------------------------\033[0m"
@@ -39,6 +38,9 @@ prepare_pacman() {
         mkdir -p "${DESTDIR}/var/lib/pacman"
     fi
     ${PACMAN} -Sy
+    KEYRING="archlinux-keyring"
+    [[ "$(uname -m)" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
+    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} || exit 1
 }
 
 # package_installation
