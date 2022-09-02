@@ -99,6 +99,16 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
+    DIALOG --infobox "Waiting for Arch Linux keyring initialization..." 3 40
+    # pacman-key process itself
+    while pgrep -x pacman-key > /dev/null 2>&1; do
+        sleep 1
+    done
+    # gpg finished in background
+    while pgrep -x gpg > /dev/null 2>&1; do
+        sleep 1
+    done
+    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     DIALOG --infobox "Refreshing package database..." 3 40
     ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
