@@ -499,9 +499,9 @@ Server = https://pkgbuild.com/~tpowa/archboot/pkg
 # pacman -Sy archboot-arm
 ```
 
-* You can build **aarch64** images on **x86_64** hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-qemu-aarch64** package.
+* You can build **aarch64** images on **x86_64** hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **qemu-user-static** package.
 ```plaintext
-# pacman -Sy archboot-qemu-aarch64
+# pacman -Sy qemu-user-static
 ```
 * If you want to build **aarch64** images replace **x86_64** with **aarch64** in the commands and files below.
 
