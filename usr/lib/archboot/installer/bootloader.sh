@@ -241,7 +241,7 @@ do_uefi_efibootmgr() {
 
 _EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
 
-for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | fgrep -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
+for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 
