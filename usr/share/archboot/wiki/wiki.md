@@ -39,9 +39,9 @@
 ### **<span dir="">Features of the images</span>**
 | Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 |
 |------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|
-| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 127 MB | 129 MB |
-| _date_ | 1300 MB | Yes | Yes | No | 451 MB | 351 MB |
-| _date_-local | 3300 MB | Yes | Yes | Yes | 1501 MB | 1209 MB |
+| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 129 MB | 133 MB |
+| _date_ | 1300 MB | Yes | Yes | No | 452 MB | 354 MB |
+| _date_-local | 3300 MB | Yes | Yes | Yes | 1513 MB | 1240 MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
@@ -439,7 +439,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Internal update feature | Yes | No |
 | Offline installation support | Yes | No |
 | [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") installation support | Yes | No |
-| Image size | <127-1501MB | >833MB |
+| Image size | <129-1513MB | >833MB |
 | RAM to boot | >1.3GB | >800MB |
 | Bootup speed | 8 seconds | 30 seconds |
 | Build speed | faster | slower |
