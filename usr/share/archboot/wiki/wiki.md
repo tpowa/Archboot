@@ -441,7 +441,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") installation support | Yes | No |
 | Image size | <129-1513MB | >833MB |
 | RAM to boot | >1.3GB | >800MB |
-| Bootup speed | 8 seconds | 30 seconds |
+| Bootup speed | 8 seconds | 23 seconds |
 | Build speed | faster | slower |
 | Image assembling | grub-mkrescue | xorriso |
 | Image bootloader | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") | [**grub**](https://wiki.archlinux.org/title/Grub "Grub") |
