@@ -420,7 +420,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | [**archinstall**](https://wiki.archlinux.org/title/Archinstall "Archinstall") | No | Yes |
 | setup/quickinst script | Yes | No |
 | [**Arch Install Scripts**](https://wiki.archlinux.org/title/Arch_Install_Scripts "Arch Install Scripts") | Yes | Yes |
-| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot")<br>with fedora signed shim | Yes | No |
+| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot")<br>with Microsoft certificates<br>supported by fedora signed shim | Yes | No |
 | Initramfs only | Yes | No |
 | Man/Info pages | No | Yes |
 | Localization | English only | Yes |
