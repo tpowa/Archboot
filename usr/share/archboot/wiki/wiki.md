@@ -55,7 +55,7 @@
 
 * For [**PXE**](https://wiki.archlinux.org/title/PXE "PXE") booting add the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"),[**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd") and [**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") to your [**TFTP**](https://wiki.archlinux.org/title/TFTP "TFTP"), add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line") setup and you will get a running installation/rescue system.
 * For rescue booting add an entry to your [**bootloader**](https://wiki.archlinux.org/title/Bootloader "Bootloader") pointing to the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"), [**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd"),[**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") and add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line").
-* For **local image** download **both** initrds and load **both** files with your boot loader or PXE setup.
+* For **local image** download **both** initrds and load **both** files with your bootloader or PXE setup.
 
 ### **<span dir="">Supported boot modes</span>**
 | Boot Mode | X86_64 | AARCH64 |
