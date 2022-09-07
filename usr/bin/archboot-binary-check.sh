@@ -21,8 +21,15 @@ if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
     exit 1
 fi
 
-echo "${1}" >binary.txt
+# update pacman db first
+pacman -Sy
+if [[ "${1}" == "base" ]]; then
+    PACKAGE="$(pacman -Qi base | grep Depends | cut -d ":" -f2)"
+else
+    PACKAGE="${1}"
+fi
+echo "${PACKAGE}" >binary.txt
 #shellcheck disable=SC2086
-for i in $(pacman -Ql ${1} | grep "/usr/bin/..*"$ | cut -d' ' -f2);do
-	which "${i}" >/dev/null || echo "${i}">>binary.txt 
+for i in $(pacman -Ql ${PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
+	which "${i}" >/dev/null || echo "${i}">>binary.txt
 done
