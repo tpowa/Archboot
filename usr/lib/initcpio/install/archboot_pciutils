@@ -3,7 +3,7 @@
 
 build ()
 {
-    map add_binary lspci setpci
+    map add_binary lspci setpci update-pciids
     add_file "/usr/share/hwdata/pci.ids"
 }
 
