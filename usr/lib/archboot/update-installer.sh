@@ -154,13 +154,14 @@ _zram_usr() {
         mkdir /usr.zram
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
-        USR_SYMLINKS="$(echo /usr/* | sed -e 's#/usr/##g')"
         mv /usr/* /usr.zram/
-        # pacman does not like /usr to be a symlink,
-        # link everything below /usr
+        USR_SYMLINKS="bin lib lib64"
         for i in ${USR_SYMLINKS}; do
             /usr.zram/bin/sln /usr.zram/${i} /usr/${i}
         done
+        # pacman kills symlinks in below /usr
+        # mount --bind is the only way to solve this.
+        mount --bind /usr.zram /usr
         systemctl restart dbus > /dev/tty7 2>&1
     fi
 }
