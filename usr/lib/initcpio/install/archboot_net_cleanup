@@ -7,7 +7,7 @@ build ()
       slattach traceroute arping clockdiff rarpd rdisc tracepath \
       dig host nslookup telnet ssh arpd genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss \
       tc dhclient ifplugd ifplugstatus bridge dcb devlink rdma tipc vdpa \
-      ping ethtool elinks dhcp_lease_time dhcp_release dhcp_release6 \
+      ping ninfod ethtool elinks dhcp_lease_time dhcp_release dhcp_release6 \
       routel brctl dhclient-script"
     for i in $apps; do
         rm /usr/bin/"$i"
