@@ -31,5 +31,5 @@ fi
 echo "${PACKAGE}" >binary.txt
 #shellcheck disable=SC2086
 for i in $(pacman -Ql ${PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
-	which "${i}" >/dev/null || echo "${i}">>binary.txt
+	which "${i}" >/dev/null 2>&1 || echo "${i}" >>binary.txt
 done
