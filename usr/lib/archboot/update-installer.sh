@@ -156,6 +156,7 @@ _zram_usr() {
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
         mv /usr/* /usr.zram/
         /usr.zram/bin/sln /usr.zram/lib /usr/lib
+        /usr.zram/bin/sln /usr.zram/lib64 /usr/lib64
         /usr.zram/bin/rm -r /usr
         /usr.zram/bin/sln /usr.zram /usr
     fi
