@@ -147,7 +147,7 @@ _zram_initialize() {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _zram_usr() {
-    if ! [[ -h /usr ]]; then
+    if ! [[ -d /usr.zram ]]; then
         echo "${1}" >/sys/block/zram0/disksize
         echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
