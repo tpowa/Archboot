@@ -154,7 +154,7 @@ _zram_usr() {
         mkdir /usr.zram
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
-        mv -T /usr/* /usr.zram
+        mv /usr/* /usr.zram/
         /usr.zram/bin/sln /usr.zram/lib /usr/lib
         /usr.zram/bin/rm -r /usr
         /usr.zram/bin/sln /usr.zram /usr
