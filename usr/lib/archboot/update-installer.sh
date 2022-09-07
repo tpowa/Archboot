@@ -155,9 +155,11 @@ _zram_usr() {
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
         mv /usr/* /usr.zram/
+        # fix libs for rm usage
         /usr.zram/bin/sln /usr.zram/lib /usr/lib
         /usr.zram/bin/sln /usr.zram/lib64 /usr/lib64
-        /usr.zram/bin/ln -snf /usr.zram /usr
+        /usr.zram/bin/rm -r /usr
+        /usr.zram/bin/sln /usr.zram /usr
         systemctl restart dbus > /dev/tty7 2>&1
     fi
 }
