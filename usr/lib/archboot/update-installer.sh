@@ -154,18 +154,8 @@ _zram_usr() {
         mkdir /usr.zram
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
-        cp -r /usr/* /usr.zram/
-        ln -sfn /usr.zram/lib /lib
-        ln -sfn /usr.zram/lib /lib64
-        echo /usr.zram/lib > /etc/ld.so.conf
-        ldconfig
-        ln -sfn /usr.zram/bin /bin
-        ln -sfn /usr.zram/bin /sbin
-        #shellcheck disable=SC2115
-        rm -r /usr/*
-        /usr.zram/bin/./mount --bind /usr.zram /usr
-        systemctl daemon-reload > /dev/tty7 2>&1
-        systemctl restart dbus > /dev/tty7 2>&1
+        mv -T /usr /usr.zram
+        /usr.zram/bin/sln /usr.zram /usr
     fi
 }
 
