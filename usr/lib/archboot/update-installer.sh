@@ -155,7 +155,7 @@ _zram_usr() {
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
         mv /usr/* /usr.zram/
-        USR_SYMLINKS="bin lib lib64"
+        USR_SYMLINKS="bin local lib lib64"
         for i in ${USR_SYMLINKS}; do
             /usr.zram/bin/sln /usr.zram/${i} /usr/${i}
         done
