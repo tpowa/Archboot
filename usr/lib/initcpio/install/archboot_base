@@ -42,7 +42,7 @@ build ()
     ### add shadow
     map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg
+          newusers pwck pwconv pwunconv useradd userdel usermod sg getsubids
 
     ### fix licenses
     map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
