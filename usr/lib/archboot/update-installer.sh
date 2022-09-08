@@ -40,6 +40,7 @@ usage () {
         # local image
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
+                # you can only install one environment with less RAM
                 if ! [[ -e "/.graphic_run" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
                     _graphic_options
                     echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
