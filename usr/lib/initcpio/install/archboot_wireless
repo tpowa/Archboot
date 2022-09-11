@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Created by Tobias Powalowski <tpowa@archlinux.org>
-_KEYDIR="/usr/share/archboot/keys/MOK"
 
 build ()
 {
@@ -21,10 +20,6 @@ build ()
                  "/usr/lib/crda/pubkeys/sforshee.key.pub.pem"
     # fixing licenses
     map add_file "/usr/share/licenses/expat/COPYING" "/usr/share/licenses/wireless-regdb/LICENSE"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        map add_file "/usr/share/licenses/ipw2200-fw/LICENSE" "/usr/share/licenses/ipw2100-fw/LICENSE"
-    fi
-
 }
 
 help ()
