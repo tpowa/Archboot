@@ -17,7 +17,7 @@ build ()
           zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \
-          lzless lzmore lzma modinfo nc reset unlzma unxz xzcat lastb \
+          lzless lzmore lzma modinfo reset unlzma unxz xzcat lastb \
           blkzone chmem choom fincore hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs \
           scriptlive setpriv  uclampset uname26 uuidparse zramctl [ b2sum base32 base64 \
           basenc chcon comm csplit dircolors expand factor fmt hostid join link \
