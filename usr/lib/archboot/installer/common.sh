@@ -122,10 +122,6 @@ auto_packages() {
     linux_firmware
     marvell_firmware
     ### HACK:
-    # always add systemd-sysvcompat components
-    PACKAGES="${PACKAGES//\ systemd-sysvcompat\ / }"
-    PACKAGES="${PACKAGES} systemd-sysvcompat"
-    ### HACK:
     # always add intel-ucode
     if [[ "$(uname -m)" == "x86_64" ]]; then
         PACKAGES="${PACKAGES//\ intel-ucode\ / }"
@@ -156,9 +152,6 @@ auto_packages() {
     PACKAGES="${PACKAGES} nano"
     PACKAGES="${PACKAGES//\ vi\ / }"
     PACKAGES="${PACKAGES} vi"
-    ### HACK: circular depends are possible in base, install filesystem first!
-    PACKAGES="${PACKAGES//\ filesystem\ / }"
-    PACKAGES="filesystem ${PACKAGES}"
 }
 
 # /etc/locale.gen
