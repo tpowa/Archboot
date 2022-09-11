@@ -9,7 +9,7 @@ build ()
 	  nfsdcltrack nfsiostat gssproxy screen tmux
     map add_file "/etc/screenrc" "/etc/ssh/ssh_config" "/etc/ssh/sshd_config" "/etc/ssh/moduli" \
         "/etc/rsyncd.conf" "/etc/exports"  "/usr/lib/ssh/sftp-server" "/usr/lib/ssh/ssh-keysign" \
-        "/usr/lib/ssh/ssh-pkcs11-helper" "/etc/conf.d/rpcbind" "/etc/gssapi_mech.conf" \
+        "/usr/lib/ssh/ssh-pkcs11-helper" "/etc/conf.d/rpcbind" \
         "/etc/netconfig"
     add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
     add_full_dir "/usr/lib/libnfsidmap/"
@@ -28,7 +28,7 @@ build ()
     # fix licenses
     map add_file "/usr/share/licenses/rpcbind/COPYING" "/usr/share/licenses/libsasl/COPYING" \
         "/usr/share/licenses/libldap/LICENSE" "/usr/share/licenses/nfsidmap/LICENSE" \
-        "/usr/share/licenses/libgssglue/COPYING" "/usr/share/licenses/tmux/LICENSE"
+        "/usr/share/licenses/tmux/LICENSE"
 }
 
 help ()
