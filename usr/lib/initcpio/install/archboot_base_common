@@ -52,9 +52,6 @@ build ()
     map add_full_dir "/etc/security" "/etc/default" "/etc/pam.d" "/usr/lib/security"
     add_file "/etc/environment"
 
-    #fix cracklib support!
-    add_file /usr/lib/libcrack.so.2
-
     ### add shadow
     map add_binary login nologin
     add_file "/etc/login.defs"
