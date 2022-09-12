@@ -4,7 +4,6 @@
 build ()
 {
     add_binary "lsusb"
-    add_file "/usr/share/hwdata/usb.ids"
 }
 
 help ()
