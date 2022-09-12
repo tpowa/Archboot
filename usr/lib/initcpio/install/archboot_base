@@ -6,7 +6,7 @@ build ()
     map add_binary getent head id cksum tail test tr uptime w who which whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
           chgrp chown dialog dmesg egrep fgrep stty sync tar bsdcpio hdparm \
-          chroot dirname expr bzip2 su cpio sdparm tput \
+          chroot dirname expr bzip2 su sdparm tput \
           ifconfig losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
           xzdec switch_root pivot_root chcpu ctrlaltdel gdisk sgdisk cgdisk fixparts findmnt \
           lsfd lsblk swaplabel cal chrt col colcrt colrm column fallocate flock getopt \
