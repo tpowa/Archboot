@@ -36,7 +36,7 @@ _fix_network "${1}"
 # update container to latest packages
 echo "Installing pacman to container ..."
 mkdir -p "${1}/${_PACMAN_RISCV64}/var/lib/pacman"
-systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_RISCV64}" -Sy awk pacman --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_RISCV64}" -Sy awk pacman archlinux-keyring --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 _generate_keyring "${1}/${_PACMAN_RISCV64}" || exit 1
 _fix_network "${1}/${_PACMAN_RISCV64}"
 _CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_RISCV64}" 2>/dev/null
