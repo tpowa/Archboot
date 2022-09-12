@@ -19,7 +19,7 @@ _update_aarch64_pacman_chroot() {
     # update container to latest packages
     echo "Update container to latest packages..."
     systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
-    _fix_aarch64_network "${_PACMAN_AARCH64}"
+    _fix_network "${_PACMAN_AARCH64}"
     _CLEANUP_CONTAINER="1" _clean_container "${_PACMAN_AARCH64}" >/dev/null 2>&1
     _CLEANUP_CACHE="1" _clean_cache "${_PACMAN_AARCH64}" >/dev/null 2>&1
     echo "Generating tarball ..."

@@ -31,13 +31,13 @@ bsdtar -xf ArchLinuxARM-aarch64-latest.tar.gz -C "${1}"
 echo "Removing installation tarball ..."
 rm ArchLinuxARM-aarch64-latest.tar.gz
 _generate_keyring "${1}" || exit 1
-_fix_aarch64_network "${1}"
+_fix_network "${1}"
 # update container to latest packages
 echo "Installing pacman to container ..."
 mkdir -p "${1}/${_PACMAN_AARCH64}/var/lib/pacman"
 systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_AARCH64}" -Sy awk pacman --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 _generate_keyring "${1}/${_PACMAN_AARCH64}" || exit 1
-_fix_aarch64_network "${1}/${_PACMAN_AARCH64}"
+_fix_network "${1}/${_PACMAN_AARCH64}"
 _CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_AARCH64}" 2>/dev/null
 _CLEANUP_CACHE="1" _clean_cache "${1}/${_PACMAN_AARCH64}" 2>/dev/null
 echo "Generating tarball ..."

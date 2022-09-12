@@ -93,7 +93,7 @@ _x86_64_pacman_restore() {
     fi    
 }
 
-_fix_aarch64_network() {
+_fix_network() {
     echo "Fix network settings in ${1} ..."
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
