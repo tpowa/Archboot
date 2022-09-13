@@ -12,8 +12,6 @@ _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
 _STANDARD_PACKAGES="gparted nss-mdns chromium"
 _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
-# riscv64 need other packages
-[[ "$(uname -m)" == "riscv64" ]] && _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES} ${_PLASMA_PACKAGES}"
 
 ### check for root
 _root_check() {
