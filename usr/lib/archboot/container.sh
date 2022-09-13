@@ -50,7 +50,25 @@ _aarch64_pacman_chroot() {
     echo "Update container to latest packages..."
     systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
 }
-    
+
+_riscv64_pacman_chroot() {
+    if ! [[ -f ${_PACMAN_RISCV64_CHROOT} && -f ${_PACMAN_RISCV64_CHROOT}.sig ]]; then
+        echo "Downloading ${_PACMAN_RISCV64_CHROOT} ..."
+        wget ${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}/${_PACMAN_RISCV64_CHROOT}{,.sig} >/dev/null 2>&1
+    else
+        echo "Using local ${_PACMAN_RISCV64_CHROOT} ..."
+    fi
+    echo "Verifying ${_PACMAN_RISCV64_CHROOT} ..."
+    gpg --verify "${_PACMAN_RISCV64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
+    bsdtar -C "${1}" -xf "${_PACMAN_RISCV64_CHROOT}"
+    if [[ -f ${_PACMAN_RISCV64_CHROOT} && -f ${_PACMAN_RISCV64_CHROOT}.sig ]]; then
+        echo "Removing installation tarball ${_PACMAN_RISCV64_CHROOT} ..."
+        rm ${_PACMAN_RISCV64_CHROOT}{,.sig}
+    fi
+    echo "Update container to latest packages..."
+    systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
+}
+
 # clean container from not needed files
 _clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
@@ -168,7 +186,7 @@ _install_archboot() {
     rm -r "${1}"/blankdb
 }
 
-_aarch64_install_base_packages() {
+_other_install_base_packages() {
     echo "Installing packages ${_PACKAGES} to ${1} ..."
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")" ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
@@ -180,7 +198,7 @@ _aarch64_install_base_packages() {
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
-_aarch64_install_archboot() {
+_other_install_archboot() {
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
