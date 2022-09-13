@@ -37,6 +37,14 @@ _aarch64_check() {
     fi
 }
 
+### check for aarch64
+_riscv64_check() {
+    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+        echo "ERROR: Please run on riscv64 hardware."
+        exit 1
+    fi
+}
+
 ### check for tpowa's build server
 _buildserver_check() {
     if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
