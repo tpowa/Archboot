@@ -23,11 +23,13 @@ build ()
           basenc chcon comm csplit dircolors expand factor fmt hostid join link \
           logname md5sum nice nl nohup nproc numfmt paste pathchk pinky pr printenv ptx realpath \
           runcon sha1sum sha224sum sha256sum sha384sum sha512sum shuf split stdbuf sum timeout truncate \
-          tsort unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
+          tsort unexpand unlink users vdir pwait fuser prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat
-    [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64
+    [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64 peekfd
+    [[ "$(uname -m)" == "aarch64" ]] && add_binary peekfd
+
     ### add zsh
     map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     

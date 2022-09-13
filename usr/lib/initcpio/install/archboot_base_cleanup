@@ -23,12 +23,15 @@ build ()
           dircolors expand factor fmt hostid join link logname md5sum nice nl nohup \
           nproc numfmt paste pathchk pinky pr printenv ptx runcon sha1sum sha224sum \
           sha256sum sha384sum sha512sum shuf split stdbuf sum timeout truncate tsort \
-          unexpand unlink users vdir pwait fuser peekfd prtstat pslog pstree newgidmap newuidmap \
+          unexpand unlink users vdir pwait fuser prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat"
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        apps="i386 x86_64 $apps"
+        apps="i386 x86_64 peekfd $apps"
+    fi
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        apps="peekfd $apps"
     fi
     for i in $apps; do
         rm /usr/bin/"$i"
