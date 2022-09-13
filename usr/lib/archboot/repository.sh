@@ -27,7 +27,7 @@ _download_packages() {
     pacman --root "${1}" -Syw ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
 }
 
-_aarch64_download_packages() {
+_other_download_packages() {
     mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
