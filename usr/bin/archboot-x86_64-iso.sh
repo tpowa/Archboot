@@ -10,6 +10,7 @@ _x86_64_check
 _config
 echo "Starting ISO creation ..."
 _prepare_kernel_initramfs_files || exit 1
+_prepare_ucode || exit 1
 _prepare_fedora_shim_bootloaders_x86_64 || exit 1
 _prepare_uefi_shell_tianocore || exit 1
 _prepare_efitools_uefi || exit 1

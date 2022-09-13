@@ -72,6 +72,9 @@ _prepare_kernel_initramfs_files() {
     # add with .cer, cause of DELL firmware
     mkdir -p "${_ISODIR}/EFI/KEY"
     cp ${_KEYDIR}/MOK.CER "${_ISODIR}/EFI/KEY/MOK.cer"
+}
+
+_prepare_ucode() {
     # install ucode files
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
     cp /boot/amd-ucode.img "${_ISODIR}/boot/"
@@ -138,6 +141,12 @@ _prepare_uefi_IA32() {
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
+}
+
+# build grubXXX with all modules: http://bugs.archlinux.org/task/71382
+_prepare_uefi_RISCV64() {
+    echo "Prepare RISCV64 Grub ..."
+    cp /usr/share/archboot/bootloader/grubriscv64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 _prepare_background() {

@@ -5,15 +5,12 @@
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check
-_aarch64_check
+_riscv64_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
 echo "Starting ISO creation ..."
 _prepare_kernel_initramfs_files || exit 1
-_prepare_ucode || exit 1
-_prepare_fedora_shim_bootloaders_aarch64 || exit 1
-_prepare_efitools_uefi || exit 1
-_prepare_uefi_AA64 || exit 1
+_prepare_uefi_RISCV64 || exit 1
 _prepare_background || exit 1
 _reproducibility
 _prepare_uefi_image || exit 1
