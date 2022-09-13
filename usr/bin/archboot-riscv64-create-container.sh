@@ -2,14 +2,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
-_ARCHBOOT="archboot-arm"
-_KEYRING="archlinuxarm"
+_ARCHBOOT="archboot-riscv"
+_KEYRING="archlinux"
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check
 echo "Starting container creation ..."
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
-if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
     _create_pacman_conf "${1}"
     _prepare_pacman "${1}" || exit 1
     _install_base_packages "${1}" || exit 1
@@ -25,7 +25,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _copy_mirrorlist_and_pacman_conf "${1}"
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _aarch64_pacman_chroot "${1}" || exit 1
+    _riscv64_pacman_chroot "${1}" || exit 1
     _create_pacman_conf "${1}" "use_container_config"
     _other_install_base_packages "${1}" || exit 1
     _other_install_archboot "${1}" || exit 1
