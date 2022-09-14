@@ -17,7 +17,7 @@ archboot-aarch64-create-container.sh grub-aarch64
 _prepare_uefi_AA64 grub-aarch64 || exit 1
 _cleanup grub-aarch64 || exit 1
 archboot-riscv64-create-container.sh grub-riscv64
-_prepare_uefi_RISCV64 grub-aarch64 || exit 1
+_prepare_uefi_RISCV64 grub-riscv64 || exit 1
 _cleanup grub-riscv64 || exit 1
 _upload_efi_files grub-efi || exit 1
 _cleanup grub-efi || exit 1
