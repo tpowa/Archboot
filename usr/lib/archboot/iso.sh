@@ -141,13 +141,12 @@ _prepare_uefi_IA32() {
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
-    cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/BOOTR64.efi"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_RISCV64() {
     echo "Prepare RISCV64 Grub ..."
-    cp /usr/share/archboot/bootloader/grubriscv64.efi "${_ISODIR}/EFI/BOOT/"
+    cp /usr/share/archboot/bootloader/bootriscv64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
 _prepare_background() {
