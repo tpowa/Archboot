@@ -66,8 +66,9 @@ _prepare_uefi_RISCV64() {
     cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Prepare RISCV64 Grub ..."
     # https://fedoraproject.org/wiki/Architectures/RISC-V/GRUB2
-    systemd-nspawn -q -D "${1}" grub-mkstandalone -d /usr/lib/grub/riscv64-efi -O riscv64-efi --sbat=/usr/share/grub/sbat.csv --compress=xz --modules="boot cat configfile echo f2fs fat font iso9660 linux loadenv loopback minicmd normal part_apple part_gpt part_msdos regexp search search_fs_file search_fs_uuid search_label serial sleep" --fonts="unicode" --locales="" --themes="" -o /bootriscv64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
-    mv "${1}"/bootriscv64.efi grub-efi/
+    systemd-nspawn -q -D "${1}" grub-mkstandalone -d /usr/lib/grub/riscv64-efi -O riscv64-efi --sbat=/usr/share/grub/sbat.csv --compress=xz --modules="boot cat configfile echo f2fs fat font iso9660 linux loadenv loopback minicmd normal part_apple part_gpt part_msdos regexp search search_fs_file search_fs_uuid search_label serial sleep" --fonts="unicode" --locales="" --themes="" -o /BOOTRISCV64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
+    mv "${1}"/BOOTRISCV64.efi grub-efi/
+    cp grub-efi/BOOTRISCV64.efi grub-efi/grubriscv64.efi
 }
 
 _upload_efi_files() {
