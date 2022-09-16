@@ -6,16 +6,12 @@
 _parameters "$@"
 _root_check
 _riscv64_check
+_loop_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
 echo "Starting ISO creation ..."
-_prepare_kernel_initramfs_files || exit 1
-_prepare_uefi_RISCV64 || exit 1
-_prepare_background || exit 1
+_prepare_kernel_initramfs_files_RISCV64 || exit 1
 _reproducibility
-_prepare_uefi_image || exit 1
-_reproducibility
-_grub_mkrescue || exit 1
 _reproducibility_iso  || exit 1
 _create_cksum || exit 1
 _cleanup_iso || exit 1

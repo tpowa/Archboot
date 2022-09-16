@@ -39,7 +39,7 @@ _update_riscv64_pacman_chroot() {
     # update riscv64 pacman chroot
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_PACMAN_RISCV64}" ]] || mkdir "${_PACMAN_RISCV64}"
-    echo "Downloading archlinuxarm pacman RISCV64 chroot..."
+    echo "Downloading archlinux pacman riscv64 chroot..."
     [[ -f pacman-riscv64-chroot-latest.tar.zst ]] && rm pacman-riscv64-chroot-latest.tar.zst{,.sig} 2>/dev/null
     wget ${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}/${_PACMAN_RISCV64_CHROOT}{,.sig} >/dev/null 2>&1
     # verify download

@@ -143,10 +143,21 @@ _prepare_uefi_AA64() {
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
-# build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_uefi_RISCV64() {
-    echo "Prepare RISCV64 Grub ..."
-    cp /usr/share/archboot/bootloader/BOOTRISCV64.efi "${_ISODIR}/EFI/BOOT/"
+### EFI status of RISCV64:
+#----------------------------------------------------
+# EFI is not yet working for RISCV64!
+# - grub does not allow linux command in memdisk mode
+# - grub itself cannot initialize efi system partion
+# - refind bails out with error
+# - systemd-boot does not support loading of initrd
+# - unified EFI is not possible because of this:
+#   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
+# - only left option is extlinux support in u-boot loader
+_prepare_kernel_initramfs_files_RISCV64() {
+    echo "Prepare RISCV64 extlinux ..."
+    mkdir -p ${_ISODIR}/boot/extlinux
+    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
 }
 
 _prepare_background() {
@@ -172,6 +183,47 @@ _prepare_uefi_image() {
     mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copy all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+}
+
+# https://github.com/CoelacanthusHex/archriscv-scriptlet/blob/master/mkimg
+# https://checkmk.com/linux-knowledge/mounting-partition-loop-device
+# calculate mountpoint offset: sector*start
+# 512*2048=1048576
+# https://reproducible-builds.org/docs/system-images/
+# mkfs.ext4 does not allow reproducibility
+_prepare_extlinux_image() {
+    echo "Prepare extlinux image ..."
+    ## get size of boot files
+    BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
+    IMGSZ=$(( (BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
+    ## Create cdefiboot.img
+    dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
+    EXT_IMAGE="${_ISODIR}/extlinux.img"
+    sfdisk "${_ISODIR}/extlinux.img" <<EOF
+label: dos
+label-id: 0x12345678
+device: "${_ISODIR}/extlinux.img"
+unit: sectors
+"${_ISODIR}/extlinux.img"1 : start=        2048, type=83, bootable
+EOF
+    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null
+    mkdir ${_ISODIR}/mount
+    mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"
+    mkdir -p "${_ISODIR}/mount/boot/extlinux"
+    cp -r "${_ISODIR}/boot" "${_ISODIR}/mount"
+
+cat << EOF >> "${_ISODIR}/mount/boot/extlinux/extlinux.conf"
+menu title Welcome to Archboot - Arch Linux RISC-V64
+timeout 100
+default linux
+label linux
+    menu label Boot System (automatic boot in 10 seconds ...)
+    kernel /boot/vmlinuz_${_RUNNING_ARCH}"
+    initrd /boot/initramfs_${_RUNNING_ARCH}.img
+    append rootfstype=ramfs console=ttyS0,115200 console=tty0
+EOF
+    umount "${_ISODIR}/mount"
+    mv "${_ISODIR}/extlinux.img" "${_IMAGENAME}.img"
 }
 
 _grub_mkrescue() {
