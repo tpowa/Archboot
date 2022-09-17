@@ -84,16 +84,16 @@ _create_boot() {
         _MP="$(mktemp -d archboot-mount.XXX)"
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}"
+                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
                 cp "${_MP}/${_KERNEL}" "${_KERNEL_ARCHBOOT}"
                 cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS}"
                 umount "${_MP}"
             elif echo "${i}" | grep -q latest; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}"
+                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
                 cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS_LATEST}"
                 umount "${_MP}"
             elif echo "${i}" | grep -q local; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}"
+                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
                 cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS_LOCAL}"
                 umount "${_MP}"
             fi
