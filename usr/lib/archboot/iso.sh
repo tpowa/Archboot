@@ -213,7 +213,7 @@ _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(( (BOOTSIZE*120)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$(( (BOOTSIZE*118)/100/1024 + 1)) # image size in sectors
     ## Create extlinux.img
     dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
     EXT_IMAGE="${_ISODIR}/extlinux.img"
