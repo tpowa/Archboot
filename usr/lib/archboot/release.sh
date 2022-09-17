@@ -17,7 +17,7 @@ _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 [[ "${_ARCH}" == "x86_64" ]] && _ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
 [[ "${_ARCH}" == "aarch64" ]] && _ISONAME="archboot-archlinuxarm-$(date +%Y.%m.%d-%H.%M)"
-[[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinux-riscv64-$(date +%Y.%m.%d-%H.%M)"
+[[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinuxriscv-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
