@@ -5,7 +5,7 @@ build ()
 {
 	### https://github.com/archlinux/mkinitcpio/pull/113/commits/0e5bc5b41f73b7d6d4e346be957a32258f07e7a7
 	# remove when merged to block hook
-    add_checked_modules '/kernel/fs' '/drivers/spi/'
+    add_checked_modules '/kernel/fs|/drivers/spi/'
     map add_binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
 	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \

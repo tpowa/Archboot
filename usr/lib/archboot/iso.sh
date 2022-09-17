@@ -12,7 +12,7 @@ _usage () {
     echo "  -g                  Start generation of image."
     echo "  -p=PRESET           Which preset should be used."
     echo "                      /etc/archboot/presets locates the presets"
-    echo "                      default=x86_64"
+    echo "                      default=${_RUNNING_ARCH}"
     echo "  -i=IMAGENAME        Your IMAGENAME."
     echo "  -h                  This message."
     exit 0
@@ -24,7 +24,7 @@ _parameters() {
             -g|--g) export _GENERATE="1" ;;
             -p=*|--p=*) _PRESET="$(echo "${1}" | awk -F= '{print $2;}')" ;;
             -i=*|--i=*) _IMAGENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
-            -h|--h|?) usage ;; 
+            -h|--h|?) _usage ;;
             *) _usage ;;
         esac
         shift
