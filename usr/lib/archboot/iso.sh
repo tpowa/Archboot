@@ -213,7 +213,7 @@ _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(( (BOOTSIZE*118)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$(( (BOOTSIZE*117)/100/1024 + 1)) # image size in sectors
     ## Create extlinux.img
     dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
     EXT_IMAGE="${_ISODIR}/extlinux.img"
@@ -254,8 +254,8 @@ _create_cksum() {
     ## create sha256sums.txt
     echo "Generating sha256sum ..."
     [[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
-    echo ./*.iso >/dev/null 2>&1 && cksum -a sha256 ./*.iso > "sha256sums.txt"
-    echo ./*.img >/dev/null 2>&1 && cksum -a sha256 ./*.img > "sha256sums.txt"
+    [[ "$(echo ./*.iso)" == "./*.iso" ]] || cksum -a sha256 ./*.iso > "sha256sums.txt"
+    [[ "$(echo ./*.img)" == "./*.img" ]] || cksum -a sha256 ./*.img > "sha256sums.txt"
 }
 
 _cleanup_iso() {
