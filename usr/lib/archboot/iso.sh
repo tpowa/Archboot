@@ -198,7 +198,7 @@ _prepare_uefi_image() {
 _prepare_extlinux_conf() {
         echo "Prepare extlinux.conf ..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
-menu title Welcome to Archboot - Arch Linux RISC-V64
+menu title Welcome to Archboot - Arch Linux RISC-V 64
 timeout 100
 default linux
 label linux

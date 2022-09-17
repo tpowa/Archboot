@@ -16,6 +16,7 @@ _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 [[ "${_ARCH}" == "x86_64" ]] && _ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
 [[ "${_ARCH}" == "aarch64" ]] && _ISONAME="archboot-archlinuxarm-$(date +%Y.%m.%d-%H.%M)"
+[[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinux-riscv64-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
@@ -74,27 +75,31 @@ _create_iso() {
 _create_boot() {
     # create boot directory with ramdisks
     echo "Create boot directory ..."
-    mkdir -p boot/licenses/amd-ucode
-    [[ "${_ARCH}" == "aarch64" ]] || mkdir -p boot/licenses/intel-ucode
-    for i in *.iso; do
-        if  echo "${i}" | grep -v local | grep -vq latest; then
-            isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
-            [[ "${_ARCH}" == "aarch64" ]] || isoinfo -R -i "${i}" -x /"${_INTEL_UCODE}" 2>/dev/null > "${_INTEL_UCODE}"
-            isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS}"
-            isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL_ARCHBOOT}"
-        elif echo "${i}" | grep -q latest; then
-            isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
-        elif echo "${i}" | grep -q local; then
-            isoinfo -R -i "${i}" -x /"${_INITRAMFS_L0}" 2>/dev/null > "${_INITRAMFS_LOCAL0}"
-            isoinfo -R -i "${i}" -x /"${_INITRAMFS_L1}" 2>/dev/null > "${_INITRAMFS_LOCAL1}"
+    if [[ "${_ARCH}" == "riscv64" ]]; then
+
+    else
+        mkdir -p boot/licenses/amd-ucode
+        [[ "${_ARCH}" == "aarch64" ]] || mkdir -p boot/licenses/intel-ucode
+        for i in *.iso; do
+            if  echo "${i}" | grep -v local | grep -vq latest; then
+                isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
+                [[ "${_ARCH}" == "aarch64" ]] || isoinfo -R -i "${i}" -x /"${_INTEL_UCODE}" 2>/dev/null > "${_INTEL_UCODE}"
+                isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS}"
+                isoinfo -R -i "${i}" -x /"${_KERNEL}" 2>/dev/null > "${_KERNEL_ARCHBOOT}"
+            elif echo "${i}" | grep -q latest; then
+                isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LATEST}"
+            elif echo "${i}" | grep -q local; then
+                isoinfo -R -i "${i}" -x /"${_INITRAMFS_L0}" 2>/dev/null > "${_INITRAMFS_LOCAL0}"
+                isoinfo -R -i "${i}" -x /"${_INITRAMFS_L1}" 2>/dev/null > "${_INITRAMFS_LOCAL1}"
+            fi
+        done
+        if [[ -d /usr/share/licenses/amd-ucode ]]; then
+            cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
         fi
-    done
-    if [[ -d /usr/share/licenses/amd-ucode ]]; then
-        cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-    fi
-    if ! [[ "${_ARCH}" == "aarch64" ]]; then
-        if [[ -d /usr/share/licenses/intel-ucode ]]; then
-            cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+        if ! [[ "${_ARCH}" == "aarch64" ]]; then
+            if [[ -d /usr/share/licenses/intel-ucode ]]; then
+                cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+            fi
         fi
     fi
 }
