@@ -188,7 +188,6 @@ _install_archboot() {
 }
 
 _other_install_base_packages() {
-    echo "Installing packages ${_PACKAGES} to ${1} ..."
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")" ]]; then
         _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi

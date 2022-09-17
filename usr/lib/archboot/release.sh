@@ -70,7 +70,7 @@ _create_iso() {
     echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # move iso out of container
     [[ "$(echo ./*.iso)" == "./*.iso" ]] || mv "${_W_DIR}"/*.iso ./
-    [[ "$(echo ./*.img)" == "./*.img" ]] || mv "${_W_DIR}"/*.iso ./
+    [[ "$(echo ./*.img)" == "./*.img" ]] || mv "${_W_DIR}"/*.img ./
     # remove container
     echo "Remove container ${_W_DIR} ..."
     rm -r "${_W_DIR}"
