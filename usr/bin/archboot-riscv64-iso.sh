@@ -10,6 +10,7 @@ _loop_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
 echo "Starting Image creation ..."
+_fix_mkinitcpio
 _prepare_kernel_initramfs_files_RISCV64 || exit 1
 _prepare_extlinux_conf || exit 1
 _reproducibility
