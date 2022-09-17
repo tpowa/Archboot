@@ -9,10 +9,11 @@ _riscv64_check
 _loop_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
-echo "Starting ISO creation ..."
+echo "Starting Image creation ..."
 _prepare_kernel_initramfs_files_RISCV64 || exit 1
+_prepare_extlinux_conf || exit 1
 _reproducibility
-_reproducibility_iso  || exit 1
+_prepare_extlinux_image || exit 1
 _create_cksum || exit 1
 _cleanup_iso || exit 1
-echo "Finished ISO creation."
+echo "Finished Image creation."

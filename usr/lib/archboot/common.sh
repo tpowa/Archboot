@@ -49,7 +49,7 @@ _loop_check() {
     if ! [[ -b /dev/loop0 ]]; then
         modprobe loop > /dev/null 2>&1
         losetup -f  > /dev/null 2>&1
-        ! [[ -b /dev/loop0 ]] && (echo "ERROR: No /dev/loop0 available, aborting."; exit 1)
+        ! [[ -b /dev/loop0 ]] && (echo "ERROR: No /dev/loop0 available. Aborting..."; exit 1)
     fi
 }
 

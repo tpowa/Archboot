@@ -38,12 +38,7 @@ _config() {
     [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)-${_RUNNING_ARCH}"
 }
 
-_prepare_kernel_initramfs_files() {
-    echo "Prepare kernel and initramfs ..."
-    #shellcheck disable=SC1090
-    source "${_PRESET}"
-    mkdir -p "${_ISODIR}"/EFI/{BOOT,tools}
-    mkdir -p "${_ISODIR}/boot"
+_fix_mkinitcpio() {
     # fix for mkinitcpio 31
     # https://bugs.archlinux.org/task/72882
     # remove on mkinitcpio 32 release
@@ -51,6 +46,14 @@ _prepare_kernel_initramfs_files() {
     [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
     cp  "/usr/bin/mkinitcpio" "/usr/bin/mkinitcpio.old"
     [[ -f "/usr/share/archboot/patches/31-mkinitcpio.fixed" ]] && cp "/usr/share/archboot/patches/31-mkinitcpio.fixed" "/usr/bin/mkinitcpio"
+}
+
+_prepare_kernel_initramfs_files() {
+    echo "Prepare kernel and initramfs ..."
+    #shellcheck disable=SC1090
+    source "${_PRESET}"
+    mkdir -p "${_ISODIR}"/EFI/{BOOT,tools}
+    mkdir -p "${_ISODIR}/boot"
 
     #shellcheck disable=SC2154
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
@@ -72,6 +75,24 @@ _prepare_kernel_initramfs_files() {
     # add with .cer, cause of DELL firmware
     mkdir -p "${_ISODIR}/EFI/KEY"
     cp ${_KEYDIR}/MOK.CER "${_ISODIR}/EFI/KEY/MOK.cer"
+}
+
+### EFI status of RISCV64:
+#----------------------------------------------------
+# EFI is not yet working for RISCV64!
+# - grub does not allow linux command in memdisk mode
+# - grub itself cannot initialize efi system partion
+# - refind bails out with error
+# - systemd-boot does not support loading of initrd
+# - unified EFI is not possible because of this:
+#   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
+# - only left option is extlinux support in u-boot loader
+_prepare_kernel_initramfs_files_RISCV64() {
+    echo "Prepare RISCV64 extlinux ..."
+    source "${_PRESET}"
+    mkdir -p ${_ISODIR}/boot/extlinux
+    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
 }
 
 _prepare_ucode() {
@@ -143,23 +164,6 @@ _prepare_uefi_AA64() {
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
 }
 
-### EFI status of RISCV64:
-#----------------------------------------------------
-# EFI is not yet working for RISCV64!
-# - grub does not allow linux command in memdisk mode
-# - grub itself cannot initialize efi system partion
-# - refind bails out with error
-# - systemd-boot does not support loading of initrd
-# - unified EFI is not possible because of this:
-#   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
-# - only left option is extlinux support in u-boot loader
-_prepare_kernel_initramfs_files_RISCV64() {
-    echo "Prepare RISCV64 extlinux ..."
-    mkdir -p ${_ISODIR}/boot/extlinux
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
-}
-
 _prepare_background() {
     echo "Prepare Grub background ..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
@@ -191,6 +195,20 @@ _prepare_uefi_image() {
 # 512*2048=1048576
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
+_prepare_extlinux_conf() {
+        echo "Prepare extlinux.conf ..."
+    cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
+menu title Welcome to Archboot - Arch Linux RISC-V64
+timeout 100
+default linux
+label linux
+    menu label Boot System (automatic boot in 10 seconds ...)
+    kernel /boot/vmlinuz_${_RUNNING_ARCH}"
+    initrd /boot/initramfs_${_RUNNING_ARCH}.img
+    append rootfstype=ramfs console=ttyS0,115200 console=tty0
+EOF
+}
+
 _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
@@ -206,22 +224,10 @@ device: "${_ISODIR}/extlinux.img"
 unit: sectors
 "${_ISODIR}/extlinux.img"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null
+    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null || exit 1
     mkdir ${_ISODIR}/mount
-    mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"
-    mkdir -p "${_ISODIR}/mount/boot/extlinux"
-    cp -r "${_ISODIR}/boot" "${_ISODIR}/mount"
-
-cat << EOF >> "${_ISODIR}/mount/boot/extlinux/extlinux.conf"
-menu title Welcome to Archboot - Arch Linux RISC-V64
-timeout 100
-default linux
-label linux
-    menu label Boot System (automatic boot in 10 seconds ...)
-    kernel /boot/vmlinuz_${_RUNNING_ARCH}"
-    initrd /boot/initramfs_${_RUNNING_ARCH}.img
-    append rootfstype=ramfs console=ttyS0,115200 console=tty0
-EOF
+    mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"  || exit 1
+    cp -ar "${_ISODIR}/boot" "${_ISODIR}/mount"
     umount "${_ISODIR}/mount"
     mv "${_ISODIR}/extlinux.img" "${_IMAGENAME}.img"
 }
@@ -248,11 +254,12 @@ _create_cksum() {
     ## create sha256sums.txt
     echo "Generating sha256sum ..."
     [[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
-    cksum -a sha256 ./*.iso > "sha256sums.txt"
+    echo ./*.iso >/dev/null 2>&1 && cksum -a sha256 ./*.iso > "sha256sums.txt"
+    echo ./*.img >/dev/null 2>&1 && cksum -a sha256 ./*.iso > "sha256sums.txt"
 }
 
 _cleanup_iso() {
     # cleanup
-    echo "Cleanup remove ${_ISODIR} ..."
+    echo "Cleanup... remove ${_ISODIR} ..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }
