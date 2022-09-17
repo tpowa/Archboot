@@ -181,7 +181,7 @@ _prepare_uefi_image() {
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/EFI | grep total | cut -f1)
     IMGSZ=$(( (BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
-    ## Create cdefiboot.img
+    ## Create efi.img
     dd if=/dev/zero of="${_ISODIR}"/efi.img bs="${IMGSZ}" count=1024 status=none
     VFAT_IMAGE="${_ISODIR}/efi.img"
     mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
@@ -203,7 +203,7 @@ timeout 100
 default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds ...)
-    kernel /boot/vmlinuz_${_RUNNING_ARCH}"
+    kernel /boot/vmlinuz_${_RUNNING_ARCH}
     initrd /boot/initramfs_${_RUNNING_ARCH}.img
     append rootfstype=ramfs console=ttyS0,115200 console=tty0
 EOF
@@ -213,18 +213,18 @@ _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(( (BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
-    ## Create cdefiboot.img
+    IMGSZ=$(( (BOOTSIZE*120)/100/1024 + 1)) # image size in sectors
+    ## Create extlinux.img
     dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
     EXT_IMAGE="${_ISODIR}/extlinux.img"
-    sfdisk "${_ISODIR}/extlinux.img" <<EOF
+    sfdisk "${_ISODIR}/extlinux.img" >/dev/null 2>&1 <<EOF
 label: dos
 label-id: 0x12345678
 device: "${_ISODIR}/extlinux.img"
 unit: sectors
 "${_ISODIR}/extlinux.img"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null || exit 1
+    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null 2>&1 || exit 1
     mkdir ${_ISODIR}/mount
     mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"  || exit 1
     cp -ar "${_ISODIR}/boot" "${_ISODIR}/mount"
@@ -255,7 +255,7 @@ _create_cksum() {
     echo "Generating sha256sum ..."
     [[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
     echo ./*.iso >/dev/null 2>&1 && cksum -a sha256 ./*.iso > "sha256sums.txt"
-    echo ./*.img >/dev/null 2>&1 && cksum -a sha256 ./*.iso > "sha256sums.txt"
+    echo ./*.img >/dev/null 2>&1 && cksum -a sha256 ./*.img > "sha256sums.txt"
 }
 
 _cleanup_iso() {
