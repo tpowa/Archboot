@@ -227,7 +227,8 @@ EOF
     mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null 2>&1 || exit 1
     mkdir ${_ISODIR}/mount
     mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"  || exit 1
-    cp -ar "${_ISODIR}/boot" "${_ISODIR}/mount"
+    cp -r "${_ISODIR}/boot" "${_ISODIR}/mount"
+    chmod 644 "${_ISODIR}/mount/boot/*"
     umount "${_ISODIR}/mount"
     mv "${_ISODIR}/extlinux.img" "${_IMAGENAME}.img"
 }
