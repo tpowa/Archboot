@@ -12,7 +12,7 @@ _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
 _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
-[[ "${_RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-linux"
+[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 _latest_install() {
@@ -156,7 +156,11 @@ _zram_usr() {
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
         mv /usr/* /usr.zram/
-        USR_SYMLINKS="bin local lib lib64"
+        if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+            USR_SYMLINKS="bin local lib"
+        else
+            USR_SYMLINKS="bin local lib lib64"
+        fi
         for i in ${USR_SYMLINKS}; do
             /usr.zram/bin/sln /usr.zram/${i} /usr/${i}
         done
