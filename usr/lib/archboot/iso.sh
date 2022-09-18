@@ -180,7 +180,7 @@ _prepare_uefi_image() {
     echo "Prepare UEFI image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/EFI | grep total | cut -f1)
-    IMGSZ=$(( (BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
     ## Create efi.img
     dd if=/dev/zero of="${_ISODIR}"/efi.img bs="${IMGSZ}" count=1024 status=none
     VFAT_IMAGE="${_ISODIR}/efi.img"
@@ -213,7 +213,7 @@ _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(( (BOOTSIZE*117)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$(((BOOTSIZE)/1024 + 21000)) # image size in sectors
     ## Create extlinux.img
     dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
     EXT_IMAGE="${_ISODIR}/extlinux.img"
