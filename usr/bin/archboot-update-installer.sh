@@ -127,14 +127,14 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         echo -e "You are running in \033[1mLocal mode\033[0m with less than \033[1m4500 MB RAM\033[0m, which only can launch \033[1mone\033[0m environment."
         echo -e "Please relaunch your already used graphical environment from commandline."
     else
+        echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+        _gpg_check
         if ! [[ -d /usr.zram ]]; then
-            echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram ..."
+            echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram ..."
             _zram_usr "${_ZRAM_SIZE}"
         else
-            echo -e "\033[1mStep 1/5:\033[0m Move /usr to /usr.zram already done ..."
+            echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram already done ..."
         fi
-        echo -e "\033[1mStep 2/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
-        _gpg_check
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_run
         [[ "${_L_XFCE}" == "1" ]] && _install_xfce
         [[ "${_L_GNOME}" == "1" ]] && _install_gnome
