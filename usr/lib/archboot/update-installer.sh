@@ -77,8 +77,10 @@ usage () {
     else
     # latest image
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
-            echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-            echo ""
+            if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+                echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
+                echo ""
+            fi
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
             _latest_install
