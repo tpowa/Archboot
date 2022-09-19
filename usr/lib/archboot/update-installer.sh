@@ -249,11 +249,11 @@ _kver_x86() {
 
 _kver_generic() {
     # get kernel version from installed kernel
-    read -r _ _ _HWKVER _ < <(grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+' "/${VMLINUZ}")
-
-    # try if the image is gzip compressed
-    if [[ -z "${_HWKVER}" ]]; then
-        read -r _ _ _HWKVER _ < <(gzip -c -d "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+    if [[ -f "/${VMLINUZ}" ]]; then
+        reader=cat
+        # try if the image is gzip compressed
+        [[ $(file -b --mime-type "/${VMLINUZ}") == 'application/gzip' ]] && reader=zcat
+        read _ _ kver _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 
     # fallback if no detectable kernel is installed
