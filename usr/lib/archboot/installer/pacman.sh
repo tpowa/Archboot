@@ -82,10 +82,12 @@ update_environment() {
         detect_uefi_boot
         UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
-            DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
-            if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
-                DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
-                /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
+            if ! [[ "$(uname -m)" == "riscv64" ]]; then
+                DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
+                if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
+                    DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
+                    /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
+                fi
             fi
         fi
     fi
