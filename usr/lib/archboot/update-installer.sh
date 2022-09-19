@@ -27,9 +27,9 @@ _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         echo -e " \033[1m-gnome\033[0m           Launch Gnome desktop with VNC sharing enabled."
         echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
+        echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
+        echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
     fi
-    echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
-    echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
 }
 
 usage () {
