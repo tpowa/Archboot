@@ -34,36 +34,43 @@
 | [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/sha256sum.txt) | [**Forum link**](https://archlinuxarm.org/forum/viewtopic.php?f=8&t=15777) |
 
 * Installs the Arch Linux port of [**Arch Linux ARM aarch64**](https://archlinuxarm.org/)
-* Supports Apple Mac M1 and higher for virtual machines eg. [**Parallels Desktop**](https://wiki.archlinux.org/title/Parallels_Desktop "Parallels Desktop") and [**VMware**](https://wiki.archlinux.org/title/VMware "VMware")
+* Supports Apple Mac M1 and higher for virtual machines eg. [**Parallels Desktop**](https://wiki.archlinux.org/title/Parallels_Desktop "Parallels Desktop"), [**UTM**](https://mac.getutm.app/ "UTM MacOS") and [**VMware**](https://wiki.archlinux.org/title/VMware "VMware")
+
+#### **<span dir="">riscv64 architecture</span>**
+| Release information | ISO images | SHA256SUM |
+|---------------------|------------|-----------|
+| [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/sha256sum.txt)
+* Installs the Arch Linux port of [**Arch Linux RISC-V riscv64**](https://archriscv.felixc.at/)
 
 ### **<span dir="">Features of the images</span>**
-| Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 |
-|------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|
-| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 129 MB | 133 MB |
-| _date_ | 1300 MB | Yes | Yes | No | 447 MB | 349 MB |
-| _date_-local | 3300 MB | Yes | Yes | Yes | 1497 MB | 1226 MB |
+| Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 | Size<br>RISCV64 |
+|------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|-----------------|
+| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 129 MB | 133 MB | 143 MB |
+| _date_ | 1300 MB | Yes | Yes | No | 447 MB | 349 MB | 469 MB |
+| _date_-local | 3300 MB | Yes | Yes | Yes | 1497 MB | 1226 MB | 1207 MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
 
 ### [**<span dir="">PXE</span>**](https://wiki.archlinux.org/title/PXE "PXE") **<span dir="">booting / Rescue system</span>**
-| Download | X86_64 | AARCH64 |
-|----------|--------|---------|
-| Kernel | [**vmlinuz_archboot_x86_64**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/vmlinuz_archboot_x86_64) | [**vmlinuz_archboot_aarch64**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/vmlinuz_archboot_aarch64) |
-| Initrd | [**initramfs_x86_64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img)<br>[**initramfs_x86_64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img)<br>[**initramfs_x86_64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-0.img)<br>[**initramfs_x86_64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-1.img) | [**initramfs_aarch64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img)<br>[**initramfs_aarch64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img)<br>[**initramfs_aarch64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-0.img)<br>[**initramfs_aarch64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-1.img) |
-| Microcode | [**intel-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/intel-ucode.img)<br>[**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/amd-ucode.img) | [**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/amd-ucode.img) |
+| Download | X86_64 | AARCH64 | RISCV64 |
+|----------|--------|---------|---------|
+| Kernel | [**vmlinuz_archboot_x86_64**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/vmlinuz_archboot_x86_64) | [**vmlinuz_archboot_aarch64**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/vmlinuz_archboot_aarch64) | [**vmlinuz_archboot_riscv64**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/vmlinuz_archboot_riscv64) |
+| Initrd | [**initramfs_x86_64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img)<br>[**initramfs_x86_64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img)<br>[**initramfs_x86_64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-0.img)<br>[**initramfs_x86_64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-1.img) | [**initramfs_aarch64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img)<br>[**initramfs_aarch64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img)<br>[**initramfs_aarch64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-0.img)<br>[**initramfs_aarch64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-1.img) |[**initramfs_riscv64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64.img)<br>[**initramfs_riscv64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64-latest.img)<br> [**initramfs_riscv64-local.img**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64-local.img) |
+| Microcode | [**intel-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/intel-ucode.img)<br>[**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/amd-ucode.img) | [**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/amd-ucode.img) ||
 
 * For [**PXE**](https://wiki.archlinux.org/title/PXE "PXE") booting add the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"),[**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd") and [**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") to your [**TFTP**](https://wiki.archlinux.org/title/TFTP "TFTP"), add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line") setup and you will get a running installation/rescue system.
 * For rescue booting add an entry to your [**bootloader**](https://wiki.archlinux.org/title/Bootloader "Bootloader") pointing to the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"), [**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd"),[**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") and add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line").
 * For **local image** download **both** initrds and load **both** files with your bootloader or PXE setup.
 
 ### **<span dir="">Supported boot modes</span>**
-| Boot Mode | X86_64 | AARCH64 |
-|-----------|--------|---------|
-| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") BIOS with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No |
-| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI")/UEFI_CD booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | Yes |
-| UEFI_MIX_MODE booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No |
-| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") with the<br>included fedora [**signed shim**](https://wiki.archlinux.org/title/Secure_Boot#shim "Secure Boot") | Yes | Yes |
+| Boot Mode | X86_64 | AARCH64 | RISCV64 |
+|-----------|--------|---------|---------|
+| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") BIOS with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No | No |
+| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI")/UEFI_CD booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | Yes | No |
+| UEFI_MIX_MODE booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No | No |
+| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") with the<br>included fedora [**signed shim**](https://wiki.archlinux.org/title/Secure_Boot#shim "Secure Boot") | Yes | Yes | No |
+| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") with [**U-Boot**](https://www.denx.de/wiki/U-Boot "U-Boot")  | No | No | Yes |
 
 It supports [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB")'s iso loopback support. Variables used (below for example):
 
@@ -621,27 +628,45 @@ You can run [**QEMU**](https://wiki.archlinux.org/title/QEMU "QEMU") tests at di
 ### **<span dir="">kernel and initramdisk testing</span>**
 
 ```plaintext
-$ qemu-system-x86_64 -kernel yourkernel -initrd yourinitramdisk -append "rootfstype=ramfs" --enable-kvm -usb -usbdevice tablet
+$ qemu-system-x86_64 -kernel yourkernel -initrd yourinitramdisk \
+-append "rootfstype=ramfs" --enable-kvm -usb -usbdevice tablet
 ```
 
 ### **<span dir="">BIOS MBR mode</span>**
 
 ```plaintext
-$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevice tablet --enable-kvm -boot d
+$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
+-usb -usbdevice tablet --enable-kvm -boot d
 ```
+
+### **<span dir=""> RISC-V 64bit MBR mode</span>**
+
+```plaintext
+$ qemu-system-riscv64 -M virt -kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \
+-device virtio-gpu-pci -device virtio-net-device,netdev=eth0 -netdev user,id=eth0 \
+-netdev user,id=net,hostfwd=tcp::2222-:22 \
+-device nec-usb-xhci -device usb-tablet -device usb-kbd \
+-object rng-random,filename=/dev/urandom,id=rng -device virtio-rng-device,rng=rng \
+-drive file=<yourimage>,if=virtio,format=raw -m <yourmemory>
+```
+* Use **ssh root@localhost -p 2222** to connect to machine from your running host.
 
 ### **<span dir="">UEFI GPT mode</span>**
 
 #### **<span dir="">64bit UEFI / 64bit running system</span>**
 
 ```plaintext
-$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevice tablet --enable-kvm -boot d --bios /usr/share/edk2-ovmf/x64/OVMF.fd
+$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
+-usb -usbdevice tablet --enable-kvm -boot d \
+--bios /usr/share/edk2-ovmf/x64/OVMF.fd
 ```
 
 #### **<span dir="">32bit UEFI / 64bit running system</span>**
 
 ```plaintext
-$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevice tablet --enable-kvm -boot d --bios /usr/share/edk2-ovmf/ia32/OVMF.fd
+$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
+-usb -usbdevice tablet --enable-kvm -boot d \
+--bios /usr/share/edk2-ovmf/ia32/OVMF.fd
 ```
 
 ### **<span dir="">UEFI GPT Secure Boot</span>**
@@ -658,13 +683,19 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevic
 #### **<span dir="">64bit UEFI / 64bit running system</span>**
 
 ```plaintext
--drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd -drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd -global driver=cfi.pflash01,property=secure,value=on -machine q35,smm=on,accel=kvm -global ICH9-LPC.disable_s3=1
+-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd \
+-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \
+-global driver=cfi.pflash01,property=secure,value=on -machine q35,smm=on,accel=kvm \
+-global ICH9-LPC.disable_s3=1
 ```
 
 #### **<span dir="">32bit UEFI / 64bit running system</span>**
 
 ```plaintext
--drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd -drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd -global driver=cfi.pflash01,property=secure,value=on -machine q35,smm=on,accel=kvm -global ICH9-LPC.disable_s3=1
+-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd \
+-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \
+-global driver=cfi.pflash01,property=secure,value=on \
+-machine q35,smm=on,accel=kvm -global ICH9-LPC.disable_s3=1
 ```
 
 #### **<span dir="">64bit UEFI / 64bit running system AARCH64</span>**
@@ -673,19 +704,24 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw -usb -usbdevic
 * serial console only:
 
 ```plaintext
--bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt -cpu cortex-a57 -nographic
+-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
+-cpu cortex-a57 -nographic
 ```
 
 * virtio vga device with keyboard and mouse
 
 ```plaintext
--bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt -cpu cortex-a57 -device virtio-gpu-pci -device nec-usb-xhci -device usb-tablet -device usb-kbd
+-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
+-cpu cortex-a57 -device virtio-gpu-pci -device nec-usb-xhci \
+-device usb-tablet -device usb-kbd
 ```
 
 * ramfb vga device with keyboard and mouse
 
 ```plaintext
--bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt -cpu cortex-a57 -device ramfb -device nec-usb-xhci -device usb-tablet -device usb-kbd
+-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
+-cpu cortex-a57 -device ramfb -device nec-usb-xhci \
+-device usb-tablet -device usb-kbd
 ```
 
 ### **<span dir="">Additional qemu parameters</span>**
