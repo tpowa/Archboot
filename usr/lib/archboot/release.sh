@@ -35,23 +35,26 @@ _create_iso() {
     [[ "${_ARCH}" == "riscv64" ]] && _BIND_LOOP="--bind /dev/loop0"
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
-    # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
-    # remove not working lvm2 from latest image
-    echo "Remove lvm2 from container ${_W_DIR} ..."
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
-    # generate latest tarball in container
-    echo "Generate local ISO ..."
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
-    # generate local iso in container
-    systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-    -i=${_ISONAME}-local-${_ARCH}" || exit 1
-    rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
-    echo "Generate latest ISO ..."
-    # generate latest iso in container
-    systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-    -i=${_ISONAME}-latest-${_ARCH}" || exit 1
-    echo "Install lvm2 to container ${_W_DIR} ..."
-    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
+    # riscv64 does not support kexec at the moment
+    if ! [[ "${_ARCH}" == "riscv64" ]]; then
+        # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
+        # remove not working lvm2 from latest image
+        echo "Remove lvm2 from container ${_W_DIR} ..."
+        systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Rdd lvm2 --noconfirm" >/dev/null 2>&1
+        # generate latest tarball in container
+        echo "Generate local ISO ..."
+        # generate local iso in container
+        systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        -i=${_ISONAME}-local-${_ARCH}" || exit 1
+        rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
+        echo "Generate latest ISO ..."
+        # generate latest iso in container
+        systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        -i=${_ISONAME}-latest-${_ARCH}" || exit 1
+        echo "Install lvm2 to container ${_W_DIR} ..."
+        systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
+    fi
     echo "Generate normal ISO ..."
     # generate iso in container
     systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
