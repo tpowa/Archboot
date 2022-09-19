@@ -228,9 +228,9 @@ EOF
     mkdir ${_ISODIR}/mount
     mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"  || exit 1
     cp -r "${_ISODIR}/boot" "${_ISODIR}/mount"
-    chmod 644 "${_ISODIR}/mount/boot/*"
-    umount "${_ISODIR}/mount"
-    mv "${_ISODIR}/extlinux.img" "${_IMAGENAME}.img"
+    chmod 644 "${_ISODIR}"/mount/boot/*
+    umount "${_ISODIR}"/mount
+    mv "${_ISODIR}"/extlinux.img "${_IMAGENAME}.img"
 }
 
 _grub_mkrescue() {
