@@ -16,14 +16,18 @@ _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
 _latest_install() {
-    echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-    echo -e "                  package cache (using kexec)."
-    echo ""
+    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+        echo -e "                  package cache (using kexec)."
+        echo ""
+    fi
 }
 
 _graphic_options() {
-    echo -e " \033[1m-gnome\033[0m           Launch Gnome desktop with VNC sharing enabled."
-    echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
+    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+        echo -e " \033[1m-gnome\033[0m           Launch Gnome desktop with VNC sharing enabled."
+        echo -e " \033[1m-gnome-wayland\033[0m   Launch Gnome desktop with Wayland backend."
+    fi
     echo -e " \033[1m-plasma\033[0m          Launch KDE Plasma desktop with VNC sharing enabled."
     echo -e " \033[1m-plasma-wayland\033[0m  Launch KDE Plasma desktop with Wayland backend."
 }
