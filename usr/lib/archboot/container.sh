@@ -74,8 +74,8 @@ _clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
         echo "Clean container, delete not needed files from ${1} ..."
         rm -r "${1}"/usr/include
-        rm -r "${1}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,common-lisp,dhclient,dhcpcd,dnsmasq,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,iptables,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,p11-kit,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl[0-9]*,i18n,locale}
-        rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,itcl[0-9]*,iwd,krb5,ldb,ldscripts,libnl,ntfs-3g,p11-kit,pkgconfig,python[0-9]*,rsync,samba,sasl2,siconv,tar,tcl[0-9]*,tdbc[0-9]*,tdbcmysql[0-9]*,tdbcodbc[0-9]*,tdbcpostgres[0-9]*,terminfo,thread[0-9]*,xfsprogs,xtables}
+        rm -r "${1}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,common-lisp,dhclient,dhcpcd,dnsmasq,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,iptables,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,xtables,zoneinfo-leaps,man,doc,info,perl[0-9]*,i18n,locale}
+        rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,itcl[0-9]*,iwd,krb5,ldb,ldscripts,libnl,ntfs-3g,pkgconfig,python[0-9]*,rsync,samba,sasl2,siconv,tar,tcl[0-9]*,tdbc[0-9]*,tdbcmysql[0-9]*,tdbcodbc[0-9]*,tdbcpostgres[0-9]*,terminfo,thread[0-9]*,xfsprogs,xtables}
         # until vim is fixed, clean all files and leave libperl.so
         find "${1}"/usr/lib/perl[0-9]* -type f ! -name 'libperl.so' -exec rm -rf {} \;
     fi
