@@ -506,11 +506,17 @@ Server = https://pkgbuild.com/~tpowa/archboot/pkg
 # pacman -Sy archboot-arm
 ```
 
-* You can build **aarch64** images on **x86_64** hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **qemu-user-static** package.
+* [**Install**](https://wiki.archlinux.org/title/Install "Install") the **archboot-riscv** package on **riscv64** hardware.
+
+```plaintext
+# pacman -Sy archboot-riscv
+```
+
+* You can build **aarch64** or **riscv64** images on **x86_64** hardware. [**Install**](https://wiki.archlinux.org/title/Install "Install") the **qemu-user-static** package.
 ```plaintext
 # pacman -Sy qemu-user-static
 ```
-* If you want to build **aarch64** images replace **x86_64** with **aarch64** in the commands and files below.
+* If you want to build **aarch64** or **riscv64** images replace **x86_64** with the architecture of your choice in the commands and files below.
 
 
 ### **<span dir="">Requirements</span>**
@@ -601,20 +607,22 @@ Simple run:
 # archboot-x86_64-server-release.sh
 ```
 
-#### **<span dir="">aarch64 architecture</span>**
+#### **<span dir="">aarch64/riscv64 architecture</span>**
 
-* You have to skip the tarball creation step, on **aarch64** hardware.
-* [**Install**](https://wiki.archlinux.org/title/Install "Install") the [**<span dir="">archboot-qemu-aarch64</span>**](https://archlinux.org/packages/?name=archboot-qemu-aarch64) package, for building on **x86_64** hardware.
+* You have to skip the tarball creation step, on **aarch64** or **riscv64** hardware.
+* [**Install**](https://wiki.archlinux.org/title/Install "Install") the [**<span dir="">qemu-user-static</span>**](https://archlinux.org/packages/?name=qemu-user-static) package, for building on **x86_64** hardware.
 * On first time setup you need to create the pacman-aarch64-chroot tarball on **x86_64** hardware.
 
 ```plaintext
 # archboot-pacman-aarch64-chroot.sh build-directory
+# archboot-pacman-riscv64-chroot.sh build-directory
 ```
 
 * Afterwards you only have to run for each release:
 
 ```plaintext
 # archboot-aarch64-server-release.sh
+# archboot-riscv64-server-release.sh
 ```
 
 #### **<span dir="">Server cleanup</span>**
@@ -789,3 +797,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
 * [**Archboot repository**](https://gitlab.archlinux.org/tpowa/archboot-repository)
 * [**Archboot video on Parallels Macbook M1**](https://www.youtube.com/watch?v=xo_PlJHloqk)
 * [**Archboot video featuring local image**](https://www.youtube.com/watch?v=mb3ykTklnWU)
+
+## <span dir="">References</span>
+* [**Qemu display devices**](https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/)
+* [**Qemu on RISC-V**](https://colatkinson.site/linux/riscv/2021/01/27/riscv-qemu/)
