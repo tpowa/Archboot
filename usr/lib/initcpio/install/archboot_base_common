@@ -149,6 +149,7 @@ build ()
     add_symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/$cafile"
     add_symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/$cafile"
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
+    add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
     ### add secure boot MOK
     add_full_dir /usr/share/archboot/keys
