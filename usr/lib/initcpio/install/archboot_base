@@ -37,9 +37,6 @@ build ()
     add_full_dir /usr/lib/locale/C.UTF-8
     ### add custom locale
     [[ -e "/usr/lib/locale/locale-archive" ]] && add_file "/usr/lib/locale/locale-archive"
-
-    ### fix file
-    add_file "/usr/share/file/misc/magic.mgc"
     
     ### add shadow
     map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
