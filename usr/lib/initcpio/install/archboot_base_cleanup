@@ -14,7 +14,7 @@ build ()
           look lsfd lscpu mcookie namei prlimit rename renice rev script scriptreplay uname26 \
           linux32 linux64 setarch setsid setterm taskset ul unshare uuidgen whereis write \
           addpart delpart ldattach partx readprofile rtcwake uuidd sysctl pkill pmap \
-          pwdx slabtop tload vmstat watch file eject keyctl request-key zsh hostname tac \
+          pwdx slabtop tload vmstat watch eject keyctl request-key zsh hostname tac \
           sulogin resizepart lslocks wdctl zless zgrep fold od shred blockdev blkdiscard \
           newgrp nsenter runuser vigr vipw diff lsmod lzcmp lzdiff lzegrep \
           lzgrep lzfgrep xzegrep xzfgrep xzgrep lzless lzmore reset blkzone \
