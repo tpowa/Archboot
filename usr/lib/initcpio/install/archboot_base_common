@@ -19,6 +19,10 @@ build ()
           sort zstd nano date tee mktemp install pgrep vi ex edit view mkfs.btrfs rmmod mountpoint gzip \
           ldconfig ln top df cut stat sln nscd file
 
+
+    ### add file magic file
+    add_file /usr/share/file/misc/magic.mgc
+
     ### add nano files
     add_full_dir /usr/share/nano
     
