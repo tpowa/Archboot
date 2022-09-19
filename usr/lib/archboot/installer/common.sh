@@ -6,7 +6,7 @@ LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 RUNNING_ARCH="$(uname -m)"
 KERNELPKG="linux"
 # name of the kernel image
-[[ "${RUNNING_ARCH}" == "x86_64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${RUNNING_ARCH}" == "x86_64" || "${RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
 if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ="Image.gz"
     #shellcheck disable=SC2034
@@ -123,7 +123,7 @@ auto_packages() {
     marvell_firmware
     ### HACK:
     # always add intel-ucode
-    if [[ "$(uname -m)" == "x86_64" ]]; then
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         PACKAGES="${PACKAGES//\ intel-ucode\ / }"
         PACKAGES="${PACKAGES} intel-ucode"
     fi
