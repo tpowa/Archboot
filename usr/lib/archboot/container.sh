@@ -110,6 +110,8 @@ _prepare_pacman() {
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
+    echo "Remove archboot repository sync db ..."
+    rm -f /var/lib/archboot/sync/archboot.db
     echo "Update Arch Linux keyring ..."
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
