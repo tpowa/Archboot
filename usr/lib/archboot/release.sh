@@ -84,12 +84,12 @@ _create_boot() {
         mkdir -p boot/
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL}" ./boot/"${_KERNEL_ARCHBOOT}"
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
             elif echo "${i}" | grep -q latest; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS_LATEST}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS_LOCAL}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
             fi
         done
     else
