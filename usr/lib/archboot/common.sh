@@ -47,6 +47,14 @@ _riscv64_check() {
     fi
 }
 
+### check if running in container
+_container_check() {
+    if [[ $(grep -q bash /proc/1/sched) ]]; then
+        echo "ERROR: Running inside container. Aborting..."
+        exit 1
+    fi
+}
+
 ### check for tpowa's build server
 _buildserver_check() {
     if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
