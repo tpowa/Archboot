@@ -163,6 +163,7 @@ _install_base_packages() {
 }
 
 _install_archboot() {
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
@@ -200,7 +201,7 @@ _other_install_base_packages() {
 
 _other_install_archboot() {
     # riscv64 need other packages
-    [[ "$(echo $(systemd-nspawn -q -D "${1}" uname -m) | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES}"
+    [[ "$(echo $(systemd-nspawn -q -D "${1}" uname -m) | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then

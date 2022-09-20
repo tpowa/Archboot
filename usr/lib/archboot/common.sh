@@ -10,8 +10,10 @@ _FIX_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl 
 _XORG_PACKAGE="xorg"
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
-_STANDARD_PACKAGES="gparted nss-mdns chromium"
-_GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
+_STANDARD_PACKAGES="gparted nss-mdns"
+_STANDARD_BROWSER="chromium"
+[[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
+_GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
 
 ### check for root
 _root_check() {
