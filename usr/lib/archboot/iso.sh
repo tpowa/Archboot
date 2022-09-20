@@ -206,7 +206,7 @@ EOF
 # https://github.com/CoelacanthusHex/archriscv-scriptlet/blob/master/mkimg
 # https://checkmk.com/linux-knowledge/mounting-partition-loop-device
 # calculate mountpoint offset: sector*start
-# 512*2048=1048576
+# 512*2048=1048576 == 1M
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
 _prepare_uboot_image() {
@@ -224,7 +224,7 @@ device: "${VFAT_IMAGE}"
 unit: sectors
 "${VFAT_IMAGE}"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
+    mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copy all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
