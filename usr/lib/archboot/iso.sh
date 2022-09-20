@@ -226,7 +226,8 @@ unit: sectors
 EOF
     mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copy all files to UEFI vfat image
-    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+    mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
+    mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
 }
 
 _grub_mkrescue() {
