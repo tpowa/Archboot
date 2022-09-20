@@ -213,7 +213,7 @@ _prepare_extlinux_image() {
     echo "Prepare extlinux image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(((BOOTSIZE*117)/100/1024)) # image size in sectors
+    IMGSZ=$(((BOOTSIZE*110)/100/1024)) # image size in sectors
     ## Create extlinux.img
     dd if=/dev/zero of="${_ISODIR}"/extlinux.img bs="${IMGSZ}" count=1024 status=none
     EXT_IMAGE="${_ISODIR}/extlinux.img"
@@ -224,7 +224,7 @@ device: "${_ISODIR}/extlinux.img"
 unit: sectors
 "${_ISODIR}/extlinux.img"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.ext4 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null 2>&1 || exit 1
+    mkfs.ext2 -E offset=1048576 -U clear "${_ISODIR}/extlinux.img" >/dev/null 2>&1 || exit 1
     mkdir ${_ISODIR}/mount
     mount -o loop,offset=1048576 "${_ISODIR}/extlinux.img" "${_ISODIR}/mount"  || exit 1
     cp -r "${_ISODIR}/boot" "${_ISODIR}/mount"
