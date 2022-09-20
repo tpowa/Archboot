@@ -375,6 +375,16 @@ bit.ly/archboot
 EOF
 }
 
+_firefox_flags() {
+if ! grep -q startup usr/lib/firefox/browser/defaults/preferences/vendor.js; then
+ echo "Adding firefox flags vendor.js ..."
+    cat << EOF >> usr/lib/firefox/browser/defaults/preferences/vendor.js
+pref("browser.aboutwelcome.enabled", false, locked);
+pref("browser.startup.homepage_override.once", false, locked);
+pref("datareporting.policy.firstRunURL", "https://bit.ly/archboot", locked);
+EOF
+}
+
 _autostart_vnc() {
     echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd

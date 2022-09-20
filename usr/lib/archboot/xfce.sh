@@ -171,8 +171,11 @@ EOF
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     echo "Replacing directory menu launcher with setup ..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Setting chromium as default browser ..."
-    sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
+    # use firefox on riscv64
+    if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+      echo "Setting chromium as default browser ..."
+      sed -i -e 's#firefox#chromium#g' /etc/xdg/xfce4/helpers.rc
+    fi
     echo "Replacing menu structure ..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"

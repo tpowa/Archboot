@@ -117,7 +117,8 @@ if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
     systemctl start avahi-daemon.service
-    _chromium_flags
+    which firefox > /dev/null 2>&1  && _firefox_flags
+    which chromium > /dev/null 2>&1 && _chromium_flags
 fi
 
 # Gnome, KDE/PLASMA or XFCE launch
@@ -145,7 +146,9 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         systemctl start avahi-daemon.service
         # only start vnc on xorg environment
         [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
-        _chromium_flags
+        which firefox > /dev/null 2>&1  && _firefox_flags
+        which chromium > /dev/null 2>&1 && _chromium_flags
+        fi
         [[ "${_L_XFCE}" == "1" ]] && _start_xfce
         [[ "${_L_GNOME}" == "1" ]] && _start_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
