@@ -46,7 +46,7 @@
 | Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 | Size<br>RISCV64 |
 |------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|-----------------|
 | _date_-latest | 2000 MB | No | DHCP server needed | Yes | 129 MB | 133 MB ||
-| _date_ | 1300 MB | Yes | Yes | No | 447 MB | 349 MB | 523 MB |
+| _date_ | 1300 MB | Yes | Yes | No | 447 MB | 349 MB | 457 MB |
 | _date_-local | 3300 MB | Yes | Yes | Yes | 1497 MB | 1226 MB ||
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
