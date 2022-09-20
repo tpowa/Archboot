@@ -47,14 +47,6 @@ _riscv64_check() {
     fi
 }
 
-_loop_check() {
-    if ! [[ -b /dev/loop0 ]]; then
-        modprobe loop > /dev/null 2>&1
-        losetup -f  > /dev/null 2>&1
-        ! [[ -b /dev/loop0 ]] && (echo "ERROR: No /dev/loop0 available. Aborting..."; exit 1)
-    fi
-}
-
 ### check for tpowa's build server
 _buildserver_check() {
     if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then

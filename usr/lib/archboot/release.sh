@@ -31,8 +31,6 @@ _usage () {
 _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
-    _BIND_LOOP=""
-    [[ "${_ARCH}" == "riscv64" ]] && _BIND_LOOP="--bind /dev/loop0"
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
@@ -45,19 +43,19 @@ _create_iso() {
         # generate latest tarball in container
         echo "Generate local ISO ..."
         # generate local iso in container
-        systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         echo "Generate latest ISO ..."
         # generate latest iso in container
-        systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Install lvm2 to container ${_W_DIR} ..."
         systemd-nspawn -D "${_W_DIR}" /bin/bash -c "pacman -Sy lvm2  --noconfirm" >/dev/null 2>&1
     fi
     echo "Generate normal ISO ..."
     # generate iso in container
-    systemd-nspawn ${_BIND_LOOP} -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
@@ -84,24 +82,16 @@ _create_boot() {
     echo "Create boot directory ..."
     if [[ "${_ARCH}" == "riscv64" ]]; then
         mkdir -p boot/
-        _MP="$(mktemp -d archboot-mount.XXX)"
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
-                cp "${_MP}/${_KERNEL}" "${_KERNEL_ARCHBOOT}"
-                cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS}"
-                umount "${_MP}"
+                mcopy -i "${i}"@@1048576 ::/"${_KERNEL}" ./boot/"${_KERNEL_ARCHBOOT}"
+                mcopy -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS}"
             elif echo "${i}" | grep -q latest; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
-                cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS_LATEST}"
-                umount "${_MP}"
+                mcopy -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
-                mount -o loop,offset=1048576 "${i}" "${_MP}" || exit 1
-                cp "${_MP}/${_INITRAMFS}" "${_INITRAMFS_LOCAL}"
-                umount "${_MP}"
+                mcopy -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./boot/"${_INITRAMFS_LOCAL}"
             fi
         done
-        rm -r "${_MP}"
     else
         mkdir -p boot/licenses/amd-ucode
         [[ "${_ARCH}" == "aarch64" ]] || mkdir -p boot/licenses/intel-ucode
