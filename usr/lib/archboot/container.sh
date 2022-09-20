@@ -163,7 +163,8 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
+    # riscv64 need does not support local image at the moment
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
