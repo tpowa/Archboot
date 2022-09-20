@@ -111,7 +111,7 @@ _prepare_pacman() {
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     echo "Remove archboot repository sync db ..."
-    rm -f /var/lib/archboot/sync/archboot.db
+    rm -f /var/lib/pacman/sync/archboot.db
     echo "Update Arch Linux keyring ..."
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
@@ -189,6 +189,8 @@ _install_archboot() {
     #shellcheck disable=SC2086
     pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
     rm -r "${1}"/blankdb
+    echo "Remove archboot repository sync db ..."
+    rm /var/lib/pacman/sync/archboot.db
 }
 
 _other_install_base_packages() {
