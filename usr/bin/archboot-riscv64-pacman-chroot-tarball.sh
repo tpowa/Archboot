@@ -6,7 +6,6 @@ _ARCH="riscv64"
 . /usr/lib/archboot/container.sh
 _RISCV64_VERSION="archriscv-20220727"
 _LATEST_RISCV64="https://archriscv.felixc.at/images/${_RISCV64_VERSION}.tar.zst"
-_KEYRING="archlinux"
 
 _usage () {
     echo "CREATE RISCV64 PACMAN CHROOT"

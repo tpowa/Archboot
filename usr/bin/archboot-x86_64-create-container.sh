@@ -3,7 +3,6 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 _ARCHBOOT="archboot"
-_KEYRING="archlinux"
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check

@@ -5,7 +5,6 @@ _ARCH="aarch64"
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 _LATEST_ARM64="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
-_KEYRING="archlinuxarm"
 
 _usage () {
     echo "CREATE AARCH64 PACMAN CHROOT"
