@@ -148,7 +148,6 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
         which firefox > /dev/null 2>&1  && _firefox_flags
         which chromium > /dev/null 2>&1 && _chromium_flags
-        fi
         [[ "${_L_XFCE}" == "1" ]] && _start_xfce
         [[ "${_L_GNOME}" == "1" ]] && _start_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
