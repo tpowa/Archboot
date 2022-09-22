@@ -162,26 +162,6 @@ configure_system() {
     fi
 }
 
-install_bootloader_menu() {
-    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            ANSWER="UEFI"
-    else
-        DIALOG --menu "What is your boot system type?" 10 40 2 \
-            "UEFI" "UEFI" \
-            "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1 
-    fi
-    case $(cat ${ANSWER}) in
-        "UEFI") install_bootloader_uefi ;;
-        "BIOS") install_bootloader_bios ;;
-    esac
-
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="7"
-    else
-        NEXTITEM="8"
-    fi
-}
-
 mainmenu() {
     if [[ -n "${NEXTITEM}" ]]; then
         DEFAULT="--default-item ${NEXTITEM}"

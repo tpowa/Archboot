@@ -4,10 +4,9 @@
 INTEL_UCODE="intel-ucode.img"
 # name of amd ucode initramfs image
 AMD_UCODE="amd-ucode.img"
-PART_ROOT=""
 ROOTFS=""
 # name of the initramfs filesystem
-INITRAMFS="initramfs-${KERNELPKG}"
+INITRAMFS="initramfs-${KERNELPKG}.img"
 
 getrootfstype() {
     ROOTFS="$(getfstype "${PART_ROOT}")"
@@ -135,6 +134,15 @@ check_bootpart() {
         subdir="/boot"
         bootdev="${PART_ROOT}"
     fi
+}
+
+# only allow ext2/3/4 and vfat on uboot bootloader
+abort_uboot(){
+        FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
+        if ! [[ "${FSTYPE}" = "ext2" || "${FSTYPE}" = "ext3" || "${FSTYPE}" = "ext4" || "${FSTYPE}" = "vfat" ]]; then
+            DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
+            return 1
+        fi
 }
 
 # check for nilfs2 bootpart and abort if detected
@@ -428,10 +436,10 @@ do_efistub_copy_to_efisys() {
         ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
 
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
 
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}.img" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
 
         #######################
 
@@ -443,7 +451,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 PathChanged=/boot/${VMLINUZ}
 PathChanged=/boot/${INTEL_UCODE}
 PathChanged=/boot/${AMD_UCODE}
-PathChanged=/boot/${INITRAMFS}.img
+PathChanged=/boot/${INITRAMFS}
 Unit=efistub_copy.service
 
 [Install]
@@ -459,7 +467,7 @@ Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INTEL_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${AMD_UCODE}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS}.img ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}
 CONFEOF
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
@@ -484,7 +492,7 @@ CONFEOF
         fi
         _INITRD_AMD_UCODE="/${AMD_UCODE}"
 
-        _INITRD_NORMAL="/${INITRAMFS}.img"
+        _INITRD_NORMAL="/${INITRAMFS}"
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL_NORMAL="/EFI/arch/${VMLINUZ_EFISTUB}"
@@ -494,7 +502,7 @@ CONFEOF
         fi
         _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
 
-        _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}.img"
+        _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}"
     fi
 
 }
@@ -516,8 +524,8 @@ do_efistub_uefi() {
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         _CONTINUE="1"
     else
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}.img respectively." 0 0
+        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS} respectively." 0 0
             _CONTINUE="1"
         else
             DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
@@ -879,7 +887,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}.img
+    initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}
 }
 
 EOF
@@ -894,7 +902,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${GRUB_ROOT_DRIVE}
     ${LINUX_MOD_COMMAND}
-    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}.img
+    initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}
 }
 
 EOF
@@ -978,14 +986,36 @@ fi
     unset BOOT_PART_FS
     unset BOOT_PART_FS_LABEL
     unset BOOT_PART_DRIVE
-
     unset ROOT_PART_FS_UUID
     unset ROOT_PART_FS
-
     unset GRUB_ROOT_DRIVE
     unset LINUX_UNMOD_COMMAND
     unset LINUX_MOD_COMMAND
+}
 
+do_uboot() {
+    common_bootloader_checks
+    check_bootpart
+    abort_uboot
+    [[ -d ${DESTDIR}/boot/extlinux ]] || mkdir -p ${DESTDIR}/boot/extlinux
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
+    _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    # write extlinux.conf
+    DIALOG --infobox "Installing UBOOT..." 0 0
+    cat << EOF >> "${DESTDIR}/boot/extlinux/extlinux.conf"
+menu title Welcome Arch Linux RISC-V 64
+timeout 100
+default linux
+label linux
+    menu label Boot System (automatic boot in 10 seconds ...)
+    kernel ${subdir}/${VMLINUZ}
+    initrd ${subdir}/${INITRAMFS}
+    append ${_KERNEL_PARAMS_COMMON_MOD}
+EOF
+    DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 3 seconds..." 5 55
+    sleep 3
+    unset _KERNEL_PARAMS_COMMON_UNMOD
+    unset _KERNEL_PARAMS_COMMON_MOD
 }
 
 do_grub_bios() {
@@ -993,48 +1023,45 @@ do_grub_bios() {
     do_grub_common_before
 
     # try to auto-configure GRUB(2)...
-    if [[ "${PART_ROOT}" != "" ]]; then
-        check_bootpart
+    check_bootpart
 
-        # check if raid, raid partition, dmraid or device devicemapper is used
-        if echo "${bootdev}" | grep -q /dev/md || echo "${bootdev}" | grep /dev/mapper; then
-            # boot from lvm, raid, partitioned raid and dmraid devices is supported
-            FAIL_COMPLEX="0"
+    # check if raid, raid partition, dmraid or device devicemapper is used
+    if echo "${bootdev}" | grep -q /dev/md || echo "${bootdev}" | grep /dev/mapper; then
+        # boot from lvm, raid, partitioned raid and dmraid devices is supported
+        FAIL_COMPLEX="0"
 
-            if cryptsetup status "${bootdev}"; then
-                # encryption devices are not supported
-                FAIL_COMPLEX="1"
-            fi
-        fi
-
-        if [[ "${FAIL_COMPLEX}" == "0" ]]; then
-            # check if mapper is used
-            if  echo "${bootdev}" | grep -q /dev/mapper; then
-                RAID_ON_LVM="0"
-
-                #check if mapper contains a md device!
-                for devpath in $(pvs -o pv_name --noheading); do
-                    if echo "${devpath}" | grep -v "/dev/md.p" | grep /dev/md; then
-                        detectedvolumegroup="$(pvs -o vg_name --noheading "${devpath}")"
-
-                        if echo /dev/mapper/"${detectedvolumegroup}"-* | grep "${bootdev}"; then
-                            # change bootdev to md device!
-                            bootdev=$(pvs -o pv_name --noheading "${devpath}")
-                            RAID_ON_LVM="1"
-                            break
-                        fi
-                    fi
-                done
-            fi
-
-            #check if raid is used
-            USE_RAID=""
-            if echo "${bootdev}" | grep -q /dev/md; then
-                USE_RAID="1"
-            fi
+        if cryptsetup status "${bootdev}"; then
+            # encryption devices are not supported
+            FAIL_COMPLEX="1"
         fi
     fi
 
+    if [[ "${FAIL_COMPLEX}" == "0" ]]; then
+        # check if mapper is used
+        if  echo "${bootdev}" | grep -q /dev/mapper; then
+            RAID_ON_LVM="0"
+
+            #check if mapper contains a md device!
+            for devpath in $(pvs -o pv_name --noheading); do
+                if echo "${devpath}" | grep -v "/dev/md.p" | grep /dev/md; then
+                    detectedvolumegroup="$(pvs -o vg_name --noheading "${devpath}")"
+
+                    if echo /dev/mapper/"${detectedvolumegroup}"-* | grep "${bootdev}"; then
+                        # change bootdev to md device!
+                        bootdev=$(pvs -o pv_name --noheading "${devpath}")
+                        RAID_ON_LVM="1"
+                        break
+                    fi
+                fi
+            done
+        fi
+
+        #check if raid is used
+        USE_RAID=""
+        if echo "${bootdev}" | grep -q /dev/md; then
+            USE_RAID="1"
+        fi
+    fi
 
     # A switch is needed if complex ${bootdev} is used!
     # - LVM and RAID ${bootdev} needs the MBR of a device and cannot be used itself as ${bootdev}
@@ -1230,17 +1257,22 @@ install_bootloader_uefi() {
             "GRUB_UEFI") do_grub_uefi ;;
         esac
     fi
-
 }
 
 install_bootloader_bios() {
-
     DIALOG --menu "Which BIOS bootloader would you like to use?" 9 50 1 \
         "GRUB_BIOS" "GRUB(2) BIOS" 2>"${ANSWER}" || CANCEL=1
     case $(cat "${ANSWER}") in
         "GRUB_BIOS") do_grub_bios ;;
     esac
+}
 
+install_bootloader_uboot() {
+    DIALOG --menu "Which bootloader would you like to use?" 9 50 1 \
+        "UBOOT" "UBOOT" 2>"${ANSWER}" || CANCEL=1
+    case $(cat "${ANSWER}") in
+        "UBOOT") do_uboot ;;
+    esac
 }
 
 install_bootloader() {
@@ -1278,4 +1310,26 @@ install_bootloader() {
         _ANOTHER="0"
         DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 && _ANOTHER="1"
     done
+}
+
+install_bootloader_menu() {
+    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        ANSWER="UEFI"
+    elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
+        ANSWER="UBOOT"
+    else
+        DIALOG --menu "What is your boot system type?" 10 40 2 \
+            "UEFI" "UEFI" \
+            "BIOS" "BIOS" 2>${ANSWER} || CANCEL=1
+    fi
+    case $(cat ${ANSWER}) in
+        "UEFI") install_bootloader_uefi ;;
+        "BIOS") install_bootloader_bios ;;
+        "UBOOT") install_bootloader_uboot ;;
+    esac
+    if [[ "${CANCEL}" = "1" ]]; then
+        NEXTITEM="7"
+    else
+        NEXTITEM="8"
+    fi
 }
