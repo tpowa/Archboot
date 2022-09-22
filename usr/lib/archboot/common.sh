@@ -49,7 +49,7 @@ _riscv64_check() {
 
 ### check if running in container
 _container_check() {
-    if [[ $(grep -q bash /proc/1/sched) ]]; then
+    if grep -q bash /proc/1/sched ; then
         echo "ERROR: Running inside container. Aborting..."
         exit 1
     fi
