@@ -129,7 +129,7 @@ _create_pacman_conf() {
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="${_PACMAN_CONF##$^$"{1}"#}"
+        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="${_PACMAN_CONF##$^"${1}"#}"
     else
         echo "Use custom pacman.conf ..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
