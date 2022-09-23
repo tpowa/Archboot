@@ -259,7 +259,7 @@ _kver_generic() {
         reader="cat"
         # try if the image is gzip compressed
         [[ $(file -b --mime-type "/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-        read -r _ _ HWKVER _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        read -r _ _ _HWKVER _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 
     # fallback if no detectable kernel is installed
