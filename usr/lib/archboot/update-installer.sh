@@ -383,6 +383,7 @@ pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
 pref("datareporting.policy.firstRunURL", "https://bit.ly/archboot", locked);
 EOF
+fi
 }
 
 _autostart_vnc() {
