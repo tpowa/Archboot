@@ -113,9 +113,10 @@ _prepare_pacman() {
     echo "Remove archboot repository sync db ..."
     rm -f /var/lib/pacman/sync/archboot.db
     echo "Update Arch Linux keyring ..."
-    KEYRING="archlinux-keyring"
-    [[ "$(uname -m)" == "aarch64" ]] && KEYRING="archlinux-keyring archlinuxarm-keyring"
-    pacman -Sy --config "${_PACMAN_CONF}" --noconfirm --noprogressbar ${KEYRING}
+    _KEYRING="archlinux-keyring"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="archlinux-keyring archlinuxarm-keyring"
+    #shellcheck disable=SC2086
+    pacman -Sy --config "${_PACMAN_CONF}" --noconfirm --noprogressbar ${_KEYRING}
 }
 
 #shellcheck disable=SC2120
@@ -128,7 +129,7 @@ _create_pacman_conf() {
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="$(echo ${_PACMAN_CONF} | sed -e "s#^${1}##g")"
+        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="${_PACMAN_CONF##$^${1}#}"
     else
         echo "Use custom pacman.conf ..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
@@ -206,7 +207,9 @@ _other_install_base_packages() {
 
 _other_install_archboot() {
     # riscv64 need does not support local image at the moment
-    [[ "$(systemd-nspawn -q -D "${1}" uname -m | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    _CONTAINER_ARCH="$(systemd-nspawn -q -D "${1}" uname -m)"
+    #shellcheck disable=SC2001
+    [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
