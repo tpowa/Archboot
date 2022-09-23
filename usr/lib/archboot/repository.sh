@@ -35,7 +35,9 @@ _other_download_packages() {
     systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     systemd-nspawn -q -D "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     # riscv64 does not support local image at the moment
-    [[ "$(echo $(systemd-nspawn -q -D "${1}" uname -m) | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    _CONTAINER_ARCH="$(systemd-nspawn -q -D "${1}" uname -m)"
+    #shellcheck disable=SC2001
+    [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
     systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
