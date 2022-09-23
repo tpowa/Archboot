@@ -997,7 +997,7 @@ do_uboot() {
     common_bootloader_checks
     check_bootpart
     abort_uboot
-    [[ -d ${DESTDIR}/boot/extlinux ]] || mkdir -p ${DESTDIR}/boot/extlinux
+    [[ -d "${DESTDIR}/boot/extlinux" ]] || mkdir -p "${DESTDIR}/boot/extlinux"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     # write extlinux.conf
