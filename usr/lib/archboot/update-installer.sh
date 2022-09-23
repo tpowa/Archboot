@@ -168,7 +168,7 @@ _zram_usr() {
             USR_SYMLINKS="bin local lib lib64"
         fi
         for i in ${USR_SYMLINKS}; do
-            /usr.zram/bin/sln /usr.zram/${i} /usr/${i}
+            /usr.zram/bin/sln /usr.zram/"${i}" /usr/"${i}"
         done
         # pacman kills symlinks in below /usr
         # mount --bind is the only way to solve this.
@@ -256,10 +256,10 @@ _kver_x86() {
 _kver_generic() {
     # get kernel version from installed kernel
     if [[ -f "/${VMLINUZ}" ]]; then
-        reader=cat
+        reader="cat"
         # try if the image is gzip compressed
-        [[ $(file -b --mime-type "/${VMLINUZ}") == 'application/gzip' ]] && reader=zcat
-        read _ _ kver _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        [[ $(file -b --mime-type "/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+        read -r _ _ HWKVER _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 
     # fallback if no detectable kernel is installed
