@@ -3,6 +3,7 @@
 . /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
+#shellcheck disable=SC1094
 . /usr/lib/archboot/update-installer.sh
 . /usr/lib/archboot/xfce.sh
 . /usr/lib/archboot/gnome.sh
