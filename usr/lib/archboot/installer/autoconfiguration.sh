@@ -120,7 +120,7 @@ auto_mkinitcpio() {
         reader="cat"
         # try if the image is gzip compressed
         [[ $(file -b --mime-type "${DESTDIR}/boot/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-        read _ _ HWKVER _ < <($reader "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        read -r _ _ HWKVER _ < <($reader "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
     # arrange MODULES for mkinitcpio.conf
     HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller --filesystem ${FBPARAMETER})"

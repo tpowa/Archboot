@@ -89,8 +89,9 @@ _prepare_kernel_initramfs_files() {
 # - only left option is extlinux support in u-boot loader
 _prepare_kernel_initramfs_files_RISCV64() {
     echo "Prepare RISCV64 u-boot ..."
+    #shellcheck disable=SC1090
     source "${_PRESET}"
-    mkdir -p ${_ISODIR}/boot/extlinux
+    mkdir -p "${_ISODIR}"/boot/extlinux
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
 }

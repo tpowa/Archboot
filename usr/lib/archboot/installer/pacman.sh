@@ -116,7 +116,8 @@ prepare_pacman() {
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
     KEYRING="archlinux-keyring"
     [[ "${RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
-    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
+    #shellcheck disable=SC2086
+    pacman -Sy "${PACMAN_CONF}" --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
 }
 
 # Set PACKAGES parameter before running to install wanted packages

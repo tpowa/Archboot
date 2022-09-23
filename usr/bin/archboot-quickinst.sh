@@ -49,6 +49,7 @@ prepare_pacman() {
     ${PACMAN} -Sy
     KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
+    #shellcheck disable=SC2086
     pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} || exit 1
 }
 
