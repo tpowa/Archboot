@@ -54,7 +54,7 @@ if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
     _clean_kernel_cache
     sleep 10
     echo -e "\033[1mStep 4/9:\033[0m Copy kernel ${VMLINUZ} to /${VMLINUZ} ..."
-    cp "${_W_DIR}"/boot/${VMLINUZ} / || exit 1
+    cp "${_W_DIR}/boot/${VMLINUZ}" / || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
