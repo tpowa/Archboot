@@ -1,3 +1,4 @@
+#!/bin/bash
 # don't run ttyS0 as first device
 _welcome () {
     echo -e "\033[1mWelcome to \033[36mArchboot - Arch Linux\033[0m"
@@ -18,7 +19,7 @@ _enter_shell() {
     if ! pgrep -x dbus-run-sessio > /dev/null 2>&1; then
         cd /
         echo -e "Hit \033[1m\033[92mENTER\033[0m for \033[1mshell\033[0m login."
-        read
+        read -r
         clear
     fi
 }
