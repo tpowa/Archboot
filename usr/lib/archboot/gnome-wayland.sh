@@ -18,7 +18,8 @@ _install_gnome_wayland() {
 
 _configure_gnome_wayland() {
     echo "Configuring Gnome ..."
-    gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', "${_STANDARD_BROWSER}.desktop", 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    [[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
     echo "Setting wallpaper ..."
     gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
     echo "Autostarting setup ..."
