@@ -1,5 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+. /etc/archboot/defaults
 
 _install_kde() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
@@ -53,7 +54,7 @@ _configure_kde() {
 	<DefaultMergeDirs/>
 	<Include>
 	<Filename>archboot.desktop</Filename>
-	<Filename>chromium.desktop</Filename>
+	<Filename>${_STANDARD_BROWSER}.desktop</Filename>
 	<Filename>org.kde.dolphin.desktop</Filename>
 	<Filename>gparted.desktop</Filename>
 	<Filename>org.kde.konsole.desktop</Filename>

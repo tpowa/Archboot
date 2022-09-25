@@ -9,6 +9,8 @@ _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 _GRAPHIC_IGNORE="linux linux-firmware linux-firmware-marvell"
 # VNC password
 _VNC_PW="archboot"
+### Standard Web Browser: chromium or firefox
+_STANDARD_BROWSER="firefox"
 ### XFCE defaults
 # Xfce packages
 _XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
