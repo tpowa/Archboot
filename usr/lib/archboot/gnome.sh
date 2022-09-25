@@ -1,12 +1,11 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-. /etc/archboot/defaults
 
 _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
         echo "          This will need some time ..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_GNOME_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop ..."
         _configure_gnome >/dev/tty7 2>&1
         systemd-sysusers >/dev/tty7 2>&1

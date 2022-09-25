@@ -1,12 +1,11 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-. /etc/archboot/defaults
 
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing XFCE desktop now ..."
         echo "          This will need some time ..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 4/5:\033[0m Configuring XFCE desktop ..."
         _configure_xfce >/dev/tty7 2>&1
     else
