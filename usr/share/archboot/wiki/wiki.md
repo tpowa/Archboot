@@ -43,11 +43,11 @@
 * Installs the Arch Linux port of [**Arch Linux RISC-V riscv64**](https://archriscv.felixc.at/)
 
 ### **<span dir="">Features of the images</span>**
-| Type | RAM to boot | WiFi<br>support | LAN<br>support | Package cache<br>for installation | Size<br>X86_64 | Size<br>AARCH64 | Size<br>RISCV64 |
+| Type | RAM to boot | WiFi support | LAN support | Package cache for installation | Size X86_64 | Size AARCH64 | Size RISCV64 |
 |------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|-----------------|
-| _date_-latest | 2000 MB | No | DHCP server needed | Yes | 129 MB | 133 MB ||
-| _date_ | 1300 MB | Yes | Yes | No | 447 MB | 349 MB | 457 MB |
-| _date_-local | 3300 MB | Yes | Yes | Yes | 1497 MB | 1226 MB ||
+| _date_-latest | 2000MB | No | DHCP server needed | Yes | 131MB | 134MB ||
+| _date_ | 1300MB | Yes | Yes | No | 448MB | 350MB | 457MB |
+| _date_-local | 3300MB | Yes | Yes | Yes | 1485MB | 1210MB ||
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
@@ -438,6 +438,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | IRC client | [**weechat**](https://wiki.archlinux.org/title/Weechat "Weechat") | [**irssi**](https://wiki.archlinux.org/title/Irssi "Irssi") |
 | IRC and text browser preconfigured | Yes | No |
 | [**Chromium**](https://wiki.archlinux.org/title/Chromium "Chromium") browser | Yes | No |
+| [**Firefox**](https://wiki.archlinux.org/title/Firefox "Firefox") browser | Yes | No |
 | [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") desktop | Yes | No |
 | [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | Yes | No |
 | [**KDE/Plasma**](https://wiki.archlinux.org/title/KDE "KDE/Plasma") desktop | Yes | No |
@@ -647,7 +648,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
 -usb -usbdevice tablet --enable-kvm -boot d
 ```
 
-### **<span dir=""> RISC-V 64bit MBR mode</span>**
+### **<span dir="">MBR mode RISC-V 64bit</span>**
 
 ```plaintext
 $ qemu-system-riscv64 -M virt -kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \
@@ -743,7 +744,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
 * [**KVM**](https://wiki.archlinux.org/title/KVM "KVM") virtio network for tap0:
 
 ```plaintext
--net nic,model=virtio -net tap,ifname=tap0,script=no,downscript=no
+-device virtio-net-device,netdev=eth0 -netdev tap,id=eth0,ifname=tap0,script=no,downscript=no
 ```
 
 * [**KVM**](https://wiki.archlinux.org/title/KVM "KVM") virtio harddisk:
