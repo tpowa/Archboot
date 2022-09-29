@@ -45,9 +45,9 @@
 ### **<span dir="">Features of the images</span>**
 | Type | RAM to boot | WiFi support | LAN support | Package cache for installation | Size AARCH64 | Size RISCV64 | Size X86_64 |
 |------|-------------|--------------|-------------|--------------------------------|--------------|--------------|---------------|
-| _date_-latest | 2000MB | No | DHCP server needed | Yes | | 134MB | 131MB |
-| _date_ | 1300MB | Yes | Yes | No | 457MB | 350MB | 448MB |
-| _date_-local | 3300MB | Yes | Yes | Yes | | 1210MB | 1485MB |
+| _date_-latest | 2000MB | No | DHCP server needed | Yes | 134 MB || 131MB |
+| _date_ | 1300MB | Yes | Yes | No | 350MB | 457MB | 448MB |
+| _date_-local | 3300MB | Yes | Yes | Yes | 1210MB|| 1485MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
