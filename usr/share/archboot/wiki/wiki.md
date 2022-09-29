@@ -23,11 +23,6 @@
 * Source packages with archboot repository are located [**here**](https://pkgbuild.com/\~tpowa/archboot/src/iso/).
 * Latest news about the package itself, are posted [**here**](https://www.reddit.com/r/archboot/).
 
-#### **<span dir="">x86_64 architecture</span>**
-| Release information | ISO images | SHA256SUM | Forum thread |
-|---------------------|------------|-----------|--------------|
-| [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/sha256sum.txt) | [**Forum link**](https://bbs.archlinux.org/viewtopic.php?id=182439) |
-
 #### **<span dir="">aarch64 architecture</span>**
 | Release information | ISO images | SHA256SUM | Forum thread |
 |---------------------|------------|-----------|--------------|
@@ -42,35 +37,40 @@
 | [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/sha256sum.txt)
 * Installs the Arch Linux port of [**Arch Linux RISC-V riscv64**](https://archriscv.felixc.at/)
 
+#### **<span dir="">x86_64 architecture</span>**
+| Release information | ISO images | SHA256SUM | Forum thread |
+|---------------------|------------|-----------|--------------|
+| [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/sha256sum.txt) | [**Forum link**](https://bbs.archlinux.org/viewtopic.php?id=182439) |
+
 ### **<span dir="">Features of the images</span>**
-| Type | RAM to boot | WiFi support | LAN support | Package cache for installation | Size X86_64 | Size AARCH64 | Size RISCV64 |
-|------|-------------|-----------------|----------------|-----------------------------------|----------------|-----------------|-----------------|
-| _date_-latest | 2000MB | No | DHCP server needed | Yes | 131MB | 134MB ||
-| _date_ | 1300MB | Yes | Yes | No | 448MB | 350MB | 457MB |
-| _date_-local | 3300MB | Yes | Yes | Yes | 1485MB | 1210MB ||
+| Type | RAM to boot | WiFi support | LAN support | Package cache for installation | Size AARCH64 | Size RISCV64 | Size X86_64 |
+|------|-------------|--------------|-------------|--------------------------------|--------------|--------------|---------------|
+| _date_-latest | 2000MB | No | DHCP server needed | Yes | | 134MB | 131MB |
+| _date_ | 1300MB | Yes | Yes | No | 457MB | 350MB | 448MB |
+| _date_-local | 3300MB | Yes | Yes | Yes | | 1210MB | 1485MB |
 
 * **With** a fast internet connection **and** a running [**DHCP**](https://wiki.archlinux.org/title/DHCP "DHCP") server, go for the **"latest"** image.
 * **Without** an internet connection for installation, you should use the **"local"** image. It includes a **local package repository** for installation.
 
 ### [**<span dir="">PXE</span>**](https://wiki.archlinux.org/title/PXE "PXE") **<span dir="">booting / Rescue system</span>**
-| Download | X86_64 | AARCH64 | RISCV64 |
+| Download | AARCH64 | RISCV64 | X86_64 |
 |----------|--------|---------|---------|
-| Kernel | [**vmlinuz_archboot_x86_64**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/vmlinuz_archboot_x86_64) | [**vmlinuz_archboot_aarch64**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/vmlinuz_archboot_aarch64) | [**vmlinuz_archboot_riscv64**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/vmlinuz_archboot_riscv64) |
-| Initrd | [**initramfs_x86_64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img)<br>[**initramfs_x86_64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img)<br>[**initramfs_x86_64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-0.img)<br>[**initramfs_x86_64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-1.img) | [**initramfs_aarch64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img)<br>[**initramfs_aarch64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img)<br>[**initramfs_aarch64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-0.img)<br>[**initramfs_aarch64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-1.img) |[**initramfs_riscv64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64.img) |
-| Microcode | [**intel-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/intel-ucode.img)<br>[**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/amd-ucode.img) | [**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/amd-ucode.img) ||
+| Kernel | [**vmlinuz_archboot_aarch64**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/vmlinuz_archboot_aarch64) | [**vmlinuz_archboot_riscv64**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/vmlinuz_archboot_riscv64) |[**vmlinuz_archboot_x86_64**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/vmlinuz_archboot_x86_64)  |
+| Initrd | [**initramfs_aarch64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img)<br>[**initramfs_aarch64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img)<br>[**initramfs_aarch64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-0.img)<br>[**initramfs_aarch64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-1.img) |[**initramfs_riscv64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64.img) | [**initramfs_x86_64.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img)<br>[**initramfs_x86_64-latest.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img)<br>[**initramfs_x86_64-local-0.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-0.img)<br>[**initramfs_x86_64-local-1.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-1.img) |
+| Microcode | [**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/boot/amd-ucode.img) || [**intel-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/intel-ucode.img)<br>[**amd-ucode.img**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/boot/amd-ucode.img) |
 
 * For [**PXE**](https://wiki.archlinux.org/title/PXE "PXE") booting add the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"),[**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd") and [**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") to your [**TFTP**](https://wiki.archlinux.org/title/TFTP "TFTP"), add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line") setup and you will get a running installation/rescue system.
 * For rescue booting add an entry to your [**bootloader**](https://wiki.archlinux.org/title/Bootloader "Bootloader") pointing to the [**kernel**](https://wiki.archlinux.org/title/Kernel "Kernel"), [**initrds**](https://wiki.archlinux.org/title/Initrd "Initrd"),[**microcode**](https://wiki.archlinux.org/title/Microcode "Microcode") and add `rootfstype=ramfs` to your [**kernel command line**](https://wiki.archlinux.org/title/Kernel_command_line "Kernel command line").
 * For **local image** download **both** initrds and load **both** files with your bootloader or PXE setup.
 
 ### **<span dir="">Supported boot modes</span>**
-| Boot Mode | X86_64 | AARCH64 | RISCV64 |
-|-----------|--------|---------|---------|
-| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") BIOS with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No | No |
-| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI")/UEFI_CD booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | Yes | No |
-| UEFI_MIX_MODE booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No | No |
-| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") with the<br>included fedora [**signed shim**](https://wiki.archlinux.org/title/Secure_Boot#shim "Secure Boot") | Yes | Yes | No |
-| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") with [**U-Boot**](https://www.denx.de/wiki/U-Boot "U-Boot")  | No | No | Yes |
+| Boot Mode | AARCH64 | RISCV64 | X86_64 |
+|-----------|---------|---------|--------|
+| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") BIOS with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | No | No | Yes |
+| [**UEFI**](https://wiki.archlinux.org/title/UEFI "UEFI")/UEFI_CD booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | Yes | No | Yes |
+| UEFI_MIX_MODE booting with [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB") | No | No | Yes |
+| [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot") with the<br>included fedora [**signed shim**](https://wiki.archlinux.org/title/Secure_Boot#shim "Secure Boot") | Yes | No | Yes |
+| [**MBR**](https://wiki.archlinux.org/title/MBR "MBR") with [**U-Boot**](https://www.denx.de/wiki/U-Boot "U-Boot")  | No | Yes | No |
 
 It supports [**GRUB**](https://wiki.archlinux.org/title/GRUB "GRUB")'s iso loopback support. Variables used (below for example):
 
@@ -447,7 +447,7 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Internal update feature | Yes | No |
 | Offline installation support | Yes | No |
 | [**VNC**](https://wiki.archlinux.org/title/VNC "VNC") installation support | Yes | No |
-| Image size | <129-1497MB | >833MB |
+| Image size | >131-1485MB | >833MB |
 | RAM to boot | >1.3GB | >800MB |
 | Bootup speed | 8 seconds | 23 seconds |
 | Build speed | faster | slower |
