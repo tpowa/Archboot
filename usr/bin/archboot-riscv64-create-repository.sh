@@ -9,9 +9,9 @@ _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check
-_cachedir_check
 echo "Starting repository creation ..."
 if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+    _cachedir_check
     _create_pacman_conf "${_REPODIR}"
     _prepare_pacman "${_REPODIR}" || exit 1
     _download_packages "${_REPODIR}" || exit 1
