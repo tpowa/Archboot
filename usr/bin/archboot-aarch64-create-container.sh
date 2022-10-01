@@ -24,7 +24,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _copy_mirrorlist_and_pacman_conf "${1}"
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _aarch64_pacman_chroot "${1}" || exit 1
+    _pacman_chroot "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" "${_PACMAN_AARCH64_CHROOT}" || exit 1
     _create_pacman_conf "${1}" "use_container_config"
     _other_install_base_packages "${1}" || exit 1
     _other_install_archboot "${1}" || exit 1

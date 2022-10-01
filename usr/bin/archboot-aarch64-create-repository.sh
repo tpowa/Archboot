@@ -18,7 +18,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _umount_special "${_REPODIR}" || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _aarch64_pacman_chroot "${_REPODIR}" || exit 1
+    _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" "${_PACMAN_AARCH64_CHROOT}" || exit 1
     _create_pacman_conf "${_REPODIR}" "use_container_config"
     _other_download_packages "${_REPODIR}" || exit 1
 fi

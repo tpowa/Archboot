@@ -18,7 +18,7 @@ if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
     _umount_special "${_REPODIR}" || exit 1
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    _riscv64_pacman_chroot "${_REPODIR}" || exit 1
+    _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" "${_PACMAN_RISCV64_CHROOT}" || exit 1
     _create_pacman_conf "${_REPODIR}" "use_container_config"
     _other_download_packages "${_REPODIR}" || exit 1
 fi

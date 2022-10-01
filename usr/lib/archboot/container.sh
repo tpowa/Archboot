@@ -33,37 +33,19 @@ _clean_cache() {
     fi
 }
 
-_aarch64_pacman_chroot() {
-    if ! [[ -f ${_PACMAN_AARCH64_CHROOT} && -f ${_PACMAN_AARCH64_CHROOT}.sig ]]; then
-        echo "Downloading ${_PACMAN_AARCH64_CHROOT} ..."
-        wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
+_pacman_chroot() {
+    if ! [[ -f ${3} && -f ${3}.sig ]]; then
+        echo "Downloading ${3} ..."
+        wget ${2}/${3}{,.sig} >/dev/null 2>&1
     else
-        echo "Using local ${_PACMAN_AARCH64_CHROOT} ..."
+        echo "Using local ${3} ..."
     fi
-    echo "Verifying ${_PACMAN_AARCH64_CHROOT} ..."
-    gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${1}" -xf "${_PACMAN_AARCH64_CHROOT}"
-    if [[ -f ${_PACMAN_AARCH64_CHROOT} && -f ${_PACMAN_AARCH64_CHROOT}.sig ]]; then
-        echo "Removing installation tarball ${_PACMAN_AARCH64_CHROOT} ..."
-        rm ${_PACMAN_AARCH64_CHROOT}{,.sig}
-    fi
-    echo "Update container to latest packages..."
-    systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
-}
-
-_riscv64_pacman_chroot() {
-    if ! [[ -f ${_PACMAN_RISCV64_CHROOT} && -f ${_PACMAN_RISCV64_CHROOT}.sig ]]; then
-        echo "Downloading ${_PACMAN_RISCV64_CHROOT} ..."
-        wget ${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}/${_PACMAN_RISCV64_CHROOT}{,.sig} >/dev/null 2>&1
-    else
-        echo "Using local ${_PACMAN_RISCV64_CHROOT} ..."
-    fi
-    echo "Verifying ${_PACMAN_RISCV64_CHROOT} ..."
-    gpg --verify "${_PACMAN_RISCV64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${1}" -xf "${_PACMAN_RISCV64_CHROOT}"
-    if [[ -f ${_PACMAN_RISCV64_CHROOT} && -f ${_PACMAN_RISCV64_CHROOT}.sig ]]; then
-        echo "Removing installation tarball ${_PACMAN_RISCV64_CHROOT} ..."
-        rm ${_PACMAN_RISCV64_CHROOT}{,.sig}
+    echo "Verifying ${3} ..."
+    gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
+    bsdtar -C "${1}" -xf "${3}"
+    if [[ -f ${3} && -f ${3}.sig ]]; then
+        echo "Removing installation tarball ${3} ..."
+        rm ${3}{,.sig}
     fi
     echo "Update container to latest packages..."
     systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
