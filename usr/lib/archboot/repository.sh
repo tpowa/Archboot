@@ -39,7 +39,7 @@ _other_download_packages() {
     #shellcheck disable=SC2001
     [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-    ${_NSPAWN} /bin/bash -c "pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+    ${_NSPAWN} pacman -Syw ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --dbpath /blankdb --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
 }
 
 _move_packages() {
