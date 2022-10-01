@@ -7,7 +7,7 @@ _ARCHBOOT="archboot"
 [[ -z "${1}" ]] && _usage
 _root_check
 _x86_64_check
-echo "Start release creation in $1 ..."
+echo "Start release creation in ${1} ..."
 _create_iso "$@" || exit 1
 _create_boot || exit 1
 _create_cksum || exit 1
