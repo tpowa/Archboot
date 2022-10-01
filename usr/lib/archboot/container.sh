@@ -153,7 +153,7 @@ _pacman_parameters() {
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
     fi
     # defaults used on every pacman call
-    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm ${_CACHEDIR}"
 }
 
 _install_base_packages() {
@@ -193,18 +193,18 @@ _install_archboot() {
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
             echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
         else
             echo "Downloading ${_ARCHBOOT} to ${1} ..."
-            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
         fi
     else
         echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
+    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1
     # cleanup
     if [[ -z "${2}" ]]; then
         rm -r "${1}"/blankdb
