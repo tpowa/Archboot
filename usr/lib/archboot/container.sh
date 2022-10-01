@@ -144,13 +144,13 @@ _umount_special() {
 
 _pacman_parameters() {
     if [[ "${2}" == "use_binfmt" ]]; then
-        _SYSTEMD="systemd-nspawn -q -D "${1}""
+        _SYSTEMD="systemd-nspawn -q -D ${1}"
         _PACMAN="pacman"
         _PACMAN_CACHEDIR=""
     else
         _SYSTEMD=""
-        _PACMAN="pacman --root "${1}""
-        _PACMAN_CACHEDIR="--cachedir "${_CACHEDIR}""
+        _PACMAN="pacman --root ${1}"
+        _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
     fi
 }
 
@@ -167,10 +167,10 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    _PACMAN_COMMON="${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_COMMON="${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
     _pacman_parameters "${1}" "${2}"
-    if [[ "${2}" ]]; then
-        _PACMAN_DB="--dbpath "${1}"/blankdb"
+    if [[ -z "${2}" ]]; then
+        _PACMAN_DB="--dbpath ${1}/blankdb"
         # riscv64 need does not support local image at the moment
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     else
