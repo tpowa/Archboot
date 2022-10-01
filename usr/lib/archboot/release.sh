@@ -31,32 +31,31 @@ _usage () {
 _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
-    1="${_W_DIR}"
     # create container
-    archboot-"${_ARCH}"-create-container.sh "${1}" -cc --install-source="${2}" || exit 1
-    _create_archboot_db "${1}"/var/cache/pacman/pkg
+    archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # remove not working lvm2 from latest image
-        echo "Remove lvm2 from container ${1} ..."
-        ${_NSPAWN} pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
+        echo "Remove lvm2 from container ${_W_DIR} ..."
+        systemd-nspawn -q -D "${_W_DIR}" pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
         # generate latest tarball in container
         echo "Generate local ISO ..."
         # generate local iso in container
-        ${_NSPAWN} /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
-        rm -rf "${1}"/var/cache/pacman/pkg/*
+        rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         echo "Generate latest ISO ..."
         # generate latest iso in container
-        ${_NSPAWN} /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
-        echo "Install lvm2 to container ${1} ..."
-        ${_NSPAWN} pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
+        echo "Install lvm2 to container ${_W_DIR} ..."
+        systemd-nspawn -q -D "${_W_DIR}" pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
     fi
     echo "Generate normal ISO ..."
     # generate iso in container
-    ${_NSPAWN} /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
@@ -65,17 +64,17 @@ _create_iso() {
     echo "Homepage: https://bit.ly/archboot";\
     echo "Architecture: ${_ARCH}";\
     echo "RAM requirement to boot: 1300 MB or greater";\
-    echo "Archboot:$(${_NSPAWN} pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
-    echo "Kernel:$(${_NSPAWN} pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Pacman:$(${_NSPAWN} pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Systemd:$(${_NSPAWN} pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
+    echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
+    echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # move iso out of container
-    mv "${1}"/*.iso ./ > /dev/null 2>&1
-    mv "${1}"/*.img ./ > /dev/null 2>&1
+    mv "${_W_DIR}"/*.iso ./ > /dev/null 2>&1
+    mv "${_W_DIR}"/*.img ./ > /dev/null 2>&1
     # remove container
-    echo "Remove container ${1} ..."
-    rm -r "${1}"
+    echo "Remove container ${_W_DIR} ..."
+    rm -r "${_W_DIR}"
 }
 
 _create_boot() {
