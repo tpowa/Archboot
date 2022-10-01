@@ -14,6 +14,7 @@ _STANDARD_PACKAGES="gparted nss-mdns"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
+_NSPAWN="systemd-nspawn -q -D ${1}"
 
 ### check for root
 _root_check() {

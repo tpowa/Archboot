@@ -145,12 +145,10 @@ _umount_special() {
 _pacman_parameters() {
     # building for different architecture using binfmt
     if [[ "${2}" == "use_binfmt" ]]; then
-        _NSPAWN="systemd-nspawn -q -D ${1}"
-        _PACMAN="pacman"
+        _PACMAN="${_NSPAWN} pacman"
         _PACMAN_CACHEDIR=""
     # building for running architecture
     else
-        _NSPAWN=""
         _PACMAN="pacman --root ${1}"
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
     fi
@@ -164,10 +162,10 @@ _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
         echo "Downloading ${_PACKAGES} to ${1} ..."
-        ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
     fi
     echo "Installing packages ${_PACKAGES} to ${1} ..."
-     ${_NSPAWN} ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
+     ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
@@ -195,18 +193,18 @@ _install_archboot() {
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
             echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         else
             echo "Downloading ${_ARCHBOOT} to ${1} ..."
-            ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         fi
     else
         echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_NSPAWN} ${_PACMAN} -Sy ${_PACMAN_OPTIONS} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
+    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
     # cleanup
     if [[ -z "${2}" ]]; then
         rm -r "${1}"/blankdb
@@ -244,7 +242,6 @@ _set_hostname() {
 
 _fix_groups() {
     echo "Recreate system groups ..."
-    _NSPAWN="systemd-nspawn -q -D ${1}"
     rm "${1}"/etc/{group,gshadow}
     ${_NSPAWN} systemd-sysusers >/dev/null 2>&1
     # fix missing group in iwd FS#74646
