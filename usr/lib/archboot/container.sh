@@ -111,7 +111,7 @@ _create_pacman_conf() {
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="${_PACMAN_CONF##$^"${1}"#}"
+        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="$(echo ${_PACMAN_CONF} | sed -e "s#${1}##g")"
     else
         echo "Use custom pacman.conf ..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
@@ -123,6 +123,7 @@ _create_pacman_conf() {
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
+        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
 }
 
@@ -141,82 +142,75 @@ _umount_special() {
     umount -R "${1}/dev"
 }
 
+_pacman_parameters() {
+    if [[ -z "${2}" ]]; then
+        _SYSTEMD=""
+        _PACMAN="pacman --root "${1}""
+        _PACMAN_CACHEDIR="--cachedir "${_CACHEDIR}""
+    else
+        _SYSTEMD="systemd-nspawn -q -D "${1}""
+        _PACMAN="pacman"
+        _PACMAN_CACHEDIR=""
+    fi
+}
+
 _install_base_packages() {
+    _PACMAN_COMMON="${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
+    _pacman_parameters "${1}" "${2}"
+    if ! [[ -z "${2}" ]]; then
+        [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
+        echo "Downloading ${_PACKAGES} to ${1} ..."
+        ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} --dbpath /blankdb >/dev/null 2>&1 || exit 1
+    fi
     echo "Installing packages ${_PACKAGES} to ${1} ..."
-    #shellcheck disable=SC2086
-    pacman --root "${1}" -Sy ${_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
+     ${_SYSTEMD} ${_PACMAN} -Sy ${_PACMAN_COMMON} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
-    # riscv64 need does not support local image at the moment
-    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    _PACMAN_COMMON="${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm"
+    _pacman_parameters "${1}" "${2}"
+    if [[ -z "${2}" ]]; then
+        _PACMAN_DB="--dbpath "${1}"/blankdb"
+        # riscv64 need does not support local image at the moment
+        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    else
+        _PACMAN_DB=""
+        # riscv64 need does not support local image at the moment
+        _CONTAINER_ARCH="$(${_SYSTEMD} uname -m)"
+        #shellcheck disable=SC2001
+        [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+        [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
+        cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
+    fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
-    pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
-    pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+    ${_SYSTEMD} pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
+    ${_SYSTEMD} pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
             echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
+            ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         else
             echo "Downloading ${_ARCHBOOT} to ${1} ..."
-             pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
+            ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         fi
     else
         echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        pacman --root "${1}" -Syw --dbpath "${1}"/blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --cachedir "${_CACHEDIR}" --noconfirm >/dev/null 2>&1 || exit 1
+        ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    pacman --root "${1}" -Sy ${_ARCHBOOT} --config "${_PACMAN_CONF}" --ignore systemd-resolvconf --noconfirm --cachedir "${_CACHEDIR}" >/dev/null 2>&1
-    rm -r "${1}"/blankdb
-    echo "Remove archboot repository sync db ..."
-    rm /var/lib/pacman/sync/archboot.db
-}
-
-_other_install_base_packages() {
-    if [[ -e "${1}/$(basename "${_PACMAN_CONF}")" ]]; then
-        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
-    fi
-    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    echo "Downloading ${_PACKAGES} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
-    echo "Installing ${_PACKAGES} to ${1} ..."
-    systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
-}
-
-_other_install_archboot() {
-    # riscv64 need does not support local image at the moment
-    _CONTAINER_ARCH="$(systemd-nspawn -q -D "${1}" uname -m)"
-    #shellcheck disable=SC2001
-    [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
-    [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
-    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    if [[ -e "${1}/$(basename "${_PACMAN_CONF}")"  ]]; then
-        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
-    fi
-    echo "Adding ${_GPG_KEY_ID} to trusted keys"
-    [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
-    cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
-    systemd-nspawn -q -D "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
-    rm "${1}"/"${_GPG_KEY}"
-    if grep -qw archboot /etc/hostname; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
-            echo "Downloading ${_ARCHBOOT} to ${1} ..."
-            systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
-        else
-            echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
-        fi
+    ${_SYSTEMD} ${_PACMAN} -Sy ${_PACMAN_COMMON} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
+    # cleanup
+    if [[ -z "${2}" ]]; then
+        rm -r "${1}"/blankdb
+        echo "Remove archboot repository sync db ..."
+        rm /var/lib/pacman/sync/archboot.db
     else
-        echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Syw --dbpath /blankdb ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
+        rm "${1}"/"${_GPG_KEY}"
     fi
-        echo "Installing ${_ARCHBOOT} to ${1} ..."
-        systemd-nspawn -q -D "${1}" /bin/bash -c "pacman -Sy ${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm" >/dev/null 2>&1
 }
 
 _copy_mirrorlist_and_pacman_conf() {
