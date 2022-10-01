@@ -48,7 +48,7 @@ _pacman_chroot() {
         rm ${3}{,.sig}
     fi
     echo "Update container to latest packages..."
-    systemd-nspawn -D "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
+    ${_NSPAWN} pacman -Syu --noconfirm >/dev/null 2>&1
 }
 
 # clean container from not needed files

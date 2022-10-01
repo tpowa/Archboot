@@ -70,8 +70,8 @@ _generate_keyring() {
     if ! grep -qw archboot /etc/hostname; then
         # generate pacman keyring
         echo "Generate pacman keyring in container ..."
-        systemd-nspawn -q -D "${1}" pacman-key --init >/dev/null 2>&1
-        systemd-nspawn -q -D "${1}" pacman-key --populate >/dev/null 2>&1
+        ${_NSPAWN} pacman-key --init >/dev/null 2>&1
+        ${_NSPAWN} pacman-key --populate >/dev/null 2>&1
     else
         cp -ar /etc/pacman.d/gnupg "${1}"/etc/pacman.d >/dev/null 2>&1
     fi
