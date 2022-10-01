@@ -143,36 +143,40 @@ _umount_special() {
 }
 
 _pacman_parameters() {
+    # building for different architecture using binfmt
     if [[ "${2}" == "use_binfmt" ]]; then
-        _SYSTEMD="systemd-nspawn -q -D ${1}"
+        _NSPAWN="systemd-nspawn -q -D ${1}"
         _PACMAN="pacman"
         _PACMAN_CACHEDIR=""
+    # building for running architecture
     else
-        _SYSTEMD=""
+        _NSPAWN=""
         _PACMAN="pacman --root ${1}"
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
     fi
+    # defaults used on every pacman call
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
 }
 
 _install_base_packages() {
-    _PACMAN_COMMON="${_PACKAGES} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
     _pacman_parameters "${1}" "${2}"
     if [[ "${2}" == "use_binfmt" ]]; then
         [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
         echo "Downloading ${_PACKAGES} to ${1} ..."
-        ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} --dbpath /blankdb >/dev/null 2>&1 || exit 1
+        ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
     fi
     echo "Installing packages ${_PACKAGES} to ${1} ..."
-     ${_SYSTEMD} ${_PACMAN} -Sy ${_PACMAN_COMMON} >/dev/null 2>&1 || exit 1
+     ${_NSPAWN} ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
-    _PACMAN_COMMON="${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     _pacman_parameters "${1}" "${2}"
     if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN_DB=""
         # riscv64 need does not support local image at the moment
-        _CONTAINER_ARCH="$(${_SYSTEMD} uname -m)"
+        _CONTAINER_ARCH="$(${_NSPAWN} uname -m)"
         #shellcheck disable=SC2001
         [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
         [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
@@ -185,24 +189,24 @@ _install_archboot() {
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     echo "Adding ${_GPG_KEY_ID} to trusted keys"
-    ${_SYSTEMD} pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
-    ${_SYSTEMD} pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+    ${_NSPAWN} pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
+    ${_NSPAWN} pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
             echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         else
             echo "Downloading ${_ARCHBOOT} to ${1} ..."
-            ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+            ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
         fi
     else
         echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        ${_SYSTEMD} ${_PACMAN} -Syw ${_PACMAN_COMMON} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
+        ${_NSPAWN} ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} ${_PACMAN_CACHEDIR} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_SYSTEMD} ${_PACMAN} -Sy ${_PACMAN_COMMON} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
+    ${_NSPAWN} ${_PACMAN} -Sy ${_PACMAN_OPTIONS} ${_PACMAN_CACHEDIR} >/dev/null 2>&1
     # cleanup
     if [[ -z "${2}" ]]; then
         rm -r "${1}"/blankdb
