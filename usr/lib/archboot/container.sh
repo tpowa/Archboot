@@ -153,12 +153,12 @@ _pacman_parameters() {
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
     fi
     # defaults used on every pacman call
-    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm ${_CACHEDIR}"
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
 }
 
 _install_base_packages() {
-    _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
     _pacman_parameters "${1}" "${2}"
+    _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
         echo "Downloading ${_PACKAGES} to ${1} ..."
@@ -169,8 +169,8 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     _pacman_parameters "${1}" "${2}"
+    _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN_DB=""
         # riscv64 need does not support local image at the moment
