@@ -244,17 +244,18 @@ _set_hostname() {
 
 _fix_groups() {
     echo "Recreate system groups ..."
+    _NSPAWN="systemd-nspawn -q -D ${1}"
     rm "${1}"/etc/{group,gshadow}
-    systemd-nspawn -q -D "${1}" systemd-sysusers >/dev/null 2>&1
+    ${_NSPAWN} systemd-sysusers >/dev/null 2>&1
     # fix missing group in iwd FS#74646
-    systemd-nspawn -q -D "${1}" groupadd netdev >/dev/null 2>&1
+    ${_NSPAWN} groupadd netdev >/dev/null 2>&1
     # add missing groups
-    systemd-nspawn -q -D "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r -g 26 proc >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupmems -g proc -a polkitd >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r colord >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r -g 140 usbmux >/dev/null 2>&1
+    ${_NSPAWN} useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
+    ${_NSPAWN} groupadd -r -g 26 proc >/dev/null 2>&1
+    ${_NSPAWN} groupmems -g proc -a polkitd >/dev/null 2>&1
+    ${_NSPAWN} groupadd -r colord >/dev/null 2>&1
+    ${_NSPAWN} groupadd -r -g 140 usbmux >/dev/null 2>&1
     # add missing groups on aarch64
-    systemd-nspawn -q -D "${1}" groupadd -r -g 90 network >/dev/null 2>&1
-    systemd-nspawn -q -D "${1}" groupadd -r tss >/dev/null 2>&1
+    ${_NSPAWN} groupadd -r -g 90 network >/dev/null 2>&1
+    ${_NSPAWN} groupadd -r tss >/dev/null 2>&1
 }
