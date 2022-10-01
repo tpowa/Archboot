@@ -169,11 +169,7 @@ _install_base_packages() {
 _install_archboot() {
     _PACMAN_COMMON="${_ARCHBOOT} --config ${_PACMAN_CONF} --ignore systemd-resolvconf --noconfirm"
     _pacman_parameters "${1}" "${2}"
-    if [[ -z "${2}" ]]; then
-        _PACMAN_DB="--dbpath ${1}/blankdb"
-        # riscv64 need does not support local image at the moment
-        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
-    else
+    if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN_DB=""
         # riscv64 need does not support local image at the moment
         _CONTAINER_ARCH="$(${_SYSTEMD} uname -m)"
@@ -181,6 +177,10 @@ _install_archboot() {
         [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
         [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
         cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
+    else
+        _PACMAN_DB="--dbpath ${1}/blankdb"
+        # riscv64 need does not support local image at the moment
+        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
