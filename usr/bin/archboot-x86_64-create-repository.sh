@@ -14,6 +14,7 @@ _cachedir_check
 _x86_64_check
 echo "Starting repository creation ..."
 _prepare_pacman "${_REPODIR}" || exit 1
+_pacman_parameters "${_REPODIR}"
 _download_packages "${_REPODIR}" || exit 1
 _x86_64_pacman_restore || exit 1
 _umount_special "${_REPODIR}" || exit 1

@@ -144,8 +144,8 @@ _umount_special() {
 
 _install_base_packages() {
     _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
+    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ "${2}" == "use_binfmt" ]]; then
-        [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
         echo "Downloading ${_PACKAGES} to ${1} ..."
         ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
     fi

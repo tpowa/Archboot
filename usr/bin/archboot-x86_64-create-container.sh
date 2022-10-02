@@ -35,4 +35,3 @@ fi
 _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 echo "Finished container setup in ${1} ."
-

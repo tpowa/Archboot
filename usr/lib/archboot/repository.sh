@@ -20,14 +20,14 @@ _cachedir_check() {
 
 _download_packages() {
     _PACMAN_OPTIONS="${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS}"
+    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ "${2}" == "use_binfmt" ]]; then
-        mkdir "${1}"/blankdb
         _copy_gpg_key
         _riscv64_disable_graphics
     fi
     _pacman_key
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-    ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
 }
 
 _move_packages() {
