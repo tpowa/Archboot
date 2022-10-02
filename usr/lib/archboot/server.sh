@@ -46,68 +46,6 @@ _update_pacman_chroot() {
     sudo -u "${_USER}" scp -q ${_PACMAN_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN} || exit 1
 }
 
-_update_aarch64_pacman_chroot() {
-    # update aarch64 pacman chroot
-    cd "${_ISO_HOME}" || exit 1
-    [[ -d "${_PACMAN_AARCH64}" ]] || mkdir "${_PACMAN_AARCH64}"
-    echo "Downloading archlinuxarm pacman aarch64 chroot..."
-    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig} 2>/dev/null
-    wget ${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}/${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
-    # verify download
-    sudo -u "${_USER}" gpg --verify "${_PACMAN_AARCH64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${_PACMAN_AARCH64}" -xf "${_PACMAN_AARCH64_CHROOT}" >/dev/null 2>&1
-    echo "Removing installation tarball ..."
-    rm ${_PACMAN_AARCH64_CHROOT}{,.sig} >/dev/null 2>&1
-    # update container to latest packages
-    echo "Update container to latest packages..."
-    systemd-nspawn -D "${_PACMAN_AARCH64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
-    _fix_network "${_PACMAN_AARCH64}"
-    _CLEANUP_CONTAINER="1" _clean_container "${_PACMAN_AARCH64}" >/dev/null 2>&1
-    _CLEANUP_CACHE="1" _clean_cache "${_PACMAN_AARCH64}" >/dev/null 2>&1
-    echo "Generating tarball ..."
-    tar -acf "${_PACMAN_AARCH64_CHROOT}" -C "${_PACMAN_AARCH64}" .
-    echo "Removing ${_PACMAN_AARCH64} ..."
-    rm -r "${_PACMAN_AARCH64}"
-    echo "Finished container tarball."
-    echo "Sign tarball ..."
-    #shellcheck disable=SC2086
-    sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_AARCH64_CHROOT}" || exit 1
-    chown "${_USER}:${_GROUP}" ${_PACMAN_AARCH64_CHROOT}{,.sig} || exit 1
-    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN_AARCH64} ..."
-    sudo -u "${_USER}" scp -q ${_PACMAN_AARCH64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_AARCH64} || exit 1
-}
-
-_update_riscv64_pacman_chroot() {
-    # update riscv64 pacman chroot
-    cd "${_ISO_HOME}" || exit 1
-    [[ -d "${_PACMAN_RISCV64}" ]] || mkdir "${_PACMAN_RISCV64}"
-    echo "Downloading archlinux pacman riscv64 chroot..."
-    [[ -f pacman-riscv64-chroot-latest.tar.zst ]] && rm pacman-riscv64-chroot-latest.tar.zst{,.sig} 2>/dev/null
-    wget ${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}/${_PACMAN_RISCV64_CHROOT}{,.sig} >/dev/null 2>&1
-    # verify download
-    sudo -u "${_USER}" gpg --verify "${_PACMAN_RISCV64_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${_PACMAN_RISCV64}" -xf "${_PACMAN_RISCV64_CHROOT}" >/dev/null 2>&1
-    echo "Removing installation tarball ..."
-    rm ${_PACMAN_RISCV64_CHROOT}{,.sig} >/dev/null 2>&1
-    # update container to latest packages
-    echo "Update container to latest packages..."
-    systemd-nspawn -D "${_PACMAN_RISCV64}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
-    _fix_network "${_PACMAN_RISCV64}"
-    _CLEANUP_CONTAINER="1" _clean_container "${_PACMAN_RISCV64}" >/dev/null 2>&1
-    _CLEANUP_CACHE="1" _clean_cache "${_PACMAN_RISCV64}" >/dev/null 2>&1
-    echo "Generating tarball ..."
-    tar -acf "${_PACMAN_RISCV64_CHROOT}" -C "${_PACMAN_RISCV64}" .
-    echo "Removing ${_PACMAN_RISCV64} ..."
-    rm -r "${_PACMAN_RISCV64}"
-    echo "Finished container tarball."
-    echo "Sign tarball ..."
-    #shellcheck disable=SC2086
-    sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_RISCV64_CHROOT}" || exit 1
-    chown "${_USER}:${_GROUP}" ${_PACMAN_RISCV64_CHROOT}{,.sig} || exit 1
-    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN_RISCV64} ..."
-    sudo -u "${_USER}" scp -q ${_PACMAN_RISCV64_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_RISCV64} || exit 1
-}
-
 _server_upload() {
     # copy files to server
     echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
