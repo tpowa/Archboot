@@ -156,23 +156,15 @@ _install_base_packages() {
 _install_archboot() {
     _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
-        _PACMAN_DB=""
-        # riscv64 need does not support local image at the moment
-        _CONTAINER_ARCH="$(${_NSPAWN} uname -m)"
-        #shellcheck disable=SC2001
-        [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
-        [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
-        cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
+        _copy_gpg_key
+        _riscv64_disable_graphics
     else
-        _PACMAN_DB="--dbpath ${1}/blankdb"
         # riscv64 need does not support local image at the moment
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
-    echo "Adding ${_GPG_KEY_ID} to trusted keys"
-    ${_NSPAWN} pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
-    ${_NSPAWN} pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+    _pacman_key
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then

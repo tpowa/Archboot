@@ -131,12 +131,34 @@ _pacman_parameters() {
     # building for different architecture using binfmt
     if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN="${_NSPAWN} pacman"
+        _PACMAN_KEY="${_NSPAWN} pacman-key"
         _PACMAN_CACHEDIR=""
+        _PACMAN_DB=""
     # building for running architecture
     else
         _PACMAN="pacman --root ${1}"
+        _PACMAN_KEY="pacman-key"
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
+        _PACMAN_DB="--dbpath ${1}/blankdb"
     fi
     # defaults used on every pacman call
     _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
+}
+
+_pacman_key() {
+    echo "Adding ${_GPG_KEY_ID} to trusted keys"
+    ${_PACMAN_KEY} --add "${_GPG_KEY}" >/dev/null 2>&1
+    ${_PACMAN_KEY} --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+}
+
+_copy_gpg_key() {
+    [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
+    cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
+}
+
+_riscv64_disable_graphics() {
+    # riscv64 need does not support local image at the moment
+    _CONTAINER_ARCH="$(${_NSPAWN} uname -m)"
+    #shellcheck disable=SC2001
+    [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
 }
