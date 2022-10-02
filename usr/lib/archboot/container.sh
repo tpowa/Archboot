@@ -204,12 +204,12 @@ _install_archboot() {
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1
     # cleanup
-    if [[ -z "${2}" ]]; then
+    if [[ "${2}"  == "use_binfmt" ]]; then
+        rm "${1}"/"${_GPG_KEY}"
+    else
         rm -r "${1}"/blankdb
         echo "Remove archboot repository sync db ..."
         rm /var/lib/pacman/sync/archboot.db
-    else
-        rm "${1}"/"${_GPG_KEY}"
     fi
 }
 
