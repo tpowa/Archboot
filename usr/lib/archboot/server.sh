@@ -4,6 +4,48 @@
 . /usr/lib/archboot/container.sh
 _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 
+_update_pacman_chroot() {
+    if [[ "${_ARCH}" == "aarch64" ]]; then
+        _ARCH_DIR="${_PACMAN_AARCH64}"
+        _ARCH_CHROOT_PUBLIC="${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}"
+        _PACMAN_CHROOT="${_PACMAN_AARCH64_CHROOT}"
+        _SERVER_PACMAN="${_SERVER_PACMAN_AARCH64}"
+    elif [[ "${_ARCH}" == "riscv64" ]]; then
+        _ARCH_DIR="${_PACMAN_RISCV64}"
+        _ARCH_CHROOT_PUBLIC="${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}"
+        _PACMAN_CHROOT="${_PACMAN_RISCV64_CHROOT}"
+        _SERVER_PACMAN="${_SERVER_PACMAN_RISCV64}"
+    fi
+    # update pacman chroot
+    cd "${_ISO_HOME}" || exit 1
+    [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
+    echo "Downloading archlinuxarm pacman aarch64 chroot..."
+    [[ -f pacman-aarch64-chroot-latest.tar.zst ]] && rm pacman-aarch64-chroot-latest.tar.zst{,.sig} 2>/dev/null
+    wget ${_ARCHBOOT_CHROOT_PUBLIC}/${_PACMAN_CHROOT}{,.sig} >/dev/null 2>&1
+    # verify download
+    sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" >/dev/null 2>&1 || exit 1
+    bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" >/dev/null 2>&1
+    echo "Removing installation tarball ..."
+    rm ${_PACMAN_CHROOT}{,.sig} >/dev/null 2>&1
+    # update container to latest packages
+    echo "Update container to latest packages..."
+    systemd-nspawn -D "${_ARCH_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
+    _fix_network "${_ARCH_DIR}"
+    _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" >/dev/null 2>&1
+    _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" >/dev/null 2>&1
+    echo "Generating tarball ..."
+    tar -acf "${_PACMAN_CHROOT}" -C "${_ARCH_DIR}" .
+    echo "Removing ${_ARCH_DIR} ..."
+    rm -r "${_ARCH_DIR}"
+    echo "Finished container tarball."
+    echo "Sign tarball ..."
+    #shellcheck disable=SC2086
+    sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
+    chown "${_USER}:${_GROUP}" ${_PACMAN_CHROOT}{,.sig} || exit 1
+    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN} ..."
+    sudo -u "${_USER}" scp -q ${_PACMAN_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN} || exit 1
+}
+
 _update_aarch64_pacman_chroot() {
     # update aarch64 pacman chroot
     cd "${_ISO_HOME}" || exit 1
