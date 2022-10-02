@@ -14,7 +14,7 @@ _STANDARD_PACKAGES="gparted nss-mdns"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
-_NSPAWN="systemd-nspawn -q -D ${1}"
+_NSPAWN="systemd-nspawn -q -D"
 
 ### check for root
 _root_check() {
@@ -70,8 +70,8 @@ _generate_keyring() {
     if ! grep -qw archboot /etc/hostname; then
         # generate pacman keyring
         echo "Generate pacman keyring in container ..."
-        ${_NSPAWN} pacman-key --init >/dev/null 2>&1
-        ${_NSPAWN} pacman-key --populate >/dev/null 2>&1
+        ${_NSPAWN} ${1} pacman-key --init >/dev/null 2>&1
+        ${_NSPAWN} ${1} pacman-key --populate >/dev/null 2>&1
     else
         cp -ar /etc/pacman.d/gnupg "${1}"/etc/pacman.d >/dev/null 2>&1
     fi
@@ -130,8 +130,8 @@ _create_archboot_db() {
 _pacman_parameters() {
     # building for different architecture using binfmt
     if [[ "${2}" == "use_binfmt" ]]; then
-        _PACMAN="${_NSPAWN} pacman"
-        _PACMAN_KEY="${_NSPAWN} pacman-key"
+        _PACMAN="${_NSPAWN} ${1} pacman"
+        _PACMAN_KEY="${_NSPAWN} ${1} pacman-key"
         _PACMAN_CACHEDIR=""
         _PACMAN_DB=""
     # building for running architecture
@@ -159,7 +159,7 @@ _copy_gpg_key() {
 
 _riscv64_disable_graphics() {
     # riscv64 need does not support local image at the moment
-    _CONTAINER_ARCH="$(${_NSPAWN} uname -m)"
+    _CONTAINER_ARCH="$(${_NSPAWN} ${1} uname -m)"
     #shellcheck disable=SC2001
     [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
 }

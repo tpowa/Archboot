@@ -39,23 +39,23 @@ _create_iso() {
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # remove not working lvm2 from latest image
         echo "Remove lvm2 from container ${_W_DIR} ..."
-        systemd-nspawn -q -D "${_W_DIR}" pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
         # generate latest tarball in container
         echo "Generate local ISO ..."
         # generate local iso in container
-        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         echo "Generate latest ISO ..."
         # generate latest iso in container
-        systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Install lvm2 to container ${_W_DIR} ..."
-        systemd-nspawn -q -D "${_W_DIR}" pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
     fi
     echo "Generate normal ISO ..."
     # generate iso in container
-    systemd-nspawn -q -D "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
@@ -64,11 +64,11 @@ _create_iso() {
     echo "Homepage: https://bit.ly/archboot";\
     echo "Architecture: ${_ARCH}";\
     echo "RAM requirement to boot: 1300 MB or greater";\
-    echo "Archboot:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
-    echo "Kernel:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Pacman:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Systemd:$(systemd-nspawn -q -D "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
+    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
+    echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ > /dev/null 2>&1
     mv "${_W_DIR}"/*.img ./ > /dev/null 2>&1
