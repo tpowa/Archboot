@@ -123,6 +123,7 @@ _create_pacman_conf() {
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
+        _PACMAN_CONF="$(basename ${_PACMAN_CONF})"
     fi
 }
 
