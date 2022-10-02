@@ -126,3 +126,17 @@ _create_archboot_db() {
     #shellcheck disable=SC2046
     LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
 }
+
+_pacman_parameters() {
+    # building for different architecture using binfmt
+    if [[ "${2}" == "use_binfmt" ]]; then
+        _PACMAN="${_NSPAWN} pacman"
+        _PACMAN_CACHEDIR=""
+    # building for running architecture
+    else
+        _PACMAN="pacman --root ${1}"
+        _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
+    fi
+    # defaults used on every pacman call
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
+}
