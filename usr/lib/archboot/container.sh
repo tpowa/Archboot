@@ -111,7 +111,7 @@ _create_pacman_conf() {
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="$(echo ${_PACMAN_CONF} | sed -e "s#${1}##g")"
+        [[ "${2}" == "use_container_config" ]] && _PACMAN_CONF="$(echo ${_PACMAN_CONF} | sed -e "s#^${1}##g")"
     else
         echo "Use custom pacman.conf ..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
@@ -123,7 +123,6 @@ _create_pacman_conf() {
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
-        _PACMAN_CONF=$(basename "${_PACMAN_CONF}")
     fi
 }
 
