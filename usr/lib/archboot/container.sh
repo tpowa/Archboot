@@ -157,7 +157,6 @@ _pacman_parameters() {
 }
 
 _install_base_packages() {
-    _pacman_parameters "${1}" "${2}"
     _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
@@ -169,7 +168,6 @@ _install_base_packages() {
 }
 
 _install_archboot() {
-    _pacman_parameters "${1}" "${2}"
     _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN_DB=""

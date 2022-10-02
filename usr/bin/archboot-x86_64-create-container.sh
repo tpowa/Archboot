@@ -11,6 +11,7 @@ echo "Starting container creation ..."
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 _create_pacman_conf "${1}"
 _prepare_pacman "${1}" || exit 1
+_pacman_parameters "${1}"
 _install_base_packages "${1}" || exit 1
 _clean_mkinitcpio "${1}"
 _clean_cache "${1}"

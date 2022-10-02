@@ -11,6 +11,7 @@ echo "Starting container creation ..."
 if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
     _create_pacman_conf "${1}"
     _prepare_pacman "${1}" || exit 1
+    _pacman_parameters "${1}"
     _install_base_packages "${1}" || exit 1
     _clean_mkinitcpio "${1}"
     _clean_cache "${1}"
@@ -26,8 +27,9 @@ fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _pacman_chroot "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" "${_PACMAN_RISCV64_CHROOT}" || exit 1
     _create_pacman_conf "${1}" "use_container_config"
-    _install_base_packages "${1}" "use_binfmt" || exit 1
-    _install_archboot "${1}" "use_binfmt" || exit 1
+    _pacman_parameters "${1}" "use_binfmt"
+    _install_base_packages "${1}" || exit 1
+    _install_archboot "${1}" || exit 1
     _fix_groups "${1}"
     _clean_mkinitcpio "${1}"
     _clean_cache "${1}"
