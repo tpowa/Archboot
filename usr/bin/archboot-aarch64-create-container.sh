@@ -29,8 +29,8 @@ if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _pacman_chroot "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" "${_PACMAN_AARCH64_CHROOT}" || exit 1
     _create_pacman_conf "${1}" "use_container_config"
     _pacman_parameters "${1}" "use_binfmt"
-    _install_base_packages "${1}" || exit 1
-    _install_archboot "${1}" || exit 1
+    _install_base_packages "${1}" "use_binfmt" || exit 1
+    _install_archboot "${1}" "use_binfmt" || exit 1
     _fix_groups "${1}"
     _clean_mkinitcpio "${1}"
     _clean_cache "${1}"
