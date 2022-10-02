@@ -141,6 +141,7 @@ _pacman_parameters() {
         _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
         _PACMAN_DB="--dbpath ${1}/blankdb"
     fi
+    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     # defaults used on every pacman call
     _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
 }
@@ -161,4 +162,11 @@ _riscv64_disable_graphics() {
     _CONTAINER_ARCH="$(${_NSPAWN} uname -m)"
     #shellcheck disable=SC2001
     [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+}
+
+_cachedir_check() {
+    if grep -q ^CacheDir /etc/pacman.conf; then
+        echo "Error: CacheDir is set in /etc/pacman.conf. Aborting ..."
+        exit 1
+    fi
 }

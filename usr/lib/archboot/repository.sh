@@ -11,16 +11,8 @@ _usage () {
     exit 0
 }
 
-_cachedir_check() {
-    if grep -q ^CacheDir /etc/pacman.conf; then
-        echo "Error: CacheDir set in /etc/pacman.conf. Aborting ..."
-        exit 1
-    fi
-}
-
 _download_packages() {
     _PACMAN_OPTIONS="${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS}"
-    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ "${2}" == "use_binfmt" ]]; then
         _copy_gpg_key
         _riscv64_disable_graphics

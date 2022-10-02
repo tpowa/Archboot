@@ -7,6 +7,7 @@ _ARCHBOOT="archboot"
 _parameters "$@"
 _root_check
 _x86_64_check
+_cachedir_check
 echo "Starting container creation ..."
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 _create_pacman_conf "${1}"

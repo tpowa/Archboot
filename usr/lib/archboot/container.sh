@@ -144,13 +144,12 @@ _umount_special() {
 
 _install_base_packages() {
     _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
-    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} to ${1} ..."
         ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
     fi
     echo "Installing packages ${_PACKAGES} to ${1} ..."
-     ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
@@ -163,7 +162,6 @@ _install_archboot() {
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
-    [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     _pacman_key
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
