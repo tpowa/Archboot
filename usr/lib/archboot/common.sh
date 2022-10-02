@@ -133,7 +133,7 @@ _pacman_parameters() {
         _PACMAN="${_NSPAWN} ${1} pacman"
         _PACMAN_KEY="${_NSPAWN} ${1} pacman-key"
         _PACMAN_CACHEDIR=""
-        _PACMAN_DB=""
+        _PACMAN_DB="--dbpath /blankdb"
     # building for running architecture
     else
         _PACMAN="pacman --root ${1}"
