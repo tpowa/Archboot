@@ -48,7 +48,7 @@ _pacman_chroot() {
         rm ${3}{,.sig}
     fi
     echo "Update container to latest packages..."
-    ${_NSPAWN} ${1} pacman -Syu --noconfirm >/dev/null 2>&1
+    ${_NSPAWN} "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
 }
 
 # clean container from not needed files
@@ -216,16 +216,16 @@ _set_hostname() {
 _fix_groups() {
     echo "Recreate system groups ..."
     rm "${1}"/etc/{group,gshadow}
-    ${_NSPAWN} ${1} systemd-sysusers >/dev/null 2>&1
+    ${_NSPAWN} "${1}" systemd-sysusers >/dev/null 2>&1
     # fix missing group in iwd FS#74646
-    ${_NSPAWN} ${1} groupadd netdev >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd netdev >/dev/null 2>&1
     # add missing groups
-    ${_NSPAWN} ${1} useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
-    ${_NSPAWN} ${1} groupadd -r -g 26 proc >/dev/null 2>&1
-    ${_NSPAWN} ${1} groupmems -g proc -a polkitd >/dev/null 2>&1
-    ${_NSPAWN} ${1} groupadd -r colord >/dev/null 2>&1
-    ${_NSPAWN} ${1} groupadd -r -g 140 usbmux >/dev/null 2>&1
+    ${_NSPAWN} "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r -g 26 proc >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupmems -g proc -a polkitd >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r colord >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r -g 140 usbmux >/dev/null 2>&1
     # add missing groups on aarch64
-    ${_NSPAWN} ${1} groupadd -r -g 90 network >/dev/null 2>&1
-    ${_NSPAWN} ${1} groupadd -r tss >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r -g 90 network >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r tss >/dev/null 2>&1
 }
