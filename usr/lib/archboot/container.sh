@@ -154,8 +154,8 @@ _install_base_packages() {
 _install_archboot() {
     _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
-        _copy_gpg_key
-        _riscv64_disable_graphics
+        _copy_gpg_key "${1}"
+        _riscv64_disable_graphics "${1}"
     else
         # riscv64 need does not support local image at the moment
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
