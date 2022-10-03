@@ -143,17 +143,15 @@ _umount_special() {
 }
 
 _install_base_packages() {
-    _PACMAN_OPTIONS="${_PACKAGES} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} to ${1} ..."
-        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} --dbpath /blankdb >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
-    echo "Installing packages ${_PACKAGES} to ${1} ..."
-    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
+    echo "Installing ${_PACKAGES} to ${1} ..."
+    ${_PACMAN} -Sy ${_PACKAGES} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
-    _PACMAN_OPTIONS="${_ARCHBOOT} ${_PACMAN_DEFAULTS}"
     if [[ "${2}" == "use_binfmt" ]]; then
         _pacman_key "${1}"
         _riscv64_disable_graphics "${1}"
@@ -165,19 +163,18 @@ _install_archboot() {
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
-            echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+            _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
         else
-            echo "Downloading ${_ARCHBOOT} to ${1} ..."
-            ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+            _PACKAGES="${_ARCHBOOT}"
         fi
     else
-        echo "Downloading ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+        _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
     fi
+    echo "Downloading ${_PACKAGES} to ${1} ..."
+    ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
