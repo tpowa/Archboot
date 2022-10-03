@@ -13,11 +13,10 @@ _usage () {
 
 _download_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
-        _copy_gpg_key "${1}"
+        _pacman_key "${1}"
         _riscv64_disable_graphics "${1}"
     fi
     _PACMAN_OPTIONS="${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS}"
-    _pacman_key
     echo "Downloading packages ${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES} to ${1} ..."
     ${_PACMAN} -Syw ${_PACMAN_OPTIONS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
 }

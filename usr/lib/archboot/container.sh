@@ -157,12 +157,12 @@ _install_archboot() {
     if [[ "${2}" == "use_binfmt" ]]; then
         _copy_gpg_key "${1}"
         _riscv64_disable_graphics "${1}"
+        _pacman_key "${1}"
     else
         # riscv64 need does not support local image at the moment
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
-    _pacman_key
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
@@ -180,9 +180,7 @@ _install_archboot() {
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
     # cleanup
-    if [[ "${2}"  == "use_binfmt" ]]; then
-        rm "${1}"/"${_GPG_KEY}"
-    else
+    if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
         echo "Remove archboot repository sync db ..."
         rm /var/lib/pacman/sync/archboot.db
