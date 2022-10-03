@@ -178,7 +178,7 @@ _install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1
+    ${_PACMAN} -Sy ${_PACMAN_OPTIONS} >/dev/null 2>&1 || exit 1
     # cleanup
     if [[ "${2}"  == "use_binfmt" ]]; then
         rm "${1}"/"${_GPG_KEY}"
