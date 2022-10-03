@@ -27,7 +27,7 @@ if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
 fi
 if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     _pacman_chroot "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" "${_PACMAN_RISCV64_CHROOT}" || exit 1
-    _create_pacman_conf "${1}" "use_container_config"
+    _create_pacman_conf "${1}" "use_binfmt"
     _pacman_parameters "${1}" "use_binfmt"
     _install_base_packages "${1}" "use_binfmt" || exit 1
     _install_archboot "${1}" "use_binfmt" || exit 1
