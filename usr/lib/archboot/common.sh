@@ -169,6 +169,20 @@ _cachedir_check() {
     fi
 }
 
+_prepare_gnome() {
+    if ! [[ -e /usr/bin/gnome-session ]]; then
+        echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_PACKAGES}"
+        echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop ..."
+        _configure_gnome
+        systemd-sysusers
+        systemd-tmpfiles --create
+    else
+        echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop already done ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop already done ..."
+    fi
+}
 
 _configure_gnome() {
     echo "Configuring Gnome ..."
