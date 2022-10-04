@@ -45,7 +45,7 @@ _pacman_chroot() {
     bsdtar -C "${1}" -xf "${3}"
     if [[ -f "${3}" && -f "${3}".sig ]]; then
         echo "Removing installation tarball ${3} ..."
-        rm ${3}{,.sig}
+        rm "${3}"{,.sig}
     fi
     echo "Update container to latest packages..."
     ${_NSPAWN} "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
@@ -150,6 +150,7 @@ _install_base_packages() {
         ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_PACKAGES} to ${1} ..."
+    #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_PACKAGES} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
 }
 
