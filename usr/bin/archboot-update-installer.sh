@@ -141,8 +141,8 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         [[ "${_L_XFCE}" == "1" ]] && _install_xfce
         [[ "${_L_GNOME}" == "1" ]] && _install_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
-        [[ "${_L_PLASMA}" == "1" ]] && _install_kde
-        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_kde_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
         echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
         systemctl start avahi-daemon.service
         # only start vnc on xorg environment
@@ -152,8 +152,8 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         [[ "${_L_XFCE}" == "1" ]] && _start_xfce
         [[ "${_L_GNOME}" == "1" ]] && _start_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
-        [[ "${_L_PLASMA}" == "1" ]] && _start_kde
-        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_kde_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _start_plasma
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
     fi
 fi
 
