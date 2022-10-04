@@ -169,6 +169,31 @@ _cachedir_check() {
     fi
 }
 
+
+_configure_gnome() {
+    echo "Configuring Gnome ..."
+    [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    [[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    echo "Setting wallpaper ..."
+    gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
+    echo "Autostarting setup ..."
+    cat << EOF > /etc/xdg/autostart/archboot.desktop
+[Desktop Entry]
+Type=Application
+Name=Archboot Setup
+GenericName=Installer
+Exec=gnome-terminal -- /usr/bin/setup
+Icon=system-software-install
+EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+    _HIDE_MENU="avahi-discover bssh bvnc org.gnome.Extensions org.gnome.FileRoller org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
+    echo "Hiding ${_HIDE_MENU} menu entries ..."
+    for i in ${_HIDE_MENU}; do
+        echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
+        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+    done
+}
+
 _configure_plasma() {
     echo "Configuring KDE ..."
     sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,applications:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
