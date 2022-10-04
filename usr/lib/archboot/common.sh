@@ -169,19 +169,6 @@ _cachedir_check() {
     fi
 }
 
-_prepare_plasma() {
-    if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop now ..."
-        echo "          This will need some time ..."
-        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop ..."
-        _configure_plasma >/dev/tty7 2>&1
-    else
-        echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop already done ..."
-        echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop already done ..."
-    fi
-}
-
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop now ..."
@@ -194,6 +181,19 @@ _prepare_gnome() {
     else
         echo -e "\033[1mStep 3/5:\033[0m Installing GNOME desktop already done ..."
         echo -e "\033[1mStep 4/5:\033[0m Configuring GNOME desktop already done ..."
+    fi
+}
+
+_prepare_plasma() {
+    if ! [[ -e /usr/bin/startplasma-x11 ]]; then
+        echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop now ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
+        echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop ..."
+        _configure_plasma >/dev/tty7 2>&1
+    else
+        echo -e "\033[1mStep 3/5:\033[0m Installing KDE/Plasma desktop already done ..."
+        echo -e "\033[1mStep 4/5:\033[0m Configuring KDE desktop already done ..."
     fi
 }
 
