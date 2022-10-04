@@ -18,6 +18,7 @@ _download_packages() {
     fi
     _PACKAGES="${_PACKAGES} ${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
     echo "Downloading ${_PACKAGES} to ${1} ..."
+    #shellcheck disable=SC2086
     ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
 }
 

@@ -36,14 +36,14 @@ _clean_cache() {
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3} ..."
-        wget ${2}/${3}{,.sig} >/dev/null 2>&1
+        wget "${2}"/"${3}"{,.sig} >/dev/null 2>&1
     else
         echo "Using local ${3} ..."
     fi
     echo "Verifying ${3} ..."
     gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${1}" -xf "${3}"
-    if [[ -f ${3} && -f ${3}.sig ]]; then
+    if [[ -f "${3}" && -f "${3}".sig ]]; then
         echo "Removing installation tarball ${3} ..."
         rm ${3}{,.sig}
     fi
@@ -111,7 +111,8 @@ _create_pacman_conf() {
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo ${_PACMAN_CONF} | sed -e "s#^${1}##g")"
+        #shellcheck disable=SC2001
+        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sed -e "s#^${1}##g")"
     else
         echo "Use custom pacman.conf ..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
@@ -123,7 +124,7 @@ _create_pacman_conf() {
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
-        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename ${_PACMAN_CONF})"
+        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename "${_PACMAN_CONF}")"
     fi
 }
 
@@ -145,6 +146,7 @@ _umount_special() {
 _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} to ${1} ..."
+        #shellcheck disable=SC2086
         ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_PACKAGES} to ${1} ..."
@@ -171,6 +173,7 @@ _install_archboot() {
         _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
     fi
     echo "Downloading ${_PACKAGES} to ${1} ..."
+    #shellcheck disable=SC2086
     ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
