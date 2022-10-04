@@ -20,7 +20,7 @@ _update_pacman_chroot() {
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
     echo "Downloading pacman ${_ARCH} chroot..."
-    [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-${_ARCH}-chroot-latest.tar.zst{,.sig} 2>/dev/null
+    [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>/dev/null
     wget ${_ARCH_CHROOT_PUBLIC}/${_PACMAN_CHROOT}{,.sig} >/dev/null 2>&1
     # verify download
     sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" >/dev/null 2>&1 || exit 1
