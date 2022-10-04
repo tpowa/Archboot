@@ -3,7 +3,7 @@
 
 _install_gnome() {
     _PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}"
-    _prepare_gnome >/dev/tty7 2>&1
+    _prepare_gnome
 }
 
 _start_gnome() {

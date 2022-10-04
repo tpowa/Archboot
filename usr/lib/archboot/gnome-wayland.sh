@@ -3,7 +3,7 @@
 
 _install_gnome_wayland() {
     _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}"
-    _prepare_gnome >/dev/tty7 2>&1
+    _prepare_gnome
 }
 
 _start_gnome_wayland() {
