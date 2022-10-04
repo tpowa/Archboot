@@ -3,7 +3,7 @@
 
 _install_plasma_wayland() {
     _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_PLASMA_PACKAGES}"
-    _prepare_plasma >/dev/tty7 2>&1
+    _prepare_plasma
 }
 
 _start_plasma_wayland() {
