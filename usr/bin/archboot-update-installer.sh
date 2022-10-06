@@ -167,7 +167,7 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
     else
         echo -e "\033[1mStep 2/4:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo -e "\033[1mStep 3/4:\033[0m Reinstalling packages for Arch Linux full system ..."
+    echo -e "\033[1mStep 3/4:\033[0m Reinstalling installed packages and adding man-pages for Arch Linux full system ..."
     echo "          This will need some time ..."
     pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db man-pages - >/dev/tty7 2>&1
     echo -e "\033[1mStep 4/4:\033[0m Cleanup package cache ..."
