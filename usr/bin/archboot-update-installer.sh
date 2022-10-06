@@ -169,7 +169,7 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
     fi
     echo -e "\033[1mStep 3/4:\033[0m Reinstalling packages for Arch Linux full system ..."
     echo "          This will need some time ..."
-    pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db base-devel - >/dev/tty7 2>&1
+    pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db man-pages - >/dev/tty7 2>&1
     echo -e "\033[1mStep 4/4:\033[0m Cleanup package cache ..."
     rm /var/cache/pacman/pkg/*
     echo -e "\033[1mYour system has turned into a full Arch Linux system.\033[0m"
