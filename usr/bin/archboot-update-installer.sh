@@ -171,7 +171,7 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
     pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db base-devel - >/dev/tty7 2>&1
     echo -e "\033[1mStep 4/4:\033[0m Cleanup package cache ..."
     rm /var/cache/pacman/pkg/*
-    echo "\033[1mYour system has turned into a full Arch Linux system.\033[0m"
-    echo "\033[1mHave fun.\033[0m"
+    echo -e "\033[1mYour system has turned into a full Arch Linux system.\033[0m"
+    echo -e "\033[1mHave fun.\033[0m"
 fi
 
