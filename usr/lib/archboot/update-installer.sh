@@ -84,6 +84,8 @@ usage () {
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
             _latest_install
+            echo -e " \033[1m-switch-to-full-system\033[0m          Switch to full Arch Linux system."
+            echo ""
         fi
     fi
     exit 0

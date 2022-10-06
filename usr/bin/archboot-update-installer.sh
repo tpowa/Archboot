@@ -26,6 +26,7 @@ while [ $# -gt 0 ]; do
         -plasma-wayland|--plasma-wayland) _L_PLASMA_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
+        -switch-to-full-system) _FULL_SYSTEM="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
@@ -99,14 +100,14 @@ fi
 
 # install custom xorg or wayland
 if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
+    echo -e "\033[1mStep 1/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
     if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram ..."
+        echo -e "\033[1mStep 2/3:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
     else
-        echo -e "\033[1mStep 1/3:\033[0m Move /usr to /usr.zram already done ..."
+        echo -e "\033[1mStep 2/3:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo -e "\033[1mStep 2/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
-    _gpg_check
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
         echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
@@ -156,5 +157,21 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
     fi
 fi
-
+# Switch to full system
+if [[ "${_FULL_SYSTEM}" == "1" ]]; then
+    echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    if ! [[ -d /usr.zram ]]; then
+        echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram ..."
+        _zram_usr "${_ZRAM_SIZE}"
+    else
+        echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram already done ..."
+    fi
+    echo -e "\033[1mStep 3/4:\033[0m Switching to Arch Linux full system ..."
+    pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db base-devel -
+    echo -e "\033[1mStep 4/4:\033[0m Cleanup package cache ..."
+    rm /var/cache/pacman/pkg/*
+    echo "\033[1mYour system has turned into a full Arch Linux system.\033[0m"
+    echo "\033[1mHave fun.\033[0m"
+fi
 
