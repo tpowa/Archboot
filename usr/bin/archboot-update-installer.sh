@@ -159,13 +159,13 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
 fi
 # Switch to full system
 if [[ "${_FULL_SYSTEM}" == "1" ]]; then
-    echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 1/4:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
     if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram ..."
+        echo -e "\033[1mStep 2/4:\033[0m Move /usr to /usr.zram ..."
         _zram_usr "${_ZRAM_SIZE}"
     else
-        echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram already done ..."
+        echo -e "\033[1mStep 2/4:\033[0m Move /usr to /usr.zram already done ..."
     fi
     echo -e "\033[1mStep 3/4:\033[0m Switching to Arch Linux full system ..."
     pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db base-devel -
