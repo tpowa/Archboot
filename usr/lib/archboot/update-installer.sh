@@ -332,10 +332,12 @@ _cleanup_cache() {
 }
 
 _prepare_graphic() {
-    echo "Removing firmware files ..."
-    rm -rf /usr/lib/firmware
-    # fix libs first, then install packages from defaults
-    _GRAPHIC="${_FIX_PACKAGES} ${1}"
+    if [[ ! -e "/.full-system" ]]; then
+        echo "Removing firmware files ..."
+        rm -rf /usr/lib/firmware
+        # fix libs first, then install packages from defaults
+        _GRAPHIC="${_FIX_PACKAGES} ${1}"
+    fi
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo "Running pacman to install packages: ${_GRAPHIC} ..."
@@ -348,7 +350,7 @@ _prepare_graphic() {
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
-            [[ ! -e "/.full-system" ]] &&_cleanup_install
+            [[ ! -e "/.full-system" ]] && _cleanup_install
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
