@@ -157,7 +157,7 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
-    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]];
+    if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         rm /var/cache/pacman/pkg/*
     fi
     echo -e "\033[1mFinished.\033[0m"
