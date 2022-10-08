@@ -150,7 +150,8 @@ if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacma
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
     echo -e "\033[1mStep 1/2:\033[0m Reinstalling installed packages and adding man-pages for Arch Linux full system ..."
     echo "          This will need some time ..."
-    pacman -Qqn | grep -v archboot | pacman -Sy --noconfirm man-db man-pages - >/dev/tty7 2>&1 || exit 1
+    pacman -Sy >/dev/tty7 2>&1 || exit 1
+    pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages - >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
     rm /var/cache/pacman/pkg/*
     echo -e "\033[1mFinished. Your full Arch Linux system is ready now.\033[0m"
