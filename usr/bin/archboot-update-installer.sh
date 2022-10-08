@@ -148,7 +148,7 @@ fi
 if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
-    echo -e "\033[1mStep 1/2:\033[0m Renstalling packages and adding info/man-pages ..."
+    echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
     echo "          This will need some time ..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
