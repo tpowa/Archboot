@@ -6,7 +6,7 @@ _install_xfce() {
         echo -e "\033[1mStep 1/3:\033[0m Installing XFCE desktop now ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 2/35:\033[0m Configuring XFCE desktop ..."
+        echo -e "\033[1mStep 2/3:\033[0m Configuring XFCE desktop ..."
         _configure_xfce >/dev/tty7 2>&1
     else
         echo -e "\033[1mStep 1/3:\033[0m Installing XFCE desktop already done ..."

@@ -345,15 +345,13 @@ _prepare_graphic() {
         #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
         # check if already full system is used
-        if [[ ! -e "/.full-system" ]]; then
-            for i in ${_GRAPHIC}; do
-                #shellcheck disable=SC2086
-                pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
-                [[ ! -e "/.full-system" ]] &&_cleanup_install
-                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-                rm -f /var/log/pacman.log
-            done
-        fi
+        for i in ${_GRAPHIC}; do
+            #shellcheck disable=SC2086
+            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
+            [[ ! -e "/.full-system" ]] &&_cleanup_install
+            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
+            rm -f /var/log/pacman.log
+        done
     else
         echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE}) ..."
         _IGNORE=""
