@@ -191,7 +191,7 @@ _zram_w_dir() {
 
 _initialize_zram_usr() {
     echo -e "\033[1mInitializing /usr.zram ...\033[0m"
-    echo -e "\033[1mStep 1/2[1m:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram ..."
