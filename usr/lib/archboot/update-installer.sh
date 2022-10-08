@@ -63,7 +63,7 @@ usage () {
                 echo ""
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-                echo -e " \033[1m-switch-to-full-system\033[0m          Switch to full Arch Linux system.";\
+                echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system.";\
                 echo ""
             fi
         fi

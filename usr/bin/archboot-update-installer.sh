@@ -26,7 +26,7 @@ while [ $# -gt 0 ]; do
         -plasma-wayland|--plasma-wayland) _L_PLASMA_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
-        -switch-to-full-system) _FULL_SYSTEM="1" ;;
+        -full-system) _FULL_SYSTEM="1" ;;
         -h|--h|?) usage ;;
         *) usage ;;
         esac
