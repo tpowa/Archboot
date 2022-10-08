@@ -191,7 +191,7 @@ _zram_w_dir() {
 
 _initialize_zram_usr() {
     echo -e "\033[Initializing /usr.zram ...\033[0m"
-    echo -e "\033Step 1/2[1m:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 1/2[1m:\033[0m Waiting for gpg pacman keyring import to finish ..."
     _gpg_check
     if ! [[ -d /usr.zram ]]; then
         echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram ..."
@@ -199,7 +199,7 @@ _initialize_zram_usr() {
     else
         echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo -e "\033[Finished. /usr.zram is ready now.\033[0m"
+    echo -e "\033[1mFinished. /usr.zram is ready now.\033[0m"
 }
 
 _umount_w_dir() {
