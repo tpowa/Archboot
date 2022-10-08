@@ -332,6 +332,7 @@ _cleanup_cache() {
 }
 
 _prepare_graphic() {
+    _GRAPHIC="${1}"
     if [[ ! -e "/.full-system" ]]; then
         echo "Removing firmware files ..."
         rm -rf /usr/lib/firmware
