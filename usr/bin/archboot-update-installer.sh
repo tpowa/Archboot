@@ -100,21 +100,14 @@ fi
 
 # install custom xorg or wayland
 if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
-    echo -e "\033[1mStep 1/3:\033[0m Waiting for gpg pacman keyring import to finish ..."
-    _gpg_check
-    if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 2/3:\033[0m Move /usr to /usr.zram ..."
-        _zram_usr "${_ZRAM_SIZE}"
-    else
-        echo -e "\033[1mStep 2/3:\033[0m Move /usr to /usr.zram already done ..."
-    fi
+    _initialize_zram_usr
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
-        echo -e "\033[1mStep 3/3:\033[0m Installing custom wayland ..."
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ "${_CUSTOM_X}" == "1" ]]; then
-        echo -e "\033[1mStep 3/3:\033[0m Installing custom xorg ..."
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
@@ -130,21 +123,14 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         echo -e "You are running in \033[1mLocal mode\033[0m with less than \033[1m4500 MB RAM\033[0m, which only can launch \033[1mone\033[0m environment."
         echo -e "Please relaunch your already used graphical environment from commandline."
     else
-        echo -e "\033[1mStep 1/5:\033[0m Waiting for gpg pacman keyring import to finish ..."
-        _gpg_check
-        if ! [[ -d /usr.zram ]]; then
-            echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram ..."
-            _zram_usr "${_ZRAM_SIZE}"
-        else
-            echo -e "\033[1mStep 2/5:\033[0m Move /usr to /usr.zram already done ..."
-        fi
+        _initialize_zram_usr
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_run
         [[ "${_L_XFCE}" == "1" ]] && _install_xfce
         [[ "${_L_GNOME}" == "1" ]] && _install_gnome
         [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
         [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
         [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
-        echo -e "\033[1mStep 5/5:\033[0m Starting avahi-daemon ..."
+        echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
         systemctl start avahi-daemon.service
         # only start vnc on xorg environment
         [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
@@ -157,21 +143,19 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
         [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
     fi
 fi
-# Switch to full system
-if [[ "${_FULL_SYSTEM}" == "1" ]]; then
-    echo -e "\033[1mStep 1/4:\033[0m Waiting for gpg pacman keyring import to finish ..."
-    _gpg_check
-    if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 2/4:\033[0m Move /usr to /usr.zram ..."
-        _zram_usr "${_ZRAM_SIZE}"
-    else
-        echo -e "\033[1mStep 2/4:\033[0m Move /usr to /usr.zram already done ..."
-    fi
-    echo -e "\033[1mStep 3/4:\033[0m Reinstalling installed packages and adding man-pages for Arch Linux full system ..."
+
+# Switch to full Arch Linux system
+if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    _initialize_zram_usr
+    echo -e "\033[1mInitializing full Arch Linux system ....\033[0m"
+    echo -e "\033[1mStep 1/2:\033[0m Reinstalling installed packages and adding man-pages for Arch Linux full system ..."
     echo "          This will need some time ..."
-    pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db man-pages - >/dev/tty7 2>&1
-    echo -e "\033[1mStep 4/4:\033[0m Cleanup package cache ..."
+    pacman -Qqn  | grep -v archboot | pacman -Sy --noconfirm man-db man-pages - >/dev/tty7 2>&1 || exit 1
+    echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
     rm /var/cache/pacman/pkg/*
-    echo -e "\033[1mYour system has turned into a full Arch Linux system.\033[0m"
+    echo -e "\033[1mFinished. Your full Arch Linux system is ready now.\033[0m"
+    touch /.full-system
+else
+    echo -e "\033[1m\033[91mError: Full Arch Linux system already setup or running in local mode.\033[0m"
 fi
 

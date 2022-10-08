@@ -62,11 +62,15 @@ usage () {
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \033[1m-custom-wayland\033[0m  Install custom Wayland environment."
                 echo ""
             fi
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
+                echo -e " \033[1m-switch-to-full-system\033[0m          Switch to full Arch Linux system.";\
+                echo ""
+            fi
         fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
-        echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory"
+        echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory."
         echo ""
     fi
     # local image
@@ -84,8 +88,6 @@ usage () {
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
             _latest_install
-            echo -e " \033[1m-switch-to-full-system\033[0m          Switch to full Arch Linux system."
-            echo ""
         fi
     fi
     exit 0
@@ -185,6 +187,19 @@ _zram_w_dir() {
     mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
     [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
     mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
+}
+
+_initialize_zram_usr() {
+    echo -e "\033[Initializing /usr.zram ...\033[0m"
+    echo -e "\033Step 1/2[1m:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    if ! [[ -d /usr.zram ]]; then
+        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram ..."
+        _zram_usr "${_ZRAM_SIZE}"
+    else
+        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done ..."
+    fi
+    echo -e "\033[Finished. /usr.zram is ready now.\033[0m"
 }
 
 _umount_w_dir() {
@@ -329,13 +344,16 @@ _prepare_graphic() {
         _create_pacman_conf
         #shellcheck disable=SC2086
         pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
-        for i in ${_GRAPHIC}; do
-            #shellcheck disable=SC2086
-            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
-            _cleanup_install
-            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-            rm -f /var/log/pacman.log
-        done
+        # check if already full system is used
+        if [[ ! -e "/.full-system" ]]; then
+            for i in ${_GRAPHIC}; do
+                #shellcheck disable=SC2086
+                pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
+                _cleanup_install
+                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
+                rm -f /var/log/pacman.log
+            done
+        fi
     else
         echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE}) ..."
         _IGNORE=""
