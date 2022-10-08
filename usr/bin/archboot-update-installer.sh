@@ -154,7 +154,8 @@ if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacma
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
     rm /var/cache/pacman/pkg/*
-    echo -e "\033[1mFinished. Your full Arch Linux system is ready now.\033[0m"
+    echo -e "\033[1mFinished.\033[0m"
+    echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full-system
 else
     echo -e "\033[1m\033[91mError: Full Arch Linux system already setup or running in local mode.\033[0m"

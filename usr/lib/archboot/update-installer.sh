@@ -199,7 +199,7 @@ _initialize_zram_usr() {
     else
         echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo -e "\033[1mFinished. /usr.zram is ready now.\033[0m"
+    echo -e "\033[1mFinished.\033[0m"
 }
 
 _umount_w_dir() {
