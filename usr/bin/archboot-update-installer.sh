@@ -145,7 +145,15 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
 fi
 
 # Switch to full Arch Linux system
-if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+if [[ "${_FULL_SYSTEM}" == "1" ]]; then
+    if [[ -e "/.full-system" ]]; then
+        echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
+        exit 0
+    fi
+    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        echo -e "\033[1m\033[91mError: You are running in local mode.\033[0m"
+        exit 1
+    fi
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
     echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
@@ -157,7 +165,5 @@ if [[ "${_FULL_SYSTEM}" == "1" && ! -e "/.full-system" && ! -e "/var/cache/pacma
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full-system
-else
-    echo -e "\033[1m\033[91mError: Full Arch Linux system already setup or running in local mode.\033[0m"
 fi
 
