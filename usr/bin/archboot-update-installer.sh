@@ -150,10 +150,6 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
         echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
         exit 0
     fi
-    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        echo -e "\033[1m\033[91mError: You are running in local mode.\033[0m"
-        exit 1
-    fi
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
     echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
@@ -161,7 +157,9 @@ if [[ "${_FULL_SYSTEM}" == "1" ]]; then
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
-    rm /var/cache/pacman/pkg/*
+    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]];
+        rm /var/cache/pacman/pkg/*
+    fi
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full-system
