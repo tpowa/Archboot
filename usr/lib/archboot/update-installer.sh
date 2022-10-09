@@ -206,7 +206,7 @@ _umount_w_dir() {
     if mountpoint -q "${_W_DIR}"; then
         echo "Unmounting ${_W_DIR} ..." > /dev/tty7
         # umount all possible mountpoints
-        umount -R "${_W_DIR }"
+        umount -R "${_W_DIR}"
         echo 1 > /sys/block/zram1/reset
         # wait 5 seconds to get RAM cleared and set free
         sleep 5
