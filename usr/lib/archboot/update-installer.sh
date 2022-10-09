@@ -333,11 +333,11 @@ _cleanup_cache() {
 
 # needed for programs which check disk space
 _home_root_mount() {
-    if ! mountpoint /home > /dev/null 2>&1; then
+    if ! mountpoint /home >/dev/null 2>&1; then
         echo "Mount tmpfs on /home ..."
         mount -t tmpfs tmpfs /home
     fi
-    if ! mountpoint /root > /dev/null 2>&1; then
+    if ! mountpoint /root >/dev/null 2>&1; then
         echo "Mount tmpfs on /root ..."
         mount -t tmpfs tmpfs /root
     fi
