@@ -55,7 +55,7 @@ fi
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
     if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
-        _hint_graphic
+        _hint_graphic_installed
     else
         _install_graphic
     fi
