@@ -449,7 +449,8 @@ _full_system() {
         exit 0
     fi
     # higher _ZRAM_SIZE is needed for plasma environment 200MB safety buffer
-    if [[ "${_ZRAM_SIZE}" -lt "4000M" ]]; then
+    _ZRAM_VALUE="$(echo ${_ZRAM_SIZE} | sed -e 's#[A-Z]##g')"
+    if [[ "${_ZRAM_VALUE}" -lt "4000" ]]; then
         _ZRAM_SIZE="4000M"
     fi
     _initialize_zram_usr
