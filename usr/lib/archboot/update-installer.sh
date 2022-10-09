@@ -448,6 +448,8 @@ _full_system() {
         echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
         exit 0
     fi
+    # higher _ZRAM_SIZE is needed for plasma environment 200MB safety buffer
+    _ZRAM_SIZE="4000M"
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
     echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
@@ -474,27 +476,24 @@ _new_image() {
 }
 
 _install_graphic () {
-        if [[ -e "/.full_system" && "${_L_PLASMA}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
-            _ZRAM_SIZE="3800M"
-        fi
-        _initialize_zram_usr
-        [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-        [[ "${_L_XFCE}" == "1" ]] && _install_xfce
-        [[ "${_L_GNOME}" == "1" ]] && _install_gnome
-        [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
-        [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
-        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
-        echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
-        systemctl start avahi-daemon.service
-        # only start vnc on xorg environment
-        [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
-        which firefox > /dev/null 2>&1  && _firefox_flags
-        which chromium > /dev/null 2>&1 && _chromium_flags
-        [[ "${_L_XFCE}" == "1" ]] && _start_xfce
-        [[ "${_L_GNOME}" == "1" ]] && _start_gnome
-        [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
-        [[ "${_L_PLASMA}" == "1" ]] && _start_plasma
-        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
+    _initialize_zram_usr
+    [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
+    [[ "${_L_XFCE}" == "1" ]] && _install_xfce
+    [[ "${_L_GNOME}" == "1" ]] && _install_gnome
+    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
+    [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
+    [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
+    echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
+    systemctl start avahi-daemon.service
+    # only start vnc on xorg environment
+    [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
+    which firefox > /dev/null 2>&1  && _firefox_flags
+    which chromium > /dev/null 2>&1 && _chromium_flags
+    [[ "${_L_XFCE}" == "1" ]] && _start_xfce
+    [[ "${_L_GNOME}" == "1" ]] && _start_gnome
+    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
+    [[ "${_L_PLASMA}" == "1" ]] && _start_plasma
+    [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
 }
 
 _hint_graphic_installed () {
