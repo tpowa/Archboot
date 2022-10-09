@@ -206,7 +206,7 @@ _umount_w_dir() {
     if mountpoint -q "${_W_DIR}"; then
         echo "Unmounting ${_W_DIR} ..." > /dev/tty7
         # umount all possible mountpoints
-        umount -R "${_W_DIR}"
+        umount -R "${_W_DIR }"
         echo 1 > /sys/block/zram1/reset
         # wait 5 seconds to get RAM cleared and set free
         sleep 5
@@ -474,6 +474,9 @@ _new_image() {
 }
 
 _install_graphic () {
+        if [[ -e "/.full_system" && "${_L_PLASMA}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
+            _ZRAM_SIZE="3800M"
+        fi
         _initialize_zram_usr
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
         [[ "${_L_XFCE}" == "1" ]] && _install_xfce
