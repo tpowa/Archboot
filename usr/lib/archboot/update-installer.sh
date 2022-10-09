@@ -454,7 +454,7 @@ _full_system() {
     echo "          This will need some time ..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
-    echo -e "\033[1mStep 2/2:\033[0m Mount /home and /root with tmpfs ..."
+    echo -e "\033[1mStep 2/2:\033[0m Checking /home and /root are tmpfs ..."
     _home_root_mount
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
