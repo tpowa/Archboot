@@ -45,7 +45,7 @@ usage () {
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
                 # you can only install one environment with less RAM
-                if ! [[ -e "/.graphic_run" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
+                if ! [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
                     _graphic_options
                     echo -e " \033[1m-xfce\033[0m            Launch XFCE desktop with VNC sharing enabled."
                     echo ""
@@ -329,6 +329,21 @@ _cleanup_cache() {
     for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
     done
+    for i in $(grep -w 'reinstalled' /var/log/pacman.log | cut -d ' ' -f 4); do
+        rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
+    done
+}
+
+# needed for programs which check disk space
+_home_root_mount() {
+    if ! mountpoint /home; then
+        echo "Mount tmpfs on /home ..."
+        mount -t tmpfs tmpfs /home
+    fi
+    if ! mountpoint /root; then
+        echo "Mount tmpfs on /root ..."
+        mount -t tmpfs tmpfs /root
+    fi
 }
 
 _prepare_graphic() {
@@ -375,15 +390,135 @@ _prepare_graphic() {
             rm -f /var/log/pacman.log
         done
     fi
-    echo "Removing not used icons ..."
-    rm -rf /usr/share/icons/breeze-dark
-    echo "Cleanup locale and i18n ..."
-    rm -rf /usr/share/{locale,i18n}
-    # needed for environments which check disk space
-    if ! mountpoint /root; then
-        echo "Mount tmpfs on /root"
-        mount -t tmpfs tmpfs /root
+    if [[ ! -e "/.full-system" ]]; then
+        echo "Removing not used icons ..."
+        rm -rf /usr/share/icons/breeze-dark
+        echo "Cleanup locale and i18n ..."
+        rm -rf /usr/share/{locale,i18n}
     fi
+    _home_root_mount
+}
+
+_new_environment() {
+    _update_installer_check
+    touch /.update-installer
+    _umount_w_dir
+    _zram_w_dir "${_ZRAM_SIZE}"
+    echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    _gpg_check
+    echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
+    _clean_archboot
+    _zram_usr "300M"
+    _clean_kernel_cache
+    echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
+    echo "          This will need some time ..."
+    _create_container || exit 1
+    # 10 seconds for getting free RAM
+    _clean_kernel_cache
+    sleep 10
+    echo -e "\033[1mStep 4/9:\033[0m Copy kernel ${VMLINUZ} to /${VMLINUZ} ..."
+    cp "${_W_DIR}/boot/${VMLINUZ}" / || exit 1
+    [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
+    [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
+    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
+    echo "          This will need some time ..."
+    # add fix for mkinitcpio 31, remove when 32 is released
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-mkinitcpio.fixed "${_W_DIR}"/usr/bin/mkinitcpio
+    cp "${_W_DIR}"/usr/share/archboot/patches/31-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
+    # write initramfs to "${_W_DIR}"/tmp
+    systemd-nspawn -D "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
+    echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
+    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
+    # 10 seconds for getting free RAM
+    _clean_kernel_cache
+    sleep 10
+    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img ..."
+    echo "          This will need some time ..."
+    _create_initramfs
+    echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
+    cd /
+    _umount_w_dir
+    _clean_kernel_cache
+    # unload virtio-net to avoid none functional network device on aarch64
+    grep -qw virtio_net /proc/modules && rmmod virtio_net
+    echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
+    echo "          This will need some time ..."
+    _kexec
+}
+
+_full_system() {
+    if [[ -e "/.full-system" ]]; then
+        echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
+        exit 0
+    fi
+    _initialize_zram_usr
+    echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
+    echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
+    echo "          This will need some time ..."
+    pacman -Sy >/dev/tty7 2>&1 || exit 1
+    pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
+    echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
+    _cleanup_cache
+    _home_root_mount
+    echo -e "\033[1mFinished.\033[0m"
+    echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
+    touch /.full-system
+}
+
+_new_image() {
+    _zram_w_dir "4000M"
+    echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
+    _clean_archboot
+    rm /var/cache/pacman/pkg/*
+    _zram_usr "300M"
+    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
+    echo "          This will need some time ..."
+    "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
+    echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
+}
+
+_install_graphic () {
+        _initialize_zram_usr
+        [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
+        [[ "${_L_XFCE}" == "1" ]] && _install_xfce
+        [[ "${_L_GNOME}" == "1" ]] && _install_gnome
+        [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
+        echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
+        systemctl start avahi-daemon.service
+        # only start vnc on xorg environment
+        [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
+        which firefox > /dev/null 2>&1  && _firefox_flags
+        which chromium > /dev/null 2>&1 && _chromium_flags
+        [[ "${_L_XFCE}" == "1" ]] && _start_xfce
+        [[ "${_L_GNOME}" == "1" ]] && _start_gnome
+        [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
+        [[ "${_L_PLASMA}" == "1" ]] && _start_plasma
+        [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
+}
+
+_hint_graphic_installed () {
+    echo -e "\033[1m\033[91mError: Graphical environment already installed ...\033[0m"
+    echo -e "You are running in \033[1mLocal mode\033[0m with less than \033[1m4500 MB RAM\033[0m, which only can launch \033[1mone\033[0m environment."
+    echo -e "Please relaunch your already used graphical environment from commandline."
+}
+
+_custom_wayland_xorg() {
+    _initialize_zram_usr
+    if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
+    fi
+    if [[ "${_CUSTOM_X}" == "1" ]]; then
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    fi
+    systemctl start avahi-daemon.service
+    which firefox > /dev/null 2>&1  && _firefox_flags
+    which chromium > /dev/null 2>&1 && _chromium_flags
 }
 
 _chromium_flags() {
