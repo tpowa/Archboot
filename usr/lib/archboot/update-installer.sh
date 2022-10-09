@@ -449,7 +449,9 @@ _full_system() {
         exit 0
     fi
     # higher _ZRAM_SIZE is needed for plasma environment 200MB safety buffer
-    _ZRAM_SIZE="4000M"
+    if [[ "${_ZRAM_SIZE}" -lt "4000M" ]]; then
+        _ZRAM_SIZE="4000M"
+    fi
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
     echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
