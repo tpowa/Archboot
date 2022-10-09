@@ -329,18 +329,15 @@ _cleanup_cache() {
     for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
     done
-    for i in $(grep -w 'reinstalled' /var/log/pacman.log | cut -d ' ' -f 4); do
-        rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
-    done
 }
 
 # needed for programs which check disk space
 _home_root_mount() {
-    if ! mountpoint /home; then
+    if ! mountpoint /home > /dev/null 2>&1; then
         echo "Mount tmpfs on /home ..."
         mount -t tmpfs tmpfs /home
     fi
-    if ! mountpoint /root; then
+    if ! mountpoint /root > /dev/null 2>&1; then
         echo "Mount tmpfs on /root ..."
         mount -t tmpfs tmpfs /root
     fi
@@ -348,7 +345,7 @@ _home_root_mount() {
 
 _prepare_graphic() {
     _GRAPHIC="${1}"
-    if [[ ! -e "/.full-system" ]]; then
+    if [[ ! -e "/.full_system" ]]; then
         echo "Removing firmware files ..."
         rm -rf /usr/lib/firmware
         # fix libs first, then install packages from defaults
@@ -366,7 +363,7 @@ _prepare_graphic() {
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
-            [[ ! -e "/.full-system" ]] && _cleanup_install
+            [[ ! -e "/.full_system" ]] && _cleanup_install
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
@@ -380,17 +377,17 @@ _prepare_graphic() {
         fi
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
-        [[ ! -e "/.full-system" ]] && _cleanup_install
+        [[ ! -e "/.full_system" ]] && _cleanup_install
         echo "Running pacman to install packages: ${_GRAPHIC} ..."
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
-            [[ ! -e "/.full-system" ]] && _cleanup_install
+            [[ ! -e "/.full_system" ]] && _cleanup_install
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
     fi
-    if [[ ! -e "/.full-system" ]]; then
+    if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons ..."
         rm -rf /usr/share/icons/breeze-dark
         echo "Cleanup locale and i18n ..."
@@ -447,7 +444,7 @@ _new_environment() {
 }
 
 _full_system() {
-    if [[ -e "/.full-system" ]]; then
+    if [[ -e "/.full_system" ]]; then
         echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
         exit 0
     fi
@@ -457,12 +454,11 @@ _full_system() {
     echo "          This will need some time ..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | grep -v archboot | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
-    echo -e "\033[1mStep 2/2:\033[0m Cleanup package cache ..."
-    _cleanup_cache
+    echo -e "\033[1mStep 2/2:\033[0m Mount /home and /root with tmpfs ..."
     _home_root_mount
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
-    touch /.full-system
+    touch /.full_system
 }
 
 _new_image() {
