@@ -8,8 +8,8 @@
 
 ## Introduction
 
-**Archboot**<span dir=""> is a most advanced, modular Arch Linux boot/install image creation utility to generate reproducible bootable media for CD/USB/PXE, designed for installation or rescue operation. It is fully based on </span>[**mkinitcpio**](https://wiki.archlinux.org/title/Mkinitcpio "Mkinitcpio")<span dir="">, only runs in RAM and without any special filesystems like squashfs/erofs.</span>\
-<span dir="">The project is developed by </span>[**tpowa**](https://archlinux.org/people/developers/#tpowa)<span dir="">.</span>
+**Archboot**<span dir=""> is a most advanced, modular [**Arch Linux**](https://archlinux.org/) boot/install image creation utility to generate reproducible bootable media for CD/USB/PXE, designed for installation or rescue operation. It is fully based on </span>[**mkinitcpio**](https://wiki.archlinux.org/title/Mkinitcpio "Mkinitcpio")<span dir="">, only runs in RAM and without any special filesystems like squashfs/erofs.</span>\
+<span dir="">The project is developed by </span>[**tpowa**](https://archlinux.org/people/developers/#tpowa)<span dir=""> since 2006.</span>
 
 ## <span dir="">Image Releases</span>
 
@@ -23,21 +23,18 @@
 * Source packages with archboot repository are located [**here**](https://pkgbuild.com/\~tpowa/archboot/src/iso/).
 * Latest news about the package itself, are posted [**here**](https://www.reddit.com/r/archboot/).
 
-#### **<span dir="">aarch64 architecture</span>**
+#### **<span dir="">[**Arch Linux ARM aarch64**](https://archlinuxarm.org/)</span>**
 | Release information | ISO images | SHA256SUM | Forum thread |
 |---------------------|------------|-----------|--------------|
 | [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/aarch64/latest/sha256sum.txt) | [**Forum link**](https://archlinuxarm.org/forum/viewtopic.php?f=8&t=15777) |
-
-* Installs the Arch Linux port of [**Arch Linux ARM aarch64**](https://archlinuxarm.org/)
 * Supports Apple Mac M1 and higher for virtual machines eg. [**Parallels Desktop**](https://wiki.archlinux.org/title/Parallels_Desktop "Parallels Desktop"), [**UTM**](https://mac.getutm.app/ "UTM MacOS") and [**VMware**](https://wiki.archlinux.org/title/VMware "VMware")
 
-#### **<span dir="">riscv64 architecture</span>**
+#### **<span dir="">[**Arch Linux RISC-V riscv64**](https://archriscv.felixc.at/)</span>**
 | Release information | ISO images | SHA256SUM |
 |---------------------|------------|-----------|
 | [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/riscv64/latest/sha256sum.txt)
-* Installs the Arch Linux port of [**Arch Linux RISC-V riscv64**](https://archriscv.felixc.at/)
 
-#### **<span dir="">x86_64 architecture</span>**
+#### **<span dir="">[**Arch Linux x86_64**](https://archlinux.org/)</span>**
 | Release information | ISO images | SHA256SUM | Forum thread |
 |---------------------|------------|-----------|--------------|
 | [**Latest**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/Release.txt) | [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest) | [**Check**](https://pkgbuild.com/\~tpowa/archboot/iso/x86_64/latest/sha256sum.txt) | [**Forum link**](https://bbs.archlinux.org/viewtopic.php?id=182439) |
@@ -164,6 +161,10 @@ $ ssh root@yourip
 ```plaintext
 # secureboot-keys.sh -name=yournametoembed directory
 ```
+### **<span dir="">Switch to full Arch Linux system</span>**
+* The Archboot system is stripped down to minimal space usage, though man/info pages, includes, additional kernel modules (eg. sound) and other things are not provided by default.
+* If you need the full Arch Linux system launch: `# update-installer -full-system`
+* This will also stop cleaning the system, while running other `# update-installer` tasks.
 
 ### **<span dir="">Interactive setup</span>**
 
@@ -424,20 +425,20 @@ Fix: Switch to a virtual console (with `Alt+F1...F6`) you have not used so far o
 | Feature | archboot | archiso |
 |---------|----------|---------|
 | Developers | tpowa | arch-releng team |
-| [**archinstall**](https://wiki.archlinux.org/title/Archinstall "Archinstall") | No | Yes |
+| [**archinstall**](https://wiki.archlinux.org/title/Archinstall "Archinstall") | Optional | Yes |
 | setup/quickinst script | Yes | No |
 | [**Arch Install Scripts**](https://wiki.archlinux.org/title/Arch_Install_Scripts "Arch Install Scripts") | Yes | Yes |
 | [**Secure Boot**](https://wiki.archlinux.org/title/Secure_Boot "Secure Boot")<br>with Microsoft certificates<br>supported by fedora signed shim | Yes | No |
-| Initramfs only | Yes | No |
-| Man/Info pages | No | Yes |
-| Localization | English only | Yes |
+| Base system located on| initramfs | squashfs |
+| Man/Info pages | Optional | Yes |
+| Localization | Optional | Yes |
 | [**accessibility**](https://wiki.archlinux.org/title/Accessibility "Accessibility") support | No | Yes |
 | [**netctl**](https://wiki.archlinux.org/title/Netctl "Netctl") support | Yes | No |
 | Mobile broadband modem<br>management service (modemmanager) | No | Yes |
 | Text browser | [**elinks**](https://wiki.archlinux.org/title/Elinks "Elinks") | [**lynx**](https://wiki.archlinux.org/title/Lynx "Lynx") |
 | IRC client | [**weechat**](https://wiki.archlinux.org/title/Weechat "Weechat") | [**irssi**](https://wiki.archlinux.org/title/Irssi "Irssi") |
 | IRC and text browser preconfigured | Yes | No |
-| [**Chromium**](https://wiki.archlinux.org/title/Chromium "Chromium") browser | Yes | No |
+| [**Chromium**](https://wiki.archlinux.org/title/Chromium "Chromium") browser | Optional | No |
 | [**Firefox**](https://wiki.archlinux.org/title/Firefox "Firefox") browser | Yes | No |
 | [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") desktop | Yes | No |
 | [**Gnome**](https://wiki.archlinux.org/title/Gnome "Gnome") [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland") | Yes | No |
@@ -771,7 +772,7 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
 -vga none
 ```
 
-## <span dir="">Related articles</span>
+## <span dir="">Arch Linux Wiki</span>
 
 * [**Installation Guide**](https://wiki.archlinux.org/title/Installation_Guide "Installation Guide")
 * [**Improving performance**](https://wiki.archlinux.org/title/Improving_performance "Improving performance")
@@ -788,16 +789,19 @@ $ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
 * [**VNC**](https://wiki.archlinux.org/title/VNC "VNC")
 * [**Wayland**](https://wiki.archlinux.org/title/Wayland "Wayland")
 
-## <span dir="">Quick links</span>
+## <span dir="">Quick links Archboot</span>
 
-* [**Archboot blog**](https://www.reddit.com/r/archboot)
-* [**Archboot project page**](https://gitlab.archlinux.org/tpowa/archboot)
-* [**Archboot download**](https://pkgbuild.com/\~tpowa/archboot/iso)
-* [**Archboot screenshots**](https://pkgbuild.com/\~tpowa/archboot/web)
-* [**Archboot build sources**](https://pkgbuild.com/\~tpowa/archboot/src)
-* [**Archboot repository**](https://gitlab.archlinux.org/tpowa/archboot-repository)
-* [**Archboot video on Parallels Macbook M1**](https://www.youtube.com/watch?v=xo_PlJHloqk)
-* [**Archboot video featuring local image**](https://www.youtube.com/watch?v=mb3ykTklnWU)
+* [**Blog**](https://www.reddit.com/r/archboot)
+* [**Project page**](https://gitlab.archlinux.org/tpowa/archboot)
+* [**Download**](https://pkgbuild.com/\~tpowa/archboot/iso)
+* [**Screenshots**](https://pkgbuild.com/\~tpowa/archboot/web)
+* [**Build sources**](https://pkgbuild.com/\~tpowa/archboot/src)
+* [**Repository**](https://gitlab.archlinux.org/tpowa/archboot-repository)
+
+## <span dir="">Quick links videos</span>
+
+* [**Parallels Macbook M1**](https://www.youtube.com/watch?v=xo_PlJHloqk)
+* [**Running local image**](https://www.youtube.com/watch?v=mb3ykTklnWU)
 
 ## <span dir="">References</span>
 * [**Qemu display devices**](https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/)
