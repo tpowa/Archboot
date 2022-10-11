@@ -505,59 +505,6 @@ _hint_graphic_installed () {
     echo -e "Please relaunch your already used graphical environment from commandline."
 }
 
-_custom_wayland_xorg() {
-    _initialize_zram_usr
-    if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
-        echo "          This will need some time ..."
-        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
-    fi
-    if [[ "${_CUSTOM_X}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
-        echo "          This will need some time ..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
-    fi
-    systemctl start avahi-daemon.service
-    which firefox > /dev/null 2>&1  && _firefox_flags
-    which chromium > /dev/null 2>&1 && _chromium_flags
-}
-
-_chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
-    cat << EOF >/etc/chromium-flags.conf
---no-sandbox
---test-type
---incognito
-bit.ly/archboot
-EOF
-}
-
-_firefox_flags() {
-    if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
-        if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js ..."
-            cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
-pref("browser.aboutwelcome.enabled", false, locked);
-pref("browser.startup.homepage_override.once", false, locked);
-pref("datareporting.policy.firstRunURL", "https://bit.ly/archboot", locked);
-EOF
-        fi
-    fi
-}
-
-_autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
-    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
-    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc ..."
-    cat << EOF > /etc/xdg/autostart/tigervnc.desktop
-[Desktop Entry]
-Type=Application
-Name=Tigervnc
-Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
-EOF
-}
-
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Installing GNOME desktop now ..."
@@ -666,4 +613,57 @@ Exec=konsole -p colors=Linux -e /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+}
+
+_custom_wayland_xorg() {
+    _initialize_zram_usr
+    if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
+    fi
+    if [[ "${_CUSTOM_X}" == "1" ]]; then
+        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
+        echo "          This will need some time ..."
+        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
+    fi
+    systemctl start avahi-daemon.service
+    which firefox > /dev/null 2>&1  && _firefox_flags
+    which chromium > /dev/null 2>&1 && _chromium_flags
+}
+
+_chromium_flags() {
+    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
+    cat << EOF >/etc/chromium-flags.conf
+--no-sandbox
+--test-type
+--incognito
+bit.ly/archboot
+EOF
+}
+
+_firefox_flags() {
+    if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
+        if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
+            echo "Adding firefox flags vendor.js ..."
+            cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
+pref("browser.aboutwelcome.enabled", false, locked);
+pref("browser.startup.homepage_override.once", false, locked);
+pref("datareporting.policy.firstRunURL", "https://bit.ly/archboot", locked);
+EOF
+        fi
+    fi
+}
+
+_autostart_vnc() {
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
+    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    echo "Autostarting tigervnc ..."
+    cat << EOF > /etc/xdg/autostart/tigervnc.desktop
+[Desktop Entry]
+Type=Application
+Name=Tigervnc
+Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
+EOF
 }
