@@ -38,12 +38,11 @@ usage () {
     echo -e " \033[1m-h\033[0m               This message."
     echo -e ""
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" ]]; then
+        echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
+    fi
     echo -e ""
     if [[ -e /usr/bin/setup ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" ]]; then
-            echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
-            echo ""
-        fi
         # local image
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
