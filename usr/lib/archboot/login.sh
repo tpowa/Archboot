@@ -1,7 +1,9 @@
 #!/bin/bash
 # don't run ttyS0 as first device
 _welcome () {
-    echo -e "\033[1mWelcome to \033[36mArchboot - Arch Linux\033[0m"
+    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux\033[0m"
+    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux ARM\033[0m"
+    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux RISC-V 64\033[0m"
     echo -e "\033[1m--------------------------------------------------------------------\033[0m"
     _local_mode
 }
