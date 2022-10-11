@@ -19,7 +19,6 @@ _latest_install() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
         echo -e "                  package cache (using kexec)."
-        echo ""
     fi
 }
 
@@ -41,6 +40,10 @@ usage () {
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
     echo -e ""
     if [[ -e /usr/bin/setup ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" ]]; then
+            echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
+            echo ""
+        fi
         # local image
         if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]] ; then
@@ -63,15 +66,10 @@ usage () {
                 echo ""
             fi
         fi
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" ]]; then
-            echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
-            echo ""
-        fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
         echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory."
-        echo ""
     fi
     # local image
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
@@ -83,7 +81,6 @@ usage () {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
-                echo ""
             fi
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
