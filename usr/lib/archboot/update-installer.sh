@@ -67,10 +67,6 @@ usage () {
             fi
         fi
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
-    -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
-        echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory."
-    fi
     # local image
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
@@ -86,6 +82,10 @@ usage () {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
             _latest_install
         fi
+    fi
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
+    -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
+        echo -e " \033[1m-latest-image\033[0m    Generate latest image files in /archboot directory."
     fi
     exit 0
 }
