@@ -442,8 +442,8 @@ _kernel_check() {
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         echo -e "\033[93mWarning:\033[0m"
         echo -e "Installed kernel does not match running kernel!"
-        echo -e "Kernel module loading will not work."
-        echo -e "Use --latest options to get a matching kernel first."
+        echo -e "Kernel module loading will \033[1mnot\033[0m work."
+        echo -e "Use \033[1m--latest\033[0m options to get a matching kernel first."
     fi
 }
 
