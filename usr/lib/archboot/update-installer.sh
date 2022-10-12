@@ -437,8 +437,9 @@ _new_environment() {
 }
 
 _kernel_check() {
-    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
-    _RUNNING_KERNEL="$(uname -r)"
+    _PATH="/usr/bin"
+    _INSTALLED_KERNEL="$(${_PATH}/pacman -Qi linux | ${_PATH}/grep Version | ${_PATH}/cut -d ':' -f 2 | ${_PATH}/sed -e 's# ##g' -e 's#\.arch#-arch#g')"
+    _RUNNING_KERNEL="$(${_PATH}/uname -r)"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         echo -e "\033[93mWarning:\033[0m"
         echo -e "Installed kernel does \033[1mnot\033[0m match running kernel!"
