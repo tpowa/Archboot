@@ -37,7 +37,9 @@ usage () {
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-h\033[0m               This message."
     echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
+    elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3500000 && ! -e "/.full_system" && -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
     fi
     echo -e ""
@@ -566,7 +568,7 @@ EOF
 
 _configure_plasma() {
     echo "Configuring KDE ..."
-    sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,applications:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
+    sed -i -e 's#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,preferred://browser,preferred:gparted.desktop,applications:archboot.desktop</default>#g' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
     echo "Replacing wallpaper ..."
     for i in /usr/share/wallpapers/Next/contents/images/*; do
         cp /usr/share/archboot/grub/archboot-background.png "${i}"
