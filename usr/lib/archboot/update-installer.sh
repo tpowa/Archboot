@@ -439,9 +439,7 @@ _new_environment() {
 _kernel_check() {
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ': ' -f 2 | sed -e 's# ##g')"
     _RUNNING_KERNEL="$(uname -r)"
-    if [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
-        echo -e "No kernel mismatch detected."
-    else
+    if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         echo -e "\033[93mWarning:\033[0m"
         echo -e "Installed kernel does not match running kernel!"
         echo -e "Kernel module loading will not work."
