@@ -438,6 +438,17 @@ _new_environment() {
     _kexec
 }
 
+_kernel_check() {
+    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ': ' -f 2 | sed -e 's# ##g')"
+    _RUNNING_KERNEL="$(uname -r)"
+    if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
+        echo -e "\033[93mWarning:\033[0m"
+        echo -e "Installed kernel does not match running kernel!"
+        echo -e "Kernel module loading will not work."
+        echo -e "Use --latest options to get a matching kernel first."
+    fi
+}
+
 _full_system() {
     if [[ -e "/.full_system" ]]; then
         echo -e "\033[1m\033[1mFull Arch Linux system already setup.\033[0m"
@@ -455,6 +466,7 @@ _full_system() {
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 2/2:\033[0m Checking /home and /root are tmpfs ..."
+    _kernel_check
     _home_root_mount
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
