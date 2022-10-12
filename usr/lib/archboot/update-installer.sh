@@ -437,7 +437,7 @@ _new_environment() {
 }
 
 _kernel_check() {
-    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g')"
+    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
     _RUNNING_KERNEL="$(uname -r)"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         echo -e "\033[93mWarning:\033[0m"
