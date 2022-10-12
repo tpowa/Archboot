@@ -15,13 +15,6 @@ _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
-_latest_install() {
-    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
-        echo -e "                  package cache (using kexec)."
-    fi
-}
-
 _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         echo -e " \033[1m-gnome\033[0m           Launch Gnome desktop with VNC sharing enabled."
@@ -67,20 +60,18 @@ usage () {
             fi
         fi
     fi
-    # local image
-    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
-            _latest_install
-        fi
-    else
     # latest image
+    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
             fi
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            _latest_install
+            if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+                echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+                echo -e "                  package cache (using kexec)."
+            fi
         fi
     fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
