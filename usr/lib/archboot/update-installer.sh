@@ -489,6 +489,7 @@ _install_graphic () {
     echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     # only start vnc on xorg environment
+    echo -e "\033[1mSetting up VNC and browser ...\033[0m"
     [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
     which firefox > /dev/null 2>&1  && _firefox_flags
     which chromium > /dev/null 2>&1 && _chromium_flags
