@@ -94,15 +94,10 @@ donetwork() {
         fi
         # dhcp switch
         IP=""
-        DHCLIENT=""
         DIALOG --yesno "Do you want to use DHCP?" 5 40
         #shellcheck disable=SC2181
         if [[ $? -eq 0 ]]; then
             IP="dhcp"
-            DIALOG --defaultno --yesno "Do you want to use dhclient instead of dhcpcd?" 5 55
-            #shellcheck disable=SC2181
-            [[ $? -eq 0 ]] && DHCLIENT="yes"
-
         else
             IP="static"
             DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${ANSWER}" || return 1
@@ -112,7 +107,7 @@ donetwork() {
             DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
             DNS=$(cat "${ANSWER}")
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nUse dhclient:   ${DHCLIENT}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
@@ -134,9 +129,7 @@ donetwork() {
         [[ "${WLAN_HIDDEN}" = "yes" ]] && echo "Hidden=yes" >>"${NETWORK_PROFILE}"
     fi
     echo "IP=${IP}" >>"${NETWORK_PROFILE}"
-    if [[ "${IP}" = "dhcp" ]]; then
-        [[ "${DHCLIENT}" = "yes" ]] && echo "DHCPClient=dhclient" >>"${NETWORK_PROFILE}"
-    else
+    if [[ "${IP}" = "static" ]]; then
         #shellcheck disable=SC2129
         echo "Address='${IPADDR}'" >>"${NETWORK_PROFILE}"
         echo "Gateway='${GW}'" >>"${NETWORK_PROFILE}"

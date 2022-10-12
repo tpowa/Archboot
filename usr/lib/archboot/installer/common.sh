@@ -82,10 +82,6 @@ local_pacman_conf() {
 }
 
 auto_packages() {
-    # Add packages which are not in core repository
-    if [[ -n "$(pgrep dhclient)" ]]; then
-        ! echo "${PACKAGES}" | grep -qw dhclient && PACKAGES="${PACKAGES} dhclient"
-    fi
     # Add filesystem packages
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
         ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
