@@ -441,7 +441,9 @@ _new_environment() {
 _kernel_check() {
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ': ' -f 2 | sed -e 's# ##g')"
     _RUNNING_KERNEL="$(uname -r)"
-    if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
+    if [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
+        echo -e "No kernel mismatch detected."
+    else
         echo -e "\033[93mWarning:\033[0m"
         echo -e "Installed kernel does not match running kernel!"
         echo -e "Kernel module loading will not work."
@@ -461,13 +463,14 @@ _full_system() {
     fi
     _initialize_zram_usr
     echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
-    echo -e "\033[1mStep 1/2:\033[0m Reinstalling packages and adding info/man-pages ..."
+    echo -e "\033[1mStep 1/3:\033[0m Reinstalling packages and adding info/man-pages ..."
     echo "          This will need some time ..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
-    echo -e "\033[1mStep 2/2:\033[0m Checking /home and /root are tmpfs ..."
-    _kernel_check
+    echo -e "\033[1mStep 2/3:\033[0m Checking /home and /root are tmpfs ..."
     _home_root_mount
+    echo -e "\033[1mStep 3/3:\033[0m Checking kernel version ..."
+    _kernel_check
     echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full_system
