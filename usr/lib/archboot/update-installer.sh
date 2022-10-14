@@ -95,7 +95,7 @@ _clean_kernel_cache () {
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ "${_D_SCRIPTS}" == "1" ]]; then
-        if ! ping -c1 www.google.com; then
+        if ! ping -c1 www.google.com >/dev/tty7 2>&1; then
             echo -e "\033[91mError: Network not yet ready, aborting!\033[0m"
             exit 1
         fi
