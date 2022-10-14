@@ -95,6 +95,10 @@ _clean_kernel_cache () {
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ "${_D_SCRIPTS}" == "1" ]]; then
+        if ! ping -c1 www.google.com; then
+            echo -e "\033[91mError: Network not yet ready, aborting!\033[0m"
+            exit 1
+        fi
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
