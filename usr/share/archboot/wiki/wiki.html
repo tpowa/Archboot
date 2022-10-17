@@ -172,6 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
+<p>Last update 09:54 17.10.2022 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -214,12 +215,11 @@
 </ul></li>
 <li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">6.</span> <span dir="">Testing image and files with QEMU</strong></span></a>
 <ul>
-<li><a href="#kernel-and-initramdisk-testing" id="toc-kernel-and-initramdisk-testing"><span class="toc-section-number">6.1</span> <span dir="">kernel and initramdisk testing</span></a></li>
-<li><a href="#bios-mbr-mode" id="toc-bios-mbr-mode"><span class="toc-section-number">6.2</span> <span dir="">BIOS MBR mode</span></a></li>
-<li><a href="#mbr-mode-risc-v-64bit" id="toc-mbr-mode-risc-v-64bit"><span class="toc-section-number">6.3</span> <span dir="">MBR mode RISC-V 64bit</span></a></li>
-<li><a href="#uefi-gpt-mode" id="toc-uefi-gpt-mode"><span class="toc-section-number">6.4</span> <span dir="">UEFI GPT mode</span></a></li>
-<li><a href="#uefi-gpt-secure-boot" id="toc-uefi-gpt-secure-boot"><span class="toc-section-number">6.5</span> <span dir="">UEFI GPT Secure Boot</span></a></li>
-<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">6.6</span> <span dir="">Additional qemu parameters</span></a></li>
+
+<li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">6.1</span> <span dir="">running AARCH64</span></a></li>
+<li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">6.2</span> <span dir="">running RISCV64</span></a></li>
+<li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">6.3</span> <span dir="">running X86_64</span></a></li>
+<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">6.4</span> <span dir="">Additional qemu parameters</span></a></li>
 </ul></li>
 <li><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><strong><span class="toc-section-number">7.</span> <span dir="">Arch Linux Wiki</strong></span></a></li>
 <li><a href="#quick-links-archboot" id="toc-quick-links-archboot"><strong><span class="toc-section-number">8.</span> <span dir="">Quick links Archboot</strong></span></a></li>
@@ -520,7 +520,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>This method is intended for use with USB thumb drives:</th>
+<th>Use this command with USB thumb drives:</th>
 </tr>
 </thead>
 <tbody>
@@ -608,12 +608,12 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Connect as root user to archboot:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ ssh root@yourip</code></td>
+<td><code>$ ssh root@&lt;ipadress&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -647,7 +647,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Create your own keys:</th>
 </tr>
 </thead>
 <tbody>
@@ -665,7 +665,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Switch to full Arch Linux system:</th>
 </tr>
 </thead>
 <tbody>
@@ -744,7 +744,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Quickinst experts installation:</th>
 </tr>
 </thead>
 <tbody>
@@ -756,18 +756,18 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.12" id="keep-your-image-up-to-date"><span class="header-section-number">2.12</span> <strong><span dir="">Keep your image up to date</span></strong></h3>
 <ul>
-<li>You can always bump your image to <strong>latest</strong> available possibilities (see <strong><code>-h</code></strong> flag for all the options).</li>
+<li>You can always bump your image to <strong>latest</strong> available possibilities.</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>For all options use:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># update-installer &lt;option&gt;</code></td>
+<td><code># update-installer -h</code></td>
 </tr>
 </tbody>
 </table>
@@ -775,35 +775,33 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h3 data-number="2.13" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">2.13</span> <strong><span dir="">Tools for backup and copying of an existing system</span></strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
-<li>internal backup / copying you can use:</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>internal backup / copying using tar:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># copy-mountpoint.sh</code></td>
+<td><code># copy-mountpoint.sh -h</code></td>
 </tr>
 </tbody>
 </table>
 </ul>
 <ul>
-<li>internal or external <a href="https://wiki.archlinux.org/title/Backup" title="Backup"><strong>backup</strong></a> / copying with rsync you can use:</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>internal or external <a href="https://wiki.archlinux.org/title/Backup" title="Backup"><strong>backup</strong></a> / copying using rsync:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># rsync-backup.sh</code></td>
+<td><code># rsync-backup.sh -h</code></td>
 </tr>
 </tbody>
 </table>
@@ -813,14 +811,13 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
 <li>Fortunately, it is easy to re-create a FAT32 partition on the stick so that the USB stick again becomes available for carrying around your data.</li>
-<li>Check carefully which device actually is your USB stick. <strong></li>
-<li>The next command will render all data on your device inaccessible!</strong></li>
+<li>Check carefully which device actually is your USB stick.</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Attention: This will render all data on your device inaccessible!</th>
 </tr>
 </thead>
 <tbody>
@@ -833,13 +830,12 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h3 data-number="2.15" id="faq-known-issues-and-limitations"><span class="header-section-number">2.15</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
 <li>Please check the forum threads for posted fixes and workarounds.</li>
-<li>Please run this script to get latest fixes from git:</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Get latest fixes from git:</th>
 </tr>
 </thead>
 <tbody>
@@ -852,6 +848,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
 </ul>
+<dd>
 <p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.</p>
 </dd>
 <dd>
@@ -1101,18 +1098,17 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 <p><a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a></p>
 <h2 data-number="3" id="create-rescue-system-of-running-system"><span class="header-section-number">3.</span> <span dir="">Create rescue system of running system</span></h2>
 <ul>
-<li>Create the initrd with your chosen profile:</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Run command:</th>
+<th>Create the initrd with your chosen profile:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># mkinitcpio -c /etc/archboot/yourwantedsystem.conf -g initrd.img</code></td>
+<td><code># mkinitcpio -c /etc/archboot/&lt;profile&gt;.conf -g initrd.img</code></td>
 </tr>
 </tbody>
 </table>
@@ -1180,7 +1176,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-x86_64-release.sh &lt;directory&gt; https://pkgbuild.com/~tpowa/archboot/src/iso/x86_64/latest/</code></td>
+<td><code># archboot-x86_64-release.sh &lt;directory&gt; \<br>https://pkgbuild.com/~tpowa/archboot/src/iso/x86_64/latest/</code></td>
 </tr>
 </tbody>
 </table>
@@ -1202,7 +1198,6 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </tbody>
 </table>
 </ul>
-<p>You get an archboot container in &lt;directory&gt;.</p>
 <ul>
 <table>
 <thead>
@@ -1218,7 +1213,14 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </table>
 </ul>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
-<h4 data-number="4.4.2" id="archboot-x86_64-iso.sh"><span class="header-section-number">4.4.2</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
+<h4 data-number="4.4.2" id="configuration-files-for-image-creation"><span class="header-section-number">4.4.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
+<p>There are the following configuration files for ISO creation:</p>
+<ul>
+<li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
+<li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
+</ul>
+<h4 data-number="4.4.3" id="archboot-x86_64-iso.sh"><span class="header-section-number">4.4.3</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
 <p>Script for image creation from running system or for use in archboot container.</p>
 <ul>
 <table>
@@ -1242,13 +1244,6 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </tr>
 </tbody>
 </table>
-</ul>
-<h4 data-number="4.4.3" id="configuration-files-for-image-creation"><span class="header-section-number">4.4.3</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
-<p>There are the following configuration files for ISO creation:</p>
-<ul>
-<li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
-<li><strong>/etc/archboot/presets/name</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
-<li><strong>/etc/archboot/name.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
 </ul>
 <h2 data-number="5" id="setting-up-an-archboot-image-server"><span class="header-section-number">5.</span> <span dir="">Setting up an archboot image server</span></h2>
 <h3 data-number="5.1" id="configuration-file"><span class="header-section-number">5.1</span> <strong><span dir="">Configuration file</span></strong></h3>
@@ -1290,8 +1285,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-pacman-aarch64-chroot.sh build-directory
-# archboot-pacman-riscv64-chroot.sh build-directory</code></td>
+<td><code># archboot-pacman-aarch64-chroot.sh &lt;build-directory&gt;<br># archboot-pacman-riscv64-chroot.sh &lt;build-directory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1308,8 +1302,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code><code># archboot-aarch64-server-release.sh
-# archboot-riscv64-server-release.sh</code></td>
+<td><code><code># archboot-aarch64-server-release.sh<br># archboot-riscv64-server-release.sh</code></td>
 </tr>
 </tbody>
 </table>
@@ -1318,6 +1311,46 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 <p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>3</strong> months.</p>
 <h2 data-number="6" id="testing-image-and-files-with-qemu"><span class="header-section-number">6.</span> <span dir="">Testing image and files with QEMU</span></h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation:</p>
+<h3 data-number="6.1" id="running-aarch64"><span class="header-section-number">6.1</span> <strong><span dir="">Running AARCH64:</span></strong></h3>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong><span dir="">edk2-armvirt</span></strong></a> package.</li>
+</ul>
+<ul>
+<table>
+<thead>
+<tr class="header">
+<th>UEFI GPT mode:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$ qemu-system-aarch64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd \<br>-machine virt -cpu cortex-a57 -device virtio-gpu-pci \<br>-device nec-usb-xhci -device usb-tablet \<br>-device usb-kbd</code></td>
+</tr>
+</tbody>
+</table>
+</ul>
+<h3 data-number="6.2" id="running-riscv64"><span class="header-section-number">6.2</span> <strong><span dir="">Running RISCV64:</span></strong></h3>
+<ul>
+<table>
+<thead>
+<tr class="header">
+<th>MBR mode:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$ qemu-system-riscv64 -M virt \<br>-kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \<br>-device virtio-gpu-pci -device virtio-net-device,netdev=eth0 \<br>-netdev user,id=eth0,hostfwd=tcp::2222-:22 \<br>-device nec-usb-xhci -device usb-tablet -device usb-kbd \<br>-object rng-random,filename=/dev/urandom,id=rng \<br>-device virtio-rng-device,rng=rng \<br>-drive file=&lt;yourimage&gt;,if=virtio,format=raw -m &lt;yourmemory&gt;</code></td>
+</tr>
+</tbody>
+</table>
+</ul>
+<ul>
+<li>Use <strong>ssh root@localhost -p 2222</strong> to connect to machine from your running host.</li>
+</ul>
+<h3 data-number="6.3" id="running-x86_64"><span class="header-section-number">6.3</span> <strong><span dir="">Running X86_64:</span></strong></h3>
+<ul>
+<h4 data-number="6.3.1" id="uefi-gpt-secure-boot"><span class="header-section-number">6.3.1</span> <strong><span dir="">Running kernel, BIOS MBR, UEFI GPT without Secure Boot:</span></strong></h3>
+</ul>
 <ul>
 <table>
 <thead>
@@ -1327,8 +1360,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -kernel yourkernel -initrd yourinitramdisk \
--append &quot;rootfstype=ramfs&quot; --enable-kvm -usb -usbdevice tablet</code></td>
+<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initramdisk&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>--enable-kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1342,33 +1374,10 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
--usb -usbdevice tablet --enable-kvm -boot d</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
-</ul>
-<ul>
-<table>
-<thead>
-<tr class="header">
-<th>MBR mode RISC-V 64bit:</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>$ qemu-system-riscv64 -M virt -kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \
--device virtio-gpu-pci -device virtio-net-device,netdev=eth0 \
--netdev user,id=eth0,hostfwd=tcp::2222-:22 \
--device nec-usb-xhci -device usb-tablet -device usb-kbd \
--object rng-random,filename=/dev/urandom,id=rng -device virtio-rng-device,rng=rng \
--drive file=&lt;yourimage&gt;,if=virtio,format=raw -m &lt;yourmemory&gt;</code></td>
-</tr>
-</tbody>
-</table>
-</ul>
-<ul>
-<li>Use <strong>ssh root@localhost -p 2222</strong> to connect to machine from your running host.</li>
 </ul>
 <ul>
 <table>
@@ -1379,9 +1388,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
--usb -usbdevice tablet --enable-kvm -boot d \
---bios /usr/share/edk2-ovmf/x64/OVMF.fd</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>--bios /usr/share/edk2-ovmf/x64/OVMF.fd</code></td>
 </tr>
 </tbody>
 </table>
@@ -1395,77 +1402,88 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=yourisofile,if=virtio,format=raw \
--usb -usbdevice tablet --enable-kvm -boot d \
---bios /usr/share/edk2-ovmf/ia32/OVMF.fd</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>--bios /usr/share/edk2-ovmf/ia32/OVMF.fd</code></td>
 </tr>
 </tbody>
 </table>
 </ul>
 <ul>
-<h3 data-number="6.5" id="uefi-gpt-secure-boot"><span class="header-section-number">6.5</span> <strong><span dir="">UEFI GPT Secure Boot</span></strong></h3>
+<h4 data-number="6.3.2" id="uefi-gpt-secure-boot"><span class="header-section-number">6.3.2</span> <strong><span dir="">UEFI GPT Secure Boot</span></strong></h3>
+</ul>
 <ul>
-<li>Copy <code>OVMF_VARS.secboot.fd</code> to a place the user has access to it.</li>
+<table>
+<thead>
+<tr class="header">
+<th>Copy <code>OVMF_VARS.secboot.fd</code> to a place the user has access to it:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code># cp /usr/share/archboot/ovmf/OVMF_VARS.secboot.fd &lt;directory&gt;</code></td>
+</tr>
+</tbody>
+</table>
+</ul>
+<ul>
 <li>The file already includes a basic set of keys from fedora ovmf package.</li>
 </ul>
-<pre class="plaintext"><code># cp /usr/share/archboot/ovmf/OVMF_VARS.secboot.fd directory</code></pre>
 <ul>
-<li>Replace the bios option, with the following additional commands:</li>
+<table>
+<thead>
+<tr class="header">
+<th>64bit UEFI / 64bit running system:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1</code></td>
+</tr>
+</tbody>
+</table>
 </ul>
-<h4 data-number="6.5.1" id="bit-uefi-64bit-running-system-2"><span class="header-section-number">6.5.1</span> <strong><span dir="">64bit UEFI / 64bit running system</span></strong></h4>
-<pre class="plaintext"><code>-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd \
--drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \
--global driver=cfi.pflash01,property=secure,value=on -machine q35,smm=on,accel=kvm \
--global ICH9-LPC.disable_s3=1</code></pre>
-<h4 data-number="6.5.2" id="bit-uefi-64bit-running-system-3"><span class="header-section-number">6.5.2</span> <strong><span dir="">32bit UEFI / 64bit running system</span></strong></h4>
-<pre class="plaintext"><code>-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd \
--drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \
--global driver=cfi.pflash01,property=secure,value=on \
--machine q35,smm=on,accel=kvm -global ICH9-LPC.disable_s3=1</code></pre>
-<h4 data-number="6.5.3" id="bit-uefi-64bit-running-system-aarch64"><span class="header-section-number">6.5.3</span> <strong><span dir="">64bit UEFI / 64bit running system AARCH64</span></strong></h4>
 <ul>
-<li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong><span dir="">edk2-armvirt</span></strong></a> package.</li>
-<li>serial console only:</li>
+<table>
+<thead>
+<tr class="header">
+<th>32bit UEFI / 64bit running system:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1</code></td>
+</tr>
+</tbody>
+</table>
 </ul>
-<pre class="plaintext"><code>-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
--cpu cortex-a57 -nographic</code></pre>
+<h3 data-number="6.4" id="additional-qemu-parameters"><span class="header-section-number">6.4</span> <strong><span dir="">Additional qemu parameters</span></strong></h3>
 <ul>
-<li>virtio vga device with keyboard and mouse</li>
+<table>
+<thead>
+<tr class="header">
+<th>KVM virtio network for tap0:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>-device virtio-net-device,netdev=eth0 \<br>-netdev tap,id=eth0,ifname=tap0,script=no,downscript=no</code></td>
+</tr>
+</tbody>
+</table>
 </ul>
-<pre class="plaintext"><code>-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
--cpu cortex-a57 -device virtio-gpu-pci -device nec-usb-xhci \
--device usb-tablet -device usb-kbd</code></pre>
 <ul>
-<li>ramfb vga device with keyboard and mouse</li>
+<table>
+<thead>
+<tr class="header">
+<th>KVM virtio harddisk:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>-drive file=yourimagefile,if=virtio,format=raw</code></td>
+</tr>
+</tbody>
+</table>
 </ul>
-<pre class="plaintext"><code>-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd -machine virt \
--cpu cortex-a57 -device ramfb -device nec-usb-xhci \
--device usb-tablet -device usb-kbd</code></pre>
-<h3 data-number="6.6" id="additional-qemu-parameters"><span class="header-section-number">6.6</span> <strong><span dir="">Additional qemu parameters</span></strong></h3>
-<ul>
-<li>You can test how much RAM is needed to bootup, eg. <code>-m 1024</code> for 1GB RAM usage.</li>
-</ul>
-<pre class="plaintext"><code>-m memory</code></pre>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/KVM" title="KVM"><strong>KVM</strong></a> virtio network for tap0:</li>
-</ul>
-<pre class="plaintext"><code>-device virtio-net-device,netdev=eth0 -netdev tap,id=eth0,ifname=tap0,script=no,downscript=no</code></pre>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/KVM" title="KVM"><strong>KVM</strong></a> virtio harddisk:</li>
-</ul>
-<pre class="plaintext"><code>-drive file=yourimagefile,if=virtio,format=raw</code></pre>
-<ul>
-<li>normal harddisk:</li>
-</ul>
-<pre class="plaintext"><code>-hda yourimagefile</code></pre>
-<ul>
-<li>virtio graphic card</li>
-</ul>
-<pre class="plaintext"><code>-vga virtio</code></pre>
-<ul>
-<li>serial console only</li>
-</ul>
-<pre class="plaintext"><code>-vga none</code></pre>
 <h2 data-number="7" id="arch-linux-wiki"><span class="header-section-number">7.</span> <span dir="">Arch Linux Wiki</span></h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_Guide" title="Installation Guide"><strong>Installation Guide</strong></a></li>
