@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 09:54 17.10.2022 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 14:49 17.10.2022 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -282,6 +282,9 @@
 <td><a href="https://pkgbuild.com/~tpowa/archboot/iso/riscv64/latest/sha256sum.txt"><strong>Check</strong></a></td>
 </tbody>
 </table>
+</ul>
+<ul>
+<li>The image supports riscv64 and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch.</li>
 </ul>
 <a href="https://archlinux.org/"><strong>Arch Linux x86_64</strong></a>
 <ul>
@@ -520,7 +523,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>Use this command with USB thumb drives:</th>
+<th>Use this command with USB thumb drive:</th>
 </tr>
 </thead>
 <tbody>
@@ -584,7 +587,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <thead>
 <tr class="header">
 <th>Array to change</th>
-<th>Run command:</th>
+<th>Run after changing defaults:</th>
 </tr>
 </thead>
 <tbody>
@@ -1285,7 +1288,10 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-pacman-aarch64-chroot.sh &lt;build-directory&gt;<br># archboot-pacman-riscv64-chroot.sh &lt;build-directory&gt;</code></td>
+<td><code># archboot-pacman-aarch64-chroot.sh &lt;build-directory&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code># archboot-pacman-riscv64-chroot.sh &lt;build-directory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1302,7 +1308,10 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </thead>
 <tbody>
 <tr class="odd">
-<td><code><code># archboot-aarch64-server-release.sh<br># archboot-riscv64-server-release.sh</code></td>
+<td><code># archboot-aarch64-server-release.sh</code></td>
+</tr>
+<tr class="even">
+<td><code># archboot-riscv64-server-release.sh</code></td>
 </tr>
 </tbody>
 </table>
