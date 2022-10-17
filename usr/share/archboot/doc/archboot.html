@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 17.10.2022 18:28 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 17.10.2022 22:24 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -235,13 +235,10 @@
 <li><strong>Release schedule</strong>: on 10th, 20th and 30th of a month new images are released.</li>
 <li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid image files</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a> and <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> are provided.</li>
 <li><strong>PGP KEY</strong>: <a href="https://keyserver.ubuntu.com/pks/lookup?op=vindex&amp;fingerprint=on&amp;exact=on&amp;search=0x5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"><strong>5B7E 3FB7 1B7F 1032 9A1C 03AB 771D F662 7EDF 681F</strong></a> for file verification is provided.</li>
+<li><strong>Source packages</strong> with archboot repository are located <a href="https://pkgbuild.com/~tpowa/archboot/src/iso/"><strong>here</strong></a>.</li>
+<li><strong>Latest news</strong> about the package itself, are posted <a href="https://www.reddit.com/r/archboot/"><strong>here</strong></a>.</li>
 </ul>
 <h3 data-number="2.1" id="download-image-files"><span class="header-section-number">2.1</span> <strong><span dir="">Download image files</span></strong></h3>
-<ul>
-<li>Image files are released <a href="https://pkgbuild.com/~tpowa/archboot/iso/"><strong>here</strong></a>.</li>
-<li>Source packages with archboot repository are located <a href="https://pkgbuild.com/~tpowa/archboot/src/iso/"><strong>here</strong></a>.</li>
-<li>Latest news about the package itself, are posted <a href="https://www.reddit.com/r/archboot/"><strong>here</strong></a>.</li>
-</ul>
 <a href="https://archlinuxarm.org/"><strong>Arch Linux ARM aarch64</strong></a>
 <ul>
 <table>
@@ -429,8 +426,8 @@
 </table>
 </ul>
 <ul>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a>, add <code>rootfstype=ramfs</code> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a> setup and you will get a running installation/rescue system.</li>
-<li>For rescue booting add an entry to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>,<a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> and add <code>rootfstype=ramfs</code> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a>, add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a> setup and you will get a running installation/rescue system.</li>
+<li>For rescue booting add an entry to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>,<a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> and add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
 <li>For <strong>local image</strong> download <strong>both</strong> initrds and load <strong>both</strong> files with your bootloader or PXE setup.</li>
 </ul>
 <h3 data-number="2.4" id="supported-boot-modes"><span class="header-section-number">2.4</span> <strong><span dir="">Supported boot modes</span></strong></h3>
@@ -576,7 +573,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is automatically launched with starting <a href="https://wiki.archlinux.org/title/Xorg" title="Xorg"><strong>Xorg</strong></a>.
 <ul>
 <li>Connect with your vnc client and use password:<strong>archboot</strong></li>
-<li><a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <code>/etc/archboot/defaults</code> to change default vnc password.</li>
+<li><a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong>/etc/archboot/defaults</strong> to change default vnc password.</li>
 </ul></li>
 <li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
 </ul>
@@ -685,7 +682,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
 <h4 data-number="2.10.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">2.10.1</span> <strong><span dir="">Changing keymap and console fonts</span></strong></h4>
 <ul>
-<li>Your <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> and <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> will be set by km script.</li>
+<li>Your <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> and <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> will be set by <strong>km</strong> script.</li>
 </ul>
 <h4 data-number="2.10.2" id="setup-network"><span class="header-section-number">2.10.2</span> <strong><span dir="">Setup network</span></strong></h4>
 <ul>
@@ -706,7 +703,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h4 data-number="2.10.4" id="changing-timezone-and-date"><span class="header-section-number">2.10.4</span> <strong><span dir="">Changing timezone and date</span></strong></h4>
 <ul>
-<li>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the tz script.</li>
+<li>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</li>
 </ul>
 <h4 data-number="2.10.5" id="prepare-storage-drive"><span class="header-section-number">2.10.5</span> <strong><span dir="">Prepare Storage drive</span></strong></h4>
 <ul>
@@ -719,12 +716,12 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h4 data-number="2.10.6" id="install-packages"><span class="header-section-number">2.10.6</span> <strong><span dir="">Install Packages</span></strong></h4>
 <ul>
-<li>You can modify the packages to install in <code>/etc/archboot/defaults</code>.</li>
+<li>You can modify the packages to install in <strong>/etc/archboot/defaults</strong>.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will install the packages for the first boot to your storage drive.</li>
 </ul>
 <h4 data-number="2.10.7" id="configure-system"><span class="header-section-number">2.10.7</span> <strong><span dir="">Configure System</span></strong></h4>
 <ul>
-<li>hwdetect script is used for preconfiguration</li>
+<li><strong>hwdetect</strong> script is used for preconfiguration</li>
 <li>Auto/Preconfiguration of <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> mode, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>systemd</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>mdadm</strong></a>.conf</li>
 <li>You will be asked to copy the <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> GPG keyring to the installed system</li>
 <li>Configuration of basic system files: <a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
@@ -783,7 +780,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>internal backup / copying using tar:</th>
+<th>internal <a href="https://wiki.archlinux.org/title/Backup" title="Backup">backup</a> / copying using  <a href="https://wiki.archlinux.org/title/tar" title="tar">tar</a>:</th>
 </tr>
 </thead>
 <tbody>
@@ -799,7 +796,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <table>
 <thead>
 <tr class="header">
-<th>internal or external <a href="https://wiki.archlinux.org/title/Backup" title="Backup"><strong>backup</strong></a> / copying using rsync:</th>
+<th>internal or external <a href="https://wiki.archlinux.org/title/Backup" title="Backup">backup</a> / copying using <a href="https://wiki.archlinux.org/title/rsync" title="rsync">rsync</a>:</th>
 </tr>
 </thead>
 <tbody>
@@ -1153,7 +1150,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 <li>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</li>
 </ul>
 <h3 data-number="4.2" id="requirements"><span class="header-section-number">4.2</span> <strong><span dir="">Requirements</span></strong></h3>
-<p>Around 3GB free space on disk.</p>
+<p>Around <strong>3GB</strong> free space on disk.</p>
 <h3 data-number="4.3" id="create-image-files-without-modifications"><span class="header-section-number">4.3</span> <strong><span dir="">Create image files without modifications</span></strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
 <ul>
@@ -1319,7 +1316,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 <h4 data-number="5.3.3" id="server-cleanup"><span class="header-section-number">5.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
 <p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>3</strong> months.</p>
 <h2 data-number="6" id="testing-image-and-files-with-qemu"><span class="header-section-number">6.</span> <span dir="">Testing image and files with QEMU</span></h2>
-<p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation:</p>
+<p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
 <h3 data-number="6.1" id="running-aarch64"><span class="header-section-number">6.1</span> <strong><span dir="">Running AARCH64:</span></strong></h3>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong><span dir="">edk2-armvirt</span></strong></a> package.</li>
