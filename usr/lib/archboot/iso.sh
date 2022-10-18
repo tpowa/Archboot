@@ -191,7 +191,10 @@ _prepare_uefi_image() {
 
 _prepare_extlinux_conf() {
     mkdir -p "${_ISODIR}"/boot/extlinux
-    [[ ${_RUNNING_ARCH} == "aarch64" ]] && _TITLE="Arch Linux ARM 64"
+    if [[ ${_RUNNING_ARCH} == "aarch64" ]]; then
+        _TITLE="Arch Linux ARM 64"
+        _SMP="nr_cpus=1"
+    fi
     [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
     echo "Prepare extlinux.conf ..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
@@ -202,7 +205,7 @@ label linux
     menu label Boot System (automatic boot in 10 seconds ...)
     kernel /boot/vmlinuz_${_RUNNING_ARCH}
     initrd /boot/initramfs_${_RUNNING_ARCH}.img
-    append rootfstype=ramfs console=ttyS0,115200 console=tty0
+    append rootfstype=ramfs console=ttyS0,115200 console=tty0 ${_SMP}
 EOF
 }
 
