@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 17.10.2022 22:24 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 18.10.2022 07:33 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -513,8 +513,8 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h3 data-number="2.5" id="burning-release-or-writing-to-disk"><span class="header-section-number">2.5</span> <strong><span dir="">Burning release or writing to disk</span></strong></h3>
 <p>Hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
-<li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning"><strong>CD Burning</strong></a> utilities.</li>
-<li>Can be raw-written to a drive using ‘dd’ or similar utilities.</li>
+<li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
+<li>Can be raw-written to a drive using <a href="https://wiki.archlinux.org/title/Dd" title="Dd">dd</a> or similar utilities.</li>
 </ul>
 <ul>
 <table>
@@ -629,25 +629,25 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> first for initial shim setup.</li>
 <li>In order to boot in <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> mode on first boot:
 <ul>
-<li>you need to enroll archboot’s MOK key from disk: <code>/EFI/KEY/MOK.cer</code></li>
+<li>you need to enroll <strong>archboot’s MOK key</strong> from disk: <strong>/EFI/KEY/MOK.cer</strong></li>
 </ul></li>
-<li>Tools included for key management: KeyTool, HashTool, mokutil, sbsigntools, sbctl and mkkeys.sh</li>
+<li>Tools included for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></li>
 <li>setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:
 <ul>
 <li>shim from fedora is copied</li>
 <li>creating new keys is supported</li>
-<li>using existing keys from <code>/etc/secureboot/keys</code> in layout secureboot-keys.sh produces</li>
+<li>using existing keys from <strong>/etc/secureboot/keys</strong> in layout <strong>secureboot-keys.sh</strong> produces</li>
 <li>MOK setup is done with keys</li>
 <li>adding pacman hook for automatic signing</li>
-<li>On first reboot you need to enroll the used keys to the MOK then your installed system is dual boot ready.</li>
+<li>On <strong>first</strong> boot you need to <strong>enroll</strong> the used key as <strong>MOK</strong>.</li>
+<li>Then your installed system is dual boot ready.</li>
 </ul></li>
-<li>It has a support script for creating your own keys and backup the existing keys, which already include the 2 needed Microsoft certificates:</li>
 </ul>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Create your own keys:</th>
+<th>Create and backup your own keys with Microsoft certificates:</th>
 </tr>
 </thead>
 <tbody>
@@ -659,7 +659,8 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.9" id="switch-to-full-arch-linux-system"><span class="header-section-number">2.9</span> <strong><span dir="">Switch to full Arch Linux system</span></strong></h3>
 <ul>
-<li>The Archboot system is stripped down to minimal space usage, though man/info pages, includes, additional kernel modules (eg. sound) and other things are not provided by default.</li>
+<li>The Archboot system is stripped down to minimal space usage.</li>
+<li>Though man/info pages, includes, additional kernel modules (eg. sound) and other things are not provided by default.</li>
 </ul>
 <ul>
 <table>
@@ -722,9 +723,9 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h4 data-number="2.10.7" id="configure-system"><span class="header-section-number">2.10.7</span> <strong><span dir="">Configure System</span></strong></h4>
 <ul>
 <li><strong>hwdetect</strong> script is used for preconfiguration</li>
-<li>Auto/Preconfiguration of <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> mode, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>systemd</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>mdadm</strong></a>.conf</li>
+<li>Auto/Preconfiguration of <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> mode, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>systemd</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>mdadm.conf</strong></a></li>
 <li>You will be asked to copy the <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> GPG keyring to the installed system</li>
-<li>Configuration of basic system files: <a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
+<li>Configuration of basic system files:<a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
 <li>Setting root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a></li>
 </ul>
 <h4 data-number="2.10.8" id="install-bootloader"><span class="header-section-number">2.10.8</span> <strong><span dir="">Install Bootloader</span></strong></h4>
@@ -873,7 +874,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 The reason is there are so many different hardware components out there. At the moment 1.0.0rc16 is included, with latest fedora patchset, development has been stopped.
 </dd>
 <dd>
-<p>mdadm supports some isw and ddf fakeraid chipsets, but assembling during boot is deactivated in <code>/etc/mdadm.conf</code>!</p>
+<p>mdadm supports some isw and ddf fakeraid chipsets, but assembling during boot is deactivated in <strong>/etc/mdadm.conf</strong>!</p>
 </dd>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a> cannot detect correct bios boot order:</li>
