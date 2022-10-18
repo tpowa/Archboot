@@ -1000,10 +1000,12 @@ do_uboot() {
     [[ -d "${DESTDIR}/boot/extlinux" ]] || mkdir -p "${DESTDIR}/boot/extlinux"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] _TITLE="ARM 64"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] _TITLE="RISC-V 64"
     # write extlinux.conf
     DIALOG --infobox "Installing UBOOT..." 0 0
     cat << EOF >> "${DESTDIR}/boot/extlinux/extlinux.conf"
-menu title Welcome Arch Linux RISC-V 64
+menu title Welcome Arch Linux ${_TITLE}
 timeout 100
 default linux
 label linux
@@ -1313,8 +1315,10 @@ install_bootloader() {
 }
 
 install_bootloader_menu() {
-    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+    if [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         ANSWER="UEFI"
+    elif [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
+            ANSWER="UBOOT"
     elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
         ANSWER="UBOOT"
     else

@@ -191,7 +191,7 @@ _prepare_uefi_image() {
 
 _prepare_extlinux_conf() {
     mkdir -p "${_ISODIR}"/boot/extlinux
-    [[ ${_RUNNING_ARCH} == "aarch64" ]] && _TITLE="Arch Linux ARM"
+    [[ ${_RUNNING_ARCH} == "aarch64" ]] && _TITLE="Arch Linux ARM 64"
     [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
     echo "Prepare extlinux.conf ..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
