@@ -18,9 +18,9 @@ _prepare_uefi_AA64 || exit 1
 _prepare_background || exit 1
 _reproducibility
 _prepare_uefi_image || exit 1
-_prepare_extlinux_conf || exit 1
+#_prepare_extlinux_conf || exit 1
 _reproducibility
-_uboot || exit 1
+#_uboot || exit 1
 _grub_mkrescue || exit 1
 _reproducibility_iso  || exit 1
 _create_cksum || exit 1
