@@ -213,7 +213,7 @@ EOF
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
 _uboot() {
-    echo "Create U-Boot image ..."
+    echo "Generating ${_RUNNING_ARCH} U-Boot image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024)) # image size in sectors
