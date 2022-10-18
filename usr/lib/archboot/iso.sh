@@ -91,7 +91,6 @@ _prepare_kernel_initramfs_files_RISCV64() {
     echo "Prepare RISCV64 u-boot ..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
-    mkdir -p "${_ISODIR}"/boot/extlinux
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
 }
@@ -191,9 +190,12 @@ _prepare_uefi_image() {
 }
 
 _prepare_extlinux_conf() {
-        echo "Prepare extlinux.conf ..."
+    mkdir -p "${_ISODIR}"/boot/extlinux
+    [[ ${_RUNNING_ARCH} == "aarch64" ]] && _TITLE="Arch Linux ARM"
+    [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
+    echo "Prepare extlinux.conf ..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
-menu title Welcome to Archboot - Arch Linux RISC-V 64
+menu title Welcome to Archboot - ${_TITLE}
 timeout 100
 default linux
 label linux
@@ -210,8 +212,8 @@ EOF
 # 512*2048=1048576 == 1M
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
-_prepare_uboot_image() {
-    echo "Prepare u-boot image ..."
+_uboot() {
+    echo "Create U-Boot image ..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024)) # image size in sectors

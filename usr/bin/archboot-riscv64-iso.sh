@@ -13,7 +13,7 @@ _fix_mkinitcpio
 _prepare_kernel_initramfs_files_RISCV64 || exit 1
 _prepare_extlinux_conf || exit 1
 _reproducibility
-_prepare_uboot_image || exit 1
+_uboot || exit 1
 _create_cksum || exit 1
 _cleanup_iso || exit 1
 echo "Finished Image creation."
