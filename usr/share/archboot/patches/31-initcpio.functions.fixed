@@ -577,7 +577,7 @@ add_file() {
     #check if $src is a symlink
     if [[ -L $src ]]; then
         # add the symlink
-        add_file "$(realpath $src)"
+        add_file "$(realpath -- "$src")"
         # create the symlink
         add_symlink "$src" "$(realpath $src)"
     else
@@ -645,9 +645,9 @@ add_binary() {
     # check if binary is a symlink
     if [[ -L $binary ]]; then
         # add the binary
-        add_file "$(realpath $binary)"
+        add_file "$(realpath -- "$binary")"
         # create the symlink
-        add_symlink "$binary" "$(realpath $binary)"
+        add_symlink "$binary" "$(realpath -- "$binary")"
     else
         add_file "$binary" "$dest" "$mode"
     fi
