@@ -155,7 +155,7 @@ build ()
     add_full_dir /usr/share/archboot/keys
 
     ### fix licenses
-    map add_file "/usr/share/licenses/shadow/LICENSE" "/usr/share/licenses/iana-etc/LICENSE" \
+    map add_file "/usr/share/licenses/shadow/COPYING" "/usr/share/licenses/iana-etc/LICENSE" \
                  "/usr/share/licenses/dbus/COPYING" "/usr/share/licenses/p11-kit/COPYING"
 
 }
