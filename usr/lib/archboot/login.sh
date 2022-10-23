@@ -27,11 +27,13 @@ _enter_shell() {
 }
 
 _run_latest() {
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment without package cache ..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
     update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest-install\033[0m"
     update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
@@ -47,23 +49,18 @@ _run_update_installer() {
     if [[ "${TTY}" == "tty1" ]]; then
         echo -e "\033[1m\033[91m10 seconds\033[0;25m time to hit \033[1m\033[92mCTRL-C\033[0m to \033[1m\033[91mstop\033[0m the process \033[1m\033[1mnow ...\033[0m"
         sleep 10
-        echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
         echo ""
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4111000 ]]; then
-            _run_latest_install
+        # local image
+        if [[ -e /var/cache/pacman/archboot.db ]]; then
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
+                _run_latest_install
+            fi
+        # latest image
         else
-            # local image
-            if [[ -e /var/cache/pacman/archboot.db ]]; then
-                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3277000 ]]; then
-                    _run_latest_install
-                fi
-            # latest image
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
+                _run_latest
             else
-                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
-                    _run_latest
-                else
-                    _run_latest_install
-                fi
+                _run_latest_install
             fi
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
