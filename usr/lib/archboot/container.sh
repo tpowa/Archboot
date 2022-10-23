@@ -165,7 +165,8 @@ _install_archboot() {
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     #shellcheck disable=SC2086
     if grep -qw archboot /etc/hostname; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
+        # 4200MB RAM are needed for graphic packages
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4111000 ]]; then
             _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
         else
             _PACKAGES="${_ARCHBOOT}"

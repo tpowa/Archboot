@@ -49,7 +49,7 @@ _run_update_installer() {
         sleep 10
         echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
         echo ""
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4111000 ]]; then
             _run_latest_install
         else
             # local image
