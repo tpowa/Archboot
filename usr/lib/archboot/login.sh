@@ -27,13 +27,13 @@ _enter_shell() {
 }
 
 _run_latest() {
-    echo -e "\033[1mStarting\033[0m assembling of archboot environment without package cache ..."
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwithout\033[0m package cache ..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
     update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
-    echo -e "\033[1mStarting\033[0m assembling of archboot environment with package cache ..."
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwith\033[0m package cache ..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest-install\033[0m"
     update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
