@@ -7,7 +7,7 @@ build ()
 	  slattach traceroute arping clockdiff rarpd rdisc tracepath \
 	  dig host nslookup telnet ssh arpd genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss \
 	  tc ifplugd ifplugstatus bridge dcb devlink rdma tipc vdpa \
-	  ping ninfod ethtool elinks weechat dhcp_lease_time dhcp_release dhcp_release6 \
+      ninfod ethtool elinks weechat dhcp_lease_time dhcp_release dhcp_release6 \
 	  routel brctl
     # add iproute 2, add openssl helper libraries
     map add_full_dir "/usr/lib/tc" "/usr/share/tc" "/etc/iproute2" "/usr/lib/engines"
