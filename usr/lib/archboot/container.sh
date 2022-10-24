@@ -31,6 +31,12 @@ _clean_cache() {
         echo "Clean pacman cache in ${1} ..."
         rm -r "${1}"/var/cache/pacman
     fi
+    if grep -qw 'archboot' /etc/hostname; then
+        echo "Cleaning archboot /var/cache/pacman/pkg ..."
+        for i in "${1}"/var/cache/pacman/pkg/*
+            rm -f /var/cache/pacman/pkg/$i
+        done
+    fi
 }
 
 _pacman_chroot() {
