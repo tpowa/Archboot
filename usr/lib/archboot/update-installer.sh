@@ -282,8 +282,11 @@ _create_initramfs() {
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
-    sleep 3
-    rm -r "${_W_DIR}"/tmp/usr/lib/firmware
+    sleep 5
+    for i in  $(find . -mindepth 1 -type f | sort -z); do
+        rm "${i}"
+        sleep 0.05
+    done
     while pgrep -x zstd > /dev/null 2>&1; do
         _clean_kernel_cache
         sleep 1
@@ -304,7 +307,7 @@ _kexec() {
     rm /{${VMLINUZ},initrd.img}
     #shellcheck disable=SC2115
     rm -rf /usr/*
-    while pgrep -x kexec > /dev/null 2>&1; do
+    while true; do
         _clean_kernel_cache
         sleep 1
     done
