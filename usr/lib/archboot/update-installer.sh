@@ -283,8 +283,9 @@ _create_initramfs() {
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
     sleep 6
-    for i in $(find . -mindepth 1 -type d | sort -z); do
+    for i in $(find . -mindepth 1 maxdepth 1 -type d | sort -z); do
         rm -r "${i}"
+        sleep 1
     done
     while pgrep -x zstd > /dev/null 2>&1; do
         _clean_kernel_cache
