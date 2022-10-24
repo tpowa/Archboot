@@ -282,11 +282,7 @@ _create_initramfs() {
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
-    sleep 6
-    for i in $(find . -mindepth 1 -maxdepth 1 -type d | sort -z); do
-        rm -r "${i}"
-        sleep 1.5
-    done
+    sleep 2
     while pgrep -x zstd > /dev/null 2>&1; do
         _clean_kernel_cache
         sleep 1
@@ -305,8 +301,10 @@ _kexec() {
     sleep 2
     _clean_kernel_cache
     rm /{${VMLINUZ},initrd.img}
-    sleep 2
-    _clean_kernel_cache
+    while pgrep -x kexec > /dev/null 2>&1; do
+        _clean_kernel_cache
+        sleep 1
+    done
     #shellcheck disable=SC2115
     rm -rf /usr/*
 }
