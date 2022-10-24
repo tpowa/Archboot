@@ -78,11 +78,6 @@ _clean_mkinitcpio() {
     [[ -e "${1}/boot/initramfs-linux-fallback.img" ]] && rm "${1}/boot/initramfs-linux-fallback.img"
 }
 
-# Clean cache on archboot environment
-_clean_archboot_cache() {
-    grep -qw 'archboot' /etc/hostname && (echo "Cleaning archboot /var/cache/pacman/pkg ..."; rm -f /var/cache/pacman/pkg/*)
-}
-
 _prepare_pacman() {
     # prepare pacman dirs
     echo "Create directories in ${1} ..."
@@ -163,34 +158,31 @@ _install_base_packages() {
 _install_archboot() {
     if [[ "${2}" == "use_binfmt" ]]; then
         _pacman_key "${1}"
+    fi
+    echo "Installing ${_ARCHBOOT} to ${1} ..."
+    #shellcheck disable=SC2086
+    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} ${_PACMAN_DB}>/dev/null 2>&1 || exit 1
+
+    # cleanup
+    if ! [[ "${2}"  == "use_binfmt" ]]; then
+        rm -r "${1}"/blankdb
+        echo "Remove archboot repository sync db ..."
+        rm /var/lib/pacman/sync/archboot.db
+    fi
+}
+
+_download_graphical() {
+    if [[ "${2}" == "use_binfmt" ]]; then
         _riscv64_disable_graphics "${1}"
     else
         # riscv64 need does not support local image at the moment
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
-    #shellcheck disable=SC2086
-    if grep -qw archboot /etc/hostname; then
-        # 4200MB RAM are needed for graphic packages
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4111000 ]]; then
-            _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
-        else
-            _PACKAGES="${_ARCHBOOT}"
-        fi
-    else
-        _PACKAGES="${_ARCHBOOT} ${_GRAPHICAL_PACKAGES}"
-    fi
-    echo "Downloading ${_PACKAGES} to ${1} ..."
-    #shellcheck disable=SC2086
-    ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
-    echo "Installing ${_ARCHBOOT} to ${1} ..."
-    #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
-    # cleanup
-    if ! [[ "${2}"  == "use_binfmt" ]]; then
-        rm -r "${1}"/blankdb
-        echo "Remove archboot repository sync db ..."
-        rm /var/lib/pacman/sync/archboot.db
+    if ! [[ "${_GRAPHICAL_PACKAGES}" == "" ]]; then
+        echo "Downloading ${_PACKAGES} to ${1} ..."
+        #shellcheck disable=SC2086
+        ${_PACMAN} -Syw ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
 }
 

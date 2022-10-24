@@ -21,7 +21,8 @@ _clean_cache "${1}"
 _umount_special "${1}" || exit 1
 _fix_groups "${1}"
 _clean_container "${1}"
-_clean_archboot_cache
+_download_graphical "${1}" || exit 1
+_clean_cache "${1}"
 _generate_keyring "${1}" || exit 1
 _copy_mirrorlist_and_pacman_conf "${1}"
 _copy_archboot_defaults "${1}"
