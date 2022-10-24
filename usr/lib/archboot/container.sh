@@ -33,7 +33,7 @@ _clean_cache() {
     fi
     if grep -qw 'archboot' /etc/hostname; then
         echo "Cleaning archboot /var/cache/pacman/pkg ..."
-        for i in "${1}"/var/cache/pacman/pkg/*
+        for i in "${1}"/var/cache/pacman/pkg/*; do
             rm -f /var/cache/pacman/pkg/$i
         done
     fi
