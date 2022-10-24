@@ -34,7 +34,7 @@ _clean_cache() {
     if grep -qw 'archboot' /etc/hostname; then
         echo "Cleaning archboot /var/cache/pacman/pkg ..."
         for i in "${1}"/var/cache/pacman/pkg/*; do
-            rm $i
+            rm /var/cache/pacman/pkg/$(basename "${i}")
         done
     fi
 }
@@ -161,7 +161,7 @@ _install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} ${_PACMAN_DB}>/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
 
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
@@ -180,9 +180,9 @@ _download_graphical() {
     fi
     [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
     if ! [[ "${_GRAPHICAL_PACKAGES}" == "" ]]; then
-        echo "Downloading ${_PACKAGES} to ${1} ..."
+        echo "Downloading ${_GRAPHICAL_PACKAGES} to ${1} ..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
     fi
 }
 
