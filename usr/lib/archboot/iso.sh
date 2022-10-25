@@ -39,13 +39,11 @@ _config() {
 }
 
 _fix_mkinitcpio() {
-    # fix for mkinitcpio 31
+    # fix for mkinitcpio 32
     # https://bugs.archlinux.org/task/72882
-    # remove on mkinitcpio 32 release
+    # remove on mkinitcpio 33 release
     cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
-    [[ -f "/usr/share/archboot/patches/31-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/31-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-    cp  "/usr/bin/mkinitcpio" "/usr/bin/mkinitcpio.old"
-    [[ -f "/usr/share/archboot/patches/31-mkinitcpio.fixed" ]] && cp "/usr/share/archboot/patches/31-mkinitcpio.fixed" "/usr/bin/mkinitcpio"
+    [[ -f "/usr/share/archboot/patches/32-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/32-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
 }
 
 _prepare_kernel_initramfs_files() {
