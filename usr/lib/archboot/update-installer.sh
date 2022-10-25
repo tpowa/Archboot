@@ -629,16 +629,18 @@ EOF
 _custom_wayland_xorg() {
     _initialize_zram_usr
     if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom wayland ..."
+        echo -e "\033[1mStep 1/3:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ "${_CUSTOM_X}" == "1" ]]; then
-        echo -e "\033[1mStep 1/1:\033[0m Installing custom xorg ..."
+        echo -e "\033[1mStep 1/3:\033[0m Installing custom xorg ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
+    echo -e "\033[1mStep 2/3:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
+    echo -e "\033[1mStep 3/3:\033[0m Setting up browser ...\033[0m"
     which firefox > /dev/null 2>&1  && _firefox_flags
     which chromium > /dev/null 2>&1 && _chromium_flags
 }
