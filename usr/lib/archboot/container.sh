@@ -162,7 +162,6 @@ _install_archboot() {
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
-
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
