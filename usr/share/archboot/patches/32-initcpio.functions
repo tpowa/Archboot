@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 parseopts() {
     local opt= optarg= i= shortopts=$1
