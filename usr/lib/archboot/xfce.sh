@@ -3,14 +3,14 @@
 
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        echo -e "\033[1mStep 1/3:\033[0m Installing XFCE desktop now ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing XFCE desktop now ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 2/3:\033[0m Configuring XFCE desktop ..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring XFCE desktop ..."
         _configure_xfce >/dev/tty7 2>&1
     else
-        echo -e "\033[1mStep 1/3:\033[0m Installing XFCE desktop already done ..."
-        echo -e "\033[1mStep 2/3:\033[0m Configuring XFCE desktop already done ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing XFCE desktop already done ..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring XFCE desktop already done ..."
     fi
 }
 
@@ -251,7 +251,7 @@ EOF
 }
 
 _start_xfce() {
-    echo -e "Launching XFCE now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo -e "Launching \033[1mXFCE\033[0m now, logging is done on \033[1m/dev/tty8\033[0m ..."
     startxfce4 >/dev/tty8 2>&1
-    echo -e "To relaunch XFCE desktop use: \033[92mstartxfce4\033[0m"
+    echo -e "To relaunch \033[1mXFCE\033[0m desktop use: \033[92mstartxfce4\033[0m"
 }

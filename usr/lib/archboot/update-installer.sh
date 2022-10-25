@@ -199,7 +199,6 @@ _initialize_zram_usr() {
     else
         echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done ..."
     fi
-    echo -e "\033[1mFinished.\033[0m"
 }
 
 _umount_w_dir() {
@@ -472,7 +471,6 @@ _full_system() {
     _home_root_mount
     echo -e "\033[1mStep 3/3:\033[0m Checking kernel version ..."
     _kernel_check
-    echo -e "\033[1mFinished.\033[0m"
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full_system
 }
@@ -492,15 +490,16 @@ _new_image() {
 _install_graphic () {
     _initialize_zram_usr
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
+    echo -e "\033[1mInitializing desktop environment ...\033[0m"
     [[ "${_L_XFCE}" == "1" ]] && _install_xfce
     [[ "${_L_GNOME}" == "1" ]] && _install_gnome
     [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
     [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
     [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
-    echo -e "\033[1mStep 3/3:\033[0m Starting avahi-daemon ..."
+    echo -e "\033[1mStep 3/4:\033[0m Starting avahi-daemon ..."
     systemctl start avahi-daemon.service
     # only start vnc on xorg environment
-    echo -e "\033[1mSetting up VNC and browser ...\033[0m"
+    echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser ...\033[0m"
     [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
     which firefox > /dev/null 2>&1  && _firefox_flags
     which chromium > /dev/null 2>&1 && _chromium_flags
@@ -645,7 +644,7 @@ _custom_wayland_xorg() {
 }
 
 _chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf ..."
+    echo "Adding chromium flags to /etc/chromium-flags.conf ..." >/dev/tty7
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
@@ -657,7 +656,7 @@ EOF
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
         if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js ..."
+            echo "Adding firefox flags vendor.js ..." >/dev/tty7
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
@@ -668,10 +667,10 @@ EOF
 }
 
 _autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..."
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..." >/dev/tty7
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc ..."
+    echo "Autostarting tigervnc ..." >/dev/tty7
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
