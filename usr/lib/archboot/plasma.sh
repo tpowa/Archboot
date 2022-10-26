@@ -11,5 +11,5 @@ _start_plasma() {
     echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
     echo "exec startplasma-x11" >> /root/.xinitrc
     startx >/dev/tty8 2>&1
-    echo -e "To relaunch \033[1mKDE/Plasma033[0m desktop use: \033[92mstartx\033[0m"
+    echo -e "To relaunch \033[1mKDE/Plasma\033[0m desktop use: \033[92mstartx\033[0m"
 }
