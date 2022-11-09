@@ -29,7 +29,7 @@ build ()
     # fixing licenses
     map add_file "/usr/share/licenses/db/LICENSE" \
         "/usr/share/licenses/bind/LICENSE" "/usr/share/licenses/krb5/LICENSE" \
-        "/usr/share/licenses/openssh/LICENCE" "/usr/share/licenses/openssl/LICENSE" \
+        "/usr/share/licenses/openssh/LICENCE" "/usr/share/licenses/openssl/LICENSE.txt" \
         "/usr/share/licenses/sqlite/license.txt" "/usr/share/licenses/dnssec-anchors/LICENSE"
 }
 
