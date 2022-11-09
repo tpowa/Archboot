@@ -157,9 +157,8 @@ _pacman_key() {
 
 _riscv64_disable_graphics() {
     # riscv64 need does not support local image at the moment
-    _CONTAINER_ARCH="$(${_NSPAWN} "${1}" uname -m)"
     #shellcheck disable=SC2001
-    [[ "$(echo "${_CONTAINER_ARCH}" | sed -e 's#\r##g')" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    ${_NSPAWN} "${1}" uname -m | grep -q riscv64 && _GRAPHICAL_PACKAGES=""
 }
 
 _cachedir_check() {
@@ -168,3 +167,4 @@ _cachedir_check() {
         exit 1
     fi
 }
+
