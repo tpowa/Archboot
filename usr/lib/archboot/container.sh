@@ -171,7 +171,7 @@ _install_archboot() {
 }
 
 _download_graphical() {
-    _riscv64_disable_graphics "${1}"
+    _riscv64_disable_graphics "${1}" "${2}"
     if grep -qw archboot /etc/hostname; then
         # strip down to XFCE on memory < 4096
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3478000 ]]; then
