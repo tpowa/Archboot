@@ -171,12 +171,7 @@ _install_archboot() {
 }
 
 _download_graphical() {
-    if [[ "${2}" == "use_binfmt" ]]; then
-        _riscv64_disable_graphics "${1}"
-    else
-        # riscv64 need does not support local image at the moment
-        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
-    fi
+    _riscv64_disable_graphics "${1}"
     if grep -qw archboot /etc/hostname; then
         # strip down to XFCE on memory < 4096
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3478000 ]]; then

@@ -156,9 +156,14 @@ _pacman_key() {
 }
 
 _riscv64_disable_graphics() {
-    # riscv64 need does not support local image at the moment
-    #shellcheck disable=SC2001
-    ${_NSPAWN} "${1}" uname -m | grep -q riscv64 && _GRAPHICAL_PACKAGES=""
+    if [[ "${2}" == "use_binfmt" ]]; then
+        # riscv64 need does not support local image at the moment
+        #shellcheck disable=SC2001
+        ${_NSPAWN} "${1}" uname -m | grep -qw riscv64 && _GRAPHICAL_PACKAGES=""
+    else
+        # riscv64 need does not support local image at the moment
+        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
+    fi
 }
 
 _cachedir_check() {
