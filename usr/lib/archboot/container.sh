@@ -146,11 +146,11 @@ _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} to ${1} ..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
     echo "Installing ${_PACKAGES} to ${1} ..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACKAGES} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
 }
 
 _install_archboot() {
