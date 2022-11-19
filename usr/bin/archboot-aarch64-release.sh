@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="aarch64"
-_ARCHBOOT="archboot-arm"
+_ARCHBOOT="archboot-arm archlinuxarm-keyring"
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/release.sh
 [[ -z "${1}" ]] && _usage

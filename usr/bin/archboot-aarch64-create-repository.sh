@@ -3,7 +3,7 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 . /usr/lib/archboot/repository.sh
-_ARCHBOOT="archboot-arm"
+_ARCHBOOT="archboot-arm archlinuxarm-keyring"
 [[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
 _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
