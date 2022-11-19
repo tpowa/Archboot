@@ -96,8 +96,6 @@ _prepare_pacman() {
     echo "Remove archboot repository sync db ..."
     rm -f /var/lib/pacman/sync/archboot.db
     echo "Update Arch Linux keyring ..."
-    _KEYRING="archlinux-keyring"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
     pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} >/dev/null 2>&1
 }

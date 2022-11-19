@@ -2,7 +2,6 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
-_ARCHBOOT="archboot-riscv"
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check

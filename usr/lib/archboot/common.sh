@@ -4,6 +4,16 @@
 LANG="C"
 _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
+_KEYRING="archlinux-keyring"
+if [[ "$(echo ${_BASENAME} | grep -qw aarch64)" ]]; then
+    _ARCHBOOT="archboot-arm"
+    _KEYRING="${_KEYRING} archlinuxarm-keyring"
+elif [[ "$(echo ${_BASENAME} | grep -qw riscv64)" ]]; then
+    _ARCHBOOT="archboot-riscv64"
+else
+    _ARCHBOOT="archboot"
+fi
+
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _FIX_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2"
