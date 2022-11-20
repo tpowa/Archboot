@@ -9,7 +9,7 @@ if echo ${_BASENAME} | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"
 elif echo ${_BASENAME} | grep -qw riscv64; then
-    _ARCHBOOT="archboot-riscv64"
+    _ARCHBOOT="archboot-riscv"
 else
     _ARCHBOOT="archboot"
 fi
