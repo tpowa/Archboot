@@ -34,6 +34,7 @@ build ()
     map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     
     ### add C.UTF-8 locale
+    add_dir /usr/lib/locale
     add_full_dir /usr/lib/locale/C.UTF-8
     ### add custom locale
     [[ -e "/usr/lib/locale/locale-archive" ]] && add_file "/usr/lib/locale/locale-archive"
