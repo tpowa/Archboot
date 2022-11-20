@@ -166,11 +166,9 @@ _zram_usr() {
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
         echo "Moving /usr to /usr.zram ..." > /dev/tty7
         mv /usr/* /usr.zram/
-        if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-            USR_SYMLINKS="bin local lib"
-        else
-            USR_SYMLINKS="bin local lib lib64"
-        fi
+        USR_SYMLINKS="bin local lib"
+        # lib64 is x86_64 only
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && USR_SYMLINKS="${USR_SYMLINKS} lib64"
         for i in ${USR_SYMLINKS}; do
             /usr.zram/bin/sln /usr.zram/"${i}" /usr/"${i}"
         done
