@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_ARCH="riscv64"
 . /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh

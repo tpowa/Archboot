@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_ARCH="aarch64"
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/release.sh
 [[ -z "${1}" ]] && _usage

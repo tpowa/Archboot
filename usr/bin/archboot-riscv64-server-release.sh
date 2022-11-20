@@ -1,5 +1,4 @@
 #! /bin/bash
-_ARCH="riscv64"
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/server.sh
 _root_check

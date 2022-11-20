@@ -8,10 +8,13 @@ _KEYRING="archlinux-keyring"
 if echo ${_BASENAME} | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"
+    _ARCH="aarch64"
 elif echo ${_BASENAME} | grep -qw riscv64; then
     _ARCHBOOT="archboot-riscv"
+    _ARCH="riscv64"
 else
     _ARCHBOOT="archboot"
+    _ARCH="x86_64"
 fi
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
