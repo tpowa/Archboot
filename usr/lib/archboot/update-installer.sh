@@ -414,8 +414,6 @@ _new_environment() {
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
     echo "          This will need some time ..."
-    # add fix for mkinitcpio 31, remove when 33 is released
-    cp "${_W_DIR}"/usr/share/archboot/patches/32-initcpio.functions.fixed "${_W_DIR}"/usr/lib/initcpio/functions
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."

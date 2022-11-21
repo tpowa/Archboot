@@ -38,14 +38,6 @@ _config() {
     [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)-${_RUNNING_ARCH}"
 }
 
-_fix_mkinitcpio() {
-    # fix for mkinitcpio 32
-    # https://bugs.archlinux.org/task/72882
-    # remove on mkinitcpio 33 release
-    cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
-    [[ -f "/usr/share/archboot/patches/32-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/32-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
-}
-
 _prepare_kernel_initramfs_files() {
     echo "Prepare kernel and initramfs ..."
     #shellcheck disable=SC1090

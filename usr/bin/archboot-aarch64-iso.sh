@@ -9,7 +9,6 @@ _aarch64_check
 [[ "${_GENERATE}" == "1" ]] || _usage
 _config
 echo "Starting ISO creation ..."
-_fix_mkinitcpio
 _prepare_kernel_initramfs_files || exit 1
 _prepare_ucode || exit 1
 _prepare_fedora_shim_bootloaders_aarch64 || exit 1
