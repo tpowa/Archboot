@@ -56,7 +56,6 @@ _prepare_kernel_initramfs_files() {
     if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi
-    mv "/usr/lib/initcpio/functions.old" "/usr/lib/initcpio/functions"
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT \
     --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
