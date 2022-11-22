@@ -1,1 +1,1 @@
-../lib/archboot/archboot-release.sh
+../lib/archboot/run-release.sh

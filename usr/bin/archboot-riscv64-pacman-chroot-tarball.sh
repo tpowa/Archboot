@@ -1,1 +1,1 @@
-../lib/archboot/archboot-pacman-chroot-tarball.sh
+../lib/archboot/run-chroot-tarball.sh

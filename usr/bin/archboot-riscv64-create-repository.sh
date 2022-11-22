@@ -1,1 +1,1 @@
-../lib/archboot/archboot-create-repository.sh
+../lib/archboot/run-repository.sh

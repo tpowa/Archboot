@@ -1,1 +1,1 @@
-../lib/archboot/archboot-create-container.sh
+../lib/archboot/run-container.sh
