@@ -1,0 +1,1 @@
+../lib/archboot/archboot-release.sh
