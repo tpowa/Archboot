@@ -116,15 +116,15 @@ _download_latest() {
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
         # helper binaries
         echo -e "\033[1mStep 2/4:\033[0m Downloading latest scripts ..."
-        BINS="binary-check.sh secureboot-keys.sh mkkeys.sh"
-        for i in ${BINS}; do
-            [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
-            [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
-        done
         # main binaries
         BINS="quickinst setup km tz update-installer copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
+        done
+        BINS="binary-check.sh secureboot-keys.sh mkkeys.sh"
+        for i in ${BINS}; do
+            [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
+            [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
         done
         # main libs
         echo -e "\033[1mStep 3/4:\033[0m Downloading latest script libs ..."
@@ -144,9 +144,9 @@ _download_latest() {
         done
         # setup libs
         echo -e "\033[1mStep 4/4:\033[0m Downloading latest setup libs ..."
-        SETUPS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
+        LIBS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
                 configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
-        for i in ${SETUPS}; do
+        for i in ${LIBS}; do
             wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
         done
         echo -e "\033[1mFinished:\033[0m Downloading scripts done."
