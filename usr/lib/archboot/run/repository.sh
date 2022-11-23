@@ -3,13 +3,13 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 . /usr/lib/archboot/repository.sh
-[[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
-_REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check
+[[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
+_REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 echo "Starting repository creation ..."
-if echo "${0}" | grep -qw "${_RUNNING_ARCH}"; then
+if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _x86_64_pacman_use_default || exit 1
     _cachedir_check
@@ -22,10 +22,10 @@ if echo "${0}" | grep -qw "${_RUNNING_ARCH}"; then
 else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
-        if echo "${0}" | grep -qw aarch64; then
+        if echo "${_BASENAME}" | grep -qw aarch64; then
         _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" "${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
-        if echo "${0}" | grep -qw riscv64; then
+        if echo "${_BASENAME}" | grep -qw riscv64; then
         _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" "${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi
         _create_pacman_conf "${_REPODIR}" "use_binfmt"

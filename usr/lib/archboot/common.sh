@@ -62,9 +62,9 @@ _riscv64_check() {
 
 ### check architecture
 _architecture_check() {
-    echo "${0}" | grep -qw aarch64 && _aarch64_check
-    echo "${0}" | grep -qw riscv64 && _riscv64_check
-    echo "${0}" | grep -qw x86_64 && _x86_64_check
+    echo "${_BASENAME}" | grep -qw aarch64 && _aarch64_check
+    echo "${_BASENAME}" | grep -qw riscv64 && _riscv64_check
+    echo "${_BASENAME}" | grep -qw x86_64 && _x86_64_check
 }
 
 ### check if running in container
