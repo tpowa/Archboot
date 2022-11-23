@@ -4,12 +4,12 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 #shellcheck disable=SC1094
-. /usr/lib/archboot/update-installer.sh
-. /usr/lib/archboot/xfce.sh
-. /usr/lib/archboot/gnome.sh
-. /usr/lib/archboot/gnome-wayland.sh
-. /usr/lib/archboot/plasma.sh
-. /usr/lib/archboot/plasma-wayland.sh
+. /usr/lib/archboot/update-installer/update-installer.sh
+. /usr/lib/archboot/update-installer/xfce.sh
+. /usr/lib/archboot/update-installer/gnome.sh
+. /usr/lib/archboot/update-installer/gnome-wayland.sh
+. /usr/lib/archboot/update-installer/plasma.sh
+. /usr/lib/archboot/update-installer/plasma-wayland.sh
 
 [[ -z "${1}" ]] && usage
 

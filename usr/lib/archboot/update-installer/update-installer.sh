@@ -12,6 +12,7 @@ _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
 _RUN="/${_LIB}/run"
+_UPDATE="/${_LIB}/update-installer"
 _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
@@ -110,25 +111,39 @@ _download_latest() {
         fi
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
+        # config
+        echo -e "\033[1mStep 1/4:\033[0m Downloading latest config ..."
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
+        # helper binaries
+        echo -e "\033[1mStep 2/4:\033[0m Downloading latest scripts ..."
         BINS="binary-check.sh secureboot-keys.sh mkkeys.sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
         done
+        # main binaries
         BINS="quickinst setup km tz update-installer copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
-        LIBS="common.sh container.sh release.sh iso.sh update-installer.sh xfce.sh \
-        gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh login.sh run-container.sh run-release.sh"
+        # main libs
+        echo -e "\033[1mStep 3/4:\033[0m Downloading latest script libs ..."
+        LIBS="common.sh container.sh release.sh iso.sh login.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done
+        # update-installer libs
+        LIBS="update-installer.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh"
+        for i in ${LIBS}; do
+            wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
+        done
+        # run libs
         LIBS="container.sh release.sh"
         for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_LIB}/${i}"
+            wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
         done
+        # setup libs
+        echo -e "\033[1mStep 4/4:\033[0m Downloading latest setup libs ..."
         SETUPS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
                 configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
         for i in ${SETUPS}; do
