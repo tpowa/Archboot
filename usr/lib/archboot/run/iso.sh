@@ -4,8 +4,8 @@
 . /usr/lib/archboot/iso.sh
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
-_root_check
 [[ "${_GENERATE}" == "1" ]] || _usage
+_root_check
 _architecture_check
 _config
 if echo "${0}" | grep -qw aarch64 || echo "${0}" | grep -qw x86_64; then
