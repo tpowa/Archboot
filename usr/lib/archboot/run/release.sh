@@ -4,6 +4,7 @@
 . /usr/lib/archboot/release.sh
 [[ -z "${1}" ]] && _usage
 _root_check
+_check_architecture
 echo "Start release creation in ${1} ..."
 _create_iso "$@" || exit 1
 _create_boot || exit 1

@@ -60,6 +60,13 @@ _riscv64_check() {
     fi
 }
 
+### check architecture
+_check_architecture() {
+    echo "${0}" | grep -qw aarch64 && _aarch64_check
+    echo "${0}" | grep -qw riscv64 && _riscv64_check
+    echo "${0}" | grep -qw x86_64 && _x86_64_check
+}
+
 ### check if running in container
 _container_check() {
     if grep -q bash /proc/1/sched ; then
