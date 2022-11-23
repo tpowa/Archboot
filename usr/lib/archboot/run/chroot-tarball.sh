@@ -10,7 +10,7 @@ if echo "${0}" | grep -qw aarch64; then
     _SERVER_PACMAN_ARCH="${_SERVER_PACMAN_AARCH64}"
     _LATEST_ARCH="http://os.archlinuxarm.org/os/${_ARCH_VERSION}"
     _CAP_ARCH="AARCH64"
-    _LOW_ARCH="aarch64"
+    _ARCH="aarch64"
 else
     _PACMAN_ARCH_CHROOT="${_PACMAN_RISCV64_CHROOT}"
     _PACMAN_ARCH="${_PACMAN_RISCV64}"
@@ -18,13 +18,13 @@ else
     _SERVER_PACMAN_ARCH="${_SERVER_PACMAN_RISCV64}"
     _LATEST_ARCH="https://archriscv.felixc.at/images/${_ARCH_VERSION}"
     _CAP_ARCH="RISCV64"
-    _LOW_ARCH="riscv64"
+    _ARCH="riscv64"
 fi
 
 _usage () {
     echo "CREATE ${_CAP_ARCH} PACMAN CHROOT"
     echo "-----------------------------"
-    echo "This will create the ${_LOW_ARCH} pacman chroot tarball on x86_64"
+    echo "This will create the ${_ARCH} pacman chroot tarball."
     echo "Usage: ${_BASENAME} <build-directory>"
     exit 0
 }
@@ -32,7 +32,6 @@ _usage () {
 [[ -z "${1}" ]] && _usage
 
 _root_check
-_x86_64_check
 
 echo "Starting container creation ..."
 # remove old files
