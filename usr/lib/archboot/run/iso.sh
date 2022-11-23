@@ -6,7 +6,7 @@
 _parameters "$@"
 _root_check
 [[ "${_GENERATE}" == "1" ]] || _usage
-_check_architecture
+_architecture_check
 _config
 if echo "${0}" | grep -qw aarch64 || echo "${0}" | grep -qw x86_64; then
     # running system = aarch64 or x86_64
