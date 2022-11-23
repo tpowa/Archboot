@@ -5,11 +5,11 @@ LANG="C"
 _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
 _KEYRING="archlinux-keyring"
-if echo ${_BASENAME} | grep -qw aarch64; then
+if echo "${_BASENAME}" | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"
     _ARCH="aarch64"
-elif echo ${_BASENAME} | grep -qw riscv64; then
+elif echo "${_BASENAME}" | grep -qw riscv64; then
     _ARCHBOOT="archboot-riscv"
     _ARCH="riscv64"
 else
