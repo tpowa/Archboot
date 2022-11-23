@@ -2,6 +2,7 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/server.sh
 _root_check
+_container_check
 if echo "${_BASENAME}" | grep -qw riscv64 || echo "${_BASENAME}" | grep -qw aarch64; then
     _update_pacman_chroot || exit 1
 fi
