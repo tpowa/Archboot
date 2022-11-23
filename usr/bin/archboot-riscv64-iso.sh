@@ -1,1 +1,1 @@
-../lib/archboot/run-iso.sh
+../lib/archboot/run/iso.sh

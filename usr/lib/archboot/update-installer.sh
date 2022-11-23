@@ -11,6 +11,7 @@ _BIN="/usr/bin"
 _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
+_RUN="/${_LIB}/run"
 _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
@@ -123,6 +124,10 @@ _download_latest() {
         gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh login.sh run-container.sh run-release.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
+        done
+        LIBS="container.sh release.sh"
+        for i in ${LIBS}; do
+            wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_LIB}/${i}"
         done
         SETUPS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
                 configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
