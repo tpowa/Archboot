@@ -233,7 +233,7 @@ choose_btrfs_subvolume () {
     done
     if [[ -n "${SUBVOLUMES}" ]]; then
     #shellcheck disable=SC2086
-        DIALOG --menu "Select the subvolume to mount:" 21 50 13 ${SUBVOLUMES} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the subvolume to mount:" 15 50 13 ${SUBVOLUMES} 2>"${ANSWER}" || return 1
         BTRFS_SUBVOLUME=$(cat "${ANSWER}")
     else
         if [[ "${SUBVOLUMES_DETECTED}" = "yes" ]]; then
@@ -275,7 +275,7 @@ btrfs_compress() {
     fi
     if [[ "${BTRFS_COMPRESS}" = "compress" ]]; then
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the compression method you want to use:" 21 50 9 ${BTRFS_COMPRESSLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the compression method you want to use:" 11 50 9 ${BTRFS_COMPRESSLEVELS} 2>"${ANSWER}" || return 1
         BTRFS_COMPRESS="compress=$(cat "${ANSWER}")"
     fi
 }
