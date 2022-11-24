@@ -1000,8 +1000,8 @@ do_uboot() {
     [[ -d "${DESTDIR}/boot/extlinux" ]] || mkdir -p "${DESTDIR}/boot/extlinux"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
-    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
+    [[ "${RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
+    [[ "${RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
     # write extlinux.conf
     DIALOG --infobox "Installing UBOOT..." 0 0
     cat << EOF >> "${DESTDIR}/boot/extlinux/extlinux.conf"
