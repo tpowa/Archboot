@@ -267,7 +267,7 @@ btrfs_subvolume() {
 # ask for btrfs compress option
 btrfs_compress() {
     BTRFS_COMPRESS="NONE"
-    BTRFS_COMPRESSLEVELS="lzo - zlib - zstd -"
+    BTRFS_COMPRESSLEVELS="zstd - lzo - zlib -"
     if [[ "${BTRFS_SUBVOLUME}" = "NONE" ]]; then
         DIALOG --yesno "Would you like to compress the data on ${PART}?" 0 0 && BTRFS_COMPRESS="compress"
     else
