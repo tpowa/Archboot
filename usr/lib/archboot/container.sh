@@ -1,7 +1,6 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_CACHEDIR="/var/cache/pacman/pkg"
 
 _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
@@ -82,7 +81,7 @@ _prepare_pacman() {
     # prepare pacman dirs
     echo "Create directories in ${1} ..."
     mkdir -p "${1}/var/lib/pacman"
-    mkdir -p "${_CACHEDIR}"
+    mkdir -p "${1}/${_CACHEDIR}"
     [[ -e "${1}/proc" ]] || mkdir -m 555 "${1}/proc"
     [[ -e "${1}/sys" ]] || mkdir -m 555 "${1}/sys"
     [[ -e "${1}/dev" ]] || mkdir -m 755 "${1}/dev"
