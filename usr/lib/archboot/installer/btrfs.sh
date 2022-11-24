@@ -275,7 +275,7 @@ btrfs_compress() {
     fi
     if [[ "${BTRFS_COMPRESS}" = "compress" ]]; then
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the compression method you want to use:" 11 50 9 ${BTRFS_COMPRESSLEVELS} 2>"${ANSWER}" || return 1
+        DIALOG --menu "Select the compression method you want to use:" 10 50 8 ${BTRFS_COMPRESSLEVELS} 2>"${ANSWER}" || return 1
         BTRFS_COMPRESS="compress=$(cat "${ANSWER}")"
     fi
 }
