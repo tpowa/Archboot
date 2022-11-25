@@ -88,8 +88,8 @@ fi
 while [[ "${SET_TIME}" == "" ]]; do
     DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 15 65 && HARDWARECLOCK="UTC"
     if DIALOG --yesno \
-    "Do you want to use the Network Time Protocol for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 6 60; then
-        DIALOG --infobox "Syncing clock with internet clock pool..." 6 60
+    "Do you want to use the Network Time Protocol for syncing your clock, by using the internet clock pool?\n(You need a working internet connection for doing this!)" 8 60; then
+        DIALOG --infobox "Syncing clock with internet clock pool..." 3 40
         # sync immediatly with standard pool
         if [[ ! $(ntpdate pool.ntp.org) ]]; then
             DIALOG --msgbox "An error has occured, time was not changed!" 0 0
