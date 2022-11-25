@@ -54,7 +54,7 @@ set_password() {
             echo "${PASSWORD}" >> /tmp/.password
             PASSWORD=/tmp/.password
         else
-            DIALOG --msgbox "Error:\nPassword didn't match, please enter again." 6 40
+            DIALOG --msgbox "Error:\nPassword didn't match, please enter again." 6 50
             PASSWORD=""
             PASS=""
             PASS2=""
