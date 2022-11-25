@@ -123,9 +123,10 @@ while [[ "${SET_TIME}" == "" ]]; do
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         _datetime="$(echo "${_date}" "${_time}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_datetime}"
+        SET_TIME="1"
     fi
     dohwclock
-    DIALOG --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 || SET_TIME="1"
+    DIALOG --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && SET_TIME=""
 done
 S_NEXTITEM="3"
 }
