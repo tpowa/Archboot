@@ -35,12 +35,10 @@ DIALOG() {
 }
 
 dohwclock() {
-if [[ ! -f /etc/adjtime ]]; then
-    echo "0.0 0 0.0" > /etc/adjtime
-    echo "0" >> /etc/adjtime
-    [[ "${HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
-    [[ "${HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
-fi
+echo "0.0 0 0.0" > /etc/adjtime
+echo "0" >> /etc/adjtime
+[[ "${HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
+[[ "${HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
 if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
     timedatectl set-local-rtc 0
     DATE_PROGRAM=timedatectl
@@ -48,7 +46,7 @@ if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
     echo UTC > /tmp/.hardwareclock
 else
     timedatectl set-local-rtc 1
-    DATE_PROGRAM="$(date)"
+    DATE_PROGRAM=date
     # for setup script
     echo LOCAL > /tmp/.hardwareclock
 fi
