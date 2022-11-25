@@ -56,13 +56,21 @@ fi
 dotimezone () {
 SET_ZONE=""
 while ! [[ "${SET_ZONE}" = "1" ]]; do
+    REGIONS=""
+    for i in $(timedatectl --no-pager list-timezones | cut -d '/' -f 1 | sort -u); do
+        REGIONS="${REGIONS} ${i} -"
+    done
+    #shellcheck disable=SC2086
+    DIALOG --menu "Please Select A Region/Timezone:" 22 60 16 ${REGIONS} 2>${ANSWER}
+    region=$(cat ${ANSWER})
     ZONES=""
-    for i in $(timedatectl --no-pager list-timezones); do
+    for i in $(timedatectl --no-pager list-timezones | grep -w $region | cut -d '/' -f 2); do
         ZONES="${ZONES} ${i} -"
     done
     #shellcheck disable=SC2086
     DIALOG --menu "Please Select A Timezone:" 22 60 16 ${ZONES} 2>${ANSWER} && SET_ZONE="1"
     zone=$(cat ${ANSWER})
+    [[ "${zone}" == "${region}" ]] || zone="${region}/${zone}"
     if [[ "${SET_ZONE}" = "1" ]]; then
         DIALOG --infobox "Setting Timezone to ${zone} ..." 0 0
         echo "${zone}" > /tmp/.timezone
