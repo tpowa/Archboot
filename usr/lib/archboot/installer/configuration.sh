@@ -54,7 +54,8 @@ set_password() {
             echo "${PASSWORD}" >> /tmp/.password
             PASSWORD=/tmp/.password
         else
-            DIALOG --msgbox "Password didn't match, please enter again." 0 0
+            DIALOG --msgbox "Error: Password didn't match, please enter again." 0 0
+            PASSWORD=""
         fi
     done
     chroot "${DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
