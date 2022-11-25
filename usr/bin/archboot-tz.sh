@@ -87,11 +87,12 @@ if [[ ! -s /tmp/.timezone ]]; then
 fi
 while [[ "${SET_TIME}" == "" ]]; do
     DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && HARDWARECLOCK="UTC"
+    dohwclock
     # check internet connection
     if ping -c1 www.google.com >/dev/null 2>&1; then
         if DIALOG --yesno \
         "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-            DIALOG --infobox "Syncing clock with internet clock pool ..." 3 45
+            DIALOG --infobox "Syncing clock with internet clock pool ..." 3 50
             # sync immediatly with standard pool
             if [[ ! $(ntpdate pool.ntp.org) ]]; then
                 DIALOG --msgbox "An error has occured, time was not changed!" 0 0
@@ -125,7 +126,6 @@ while [[ "${SET_TIME}" == "" ]]; do
         timedatectl set-time "${_datetime}"
         SET_TIME="1"
     fi
-    dohwclock
     DIALOG --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && SET_TIME=""
 done
 S_NEXTITEM="3"
