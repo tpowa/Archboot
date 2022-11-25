@@ -179,7 +179,7 @@ auto_pacman_mirror() {
     fi
 }
 
-auto_system_files () {
+auto_system_files() {
     if [[ ! -f ${DESTDIR}/etc/hostname ]]; then
         echo "myhostname" > "${DESTDIR}"/etc/hostname
     fi
