@@ -56,6 +56,8 @@ set_password() {
         else
             DIALOG --msgbox "Error: Password didn't match, please enter again." 0 0
             PASSWORD=""
+            PASS=""
+            PASS2=""
         fi
     done
     chroot "${DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
