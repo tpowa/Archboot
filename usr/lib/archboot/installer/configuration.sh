@@ -2,9 +2,15 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 check_root_password() {
     # check if empty password is set
-    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP && set_password
+    if chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
+        DIALOG --msgbox "Setup detected empty password set for root user, please set password now." 18 70
+        set_password
+    fi
     # check if account is locked
-    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L && set_password
+    if chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
+        DIALOG --msgbox "Setup detected locked account for root user, please set password to unlock account now." 18 70
+        set_password
+    fi
 }
 
 set_mkinitcpio() {
