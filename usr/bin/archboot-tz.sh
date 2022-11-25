@@ -64,7 +64,7 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
     DIALOG --menu "Please Select A Region/Timezone:" 22 40 16 ${REGIONS} 2>${ANSWER}
     region=$(cat ${ANSWER})
     ZONES=""
-    for i in $(timedatectl --no-pager list-timezones | grep -w $region | cut -d '/' -f 2 | sort -u); do
+    for i in $(timedatectl --no-pager list-timezones | grep -w "${region}" | cut -d '/' -f 2 | sort -u); do
         ZONES="${ZONES} ${i} -"
     done
     #shellcheck disable=SC2086
