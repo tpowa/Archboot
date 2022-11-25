@@ -14,10 +14,9 @@ fi
 abort()
 {
     DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 42 || return 0
-    [[ -e /tmp/.km ]] && rm -f /tmp/.km
     [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
     [[ -e /tmp/.font ]] && rm -f /tmp/.font
-        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
     clear
     exit 1
 }
@@ -54,7 +53,8 @@ dokeymap() {
     echo "${keymap}" > /tmp/.keymap
     if [[ "${keymap}" ]]; then
         DIALOG --infobox "Loading keymap: ${keymap}" 0 0
-        localectl set-keymap "${keymap}" || error_kmset 
+        localectl set-keymap "${keymap}" || error_kmset
+        echo "${keymap}" > /tmp/.keymap
     fi
 S_NEXTITEM=2
 }
@@ -85,6 +85,7 @@ doconsolefont() {
             SERIAL="$(tty)"
             setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/${SERIAL}" > /dev/null 2>&1
         fi
+        echo ${font} > /tmp/.font
     fi
 S_NEXTITEM=3
 }
@@ -119,7 +120,6 @@ mainmenu() {
 
 : >/tmp/.keymap
 : >/tmp/.font
-: >/tmp/.km
 
 if [[ ! -d ${BASEDIR}/keymaps ]]; then
     echo "Cannot load keymaps, as none were found in ${BASEDIR}/keymaps" >&2
