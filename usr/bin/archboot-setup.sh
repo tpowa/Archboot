@@ -109,7 +109,7 @@ configure_system() {
     fi
     ## END PREPROCESS ##
     geteditor || return 1
-    check_root_password
+    check_root_password || return 1
     FILE=""
 
     # main menu loop
