@@ -98,15 +98,12 @@ prepare_storagedrive() {
 configure_system() {
     destdir_mounts || return 1
     ## PREPROCESSING ##
-    # only done on first invocation of configure_system and redone on canceled configure system
-    if [[ ${S_CONFIG} -eq 0 ]]; then
-        DIALOG --infobox "Preconfiguring system ..." 3 40
-        auto_pacman_mirror
-        auto_network
-        auto_parameters
-        auto_system_files
-        auto_mkinitcpio
-    fi
+    DIALOG --infobox "Preconfiguring system ..." 3 40
+    auto_pacman_mirror
+    auto_network
+    auto_parameters
+    auto_system_files
+    auto_mkinitcpio
     ## END PREPROCESS ##
     geteditor || return 1
     check_root_password || return 1
@@ -114,7 +111,6 @@ configure_system() {
 
     # main menu loop
     while true; do
-        S_CONFIG=0
         if [[ -n "${FILE}" ]]; then
             DEFAULT="--default-item ${FILE}"
         else
