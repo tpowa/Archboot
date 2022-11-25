@@ -130,8 +130,8 @@ if [[ ! -d ${BASEDIR}/consolefonts ]]; then
     echo "Cannot load consolefonts, as none were found in ${BASEDIR}/consolefonts" >&2
 fi
 
-if [[ ! $(which loadkeys) ]]; then
-    echo "'loadkeys' binary not found!" >&2
+if [[ ! $(which localectl) ]]; then
+    echo "'localectl' binary not found!" >&2
     exit 1
 fi
 
