@@ -78,7 +78,6 @@ done
 
 dotimeset() {
 SET_TIME=""
-USE_NTPD=""
 HARDWARECLOCK=""
 DATE_PROGRAM=""
 if [[ ! -s /tmp/.timezone ]]; then
@@ -86,23 +85,20 @@ if [[ ! -s /tmp/.timezone ]]; then
     S_NEXTITEM="1"
     dotimezone || return 1
 fi
-DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC confuses it." 15 65 && HARDWARECLOCK="UTC"
-dohwclock
-DIALOG --cr-wrap --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && SET_TIME="1"
-if [[ "${SET_TIME}" = "1" ]]; then
-    timedatectl set-ntp 0
-    [[ $(which ntpd) ]] &&  DIALOG --defaultno --yesno "'ntpd' was detected on your system.\n\nDo you want to use 'ntpd' for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 0 0 && USE_NTPD="1"
-    if [[ "${USE_NTPD}" = "1" ]]; then
+while [[ "${SET_TIME}" == "" ]]; do
+    DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 15 65 && HARDWARECLOCK="UTC"
+    if DIALOG --yesno \
+    "Do you want to use the Network Time Protocol for syncing your clock,\nby using the internet clock pool?\n(You need a working internet connection for doing this!)" 0 0; then
         # sync immediatly with standard pool
-        if [[ ! $(ntpdate pool.ntp.org) ]]; then 
+        if [[ ! $(ntpdate pool.ntp.org) ]]; then
             DIALOG --msgbox "An error has occured, time was not changed!" 0 0
-            S_NEXTITEM="2" 
+            S_NEXTITEM="2"
             return 1
         fi
         # enable background syncing
         timedatectl set-ntp 1
-        DIALOG --cr-wrap --msgbox "Synced clock with internet pool successfully.\n\nYour current time is now:\n$(${DATE_PROGRAM})" 0 0
     else
+        timedatectl set-ntp 0
         # display and ask to set date/time
         CANCEL=""
         dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${ANSWER} || CANCEL="1"
@@ -121,9 +117,10 @@ if [[ "${SET_TIME}" = "1" ]]; then
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         _datetime="$(echo "${_date}" "${_time}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_datetime}"
-        DIALOG --cr-wrap --msgbox "Your current time is now:\n$(${DATE_PROGRAM})" 0 0
     fi
-fi
+    dohwclock
+    DIALOG --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 || SET_TIME="1"
+done
 S_NEXTITEM="3"
 }
 
