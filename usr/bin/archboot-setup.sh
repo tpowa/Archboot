@@ -111,6 +111,7 @@ configure_system() {
     geteditor || return 1
     # check for no root password
     chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP && set_password
+    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L && set_password
     FILE=""
 
     # main menu loop
