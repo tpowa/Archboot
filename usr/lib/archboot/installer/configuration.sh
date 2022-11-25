@@ -37,11 +37,17 @@ set_locale() {
 
 set_password() {
     PASSWORD=""
+    PASS=""
+    PASS2=""
     while [[ "${PASSWORD}" = "" ]]; do
-        DIALOG --insecure --passwordbox "Enter root password:" 0 0 2>"${ANSWER}" || return 1
-        PASS=$(cat "${ANSWER}")
-        DIALOG --insecure --passwordbox "Retype root password:" 0 0 2>"${ANSWER}" || return 1
-        PASS2=$(cat "${ANSWER}")
+        while [[ "${PASS}" = "" ]]; do
+            DIALOG --insecure --passwordbox "Enter new root password:" 0 0 2>"${ANSWER}" || return 1
+            PASS=$(cat "${ANSWER}")
+        done
+        while [[ "${PASS2}" = "" ]]; do
+            DIALOG --insecure --passwordbox "Retype new root password:" 0 0 2>"${ANSWER}" || return 1
+            PASS2=$(cat "${ANSWER}")
+        done
         if [[ "${PASS}" = "${PASS2}" ]]; then
             PASSWORD=${PASS}
             echo "${PASSWORD}" > /tmp/.password
