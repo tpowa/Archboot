@@ -109,9 +109,7 @@ configure_system() {
     fi
     ## END PREPROCESS ##
     geteditor || return 1
-    # check for no root password
-    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP && set_password
-    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L && set_password
+    check_root_password
     FILE=""
 
     # main menu loop
@@ -141,13 +139,13 @@ configure_system() {
         if [[ "${FILE}" = "Return" || -z "${FILE}" ]]; then       # exit
             S_CONFIG=1
             break           
-        elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then    # non-file
+        elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
             set_mkinitcpio
-        elif [[ "${FILE}" = "/etc/locale.gen" ]]; then          # non-file
+        elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
             set_locale
-        elif [[ "${FILE}" = "Root-Password" ]]; then            # non-file
+        elif [[ "${FILE}" = "Root-Password" ]]; then              # non-file
             set_password
-        else                                                #regular file
+        else                                                      #regular file
             ${EDITOR} "${DESTDIR}""${FILE}"
         fi
     done

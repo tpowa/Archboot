@@ -1,5 +1,12 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+check_root_password() {
+    # check if empty password is set
+    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP && set_password
+    # check if account is locked
+    chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L && set_password
+}
+
 set_mkinitcpio() {
     DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- Non US keymap users should add 'keymap' to HOOKS= array\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- raid, lvm2, encrypt are not enabled by default\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 15 70
     HOOK_ERROR=""
