@@ -99,7 +99,7 @@ while [[ "${SET_TIME}" == "" ]]; do
     if ping -c1 www.google.com >/dev/null 2>&1; then
         if DIALOG --yesno \
         "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-            DIALOG --infobox "Syncing clock with NTP pool ..." 3 50
+            DIALOG --infobox "Syncing clock with NTP pool ..." 3 45
             # sync immediatly with standard pool
             if [[ ! $(ntpdate pool.ntp.org) ]]; then
                 DIALOG --msgbox "An error has occured, time was not changed!" 0 0

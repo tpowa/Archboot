@@ -108,7 +108,7 @@ configure_system() {
     geteditor || return 1
     check_root_password || return 1
     FILE=""
-
+    S_CONFIG=""
     # main menu loop
     while true; do
         if [[ -n "${FILE}" ]]; then
