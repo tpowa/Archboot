@@ -77,15 +77,15 @@ done
 }
 
 dotimeset() {
-SET_TIME=""
-HARDWARECLOCK=""
-DATE_PROGRAM=""
 if [[ ! -s /tmp/.timezone ]]; then
     DIALOG --msgbox "Error:\nYou have to select timezone first." 0 0
     S_NEXTITEM="1"
     dotimezone || return 1
 fi
+SET_TIME=""
 while [[ "${SET_TIME}" == "" ]]; do
+    HARDWARECLOCK=""
+    DATE_PROGRAM=""
     DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && HARDWARECLOCK="UTC"
     dohwclock
     # check internet connection
