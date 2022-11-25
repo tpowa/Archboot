@@ -46,6 +46,7 @@ if [[ "${HARDWARECLOCK}" = "UTC" ]]; then
     echo UTC > /tmp/.hardwareclock
 else
     timedatectl set-local-rtc 1
+    #shellcheck disable=SC2209
     DATE_PROGRAM=date
     # for setup script
     echo LOCAL > /tmp/.hardwareclock
