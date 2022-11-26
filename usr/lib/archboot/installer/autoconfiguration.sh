@@ -44,8 +44,8 @@ auto_swap () {
 auto_mdadm()
 {
     if [[ -e ${DESTDIR}/etc/mdadm.conf ]]; then
-        DIALOG --infobox "Enable mdadm settings on installed system ..." 3 70
         if grep -q ^md /proc/mdstat 2>/dev/null; then
+            DIALOG --infobox "Enable mdadm settings on installed system ..." 3 70
             mdadm -Ds >> "${DESTDIR}"/etc/mdadm.conf
         fi
         sleep 1
