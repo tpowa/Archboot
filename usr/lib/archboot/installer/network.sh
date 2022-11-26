@@ -143,7 +143,7 @@ donetwork() {
     # add sleep here dhcp can need some time to get link
     DIALOG --infobox "Waiting 30 seconds for network link to come up ..." 3 60
     NETWORK_COUNT="0"
-    while ! ping -c1 www.google.com > /dev/null 2>&1 && break; do
+    while ! ping -c1 www.google.com > "${LOG}"; do
         sleep 1
         NETWORK_COUNT="$((NETWORK_COUNT+1))"
         [[ "${NETWORK_COUNT}" == "30" ]] && break
