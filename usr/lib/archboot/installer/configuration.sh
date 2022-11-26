@@ -93,3 +93,9 @@ run_mkinitcpio() {
     chroot_umount
     sleep 1
 }
+
+run_locale_gen() {
+    DIALOG --infobox "Rebuilding glibc locales ..." 3 40
+    locale_gen
+    sleep 1
+}

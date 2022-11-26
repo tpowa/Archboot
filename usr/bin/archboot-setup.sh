@@ -145,9 +145,7 @@ configure_system() {
         ## POSTPROCESSING ##
         # /etc/initcpio.conf
         run_mkinitcpio
-        DIALOG --infobox "Rebuilding glibc locales ..." 3 40
-        locale_gen
-        sleep 1
+        run_locale_gen
         ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
