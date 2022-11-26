@@ -27,7 +27,7 @@ auto_fstab(){
 auto_ssd () {
     if [[ ! -f ${DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
         DIALOG --infobox "Enable performance ioscheduler settings on installed system ..." 3 70
-        cp /etc/udev/rules.d/70-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/70-ioschedulers.rules
+        cp /etc/udev/rules.d/60-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
         sleep 1
     fi
     if [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
