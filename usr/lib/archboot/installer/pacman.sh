@@ -188,7 +188,6 @@ install_packages() {
     auto_vconsole
     auto_hostname
     auto_locale
-    auto_mkinitcpio
     # tear down the chroot environment
     chroot_umount
 }
