@@ -4,7 +4,7 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 BASEDIR="/usr/share/kbd"
-
+KEYMAP="$(localectl list-keymaps --no-pager)"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
@@ -39,11 +39,20 @@ error_kmset()
 dokeymap() {
     echo "Scanning for keymaps..."
     KEYMAPS=""
-    for i in be bg br $(localectl list-keymaps --no-pager | grep -v '...' | grep "^[a-z]"); do
+    for i in be bg br $(${KEYMAP} | grep -v '...' | grep "^[a-z]"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
     #shellcheck disable=SC2086
+    DIALOG --menu "Select A Region:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    if [[ "${CANCEL}" = "1" ]]; then
+        S_NEXTITEM="1"
+        return 1
+    fi
+    KEYMAPS=""
+    for i in ${KEYMAP} | grep "${ANSWER}"; do
+        KEYMAPS="${KEYMAPS} ${i} -"
+    done
     DIALOG --menu "Select A Keymap:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
