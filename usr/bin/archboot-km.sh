@@ -54,7 +54,7 @@ dokeymap() {
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Layout:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap Layout:" 16 40 12 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
