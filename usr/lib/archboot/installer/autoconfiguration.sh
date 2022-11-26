@@ -1,10 +1,10 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
+
 # auto_fstab()
 # preprocess fstab file
 # comments out old fields and inserts new ones
 # according to partitioning/formatting stage
-#
 auto_fstab(){
     # Modify fstab
     if [[ "${S_MKFS}" = "1" || "${S_MKFSAUTO}" = "1" ]]; then
@@ -21,15 +21,17 @@ auto_fstab(){
     fi
 }
 
-# auto_ssd()
 # add udev rule for schedulers by default
-# add sysctl file for swaps
-auto_ssd () {
+auto_scheduler () {
     if [[ ! -f ${DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
         DIALOG --infobox "Enable performance ioscheduler settings on installed system ..." 3 70
         cp /etc/udev/rules.d/60-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
         sleep 1
     fi
+}
+
+# add sysctl file for swaps
+auto_swap () {
     if [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
         DIALOG --infobox "Enable sysctl swap settings on installed system ..." 3 70
         cp /etc/sysctl.d/99-sysctl.conf "${DESTDIR}"/etc/sysctl.d/99-sysctl.conf
@@ -60,7 +62,7 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
-    DIALOG --infobox "Enable netctl network and proxy settings to installed system ..." 3 70
+    DIALOG --infobox "Enable netctl network and proxy settings on installed system ..." 3 70
     # copy netctl profiles
     [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* "${DESTDIR}"/etc/netctl/ 2>/dev/null
     # enable netctl profiles
@@ -152,7 +154,7 @@ auto_mkinitcpio() {
     sleep 1
 }
 
-auto_parameters() {
+auto_vconsole() {
     if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
         DIALOG --infobox "Setting keymap and font on installed system ..." 3 70
         : >"${DESTDIR}"/etc/vconsole.conf
@@ -206,12 +208,15 @@ auto_pacman_mirror() {
     fi
 }
 
-auto_system_files() {
+auto_hostname() {
     if [[ ! -f ${DESTDIR}/etc/hostname ]]; then
         DIALOG --infobox "Set default hostname on installed system ..." 3 70
         echo "myhostname" > "${DESTDIR}"/etc/hostname
         sleep 1
     fi
+}
+
+auto_locale() {
     if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
         DIALOG --infobox "Set default locale on installed system ..." 3 70
         echo "LANG=C.UTF-8" > "${DESTDIR}"/etc/locale.conf

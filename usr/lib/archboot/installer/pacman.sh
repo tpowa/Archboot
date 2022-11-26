@@ -175,12 +175,20 @@ install_packages() {
     # automagic time!
     # any automatic configuration should go here
     DIALOG --infobox "Writing base configuration..." 6 40
+    auto_timesetting
+    auto_network
     auto_fstab
-    auto_ssd
+    auto_scheduler
+    auto_swap
     auto_mdadm
     auto_luks
     auto_pacman
     auto_testing
+    auto_pacman_mirror
+    auto_vconsole
+    auto_hostname
+    auto_locale
+    auto_mkinitcpio
     # tear down the chroot environment
     chroot_umount
 }

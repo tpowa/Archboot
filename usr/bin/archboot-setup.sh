@@ -98,10 +98,6 @@ prepare_storagedrive() {
 configure_system() {
     destdir_mounts || return 1
     ## PREPROCESSING ##
-    auto_pacman_mirror
-    auto_network
-    auto_parameters
-    auto_system_files
     auto_mkinitcpio
     ## END PREPROCESS ##
     geteditor || return 1
@@ -147,8 +143,6 @@ configure_system() {
     if [[ ${S_CONFIG} -eq 1 ]]; then
         # only done on normal exit of configure menu
         ## POSTPROCESSING ##
-        # adjust time
-        auto_timesetting
         # /etc/initcpio.conf
         run_mkinitcpio
         DIALOG --infobox "Rebuilding glibc locales ..." 3 40
