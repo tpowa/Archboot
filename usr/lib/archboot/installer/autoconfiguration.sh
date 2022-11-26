@@ -8,7 +8,7 @@
 auto_fstab(){
     # Modify fstab
     if [[ "${S_MKFS}" = "1" || "${S_MKFSAUTO}" = "1" ]]; then
-        DIALOG --infobox "Create new fstab on installed system ..." 6 60
+        DIALOG --infobox "Create new fstab on installed system ..." 3 70
         if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>"${DESTDIR}"/etc/fstab
         fi
@@ -25,13 +25,13 @@ auto_fstab(){
 # add udev rule for schedulers by default
 # add sysctl file for swaps
 auto_ssd () {
-    if [[ ! -f ${DESTDIR}/etc/udev/rules.d/60-ioschedulers.rules ]]; then
-        DIALOG --infobox "Enable performance ioscheduler settings on installed system ..." 6 60
-        cp /etc/udev/rules.d/60-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
+    if [[ ! -f ${DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
+        DIALOG --infobox "Enable performance ioscheduler settings on installed system ..." 3 70
+        cp /etc/udev/rules.d/70-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/70-ioschedulers.rules
         sleep 1
     fi
     if [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
-        DIALOG --infobox "Enable sysctl swap settings on installed system ..." 6 60
+        DIALOG --infobox "Enable sysctl swap settings on installed system ..." 3 70
         cp /etc/sysctl.d/99-sysctl.conf "${DESTDIR}"/etc/sysctl.d/99-sysctl.conf
         sleep 1
     fi
@@ -42,7 +42,7 @@ auto_ssd () {
 auto_mdadm()
 {
     if [[ -e ${DESTDIR}/etc/mdadm.conf ]]; then
-        DIALOG --infobox "Enable mdadm settings on installed system ..." 6 60
+        DIALOG --infobox "Enable mdadm settings on installed system ..." 3 70
         if grep -q ^md /proc/mdstat 2>/dev/null; then
             mdadm -Ds >> "${DESTDIR}"/etc/mdadm.conf
         fi
@@ -60,7 +60,7 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
-    DIALOG --infobox "Enable netctl network and proxy settings to installed system ..." 6 60
+    DIALOG --infobox "Enable netctl network and proxy settings to installed system ..." 3 70
     # copy netctl profiles
     [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* "${DESTDIR}"/etc/netctl/ 2>/dev/null
     # enable netctl profiles
@@ -84,7 +84,7 @@ auto_pacman()
 {
     if ! [[ -d ${DESTDIR}/etc/pacman.d/gnupg ]]; then
         DO_PACMAN_GPG=""
-        DIALOG --infobox "Enable pacman's GPG keyring files on installed system ..." 6 60
+        DIALOG --infobox "Enable pacman's GPG keyring files on installed system ..." 3 70
         cp -ar /etc/pacman.d/gnupg "${DESTDIR}"/etc/pacman.d 2>&1
         sleep 1
     fi
@@ -95,7 +95,7 @@ auto_pacman()
 auto_testing()
 {
     if [[ "${DOTESTING}" == "yes" ]]; then
-        DIALOG --infobox "Enable [testing] repository on installed system ..." 6 60
+        DIALOG --infobox "Enable [testing] repository on installed system ..." 3 70
         sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${DESTDIR}"/etc/pacman.conf
         sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${DESTDIR}"/etc/pacman.conf
         sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${DESTDIR}"/etc/pacman.conf
@@ -113,7 +113,7 @@ auto_mkinitcpio() {
     if lsmod | grep -q ^nfs; then
         DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
     fi
-    DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 6 60
+    DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 3 70
     # check on framebuffer modules and kms FBPARAMETER
     grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
     grep -q "^amdgpu" /proc/modules && FBPARAMETER="--amd-kms"
@@ -154,7 +154,7 @@ auto_mkinitcpio() {
 
 auto_parameters() {
     if [[ ! -f ${DESTDIR}/etc/vconsole.conf ]]; then
-        DIALOG --infobox "Setting keymap and font on installed system ..." 6 60
+        DIALOG --infobox "Setting keymap and font on installed system ..." 3 70
         : >"${DESTDIR}"/etc/vconsole.conf
         if [[ -s /tmp/.keymap ]]; then
             echo KEYMAP="$(sed -e 's/\..*//g' /tmp/.keymap)" >> "${DESTDIR}"/etc/vconsole.conf
@@ -169,11 +169,11 @@ auto_parameters() {
 auto_luks() {
     # remove root device from crypttab
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${DESTDIR}"/etc/crypttab)"  = "" ]]; then
-        DIALOG --infobox "Enable luks settings on installed system ..." 6 60
+        DIALOG --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
         sed -i -e "/^$(basename "${PART_ROOT}") /d" /tmp/.crypttab
         cat /tmp/.crypttab >> "${DESTDIR}"/etc/crypttab
-        chmod 600 /tmp/passphrase-* 2>/dev/null
+        chmod 700 /tmp/passphrase-* 2>/dev/null
         cp /tmp/passphrase-* "${DESTDIR}"/etc/ 2>/dev/null
         sleep 1
     fi
@@ -181,12 +181,12 @@ auto_luks() {
 
 auto_timesetting() {
     if [[ -e /etc/localtime && ! -e "${DESTDIR}"/etc/localtime ]]; then
-        DIALOG --infobox "Enable timezone setting on installed system ..." 6 60
+        DIALOG --infobox "Enable timezone setting on installed system ..." 3 70
         cp -a /etc/localtime "${DESTDIR}"/etc/localtime
         sleep 1
     fi
     if [[ ! -f "${DESTDIR}"/etc/adjtime ]]; then
-        DIALOG --infobox "Enable clock setting on installed system ..." 6 60
+        DIALOG --infobox "Enable clock setting on installed system ..." 3 70
         echo "0.0 0 0.0" > "${DESTDIR}"/etc/adjtime
         echo "0" >> "${DESTDIR}"/etc/adjtime
         [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>"${DESTDIR}"/etc/adjtime
@@ -198,7 +198,7 @@ auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [[ "${SYNC_URL}" != "" ]]; then
-        DIALOG --infobox "Enable pacman mirror on installed system ..." 6 60
+        DIALOG --infobox "Enable pacman mirror on installed system ..." 3 70
         #shellcheck disable=SC2027,SC2086
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
@@ -208,12 +208,12 @@ auto_pacman_mirror() {
 
 auto_system_files() {
     if [[ ! -f ${DESTDIR}/etc/hostname ]]; then
-        DIALOG --infobox "Set default hostname on installed system ..." 6 60
+        DIALOG --infobox "Set default hostname on installed system ..." 3 70
         echo "myhostname" > "${DESTDIR}"/etc/hostname
         sleep 1
     fi
     if [[ ! -f ${DESTDIR}/etc/locale.conf ]]; then
-        DIALOG --infobox "Set default locale on installed system ..." 6 60
+        DIALOG --infobox "Set default locale on installed system ..." 3 70
         echo "LANG=C.UTF-8" > "${DESTDIR}"/etc/locale.conf
         echo "LC_COLLATE=C" >> "${DESTDIR}"/etc/locale.conf
         sleep 1
