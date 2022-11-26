@@ -38,8 +38,8 @@ error_kmset()
 
 dokeymap() {
     echo "Scanning for keymaps..."
-    KEYMAPS=
-    for i in $(localectl list-keymaps --no-pager); do
+    KEYMAPS=""
+    for i in be bg br $(localectl list-keymaps --no-pager | grep -v '...' | grep "^[a-z]"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
