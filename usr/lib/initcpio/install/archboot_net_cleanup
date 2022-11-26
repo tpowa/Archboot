@@ -4,11 +4,10 @@
 build ()
 {
     apps="dnsdomainname netstat arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
-      slattach traceroute arping clockdiff rarpd rdisc tracepath \
-      dig host nslookup telnet ssh arpd genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss \
-      tc ifplugd ifplugstatus bridge dcb devlink rdma tipc vdpa \
-      ninfod ethtool elinks dhcp_lease_time dhcp_release dhcp_release6 \
-      routel brctl"
+      slattach traceroute arping clockdiff tracepath dig host nslookup telnet ssh arpd \
+      genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc ifplugd ifplugstatus \
+      bridge dcb devlink rdma tipc vdpa ethtool elinks dhcp_lease_time dhcp_release \
+      dhcp_release6 routel brctl"
     for i in $apps; do
         rm /usr/bin/"$i"
     done
