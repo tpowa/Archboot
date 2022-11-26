@@ -57,7 +57,7 @@ dotimezone () {
 SET_ZONE=""
 while ! [[ "${SET_ZONE}" = "1" ]]; do
     REGIONS=""
-    for i in $(timedatectl --no-pager list-timezones | cut -d '/' -f 1 | grep -v "[A-Z]$" -v "[0-9]$" -v "Zulu" -v "-" | sort -u); do
+    for i in $(timedatectl --no-pager list-timezones | cut -d '/' -f 1 | grep -v "[A-Z]$" -v "[0-9]$" -v "Zulu" | sort -u); do
         REGIONS="${REGIONS} ${i} -"
     done
     #shellcheck disable=SC2086
