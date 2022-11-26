@@ -66,7 +66,6 @@ set_password() {
 
 # run_mkinitcpio()
 # runs mkinitcpio on the target system, displays output
-#
 run_mkinitcpio() {
     DIALOG --infobox "Rebuilding initramfs ..." 3 40
     chroot_mount
