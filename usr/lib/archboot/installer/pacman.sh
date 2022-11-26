@@ -168,7 +168,7 @@ install_packages() {
     auto_packages
     # fix double spaces
     PACKAGES="${PACKAGES//  / }"
-    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${VC} console.\n\nDo you wish to continue?" 13 75 || return 1
+    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${VC} console.\n\nDo you wish to continue?" 12 75 || return 1
     run_pacman
     NEXTITEM="6"
     chroot_mount
