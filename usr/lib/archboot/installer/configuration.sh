@@ -91,4 +91,5 @@ run_mkinitcpio() {
     fi
     rm /tmp/.mkinitcpio-retcode
     chroot_umount
+    sleep 1
 }

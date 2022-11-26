@@ -98,7 +98,6 @@ prepare_storagedrive() {
 configure_system() {
     destdir_mounts || return 1
     ## PREPROCESSING ##
-    DIALOG --infobox "Preconfiguring system ..." 3 40
     auto_pacman_mirror
     auto_network
     auto_parameters
@@ -154,6 +153,7 @@ configure_system() {
         run_mkinitcpio
         DIALOG --infobox "Rebuilding glibc locales ..." 3 40
         locale_gen
+        sleep 1
         ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
