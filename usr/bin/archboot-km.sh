@@ -4,7 +4,7 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 BASEDIR="/usr/share/kbd"
-KEYMAP="$(localectl list-keymaps --no-pager)"
+KEYMAP="localectl list-keymaps --no-pager"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
@@ -37,27 +37,29 @@ error_kmset()
 }
 
 dokeymap() {
-    echo "Scanning for keymaps..."
     KEYMAPS=""
     for i in be bg br $(${KEYMAP} | grep -v '...' | grep "^[a-z]"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Region:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap:" 22 20 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
     fi
+    ANSWER=$(cat ${ANSWER})
     KEYMAPS=""
-    for i in ${KEYMAP} | grep "${ANSWER}"; do
+    for i in $(${KEYMAP} | grep -w "${ANSWER}"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
-    DIALOG --menu "Select A Keymap:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    #shellcheck disable=SC2086
+    DIALOG --menu "Select A Keymap Layout:" 22 60 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
     fi
+    #shellcheck disable=SC2086
     keymap=$(cat ${ANSWER})
     echo "${keymap}" > /tmp/.keymap
     if [[ "${keymap}" ]]; then
@@ -69,19 +71,30 @@ S_NEXTITEM=2
 }
 
 doconsolefont() {
-    echo "Scanning for fonts..."
+    SIZE=
+    CANCEL=
+    SIZES="16 - 14 - 12 - 10 - 8 -"
+    #shellcheck disable=SC2086
+    DIALOG --menu "Select A Font Size:" 12 40 8 ${SIZES} 2>${ANSWER} || CANCEL=1
+    if [[ "${CANCEL}" = "1" ]]; then
+        S_NEXTITEM="2"
+        return 1
+    fi
+    #shellcheck disable=SC2086
+    SIZE=$(cat ${ANSWER})
     FONTS=
     # skip .cp.gz and partialfonts files for now see bug #6112, #6111
-    for i in $(find ${BASEDIR}/consolefonts -maxdepth 1 ! -name '*.cp.gz' -name "*.gz"  | sed 's|^.*/||g' | sort); do
+    for i in $(find ${BASEDIR}/consolefonts -maxdepth 1 ! -name '*.cp.gz' -name "*.gz"  | sed 's|^.*/||g' | grep "${SIZE}\.[a-z]" | sort); do
         FONTS="${FONTS} ${i} -"
     done
-    CANCEL=""
+    CANCEL=
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Console Font:" 22 60 16 ${FONTS} 2>${ANSWER} || CANCEL=1
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="2"
         return 1
     fi
+    #shellcheck disable=SC2086
     font=$(cat ${ANSWER})
     echo "${font}" > /tmp/.font
     if [[ "${font}" ]]; then
@@ -94,7 +107,7 @@ doconsolefont() {
             SERIAL="$(tty)"
             setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/${SERIAL}" > /dev/null 2>&1
         fi
-        echo ${font} > /tmp/.font
+        echo "${font}" > /tmp/.font
     fi
 S_NEXTITEM=3
 }
@@ -111,6 +124,7 @@ mainmenu() {
         "1" "Set Keymap" \
         "2" "Set Consolefont" \
         "3" "${EXIT}" 2>${ANSWER}
+    #shellcheck disable=SC2086
     case $(cat ${ANSWER}) in
         "1")
             dokeymap
