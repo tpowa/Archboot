@@ -30,10 +30,11 @@ auto_ssd () {
         cp /etc/udev/rules.d/60-ioschedulers.rules "${DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
         sleep 1
     fi
-    if [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]];
+    if [[ ! -f ${DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
         DIALOG --infobox "Enable sysctl swap settings on installed system ..." 6 60
         cp /etc/sysctl.d/99-sysctl.conf "${DESTDIR}"/etc/sysctl.d/99-sysctl.conf
         sleep 1
+    fi
 }
 
 # auto_mdadm()
