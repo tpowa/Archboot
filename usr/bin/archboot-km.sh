@@ -37,21 +37,22 @@ error_kmset()
 }
 
 dokeymap() {
+    KEYMAPS=""
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
-    KEYMAPS="be bg br ca cf cz de dk en es et fa fi fr gr hu ie il is it la lt lv mk nl no pl pt ro ru se sg sk sr ua uk us"
-    for i in ${KEYMAPS}; do
+    KEYMAP_LIST="be bg br ca cf cz de dk en es et fa fi fr gr hu ie il is it la lt lv mk nl no pl pt ro ru se sg sk sr sv ua uk us"
+    for i in ${KEYMAP_LIST}; do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap:" 22 30 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap Region:" 22 30 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
     fi
     ANSWER=$(cat ${ANSWER})
-    KEYMAPS=
+    KEYMAPS=""
     for i in $(${KEYMAP} | grep -w "${ANSWER}"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
