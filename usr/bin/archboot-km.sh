@@ -82,7 +82,6 @@ doconsolefont() {
         SIZE="16"
     fi
     #shellcheck disable=SC2086
-    SIZE=$(cat ${ANSWER})
     if [[ "${SIZE}" == "32" ]]; then
         font="latarcyrheb-sun32"
     fi
