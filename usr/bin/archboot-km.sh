@@ -89,7 +89,7 @@ doconsolefont() {
         FONTS="eurlatgr - latarcyrheb-sun16 -"
         CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Console Font:" 5 40 8 ${FONTS} 2>${ANSWER} || CANCEL=1
+        DIALOG --menu "Select A Console Font:" 8 40 10 ${FONTS} 2>${ANSWER} || CANCEL=1
         if [[ "${CANCEL}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
@@ -98,7 +98,7 @@ doconsolefont() {
         font=$(cat ${ANSWER})
     fi
     echo "${font}" > /tmp/.font
-    DIALOG --infobox "Loading font: ${font}" 0 0
+    DIALOG --infobox "Loading console font ${font} ..." 3 40
     for i in $(seq 1 6); do
         setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/tty${i}" > /dev/null 2>&1
     done
