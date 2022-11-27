@@ -89,7 +89,7 @@ doconsolefont() {
         FONTS="eurlatgr - latarcyrheb-sun16 -"
         CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Console Font:" 8 40 10 ${FONTS} 2>${ANSWER} || CANCEL=1
+        DIALOG --menu "Select A Console Font:" 10 40 12 ${FONTS} 2>${ANSWER} || CANCEL=1
         if [[ "${CANCEL}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
