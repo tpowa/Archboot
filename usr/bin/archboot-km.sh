@@ -38,7 +38,9 @@ DIALOG() {
 }
 
 do_vconsole() {
-    DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 50
+    DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 60
+    echo KEYMAP=${keymap} > /etc/vconsole.conf
+    echo FONT=${font} >> /etc/vconsole.conf
     ${VCONSOLE}
     sleep 1
 }
