@@ -4,7 +4,6 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
-VCONSOLE="/usr/lib/systemd/systemd-vconsole-setup"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
@@ -41,7 +40,10 @@ do_vconsole() {
     DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 60
     echo KEYMAP=${keymap} > /etc/vconsole.conf
     echo FONT=${font} >> /etc/vconsole.conf
-    ${VCONSOLE}
+    loadkeys "${keymap}"
+    for i in /dev/tty*; do
+        setfont -C $i ${font}
+    done
     sleep 1
 }
 
