@@ -38,12 +38,9 @@ DIALOG() {
 
 do_vconsole() {
     DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 60
-    #echo KEYMAP=${keymap} > /etc/vconsole.conf
-    #echo FONT=${font} >> /etc/vconsole.conf
-    loadkeys "${keymap}"
-    for i in /dev/tty*; do
-        setfont -C $i ${font}
-    done
+    echo KEYMAP=${keymap} > /etc/vconsole.conf
+    echo FONT=${font} >> /etc/vconsole.conf
+    systemctl restart systemd-vconsole-setup
     sleep 1
 }
 
