@@ -106,7 +106,7 @@ mainmenu() {
     #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
-        "1" "Set Keymap And Set Consolefont"
+        "1" "Set Keymap And Set Consolefont" \
         "2" "${EXIT}" 2>${ANSWER}
     #shellcheck disable=SC2086
     case $(cat ${ANSWER}) in
