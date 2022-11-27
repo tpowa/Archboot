@@ -3,6 +3,7 @@
 
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
+LIST_MAPS="localectl list-keymaps --no-pager"
 VCONSOLE="/usr/lib/systemd/systemd-vconsole-setup"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
@@ -30,7 +31,15 @@ DIALOG() {
     return $?
 }
 
+error_kmset()
+{
+    DIALOG --msgbox "An error occured, your current keymap was not changed." 0 0
+}
+
 dokeymap() {
+    KEYMAPS=""
+    # get list of 2 sign locale
+    #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech de German dk Danish en English es Spanish  et Estonian fa Iran fi Finnish fr French gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish pt Portuguese ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian us USA"
     CANCEL=""
     #shellcheck disable=SC2086
@@ -41,7 +50,7 @@ dokeymap() {
     fi
     ANSWER=$(cat ${ANSWER})
     KEYMAPS=""
-    for i in $(${KEYMAP} | grep -w "${ANSWER}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+    for i in $(${LIST_MAPS} | grep -w "${ANSWER}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
