@@ -74,44 +74,42 @@ S_NEXTITEM=2
 }
 
 doconsolefont() {
-    SIZE=
-    CANCEL=
-    SIZES="32 - 16 - 8 -"
-    #shellcheck disable=SC2086
-    DIALOG --menu "Select A Font Size:" 12 40 8 ${SIZES} 2>${ANSWER} || CANCEL=1
-    if [[ "${CANCEL}" = "1" ]]; then
-        S_NEXTITEM="2"
-        return 1
+    # check for fb size
+    FB_SIZE="$(dmesg | grep "x[0-9][0-9][0-9]x" | cut -d 'x' -f 1 | sed -e 's#.* ##g')"
+    if [[ "${FB_SIZE}" -gt '2000' ]]; then
+        SIZE="32"
+    else
+        SIZE="16"
     fi
     #shellcheck disable=SC2086
     SIZE=$(cat ${ANSWER})
-    FONTS=
-    # skip .cp.gz and partialfonts files for now see bug #6112, #6111
-    for i in $(find ${BASEDIR}/consolefonts -maxdepth 1 ! -name '*.cp.gz' -name "*.gz"  | sed 's|^.*/||g' | grep "${SIZE}\.[a-z]" | sort); do
-        FONTS="${FONTS} ${i} -"
-    done
-    CANCEL=
-    #shellcheck disable=SC2086
-    DIALOG --menu "Select A Console Font:" 22 60 16 ${FONTS} 2>${ANSWER} || CANCEL=1
-    if [[ "${CANCEL}" = "1" ]]; then
-        S_NEXTITEM="2"
-        return 1
+    if [[ "${SIZE}" == "32" ]]; then
+        font="latarcyrheb-sun32"
     fi
-    #shellcheck disable=SC2086
-    font=$(cat ${ANSWER})
-    echo "${font}" > /tmp/.font
-    if [[ "${font}" ]]; then
-        DIALOG --infobox "Loading font: ${font}" 0 0
-        for i in $(seq 1 6); do
-            setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/tty${i}" > /dev/null 2>&1
-        done
-        # set serial console if used too!
-        if tty | grep -q /dev/ttyS; then
-            SERIAL="$(tty)"
-            setfont "${BASEDIR}/consolefonts/${font}" -C "/dev/${SERIAL}" > /dev/null 2>&1
+    if [[ "${SIZE}" == "16" ]]; then
+        FONTS="eurlatgr - latarcyrheb-sun16 -"
+        CANCEL=
+        #shellcheck disable=SC2086
+        DIALOG --menu "Select A Console Font:" 5 40 8 ${FONTS} 2>${ANSWER} || CANCEL=1
+        if [[ "${CANCEL}" = "1" ]]; then
+            S_NEXTITEM="2"
+            return 1
         fi
-        echo "${font}" > /tmp/.font
+        #shellcheck disable=SC2086
+        font=$(cat ${ANSWER})
     fi
+    echo "${font}" > /tmp/.font
+    DIALOG --infobox "Loading font: ${font}" 0 0
+    for i in $(seq 1 6); do
+        setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/tty${i}" > /dev/null 2>&1
+    done
+    # set serial console if used too!
+    if tty | grep -q /dev/ttyS; then
+        SERIAL="$(tty)"
+        setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/${SERIAL}" > /dev/null 2>&1
+    fi
+    echo "${font}" > /tmp/.font
+    sleep 3
 S_NEXTITEM=3
 }
 
