@@ -40,10 +40,7 @@ dokeymap() {
     KEYMAPS=""
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
-    KEYMAP_LIST="be bg br ca cf cz de dk en es et fa fi fr gr hu ie il is it la lt lv mk nl no pl pt ro ru se sg sk sr sv ua uk us"
-    for i in ${KEYMAP_LIST}; do
-        KEYMAPS="${KEYMAPS} ${i} -"
-    done
+    KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech de German dk Danish en English es Spanish  et Estonian fa Iran fi Finnish fr French gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish pt Portuguese ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian us USA"
     CANCEL=""
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Keymap Region:" 22 30 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
@@ -57,7 +54,7 @@ dokeymap() {
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Layout:" 16 40 12 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap Layout:" 18 40 12 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
     if [[ "${CANCEL}" = "1" ]]; then
         S_NEXTITEM="1"
         return 1
@@ -83,13 +80,17 @@ doconsolefont() {
     fi
     #shellcheck disable=SC2086
     if [[ "${SIZE}" == "32" ]]; then
+        DIALOG --infobox "Detected big screen using size 32 font now ..." 3 50
         font="latarcyrheb-sun32"
+        sleep 3
     fi
     if [[ "${SIZE}" == "16" ]]; then
-        FONTS="eurlatgr Europe-Font latarcyrheb-sun16 Worldwide-Font"
+        DIALOG --infobox "Detected normal screen using size 16 fonts..." 3 50
+        FONTS="eurlatgr Europe latarcyrheb-sun16 Worldwide"
+        sleep 3
         CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Console Font:" 10 40 12 ${FONTS} 2>${ANSWER} || CANCEL=1
+        DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
         if [[ "${CANCEL}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
@@ -97,17 +98,10 @@ doconsolefont() {
         #shellcheck disable=SC2086
         font=$(cat ${ANSWER})
     fi
-    echo "${font}" > /tmp/.font
     DIALOG --infobox "Loading console font ${font} ..." 3 50
-    for i in $(seq 1 6); do
-        setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/tty${i}" > /dev/null 2>&1
-    done
-    # set serial console if used too!
-    if tty | grep -q /dev/ttyS; then
-        SERIAL="$(tty)"
-        setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/${SERIAL}" > /dev/null 2>&1
-    fi
     echo "${font}" > /tmp/.font
+    sed -i -e "s#FONT=.*#FONT=${ANSWER}#g" /etc/vconsole.conf
+    systemctl restart systemd-vconsole-setup.service
     sleep 3
 S_NEXTITEM=3
 }
