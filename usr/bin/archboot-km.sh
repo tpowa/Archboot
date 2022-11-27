@@ -4,7 +4,7 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
-if [[ "${1}" = "--setup" ]]; then
+rebif [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
     EXIT="Exit"
@@ -38,8 +38,8 @@ DIALOG() {
 
 do_vconsole() {
     DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 60
-    echo KEYMAP=${keymap} > /etc/vconsole.conf
-    echo FONT=${font} >> /etc/vconsole.conf
+    #echo KEYMAP=${keymap} > /etc/vconsole.conf
+    #echo FONT=${font} >> /etc/vconsole.conf
     loadkeys "${keymap}"
     for i in /dev/tty*; do
         setfont -C $i ${font}
