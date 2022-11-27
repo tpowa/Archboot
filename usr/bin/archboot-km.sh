@@ -3,8 +3,6 @@
 
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
-BASEDIR="/usr/share/kbd"
-KEYMAP="localectl list-keymaps --no-pager"
 VCONSOLE="/usr/lib/systemd/systemd-vconsole-setup"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
@@ -32,15 +30,7 @@ DIALOG() {
     return $?
 }
 
-error_kmset()
-{
-    DIALOG --msgbox "An error occured, your current keymap was not changed." 0 0
-}
-
 dokeymap() {
-    KEYMAPS=""
-    # get list of 2 sign locale
-    #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech de German dk Danish en English es Spanish  et Estonian fa Iran fi Finnish fr French gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish pt Portuguese ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian us USA"
     CANCEL=""
     #shellcheck disable=SC2086
@@ -127,6 +117,7 @@ mainmenu() {
             ;;
         "3")
             [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+
             clear
             exit 0 ;;
         *)
@@ -136,26 +127,6 @@ mainmenu() {
 
 : >/tmp/.keymap
 : >/tmp/.font
-
-if [[ ! -d ${BASEDIR}/keymaps ]]; then
-    echo "Cannot load keymaps, as none were found in ${BASEDIR}/keymaps" >&2
-    exit 1
-fi
-
-if [[ ! -d ${BASEDIR}/consolefonts ]]; then
-    echo "Cannot load consolefonts, as none were found in ${BASEDIR}/consolefonts" >&2
-fi
-
-if [[ ! $(which localectl) ]]; then
-    echo "'localectl' binary not found!" >&2
-    exit 1
-fi
-
-
-if [[ ! $(which setfont) ]]; then
-    echo "'setfont' binary not found!" >&2
-    exit 1
-fi
 
 if [[ -e /tmp/.km-running ]]; then
     echo "km already runs on a different console!"
