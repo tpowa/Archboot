@@ -21,6 +21,12 @@ abort()
     exit 1
 }
 
+abort_dialog() {
+    if [[ "${CANCEL}" = "1" ]]; then
+        S_NEXTITEM="1"
+        return 1
+    fi
+}
 # DIALOG()
 # an el-cheapo dialog wrapper
 #
@@ -31,12 +37,13 @@ DIALOG() {
     return $?
 }
 
-error_kmset()
-{
-    DIALOG --msgbox "An error occured, your current keymap was not changed." 0 0
+do_vconsole() {
+    DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 50
+    ${VCONSOLE}
+    sleep 1
 }
 
-dokeymap() {
+set_vconsole() {
     KEYMAPS=""
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
@@ -44,31 +51,19 @@ dokeymap() {
     CANCEL=""
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Keymap Region:" 22 30 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
-    if [[ "${CANCEL}" = "1" ]]; then
-        S_NEXTITEM="1"
-        return 1
-    fi
+    abort_dialog
     ANSWER=$(cat ${ANSWER})
     KEYMAPS=""
     for i in $(${LIST_MAPS} | grep -w "${ANSWER}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
+    CANCEL=""
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Keymap Layout:" 18 40 12 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
-    if [[ "${CANCEL}" = "1" ]]; then
-        S_NEXTITEM="1"
-        return 1
-    fi
+    abort_dialog
     #shellcheck disable=SC2086
     keymap=$(cat ${ANSWER})
     echo "${keymap}" > /tmp/.keymap
-    DIALOG --infobox "Loading keymap: ${keymap}" 0 0
-    sed -i -e "s#KEYMAP=.*#KEYMAP=${keymap}#g" /etc/vconsole.conf
-    ${VCONSOLE}
-    S_NEXTITEM=2
-}
-
-doconsolefont() {
     # check for fb size
     FB_SIZE="$(dmesg | grep "x[0-9][0-9][0-9]x" | cut -d 'x' -f 1 | sed -e 's#.* ##g')"
     if [[ "${FB_SIZE}" -gt '2000' ]]; then
@@ -90,18 +85,14 @@ doconsolefont() {
         #shellcheck disable=SC2086
         DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
         if [[ "${CANCEL}" = "1" ]]; then
-            S_NEXTITEM="2"
+            S_NEXTITEM="1"
             return 1
         fi
         #shellcheck disable=SC2086
         font=$(cat ${ANSWER})
     fi
-    DIALOG --infobox "Loading console font ${font} ..." 3 50
     echo "${font}" > /tmp/.font
-    sed -i -e "s#FONT=.*#FONT=${font}#g" /etc/vconsole.conf
-    ${VCONSOLE}
-    sleep 1
-    S_NEXTITEM=3
+    S_NEXTITEM=2
 }
 
 mainmenu() {
@@ -113,20 +104,16 @@ mainmenu() {
     #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
-        "1" "Set Keymap" \
-        "2" "Set Consolefont" \
-        "3" "${EXIT}" 2>${ANSWER}
+        "1" "Set Keymap And Set Consolefont"
+        "2" "${EXIT}" 2>${ANSWER}
     #shellcheck disable=SC2086
     case $(cat ${ANSWER}) in
         "1")
-            dokeymap
+            set_vconsole
+            do_vconsole
             ;;
         "2")
-            doconsolefont
-            ;;
-        "3")
             [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
-
             clear
             exit 0 ;;
         *)
