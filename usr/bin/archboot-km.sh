@@ -86,10 +86,10 @@ doconsolefont() {
         font="latarcyrheb-sun32"
     fi
     if [[ "${SIZE}" == "16" ]]; then
-        FONTS="eurlatgr - latarcyrheb-sun16 -"
+        FONTS="eurlatgr Europe latarcyrheb-sun16 Worldwide"
         CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Console Font:" 10 40 12 ${FONTS} 2>${ANSWER} || CANCEL=1
+        DIALOG --menu "Select A Console Font:" 10 60 12 ${FONTS} 2>${ANSWER} || CANCEL=1
         if [[ "${CANCEL}" = "1" ]]; then
             S_NEXTITEM="2"
             return 1
