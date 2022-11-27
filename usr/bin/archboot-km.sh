@@ -50,7 +50,7 @@ dokeymap() {
     fi
     ANSWER=$(cat ${ANSWER})
     KEYMAPS=""
-    for i in $(${KEYMAP} | grep -w "${ANSWER}"); do
+    for i in $(${KEYMAP} | grep -w "${ANSWER}" | grep -v 'mac' | grep -v 'amiga'); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
