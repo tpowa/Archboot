@@ -76,7 +76,7 @@ S_NEXTITEM=2
 doconsolefont() {
     SIZE=
     CANCEL=
-    SIZES="16 - 14 - 12 - 10 - 8 -"
+    SIZES="32 - 16 - 8 -"
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Font Size:" 12 40 8 ${SIZES} 2>${ANSWER} || CANCEL=1
     if [[ "${CANCEL}" = "1" ]]; then
