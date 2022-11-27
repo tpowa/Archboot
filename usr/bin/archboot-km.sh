@@ -82,12 +82,12 @@ doconsolefont() {
     if [[ "${SIZE}" == "32" ]]; then
         DIALOG --infobox "Detected big screen using size 32 font now ..." 3 50
         font="latarcyrheb-sun32"
-        sleep 2
+        sleep 1
     fi
     if [[ "${SIZE}" == "16" ]]; then
         DIALOG --infobox "Detected normal screen using size 16 fonts..." 3 50
         FONTS="eurlatgr Europe latarcyrheb-sun16 Worldwide"
-        sleep 2
+        sleep 1
         CANCEL=
         #shellcheck disable=SC2086
         DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
@@ -102,7 +102,7 @@ doconsolefont() {
     echo "${font}" > /tmp/.font
     sed -i -e "s#FONT=.*#FONT=${font}#g" /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup.service
-    sleep 2
+    sleep 1
 S_NEXTITEM=3
 }
 
