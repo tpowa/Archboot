@@ -98,7 +98,7 @@ doconsolefont() {
         font=$(cat ${ANSWER})
     fi
     echo "${font}" > /tmp/.font
-    DIALOG --infobox "Loading console font ${font} ..." 3 40
+    DIALOG --infobox "Loading console font ${font} ..." 3 50
     for i in $(seq 1 6); do
         setfont "${BASEDIR}/consolefonts/${font}".psfu.gz -C "/dev/tty${i}" > /dev/null 2>&1
     done
