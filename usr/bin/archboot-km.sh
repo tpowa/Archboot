@@ -100,7 +100,7 @@ doconsolefont() {
     fi
     DIALOG --infobox "Loading console font ${font} ..." 3 50
     echo "${font}" > /tmp/.font
-    sed -i -e "s#FONT=.*#FONT=${ANSWER}#g" /etc/vconsole.conf
+    sed -i -e "s#FONT=.*#FONT=${font}#g" /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup.service
     sleep 3
 S_NEXTITEM=3
