@@ -5,7 +5,7 @@ ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 BASEDIR="/usr/share/kbd"
 KEYMAP="localectl list-keymaps --no-pager"
-VCONSOLE="/usr/lib/systemd-vconsole-setup"
+VCONSOLE="/usr/lib/systemd/systemd-vconsole-setup"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
