@@ -62,11 +62,11 @@ dokeymap() {
     #shellcheck disable=SC2086
     keymap=$(cat ${ANSWER})
     echo "${keymap}" > /tmp/.keymap
-    if [[ "${keymap}" ]]; then
-        DIALOG --infobox "Loading keymap: ${keymap}" 0 0
-        localectl set-keymap "${keymap}" || error_kmset
-        echo "${keymap}" > /tmp/.keymap
-    fi
+    DIALOG --infobox "Loading keymap: ${keymap}" 0 0
+    sed -i -e "s#KEYMAP=.*#KEYMAP=${keymap}#g" /etc/vconsole.conf
+    systemctl restart systemd-vconsole-setup.service
+    echo "${keymap}" > /tmp/.keymap
+
 S_NEXTITEM=2
 }
 
@@ -103,7 +103,7 @@ doconsolefont() {
     sed -i -e "s#FONT=.*#FONT=${font}#g" /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup.service
     sleep 1
-S_NEXTITEM=3
+    S_NEXTITEM=3
 }
 
 mainmenu() {
