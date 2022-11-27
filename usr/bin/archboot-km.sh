@@ -65,9 +65,7 @@ dokeymap() {
     DIALOG --infobox "Loading keymap: ${keymap}" 0 0
     sed -i -e "s#KEYMAP=.*#KEYMAP=${keymap}#g" /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup.service
-    echo "${keymap}" > /tmp/.keymap
-
-S_NEXTITEM=2
+    S_NEXTITEM=2
 }
 
 doconsolefont() {
