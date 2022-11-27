@@ -4,7 +4,7 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Keymap And Console Font Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
-rebif [[ "${1}" = "--setup" ]]; then
+if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
 else
     EXIT="Exit"
