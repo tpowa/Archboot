@@ -37,8 +37,10 @@ error_kmset()
 }
 
 dokeymap() {
-    KEYMAPS=""
-    for i in be bg br $(${KEYMAP} | grep -v '...' | grep "^[a-z]"); do
+    # get list of 2 sign locale
+    #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
+    KEYMAPS="be bg br ca cf cz de dk en es et fa fi fr gr hu ie il is it la lt lv mk nl no pl pt ro ru se sg sk sr ua uk us"
+    for i in ${KEYMAPS}; do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
@@ -49,7 +51,7 @@ dokeymap() {
         return 1
     fi
     ANSWER=$(cat ${ANSWER})
-    KEYMAPS=""
+    KEYMAPS=
     for i in $(${KEYMAP} | grep -w "${ANSWER}"); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
