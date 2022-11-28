@@ -60,9 +60,7 @@ set_vconsole() {
         sleep 2
     fi
     if [[ "${SIZE}" == "16" ]]; then
-        DIALOG --infobox "Detected normal screen size ..." 3 50
         FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
-        sleep 2
         CANCEL=
         #shellcheck disable=SC2086
         DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
