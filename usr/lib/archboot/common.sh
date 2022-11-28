@@ -175,6 +175,11 @@ _pacman_key() {
     rm "${1}/${_GPG_KEY}"
 }
 
+_pacman_key_system() {
+    pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
+    pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
+}
+
 _riscv64_disable_graphics() {
     if [[ "${2}" == "use_binfmt" ]]; then
         # riscv64 need does not support local image at the moment

@@ -155,6 +155,8 @@ _install_base_packages() {
 _install_archboot() {
     if [[ "${2}" == "use_binfmt" ]]; then
         _pacman_key "${1}"
+    else
+        _pacman_key_system
     fi
     echo "Installing ${_ARCHBOOT} to ${1} ..."
     #shellcheck disable=SC2086

@@ -15,6 +15,8 @@ _download_packages() {
     _riscv64_disable_graphics "${1}" "${2}"
     if [[ "${2}" == "use_binfmt" ]]; then
         _pacman_key "${1}"
+    else
+        _pacman_key_system
     fi
     _PACKAGES="${_PACKAGES} ${_ARCHBOOT} ${_KEYRING} ${_GRAPHICAL_PACKAGES}"
     echo "Downloading ${_PACKAGES} to ${1} ..."
