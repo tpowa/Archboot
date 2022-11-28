@@ -134,6 +134,8 @@ if [[ "${1}" = "--setup" ]]; then
         clear
         exit 1
     fi
+    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+    clear
     do_vconsole
     exit 0
 else
