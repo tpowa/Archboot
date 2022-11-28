@@ -1,5 +1,20 @@
 #!/bin/bash
 # don't run ttyS0 as first device
+_vconsole() {
+    touch /.vconsole-run
+    if ! [[ -e "/.vconsole-run" ]]; then
+        FB_SIZE="$(cat $(find /sys -wholename '*fb0/modes' | cut -d 'x' -f 1 | sed -e 's#.*:##g'))"
+        if [[ "${FB_SIZE}" -gt '2000' ]]; then
+            SIZE="32"
+        else
+            SIZE="16"
+        fi
+        echo KEYMAP=us > /etc/vconsole.conf
+        echo FONT=latarcyrheb-sun${SIZE} >> /etc/vconsole.conf
+        systemctl restart systemd-vconsole-setup
+    fi
+}
+
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux\033[0m"
     [[ "$(uname -m)" == "aarch64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux ARM\033[0m"
@@ -74,6 +89,7 @@ _run_update_installer() {
 }
 
 if [[ -e /usr/bin/setup ]]; then
+    _vconsole
     _local_mode
     _enter_shell
     if ! [[ -e /tmp/.setup ]]; then
@@ -81,6 +97,7 @@ if [[ -e /usr/bin/setup ]]; then
     fi
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
+    _vconsole
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[91m- Not engough memory detected! \033[0m"
@@ -90,6 +107,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
 # local image, fail if less than 3.3GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3277000 &&\
 -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    _vconsole
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[91m- Not engough memory detected! \033[0m"
@@ -98,6 +116,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _enter_shell
 elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 &&\
 "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4210000 ]]; then
+    _vconsole
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[91m- Kexec memory gap detected: \033[1m3950M - 4.299M RAM\033[0m"
@@ -106,6 +125,7 @@ elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
 else
+    _vconsole
     _welcome
     _run_update_installer
 fi
