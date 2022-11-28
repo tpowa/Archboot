@@ -11,7 +11,7 @@ _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 echo "Starting repository creation ..."
 if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _x86_64_pacman_use_default || exit 1
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && (_x86_64_pacman_use_default || exit 1)
     _cachedir_check
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] || _create_pacman_conf "${_REPODIR}"
     _prepare_pacman "${_REPODIR}" || exit 1
