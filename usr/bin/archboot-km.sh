@@ -43,7 +43,7 @@ do_vconsole() {
 set_vconsole() {
     # check for fb size
     FB_SIZE="$(cat $(find /sys -wholename '*fb0/modes') | cut -d 'x' -f 1 | sed -e 's#.*:##g')"
-    if [[ "${FB_SIZE}" -gt '2000' ]]; then
+    if [[ "${FB_SIZE}" -gt '1900' ]]; then
         SIZE="32"
     else
         SIZE="16"
