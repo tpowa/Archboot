@@ -15,7 +15,7 @@
 . /usr/lib/archboot/installer/partition.sh
 . /usr/lib/archboot/installer/storage.sh
 
-set_keyboard() {
+set_vconsole() {
     if [[ -e /usr/bin/km ]]; then
         km --setup && NEXTITEM="1"
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
@@ -160,7 +160,7 @@ mainmenu() {
     #shellcheck disable=SC2086
     dialog ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
-    "0" "Set Keyboard And Console Font" \
+    "0" "Set Console Font And Keymap" \
     "1" "Set up Network" \
     "2" "Select Source" \
     "3" "Set Time And Date" \
@@ -172,7 +172,7 @@ mainmenu() {
     NEXTITEM="$(cat ${ANSWER})"
     case $(cat ${ANSWER}) in
         "0")
-            set_keyboard ;;
+            set_vconsole ;;
         "1")
             donetwork ;;
         "2")
