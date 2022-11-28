@@ -67,7 +67,7 @@ set_vconsole() {
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     KEYMAPS="us English de German es Spanish fr French pt Portuguese ru Russian OTHER More"
-    OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
+    OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
     CANCEL=""
     #shellcheck disable=SC2086
     DIALOG --menu "Select A Keymap Region:" 14 30 8 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
