@@ -129,7 +129,11 @@ fi
 : >/tmp/.km-running
 
 if [[ "${1}" = "--setup" ]]; then
-    set_vconsole || return 1
+    if ! set_vconsole; then
+        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+        clear
+        exit 1
+    fi
     do_vconsole
     EXIT="Return to Main Menu"
 else
