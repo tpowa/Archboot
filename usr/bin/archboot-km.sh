@@ -135,7 +135,7 @@ if [[ "${1}" = "--setup" ]]; then
         exit 1
     fi
     do_vconsole
-    EXIT="Return to Main Menu"
+    exit 0
 else
     EXIT="Exit"
 fi
