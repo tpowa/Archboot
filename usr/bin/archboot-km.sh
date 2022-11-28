@@ -2,7 +2,7 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 
 ANSWER="/tmp/.km"
-TITLE="Arch Linux Keymap And Console Font Setting"
+TITLE="Arch Linux Console Font And Keymap Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
@@ -12,7 +12,7 @@ fi
 
 abort()
 {
-    DIALOG --yesno "Abort Keymap And Console Font Setting?" 6 42 || return 0
+    DIALOG --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
     [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
     [[ -e /tmp/.font ]] && rm -f /tmp/.font
     [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
@@ -38,7 +38,7 @@ DIALOG() {
 }
 
 do_vconsole() {
-    DIALOG --infobox "Loading keymap ${keymap} and console font ${font} ..." 3 60
+    DIALOG --infobox "Setting console font ${font} and keymap ${keymap} ..." 3 60
     echo KEYMAP=${keymap} > /etc/vconsole.conf
     echo FONT=${font} >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
@@ -108,7 +108,7 @@ mainmenu() {
     #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
-        "1" "Set Keymap And Set Consolefont" \
+        "1" "Set Console Font And Keymap" \
         "2" "${EXIT}" 2>${ANSWER}
     #shellcheck disable=SC2086
     case $(cat ${ANSWER}) in
