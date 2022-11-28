@@ -26,6 +26,7 @@ abort_dialog() {
         return 1
     fi
 }
+
 # DIALOG()
 # an el-cheapo dialog wrapper
 #
@@ -45,28 +46,8 @@ do_vconsole() {
 }
 
 set_vconsole() {
-    KEYMAPS=""
-    # get list of 2 sign locale
-    #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
-    KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech de German dk Danish en English es Spanish  et Estonian fa Iran fi Finnish fr French gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish pt Portuguese ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian us USA"
-    CANCEL=""
-    #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Region:" 22 30 16 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
-    abort_dialog
-    ANSWER=$(cat ${ANSWER})
-    KEYMAPS=""
-    for i in $(${LIST_MAPS} | grep -w "${ANSWER}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
-        KEYMAPS="${KEYMAPS} ${i} -"
-    done
-    CANCEL=""
-    #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Layout:" 18 40 12 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
-    abort_dialog
-    #shellcheck disable=SC2086
-    keymap=$(cat ${ANSWER})
-    echo "${keymap}" > /tmp/.keymap
     # check for fb size
-    FB_SIZE="$(dmesg | grep "x[0-9][0-9][0-9]x" | cut -d 'x' -f 1 | sed -e 's#.* ##g')"
+    FB_SIZE="$(dmesg | grep "[0-9][0-9][0-9][0-9]x" | cut -d 'x' -f 1 | sed -e 's#.* ##g')"
     if [[ "${FB_SIZE}" -gt '2000' ]]; then
         SIZE="32"
     else
@@ -74,25 +55,47 @@ set_vconsole() {
     fi
     #shellcheck disable=SC2086
     if [[ "${SIZE}" == "32" ]]; then
-        DIALOG --infobox "Detected big screen using size 32 font now ..." 3 50
+        DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 50
         font="latarcyrheb-sun32"
-        sleep 1
+        sleep 2
     fi
     if [[ "${SIZE}" == "16" ]]; then
-        DIALOG --infobox "Detected normal screen using size 16 fonts..." 3 50
-        FONTS="eurlatgr Europe latarcyrheb-sun16 Worldwide"
-        sleep 1
+        DIALOG --infobox "Detected normal screen size ..." 3 50
+        FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
+        sleep 2
         CANCEL=
         #shellcheck disable=SC2086
         DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
-        if [[ "${CANCEL}" = "1" ]]; then
-            S_NEXTITEM="1"
-            return 1
-        fi
+        abort_dialog || return 1
         #shellcheck disable=SC2086
         font=$(cat ${ANSWER})
     fi
     echo "${font}" > /tmp/.font
+    # get list of 2 sign locale
+    #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
+    KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
+    OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Itaiian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian"
+    CANCEL=""
+    #shellcheck disable=SC2086
+    DIALOG --menu "Select A Keymap Region:" 14 30 8 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    keymap=$(cat ${ANSWER})
+    if [[ "${keymap}" == "OTHER" ]]; then
+        #shellcheck disable=SC2086
+        DIALOG --menu "Select A Keymap Region:" 18 30 12 ${OTHER_KEYMAPS} 2>${ANSWER} || CANCEL="1"
+        keymap=$(cat ${ANSWER})
+    fi
+    abort_dialog || return 1
+    KEYMAPS=""
+    for i in $(${LIST_MAPS} | grep -w "^${keymap}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+        KEYMAPS="${KEYMAPS} ${i} -"
+    done
+    CANCEL=""
+    #shellcheck disable=SC2086
+    DIALOG --menu "Select A Keymap Layout:" 14 30 8 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    abort_dialog || return 1
+    #shellcheck disable=SC2086
+    keymap=$(cat ${ANSWER})
+    echo "${keymap}" > /tmp/.keymap
     S_NEXTITEM=2
 }
 
@@ -110,7 +113,7 @@ mainmenu() {
     #shellcheck disable=SC2086
     case $(cat ${ANSWER}) in
         "1")
-            set_vconsole
+            set_vconsole || return 1
             do_vconsole
             ;;
         "2")
