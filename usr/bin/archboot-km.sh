@@ -4,13 +4,6 @@
 ANSWER="/tmp/.km"
 TITLE="Arch Linux Console Font And Keymap Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
-if [[ "${1}" = "--setup" ]]; then
-    set_vconsole || return 1
-    do_vconsole
-    EXIT="Return to Main Menu"
-else
-    EXIT="Exit"
-fi
 
 abort()
 {
@@ -134,6 +127,14 @@ if [[ -e /tmp/.km-running ]]; then
     exit 1
 fi 
 : >/tmp/.km-running
+
+if [[ "${1}" = "--setup" ]]; then
+    set_vconsole || return 1
+    do_vconsole
+    EXIT="Return to Main Menu"
+else
+    EXIT="Exit"
+fi
 
 while true; do
     mainmenu

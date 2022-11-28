@@ -21,7 +21,7 @@ set_vconsole() {
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
         archboot-km.sh --setup && NEXTITEM="1"
     else
-        DIALOG --msgbox "Error:\nkm script not found, aborting keyboard and console setting" 0 0
+        DIALOG --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
     fi
 }
 
