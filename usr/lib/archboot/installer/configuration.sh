@@ -23,6 +23,8 @@ set_mkinitcpio() {
     done
     if [[ "${HOOK_ERROR}" = "1" ]]; then
         DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
+    else
+        run_mkinitcpio
     fi
 }
 
@@ -54,6 +56,7 @@ set_locale() {
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
     sleep 2
+    run_locale_gen
 }
 
 set_password() {

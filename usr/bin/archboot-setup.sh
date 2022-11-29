@@ -133,6 +133,7 @@ configure_system() {
             break           
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
             set_mkinitcpio
+            run_mkinitcpio
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
             set_locale
             ${EDITOR} "${DESTDIR}""${FILE}"
@@ -143,12 +144,6 @@ configure_system() {
         fi
     done
     if [[ ${S_CONFIG} -eq 1 ]]; then
-        # only done on normal exit of configure menu
-        ## POSTPROCESSING ##
-        # /etc/initcpio.conf
-        run_mkinitcpio
-        run_locale_gen
-        ## END POSTPROCESSING ##
         NEXTITEM="7"
     fi
 }
