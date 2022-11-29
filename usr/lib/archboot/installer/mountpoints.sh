@@ -234,7 +234,7 @@ mountpoints() {
         BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         if [[ "${DOMKFS}" = "yes" ]]; then
             if [[ "${FSTYPE}" = "swap" ]]; then
-                DIALOG --infobox "Creating and activating swapspace on ${PART} ..." 0 0
+                DIALOG --infobox "Creating and activating \nswapspace on \n${PART} ..." 0 0
             else
                 DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP} ..." 0 0
             fi

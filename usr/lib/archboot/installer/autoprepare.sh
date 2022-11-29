@@ -41,7 +41,9 @@ autoprepare() {
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
-
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+        set_device_name_scheme || return 1
+    fi
     if [[  "${GUIDPARAMETER}" = "yes" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
@@ -279,9 +281,6 @@ autoprepare() {
     ## wait until /dev initialized correct devices
     udevadm settle
 
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        set_device_name_scheme || return 1
-    fi
     ## FSSPECS - default filesystem specs (the + is bootable flag)
     ## <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
