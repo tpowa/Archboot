@@ -112,7 +112,7 @@ run_mkinitcpio() {
 }
 
 run_locale_gen() {
-    DIALOG --infobox "Rebuilding glibc locales on installed system ..." 3 50
+    DIALOG --infobox "Rebuilding glibc locales on installed system ..." 3 60
     locale_gen
     sleep 1
 }
