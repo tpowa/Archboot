@@ -55,13 +55,11 @@ set_locale() {
             set_locale=$(cat ${ANSWER})
         fi
         sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${DESTDIR}"/etc/locale.conf
-        DIALOG --infobox "Setting LANG=${set_locale} on installed system ..." 3 70
+        DIALOG --infobox "Setting locale LANG=${set_locale} on installed system ..." 3 70
         SET_LOCALE="1"
         sleep 2
         _auto_set_locale
         run_locale_gen
-    else
-        _auto_set_locale
     fi
 }
 

@@ -135,7 +135,7 @@ configure_system() {
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
             set_mkinitcpio
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
-            set_locale
+            _auto_set_locale
             ${EDITOR} "${DESTDIR}""${FILE}"
             run_locale_gen
         elif [[ "${FILE}" = "Root-Password" ]]; then              # non-file
