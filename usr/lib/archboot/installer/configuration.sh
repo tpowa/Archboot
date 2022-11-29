@@ -31,11 +31,11 @@ set_locale() {
         LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
         OTHER_LOCALES="$(grep 'UTF' ${DESTDIR}/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Locale:" 14 30 8 ${LOCALES} 2>${ANSWER} || return 1
+        DIALOG --menu "Select A System-Wide Locale:" 14 30 8 ${LOCALES} 2>${ANSWER} || return 1
         set_locale=$(cat ${ANSWER})
         if [[ "${set_locale}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
-            DIALOG --menu "Select A Locale:" 18 30 12 ${OTHER_LOCALES} 2>${ANSWER} || return 1
+            DIALOG --menu "Select A System-Wide Locale:" 18 30 12 ${OTHER_LOCALES} 2>${ANSWER} || return 1
             set_locale=$(cat ${ANSWER})
         fi
         sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${DESTDIR}"/etc/locale.conf
@@ -46,7 +46,6 @@ set_locale() {
     for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
-    ${EDITOR} "${DESTDIR}""${FILE}"
 }
 
 set_password() {
