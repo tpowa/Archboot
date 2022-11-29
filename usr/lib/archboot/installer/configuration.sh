@@ -28,6 +28,16 @@ set_mkinitcpio() {
     fi
 }
 
+_auto_set_locale() {
+    # enable glibc locales from locale.conf
+    #shellcheck disable=SC2013
+    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
+    for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
+        sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
+    done
+    sleep 2
+}
+
 set_locale() {
     if [[ ${SET_LOCALE} == "" ]]; then
         LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
@@ -48,14 +58,10 @@ set_locale() {
         DIALOG --infobox "Setting LANG=${set_locale} on installed system ..." 3 70
         SET_LOCALE="1"
         sleep 2
+        _auto_set_locale
+    else
+        ${EDITOR} "${DESTDIR}""${FILE}"
     fi
-    # enable glibc locales from locale.conf
-    #shellcheck disable=SC2013
-    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
-    for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
-        sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
-    done
-    sleep 2
     run_locale_gen
 }
 
