@@ -97,12 +97,13 @@ prepare_storagedrive() {
 
 configure_system() {
     destdir_mounts || return 1
+    check_root_password || return 1
+    geteditor || return 1
     ## PREPROCESSING ##
+    set_locale || return 1
     auto_mkinitcpio
     ## END PREPROCESS ##
-    geteditor || return 1
-    check_root_password || return 1
-    set_locale || return 1
+
     FILE=""
     S_CONFIG=""
     # main menu loop
@@ -133,7 +134,6 @@ configure_system() {
             break           
         elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
             set_mkinitcpio
-            run_mkinitcpio
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
             set_locale
             ${EDITOR} "${DESTDIR}""${FILE}"
