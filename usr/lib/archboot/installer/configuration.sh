@@ -60,6 +60,7 @@ set_locale() {
         sleep 2
         _auto_set_locale
     else
+        _auto_set_locale
         ${EDITOR} "${DESTDIR}""${FILE}"
     fi
     run_locale_gen
