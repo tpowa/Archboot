@@ -8,6 +8,8 @@ build ()
     add_file "/usr/share/kbd/consolefonts/latarcyrheb-sun32.psfu.gz"
     add_file "/usr/share/kbd/keymaps/i386/qwerty/us.map.gz"
     add_file "/usr/share/kbd/keymaps/i386/include/qwerty-layout.inc"
+    add_file "/usr/share/kbd/keymaps/i386/include/compose.inc"
+
 }
 
 help ()
