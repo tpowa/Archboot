@@ -110,8 +110,8 @@ auto_mkinitcpio() {
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
     HWKVER=""
-    AUTO_MKINITCPIO=""
     if [[ "${AUTO_MKINITCPIO}" = "" ]]; then
+        AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
             DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
