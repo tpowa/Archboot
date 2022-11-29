@@ -221,7 +221,7 @@ autoprepare() {
     if [[ "${GUIDPARAMETER}" == "yes" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         printk off
-        DIALOG --infobox "Partitioning ${DEVICE}" 0 0
+        DIALOG --infobox "Partitioning ${DEVICE} ..." 0 0
         # clean partition table to avoid issues!
         sgdisk --zap "${DEVICE}" &>/dev/null
         # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
