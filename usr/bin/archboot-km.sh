@@ -33,7 +33,7 @@ DIALOG() {
 }
 
 do_vconsole() {
-    DIALOG --infobox "Setting console font ${font} and keymap ${keymap} ..." 3 70
+    DIALOG --infobox "Setting console font ${font} and keymap ${keymap} ..." 3 80
     echo KEYMAP="${keymap}" > /etc/vconsole.conf
     echo FONT="${font}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
