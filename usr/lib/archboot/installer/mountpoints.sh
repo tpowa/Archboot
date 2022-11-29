@@ -126,6 +126,9 @@ mountpoints() {
         #
         # Select mountpoints
         #
+        if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+            set_device_name_scheme || return 1
+        fi
         DIALOG --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         PARTS=$(findpartitions _)
         DO_SWAP=""
@@ -216,9 +219,6 @@ mountpoints() {
     done
     # disable swap and all mounted partitions
     _umountall
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
-        set_device_name_scheme || return 1
-    fi
     printk off
     while read -r line; do
         PART=$(echo "${line}" | cut -d: -f 1)
