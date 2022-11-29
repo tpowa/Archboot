@@ -85,7 +85,6 @@ auto_network()
 auto_pacman()
 {
     if ! [[ -d ${DESTDIR}/etc/pacman.d/gnupg ]]; then
-        DO_PACMAN_GPG=""
         DIALOG --infobox "Enable pacman's GPG keyring files on installed system ..." 3 70
         cp -ar /etc/pacman.d/gnupg "${DESTDIR}"/etc/pacman.d 2>&1
         sleep 1

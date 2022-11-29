@@ -3,7 +3,7 @@
 _vconsole() {
     if ! [[ -e "/.vconsole-run" ]]; then
         touch /.vconsole-run
-        FB_SIZE="$(cat $(find /sys -wholename '*fb0/modes') | cut -d 'x' -f 1 | sed -e 's#.*:##g')"
+        FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
         if [[ "${FB_SIZE}" -gt '1900' ]]; then
             SIZE="32"
         else

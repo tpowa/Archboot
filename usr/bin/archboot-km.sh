@@ -34,27 +34,18 @@ DIALOG() {
 
 do_vconsole() {
     DIALOG --infobox "Setting console font ${font} and keymap ${keymap} ..." 3 60
-    echo KEYMAP=${keymap} > /etc/vconsole.conf
-    echo FONT=${font} >> /etc/vconsole.conf
+    echo KEYMAP="${keymap}" > /etc/vconsole.conf
+    echo FONT="${font}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
 }
 
 set_vconsole() {
-    # check for fb size
-    FB_SIZE="$(cat $(find /sys -wholename '*fb0/modes') | cut -d 'x' -f 1 | sed -e 's#.*:##g')"
-    if [[ "${FB_SIZE}" -gt '1900' ]]; then
-        SIZE="32"
-    else
-        SIZE="16"
-    fi
-    #shellcheck disable=SC2086
-    if [[ "${SIZE}" == "32" ]]; then
+    if grep -qw 'sun32' /etc/vconsole; then
         DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 50
         font="latarcyrheb-sun32"
         sleep 2
-    fi
-    if [[ "${SIZE}" == "16" ]]; then
+    else
         FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
         CANCEL=
         #shellcheck disable=SC2086

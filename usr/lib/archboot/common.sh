@@ -168,7 +168,7 @@ _pacman_key() {
     echo "Adding ${_GPG_KEY} to container ..."
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
-    echo "Adding ${_GPG_KEY_ID} to container trusted keys"
+    echo "Adding ${_GPG_KEY_ID} to container trusted keys ..."
     ${_NSPAWN} "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     ${_NSPAWN} "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
     echo "Removing ${_GPG_KEY} from container ..."
@@ -176,6 +176,7 @@ _pacman_key() {
 }
 
 _pacman_key_system() {
+    echo "Adding ${_GPG_KEY_ID} to trusted keys ..."
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
 }
