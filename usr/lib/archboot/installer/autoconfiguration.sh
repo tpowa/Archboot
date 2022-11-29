@@ -110,48 +110,52 @@ auto_mkinitcpio() {
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
     HWKVER=""
-    # check on nfs
-    if lsmod | grep -q ^nfs; then
-        DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
-    fi
-    DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 3 70
-    # check on framebuffer modules and kms FBPARAMETER
-    grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
-    grep -q "^amdgpu" /proc/modules && FBPARAMETER="--amd-kms"
-    grep -q "^i915" /proc/modules && FBPARAMETER="--intel-kms"
-    grep -q "^nouveau" /proc/modules && FBPARAMETER="--nvidia-kms"
-    # check on nfs,dmraid and keymap HWPARAMETER
-    # check on used keymap, if not us keyboard layout
-    ! grep -q '^KEYMAP="us"' "${DESTDIR}"/etc/vconsole.conf && HWPARAMETER="${HWPARAMETER} --keymap"
-    # check on dmraid
-    if [[ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
-        if ! dmraid -r | grep ^no; then
-            HWPARAMETER="${HWPARAMETER} --dmraid"
+    AUTO_MKINITCPIO=""
+    if [[ "${AUTO_MKINITCPIO}" = "" ]]; then
+        # check on nfs
+        if lsmod | grep -q ^nfs; then
+            DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
         fi
+        DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 3 70
+        # check on framebuffer modules and kms FBPARAMETER
+        grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
+        grep -q "^amdgpu" /proc/modules && FBPARAMETER="--amd-kms"
+        grep -q "^i915" /proc/modules && FBPARAMETER="--intel-kms"
+        grep -q "^nouveau" /proc/modules && FBPARAMETER="--nvidia-kms"
+        # check on nfs,dmraid and keymap HWPARAMETER
+        # check on used keymap, if not us keyboard layout
+        ! grep -q '^KEYMAP="us"' "${DESTDIR}"/etc/vconsole.conf && HWPARAMETER="${HWPARAMETER} --keymap"
+        # check on dmraid
+        if [[ -e ${DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
+            if ! dmraid -r | grep ^no; then
+                HWPARAMETER="${HWPARAMETER} --dmraid"
+            fi
+        fi
+        # get kernel version
+        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+            offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
+            read -r HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+        elif [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
+            reader="cat"
+            # try if the image is gzip compressed
+            [[ $(file -b --mime-type "${DESTDIR}/boot/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+            read -r _ _ HWKVER _ < <($reader "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        fi
+        # arrange MODULES for mkinitcpio.conf
+        HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller --filesystem ${FBPARAMETER})"
+        # arrange HOOKS for mkinitcpio.conf
+        HWDETECTHOOKS="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${DESTDIR}"/usr/lib/initcpio/install "${HWPARAMETER}" --hooks)"
+        # change mkinitcpio.conf
+        [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" "${DESTDIR}"/etc/mkinitcpio.conf
+        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
+        # disable fallpack preset
+        sed -i -e "s# 'fallback'##g" "${DESTDIR}"/etc/mkinitcpio.d/*.preset
+        # remove fallback initramfs
+        [[ -e "${DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${DESTDIR}/boot/initramfs-linux-fallback.img"
+        sleep 2
+        AUTO_MKINITCPIO="1"
+        run_mkinitcpio
     fi
-    # get kernel version
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${DESTDIR}/boot/${VMLINUZ}")
-        read -r HWKVER _ < <(dd if="${DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
-    elif [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
-        reader="cat"
-        # try if the image is gzip compressed
-        [[ $(file -b --mime-type "${DESTDIR}/boot/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-        read -r _ _ HWKVER _ < <($reader "${DESTDIR}/boot/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
-    fi
-    # arrange MODULES for mkinitcpio.conf
-    HWDETECTMODULES="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller --filesystem ${FBPARAMETER})"
-    # arrange HOOKS for mkinitcpio.conf
-    HWDETECTHOOKS="$(hwdetect --kernel_directory="${DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${DESTDIR}"/usr/lib/initcpio/install "${HWPARAMETER}" --hooks)"
-    # change mkinitcpio.conf
-    [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" "${DESTDIR}"/etc/mkinitcpio.conf
-    [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${DESTDIR}"/etc/mkinitcpio.conf
-    # disable fallpack preset
-    sed -i -e "s# 'fallback'##g" "${DESTDIR}"/etc/mkinitcpio.d/*.preset
-    # remove fallback initramfs
-    [[ -e "${DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${DESTDIR}/boot/initramfs-linux-fallback.img"
-    sleep 1
-    run_mkinitcpio
 }
 
 auto_vconsole() {
