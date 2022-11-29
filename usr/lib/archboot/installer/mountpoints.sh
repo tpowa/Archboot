@@ -250,7 +250,7 @@ mountpoints() {
         sleep 1
     done < /tmp/.parts
     printk on
-    DIALOG --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds..." 0 0
+    DIALOG --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
     sleep 3
     NEXTITEM="5"
     S_MKFS=1

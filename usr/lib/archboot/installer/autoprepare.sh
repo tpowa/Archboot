@@ -340,7 +340,7 @@ autoprepare() {
         sleep 1
     done
 
-    DIALOG --infobox "Auto-prepare was successful.\nContinuing in 3 seconds..." 0 0
+    DIALOG --infobox "Auto-prepare was successful. Continuing in 3 seconds ..." 3 70
     sleep 3
     S_MKFSAUTO=1
 }

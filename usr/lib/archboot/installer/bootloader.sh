@@ -349,10 +349,10 @@ do_secureboot_keys() {
             CN=$(cat "${ANSWER}")
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
-         DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN}\nused for your keys in ${DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds..." 8 60
+         DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN}\nused for your keys in ${DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds ..." 8 60
          sleep 10
     else
-         DIALOG --infobox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now\n\nContinuing in 10 seconds..." 8 50
+         DIALOG --infobox "Setup keys:\n-Directory ${DESTDIR}/${KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now\n\nContinuing in 10 seconds ..." 8 50
          sleep 10
     fi
 }
@@ -379,7 +379,7 @@ do_mok_sign () {
         done
         mokutil -i "${DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
         rm /tmp/.password
-        DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 5 seconds..." 5 50
+        DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 5 seconds ..." 5 50
         sleep 5
     fi
     SIGN_MOK=""
@@ -392,7 +392,7 @@ do_mok_sign () {
             sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" 2>&1
             sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi "${UEFI_BOOTLOADER_DIR}"/grub${_SPEC_UEFI_ARCH}.efi > "${LOG}" 2>&1
         fi
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
+        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds ..." 7 60
         sleep 5
     fi
 }
@@ -418,7 +418,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${HOOKNAME}\n\nContinuing in 5 seconds..." 7 70
+        DIALOG --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${HOOKNAME}\n\nContinuing in 5 seconds ..." 7 70
         sleep 5
     fi
 }
@@ -553,7 +553,7 @@ do_efistub_uefi() {
 
 do_systemd_boot_uefi() {
 
-    DIALOG --infobox "Setting up SYSTEMD-BOOT now..." 3 40
+    DIALOG --infobox "Setting up SYSTEMD-BOOT now ..." 3 40
 
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
@@ -606,18 +606,18 @@ GUMEOF
             cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
-        DIALOG --msgbox "Error installing systemd-boot..." 0 0
+        DIALOG --msgbox "Error installing systemd-boot ..." 0 0
     fi
 }
 
 do_refind_uefi() {
     if [[ ! -f "${DESTDIR}/usr/bin/refind-install" ]]; then
-        DIALOG --infobox "Installing refind..." 0 0
+        DIALOG --infobox "Installing refind ..." 0 0
         PACKAGES="refind"
         run_pacman
     fi
 
-    DIALOG --infobox "Setting up rEFInd now. This needs some time..." 3 50
+    DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 50
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
@@ -651,7 +651,7 @@ REFINDEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds..." 5 40
+        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
         sleep 3
 
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf and refind_linux.conf\n\nAfter you save your changes, exit the editor." 8 50
@@ -693,7 +693,7 @@ do_grub_common_before() {
         DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && USE_DMRAID="1"
     fi
     if [[ ! -d "${DESTDIR}/usr/lib/grub" ]]; then
-        DIALOG --infobox "Installing grub..." 0 0
+        DIALOG --infobox "Installing grub ..." 0 0
         PACKAGES="grub"
         run_pacman
     fi
@@ -1003,7 +1003,7 @@ do_uboot() {
     [[ "${RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
     [[ "${RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
     # write extlinux.conf
-    DIALOG --infobox "Installing UBOOT..." 0 0
+    DIALOG --infobox "Installing UBOOT ..." 0 0
     cat << EOF >> "${DESTDIR}/boot/extlinux/extlinux.conf"
 menu title Welcome Arch Linux ${_TITLE}
 timeout 100
@@ -1014,7 +1014,7 @@ label linux
     initrd ${subdir}/${INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
-    DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 3 seconds..." 5 55
+    DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 3 seconds ..." 5 55
     sleep 3
     unset _KERNEL_PARAMS_COMMON_UNMOD
     unset _KERNEL_PARAMS_COMMON_MOD
@@ -1109,7 +1109,7 @@ do_grub_bios() {
         return 1
     fi
 
-    DIALOG --infobox "Setting up GRUB(2) BIOS. This needs some time..." 3 55
+    DIALOG --infobox "Setting up GRUB(2) BIOS. This needs some time ..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
@@ -1130,7 +1130,7 @@ do_grub_bios() {
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
-        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds..." 5 55
+        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds ..." 5 55
         sleep 3
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
@@ -1148,7 +1148,7 @@ do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
 
     do_grub_common_before
-    DIALOG --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
+    DIALOG --infobox "Setting up GRUB(2) UEFI. This needs some time ..." 3 55
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
@@ -1200,7 +1200,7 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
 
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds..." 5 60
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds ..." 5 60
         sleep 3
 
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -1222,7 +1222,7 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
-        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds..." 6 50
+        DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds ..." 6 50
         sleep 5
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0

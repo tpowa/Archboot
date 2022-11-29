@@ -114,7 +114,7 @@ auto_mkinitcpio() {
         AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
-            DIALOG --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
+            DIALOG --defaultno --yesno "Setup detected nfs driver ...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
         fi
         DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 3 70
         # check on framebuffer modules and kms FBPARAMETER

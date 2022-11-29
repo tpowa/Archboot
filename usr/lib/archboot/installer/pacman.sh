@@ -77,7 +77,7 @@ dotesting() {
 # check for updating complete environment with packages
 update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
-        echo "Packages are already in pacman cache..."  > "${LOG}"
+        echo "Packages are already in pacman cache ..."  > "${LOG}"
     else
         detect_uefi_boot
         UPDATE_ENVIRONMENT=""
@@ -101,7 +101,7 @@ prepare_pacman() {
     # Set up the necessary directories for pacman use
     [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
-    DIALOG --infobox "Waiting for Arch Linux keyring initialization..." 3 40
+    DIALOG --infobox "Waiting for Arch Linux keyring initialization ..." 3 40
     # pacman-key process itself
     while pgrep -x pacman-key > /dev/null 2>&1; do
         sleep 1
@@ -111,7 +111,7 @@ prepare_pacman() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    DIALOG --infobox "Refreshing package database..." 3 40
+    DIALOG --infobox "Refreshing package database ..." 3 40
     ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
     KEYRING="archlinux-keyring"
@@ -125,8 +125,8 @@ run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${DESTDIR}:\n${PACKAGES}...\n\nCheck ${VC} console (ALT-F${VC_NUM}) for progress..." 10 70
-    echo "Installing Packages..." >/tmp/pacman.log
+    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${DESTDIR}:\n${PACKAGES} ...\n\nCheck ${VC} console (ALT-F${VC_NUM}) for progress ..." 10 70
+    echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
     ${PACMAN} -S ${PACKAGES} |& tee -a "${LOG}" /tmp/pacman.log >/dev/null 2>&1
@@ -143,7 +143,7 @@ run_pacman(){
         DIALOG --title "${_result}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        DIALOG --infobox "Package installation complete.\nContinuing in 3 seconds..." 4 40
+        DIALOG --infobox "Package installation complete.\nContinuing in 3 seconds ..." 4 40
         sleep 3
     fi
     rm /tmp/.pacman-retcode
@@ -174,7 +174,7 @@ install_packages() {
     chroot_mount
     # automagic time!
     # any automatic configuration should go here
-    DIALOG --infobox "Writing base configuration..." 6 40
+    DIALOG --infobox "Writing base configuration ..." 6 40
     auto_timesetting
     auto_network
     auto_fstab
