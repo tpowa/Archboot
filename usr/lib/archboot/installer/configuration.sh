@@ -85,7 +85,7 @@ set_password() {
 # run_mkinitcpio()
 # runs mkinitcpio on the target system, displays output
 run_mkinitcpio() {
-    DIALOG --infobox "Rebuilding initramfs on installed system ..." 3 40
+    DIALOG --infobox "Rebuilding initramfs on installed system ..." 3 50
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -112,7 +112,7 @@ run_mkinitcpio() {
 }
 
 run_locale_gen() {
-    DIALOG --infobox "Rebuilding glibc locales on installed system ..." 3 40
+    DIALOG --infobox "Rebuilding glibc locales on installed system ..." 3 50
     locale_gen
     sleep 1
 }
