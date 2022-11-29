@@ -102,6 +102,7 @@ configure_system() {
     ## END PREPROCESS ##
     geteditor || return 1
     check_root_password || return 1
+    set_locale || return 1
     FILE=""
     S_CONFIG=""
     # main menu loop
