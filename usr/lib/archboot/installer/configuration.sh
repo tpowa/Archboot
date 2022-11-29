@@ -29,7 +29,11 @@ set_mkinitcpio() {
 set_locale() {
     if [[ ${SET_LOCALE} == "" ]]; then
         LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
-        OTHER_LOCALES="$(grep 'UTF' ${DESTDIR}/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
+        CHECK_LOCALES="$(grep 'UTF' ${DESTDIR}/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
+        OTHER_LOCALES=""
+        for i in ${CHECK_LOCALES}; do
+            OTHER_LOCALES="${OTHER_LOCALES} ${i} -"
+        done
         #shellcheck disable=SC2086
         DIALOG --menu "Select A System-Wide Locale:" 14 40 8 ${LOCALES} 2>${ANSWER} || return 1
         set_locale=$(cat ${ANSWER})
