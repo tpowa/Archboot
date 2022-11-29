@@ -617,7 +617,7 @@ do_refind_uefi() {
         run_pacman
     fi
 
-    DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 50
+    DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 60
 
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
