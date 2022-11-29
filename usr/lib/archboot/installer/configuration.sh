@@ -47,9 +47,11 @@ set_locale() {
     fi
     # enable glibc locales from locale.conf
     #shellcheck disable=SC2013
+    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system locale.gen..." 3 70
     for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
+    sleep 2
 }
 
 set_password() {
