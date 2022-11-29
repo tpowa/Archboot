@@ -234,16 +234,16 @@ mountpoints() {
         BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         if [[ "${DOMKFS}" = "yes" ]]; then
             if [[ "${FSTYPE}" = "swap" ]]; then
-                DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
+                DIALOG --infobox "Creating and activating swapspace on ${PART} ..." 0 0
             else
-                DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP}" 0 0
+                DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP} ..." 0 0
             fi
             _mkfs yes "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         else
             if [[ "${FSTYPE}" = "swap" ]]; then
-                DIALOG --infobox "Activating swapspace on ${PART}" 0 0
+                DIALOG --infobox "Activating swapspace on ${PART} ..." 0 0
             else
-                DIALOG --infobox "Mounting ${FSTYPE} on ${PART} to ${DESTDIR}${MP}" 0 0
+                DIALOG --infobox "Mounting ${FSTYPE} on ${PART} to ${DESTDIR}${MP} ..." 0 0
             fi
             _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi

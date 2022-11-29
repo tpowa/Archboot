@@ -48,7 +48,7 @@ autoprepare() {
     fi
 
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported" 0 0
+        DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
         _UEFISYS_BOOTPART="1"
     fi
 
@@ -203,13 +203,13 @@ autoprepare() {
 
     # validate DEVICE
     if [[ ! -b "${DEVICE}" ]]; then
-      DIALOG --msgbox "Device '${DEVICE}' is not valid" 0 0
+      DIALOG --msgbox "Error: Device '${DEVICE}' is not valid." 0 0
       return 1
     fi
 
     # validate DEST
     if [[ ! -d "${DESTDIR}" ]]; then
-        DIALOG --msgbox "Destination directory '${DESTDIR}' is not valid" 0 0
+        DIALOG --msgbox "Error: Destination directory '${DESTDIR}' is not valid." 0 0
         return 1
     fi
 
@@ -269,7 +269,7 @@ autoprepare() {
     fi
     #shellcheck disable=SC2181
     if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error partitioning ${DEVICE} (see ${LOG} for details)" 0 0
+        DIALOG --msgbox "Error: Partitioning ${DEVICE} (see ${LOG} for details)." 0 0
         printk on
         return 1
     fi
@@ -332,9 +332,9 @@ autoprepare() {
         fi
         BTRFS_LEVEL="NONE"
         if ! [[ "${FSTYPE}" = "swap" ]]; then
-            DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP}" 0 0
+            DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP} ..." 0 0
         else
-            DIALOG --infobox "Creating and activating swapspace on ${PART}" 0 0
+            DIALOG --infobox "Creating and activating swapspace on ${PART} ..." 0 0
         fi
         _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
