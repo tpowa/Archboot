@@ -43,11 +43,13 @@ set_locale() {
             set_locale=$(cat ${ANSWER})
         fi
         sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${DESTDIR}"/etc/locale.conf
+        DIALOG --infobox "Setting LANG=${set_locale} on installed system ..." 3 70
         SET_LOCALE="1"
+        sleep 2
     fi
     # enable glibc locales from locale.conf
     #shellcheck disable=SC2013
-    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system locale.gen..." 3 70
+    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
     for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
