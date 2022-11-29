@@ -28,16 +28,6 @@ set_mkinitcpio() {
     fi
 }
 
-_auto_set_locale() {
-    # enable glibc locales from locale.conf
-    #shellcheck disable=SC2013
-    DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
-    for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
-        sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
-    done
-    sleep 2
-}
-
 set_locale() {
     if [[ ${SET_LOCALE} == "" ]]; then
         LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
@@ -95,7 +85,7 @@ set_password() {
 # run_mkinitcpio()
 # runs mkinitcpio on the target system, displays output
 run_mkinitcpio() {
-    DIALOG --infobox "Rebuilding initramfs ..." 3 40
+    DIALOG --infobox "Rebuilding initramfs on installed system ..." 3 40
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -122,7 +112,7 @@ run_mkinitcpio() {
 }
 
 run_locale_gen() {
-    DIALOG --infobox "Rebuilding glibc locales ..." 3 40
+    DIALOG --infobox "Rebuilding glibc locales on installed system ..." 3 40
     locale_gen
     sleep 1
 }
