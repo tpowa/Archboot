@@ -231,8 +231,8 @@ auto_locale() {
 
 _auto_set_locale() {
     # enable glibc locales from locale.conf
-    #shellcheck disable=SC2013
     DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
+    #shellcheck disable=SC2013
     for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
