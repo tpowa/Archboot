@@ -20,7 +20,7 @@ linux_firmware() {
     PACKAGES="${PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
-        if modinfo "${i}" | grep -w 'firmware:'; then
+        if modinfo "${i}" | grep -qw 'firmware:'; then
             PACKAGES="${PACKAGES} linux-firmware"
             break
         fi
