@@ -151,6 +151,7 @@ auto_mkinitcpio() {
     # remove fallback initramfs
     [[ -e "${DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${DESTDIR}/boot/initramfs-linux-fallback.img"
     sleep 1
+    run_mkinitcpio
 }
 
 auto_vconsole() {
