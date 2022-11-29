@@ -59,11 +59,10 @@ set_locale() {
         SET_LOCALE="1"
         sleep 2
         _auto_set_locale
+        run_locale_gen
     else
         _auto_set_locale
-        ${EDITOR} "${DESTDIR}""${FILE}"
     fi
-    run_locale_gen
 }
 
 set_password() {

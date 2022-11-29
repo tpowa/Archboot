@@ -137,6 +137,7 @@ configure_system() {
         elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
             set_locale
             ${EDITOR} "${DESTDIR}""${FILE}"
+            run_locale_gen
         elif [[ "${FILE}" = "Root-Password" ]]; then              # non-file
             set_password
         else                                                      #regular file
