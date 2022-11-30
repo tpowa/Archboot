@@ -42,7 +42,7 @@ do_vconsole() {
 
 set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
-        DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 50
+        DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 60
         font="latarcyrheb-sun32"
         sleep 2
     else
