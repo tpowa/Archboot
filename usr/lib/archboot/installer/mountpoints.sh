@@ -241,9 +241,9 @@ mountpoints() {
             _mkfs yes "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         else
             if [[ "${FSTYPE}" = "swap" ]]; then
-                DIALOG --infobox "Activating swapspace on ${PART} ..." 0 0
+                DIALOG --infobox "Activating swapspace \non ${PART} ..." 0 0
             else
-                DIALOG --infobox "Mounting ${FSTYPE} on ${PART} to ${DESTDIR}${MP} ..." 0 0
+                DIALOG --infobox "Mounting ${FSTYPE} \non ${PART} \nto ${DESTDIR}${MP} ..." 0 0
             fi
             _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi
