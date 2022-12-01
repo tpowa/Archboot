@@ -693,9 +693,10 @@ add_binary() {
     # be discovered and added.
     #   $1: path to binary
     #   $2: destination on initcpio (optional, defaults to same as source)
+    #   $3: mode
 
     local -a sodeps
-    local line= regex= binary= dest= sodep= resolved=
+    local line= regex= binary= dest= mode= sodep= resolved=
 
     if [[ ${1:0:1} != '/' ]]; then
         binary=$(type -P "$1")
@@ -707,10 +708,13 @@ add_binary() {
         error "file not found: \`%s'" "$1"
         return 1
     fi
+    binary="$(realpath -s -- "$binary")"
 
     dest=${2:-$binary}
+    dest="$(realpath -ms -- "$dest")"
+    mode=${3:-$mode}
 
-    add_file "$binary" "$dest"
+    add_file "$binary" "$dest" "$mode"
 
     # negate this so that the RETURN trap is not fired on non-binaries
     ! lddout=$(ldd "$binary" 2>/dev/null) && return 0
