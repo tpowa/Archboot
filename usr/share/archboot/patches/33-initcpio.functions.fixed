@@ -640,14 +640,18 @@ add_file() {
         # create the symlink
         add_symlink "$dest" "$src"
     else
-        # what if mode is not set?
-        if [[ -z $mode ]]; then
-            # is it executable?
-            [[ -x $src ]] && mode=755
-            # still no mode set? default to 644
-            [[ -z $mode ]] && mode=644
+        if [[ -z "$mode" ]]; then
+            # check if destination is same
+            if [[ "$1" == "$2" ]]; then
+                command cp --preserve=mode,ownership --parents "$src" "$BUILDROOT"
+            else
+                # cp cannot handle mkdir :(
+                [[ -d $(dirname "$BUILDROOT$dest") ]] || mkdir -p $(dirname "$BUILDROOT$dest")
+                command cp --preserve=mode,ownership "$src" "$BUILDROOT$dest"
+            fi
+        else
+            command install -Dm$mode "$src" "$BUILDROOT$dest"
         fi
-        command install -Dm$mode "$src" "$BUILDROOT$dest"
     fi
 }
 
