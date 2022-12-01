@@ -8,6 +8,7 @@ _parameters "$@"
 _root_check
 _architecture_check
 _config
+_fix_mkinitcpio
 if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_64; then
     # running system = aarch64 or x86_64
     echo "Starting ISO creation ..."

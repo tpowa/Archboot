@@ -258,3 +258,10 @@ _cleanup_iso() {
     echo "Cleanup... remove ${_ISODIR} ..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }
+
+_fix_mkinitcpio() {
+    # fix performance on mkinitcpio 33
+    # remove on mkinitcpio 34 release
+    cp "/usr/lib/initcpio/functions" "/usr/lib/initcpio/functions.old"
+    [[ -f "/usr/share/archboot/patches/33-initcpio.functions.fixed" ]] && cp "/usr/share/archboot/patches/33-initcpio.functions.fixed" "/usr/lib/initcpio/functions"
+}
