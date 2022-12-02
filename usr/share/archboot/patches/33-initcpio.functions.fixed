@@ -583,30 +583,44 @@ add_symlink() {
     # Add a symlink to the initcpio image. There is no checking done
     # to ensure that the target of the symlink exists.
     #   $1: pathname of symlink on image
-    #   $2: absolute path to target of symlink (optional, can be read from $1)
+    #   $2: path to target of symlink (optional, can be read from $1)
 
-    local name=$1 target=$2
+    local name="$1" target="${2:-$1}" linkobject
 
     (( $# == 1 || $# == 2 )) || return 1
 
-    if [[ -z "$target" || "$name" == "$target" ]]; then
-        target="$(find "$name" -prune -printf '%l')"
-    elif [[ -L "$target" ]]; then
-        target="$(realpath -eq -- "$target")"
+    if [[ "$name" == "$target" && -L "$target" ]]; then
+        linkobject="$(find "$name" -prune -printf '%l')"
+        # if the link name and target are the same, treat it as if no target is specified
+        target=''
     fi
-    if [[ -z "$target" ]]; then
+
+    if [[ -z "${target:-$linkobject}" ]]; then
         error 'invalid symlink: %s' "$name"
         return 1
     fi
 
-    add_dir "${name%/*}"
+    [[ -d "${BUILDROOT}/${name%/*}" ]] || add_dir "${name%/*}"
 
-    if [[ -L $BUILDROOT$1 ]]; then
-        quiet "overwriting symlink %s -> %s" "$name" "$target"
+    if [[ -L "${BUILDROOT}/${name}" ]]; then
+        quiet "overwriting symlink %s -> %s" "$name" "${target:-$linkobject}"
     else
-        quiet "adding symlink: %s -> %s" "$name" "$target"
+        quiet "adding symlink: %s -> %s" "$name" "${target:-$linkobject}"
     fi
-    ln -sfn "$target" "$BUILDROOT$name"
+
+    if [[ -n "$linkobject" ]]; then
+        # copy the symlink to preserve relativity
+        cp -dT -- "$name" "${BUILDROOT}/${name}"
+        # Add nested symlinks
+        if [[ "${linkobject:0:1}" == '/' && -L "$linkobject" ]]; then
+            add_symlink "$linkobject"
+        elif [[ "${linkobject:0:1}" != '/' && -L "${name%/*}/${linkobject}" ]]; then
+            add_symlink "${name%/*}/${linkobject}"
+        fi
+    else
+        # create the symlink
+        ln -sfn "$target" "${BUILDROOT}/${name}"
+    fi
 }
 
 add_file() {
