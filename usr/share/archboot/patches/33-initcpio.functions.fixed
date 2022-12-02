@@ -619,7 +619,7 @@ add_file() {
     (( $# )) || return 1
 
     # determine source and destination
-    local src=$1 dest=${2:-$1} mode=${3:-$3} srcrealpath
+    local src=$1 dest=${2:-$1} mode=${3} srcrealpath
 
     if [[ ! -f $src ]]; then
         error "file not found: \`%s'" "$src"
