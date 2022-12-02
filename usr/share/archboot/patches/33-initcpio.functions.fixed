@@ -646,7 +646,7 @@ add_file() {
                 command cp --preserve=mode,ownership --parents "$src" "$BUILDROOT"
             else
                 # cp cannot handle mkdir :(
-                [[ -d $(dirname "$BUILDROOT$dest") ]] || mkdir -p $(dirname "$BUILDROOT$dest")
+                [[ -d "${BUILDROOT}${dest%/*}" ]] || add_dir "${dest%/*}"
                 command cp --preserve=mode,ownership "$src" "$BUILDROOT$dest"
             fi
         else
@@ -711,7 +711,6 @@ add_binary() {
     binary="$(realpath -s -- "$binary")"
 
     dest=${2:-$binary}
-    dest="$(realpath -ms -- "$dest")"
     mode=${3:-$mode}
 
     add_file "$binary" "$dest" "$mode"
