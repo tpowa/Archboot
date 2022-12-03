@@ -57,6 +57,8 @@ _prepare_kernel_initramfs_files() {
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    # needed to hash the kernel for secureboot enabled systems
+    install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/vmlinuz_${_RUNNING_ARCH}"
 }
 
 ### EFI status of RISCV64:
