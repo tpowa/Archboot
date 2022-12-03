@@ -164,9 +164,9 @@ _prepare_uefi_image() {
     IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Create efi.img
-    mkfs.vfat --invariant --offset=2048  -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
+    mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
     ## Copy all files to UEFI vfat image
-    mcopy -m -i "${VFAT_IMAGE}"@@1048576 -s "${_ISODIR}"/EFI ::/
+    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
 }
 
 _prepare_extlinux_conf() {
