@@ -57,12 +57,6 @@ _prepare_kernel_initramfs_files() {
         mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
     fi
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
-    [[ ${_RUNNING_ARCH} == "x86_64" ]] && sbsign --key /"${_KEYDIR}"/MOK.KEY --cert /"${_KEYDIR}"/MOK.CRT \
-    --output "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}" > /dev/null 2>&1
-    # add secure boot MOK
-    # add with .cer, cause of DELL firmware
-    mkdir -p "${_ISODIR}/EFI/KEY"
-    cp ${_KEYDIR}/MOK.CER "${_ISODIR}/EFI/KEY/MOK.cer"
 }
 
 ### EFI status of RISCV64:
@@ -136,15 +130,11 @@ _prepare_uefi_shell_tianocore() {
 _prepare_uefi_X64() {
     echo "Prepare X64 Grub ..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key "${_KEYDIR}"/MOK.KEY --cert "${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubx64.efi \
-    "${_ISODIR}/EFI/BOOT/"grubx64.efi > /dev/null 2>&1
 }
 
 _prepare_uefi_IA32() {
     echo "Prepare IA32 Grub ..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
-    sbsign --key "${_KEYDIR}"/MOK.KEY --cert "${_KEYDIR}"/MOK.CRT --output "${_ISODIR}/EFI/BOOT/"grubia32.efi \
-    "${_ISODIR}/EFI/BOOT/"grubia32.efi > /dev/null 2>&1
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
@@ -172,10 +162,9 @@ _prepare_uefi_image() {
     IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Create efi.img
-    dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
-    mkfs.vfat --invariant "${VFAT_IMAGE}" >/dev/null
+    mkfs.vfat --invariant --offset=2048  -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
     ## Copy all files to UEFI vfat image
-    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+    mcopy -m -i "${VFAT_IMAGE}"@@1048576 -s "${_ISODIR}"/EFI ::/
 }
 
 _prepare_extlinux_conf() {
