@@ -46,7 +46,7 @@ _pacman_chroot() {
         echo "Using local ${3} ..."
     fi
     echo "Verifying ${3} ..."
-    gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
+    sudo -u "${_USER}" gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${1}" -xf "${3}"
     if [[ -f "${3}" && -f "${3}".sig ]]; then
         echo "Removing installation tarball ${3} ..."
