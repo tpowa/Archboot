@@ -633,7 +633,7 @@ add_file() {
     (( $# )) || return 1
 
     # determine source and destination
-    local src=$1 dest=${2:-$1} mode=$3 srcrealpath
+    local src="$1" dest="${2:-$1}" mode="$3" srcrealpath
 
     if [[ ! -f $src ]]; then
         error "file not found: \`%s'" "$src"
@@ -650,19 +650,12 @@ add_file() {
         # add the file
         srcrealpath="$(realpath -- "$src")"
         add_file "$srcrealpath" "$srcrealpath" "$mode"
-        [[ -d "${BUILDROOT}${dest%/*}" ]] || add_dir "${dest%/*}"
         # create the symlink
         add_symlink "$dest" "$src"
     else
+        add_dir "${dest%/*}"
         if [[ -z "$mode" ]]; then
-            # check if destination is same
-            if [[ "$src" == "$dest" ]]; then
-                command cp --preserve=mode,ownership --parents "$src" "$BUILDROOT"
-            else
-                # cp cannot handle mkdir :(
-                [[ -d "${BUILDROOT}${dest%/*}" ]] || add_dir "${dest%/*}"
-                command cp --preserve=mode,ownership "$src" "${BUILDROOT}${dest}"
-            fi
+            command cp --preserve=mode,ownership "$src" "${BUILDROOT}${dest}"
         else
             command install -Dm"$mode" "$src" "${BUILDROOT}${dest}"
         fi
