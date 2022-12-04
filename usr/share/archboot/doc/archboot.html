@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 04.12.2022 13:37 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 04.12.2022 21:26 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -629,7 +629,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> first for initial shim setup.</li>
 <li>In order to boot in <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> mode on first boot:
 <ul>
-<li>you need to add the hash of <strong>grub_arch</strong> and <strong>vmlinuz_arch</strong> from disk: <strong>/EFI/BOOT/&ltgrub or vmlinuz&gt</strong></li>
+<li>you need to add the <strong>hash</strong> of <strong>grub</strong> and <strong>kernel</strong> from disk: <strong>/EFI/BOOT/grub&ltarch&gt.efi</strong> or <strong>/EFI/BOOT/vmlinuz_&ltarch&gt</strong> </li>
 </ul></li>
 <li>Tools included for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></li>
 <li>setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:
@@ -1055,7 +1055,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </tr>
 <tr class="odd">
 <td>Image size</td>
-<td>&gt;131-1485MB</td>
+<td>&gt;152-1552MB</td>
 <td>&gt;820MB</td>
 </tr>
 <tr class="even">
