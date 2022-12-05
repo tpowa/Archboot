@@ -56,10 +56,7 @@ fi
 dotimezone () {
 SET_ZONE=""
 while ! [[ "${SET_ZONE}" = "1" ]]; do
-    REGIONS=""
-    for i in $(timedatectl --no-pager list-timezones | cut -d '/' -f 1 | grep -v "[A-Z]$" | grep -v "[0-9]$" | grep -v "Zulu" | grep -v "Universal" | grep -v 'Eire' | sort -u); do
-        REGIONS="${REGIONS} ${i} -"
-    done
+    REGIONS="Africa - America - Asia - Australia - Europe -"
     #shellcheck disable=SC2086
     DIALOG --menu "Please Select A Region:" 22 40 16 ${REGIONS} 2>${ANSWER}
     region=$(cat ${ANSWER})
