@@ -118,14 +118,16 @@ auto_packages() {
     linux_firmware
     marvell_firmware
     ### HACK:
-    # always add intel-ucode
+    # always add intel-ucode on x86_64
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         PACKAGES="${PACKAGES//\ intel-ucode\ / }"
         PACKAGES="${PACKAGES} intel-ucode"
     fi
     # always add amd-ucode
-    PACKAGES="${PACKAGES//\ amd-ucode\ / }"
-    PACKAGES="${PACKAGES} amd-ucode"
+    if [[ "${RUNNING_ARCH}" == "x86_64" ||  "${RUNNING_ARCH}" == "aarch64"  ]]; then
+        PACKAGES="${PACKAGES//\ amd-ucode\ / }"
+        PACKAGES="${PACKAGES} amd-ucode"
+    fi
     ### HACK:
     # always add netctl with optdepends
     PACKAGES="${PACKAGES//\ netctl\ / }"
@@ -146,8 +148,8 @@ auto_packages() {
     # always add nano and vi
     PACKAGES="${PACKAGES//\ nano\ / }"
     PACKAGES="${PACKAGES} nano"
-    PACKAGES="${PACKAGES//\ vi\ / }"
-    PACKAGES="${PACKAGES} vi"
+    PACKAGES="${PACKAGES//\ vim\ / }"
+    PACKAGES="${PACKAGES} vim"
 }
 
 # /etc/locale.gen
