@@ -583,43 +583,38 @@ add_symlink() {
     # Add a symlink to the initcpio image. There is no checking done
     # to ensure that the target of the symlink exists.
     #   $1: pathname of symlink on image
-    #   $2: path to target of symlink (optional, can be read from $1)
+    #   $2: absolute path to target of symlink (optional, can be read from $1)
 
-    local name="$1" target="${2:-$1}" linkobject
+    local name=$1 target=$2
 
     (( $# == 1 || $# == 2 )) || return 1
 
-    if [[ "$name" == "$target" && -L "$target" ]]; then
-        linkobject="$(find "$name" -prune -printf '%l')"
-        # if the link name and target are the same, treat it as if no target is specified
-        target=''
+    # find out the link target
+    if [[ -z "$target" || "$name" == "$target" ]]; then
+        target="$(find "$name" -prune -printf '%l')"
     fi
 
-    if [[ -z "${target:-$linkobject}" ]]; then
+    if [[ -z "$target" ]]; then
         error 'invalid symlink: %s' "$name"
         return 1
     fi
 
-    [[ -d "${BUILDROOT}/${name%/*}" ]] || add_dir "${name%/*}"
+    add_dir "${name%/*}"
 
-    if [[ -L "${BUILDROOT}/${name}" ]]; then
-        quiet "overwriting symlink %s -> %s" "$name" "${target:-$linkobject}"
+    if [[ -L $BUILDROOT$1 ]]; then
+        quiet "overwriting symlink %s -> %s" "$name" "$target"
     else
-        quiet "adding symlink: %s -> %s" "$name" "${target:-$linkobject}"
+        quiet "adding symlink: %s -> %s" "$name" "$target"
     fi
 
-    if [[ -n "$linkobject" ]]; then
-        # copy the symlink to preserve relativity
-        cp -dT -- "$name" "${BUILDROOT}/${name}"
-        # Add nested symlinks
-        if [[ "${linkobject:0:1}" == '/' && -L "$linkobject" ]]; then
-            add_symlink "$linkobject"
-        elif [[ "${linkobject:0:1}" != '/' && -L "${name%/*}/${linkobject}" ]]; then
-            add_symlink "${name%/*}/${linkobject}"
-        fi
-    else
-        # create the symlink
-        ln -sfn "$target" "${BUILDROOT}/${name}"
+    # create the symlink
+    ln -sfn "$target" "$BUILDROOT$name"
+
+    # Add nested symlinks
+    if [[ "${target:0:1}" == '/' && -L "$target" && ! -L "${BUILDROOT}${target}" ]]; then
+        add_symlink "$target"
+    elif [[ "${target:0:1}" != '/' && -L "${name%/*}/${target}" && ! -L "${BUILDROOT}${name%/*}/${target}" ]]; then
+        add_symlink "${name%/*}/${target}"
     fi
 }
 
