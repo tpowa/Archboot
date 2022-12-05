@@ -59,7 +59,6 @@ while ! [[ "${SET_ZONE}" = "1" ]]; do
     REGIONS="Africa - America - Asia - Australia - Europe -"
     #shellcheck disable=SC2086
     DIALOG --menu "Please Select A Region:" 10 40 5 ${REGIONS} 2>${ANSWER}
-
     region=$(cat ${ANSWER})
     ZONES=""
     for i in $(timedatectl --no-pager list-timezones | grep -w "${region}" | cut -d '/' -f 2 | sort -u); do
@@ -167,11 +166,6 @@ mainmenu() {
 : >/tmp/.hardwareclock
 : >/tmp/.timezone
 : >/tmp/.tz
-
-if [[ ! -d ${BASEDIR} ]]; then
-    echo "Cannot load timezone data, as none were found in ${BASEDIR}" >&2
-    exit 1
-fi
 
 if [[ -e /tmp/.tz-running ]]; then
     echo "tz already runs on a different console!"
