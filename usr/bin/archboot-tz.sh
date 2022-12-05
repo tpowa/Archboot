@@ -56,7 +56,7 @@ fi
 dotimezone () {
 SET_ZONE=""
 while ! [[ "${SET_ZONE}" = "1" ]]; do
-    REGIONS="Africa - America - Asia - Australia - Europe -"
+    REGIONS="America - Europe - Africa - Asia - Australia -"
     #shellcheck disable=SC2086
     DIALOG --menu "Please Select A Region:" 12 40 7 ${REGIONS} 2>${ANSWER}
     region=$(cat ${ANSWER})
