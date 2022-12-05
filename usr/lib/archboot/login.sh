@@ -112,11 +112,11 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m3.3GB\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
-elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3860000 &&\
-"$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4210000 ]]; then
+elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3610000 &&\
+"$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4105000 ]]; then
     _welcome
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
-    echo -e "\033[91m- Kexec memory gap detected: \033[1m3950M - 4.299M RAM\033[0m"
+    echo -e "\033[91m- Kexec memory gap detected: \033[1m3701M - 4.199M RAM\033[0m"
     echo -e "\033[91m- Possibility of not working \033[1mkexec\033[0m\033[91m boot is given.\033[0m"
     echo -e "\033[93m- Please use \033[1mmore\033[0m\033[93m or \033[1mless\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
