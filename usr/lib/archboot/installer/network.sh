@@ -107,7 +107,20 @@ donetwork() {
             DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
             DNS=$(cat "${ANSWER}")
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}" 0 0
+            # http/ftp proxy settings
+        DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
+        PROXY=$(cat "${ANSWER}")
+        PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
+        if [[ "${PROXY}" = "" ]]; then
+            for i in ${PROXIES}; do
+                unset "${i}"
+            done
+        else
+            for i in ${PROXIES}; do
+                export "${i}"="${PROXY}"
+            done
+        fi
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
@@ -154,19 +167,6 @@ donetwork() {
     else
         DIALOG --infobox "Link is up. Continuing in 3 seconds ..." 3 60
         sleep 3
-    fi
-    # http/ftp proxy settings
-    DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
-    PROXY=$(cat "${ANSWER}")
-    PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
-    if [[ "${PROXY}" = "" ]]; then
-        for i in ${PROXIES}; do
-            unset "${i}"
-        done
-    else
-        for i in ${PROXIES}; do
-            export "${i}"="${PROXY}"
-        done
     fi
     NEXTITEM="2"
     S_NET=1
