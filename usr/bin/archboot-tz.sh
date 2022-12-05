@@ -58,7 +58,8 @@ SET_ZONE=""
 while ! [[ "${SET_ZONE}" = "1" ]]; do
     REGIONS="Africa - America - Asia - Australia - Europe -"
     #shellcheck disable=SC2086
-    DIALOG --menu "Please Select A Region:" 22 40 16 ${REGIONS} 2>${ANSWER}
+    DIALOG --menu "Please Select A Region:" 14 40 8 ${REGIONS} 2>${ANSWER}
+
     region=$(cat ${ANSWER})
     ZONES=""
     for i in $(timedatectl --no-pager list-timezones | grep -w "${region}" | cut -d '/' -f 2 | sort -u); do
