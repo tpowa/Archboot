@@ -59,7 +59,7 @@ geteditor() {
     if ! [[ "${EDITOR}" ]]; then
         DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
         "1" "nano (easier)" \
-        "2" "vi(m)" 2>${ANSWER} || return 1
+        "2" "vim" 2>${ANSWER} || return 1
         case $(cat ${ANSWER}) in
             "1") EDITOR="nano" ;;
             "2") if [[ -e /usr/bin/vim ]]; then
