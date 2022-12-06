@@ -95,7 +95,7 @@ update_environment() {
                         /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
                     fi
                 else
-                    DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 60
+                    DIALOG --infobox "No new kernel online available.\nContinuing in 3 seconds ..." 4 50
                     sleep 3
                 fi
             fi
