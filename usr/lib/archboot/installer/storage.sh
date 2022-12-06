@@ -49,23 +49,23 @@ _createmd() {
         CANCEL=""
         #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Software Raid" 12 60 5 \
-            "1" "Raid Help" \
-            "2" "Reset Software Raid completely" \
-            "3" "Create Software Raid" \
-            "4" "Create Partitionable Software Raid" \
+            "1" "Create Software Raid" \
+            "2" "Create Partitionable Software Raid" \
+            "3" "Reset Software Raid" \
+            "4" "Raid Help" \
             "5" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
         NEXTITEM="$(cat "${ANSWER}")"
         case $(cat "${ANSWER}") in
             "1")
-                _helpraid ;;
-            "2")
-                _stopmd ;;
-            "3")
                 RAID_PARTITION=""
                 _raid ;;
-            "4")
+            "2")
                 RAID_PARTITION="1"
                 _raid ;;
+            "3")
+                _stopmd ;;
+            "4")
+                _helpraid ;;
               *)
                 MDDONE=1 ;;
         esac
@@ -90,24 +90,24 @@ _createlvm() {
         CANCEL=""
         #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage physical volume, volume group or logical volume" 13 60 7 \
-            "1" "LVM Help" \
-            "2" "Reset Logical Volume completely" \
-            "3" "Create Physical Volume" \
-            "4" "Create Volume Group" \
-            "5" "Create Logical Volume" \
+            "1" "Create Physical Volume" \
+            "2" "Create Volume Group" \
+            "3" "Create Logical Volume" \
+            "4" "Reset Logical Volume" \
+            "5" "LVM Help" \
             "6" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
         NEXTITEM="$(cat "${ANSWER}")"
         case $(cat "${ANSWER}") in
             "1")
-                _helplvm ;;
-            "2")
-                _stoplvm ;;
-            "3")
                 _createpv ;;
-            "4")
+            "2")
                 _createvg ;;
-            "5")
+            "3")
                 _createlv ;;
+            "4")
+                _stoplvm ;;
+            "5")
+                _helplvm ;;
               *)
                 LVMDONE=1 ;;
         esac
@@ -132,18 +132,18 @@ _createluks() {
         CANCEL=""
         #shellcheck disable=SC2086
         dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Manage Luks Encryption" 11 60 5 \
-            "1" "Luks Help" \
+            "1" "Create Luks" \
             "2" "Reset Luks Encryption completely" \
-            "3" "Create Luks" \
+            "3" "Luks Help" \
             "4" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
         NEXTITEM="$(cat "${ANSWER}")"
         case $(cat "${ANSWER}") in
             "1")
-                _helpluks ;;
+                _luks ;;
             "2")
                 _stopluks ;;
             "3")
-                _luks ;;
+                _helpluks ;;
               *)
                 LUKSDONE=1 ;;
         esac
