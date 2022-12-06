@@ -69,7 +69,7 @@ select_mirror() {
 # enable testing repository on network install
 dotesting() {
     DOTESTING=""
-    DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [communtoy-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 60 && DOTESTING="yes"
+    DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [communtoy-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
 }
 
 # check for updating complete environment with packages
