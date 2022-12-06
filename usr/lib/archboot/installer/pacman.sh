@@ -84,7 +84,7 @@ update_environment() {
                 DIALOG --infobox "Refreshing package database ..." 3 40
                 pacman -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
                 sleep 1
-                DIALOG --infobox "Checking new online kernel version ..." 3 40
+                DIALOG --infobox "Checking new online kernel version ..." 3 50
                 sleep 1
                 RUNNING_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
@@ -95,7 +95,7 @@ update_environment() {
                         /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
                     fi
                 else
-                    DIALOG --infobox "No new kernel online available. Continuing in 3 seconds..." 3 40
+                    DIALOG --infobox "No new kernel online available.\nContinuing in 3 seconds..." 3 40
                     sleep 3
                 fi
             fi
