@@ -60,10 +60,8 @@ select_mirror() {
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if [[ "${DOTESTING}" == "yes" ]]; then
         #shellcheck disable=SC2129
-        echo "[testing]" >> /etc/pacman.conf
-        echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-        echo "[community-testing]" >> /etc/pacman.conf
-        echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+        sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist\nd:g" /etc/pacman.conf
+        sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
     fi
 }
 
@@ -83,10 +81,14 @@ update_environment() {
         UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
-                DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
-                if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
-                    DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
-                    /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
+                DIALOG --infobox "Refreshing package database ..." 3 40
+                ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
+                if ! [[ "$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')" == "$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')" ]]; then
+                    DIALOG --defaultno --yesno "Do you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
+                    if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
+                        DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
+                        /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
+                    fi
                 fi
             fi
         fi
