@@ -70,11 +70,7 @@ _createmd() {
                 MDDONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="1"
-    else
-        NEXTITEM="4"
-    fi
+    NEXTITEM="1"
 }
 
 # menu for lvm creation
@@ -112,11 +108,7 @@ _createlvm() {
                 LVMDONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="2"
-    else
-        NEXTITEM="4"
-    fi
+    NEXTITEM="2"
 }
 
 # menu for luks creation
@@ -148,9 +140,5 @@ _createluks() {
                 LUKSDONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="3"
-    else
-        NEXTITEM="4"
-    fi
+    NEXTITEM="3"
 }
