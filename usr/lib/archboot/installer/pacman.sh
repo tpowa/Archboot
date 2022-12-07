@@ -82,7 +82,7 @@ update_environment() {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
                 DIALOG --infobox "Refreshing package database ..." 3 70
-                pacman -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
+                pacman -Sy > "${LOG}" 2>&1
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 RUNNING_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
