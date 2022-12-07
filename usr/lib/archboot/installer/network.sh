@@ -40,6 +40,10 @@ donetwork() {
                 0) INTERFACE=$(cat "${ANSWER}") ;;
             esac
         done
+        # profile name
+        NETWORK_PROFILE=""
+        DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
+        NETWORK_PROFILE=/etc/systemd/network/$(cat "${ANSWER}").network
         # wireless switch
         CONNECTION=""
         WLAN_HIDDEN=""
@@ -67,6 +71,7 @@ donetwork() {
             #shellcheck disable=SC2001,SC2086
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
             WPA=""
+            WPA_MENU=""
             DIALOG --infobox "Checking on WPA/PSK encryption ..." 3 40
             iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
@@ -76,7 +81,7 @@ donetwork() {
                 #shellcheck disable=2046
                 DIALOG --ok-label "Select" --menu "Select encryption type:" 9 50 7 \
                     ${WPA_MENU} \
-                    "NONE" "Open network/NO encryption" 2>"${ANSWER}"
+                    "NONE" "Open_Network/NO_Encryption" 2>"${ANSWER}"
                     case $? in
                         1) return 1 ;;
                         0) WLAN_SECURITY=$(cat "${ANSWER}") ;;
@@ -89,10 +94,6 @@ donetwork() {
         else
             CONNECTION="ethernet"
         fi
-        # profile name
-        NETWORK_PROFILE=""
-        DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
-        NETWORK_PROFILE=/etc/systemd/network/$(cat "${ANSWER}").network
         # dhcp switch
         IP=""
         DIALOG --yesno "Do you want to use DHCP?" 5 40
@@ -173,7 +174,7 @@ donetwork() {
         [[ "${NETWORK_COUNT}" == "30" ]] && break
     done
     if ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; then
-        DIALOG --msgbox "Your network is not correctly working, please configure again!" 0 0
+        DIALOG --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
         return 1
     else
         DIALOG --infobox "Link is up. Continuing in 3 seconds ..." 3 60
