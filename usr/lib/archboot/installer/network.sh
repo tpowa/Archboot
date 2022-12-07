@@ -139,9 +139,9 @@ donetwork() {
     [[ "${IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${NETWORK_PROFILE}"
     if [[ "${IP}" = "static" ]]; then
         #shellcheck disable=SC2129
-        echo "Address='${IPADDR}'" >>"${NETWORK_PROFILE}"
-        echo "Gateway='${GW}'" >>"${NETWORK_PROFILE}"
-        echo "DNS=('${DNS}')" >>"${NETWORK_PROFILE}"
+        echo "Address=${IPADDR}" >>"${NETWORK_PROFILE}"
+        echo "Gateway=${GW}" >>"${NETWORK_PROFILE}"
+        echo "DNS=${DNS}" >>"${NETWORK_PROFILE}"
     fi
     if [[ "${CONNECTION}" = "wireless" ]]; then
         #shellcheck disable=SC2129
