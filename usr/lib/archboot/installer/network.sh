@@ -40,6 +40,11 @@ donetwork() {
                 0) INTERFACE=$(cat "${ANSWER}") ;;
             esac
         done
+        if echo "${INTERFACE}" | grep -q wlan >/dev/null; then
+            CONNECTION="wireless"
+        else
+            CONNECTION="ethernet"
+        fi
         # profile name
         NETWORK_PROFILE=""
         DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
@@ -51,7 +56,7 @@ donetwork() {
         WLAN_SECURITY=""
         WLAN_KEY=""
         # iwd renames wireless devices to wlanX
-        if echo "${INTERFACE}" | grep -q wlan >/dev/null; then
+        if [[ "${CONNECTION}" == "wireless" ]]; then
             CONNECTION="wireless"
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
@@ -91,8 +96,6 @@ donetwork() {
                 DIALOG --inputbox "Enter your KEY:" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
-        else
-            CONNECTION="ethernet"
         fi
         # dhcp switch
         IP=""
