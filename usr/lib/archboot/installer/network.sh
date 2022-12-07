@@ -24,6 +24,7 @@ essid_scan() {
 # args: none
 # returns: 1 on failure
 donetwork() {
+    S_NET=0
     NETPARAMETERS=""
     while [[ "${NETPARAMETERS}" = "" ]]; do
         # select network interface
