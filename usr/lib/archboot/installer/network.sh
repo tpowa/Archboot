@@ -73,15 +73,15 @@ donetwork() {
             #shellcheck disable=SC2181
             while [[ "${WLAN_SECURITY}" = "" ]]; do
                 #shellcheck disable=2046
-                DIALOG --ok-label "Select" --menu "Select encryption type:" 9 40 7 \
-                    $([[ "${WPA}" == "1" ]] && echo "WPA-PSK" "Encrypted network") \
+                DIALOG --ok-label "Select" --menu "Select encryption type:" 9 50 7 \
+                    ([[ "${WPA}" == "1" ]] && echo "WPA-PSK" "Encrypted network") \
                     "NONE" "Open network/NO encryption" 2>"${ANSWER}"
                     case $? in
                         1) return 1 ;;
                         0) WLAN_SECURITY=$(cat "${ANSWER}") ;;
                     esac
             done
-            if [[ "${WLAN_SECURITY}" == "wpa" ]]; then
+            if [[ "${WLAN_SECURITY}" == "WPA-PSK" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
