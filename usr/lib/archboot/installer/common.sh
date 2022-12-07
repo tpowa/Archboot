@@ -129,11 +129,7 @@ auto_packages() {
         PACKAGES="${PACKAGES} amd-ucode"
     fi
     ### HACK:
-    # always add netctl with optdepends
-    PACKAGES="${PACKAGES//\ netctl\ / }"
-    PACKAGES="${PACKAGES} netctl"
-    PACKAGES="${PACKAGES//\ dhcpd\ / }"
-    PACKAGES="${PACKAGES} dhcpcd"
+    # always add wpa_supplicant
     PACKAGES="${PACKAGES//\ wpa_supplicant\ / }"
     PACKAGES="${PACKAGES} wpa_supplicant"
     ### HACK:
@@ -145,7 +141,7 @@ auto_packages() {
     PACKAGES="${PACKAGES//\ mdadm\ / }"
     PACKAGES="${PACKAGES} mdadm"
     ### HACK
-    # always add nano and vi
+    # always add nano and vim
     PACKAGES="${PACKAGES//\ nano\ / }"
     PACKAGES="${PACKAGES} nano"
     PACKAGES="${PACKAGES//\ vim\ / }"

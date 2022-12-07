@@ -62,13 +62,19 @@ auto_network()
     if [[ ${S_NET} -eq 0 ]]; then
         return 1
     fi
-    DIALOG --infobox "Enable netctl network and proxy settings on installed system ..." 3 70
-    # copy netctl profiles
-    [[ -d ${DESTDIR}/etc/netctl ]] && cp /etc/netctl/* "${DESTDIR}"/etc/netctl/ 2>/dev/null
-    # enable netctl profiles
-    for i in $(echo /etc/netctl/*); do
-         [[ -f $i ]] && systemd-nspawn -q -D "${DESTDIR}" netctl enable "$(basename "${i}")" >/dev/null 2>&1
+    DIALOG --infobox "Enable network and proxy settings on installed system ..." 3 70
+    # copy wpa_supplicant profiles
+    [[ -d ${DESTDIR}/etc/wpa_supplicant ]] && cp /etc/wpa_supplicant/* "${DESTDIR}"/etc/wpa_supplicant/ 2>/dev/null
+    # copy network profiles
+    [[ -d ${DESTDIR}/etc/systemd/network ]] && cp /etc/systemd/network/* "${DESTDIR}"/etc/systemd/network/ 2>/dev/null
+    # enable network profiles
+    for i in $(echo /etc/systemd/network/*); do
+         [[ -f "${i}" ]] && systemd-nspawn -q -D "${DESTDIR}"systemctl enable "$(basename "${i}")" >/dev/null 2>&1
     done
+    if [[ -f "/tmp/.wpa_supplicant" ]]; then
+        WPA_SUPPLICANT="$(cat /tmp/wpa_supplicant)"
+        systemd-nspawn -q -D "${DESTDIR}"systemctl enable "${WPA_SUPPLICANT}" >/dev/null 2>&1
+    fi
     # copy proxy settings
     if [[ -n "${PROXY}" ]]; then
         for i in ${PROXIES}; do

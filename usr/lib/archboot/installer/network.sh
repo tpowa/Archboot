@@ -7,9 +7,6 @@ net_interfaces() {
 
 # check for already active profile
 check_nework() {
-    for i in /etc/netctl/*; do
-        [[ -f "${i}" ]] && netctl is-active "$(basename "${i}")" && S_NET=1
-    done
     [[ "${S_NET}" == "1" ]] || donetwork
 }
 
@@ -115,10 +112,11 @@ donetwork() {
                             [[ "${AUTH_COUNT}" == "30" ]] && break
                         done
                         if systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed; then
-                            DIALOG --msgbox "Error:\nAuthentification failed, please configure again!" 6 60
+                            DIALOG --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
                             WPA_AUTH=""
                         else
                             WPA_AUTH="1"
+                            echo "wpa_supplicant@${INTERFACE}.service" > /tmp/.wpa_supplicant
                             DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
                             sleep 3
                         fi
