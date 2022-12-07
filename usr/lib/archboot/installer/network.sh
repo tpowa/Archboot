@@ -92,7 +92,7 @@ donetwork() {
             done
             if [[ "${WLAN_SECURITY}" == "WPA-PSK" ]]; then
                 while [[ ${WPA_AUTH} = "" ]]; do
-                    DIALOG --inputbox "Enter your KEY:" 5 40 "WirelessKey" 2>"${ANSWER}" || return 1
+                    DIALOG --inputbox "Enter your KEY:" 8 40 "WirelessKey" 2>"${ANSWER}" || return 1
                     WLAN_KEY=$(cat "${ANSWER}")
                     if [[ "${CONNECTION}" = "wireless" ]]; then
                         # setup wpa_supplicant
@@ -107,10 +107,15 @@ donetwork() {
                         echo "wpa_supplicant config saved to ${WPA_PROFILE}." > "${LOG}"
                         echo "Starting wpa_supplicant@${INTERFACE}.service ..." > "${LOG}"
                         systemctl restart wpa_supplicant@${INTERFACE}.service
-                        DIALOG --infobox "Waiting 20 seconds for authentification ..." 3 60
-                        sleep 20
+                        AUTH_COUNT="0"
+                        while ! systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw completed; do
+                            DIALOG --infobox "Waiting 30 seconds for authentification ..." 3 60
+                            sleep 1
+                            AUTH_COUNT="$((NETWORK_COUNT+1))"
+                            [[ "${AUTH_COUNT}" == "30" ]] && break
+                        done
                         if systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed; then
-                            DIALOG --msgbox "Error:\nAuthentification failed, please configure again!" 6 70
+                            DIALOG --msgbox "Error:\nAuthentification failed, please configure again!" 6 60
                             WPA_AUTH=""
                         else
                             WPA_AUTH="1"
