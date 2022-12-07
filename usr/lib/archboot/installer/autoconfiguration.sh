@@ -72,7 +72,7 @@ auto_network()
          [[ -f "${i}" ]] && systemd-nspawn -q -D "${DESTDIR}"systemctl enable "$(basename "${i}")" >/dev/null 2>&1
     done
     if [[ -f "/tmp/.wpa_supplicant" ]]; then
-        WPA_SUPPLICANT="$(cat /tmp/wpa_supplicant)"
+        WPA_SUPPLICANT="$(cat /tmp/.wpa_supplicant)"
         systemd-nspawn -q -D "${DESTDIR}"systemctl enable "${WPA_SUPPLICANT}" >/dev/null 2>&1
     fi
     # copy proxy settings
