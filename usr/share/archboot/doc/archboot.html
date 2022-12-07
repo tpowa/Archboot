@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 05.12.2022 18:26 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 07.12.2022 19:39 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -533,7 +533,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
 <h3 data-number="2.6" id="installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="header-section-number">2.6</span> <strong><span dir="">Installation with a graphical environment or VNC instead of plain console</span></strong></h3>
 <ul>
-<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Dhcpcd" title="Dhcpcd"><strong>dhcpcd</strong></a>.</li>
+<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li>If your network does not obtain an address, please setup the <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> manually or with the setup routine.</li>
 </ul>
 <h4 data-number="2.6.1" id="preconfigured-environments"><span class="header-section-number">2.6.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
@@ -601,7 +601,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.7" id="remote-installation-with-openssh"><span class="header-section-number">2.7</span> <strong><span dir="">Remote installation with OpenSSH</span></strong></h3>
 <ul>
-<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Dhcpcd" title="Dhcpcd"><strong>dhcpcd</strong></a>.</li>
+<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need privacy during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</li>
 </ul>
 <ul>
@@ -687,7 +687,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h4 data-number="2.10.2" id="setup-network"><span class="header-section-number">2.10.2</span> <strong><span dir="">Setup network</span></strong></h4>
 <ul>
-<li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <a href="https://wiki.archlinux.org/title/Netctl" title="Netctl"><strong>netctl</strong></a>.</li>
+<li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Systemd-Networkd"><strong>systemd-networkd</strong></a>.</li>
 </ul>
 <h4 data-number="2.10.3" id="select-source"><span class="header-section-number">2.10.3</span> <strong><span dir="">Select Source</span></strong></h4>
 <ul>
@@ -972,11 +972,6 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 <td><a href="https://wiki.archlinux.org/title/Accessibility" title="Accessibility"><strong>accessibility</strong></a> support</td>
 <td>No</td>
 <td>Yes</td>
-</tr>
-<tr class="even">
-<td><a href="https://wiki.archlinux.org/title/Netctl" title="Netctl"><strong>netctl</strong></a> support</td>
-<td>Yes</td>
-<td>No</td>
 </tr>
 <tr class="even">
 <td>Detect high resolution<br>screen size</td>
