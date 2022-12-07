@@ -88,15 +88,15 @@ update_environment() {
                 RUNNING_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 sleep 2
-                if ! [[ "${RUNNING_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
+                if [[ "${RUNNING_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
+                    DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
+                    sleep 3
+                else
                     DIALOG --defaultno --yesno "New online kernel version ${ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
                     if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
                         DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         /usr/bin/update-installer -latest-install > "${LOG}" 2>&1
                     fi
-                else
-                    DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
-                    sleep 3
                 fi
             fi
         fi
