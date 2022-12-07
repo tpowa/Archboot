@@ -76,6 +76,8 @@ dotesting() {
 update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache ..."  > "${LOG}"
+        DIALOG --infobox "Packages are already in pacman cache. Continuing in 3 seconds ..." 3 70
+        sleep 3
     else
         detect_uefi_boot
         UPDATE_ENVIRONMENT=""
@@ -87,6 +89,7 @@ update_environment() {
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${LOG}"
                 sleep 2
                 if [[ "${LOCAL_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
                     DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
