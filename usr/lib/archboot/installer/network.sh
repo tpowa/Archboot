@@ -111,7 +111,7 @@ donetwork() {
                         while ! systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw completed; do
                             DIALOG --infobox "Waiting 30 seconds for authentification ..." 3 60
                             sleep 1
-                            AUTH_COUNT="$((NETWORK_COUNT+1))"
+                            AUTH_COUNT="$((AUTH_COUNT+1))"
                             [[ "${AUTH_COUNT}" == "30" ]] && break
                         done
                         if systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed; then
