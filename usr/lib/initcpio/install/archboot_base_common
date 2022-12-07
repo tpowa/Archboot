@@ -40,11 +40,19 @@ build ()
     done
 
     ### adding config files of installation system
-    map add_file "/etc/profile" "/etc/group" "/etc/gshadow"
-    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf passwd shadow shells"
+    map add_file "/etc/profile" "/etc/group"
+    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf shells"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done
+
+    ### adding security critical config files of installation system with mode 000
+    add_file "/etc/gshadow" "/etc/gshadow" "000"
+    basic_config="passwd shadow"
+    for i in $basic_config; do
+        add_file "/usr/share/archboot/base/etc/$i" "/etc/$i" "000"
+    done
+
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
