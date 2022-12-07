@@ -88,7 +88,9 @@ update_environment() {
                 pacman -Sy > "${LOG}" 2>&1
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
+                #shellcheck disable=SC2086
                 LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                #shellcheck disable=SC2086
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${LOG}"
                 sleep 2
