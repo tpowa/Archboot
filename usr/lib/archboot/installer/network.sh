@@ -135,7 +135,7 @@ donetwork() {
     [[ "${IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${NETWORK_PROFILE}"
     if [[ "${CONNECTION}" = "wireless" ]]; then
         #shellcheck disable=SC2129
-        echo "IgnoreCarrierLoss=3s" >> >>"${NETWORK_PROFILE}"
+        echo "IgnoreCarrierLoss=3s" >>"${NETWORK_PROFILE}"
     fi
     if [[ "${IP}" = "static" ]]; then
         #shellcheck disable=SC2129
