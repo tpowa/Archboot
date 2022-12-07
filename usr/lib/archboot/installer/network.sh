@@ -74,7 +74,7 @@ donetwork() {
             while [[ "${WLAN_SECURITY}" = "" ]]; do
                 #shellcheck disable=2046
                 DIALOG --ok-label "Select" --menu "Select encryption type:" 9 50 7 \
-                    ([[ "${WPA}" == "1" ]] && echo "WPA-PSK" "Encrypted network") \
+                    $([[ "${WPA}" == "1" ]] && echo "WPA-PSK" "Encrypted network") \
                     "NONE" "Open network/NO encryption" 2>"${ANSWER}"
                     case $? in
                         1) return 1 ;;
