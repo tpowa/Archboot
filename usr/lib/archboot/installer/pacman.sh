@@ -63,11 +63,13 @@ select_mirror() {
 # dotesting()
 # enable testing repository on network install
 dotesting() {
-    DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
-    if [[ "${DOTESTING}" == "yes" ]]; then
-        #shellcheck disable=SC2129
-        ! grep -q "^\[testing\]" /etc/pacman.conf && sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
-        ! grep -q "^\[community-testing\]" /etc/pacman.conf && sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
+    if ! grep -q "^\[testing\]" /etc/pacman.conf; then
+        DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
+        if [[ "${DOTESTING}" == "yes" ]]; then
+            #shellcheck disable=SC2129
+            ! grep -q "^\[testing\]" /etc/pacman.conf && sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
+            ! grep -q "^\[community-testing\]" /etc/pacman.conf && sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
+        fi
     fi
 }
 
