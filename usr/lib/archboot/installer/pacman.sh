@@ -85,10 +85,10 @@ update_environment() {
                 pacman -Sy > "${LOG}" 2>&1
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
-                RUNNING_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 sleep 2
-                if [[ "${RUNNING_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
+                if [[ "${LOCAL_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
                     DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
                     sleep 3
                 else
