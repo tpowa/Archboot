@@ -107,8 +107,8 @@ donetwork() {
                         echo "wpa_supplicant config saved to ${WPA_PROFILE}." > "${LOG}"
                         echo "Starting wpa_supplicant@${INTERFACE}.service ..." > "${LOG}"
                         systemctl restart wpa_supplicant@${INTERFACE}.service
-                        if ! systemctl is-active --quiet wpa_supplicant@${INTERFACE}.service; then
-                            DIALOG --msgbox "Error:\nAuthentification was not successfull, please configure again!" 4 70
+                        if systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed; then
+                            DIALOG --msgbox "Error:\nAuthentification failed, please configure again!" 5 60
                             WPA_AUTH=""
                         else
                             WPA_AUTH="1"
