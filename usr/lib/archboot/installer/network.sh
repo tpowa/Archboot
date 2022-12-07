@@ -154,7 +154,7 @@ donetwork() {
         [[ "${WLAN_HIDDEN}" == "yes" ]] && echo "scan_ssid=1" >> "${WPA_PROFILE}"
         echo "key_mgmt=${WLAN_SECURITY}" >> "${WPA_PROFILE}"
         echo "ssid=\"${WLAN_ESSID}\"" >> "${WPA_PROFILE}"
-        [[ -z "${WLAN_KEY}" ]] || echo "PSK=\"${WLAN_KEY}\"" >> "${WPA_PROFILE}"
+        [[ -z "${WLAN_KEY}" ]] || echo "psk=\"${WLAN_KEY}\"" >> "${WPA_PROFILE}"
         echo "}" >> "${WPA_PROFILE}"
         echo "wpa_supplicant config saved to ${WPA_PROFILE}." > "${LOG}"
         echo "Starting wpa_supplicant@${INTERFACE}.service ..." > "${LOG}"
