@@ -50,14 +50,14 @@ donetwork() {
         DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
         NETWORK_PROFILE=/etc/systemd/network/$(cat "${ANSWER}").network
         # wireless switch
-        CONNECTION=""
         WLAN_HIDDEN=""
         WLAN_ESSID=""
         WLAN_SECURITY=""
         WLAN_KEY=""
+        WPA=""
+        WPA_MENU=""
         # iwd renames wireless devices to wlanX
         if [[ "${CONNECTION}" == "wireless" ]]; then
-            CONNECTION="wireless"
             # bring interface up for essid scan
             ip link set dev "${INTERFACE}" up
             DIALOG --infobox "Scanning for ESSIDs ..." 3 40
@@ -75,8 +75,6 @@ donetwork() {
             # remove spaces
             #shellcheck disable=SC2001,SC2086
             WLAN_ESSID="$(echo ${WLAN_ESSID} | sed -e 's|#|\ |g')"
-            WPA=""
-            WPA_MENU=""
             DIALOG --infobox "Checking on WPA/PSK encryption ..." 3 40
             iw dev "${INTERFACE}" scan | grep -q 'RSN:' && WPA="1"
             iw dev "${INTERFACE}" scan | grep -q 'WPA:' && WPA="1"
