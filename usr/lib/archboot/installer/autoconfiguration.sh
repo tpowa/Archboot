@@ -68,10 +68,10 @@ auto_network()
     # copy network profiles
     [[ -d ${DESTDIR}/etc/systemd/network ]] && cp /etc/systemd/network/* "${DESTDIR}"/etc/systemd/network/ 2>/dev/null
     # enable network profiles
-    systemd-nspawn -q -D "${DESTDIR}" systemctl enable systemd-networkd >/dev/null 2>&1
+    chroot "${DESTDIR}" systemctl enable systemd-networkd >/dev/null 2>&1
     if [[ -f "/tmp/.wpa_supplicant" ]]; then
         WPA_SUPPLICANT="$(cat /tmp/.wpa_supplicant)"
-        systemd-nspawn -q -D "${DESTDIR}" systemctl enable "${WPA_SUPPLICANT}" >/dev/null 2>&1
+        chroot "${DESTDIR}" systemctl enable "${WPA_SUPPLICANT}" >/dev/null 2>&1
     fi
     # copy proxy settings
     if [[ -n "${PROXY}" ]]; then
