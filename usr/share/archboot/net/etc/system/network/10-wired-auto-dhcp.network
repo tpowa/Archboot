@@ -1,0 +1,5 @@
+# Archboot autostart dhcp on wired devices
+[Match]
+Name=en*
+[Network]
+DHCP=yes
