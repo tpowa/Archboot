@@ -60,7 +60,7 @@ select_mirror() {
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if [[ "${DOTESTING}" == "yes" ]]; then
         #shellcheck disable=SC2129
-        sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist\nd:g" /etc/pacman.conf
+        sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
         sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
     fi
 }
