@@ -60,16 +60,15 @@ select_mirror() {
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if [[ "${DOTESTING}" == "yes" ]]; then
         #shellcheck disable=SC2129
-        sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
-        sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
+        ! grep -q "^\[testing\]" && sed -i -e "s:#\[testing\]:\[testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
+        ! grep -q "^\[community-testing\]" && sed -i -e "s:#\[community-testing\]:\[community-testing\]\nInclude = /etc/pacman.d/mirrorlist:g" /etc/pacman.conf
     fi
 }
 
 # dotesting()
 # enable testing repository on network install
 dotesting() {
-    DOTESTING=""
-    DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [communtoy-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
+    DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
 }
 
 # check for updating complete environment with packages
