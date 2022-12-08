@@ -102,7 +102,7 @@ donetwork() {
                     [[ "${AUTH_COUNT}" == "30" ]] && break
                 done
                 #shellcheck disable=2086
-                if [[ -z "$(iw dev ${INTERFACE} station dump)" ]]; then
+                if [[ -z "$(iw dev ${INTERFACE} station dump)" || systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed ]]; then
                     DIALOG --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
                     WPA_AUTH=""
                 else
