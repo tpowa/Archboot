@@ -42,7 +42,7 @@ _prepare_kernel_initramfs_files() {
     echo "Prepare kernel and initramfs ..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
-    mkdir -p "${_ISODIR}"/EFI/{BOOT,tools}
+    mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
 
     #shellcheck disable=SC2154
@@ -58,7 +58,9 @@ _prepare_kernel_initramfs_files() {
     fi
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
-    install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/vmlinuz_${_RUNNING_ARCH}"
+    # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_AA64"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
 }
 
 ### EFI status of RISCV64:
@@ -96,53 +98,53 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
     echo "Prepare fedora shim ..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    for i in mmx64.efi BOOTX64.efi mmia32.efi BOOTIA32.efi; do
-        cp "/usr/share/archboot/bootloader/${i}" "${_ISODIR}/EFI/BOOT/"
-    done
+    cp "/usr/share/archboot/bootloader/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
+    cp "/usr/share/archboot/bootloader/BOOTX64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
+    cp "/usr/share/archboot/bootloader/mmia32.efi" "${_ISODIR}/EFI/BOOT/MMIA32.EFI"
+    cp "/usr/share/archboot/bootloader/BOOTIA32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
 }
 
 _prepare_fedora_shim_bootloaders_aarch64 () {
     echo "Prepare fedora shim ..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
-    for i in mmaa64.efi BOOTAA64.efi; do
-        cp "/usr/share/archboot/bootloader/${i}" "${_ISODIR}/EFI/BOOT/"
-    done
+    cp "/usr/share/archboot/bootloader/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
+    cp "/usr/share/archboot/bootloader/BOOTAA64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
 }
 
 _prepare_efitools_uefi () {
     echo "Prepare efitools ..."
-    cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/tools/HashTool.efi"
-    cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/tools/KeyTool.efi"
+    cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/TOOLS/HASHTOOL.EFI"
+    cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/TOOLS/KEYTOOL.EFI"
 }
 
 _prepare_uefi_shell_tianocore() {
     echo "Prepare uefi shells ..."
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-    cp /usr/share/edk2-shell/x64/Shell.efi "${_ISODIR}/EFI/tools/shellx64_v2.efi"
+    cp /usr/share/edk2-shell/x64/Shell.efi "${_ISODIR}/EFI/TOOLS/SHELLX64_V2.EFI"
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
-    cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/tools/shellx64_v1.efi"
+    cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64_V1.EFI"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-    cp /usr/share/edk2-shell/ia32/Shell.efi "${_ISODIR}/EFI/tools/shellia32_v2.efi"
+    cp /usr/share/edk2-shell/ia32/Shell.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32_V2.EFI"
     ## InstallTianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
-    cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/tools/shellia32_v1.efi"
+    cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA_V1.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
     echo "Prepare X64 Grub ..."
-    cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/"
+    cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
 _prepare_uefi_IA32() {
     echo "Prepare IA32 Grub ..."
-    cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/"
+    cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
-    cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/"
+    cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
 }
 
 _prepare_background() {
