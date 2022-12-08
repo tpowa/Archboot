@@ -52,8 +52,6 @@ donetwork() {
         WLAN_ESSID=""
         WLAN_SECURITY=""
         WLAN_KEY=""
-        WPA=""
-        WPA_MENU=""
         # iwd renames wireless devices to wlanX
         if [[ "${CONNECTION}" == "wireless" ]]; then
             # bring interface up for essid scan
