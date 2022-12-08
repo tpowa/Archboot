@@ -92,6 +92,7 @@ update_environment() {
                 LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 #shellcheck disable=SC2086
                 ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                [[ "${RUNNING_ARCH}" == "aarch64" ]] && ONLINE_KERNEL="$(pacman -Si ${KERNELPKG}-${RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${LOG}"
                 sleep 2
                 if [[ "${LOCAL_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
