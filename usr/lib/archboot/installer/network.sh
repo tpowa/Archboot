@@ -94,15 +94,15 @@ donetwork() {
                 systemctl restart wpa_supplicant@${INTERFACE}.service
                 AUTH_COUNT="0"
                 #shellcheck disable=2086
-                while ! systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw completed; do
+                while [[ -z "$(iw dev ${INTERFACE} station dump)" ]]; do
                     DIALOG --infobox "Waiting 30 seconds for authentification ..." 3 60
                     sleep 1
                     AUTH_COUNT="$((AUTH_COUNT+1))"
-                    systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed && break
+                    systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed > /dev/null 2&>1 && break
                     [[ "${AUTH_COUNT}" == "30" ]] && break
                 done
                 #shellcheck disable=2086
-                if systemctl status wpa_supplicant@${INTERFACE}.service | grep -qw failed; then
+                if [[ -z "$(iw dev ${INTERFACE} station dump)" ]]; then
                     DIALOG --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
                     WPA_AUTH=""
                 else
