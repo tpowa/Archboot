@@ -64,11 +64,14 @@ auto_network()
     fi
     DIALOG --infobox "Enable network and proxy settings on installed system ..." 3 70
     # copy wpa_supplicant profiles
-    [[ -d ${DESTDIR}/etc/wpa_supplicant ]] && cp /etc/wpa_supplicant/* "${DESTDIR}"/etc/wpa_supplicant/ 2>/dev/null
+    [[ -d ${DESTDIR}/etc/wpa_supplicant ]] && cp /etc/wpa_supplicant/* "${DESTDIR}"/etc/wpa_supplicant/ >/dev/null 2>&1
     # copy network profiles
-    [[ -d ${DESTDIR}/etc/systemd/network ]] && cp /etc/systemd/network/* "${DESTDIR}"/etc/systemd/network/ 2>/dev/null
-    # enable network profiles
-    chroot "${DESTDIR}" systemctl enable systemd-networkd >/dev/null 2>&1
+    if [[ -d ${DESTDIR}/etc/systemd/network ]]; then
+        # enable network profiles
+        cp /etc/systemd/network/* "${DESTDIR}"/etc/systemd/network/ >/dev/null 2>&1
+        chroot "${DESTDIR}" systemctl enable systemd-networkd >/dev/null 2>&1
+        chroot "${DESTDIR}" systemctl enable systemd-resolved >/dev/null 2>&1
+    fi
     if [[ -f "/tmp/.wpa_supplicant" ]]; then
         WPA_SUPPLICANT="$(cat /tmp/.wpa_supplicant)"
         chroot "${DESTDIR}" systemctl enable "${WPA_SUPPLICANT}" >/dev/null 2>&1
