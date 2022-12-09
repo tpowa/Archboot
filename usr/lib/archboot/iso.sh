@@ -229,7 +229,7 @@ _grub_mkrescue() {
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" &> "${_IMAGENAME}.log"
 }
 
-_memtest() {
+_prepare_memtest() {
     cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
     cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/BOOT/MEMTEST.EFI"
 }
