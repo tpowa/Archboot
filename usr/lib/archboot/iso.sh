@@ -83,6 +83,7 @@ _prepare_kernel_initramfs_files_RISCV64() {
 }
 
 _prepare_ucode() {
+    echo "Prepare ucode files ..."
     # install ucode files
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
     cp /boot/amd-ucode.img "${_ISODIR}/boot/"
@@ -91,7 +92,7 @@ _prepare_ucode() {
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/boot/"
     cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
 }
 
 _prepare_fedora_shim_bootloaders_x86_64 () {
@@ -145,6 +146,12 @@ _prepare_uefi_IA32() {
 _prepare_uefi_AA64() {
     echo "Prepare AA64 Grub ..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
+}
+
+_prepare_memtest() {
+    echo "Prepare memtest86+ ..."
+    cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
+    cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
 }
 
 _prepare_background() {
@@ -228,12 +235,6 @@ _grub_mkrescue() {
     echo "Generating ${_RUNNING_ARCH} hybrid ISO ..."
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" &> "${_IMAGENAME}.log"
 }
-
-_prepare_memtest() {
-    cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
-    cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
-}
-
 
 _reproducibility_iso() {
     echo "Create reproducible UUIDs on ${_IMAGENAME}.iso GPT ..."
