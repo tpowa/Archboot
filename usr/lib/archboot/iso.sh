@@ -59,8 +59,12 @@ _prepare_kernel_initramfs_files() {
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
     # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_AA64"
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_AA64"
+    fi
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
+    fi
 }
 
 ### EFI status of RISCV64:
@@ -84,15 +88,25 @@ _prepare_kernel_initramfs_files_RISCV64() {
 
 _prepare_ucode() {
     echo "Prepare ucode files ..."
-    # install ucode files
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
-    cp /boot/amd-ucode.img "${_ISODIR}/boot/"
-    # fix license files
-    mkdir -p "${_ISODIR}"/licenses/amd-ucode
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/boot/"
-    cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
+    # only x86_64
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        echo "Prepare intel-ucode ..."
+        cp /boot/intel-ucode.img "${_ISODIR}/boot/"
+        mkdir -p "${_ISODIR}"/licenses/intel-ucode
+        cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
+    fi
+    # only aarch64
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        echo "Prepare dtbs ..."
+        cp -r /boot/dtbs "${_ISODIR}/boot/"
+    fi
+    # both x86_64 and aarch64
+    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+        echo "Prepare amd-ucode ..."
+        cp /boot/amd-ucode.img "${_ISODIR}/boot/"
+        mkdir -p "${_ISODIR}"/licenses/amd-ucode
+        cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
+    fi
 }
 
 _prepare_fedora_shim_bootloaders_x86_64 () {
