@@ -5,15 +5,13 @@ build ()
 {
     map add_binary dnsdomainname netstat arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
       slattach traceroute arping clockdiff tracepath dig host nslookup telnet ssh arpd genl \
-      ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc ifplugd ifplugstatus bridge \
+      ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat dhcp_lease_time dhcp_release \
       dhcp_release6 routel brctl
     # add iproute 2, add openssl helper libraries
     map add_full_dir "/usr/lib/tc" "/usr/share/tc" "/etc/iproute2" "/usr/lib/engines"
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
-    # add ifplugd support
-    add_full_dir "/etc/ifplugd"
     # add weechat plugins and defaults
     PLUGINS="alias exec lua relay typing buflist fifo irc xfer charset fset logger script trigger"
     for i in ${PLUGINS}; do
