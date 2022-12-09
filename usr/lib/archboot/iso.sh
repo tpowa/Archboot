@@ -135,14 +135,10 @@ _prepare_efitools_uefi () {
 
 _prepare_uefi_shell_tianocore() {
     echo "Prepare uefi shells ..."
-    ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. >=2.3 systems
-    cp /usr/share/edk2-shell/x64/Shell.efi "${_ISODIR}/EFI/TOOLS/SHELLX64_V2.EFI"
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
-    cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64_V1.EFI"
+    cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
-    cp /usr/share/edk2-shell/ia32/Shell.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32_V2.EFI"
-    ## InstallTianocore UDK/EDK2 EdkShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. <2.3 systems
-    cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32_V1.EFI"
+    cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
