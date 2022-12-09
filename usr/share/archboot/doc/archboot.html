@@ -634,12 +634,12 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li>Tools included for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></li>
 <li>setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:
 <ul>
-<li>shim from fedora is copied</li>
+<li>fedora's signed shim is copied to installed system</li>
 <li>creating new keys is supported</li>
 <li>using existing keys from <strong>/etc/secureboot/keys</strong> in layout <strong>secureboot-keys.sh</strong> produces</li>
-<li>MOK setup is done with keys</li>
-<li>adding pacman hook for automatic signing</li>
-<li>On <strong>first</strong> boot you need to <strong>enroll</strong> the used key as <strong>MOK</strong>.</li>
+<li>MOK setup is done with personal MOK keys</li>
+<li>adding pacman hook for automatic signing with personal keys</li>
+<li>On <strong>first</strong> boot you need to <strong>enroll</strong> the used personal key as <strong>MOK</strong>.</li>
 <li>Then your installed system is dual boot ready.</li>
 </ul></li>
 </ul>
