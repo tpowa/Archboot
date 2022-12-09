@@ -231,7 +231,7 @@ _grub_mkrescue() {
 
 _prepare_memtest() {
     cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
-    cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/BOOT/MEMTEST.EFI"
+    cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
 }
 
 
