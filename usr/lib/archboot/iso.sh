@@ -85,11 +85,11 @@ _prepare_kernel_initramfs_files_RISCV64() {
 _prepare_ucode() {
     echo "Prepare ucode files ..."
     # install ucode files
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || cp /boot/intel-ucode.img "${_ISODIR}/boot/"
     cp /boot/amd-ucode.img "${_ISODIR}/boot/"
     # fix license files
     mkdir -p "${_ISODIR}"/licenses/amd-ucode
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] || mkdir -p "${_ISODIR}"/licenses/intel-ucode
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && cp -r /boot/dtbs "${_ISODIR}/boot/"
     cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] || cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"

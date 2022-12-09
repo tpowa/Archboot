@@ -618,7 +618,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.8" id="secure-boot-support-with-shim-package-signed-from-fedora"><span class="header-section-number">2.8</span> <strong><span dir="">Secure Boot support with shim package signed from fedora</span></strong></h3>
+<h3 data-number="2.8" id="secure-boot-support-with-shim-package-signed-from-fedora"><span class="header-section-number">2.8</span> <strong><span dir="">Secure Boot MOK support with fedora's signed shim package</span></strong></h3>
 <ul>
 <li><strong>Caveat:</strong>
 <ul>
@@ -629,7 +629,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <li>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> first for initial shim setup.</li>
 <li>In order to boot in <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> mode on first boot:
 <ul>
-<li>you need to add the <strong>hash</strong> of <strong>grub</strong> and <strong>kernel</strong> from disk: <strong>/EFI/BOOT/GRUB&ltarch&gt.EFI</strong> or <strong>/EFI/BOOT/VMLINUZ_&ltarch&gt</strong> </li>
+<li>you need to add the <strong>hash</strong> of <strong>grub</strong> and <strong>kernel</strong> from disk: <strong>/EFI/BOOT/GRUB&ltarch&gt.EFI</strong> and <strong>/EFI/BOOT/VMLINUZ_&ltarch&gt</strong> </li>
 </ul></li>
 <li>Tools included for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></li>
 <li>setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:
