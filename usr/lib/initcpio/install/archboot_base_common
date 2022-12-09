@@ -33,7 +33,7 @@ build ()
     add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
     systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nanorc nscd.conf nsswitch.conf protocols request-key.conf resolv.conf securetty \
+                 nanorc nscd.conf nsswitch.conf protocols request-key.conf securetty \
                  services wgetrc"
     for i in $systemfiles; do
         add_file "/etc/$i"

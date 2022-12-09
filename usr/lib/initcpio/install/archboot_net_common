@@ -7,6 +7,7 @@ build ()
     map add_binary route ip
     # start dhcpcd on startup
     add_symlink "/etc/systemd/system/multi-user.target.wants/systemd-networkd.service" "/usr/lib/systemd/system/systemd-networkd.service"
+    add_symlink "/etc/systemd/system/multi-user.target.wants/systemd-resolved.service" "/usr/lib/systemd/system/systemd-resolved.service"
     add_file "/usr/share/archboot/net/etc/systemd/network/10-wired-auto-dhcp.network" "/etc/systemd/network/10-wired-auto-dhcp.network"
 }
 
