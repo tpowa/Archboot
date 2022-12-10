@@ -35,25 +35,26 @@ do_wireless() {
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_ESSID=$(cat "${ANSWER}")
+        WLAN_CONNECT="connect"
         if [[ "${WLAN_ESSID}" = "Hidden" ]]; then
             DIALOG --inputbox "Enter the hidden ESSID:" 8 65 \
                 "secret" 2>"${ANSWER}" || return 1
             WLAN_ESSID=$(cat "${ANSWER}")
-            WLAN_HIDDEN="yes"
+            WLAN_CONNECT="connect-hidden"
         fi
         #shellcheck disable=SC2001,SC2086
         while [[ -z "${WPA_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_ESSID}" | cut -c 45-49 | grep -q 'open')" || "${WLAN_HIDDEN}" == "yes" ]]; then
+            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_ESSID}" | cut -c 45-49 | grep -q 'open')" || "${WLAN_CONNECT}" == "connect-hidden" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
             # time to connect
             if [[ -z "${WLAN_KEY}" ]]; then
-                iwctl station "${INTERFACE}" connect "${WLAN_ESSID}" && WPA_AUTH="1"
+                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_ESSID}" && WPA_AUTH="1"
             else
-                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" connect "${WLAN_ESSID}" && WPA_AUTH="1"
+                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_ESSID}" && WPA_AUTH="1"
             fi
             if [[ "${WPA_AUTH}" == "1" ]]; then
                 DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
