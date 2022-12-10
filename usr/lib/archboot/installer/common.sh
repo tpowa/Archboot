@@ -113,7 +113,6 @@ auto_packages() {
     #shellcheck disable=SC2010
     if ls /sys/class/net | grep -q wlan; then
         ! echo "${PACKAGES}" | grep -qw iwd && PACKAGES="${PACKAGES} iwd"
-        ! echo "${PACKAGES}" | grep -qw wpa_supplicant && PACKAGES="${PACKAGES} wpa_supplicant"
     fi
     # only add firmware if already used
     linux_firmware

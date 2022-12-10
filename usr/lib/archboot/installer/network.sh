@@ -93,6 +93,7 @@ donetwork() {
                 0) INTERFACE=$(cat "${ANSWER}") ;;
             esac
         done
+        echo "${INTERFACE}" >/tmp/.network-interface
         # iwd renames wireless devices to wlanX
         if echo "${INTERFACE}" | grep -q wlan >/dev/null; then
             CONNECTION="wireless"
