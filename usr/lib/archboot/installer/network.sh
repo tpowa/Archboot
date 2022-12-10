@@ -16,7 +16,7 @@ essid_scan() {
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with # between
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-40 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -30,6 +30,8 @@ do_wireless() {
     if [[ "${CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
         iwctl station "${INTERFACE}" disconnect
+        # clean old keys first!
+        rm -f /var/lib/iwd/*
         #shellcheck disable=SC2086,SC2046
         DIALOG --menu "Choose your SSID:" 14 60 7 \
         $(essid_scan _) \
@@ -49,7 +51,7 @@ do_wireless() {
         while [[ -z "${WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 41-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
+            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
