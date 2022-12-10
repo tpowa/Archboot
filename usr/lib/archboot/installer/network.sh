@@ -15,8 +15,8 @@ essid_scan() {
     # scan the area
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
-    # kill spaces from the end
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 11-44 | sed -e 's#\ $##g'); do
+    # kill spaces from the end and replace spaces with # between
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 11-44 | sed -e 's#\ $##g' -e 's| |#|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -24,39 +24,41 @@ essid_scan() {
 
 do_wireless() {
     WLAN_HIDDEN=""
-    WLAN_ESSID=""
-    WLAN_SECURITY=""
+    WLAN_SSID=""
     WLAN_KEY=""
     WPA_AUTH=""
     if [[ "${CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
         iwctl station "${INTERFACE}" disconnect
         #shellcheck disable=SC2086,SC2046
-        DIALOG --menu "Choose your ESSID:" 14 40 7 \
+        DIALOG --menu "Choose your SSID:" 14 40 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
-        WLAN_ESSID=$(cat "${ANSWER}")
+        WLAN_SSID=$(cat "${ANSWER}")
         WLAN_CONNECT="connect"
-        if [[ "${WLAN_ESSID}" = "Hidden" ]]; then
-            DIALOG --inputbox "Enter the hidden ESSID:" 8 65 \
+        if [[ "${WLAN_SSID}" = "Hidden" ]]; then
+            DIALOG --inputbox "Enter the hidden SSID:" 8 65 \
                 "secret" 2>"${ANSWER}" || return 1
-            WLAN_ESSID=$(cat "${ANSWER}")
+            WLAN_SSID=$(cat "${ANSWER}")
             WLAN_CONNECT="connect-hidden"
         fi
+        # replace # with spaces again
+        #shellcheck disable=SC2001,SC2086
+        WLAN_SSID="$(echo ${WLAN_SSID} | sed -e 's|#|\ |g')"
         #shellcheck disable=SC2001,SC2086
         while [[ -z "${WPA_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_ESSID}" | cut -c 45-49 | grep -q 'open')" ]] && [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
+            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 45-49 | grep -q 'open')" ]] && [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
             # time to connect
-            DIALOG --infobox "Connection to ${WLAN_ESSID} with ${INTERFACE} ..." 3 70
+            DIALOG --infobox "Connection to ${WLAN_SSID} with ${INTERFACE} ..." 3 70
             if [[ -z "${WLAN_KEY}" ]]; then
-                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_ESSID}" && WPA_AUTH="1"
+                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WPA_AUTH="1"
             else
-                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_ESSID}" && WPA_AUTH="1"
+                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WPA_AUTH="1"
             fi
             if [[ "${WPA_AUTH}" == "1" ]]; then
                 DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
@@ -128,7 +130,7 @@ donetwork() {
                 export "${i}"="${PROXY}"
             done
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetctl profile: ${NETWORK_PROFILE}\nESSID:      ${WLAN_ESSID}\nHidden:     ${WLAN_HIDDEN}\nEncryption: ${WLAN_SECURITY}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetctl profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
