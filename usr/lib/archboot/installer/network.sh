@@ -49,7 +49,7 @@ do_wireless() {
         while [[ -z "${WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 45-49 | grep -q 'open')" ]] && [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
+            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 41-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
                 DIALOG --inputbox "Enter your KEY:" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
