@@ -105,7 +105,7 @@ donetwork() {
         DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
         NETWORK_PROFILE=/etc/systemd/network/$(cat "${ANSWER}").network
         # wifi setup first
-        do_wireless
+        do_wireless || return 1
         # dhcp switch
         IP=""
         DIALOG --yesno "Do you want to use DHCP?" 5 40
