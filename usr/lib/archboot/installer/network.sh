@@ -52,6 +52,7 @@ do_wireless() {
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
             # time to connect
+            DIALOG --infobox "Connection to ${WLAN_ESSID} with ${INTERFACE} ..." 3 70
             if [[ -z "${WLAN_KEY}" ]]; then
                 iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_ESSID}" && WPA_AUTH="1"
             else
