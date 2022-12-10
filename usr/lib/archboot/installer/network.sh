@@ -29,9 +29,8 @@ do_wireless() {
     WLAN_KEY=""
     WPA_AUTH=""
     if [[ "${CONNECTION}" == "wireless" ]]; then
-        DIALOG --infobox "Scanning for ESSIDs ..." 3 40
         #shellcheck disable=SC2086,SC2046
-        DIALOG --menu "Choose your ESSID:" 14 55 7 \
+        DIALOG --menu "Choose your ESSID:" 14 40 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_ESSID=$(cat "${ANSWER}")
