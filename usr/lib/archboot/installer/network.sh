@@ -130,7 +130,7 @@ donetwork() {
                 export "${i}"="${PROXY}"
             done
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetctl profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetwork profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
