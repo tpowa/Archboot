@@ -16,7 +16,7 @@ essid_scan() {
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with # between
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's#\ .*$##g' -e 's#^.*\ \ ##g' -e 's| |#|g'); do
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ .*$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
