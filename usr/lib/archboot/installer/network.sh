@@ -15,7 +15,7 @@ essid_scan() {
     # scan the area
     iwctl station "${INTERFACE}" scan
     # only show better quality signals
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '***' | cut -c 11-45 | sed -e 's#\ $##g'); do
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '*' | cut -c 11-45 | sed -e 's#\ $##g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
