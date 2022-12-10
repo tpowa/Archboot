@@ -26,7 +26,7 @@ do_wireless() {
     WLAN_HIDDEN=""
     WLAN_SSID=""
     WLAN_KEY=""
-    WPA_AUTH=""
+    WLAN_AUTH=""
     if [[ "${CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
         iwctl station "${INTERFACE}" disconnect
@@ -46,7 +46,7 @@ do_wireless() {
         #shellcheck disable=SC2001,SC2086
         WLAN_SSID="$(echo ${WLAN_SSID} | sed -e 's|#|\ |g')"
         #shellcheck disable=SC2001,SC2086
-        while [[ -z "${WPA_AUTH}" ]]; do
+        while [[ -z "${WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
             if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 45-49 | grep -q 'open')" ]] && [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
@@ -56,11 +56,11 @@ do_wireless() {
             # time to connect
             DIALOG --infobox "Connection to ${WLAN_SSID} with ${INTERFACE} ..." 3 70
             if [[ -z "${WLAN_KEY}" ]]; then
-                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WPA_AUTH="1"
+                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WLAN_AUTH="1"
             else
-                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WPA_AUTH="1"
+                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" && WLAN_AUTH="1"
             fi
-            if [[ "${WPA_AUTH}" == "1" ]]; then
+            if [[ "${WLAN_AUTH}" == "1" ]]; then
                 DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
                 sleep 3
             else
