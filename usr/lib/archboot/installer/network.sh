@@ -16,7 +16,7 @@ essid_scan() {
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with # between
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ .*$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-40 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -31,7 +31,7 @@ do_wireless() {
         # disconnect the interface first!
         iwctl station "${INTERFACE}" disconnect
         #shellcheck disable=SC2086,SC2046
-        DIALOG --menu "Choose your SSID:" 14 40 7 \
+        DIALOG --menu "Choose your SSID:" 14 60 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_SSID=$(cat "${ANSWER}")
