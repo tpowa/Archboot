@@ -21,8 +21,8 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     _umount_special "${1}" || exit 1
     _fix_groups "${1}"
     _clean_container "${1}"
-    _download_graphical "${1}" || exit 1
-    _clean_cache "${1}"
+    #_download_graphical "${1}" || exit 1
+    #_clean_cache "${1}"
     _generate_keyring "${1}" || exit 1
     _copy_mirrorlist_and_pacman_conf "${1}"
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -50,8 +50,8 @@ else
         _install_archboot "${1}" "use_binfmt" || exit 1
         _fix_groups "${1}"
         _clean_mkinitcpio "${1}"
-        _download_graphical "${1}" "use_binfmt" || exit 1
-        _clean_cache "${1}"
+        #_download_graphical "${1}" "use_binfmt" || exit 1
+        #_clean_cache "${1}"
         _clean_container "${1}" 2>/dev/null
     else
         echo "Error: binfmt usage is only supported on x86_64!"
