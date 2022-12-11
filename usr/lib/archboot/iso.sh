@@ -65,6 +65,11 @@ _prepare_kernel_initramfs_files() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
     fi
+    # only aarch64
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        echo "Prepare dtbs ..."
+        cp -r /boot/dtbs "${_ISODIR}/boot/"
+    fi
 }
 
 ### EFI status of RISCV64:
@@ -87,18 +92,12 @@ _prepare_kernel_initramfs_files_RISCV64() {
 }
 
 _prepare_ucode() {
-    echo "Prepare ucode files ..."
     # only x86_64
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         echo "Prepare intel-ucode ..."
         cp /boot/intel-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/intel-ucode
         cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
-    fi
-    # only aarch64
-    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        echo "Prepare dtbs ..."
-        cp -r /boot/dtbs "${_ISODIR}/boot/"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
@@ -134,7 +133,7 @@ _prepare_efitools_uefi () {
 }
 
 _prepare_uefi_shell_tianocore() {
-    echo "Prepare uefi shells ..."
+    echo "Prepare uefi shell ..."
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
     cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
