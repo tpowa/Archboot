@@ -3,7 +3,7 @@
 
 build ()
 {
-    map add_binary usb_modeswitch usb_modeswitch_dispatcher tclsh
+    map add_binary tclsh usb_modeswitch usb_modeswitch_dispatcher
     map add_full_dir "/usr/lib/tcl8" "/usr/lib/tcl8.6"
     map add_file "/etc/usb_modeswitch.conf" "/etc/usb_modeswitch.setup"
     map add_full_dir "/etc/usb_modeswitch.d" "/usr/share/usb_modeswitch"
