@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/iso.sh
