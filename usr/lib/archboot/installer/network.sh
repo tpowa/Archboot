@@ -31,7 +31,7 @@ do_wireless() {
         # disconnect the interface first!
         iwctl station "${INTERFACE}" disconnect > /dev/null 2>&1
         # clean old keys first!
-        rm -f /var/lib/iwd/*
+        rm -f /var/lib/iwd/* > /dev/null 2>&1
         #shellcheck disable=SC2086,SC2046
         DIALOG --menu "Choose your SSID:" 14 60 7 \
         $(essid_scan _) \
