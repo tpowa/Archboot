@@ -29,7 +29,7 @@ do_wireless() {
     WLAN_AUTH=""
     if [[ "${CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
-        iwctl station "${INTERFACE}" disconnect
+        iwctl station "${INTERFACE}" disconnect > /dev/null 2>&1
         # clean old keys first!
         rm -f /var/lib/iwd/*
         #shellcheck disable=SC2086,SC2046
@@ -59,9 +59,9 @@ do_wireless() {
             # time to connect
             DIALOG --infobox "Connection to ${WLAN_SSID} with ${INTERFACE} ..." 3 70
             if [[ -z "${WLAN_KEY}" ]]; then
-                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" >/dev/null 2>&1 && WLAN_AUTH="1"
+                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" > /dev/null 2>&1 && WLAN_AUTH="1"
             else
-                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" >/dev/null 2>&1 && WLAN_AUTH="1"
+                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" > /dev/null 2>&1 && WLAN_AUTH="1"
             fi
             if [[ "${WLAN_AUTH}" == "1" ]]; then
                 DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
