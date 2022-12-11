@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 11.12.2022 16:10 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 11.12.2022 16:29 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -392,7 +392,7 @@
 </tr>
 <tr class="even">
 <td>Initrd</td>
-<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img"><strong>initramfs_aarch64.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img"><strong>initramfs_aarch64-latest.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-0.img"><strong>initramfs_aarch64-local-0.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local-1.img"><strong>initramfs_aarch64-local-1.img</strong></a></td>
+<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64.img"><strong>initramfs_aarch64.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-latest.img"><strong>initramfs_aarch64-latest.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/initramfs_aarch64-local.img"><strong>initramfs_aarch64-local.img</strong></a></td>
 <td><a href="https://pkgbuild.com/~tpowa/archboot/iso/riscv64/latest/boot/initramfs_riscv64.img"><strong>initramfs_riscv64.img</strong></a></td>
 </tr>
 <tr class="odd">
@@ -416,7 +416,7 @@
 </tr>
 <tr class="even">
 <td>Initrd</td>
-<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img"><strong>initramfs_x86_64.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img"><strong>initramfs_x86_64-latest.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-0.img"><strong>initramfs_x86_64-local-0.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local-1.img"><strong>initramfs_x86_64-local-1.img</strong></a></td>
+<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64.img"><strong>initramfs_x86_64.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-latest.img"><strong>initramfs_x86_64-latest.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/initramfs_x86_64-local.img"><strong>initramfs_x86_64-local.img</strong></a></td>
 </tr>
 <tr class="odd">
 <td>Microcode</td>
@@ -428,7 +428,6 @@
 <ul>
 <li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a>, add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a> setup and you will get a running installation/rescue system.</li>
 <li>For rescue booting add an entry to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>,<a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> and add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
-<li>For <strong>local image</strong> download <strong>both</strong> initrds and load <strong>both</strong> files with your bootloader or PXE setup.</li>
 </ul>
 <h3 data-number="2.4" id="supported-boot-modes"><span class="header-section-number">2.4</span> <strong><span dir="">Supported boot modes</span></strong></h3>
 <ul>
@@ -533,7 +532,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
 <h3 data-number="2.6" id="installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="header-section-number">2.6</span> <strong><span dir="">Installation with a graphical environment or VNC instead of plain console</span></strong></h3>
 <ul>
-<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
+<li>During boot all wired network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li>If your network does not obtain an address, please setup the <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> manually or with the setup routine.</li>
 </ul>
 <h4 data-number="2.6.1" id="preconfigured-environments"><span class="header-section-number">2.6.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
@@ -601,7 +600,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.7" id="remote-installation-with-openssh"><span class="header-section-number">2.7</span> <strong><span dir="">Remote installation with OpenSSH</span></strong></h3>
 <ul>
-<li>During boot all network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
+<li>During boot all wired network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need privacy during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</li>
 </ul>
 <ul>
@@ -688,6 +687,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h4 data-number="2.10.2" id="setup-network"><span class="header-section-number">2.10.2</span> <strong><span dir="">Setup network</span></strong></h4>
 <ul>
 <li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Systemd-Networkd"><strong>systemd-networkd</strong></a>.</li>
+<li>Your <strong>wifi network</strong></a> will be configured by <a href="https://wiki.archlinux.org/title/iwd" title="iwd"><strong>iwd</strong></a>.</li>
 </ul>
 <h4 data-number="2.10.3" id="select-source"><span class="header-section-number">2.10.3</span> <strong><span dir="">Select Source</span></strong></h4>
 <ul>
@@ -1050,7 +1050,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </tr>
 <tr class="odd">
 <td>Image size</td>
-<td>&gt;152-1552MB</td>
+<td>&gt;150-822MB</td>
 <td>&gt;858MB</td>
 </tr>
 <tr class="even">
