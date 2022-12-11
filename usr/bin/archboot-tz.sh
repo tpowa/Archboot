@@ -3,7 +3,6 @@
 
 ANSWER="/tmp/.tz"
 TITLE="Arch Linux Time And Date Setting"
-BASEDIR="/usr/share/zoneinfo"
 
 if [[ "${1}" = "--setup" ]]; then
     EXIT="Return to Main Menu"
