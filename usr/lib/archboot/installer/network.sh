@@ -58,6 +58,7 @@ do_wireless() {
             fi
             # time to connect
             DIALOG --infobox "Connection to ${WLAN_SSID} with ${INTERFACE} ..." 3 70
+            printk off
             if [[ -z "${WLAN_KEY}" ]]; then
                 iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" > /dev/null 2>&1 && WLAN_AUTH="1"
             else
@@ -69,6 +70,7 @@ do_wireless() {
             else
                 DIALOG --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
             fi
+            printk on
         done
     fi
 }
