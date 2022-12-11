@@ -95,6 +95,15 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting ...\033[0m"
     _enter_shell
+# local image, fail if less than 3.3GB RAM available
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
+-e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    _welcome
+    echo -e "\033[1m\033[91mMemory check failed:\033[0m"
+    echo -e "\033[91m- Not engough memory detected! \033[0m"
+    echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.6GB\033[0m\033[93m RAM.\033[0m"
+    echo -e "\033[91mAborting ...\033[0m"
+    _enter_shell
 elif [[ "$(uname -m)" == "aarch64" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3610000 &&\
 "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4105000 ]]; then
     _welcome
