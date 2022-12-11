@@ -26,7 +26,6 @@ _WAYLAND_PACKAGE="egl-wayland"
 _STANDARD_PACKAGES="gparted nss-mdns"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
-_GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES} ${_GNOME_PACKAGES} ${_PLASMA_PACKAGES}"
 _NSPAWN="systemd-nspawn -q -D"
 
 ### check for root
@@ -179,17 +178,6 @@ _pacman_key_system() {
     echo "Adding ${_GPG_KEY_ID} to trusted keys ..."
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
-}
-
-_riscv64_disable_graphics() {
-    if [[ "${2}" == "use_binfmt" ]]; then
-        # riscv64 need does not support local image at the moment
-        #shellcheck disable=SC2001
-        ${_NSPAWN} "${1}" uname -m | grep -qw riscv64 && _GRAPHICAL_PACKAGES=""
-    else
-        # riscv64 need does not support local image at the moment
-        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GRAPHICAL_PACKAGES=""
-    fi
 }
 
 _cachedir_check() {

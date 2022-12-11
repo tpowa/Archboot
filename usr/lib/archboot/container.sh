@@ -169,26 +169,6 @@ _install_archboot() {
     fi
 }
 
-_download_graphical() {
-    _riscv64_disable_graphics "${1}" "${2}"
-    if grep -qw archboot /etc/hostname; then
-        # strip down to XFCE on memory < 4096
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3478000 ]]; then
-            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4111000 ]]; then
-                _GRAPHICAL_PACKAGES="${_XORG_PACKAGE} ${_WAYLAND_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
-            fi
-        else
-            _GRAPHICAL_PACKAGES=""
-        fi
-    fi
-    [[ "${_CLEANUP_CACHE}" == "1" ]] && _GRAPHICAL_PACKAGES=""
-    if ! [[ "${_GRAPHICAL_PACKAGES}" == "" ]]; then
-        echo "Downloading ${_GRAPHICAL_PACKAGES} to ${1} ..."
-        #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_GRAPHICAL_PACKAGES} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
-    fi
-}
-
 _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
     echo "Create pacman config and mirrorlist in container..."
