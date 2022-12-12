@@ -3,8 +3,7 @@
 
 build ()
 {
-    map add_binary dnsdomainname netstat arp ipmaddr iptunnel mii-tool nameif plipconfig rarp \
-      slattach traceroute arping clockdiff tracepath dig host nslookup telnet ssh arpd genl \
+    map add_binary traceroute arping clockdiff tracepath dig host nslookup ssh arpd genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat dhcp_lease_time dhcp_release \
       dhcp_release6 brctl

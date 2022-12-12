@@ -14,7 +14,7 @@ build ()
           renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
           sysctl pkill pmap pwdx slabtop tload vmstat watch eject keyctl request-key \
-          zsh hostname tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
+          zsh tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \
           lzless lzmore lzma modinfo reset unlzma unxz xzcat lastb \
