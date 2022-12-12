@@ -26,8 +26,10 @@ _welcome () {
 _local_mode () {
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo -e "You are running in \033[92m\033[1mLocal mode\033[0m, with \033[1mlocal package repository\033[0m enabled.\033[0m"
-        echo -e "To \033[1mswitch\033[0m to \033[1mOnline mode\033[0m:\033[1m\033[91m# rm /var/cache/pacman/pkg/archboot.db\033[0m\033[1m"
-        echo ""
+        if [[ -e /usr/bin/setup ]] ; then
+            echo -e "To \033[1mswitch\033[0m to \033[1mOnline mode\033[0m:\033[1m\033[91m# rm /var/cache/pacman/pkg/archboot.db\033[0m\033[1m"
+            echo ""
+        fi
     fi
 }
 
