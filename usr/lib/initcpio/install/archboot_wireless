@@ -13,8 +13,7 @@ build ()
     fi
     # start iwd service
     add_symlink "/etc/systemd/system/multi-user.target.wants/iwd.service" "/usr/lib/systemd/system/iwd.service"
-    map add_binary iwconfig iwevent iwgetid iwlist iwpriv iwspy \
-        ifrename b43-fwcutter iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
+    map add_binary  b43-fwcutter iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
     # add iwd and ead daemon
     map add_binary "/usr/lib/iwd/iwd" "/usr/lib/iwd/ead"
     # crda support
