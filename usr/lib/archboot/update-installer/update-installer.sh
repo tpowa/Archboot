@@ -31,17 +31,18 @@ usage () {
     echo -e "\033[1m-------------------------------------------------------------------\033[0m"
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-h\033[0m               This message."
-    echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+    if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
+        echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+    fi
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
-    elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3500000 && ! -e "/.full_system" && -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 && ! -e "/.full_system" && -e "/var/cache/pacman/pkg/archboot.db" && -e "/usr/bin/setup" ]]; then
         echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
     fi
     echo -e ""
     if [[ -e /usr/bin/setup ]]; then
-        # local image
+        # latest image
         if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-            # latest image
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] ; then
                 _graphic_options
             fi
