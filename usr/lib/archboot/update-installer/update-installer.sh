@@ -40,8 +40,8 @@ usage () {
         echo -e " \033[1m-full-system\033[0m     Switch to full Arch Linux system."
     fi
     echo -e ""
-    if [[ -e /usr/bin/setup ]]; then
-        # latest image
+    if [[ -e "/usr/bin/setup" ]]; then
+        # works only on latest image
         if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] ; then
                 _graphic_options
@@ -54,8 +54,7 @@ usage () {
             fi
         fi
     fi
-    # latest image
-    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]] || [[ -e "/var/cache/pacman/pkg/archboot.db" && ! -e "/usr/bin/setup" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \033[1m-latest\033[0m          Launch latest archboot environment (using kexec)."
@@ -63,7 +62,7 @@ usage () {
         fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-                echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with downloaded"
+                echo -e " \033[1m-latest-install\033[0m  Launch latest archboot environment with"
                 echo -e "                  package cache (using kexec)."
             fi
         fi
