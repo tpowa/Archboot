@@ -3,8 +3,8 @@
 
 build ()
 {
-    map add_binary hwclock ntpdate ntpd ntp-keygen ntp-wait ntpdc ntpq \
-          ntptime ntptrace tzselect
+    map add_binary hwclock ntpdate ntpd ntp-keygen ntpdc ntpq \
+          ntptime tzselect
     add_file "/etc/ntp.conf"
     add_full_dir "/usr/share/zoneinfo"
     add_dir "/var/lib/ntp"
