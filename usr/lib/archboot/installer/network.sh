@@ -15,8 +15,8 @@ essid_scan() {
     # scan the area
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
-    # kill spaces from the end and replace spaces with # between
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |#|g'); do
+    # kill spaces from the end and replace spaces with + between
+    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -47,7 +47,7 @@ do_wireless() {
         fi
         # replace # with spaces again
         #shellcheck disable=SC2001,SC2086
-        WLAN_SSID="$(echo ${WLAN_SSID} | sed -e 's|#|\ |g')"
+        WLAN_SSID="$(echo ${WLAN_SSID} | sed -e 's|\+|\ |g')"
         #shellcheck disable=SC2001,SC2086
         while [[ -z "${WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
