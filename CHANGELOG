@@ -1,0 +1,181 @@
+On the road to 2023.01:
+Highlights:
+- linux 6.1.x
+- mkinitcpio v34
+- grub 2:2.06.r403.g7259d55ff-1
+- replaced netctl with systemd network stack
+- added memtest86+
+Environment changes:
+- downgrade to fedora shim 15.4-5, due to not working SB on some boards
+- removed kexec memory gap on aarch64
+- only provide full UEFI shell on grub menu
+- removed netctl with depends: wpa_supplicant, dhcpcd, ifplugd, usb_modeswitch
+- added new systemd network stack: systemd-resolved, systemd-networkd, iwd
+- removed GRAPHIC packages from local image,
+  new grub respects linux max_initrd_size which is 0x37FFFFF (around 940MB).
+- lower RAM requirement for local image to 2.7GB
+- removed none working perl and python scripts
+- removed network stack from local image pre kexec
+- removed bind, inetutils, net-tools, b43-fwcutter and wireless_tools
+- fixed /etc/request-key.d directory addition
+- fixed permission of shadow, gshadow and passwd
+- disable audit function on boot commandline by default
+setup/quickinst changes:
+- check kernel to trigger menu with updating environment
+- install vim instead of vi on installed system
+- fixed riscv64 package installation with disabling ucode packages
+- reordered/cleaned up timezone regions
+- reordered manage devices menus
+- removed netctl support
+- added systemd-networkd, systemd-resolved, iwd support
+---
+2022.12 Highlights:
+- grub 2:2.06.r380.g151467888-1
+- mkinitcpio 33-1
+- Autodetect high resolution screens with setting 32 font size by default
+  during boot
+- Better Localization support:
+  new Keymap, Console Fonts, Timezone and System-Wide Locale dialogs
+- major code cleanup with merging script parts
+  and remove redundancy
+- fixed performance regression in mkinitcpio 33
+Environment changes:
+- release year/month logo without kernel version
+- added rpcuser
+- fixed locale setting on aarch64
+- use latarcyrheb-sun16 font as default console font
+- use latarcyrheb-sun32 font on high resolution screens
+  as default console font
+- removed archboot's MOK key with signing kernel and grub on ISO,
+  this broke reproducibilty
+update-installer changes:
+- more output on updating scripts
+setup/quickinst changes:
+- new root password handling at the beginning of configuration:
+  - added check to avoid locked root account
+  - added check to avoid empty password
+  - don't allow empty root password
+- new Date and Time setting routine:
+  - splitted into Region and Timezone
+- new Keymap routine:
+  - splitted into locale and variants
+- new Console Font routine:
+  - only use latarcyrheb-sun(16,32) and eurlatgr font
+  - Autodetect high resolution screens with setting big font by default
+- new System-Wide locale setting dialog on configuration step
+- fixed partial broken autoconfiguration
+- show more information dialogs on doing pre/autoconfiguration
+- rearranged most autoconfiguration to last step of install packages
+- run mkinitcpio and locale-gen only when needed
+- fixed netlink up detection by ping www.google.com
+- fixed broken bootloader installation menu call
+- switch to zstd compression as first option on btrfs dialog
+- reformat btrfs boxes
+---
+New 2022.11 images uploaded:
+Highlights:
+- Linux 6.0.x
+Environment changes:
+- new logo Linux 6.0.x
+- removed obsolete dhclient
+- removed redundant vi
+- updated to mkinitcpio 32
+update-installer changes:
+- reformated output on X/Wayland startup
+- added check for working network
+- added new logic for local image with less than 4096 GB RAM,
+  which allows XFCE environment.
+setup/quickinst changes:
+- removed dhclient support
+---
+2022.10 Highlights:
+- New RISC-V riscv64 architecture support
+- possibility to turn system into a full
+  Arch Linux system with -full-system parameter
+  By using: # update-installer -full-system
+  Every Archboot strip down gets reverted by reinstalling all packages to a zram /usr with readding of man/info pages and localization.
+Environment changes:
+- new logo including RISC-V 64
+- possibility to choose between firefox and chromium
+  with _STANDARD_BROWSER option in defaults file
+- firefox as new default standard browser for all architectures
+- fix ca-certificates on updates
+---
+2022.09 Highlights:
+- Big end of summer cleanup this time:
+  cleanup dependencies: 47 less packages installed (316 packages -> 269 packages)
+  removed packages: linux-atm, ppp, pppoe, xl2tpd, wvdial, vpnc, openconnect,
+                    openvpn, pptpclient, libgssglue, snarf, cracklib,
+                    ipw2100-fw, ipw200-fw, gnu-netcat, cpio and fuse(3)
+  saved booted space: 16MB (689 MB -> 673 MB)
+- pacman keyring handling improvements
+- use qemu-static-user from [extra] for aarch64 iso assembling
+  (thanks David for implementing this in qemu package)
+Environment changes:
+- updated grub to 2.06.r322.gd9b4638c5-4
+- fixed pacman keyring on aarch64
+- updated OVMF_VARS.secboot.fd from fedora to 20220526git16779ede2d36-5
+- added missing base programs:
+  nscd, archlinux-keyring-wkd-sync, makepkg-template, getsubids,
+  update-pciids, ninfod, sln, lsfd
+- fixed xorg and wayland startup
+- implemented checking of missing base binaries
+- simplified zram function for /usr directory mounting
+setup/quickinst changes:
+- always install latest archlinux keyring package(s),
+  before doing pacman tasks
+- abort on package installation or keyring failure
+- added keyring initialization checks
+- removed filesystem and systemd-sysvcompat hacks
+---
+2022.08 Highlights:
+Environment changes:
+- new background image
+- kernel 5.19.x
+- shim 15.6-2
+- added kmod fix from mkinitcpio
+---
+Highlights 2022.07:
+- added all graphical environments to local images
+- autodetection of RAM with according actions on login
+- only show kexec memory gap on aarch64: 3950 MB - 4299 MB
+- all images have network(LAN),dhcpcd and ssh support already on first boot.
+- speedup gpg pacman initialization
+- also log messages from update-installer.sh to ssh too (/dev/pts/0)
+- always show Local mode on login
+Environment changes:
+- added all graphical environments to local image
+- autodetection of RAM with according actions on login
+- show kexec memory gap on aarch64: 3950 MB - 4299 MB
+- fixed kexec memory gap on x86_64
+- only download graphical packages on -latest-install
+- added kexec arithmetic for choosing KEXEC_FILE_LOAD
+- all images have now network(LAN),dhcpcd and ssh support already on bootup
+- speedup and reuse of gpg pacman initialization
+- log messages from update-installer.sh to ssh (/dev/pts/0)
+- always show Local mode on login
+- rename -kde options to -plasma
+- rename _KDE_PACKAGES to _PLASMA_PACKAGES
+- rename archboot_repo to archboot
+- rename update-installer.sh to update-installer
+- shorten xorg environment options: -gnome, -plasma and -xfce
+- only allow one graphical environment on local image < 4.5 GB RAM
+- updated welcome messages
+- updated bootloader menu entries
+- updated background image
+- added archboot MOK key
+- update fedora shim to 15.6-1
+- update grub to 2.06.r261.g2f4430cc0-1
+Setup changes:
+- allow archboot environment update with 2600 MB RAM
+- new f2fs defaults added based on Arch Linux wiki
+- efi default size on autoprepare mode set to 512 MB
+- changed filesystem order
+- fix autoprepare on mmc blockdevices
+- fix device listing to not showing install media
+- better wifi dialogs and menus
+- speedup network link detection
+Environment changes:
+- adopted glibc changes with C.UTF-8 locale
+Setup changes:
+- allow environment update with 2600 MB RAM
