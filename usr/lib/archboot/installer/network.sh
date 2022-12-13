@@ -34,7 +34,7 @@ do_wireless() {
         # clean old keys first!
         rm -f /var/lib/iwd/* > /dev/null 2>&1
         #shellcheck disable=SC2086,SC2046
-        DIALOG --menu "Choose your SSID (spaces are replaced by '+' char):" 14 60 7 \
+        DIALOG --menu "Choose your SSID (spaces in SSID are replaced by '+' char):" 14 60 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_SSID=$(cat "${ANSWER}")
@@ -54,7 +54,7 @@ do_wireless() {
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
             if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
-                DIALOG --inputbox "Enter your KEY for SSID ${WLAN_SSID}:" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
+                DIALOG --inputbox "Enter your KEY for SSID \"${WLAN_SSID}\":" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
                 WLAN_KEY=$(cat "${ANSWER}")
             fi
             # time to connect
