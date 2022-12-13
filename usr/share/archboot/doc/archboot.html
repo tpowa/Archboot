@@ -826,7 +826,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.15" id="faq-known-issues-and-limitations"><span class="header-section-number">2.15</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
-<li>Please <strong>check</strong> the forum threads for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
+<li>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
 <thead>
 <tr class="header">
@@ -869,7 +869,7 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 <br><strong>Fix</strong>: Add manual entries and delete wrong entries from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> implementation.</p>
 </ul>
 <ul>
-<li>How much <strong>RAM</strong> is needed to <strong>boot</strong>?</li>
+<li>How much <strong>RAM</strong> is needed to boot?</li>
 It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:
 <br>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot
 </ul>
@@ -1093,14 +1093,8 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </ul>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>archboot</strong> package on <strong>x86_64</strong> hardware.</li>
-</ul>
-<ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>archboot-arm</strong> package on <strong>aarch64</strong> hardware.</li>
-</ul>
-<ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>archboot-riscv</strong> package on <strong>riscv64</strong> hardware.</li>
-</ul>
-<ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>qemu-user-static</strong> package for building <strong>aarch64</strong> or <strong>riscv64</strong> images on <strong>x86_64</strong> hardware.</li>
 </ul>
 <ul>
@@ -1171,8 +1165,8 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </ul>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
 <h4 data-number="4.4.2" id="configuration-files-for-image-creation"><span class="header-section-number">4.4.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
-<p>There are the following configuration files for ISO creation:</p>
 <ul>
+There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
