@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 13.12.2022 07:03 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 13.12.2022 15:52 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -371,7 +371,7 @@
 </table>
 </ul>
 <ul>
-<li>During boot all wired network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
+<li>During boot all <strong>wired</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li><strong>With</strong> a fast internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
@@ -654,8 +654,8 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.9" id="switch-to-full-arch-linux-system"><span class="header-section-number">2.9</span> <strong><span dir="">Switch to full Arch Linux system</span></strong></h3>
 <ul>
-<li>The Archboot system is stripped down to minimal space usage.</li>
-<li>Though man/info pages, includes, additional kernel modules (eg. sound) and other things are not provided by default.</li>
+<li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
+<li>Though <strong>man/info pages, includes, additional kernel modules (eg. sound)</strong> and other things are <strong>not</strong> provided by default.</li>
 </ul>
 <ul>
 <table>
@@ -826,9 +826,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <h3 data-number="2.15" id="faq-known-issues-and-limitations"><span class="header-section-number">2.15</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
-<li>Please check the forum threads for posted fixes and workarounds.</li>
-</ul>
-<ul>
+<li>Please <strong>check</strong> the forum threads for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
 <thead>
 <tr class="header">
@@ -844,77 +842,39 @@ initrd (loop)/boot/initramfs_x86_64.img
 </ul>
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
+<a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.
+For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default, because it needs python3, which is a large dependency.
 </ul>
-<dd>
-<p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.</p>
-</dd>
-<dd>
-<p>For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default, because it needs python3, which is a large dependency.</p>
-</dd>
 <ul>
 <li>The <strong>screen stays blank</strong> or other <strong>weird screen issues</strong> happen?</li>
+Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> activation, use <code>radeon.modeset=0</code>, <code>i915.modeset=0</code>, <code>amdgpu.modeset=0</code> or <code>nouveau.modeset=0</code> on boot prompt.
 </ul>
-<dd>
-<p>Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> activation, use <code>radeon.modeset=0</code>, <code>i915.modeset=0</code>, <code>amdgpu.modeset=0</code> or <code>nouveau.modeset=0</code> on boot prompt.</p>
-</dd>
 <ul>
 <li>Your system <strong>hangs</strong> during the <strong>boot process</strong>?</li>
+Any combinations of the <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a>: <code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code> may be useful.</p>
 </ul>
-<dd>
-<p>Any combinations of the <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a>: <code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code> may be useful.</p>
-</dd>
 <ul>
-<li>dmraid/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a> might be broken on some boards, support is not perfect here.</li>
+<li><strong>dmraid</strong>/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a> might not work on some boards.</li>
+The reasons for these kind of issues are the different hardware components in the systems. At the moment 1.0.0rc16 is included, with latest fedora patchset, <strong>development</strong> has been <strong>stopped</strong>.
+<strong>mdadm</strong> supports some <strong>isw</strong> and <strong>ddf</strong> fakeraid chipsets, but <strong>assembling</strong> during boot is <strong>deactivated</strong> in <strong>/etc/mdadm.conf</strong>!</p>
 </ul>
-<dd>
-The reason is there are so many different hardware components out there. At the moment 1.0.0rc16 is included, with latest fedora patchset, development has been stopped.
-</dd>
-<dd>
-<p>mdadm supports some isw and ddf fakeraid chipsets, but assembling during boot is deactivated in <strong>/etc/mdadm.conf</strong>!</p>
-</dd>
 <ul>
-<li><a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a> cannot detect correct bios boot order:</li>
+<li><a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a> cannot detect correct <strong>BIOS</strong> boot order:</li>
+It may happen that hd(x,x) entries are not correct, thus first reboot may not work.
+<br><strong>Fix</strong>: Either change <strong>BIOS</strong> boot order or change <strong>grub.cfg</strong> to correct entries after successful boot. This cannot be fixed it is a restriction in grub!
 </ul>
-<dd>
-<p>It may happen that hd(x,x) entries are not correct, thus first reboot may not work.</p>
-</dd>
-<dd>
-<p>Reason: grub cannot detect bios boot order.</p>
-</dd>
-<dd>
-<p>Fix: Either change bios boot order or change menu.lst to correct entries after successful boot. This cannot be fixed it is a restriction in grub2!</p>
-</dd>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Efibootmgr" title="Efibootmgr"><strong>efibootmgr</strong></a> setup entries are not working:</li>
+It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> boot entries are not correct. Thus first reboot may not work e.g. <a href="https://wiki.archlinux.org/title/Ovmf" title="Ovmf"><strong>Ovmf</strong></a> <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> is affected by this.
+<br><strong>Fix</strong>: Add manual entries and delete wrong entries from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> implementation.</p>
 </ul>
-<dd>
-<p>It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> boot entries are not correct, thus first reboot may not work e.g. <a href="https://wiki.archlinux.org/title/Ovmf" title="Ovmf"><strong>Ovmf</strong></a> <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> is affected by this.</p>
-<p>Reason: The <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> implementation does not support how setup created the <a href="https://wiki.archlinux.org/title/Efibootmgr" title="Efibootmgr"><strong>efibootmgr</strong></a> entries.</p>
-<dd>
-<p>Fix: Add manual entries and delete wrong entries from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> implementation.</p>
-</dd>
 <ul>
-<li>Redisplay the <strong>Welcome to Arch Linux</strong> message:</li>
+<li>How much <strong>RAM</strong> is needed to <strong>boot</strong>?</li>
+It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:
+<br>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot
 </ul>
-<dd>
-Reason: The Welcome to Arch Linux (archboot environment) message is displayed once, before the user takes any action.
-</dd>
-<dd>
-<p>Fix: Switch to a virtual console (with <code>Alt+F1...F6</code>) you have not used so far or run <code>cat /etc/motd</code> from within a shell prompt.</p>
-</dd>
-<ul>
-<li>How much <strong>RAM</strong> is needed to boot?</li>
-</ul>
-<dd>
-<p>It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:</p>
-</dd>
-<dd>
-<p>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot</p>
-</dd>
 <ul>
 <li>What is the <strong>difference</strong> to the <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> install image?</li>
-</ul>
-<dd>
 <table>
 <thead>
 <tr class="header">
@@ -1086,7 +1046,7 @@ Reason: The Welcome to Arch Linux (archboot environment) message is displayed on
 </tr>
 </tbody>
 </table>
-</dd>
+</ul>
 <h3 data-number="2.16" id="screenshot-gallery"><span class="header-section-number">2.16</span> <strong><span dir="">Screenshot gallery</span></strong></h3>
 <p>Take a look at the archboot screenshot <a href="https://pkgbuild.com/~tpowa/archboot/web"><strong>gallery</strong></a>.</p>
 <h3 data-number="2.17" id="development-git-repository"><span class="header-section-number">2.17</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
