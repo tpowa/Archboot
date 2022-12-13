@@ -1,5 +1,5 @@
 #!/bin/bash
-if ! [[ grep -qw mac80211_hwsim /proc/modules ]]; then
+if ! grep -qw mac80211_hwsim /proc/modules; then
 	modprobe mac80211_hwsim
 fi
 iwctl ap wlan0 stop
