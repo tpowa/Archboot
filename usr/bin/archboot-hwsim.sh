@@ -30,4 +30,4 @@ systemctl restart iwd
 sleep 2
 iwctl device wlan0 set-property Mode ap
 iwctl device wlan0 set-property Powered on
-iwctl ap wlan0 start "$1" "12345678"
+iwctl ap wlan0 start "$1" "12345678" && echo -e "\033[1mSSID:$1 with password '12345678' is online now.\033[0m"
