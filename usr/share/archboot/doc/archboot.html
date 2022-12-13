@@ -194,8 +194,7 @@
 <li><a href="#keep-your-image-up-to-date" id="toc-keep-your-image-up-to-date"><span class="toc-section-number">2.12</span> <span dir="">Keep your image up to date</span></a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">2.13</span> <span dir="">Tools for backup and copying of an existing system</span></a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">2.14</span> <span dir="">Restoring an USB device to FAT32 state</span></a></li>
-<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">2.15</span> <span dir="">Setting up a simulated SSID</span></a></li>
-<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">2.16</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
+<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">2.15</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
 <li><a href="#screenshot-gallery" id="toc-screenshot-gallery"><span class="toc-section-number">2.16</span> <span dir="">Screenshot gallery</span></a></li>
 <li><a href="#development-git-repository" id="toc-development-git-repository"><span class="toc-section-number">2.17</span> <span dir="">Development: GIT repository</span></a></li>
 <li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">2.18</span> <span dir="">Bugs</span></a></li>
@@ -221,7 +220,9 @@
 <li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">6.2</span> <span dir="">running RISCV64</span></a></li>
 <li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">6.3</span> <span dir="">running X86_64</span></a></li>
 <li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">6.4</span> <span dir="">Additional qemu parameters</span></a></li>
+<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">6.5</span> <span dir="">Setting up a hwsim SSID</span></a></li>
 </ul></li>
+
 <li><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><strong><span class="toc-section-number">7.</span> <span dir="">Arch Linux Wiki</strong></span></a></li>
 <li><a href="#quick-links-archboot" id="toc-quick-links-archboot"><strong><span class="toc-section-number">8.</span> <span dir="">Quick links Archboot</strong></span></a></li>
 <li><a href="#quick-links-videos" id="toc-quick-links-videos"><strong><span class="toc-section-number">9.</span> <span dir="">Quick links videos</strong></span></a></li>
@@ -825,22 +826,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.15" id="hwsim"><span class="header-section-number">2.15</span> <strong><span dir="">Setting up a hwsim SSID</span></strong></h3>
-<ul>
-<table>
-<thead>
-<tr class="header">
-<th>Start a hwsid SSID for wireless testing purposes:</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code># archboot-hwsim.sh &ltSSID&gt</code></td>
-</tr>
-</tbody>
-</table>
-</ul>
-<h3 data-number="2.16" id="faq-known-issues-and-limitations"><span class="header-section-number">2.15</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
+<h3 data-number="2.15" id="faq-known-issues-and-limitations"><span class="header-section-number">2.15</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
 <li>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
@@ -1453,6 +1439,21 @@ There are the following configuration files for ISO creation:
 <tbody>
 <tr class="odd">
 <td><code>-drive file=yourimagefile,if=virtio,format=raw</code></td>
+</tr>
+</tbody>
+</table>
+</ul>
+<h3 data-number="6.5" id="hwsim"><span class="header-section-number">6.5</span> <strong><span dir="">Setting up a hwsim SSID</span></strong></h3>
+<ul>
+<table>
+<thead>
+<tr class="header">
+<th>Start a hwsid SSID for wireless testing purposes:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code># archboot-hwsim.sh &ltSSID&gt</code></td>
 </tr>
 </tbody>
 </table>
