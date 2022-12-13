@@ -12,8 +12,8 @@ usage()
     echo -e "\033[1m---------------------------------------\033[0m"
     echo "Create a simulated wireless SSID for testing purposes"
     echo "with mac80211_hwsim module."
-	echo "- wlan0 will be the AP"
-	echo "- wlan1 will be for STATION mode"
+	echo "- wlan0 will be setup for the AP"
+	echo "- wlan1 will be setup for STATION mode, use this for scanning your AP"
     echo -e "usage: \033[1m${APPNAME} <SSID>\033[0m"
     exit 0
 }
