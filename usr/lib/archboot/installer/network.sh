@@ -34,7 +34,7 @@ do_wireless() {
         # clean old keys first!
         rm -f /var/lib/iwd/* > /dev/null 2>&1
         #shellcheck disable=SC2086,SC2046
-        DIALOG --menu "Choose your SSID (spaces in SSID are replaced by '+' char):" 14 60 7 \
+        DIALOG --menu "Choose your SSID:\n(spaces in SSID are replaced by '+' char):" 14 60 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_SSID=$(cat "${ANSWER}")
