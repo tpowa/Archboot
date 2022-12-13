@@ -16,6 +16,8 @@ build ()
     map add_binary iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
     # add iwd and ead daemon
     map add_binary "/usr/lib/iwd/iwd" "/usr/lib/iwd/ead"
+    # add hwsim helper script
+    add_binary archboot-hwsim.sh
     # crda support
     map add_file "/etc/conf.d/wireless-regdom" "/usr/lib/crda/regulatory.bin" \
                  "/usr/lib/crda/pubkeys/sforshee.key.pub.pem"

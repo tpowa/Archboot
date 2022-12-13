@@ -14,10 +14,9 @@ usage()
 	echo "- wlan0 will be the AP"
 	echo "- wlan1 will be for STATION mode"
     echo -e "usage: \033[1m${APPNAME} <SSID>\033[0m"
-    exit "1"
 }
 
-if [ $# -gt 0 ]; then
+if [[ -z "${1}" ]]; then
     usage
 fi
 
