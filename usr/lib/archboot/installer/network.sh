@@ -16,6 +16,7 @@ essid_scan() {
     iwctl station "${INTERFACE}" scan
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
+    # '+' character is one of 6 forbidden characters in SSID standard
     for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
