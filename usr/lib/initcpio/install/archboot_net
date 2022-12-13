@@ -30,6 +30,6 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the network on an archboot image.
+  This hook includes the additional network tools on an archboot image.
 HELPEOF
 }
