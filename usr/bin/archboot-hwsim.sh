@@ -10,7 +10,8 @@ usage()
 {
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mHWSIM:\033[0m"
     echo -e "\033[1m---------------------------------------\033[0m"
-    echo "Create a simulated wireless SSID for testing purposes with mac80211_hwsim module."
+    echo "Create a simulated wireless SSID for testing purposes"
+    echo "with mac80211_hwsim module."
 	echo "- wlan0 will be the AP"
 	echo "- wlan1 will be for STATION mode"
     echo -e "usage: \033[1m${APPNAME} <SSID>\033[0m"
