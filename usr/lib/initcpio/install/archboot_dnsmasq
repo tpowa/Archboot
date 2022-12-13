@@ -3,7 +3,7 @@
 
 build ()
 {
-    add_binary "dnsmasq"
+    map add_binary dnsmasq dhcp_lease_time dhcp_release dhcp_release6
     add_file "/etc/dnsmasq.conf"
     map add_dir "/var/db" "/var/lib/misc"
 }
