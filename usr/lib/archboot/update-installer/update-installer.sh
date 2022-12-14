@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _D_SCRIPTS=""
 _L_COMPLETE=""

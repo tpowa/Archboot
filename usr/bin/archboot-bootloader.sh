@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/bootloader.sh
 _SHIM=$(mktemp -d shim.XXX)

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # name of intel ucode initramfs image
 INTEL_UCODE="intel-ucode.img"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # we rely on some output which is parsed in english!
 LANG=C.UTF8

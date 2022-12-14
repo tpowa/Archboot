@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 

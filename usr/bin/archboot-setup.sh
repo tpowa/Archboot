@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # source base and common first, contains basic parameters
 . /usr/lib/archboot/installer/base.sh
 . /usr/lib/archboot/installer/common.sh

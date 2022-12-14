@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 check_root_password() {
     # check if empty password is set

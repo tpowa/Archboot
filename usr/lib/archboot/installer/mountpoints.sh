@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # destdir_mounts()
 # check if PART_ROOT is set and if something is mounted on ${DESTDIR}

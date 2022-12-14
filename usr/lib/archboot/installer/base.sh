@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
