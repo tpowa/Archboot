@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 14.12.2022 16:04 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 15.12.2022 11:04 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -283,7 +283,7 @@
 </table>
 </ul>
 <ul>
-<li>The image supports riscv64 and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. <strong>Only</strong> recommended for testing in a VM.</li>
+<li>The image supports riscv64 and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a VM.</li>
 </ul>
 <a href="https://archlinux.org/"><strong>Arch Linux X64 x86_64</strong></a>
 <ul>
@@ -306,7 +306,7 @@
 </table>
 </ul>
 <ul>
-<li>The image for Arch Linux. Suitable for <strong>real</strong> machines and VM.</li>
+<li>The image for Arch Linux. Use it for <strong>real</strong> machines and/or virtual machines.</li>
 </ul>
 <h3 data-number="2.2" id="features-of-the-images"><span class="header-section-number">2.2</span> <strong><span dir="">Features of the images</span></strong></h3>
 <ul>
@@ -432,8 +432,9 @@
 </table>
 </ul>
 <ul>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a><br>and add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
-<li>For rescue booting add an entry to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a><br>and add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong> setup.</a><br>
+<li>For <strong>rescue booting</strong> add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
+<li>In <strong>both</strong> cases, add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
 </ul>
 <h3 data-number="2.4" id="supported-boot-modes"><span class="header-section-number">2.4</span> <strong><span dir="">Supported boot modes</span></strong></h3>
 <ul>
@@ -480,7 +481,7 @@
 </tbody>
 </table>
 </ul>
-<p>It supports <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a>’s iso loopback support.</p>
+<p>It supports <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a>’s iso loopback support:</p>
 <ul>
 <table>
 <thead>
@@ -700,7 +701,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <ul>
 <li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be synced and you have to select your favourite mirror.</li>
 <li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repository <strong>&ltdefault=no&gt</strong>.</li>
-<li>If a new kernel is online available, you can decide to load the latest archboot environment and cache packages for installation <strong>&ltdefault=no&gt</strong>.</li>
+<li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&ltdefault=no&gt</strong>.</li>
 </ul></li>
 </ul>
 <h4 data-number="2.10.4" id="changing-timezone-and-date"><span class="header-section-number">2.10.4</span> <strong><span dir="">Changing timezone and date</span></strong></h4>
@@ -710,7 +711,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <h4 data-number="2.10.5" id="prepare-storage-drive"><span class="header-section-number">2.10.5</span> <strong><span dir="">Prepare Storage drive</span></strong></h4>
 <ul>
 <li>You setup your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
-<li>Auto-Prepare mode, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (gpt) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (bios) support, <a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
+<li>Auto-Prepare mode, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (gpt) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (bios) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
 <li><a href="https://wiki.archlinux.org/title/Persistent_block_device_naming" title="Persistent block device naming"><strong>Persistent block device naming</strong></a> support: <a href="https://wiki.archlinux.org/title/PARTUUID" title="PARTUUID"><strong>PARTUUID</strong></a>, <a href="https://wiki.archlinux.org/title/PARTLABEL" title="PARTLABEL"><strong>PARTLABEL</strong></a>, UUID, LABEL and KERNEL</li>
 <li>Creation of software <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>/<a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a> partitions, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> devices and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Supports standard linux, <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>/<a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>_partitions, dmraid/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a>, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
@@ -720,14 +721,14 @@ initrd (loop)/boot/initramfs_x86_64.img
 <ul>
 <li>You can modify the packages to install in <strong>/etc/archboot/defaults</strong>.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will install the packages for the first boot to your storage drive.</li>
-<li>Autoconfiguration of basic system:<br><a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>systemd</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>mdadm.conf</strong></a></li>
+<li>Autoconfiguration of basic system:<br><a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>systemd</strong></a>,<br><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>mdadm.conf</strong></a></li>
 </ul>
 <h4 data-number="2.10.7" id="configure-system"><span class="header-section-number">2.10.7</span> <strong><span dir="">Configure System</span></strong></h4>
 <ul>
 <li>You set the root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong>.</a></li>
 <li>You set the system-wide <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a></li>
 <li>Preconfiguration of <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a> and <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> mode is done by <strong>hwdetect</strong> script</li>
-<li>Configuration of basic system files:<br><a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
+<li>Configuration of basic system files:<br><a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>,<br><a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
 </ul>
 <h4 data-number="2.10.8" id="install-bootloader"><span class="header-section-number">2.10.8</span> <strong><span dir="">Install Bootloader</span></strong></h4>
 <ul>
@@ -852,11 +853,11 @@ For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archi
 </ul>
 <ul>
 <li>The <strong>screen stays blank</strong> or other <strong>weird screen issues</strong> happen?</li>
-Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> activation, use <strong><code>radeon.modeset=0</code>, <code>i915.modeset=0</code>, <code>amdgpu.modeset=0</code> or <code>nouveau.modeset=0</code></strong> on boot prompt.
+Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> activation. Use <strong>one</strong> of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a>:<br><strong><code>radeon.modeset=0</code>, <code>i915.modeset=0</code>, <code>amdgpu.modeset=0</code> or <code>nouveau.modeset=0</code></strong>
 </ul>
 <ul>
 <li>Your system <strong>hangs</strong> during the <strong>boot process</strong>?</li>
-Any combinations of the <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a>: <strong><code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code></strong> may be useful.</p>
+<strong>Any</strong> combinations of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a> may be useful:<br><strong><code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code></strong></p>
 </ul>
 <ul>
 <li><strong>dmraid</strong>/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a> might not work on some boards.</li>
