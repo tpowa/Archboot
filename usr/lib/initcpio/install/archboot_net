@@ -3,23 +3,11 @@
 
 build ()
 {
-    add_checked_modules '/netfilter/'
     map add_binary traceroute arping clockdiff tracepath ssh arpd genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
     # add iproute 2, add openssl helper libraries
     map add_full_dir "/usr/lib/tc" "/usr/share/tc" "/etc/iproute2" "/usr/lib/engines"
-    # add iptables and nftables
-    map add_file /etc/arptables.conf /etc/ebtables.conf /etc/ethertypes /etc/nftables.conf
-    map add_full_dir /etc/iptables /usr/lib/xtables /usr/share/iptables /usr/share/xtables /usr/share/nftables
-    map add_binary arptables arptables-nft arptables-nft-restore arptables-nft-save arptables-restore \
-    arptables-save ebtables ebtables-nft ebtables-nft-restore ebtables-nft-save ebtables-restore ebtables-save \
-    ip6tables ip6tables-apply ip6tables-legacy ip6tables-legacy-restore ip6tables-legacy-save ip6tables-nft \
-    ip6tables-nft-restore ip6tables-nft-save ip6tables-restore ip6tables-restore-translate ip6tables-save \
-    ip6tables-translate iptables iptables-apply iptables-legacy iptables-legacy-restore \
-    iptables-legacy-save iptables-nft iptables-nft-restore iptables-nft-save iptables-restore \
-    iptables-restore-translate iptables-save iptables-translate iptables-xml nfbpf_compile nfnl_osf \
-    xtables-legacy-multi xtables-monitor xtables-nft-multi nft
     # add dnssec-anchors
     add_file "/etc/trusted-key.key"
     # add weechat plugins and defaults
