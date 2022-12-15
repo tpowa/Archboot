@@ -6,6 +6,9 @@ build ()
     map add_binary dnsmasq dhcp_lease_time dhcp_release dhcp_release6
     add_file "/etc/dnsmasq.conf"
     map add_dir "/var/db" "/var/lib/misc"
+    # add nftables
+    add_full_dir "/usr/share/nftables"
+    add_file "/etc/nftables.conf"
 }
 
 help ()
