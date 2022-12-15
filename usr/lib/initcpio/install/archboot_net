@@ -3,6 +3,7 @@
 
 build ()
 {
+    add_checked_modules '/netfilter/'
     map add_binary traceroute arping clockdiff tracepath ssh arpd genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
