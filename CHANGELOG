@@ -16,7 +16,7 @@ Environment changes:
 - lower RAM requirement for local image to 2.7GB
 - removed none working perl and python scripts
 - removed network stack from local image pre kexec
-- removed bind, inetutils, net-tools, b43-fwcutter and wireless_tools
+- removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter and wireless_tools
 - fixed /etc/request-key.d directory addition
 - fixed permission of shadow, gshadow and passwd
 - disable audit function on boot commandline by default
