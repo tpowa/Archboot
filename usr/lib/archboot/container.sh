@@ -63,7 +63,7 @@ _clean_container() {
         rm -r "${1}"/usr/include
         rm -r "${1}"/usr/share/{aclocal,applications,audit,avahi,awk,bash-completion,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ncat,ntp,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,perl[0-9]*,i18n,locale,xtables}
         rm -r "${1}"/usr/lib/{audit,avahi,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,cups,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,krb5,ldb,ldscripts,libnl,ntfs-3g,pkgconfig,python[0-9]*,rsync,samba,sasl2,siconv,tar,terminfo,xfsprogs,xtables}
-        # until vim is fixed, clean all files and leave libperl.so
+        # fix vim, clean all perl files and leave libperl.so
         find "${1}"/usr/lib/perl[0-9]* -type f ! -name 'libperl.so' -exec rm -rf {} \;
     fi
 }
