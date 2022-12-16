@@ -19,7 +19,7 @@ build ()
           f2fscrypt f2fstat fibmap.f2fs resize.f2fs sload.f2fs fsck.f2fs parse.f2fs blkmapd nfsconf \
           nfsdcld nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
           xfs_growfs xfs_quota \
-	  xfs_scrub xfs_scrub_all xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
+      xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
 	  xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in $apps; do
         rm /usr/bin/"$i"
