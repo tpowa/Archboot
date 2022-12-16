@@ -19,7 +19,7 @@ build ()
 	  e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io f2fscrypt f2fstat fibmap.f2fs fsck.f2fs \
 	  parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld nfsidmap nfsv4.exportd nilfs-clean \
 	  nilfs-resize nilfs-tune xfs_growfs xfs_quota \
-	  xfs_scrub xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
+	  xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
     map add_file "/etc/nilfs_cleanerd.conf" "/etc/nvme/discovery.conf"
     map add_full_dir "/etc/cifs-utils" "/etc/request-key.d"
