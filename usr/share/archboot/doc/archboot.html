@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 17.12.2022 18:23 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 18.12.2022 08:04 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -795,7 +795,6 @@ initrd (loop)/boot/initramfs_x86_64.img
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
-<li>Fortunately, it is easy to re-create a FAT32 partition on the stick so that the USB stick again becomes available for carrying around your data.</li>
 <li>Check carefully which device actually is your USB stick.</li>
 </ul>
 <ul>
@@ -831,7 +830,7 @@ initrd (loop)/boot/initramfs_x86_64.img
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
 <a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.
-For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default, because it needs python3, which is a large dependency.
+For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default.<br>It needs python3, which is a large dependency.
 </ul>
 <ul>
 <li>The <strong>screen stays blank</strong> or other <strong>weird screen issues</strong> happen?</li>
@@ -843,13 +842,12 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 </ul>
 <ul>
 <li><strong>dmraid</strong>/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a> might not work on some boards.</li>
-The reasons for these kind of issues are the different hardware components in the systems. At the moment 1.0.0rc16 is included, with latest fedora patchset, <strong>development</strong> has been <strong>stopped</strong>.
-<strong>mdadm</strong> supports some <strong>isw</strong> and <strong>ddf</strong> fakeraid chipsets, but <strong>assembling</strong> during boot is <strong>deactivated</strong> in <strong>/etc/mdadm.conf</strong>!</p>
+The reasons for these kind of issues are the different hardware components in the systems.<br>At the moment 1.0.0rc16 is included, with latest fedora patchset, <strong>development</strong> has been <strong>stopped</strong>.<br><strong>mdadm</strong> supports some <strong>isw</strong> and <strong>ddf</strong> fakeraid chipsets, but <strong>assembling</strong> during boot is <strong>deactivated</strong> in <strong>/etc/mdadm.conf</strong>!</p>
 </ul>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a> cannot detect correct <strong>BIOS</strong> boot order:</li>
 It may happen that hd(x,x) entries are not correct, thus first reboot may not work.
-<br><strong>Fix</strong>: Either change <strong>BIOS</strong> boot order or change <strong>grub.cfg</strong> to correct entries after successful boot. This cannot be fixed it is a restriction in grub!
+<br><strong>Fix</strong>: Either change <strong>BIOS</strong> boot order or change <strong>grub.cfg</strong> to correct entries after successful boot.<br>This cannot be fixed it is a restriction in grub!
 </ul>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Efibootmgr" title="Efibootmgr"><strong>efibootmgr</strong></a> setup entries are not working:</li>
