@@ -18,10 +18,9 @@ Environment changes:
 - removed network stack from local image pre kexec
 - removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter and wireless_tools
 - fixed /etc/request-key.d directory addition
-- fixed permission of shadow, gshadow and passwd
-- disable audit function on boot commandline by default
-- removed xfs_scrub and arpd, removes big libraries from system
-- removed archinstall and python from environment
+- use systemd defaults for shadow, gshadow and passwd
+- disable audit function on boot commandline
+- removed xfs_scrub, arpd, archinstall and python
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - install vim instead of vi on installed system
