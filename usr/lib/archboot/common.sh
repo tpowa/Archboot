@@ -19,7 +19,7 @@ fi
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _CACHEDIR="/var/cache/pacman/pkg"
-_FIX_PACKAGES="libunwind libelf libevent python talloc gdbm fuse3 gcc-libs perl glibc libtiff glib2 libcups harfbuzz avahi nss p11-kit libp11-kit fuse tpm2-tss libsecret smbclient libcap tevent libbsd libldap tdb ldb libmd jansson libsasl pcre2"
+_FIX_PACKAGES="libelf libevent talloc gdbm gcc-libs perl glibc glib2 harfbuzz nss p11-kit libp11-kit fuse tpm2-tss libsecret libcap libbsd libldap libmd jansson libsasl pcre2"
 _XORG_PACKAGE="xorg"
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
