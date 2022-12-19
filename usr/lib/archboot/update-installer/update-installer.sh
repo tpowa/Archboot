@@ -499,7 +499,7 @@ _install_graphic () {
     [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
     [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
     echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi ..."
-    systemd-sysusers >/dev/null 2>&1
+    systemctl restart systemd-sysusers
     systemctl restart dbus
     systemctl restart avahi-daemon
     # only start vnc on xorg environment
