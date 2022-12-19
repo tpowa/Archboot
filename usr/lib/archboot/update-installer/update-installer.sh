@@ -498,8 +498,10 @@ _install_graphic () {
     [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
     [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
     [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
-    echo -e "\033[1mStep 3/4:\033[0m Starting avahi-daemon ..."
-    systemctl start avahi-daemon.service
+    echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi ..."
+    systemd-sysusers >/dev/null 2>&1
+    systemctl restart dbus
+    systemctl restart avahi-daemon
     # only start vnc on xorg environment
     echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser ...\033[0m"
     [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc

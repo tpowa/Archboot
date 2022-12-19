@@ -45,13 +45,6 @@ build ()
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done
 
-    ### adding security critical config files of installation system with mode 000
-    add_file "/etc/gshadow" "/etc/gshadow" "000"
-    basic_config="passwd shadow"
-    for i in $basic_config; do
-        add_file "/usr/share/archboot/base/etc/$i" "/etc/$i" "000"
-    done
-
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
