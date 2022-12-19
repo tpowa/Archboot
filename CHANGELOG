@@ -21,6 +21,7 @@ Environment changes:
 - fixed permission of shadow, gshadow and passwd
 - disable audit function on boot commandline by default
 - removed xfs_scrub and arpd, removes big libraries from system
+- removed archinstall and python from environment
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - install vim instead of vi on installed system
