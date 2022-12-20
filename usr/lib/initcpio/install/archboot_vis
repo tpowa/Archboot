@@ -4,8 +4,8 @@
 build ()
 {
     map add_binary vis vis-clipboard vis-complete vis-digraph vis-menu vis-open
-    map add_full_dir /etc/vis /usr/share/vis
-    add_file /usr/share/licenses/vis/LICENSE
+    map add_full_dir /etc/vis /usr/share/vis /usr/lib/lua /usr/share/lua
+    map add_file /usr/share/licenses/vis/LICENSE /usr/share/licenses/vis/LICENSE
 }
 
 help ()
