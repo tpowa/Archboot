@@ -137,11 +137,11 @@ auto_packages() {
     PACKAGES="${PACKAGES//\ mdadm\ / }"
     PACKAGES="${PACKAGES} mdadm"
     ### HACK
-    # always add nano and vim
+    # always add nano and vis
     PACKAGES="${PACKAGES//\ nano\ / }"
     PACKAGES="${PACKAGES} nano"
-    PACKAGES="${PACKAGES//\ vim\ / }"
-    PACKAGES="${PACKAGES} vim"
+    PACKAGES="${PACKAGES//\ vis\ / }"
+    PACKAGES="${PACKAGES} vis"
 }
 
 # /etc/locale.gen
