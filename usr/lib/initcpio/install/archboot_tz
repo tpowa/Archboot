@@ -3,15 +3,9 @@
 
 build ()
 {
-    map add_binary hwclock ntpdate ntpd ntp-keygen ntpdc ntpq \
-          ntptime tzselect
-    add_file "/etc/ntp.conf"
+    map add_binary hwclock tzselect
     add_full_dir "/usr/share/zoneinfo"
-    add_dir "/var/lib/ntp"
-    chown ntp:root "$BUILDROOT/var/lib/ntp"
     add_file "/usr/bin/archboot-tz.sh" "/usr/bin/tz"
-    # fix licenses
-    add_file "/usr/share/licenses/ntp/LICENSE"
 }
 
 help ()
