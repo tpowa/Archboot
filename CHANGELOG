@@ -21,7 +21,7 @@ Environment changes:
 - use systemd defaults for shadow, gshadow and passwd
 - disable audit function on boot commandline
 - removed xfs_scrub, arpd, archinstall, python and perl
-- enabled syntax highlight in nano
+- enabled syntax highlighting in nano
 - replaced vim with neovim editor
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
