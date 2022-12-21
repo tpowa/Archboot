@@ -3,9 +3,9 @@
 
 build ()
 {
-    map add_binary grub-editenv grub-fstest grub-menulst2cfg grub-mkfont \
+    map add_binary grub-editenv grub-fstest grub-menulst2cfg \
           grub-mkimage grub-mklayout grub-mkpasswd-pbkdf2 grub-mkrelpath \
-	  grub-mount grub-script-check grub-bios-setup \
+	  grub-script-check grub-bios-setup \
 	  grub-ofpathname grub-probe grub-kbdcomp grub-mkrescue grub-mkstandalone grub-install \
               grub-mkconfig grub-mknetdir grub-reboot grub-set-default
     ## add grub-mkconfig helper scripts
