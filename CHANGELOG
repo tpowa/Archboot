@@ -32,6 +32,7 @@ setup/quickinst changes:
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
 - replaced vim with neovim editor
+- add nano syntax highlighting on installed system
 ---
 2022.12 Highlights:
 - grub 2:2.06.r380.g151467888-1
