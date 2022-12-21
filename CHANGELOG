@@ -20,7 +20,7 @@ Environment changes:
 - fixed /etc/request-key.d directory addition
 - use systemd defaults for shadow, gshadow and passwd
 - disable audit function on boot commandline
-- removed xfs_scrub, arpd, archinstall, python and perl
+- removed xfs_scrub, arpd, archinstall, testdisk, python and perl
 - enabled syntax highlighting in nano
 - replaced vim with neovim editor
 setup/quickinst changes:
