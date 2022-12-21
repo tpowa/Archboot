@@ -137,9 +137,9 @@ auto_packages() {
     PACKAGES="${PACKAGES//\ mdadm\ / }"
     PACKAGES="${PACKAGES} mdadm"
     ### HACK
-    # always add nano and vis
-    PACKAGES="${PACKAGES//\ micro\ / }"
-    PACKAGES="${PACKAGES} micro"
+    # always add nano and neovim
+    PACKAGES="${PACKAGES//\ nano\ / }"
+    PACKAGES="${PACKAGES} nano"
     PACKAGES="${PACKAGES//\ neovim\ / }"
     PACKAGES="${PACKAGES} neovim"
 }

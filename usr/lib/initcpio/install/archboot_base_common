@@ -17,7 +17,14 @@ build ()
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
           sort zstd date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
-          ldconfig nscd ln top df cut stat sln file tr micro
+          ldconfig nscd ln top df cut stat sln file tr
+
+    ### add nano
+    add_binary nano
+    add_full_dir /usr/share/nano
+    add_file /etc/nanorc
+    # add syntax highlighting
+    echo "include \"/usr/share/nano/*.nanorc\"" >> "$BUILDROOT/etc/nanorc"
 
     ### add file magic file
     add_file /usr/share/file/misc/magic.mgc
@@ -153,8 +160,7 @@ build ()
 
     ### fix licenses
     map add_file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \
-                 /usr/share/licenses/dbus/COPYING /usr/share/licenses/p11-kit/COPYING \
-                 /usr/share/licenses/micro/LICENSE
+                 /usr/share/licenses/dbus/COPYING /usr/share/licenses/p11-kit/COPYING
 
 }
 

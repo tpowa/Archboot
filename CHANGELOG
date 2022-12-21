@@ -31,7 +31,6 @@ setup/quickinst changes:
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
-- replaced nano with micro editor
 - replaced vim with neovim editor
 ---
 2022.12 Highlights:
