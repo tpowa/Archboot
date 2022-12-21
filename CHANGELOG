@@ -25,13 +25,13 @@ Environment changes:
 - replaced vim with neovim editor
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
-- install vim instead of vi on installed system
 - fixed riscv64 package installation with disabling ucode packages
 - reordered/cleaned up timezone regions
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
 - replaced vim with neovim editor
+- install neovim instead of vim to installed system
 - add nano syntax highlighting on installed system
 ---
 2022.12 Highlights:
