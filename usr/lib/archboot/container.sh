@@ -61,7 +61,7 @@ _clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
         echo "Clean container, delete not needed files from ${1} ..."
         rm -r "${1}"/usr/include
-        rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,bash-completion,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,ntp,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,perl[0-9]*,i18n,locale,xtables}
+        rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,bash-completion,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,i18n,locale,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,krb5,ldscripts,libnl,ntfs-3g,pkgconfig,python[0-9]*,rsync,sasl2,siconv,tar,terminfo,xfsprogs,xtables}
     fi
 }

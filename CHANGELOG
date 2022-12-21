@@ -14,13 +14,15 @@ Environment changes:
 - removed GRAPHIC packages from local image,
   new grub respects linux max_initrd_size which is 0x37FFFFF (around 940MB).
 - lower RAM requirement for local image to 2.7GB
-- removed none working perl and python scripts
 - removed network stack from local image pre kexec
-- removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter and wireless_tools
+- removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter,
+  ntp and wireless_tools
 - fixed /etc/request-key.d directory addition
 - use systemd defaults for shadow, gshadow and passwd
 - disable audit function on boot commandline
-- removed xfs_scrub, arpd, archinstall and python
+- removed xfs_scrub, arpd, archinstall, python and perl
+- replaced nano with micro editor
+- replaced vim with neovim editor
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - install vim instead of vi on installed system
@@ -29,6 +31,8 @@ setup/quickinst changes:
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
+- replaced nano with micro editor
+- replaced vim with neovim editor
 ---
 2022.12 Highlights:
 - grub 2:2.06.r380.g151467888-1
