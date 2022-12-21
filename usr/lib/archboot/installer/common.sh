@@ -138,10 +138,10 @@ auto_packages() {
     PACKAGES="${PACKAGES} mdadm"
     ### HACK
     # always add nano and vis
-    PACKAGES="${PACKAGES//\ nano\ / }"
-    PACKAGES="${PACKAGES} nano"
-    PACKAGES="${PACKAGES//\ vis\ / }"
-    PACKAGES="${PACKAGES} vis"
+    PACKAGES="${PACKAGES//\ micro\ / }"
+    PACKAGES="${PACKAGES} micro"
+    PACKAGES="${PACKAGES//\ neovim\ / }"
+    PACKAGES="${PACKAGES} neovim"
 }
 
 # /etc/locale.gen

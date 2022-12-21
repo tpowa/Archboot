@@ -16,15 +16,12 @@ build ()
     map add_binary init agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
-          sort zstd nano date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
+          sort zstd date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
           ldconfig nscd ln top df cut stat sln file tr
 
     ### add file magic file
     add_file /usr/share/file/misc/magic.mgc
 
-    ### add nano files
-    add_full_dir /usr/share/nano
-    
     add_file "/usr/lib/libkmod.so"
     add_symlink "/init" "/usr/lib/systemd/systemd"
     
@@ -32,7 +29,7 @@ build ()
     add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
     systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nanorc nscd.conf nsswitch.conf protocols request-key.conf securetty \
+                 nscd.conf nsswitch.conf protocols request-key.conf securetty \
                  services"
     for i in $systemfiles; do
         add_file "/etc/$i"
@@ -155,8 +152,9 @@ build ()
     add_full_dir /usr/share/archboot/keys
 
     ### fix licenses
-    map add_file "/usr/share/licenses/shadow/COPYING" "/usr/share/licenses/iana-etc/LICENSE" \
-                 "/usr/share/licenses/dbus/COPYING" "/usr/share/licenses/p11-kit/COPYING"
+    map add_file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \
+                 /usr/share/licenses/dbus/COPYING /usr/share/licenses/p11-kit/COPYING \
+                 /usr/share/licenses/micro/LICENSE
 
 }
 
