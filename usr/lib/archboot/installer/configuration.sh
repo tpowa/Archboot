@@ -48,7 +48,7 @@ set_locale() {
         DIALOG --infobox "Setting locale LANG=${set_locale} on installed system ..." 3 70
         SET_LOCALE="1"
         sleep 2
-        _auto_set_locale
+        auto_set_locale
         run_locale_gen
     fi
 }

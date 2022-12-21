@@ -235,12 +235,19 @@ auto_locale() {
     fi
 }
 
-_auto_set_locale() {
+auto_set_locale() {
     # enable glibc locales from locale.conf
     DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
     #shellcheck disable=SC2013
     for i in $(grep "^LANG" "${DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
         sed -i -e "s/^#${i}/${i}/g" "${DESTDIR}"/etc/locale.gen
     done
+    sleep 2
+}
+
+auto_nano_syntax() {
+# enable glibc locales from locale.conf
+    DIALOG --infobox "Enable nano's syntax highlighting in /etc/nanorc on installed system ..." 3 70
+    grep -q '^include' "${DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${DESTDIR}/etc/nanorc"
     sleep 2
 }
