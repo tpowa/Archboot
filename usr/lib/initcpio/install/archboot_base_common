@@ -44,11 +44,15 @@ build ()
 
     ### adding config files of installation system
     map add_file "/etc/profile" "/etc/group"
-    basic_config="bash.bashrc hostname modprobe.d/modprobe.conf shells"
+    basic_config="hostname modprobe.d/modprobe.conf shells"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done
 
+    ### add options to bashrc
+    add_file /etc/bash.bashrc
+    echo "# always try to run zsh" >> "$BUILDROOT/etc/bash.bashrc"
+    echo "command -v zsh && exec zsh \"\$@\"" >> "$BUILDROOT/etc/bash.bashrc"
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
