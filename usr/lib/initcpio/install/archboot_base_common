@@ -52,7 +52,7 @@ build ()
     ### add options to bashrc
     add_file /etc/bash.bashrc
     echo "# always try to run zsh" >> "$BUILDROOT/etc/bash.bashrc"
-    echo "command -v zsh && exec zsh \"\$@\"" >> "$BUILDROOT/etc/bash.bashrc"
+    echo "command -v zsh >/dev/null && exec zsh \"\$@\"" >> "$BUILDROOT/etc/bash.bashrc"
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
