@@ -11,7 +11,10 @@ build ()
         "/etc/rsyncd.conf" "/etc/exports"  "/usr/lib/ssh/sftp-server" "/usr/lib/ssh/ssh-keysign" \
         "/usr/lib/ssh/ssh-pkcs11-helper" "/etc/conf.d/rpcbind" \
         "/etc/netconfig"
-    add_file "/usr/share/archboot/remote/etc/ssh/sshd_config" "/etc/ssh/sshd_config"
+    add_file "/etc/ssh/sshd_config"
+    # allow root login and empty passwords
+    echo "PermitRootLogin yes" >> "$BUILDROOT/etc/ssh/sshd_config"
+    echo "PermitEmptyPasswords yes" >> "$BUILDROOT/etc/ssh/sshd_config"
     add_full_dir "/usr/lib/libnfsidmap/"
     map add_dir  "/var/empty" "/var/lib/nfs/sm" "/var/lib/nfs/sm.bak" "/var/lib/nfs/v4recovery" \
         "/var/lib/nfs/rpc_pipefs" "/var/lib/rpcbind" "/var/log/gssproxy"
