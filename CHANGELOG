@@ -19,10 +19,11 @@ Environment changes:
   ntp and wireless_tools
 - fixed /etc/request-key.d directory addition
 - use systemd defaults for shadow, gshadow and passwd
+- use system's shells file
 - disable audit function on boot commandline
 - removed xfs_scrub, arpd, archinstall, testdisk, python and perl
 - enabled syntax highlighting in nano
-- replaced vim with neovim editor
+- replaced vim editor with neovim editor
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - fixed riscv64 package installation with disabling ucode packages
