@@ -70,7 +70,7 @@ set_vconsole() {
     fi
     abort_dialog || return 1
     KEYMAPS=""
-    for i in $(${LIST_MAPS} | grep -w "^${keymap}" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+    for i in $(${LIST_MAPS} | grep "^${keymap}[-,_]" | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
         KEYMAPS="${KEYMAPS} ${i} -"
     done
     CANCEL=""
