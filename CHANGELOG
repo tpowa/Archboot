@@ -22,7 +22,7 @@ Environment changes:
 - use system's shells file
 - disable audit function on boot commandline
 - removed xfs_scrub, arpd, archinstall, testdisk, ntfs-3g, python and perl
-- enabled syntax highlighting in nano
+- enabled syntax highlighting in nano editor
 - replaced vim editor with neovim editor
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
@@ -31,9 +31,9 @@ setup/quickinst changes:
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
-- replaced vim with neovim editor
-- install neovim instead of vim to installed system
-- add nano syntax highlighting on installed system
+- replaced vim editor with neovim editor
+- install neovim editor instead of vim editor to installed system
+- add nano editor syntax highlighting on installed system
 ---
 2022.12 Highlights:
 - grub 2:2.06.r380.g151467888-1
