@@ -105,7 +105,6 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/getty.target.wants/getty@tty1.service" \
              "/usr/lib/systemd/system/getty@tty1.service"
     add_symlink "/etc/systemd/system/getty.target.wants/getty@tty1.service" "/usr/lib/systemd/system/getty@tty1.service"
-    add_file "/usr/share/archboot/base/etc/machine-id" "/etc/machine-id"
 
     ### add missing libsystemd files
     map add_file "/usr/lib/libnss_myhostname.so.2" "/usr/lib/libnss_mymachines.so.2" \
