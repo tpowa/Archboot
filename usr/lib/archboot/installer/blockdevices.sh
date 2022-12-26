@@ -243,15 +243,6 @@ findbootloaderpartitions() {
     fi
 }
 
-# find any gpt/guid formatted disks
-find_gpt() {
-    GUID_DETECTED=""
-    #shellcheck disable=SC2119
-    for i in $(finddisks); do
-        [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${i}")" == "gpt" ]] && GUID_DETECTED="1"
-    done
-}
-
 # activate_dmraid()
 # activate dmraid devices
 activate_dmraid()
@@ -339,13 +330,12 @@ set_device_name_scheme() {
     NAME_SCHEME_LEVELS=""
     MENU_DESC_TEXT=""
 
-    # check if gpt/guid formatted disks are there
-    find_gpt
+    detect_uefi_boot
 
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
 
-    if [[ "${GUID_DETECTED}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
         MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
