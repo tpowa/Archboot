@@ -43,8 +43,8 @@ build ()
     done
 
     ### adding config files of installation system
-    map add_file "/etc/profile" "/etc/group"
-    basic_config="hostname modprobe.d/modprobe.conf shells"
+    map add_file "/etc/profile" "/etc/group" "/etc/shells"
+    basic_config="hostname modprobe.d/modprobe.conf"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
     done
