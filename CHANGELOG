@@ -28,6 +28,7 @@ setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - fixed riscv64 package installation with disabling ucode packages
 - fixed GPT NAMESCHEME listing on fresh disks
+- fixed sub-keymap listing
 - reordered/cleaned up timezone regions
 - reordered manage devices menus
 - removed netctl support
