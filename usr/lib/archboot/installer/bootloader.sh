@@ -632,6 +632,9 @@ do_grub_config() {
         if mount | grep "${DESTDIR} " | grep btrfs | grep subvol; then
             subdir="/$(btrfs subvolume show "${DESTDIR}/" | grep Name | cut -d ":" -f2)"/boot
         fi
+        if mount | grep "${DESTDIR}/boot " | grep btrfs | grep subvol; then
+            subdir="/$(btrfs subvolume show "${DESTDIR}/boot" | grep Name | cut -d ":" -f2)"
+        fi
     else
         subdir=""
         # on btrfs we need to check on subvol
