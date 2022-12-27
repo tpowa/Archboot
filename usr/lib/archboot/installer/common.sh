@@ -177,7 +177,6 @@ detect_uefi_secure_boot() {
             export _DETECTED_UEFI_SECURE_BOOT="1"
         fi
     fi
-
 }
 
 detect_uefi_boot() {
