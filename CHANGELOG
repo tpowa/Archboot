@@ -27,6 +27,7 @@ Environment changes:
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - fixed riscv64 package installation with disabling ucode packages
+- fixed NAMESCHEME listing on fresh disks
 - reordered/cleaned up timezone regions
 - reordered manage devices menus
 - removed netctl support
