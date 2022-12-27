@@ -15,7 +15,6 @@ fi
 # abstract the common pacman args
 PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
-
 linux_firmware() {
     PACKAGES="${PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
