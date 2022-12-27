@@ -649,14 +649,11 @@ do_grub_config() {
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     cat << EOF > "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 if [ "\${grub_platform}" == "efi" ]; then
     set _UEFI_ARCH="\${grub_cpu}"
-
     if [ "\${grub_cpu}" == "x86_64" ]; then
         set _SPEC_UEFI_ARCH="x64"
     fi
-
     if [ "\${grub_cpu}" == "i386" ]; then
         set _SPEC_UEFI_ARCH="ia32"
     fi
@@ -664,38 +661,26 @@ if [ "\${grub_platform}" == "efi" ]; then
         set _SPEC_UEFI_ARCH="aa64"
     fi
 fi
-
-EOF
-    cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 insmod part_gpt
 insmod part_msdos
-
 # Include fat fs module - required for uefi systems.
 insmod fat
-
 insmod ${BOOT_PART_FS}
 insmod ${ROOT_PART_FS}
 insmod ${USR_PART_FS}
-
 insmod search_fs_file
 insmod search_fs_uuid
 insmod search_label
-
 insmod linux
 insmod chain
-
 set pager="1"
 # set debug="all"
-
 set locale_dir="\${prefix}/locale"
-
 EOF
     [[ "${USE_RAID}" == "1" ]] && echo "insmod raid" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     ! [[ "${RAID_ON_LVM}" == "" ]] && echo "insmod lvm" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     #shellcheck disable=SC2129
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
     insmod all_video
 else
@@ -703,21 +688,16 @@ else
         insmod efi_gop
         insmod efi_uga
     fi
-
     if [ "\${grub_platform}" == "pc" ]; then
         insmod vbe
         insmod vga
     fi
-
     insmod video_bochs
     insmod video_cirrus
 fi
-
 insmod font
-
 search --fs-uuid --no-floppy --set=usr_part ${USR_PART_HINTS_STRING} ${USR_PART_FS_UUID}
 search --fs-uuid --no-floppy --set=root_part ${ROOT_PART_HINTS_STRING} ${ROOT_PART_FS_UUID}
-
 if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
     set _fontfile="\${prefix}/fonts/unicode.pf2"
 else
@@ -729,7 +709,6 @@ else
         fi
     fi
 fi
-
 if loadfont "\${_fontfile}" ; then
     insmod gfxterm
     set gfxmode="auto"
@@ -737,7 +716,6 @@ if loadfont "\${_fontfile}" ; then
     terminal_input console
     terminal_output gfxterm
 fi
-
 EOF
     echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     [[ -e "/tmp/.device-names" ]] && sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
@@ -761,7 +739,6 @@ EOF
     NUMBER="0"
 if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
     set gfxpayload="keep"
@@ -769,12 +746,10 @@ menuentry "Arch Linux" {
     ${LINUX_MOD_COMMAND}
     initrd ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}
 }
-
 EOF
     NUMBER=$((NUMBER+1))
 else
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
     set gfxpayload="keep"
@@ -782,31 +757,19 @@ menuentry "Arch Linux" {
     ${LINUX_MOD_COMMAND}
     initrd ${subdir}/${INTEL_UCODE} ${subdir}/${AMD_UCODE} ${subdir}/${INITRAMFS}
 }
-
 EOF
     NUMBER=$((NUMBER+1))
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 if [ "\${grub_platform}" == "efi" ]; then
-
-    ## UEFI Shell 2.0
+    ## UEFI Shell
     #menuentry "UEFI Shell \${_UEFI_ARCH} v2" {
     #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
     #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
     #}
-
-    ## UEFI Shell 1.0
-    #menuentry "UEFI Shell \${_UEFI_ARCH} v1" {
-    #    search --fs-uuid --no-floppy --set=root ${UEFISYS_PART_HINTS_STRING} ${UEFISYS_PART_FS_UUID}
-    #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v1.efi
-    #}
-
 fi
-
 EOF
     NUMBER=$((NUMBER+1))
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
         ## Microsoft Windows 10/11 via x86_64 UEFI
@@ -820,13 +783,11 @@ if [ "\${grub_platform}" == "efi" ]; then
         #}
     fi
 fi
-
 EOF
     NUMBER=$((NUMBER+1))
     ## TODO: Detect actual Windows installation if any
     ## create example file for windows
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-
 if [ "\${grub_platform}" == "pc" ]; then
 
     ## Microsoft Windows 10/11 BIOS
@@ -838,11 +799,8 @@ if [ "\${grub_platform}" == "pc" ]; then
     #    search --fs-uuid --no-floppy --set=root <FS_UUID of Windows SYSTEM Partition>
     #    ntldr /bootmgr
     #}
-
 fi
-
 EOF
-
 fi
     ## copy unicode.pf2 font file
     cp -f "${DESTDIR}/usr/share/grub/unicode.pf2" "${DESTDIR}/${GRUB_PREFIX_DIR}/fonts/unicode.pf2"
