@@ -164,43 +164,14 @@ abort_f2fs_bootpart() {
 }
 
 uefi_mount_efivarfs() {
-
     ## Mount efivarfs if it is not already mounted
     if ! mount | grep -q /sys/firmware/efi/efivars; then
         modprobe -q efivarfs
         mount -t efivarfs efivarfs /sys/firmware/efi/efivars
     fi
-
-}
-
-detect_uefi_secure_boot() {
-
-    export _DETECTED_UEFI_SECURE_BOOT="0"
-
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        uefi_mount_efivarfs
-        _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
-        _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
-
-        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
-            export _DETECTED_UEFI_SECURE_BOOT="1"
-        fi
-    fi
-
-}
-
-detect_uefi_boot() {
-
-    export _DETECTED_UEFI_BOOT="0"
-
-    [[ -e "/sys/firmware/efi" ]] && _DETECTED_UEFI_BOOT="1"
-
-    detect_uefi_secure_boot
-
 }
 
 do_uefi_setup_env_vars() {
-
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
             export _EFI_MIXED="1"
@@ -217,13 +188,10 @@ do_uefi_setup_env_vars() {
         export _UEFI_ARCH="AA64"
         export _SPEC_UEFI_ARCH="aa64"
     fi
-
 }
 
 do_uefi_common() {
-
     do_uefi_setup_env_vars
-
     PACKAGES=""
     [[ ! -f "${DESTDIR}/usr/bin/mkfs.vfat" ]] && PACKAGES="${PACKAGES} dosfstools"
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
@@ -234,9 +202,7 @@ do_uefi_common() {
         [[ ! -f "${DESTDIR}/usr/bin/sbsign" ]] && PACKAGES="${PACKAGES} sbsigntools"
     fi
     ! [[ "${PACKAGES}" == "" ]] && run_pacman
-
     check_efisys_part
-
 }
 
 do_uefi_efibootmgr() {
