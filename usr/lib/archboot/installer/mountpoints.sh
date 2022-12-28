@@ -385,7 +385,7 @@ _mkfs() {
     #shellcheck disable=SC2155
     local _fslabel="$(getfslabel "${_device}")"
 
-    if [[ "${GUID_DETECTED}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         #shellcheck disable=SC2155
         local _partuuid="$(getpartuuid "${_device}")"
         #shellcheck disable=SC2155
@@ -406,7 +406,7 @@ _mkfs() {
             _device="LABEL=${_fslabel}"
         fi
     else
-        if [[ "${GUID_DETECTED}" == "1" ]]; then
+        if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
            if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_partuuid}" ]]; then
                    _device="PARTUUID=${_partuuid}"

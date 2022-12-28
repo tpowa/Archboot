@@ -96,7 +96,7 @@ freeze_xfs() {
 
 ## Setup kernel cmdline parameters to be added to bootloader configs
 bootloader_kernel_parameters() {
-    if [[ "${GUID_DETECTED}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && getrootpartuuid
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && getrootpartlabel
     fi
@@ -664,9 +664,9 @@ if [ "\${grub_platform}" == "efi" ]; then
         set _SPEC_UEFI_ARCH="aa64"
     fi
 fi
+# Include modules - required for boot
 insmod part_gpt
 insmod part_msdos
-# Include fat fs module - required for uefi systems.
 insmod fat
 insmod ${BOOT_PART_FS}
 insmod ${ROOT_PART_FS}
@@ -720,9 +720,7 @@ if loadfont "\${_fontfile}" ; then
     terminal_output gfxterm
 fi
 EOF
-    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     [[ -e "/tmp/.device-names" ]] && sort "/tmp/.device-names" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-    echo "" >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
     if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
         GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${BOOT_PART_HINTS_STRING} ${BOOT_PART_FS_UUID}"
     else
@@ -792,7 +790,6 @@ EOF
     ## create example file for windows
     cat << EOF >> "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 if [ "\${grub_platform}" == "pc" ]; then
-
     ## Microsoft Windows 10/11 BIOS
     #menuentry Microsoft Windows 10/11 BIOS-MBR {
     #    insmod part_msdos
