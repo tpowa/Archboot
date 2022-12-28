@@ -378,17 +378,11 @@ do_efistub_copy_to_efisys() {
             _EFISTUB_KERNEL="linux/arch/${VMLINUZ}.efi"
         fi
         _EFISTUB_INITRAMFS="linux/arch/${INITRAMFS}"
-
         ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
-
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
-
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
-
-        #######################
-
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -403,7 +397,6 @@ Unit=efistub_copy.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -421,8 +414,6 @@ CONFEOF
             systemctl enable efistub_copy.path
         fi
     fi
-
-    ###########################
     _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
     _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
