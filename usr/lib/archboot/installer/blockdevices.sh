@@ -329,17 +329,13 @@ set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS=""
     MENU_DESC_TEXT=""
-
     detect_uefi_boot
-
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
-
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
         MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
-
     NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
     DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>"${ANSWER}" || return 1
@@ -460,7 +456,6 @@ _stopluks()
     DISABLELUKS=""
     DETECTED_LUKS=""
     LUKSDEVICE=""
-
     # detect already running luks devices
     LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ "${LUKSDEVICE}" == "" ]] || DETECTED_LUKS=1
@@ -477,10 +472,8 @@ _stopluks()
             wipefs -a "${LUKS_REAL_DEVICE}" > "${LOG}" 2>&1
         done
     fi
-
     DISABLELUKS=""
     DETECTED_LUKS=""
-
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && DETECTED_LUKS=1
     if [[ "${DETECTED_LUKS}" = "1" ]]; then
