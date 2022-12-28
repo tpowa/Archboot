@@ -56,7 +56,7 @@ printk()
 # sets EDITOR global variable
 geteditor() {
     if ! [[ "${EDITOR}" ]]; then
-        DIALOG --menu "Select a Text Editor to Use" 10 35 3 \
+        DIALOG --menu "Select a Text Editor to Use" 9 35 3 \
         "1" "nano (easier)" \
         "2" "neovim" 2>${ANSWER} || return 1
         case $(cat ${ANSWER}) in
