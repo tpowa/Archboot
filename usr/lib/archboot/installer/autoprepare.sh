@@ -219,19 +219,19 @@ autoprepare() {
         # create fresh GPT
         sgdisk --clear "${DEVICE}" &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new=${_GPT_BIOS_GRUB_PART_NUM}:0:+${GPT_BIOS_GRUB_PART_SIZE}M --typecode=${_GPT_BIOS_GRUB_PART_NUM}:EF02 --change-name=${_GPT_BIOS_GRUB_PART_NUM}:BIOS_GRUB "${DEVICE}" > "${LOG}"
-        sgdisk --set-alignment="2048" --new=${_UEFISYS_PART_NUM}:0:+"${UEFISYS_PART_SIZE}"M --typecode=${_UEFISYS_PART_NUM}:EF00 --change-name=${_UEFISYS_PART_NUM}:UEFI_SYSTEM "${DEVICE}" > "${LOG}"
+        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_PART_NUM}":0:+"${GPT_BIOS_GRUB_PART_SIZE}"M --typecode="${_GPT_BIOS_GRUB_PART_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_PART_NUM}":BIOS_GRUB "${DEVICE}" > "${LOG}"
+        sgdisk --set-alignment="2048" --new="${_UEFISYS_PART_NUM}":0:+"${UEFISYS_PART_SIZE}"M --typecode="${_UEFISYS_PART_NUM}":EF00 --change-name="${_UEFISYS_PART_NUM}":UEFI_SYSTEM "${DEVICE}" > "${LOG}"
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
-            sgdisk --attributes=${_UEFISYS_PART_NUM}:set:2 "${DEVICE}" > "${LOG}"
+            sgdisk --attributes="${_UEFISYS_PART_NUM}":set:2 "${DEVICE}" > "${LOG}"
         else
-            sgdisk --set-alignment="2048" --new=${_BOOT_PART_NUM}:0:+"${BOOT_PART_SIZE}"M --typecode=${_BOOT_PART_NUM}:8300 --attributes=${_BOOT_PART_NUM}:set:2 --change-name=${_BOOT_PART_NUM}:ARCHLINUX_BOOT "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_BOOT_PART_NUM}":0:+"${BOOT_PART_SIZE}"M --typecode="${_BOOT_PART_NUM}":8300 --attributes="${_BOOT_PART_NUM}":set:2 --change-name="${_BOOT_PART_NUM}":ARCHLINUX_BOOT "${DEVICE}" > "${LOG}"
         fi
-        sgdisk --set-alignment="2048" --new=${_SWAP_PART_NUM}:0:+"${SWAP_PART_SIZE}"M --typecode=${_SWAP_PART_NUM}:8200 --change-name=${_SWAP_PART_NUM}:ARCHLINUX_SWAP "${DEVICE}" > "${LOG}"
+        sgdisk --set-alignment="2048" --new="${_SWAP_PART_NUM}":0:+"${SWAP_PART_SIZE}"M --typecode="${_SWAP_PART_NUM}":8200 --change-name="${_SWAP_PART_NUM}":ARCHLINUX_SWAP "${DEVICE}" > "${LOG}"
         if [[ "${FSTYPE}" = "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:0 --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:0 --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
         else
-            sgdisk --set-alignment="2048" --new=${_ROOT_PART_NUM}:0:+"${ROOT_PART_SIZE}"M --typecode=${_ROOT_PART_NUM}:8300 --change-name=${_ROOT_PART_NUM}:ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
-            sgdisk --set-alignment="2048" --new=${_HOME_PART_NUM}:0:0 --typecode=${_HOME_PART_NUM}:8302 --change-name=${_HOME_PART_NUM}:ARCHLINUX_HOME "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:+"${ROOT_PART_SIZE}"M --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_HOME_PART_NUM}":0:0 --typecode="${_HOME_PART_NUM}":8302 --change-name="${_HOME_PART_NUM}":ARCHLINUX_HOME "${DEVICE}" > "${LOG}"
         fi
         sgdisk --print "${DEVICE}" > "${LOG}"
     else
@@ -315,7 +315,7 @@ autoprepare() {
         else
             DIALOG --infobox "Creating and activating\nswapspace on\n${PART} ..." 0 0
         fi
-        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} ${BTRFS_SUBVOLUME} ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} "${BTRFS_SUBVOLUME}" ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
     done
     DIALOG --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70
