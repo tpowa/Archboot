@@ -33,6 +33,7 @@ done
 if [[ -z "${NAME}" ]]; then
     echo "ERROR: no name specified"
     usage
+    #shellcheck disable=2317
     exit 1
 fi
 
@@ -83,5 +84,6 @@ EOF
 else
     echo "ERROR: no directory specified"
     usage
+    #shellcheck disable=2317
     exit 1
 fi

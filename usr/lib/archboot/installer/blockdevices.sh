@@ -999,14 +999,14 @@ _opening_luks() {
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     luksOpen_success="0"
     while [[ "${luksOpen_success}" = "0" ]]; do
-        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" <${LUKSPASSPHRASE} >"${LOG}" && luksOpen_success=1
+        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" <"${LUKSPASSPHRASE}" >"${LOG}" && luksOpen_success=1
         if [[ "${luksOpen_success}" = "0" ]]; then
             DIALOG --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi
     done
-    DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/$(basename ${LUKSPASSPHRASE})?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
-    echo "${LUKSDEVICE}" "${PART}" "/etc/$(basename ${LUKSPASSPHRASE})" >> /tmp/.crypttab
+    DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${LUKSPASSPHRASE}")?\nName:${LUKSDEVICE}" 0 0 || LUKSPASSPHRASE="ASK"
+    echo "${LUKSDEVICE}" "${PART}" "/etc/$(basename "${LUKSPASSPHRASE}")" >> /tmp/.crypttab
 }
 
 # help for luks
@@ -1067,6 +1067,6 @@ _luks()
     _enter_luks_passphrase || return 1
     _umountall
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup -q luksFormat "${PART}" <${LUKSPASSPHRASE} >"${LOG}"
+    cryptsetup -q luksFormat "${PART}" <"${LUKSPASSPHRASE}" >"${LOG}"
     _opening_luks
 }
