@@ -35,14 +35,14 @@ _root_check
 
 echo "Starting container creation ..."
 # remove old files
-[[ -f ${_PACMAN_ARCH_CHROOT} ]] && rm ${_PACMAN_ARCH_CHROOT}{,.sig} 2>/dev/null
+[[ -f ${_PACMAN_ARCH_CHROOT} ]] && rm "${_PACMAN_ARCH_CHROOT}"{,.sig} 2>/dev/null
 echo "Create directory ${1} ..."
 mkdir -p "${1}"/"${_PACMAN_ARCH}"
 echo "Downloading archlinux ${_ARCH} ..."
 ! [[ -f ${_ARCH_VERSION} ]] && wget "${_LATEST_ARCH}" >/dev/null 2>&1
-bsdtar -xf ${_ARCH_VERSION} -C "${1}"
+bsdtar -xf "${_ARCH_VERSION}" -C "${1}"
 echo "Removing installation tarball ..."
-rm ${_ARCH_VERSION}
+rm "${_ARCH_VERSION}"
 _generate_keyring "${1}" || exit 1
 _fix_network "${1}"
 # update container to latest packages
@@ -55,14 +55,14 @@ _fix_network "${1}/${_PACMAN_ARCH}"
 _CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_ARCH}" 2>/dev/null
 _CLEANUP_CACHE="1" _clean_cache "${1}/${_PACMAN_ARCH}" 2>/dev/null
 echo "Generating tarball ..."
-tar -acf ${_PACMAN_ARCH_CHROOT} -C "${1}"/"${_PACMAN_ARCH}" . >/dev/null 2>&1 || exit 1
+tar -acf "${_PACMAN_ARCH_CHROOT}" -C "${1}"/"${_PACMAN_ARCH}" . >/dev/null 2>&1 || exit 1
 echo "Removing ${1} ..."
 rm -r "${1}"
 echo "Finished container tarball."
 echo "Sign tarball ..."
 #shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} ${_PACMAN_ARCH_CHROOT} || exit 1
-chown "${_USER}":"${_GROUP}" ${_PACMAN_ARCH_CHROOT}{,.sig} || exit 1
+chown "${_USER}":"${_GROUP}" "${_PACMAN_ARCH_CHROOT}"{,.sig} || exit 1
 echo "Uploading tarball to ${_SERVER}:${_SERVER_PACMAN_ARCH} ..."
-sudo -u "${_USER}" scp ${_PACMAN_ARCH_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN_ARCH} || exit 1
+sudo -u "${_USER}" scp "${_PACMAN_ARCH_CHROOT}"{,.sig} "${_SERVER}:${_SERVER_PACMAN_ARCH}" || exit 1
 echo "Finished."
