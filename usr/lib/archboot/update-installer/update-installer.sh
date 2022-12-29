@@ -310,7 +310,7 @@ _kexec() {
     fi
     sleep 2
     _clean_kernel_cache
-    rm /{${VMLINUZ},initrd.img}
+    rm /{"${VMLINUZ}",initrd.img}
     while pgrep -x kexec > /dev/null 2>&1; do
         _clean_kernel_cache
         sleep 1
