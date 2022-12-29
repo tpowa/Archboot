@@ -6,6 +6,9 @@ build ()
     add_binary nvim
     map add_full_dir /usr/share/nvim
     map add_file /usr/share/licenses/neovim/LICENSE.txt
+    # add lastplace plugin:
+    # https://github.com/neovim/neovim/issues/16339
+    add_file /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
 }
 
 help ()
