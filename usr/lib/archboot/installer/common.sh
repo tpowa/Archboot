@@ -155,33 +155,33 @@ locale_gen() {
 
 # set GUID (gpt) usage
 set_guid() {
-    export GUIDPARAMETER=""
+    GUIDPARAMETER="0"
     detect_uefi_boot
     # all uefi systems should use GUID layout
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        GUIDPARAMETER="yes"
+        GUIDPARAMETER="1"
     else
         ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
         ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
-        DIALOG --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && export GUIDPARAMETER="yes"
+        DIALOG --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && GUIDPARAMETER="1"
     fi
 }
 
 detect_uefi_secure_boot() {
-    export _DETECTED_UEFI_SECURE_BOOT="0"
+    _DETECTED_UEFI_SECURE_BOOT="0"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         uefi_mount_efivarfs
         _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
         _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
         if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
-            export _DETECTED_UEFI_SECURE_BOOT="1"
+            _DETECTED_UEFI_SECURE_BOOT="1"
         fi
     fi
 }
 
 detect_uefi_boot() {
-    export _DETECTED_UEFI_BOOT="0"
-    [[ -e "/sys/firmware/efi" ]] && export _DETECTED_UEFI_BOOT="1"
+    _DETECTED_UEFI_BOOT="0"
+    [[ -e "/sys/firmware/efi" ]] && _DETECTED_UEFI_BOOT="1"
     detect_uefi_secure_boot
 }
 

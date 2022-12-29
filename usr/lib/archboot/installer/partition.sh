@@ -138,7 +138,7 @@ partition() {
         [[ "${DISC}" == "DONE" ]] && break
         MSDOS_DETECTED=""
         if ! [[ "${DISC}" == "" ]]; then
-            if [[ "${GUIDPARAMETER}" == "yes" ]]; then
+            if [[ "${GUIDPARAMETER}" == "1" ]]; then
                 CHECK_BIOS_BOOT_GRUB=""
                 CHECK_UEFISYS_PART=""
                 RUN_CFDISK="1"

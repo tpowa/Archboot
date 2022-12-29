@@ -675,7 +675,7 @@ _createraid()
     if [[ ${RAID_PARTITION} == "1" ]]; then
         # switch for mbr usage
         set_guid
-        if [[ "${GUIDPARAMETER}" = "" ]]; then
+        if [[ "${GUIDPARAMETER}" = "0" ]]; then
             DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
             cfdisk "${RAIDDEVICE}"
         else

@@ -169,19 +169,19 @@ uefi_mount_efivarfs() {
 do_uefi_setup_env_vars() {
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
-            export _EFI_MIXED="1"
-            export _UEFI_ARCH="IA32"
-            export _SPEC_UEFI_ARCH="ia32"
+            _EFI_MIXED="1"
+            _UEFI_ARCH="IA32"
+            _SPEC_UEFI_ARCH="ia32"
         else
-            export _EFI_MIXED="0"
-            export _UEFI_ARCH="X64"
-            export _SPEC_UEFI_ARCH="x64"
+            _EFI_MIXED="0"
+            _UEFI_ARCH="X64"
+            _SPEC_UEFI_ARCH="x64"
         fi
     fi
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        export _EFI_MIXED="0"
-        export _UEFI_ARCH="AA64"
-        export _SPEC_UEFI_ARCH="aa64"
+        _EFI_MIXED="0"
+        _UEFI_ARCH="AA64"
+        _SPEC_UEFI_ARCH="aa64"
     fi
 }
 
