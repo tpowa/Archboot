@@ -21,12 +21,12 @@ _update_pacman_chroot() {
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
     echo "Downloading pacman ${_ARCH} chroot..."
     [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>/dev/null
-    wget ${_ARCH_CHROOT_PUBLIC}/${_PACMAN_CHROOT}{,.sig} >/dev/null 2>&1
+    wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
     # verify download
     sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" >/dev/null 2>&1
     echo "Removing installation tarball ..."
-    rm ${_PACMAN_CHROOT}{,.sig} >/dev/null 2>&1
+    rm "${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
     # update container to latest packages
     echo "Update container to latest packages..."
     ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
@@ -41,9 +41,9 @@ _update_pacman_chroot() {
     echo "Sign tarball ..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
-    chown "${_USER}:${_GROUP}" ${_PACMAN_CHROOT}{,.sig} || exit 1
+    chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN} ..."
-    sudo -u "${_USER}" scp -q ${_PACMAN_CHROOT}{,.sig} ${_SERVER}:${_SERVER_PACMAN} || exit 1
+    sudo -u "${_USER}" scp -q "${_PACMAN_CHROOT}"{,.sig} ${_SERVER}:${_SERVER_PACMAN} || exit 1
 }
 
 _server_upload() {
