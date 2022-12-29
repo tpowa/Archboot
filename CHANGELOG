@@ -17,13 +17,14 @@ Environment changes:
 - removed network stack from local image pre kexec
 - removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter,
   ntp and wireless_tools
+- removed xfs_scrub, arpd, archinstall, testdisk, ntfs-3g, python and perl
 - fixed /etc/request-key.d directory addition
 - use systemd defaults for shadow, gshadow and passwd
 - use system's shells file
 - disable audit function on boot commandline
-- removed xfs_scrub, arpd, archinstall, testdisk, ntfs-3g, python and perl
 - enabled syntax highlighting in nano editor
 - replaced vim editor with neovim editor
+- added neovim lastplace plugin
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - fixed riscv64 package installation with disabling ucode packages
