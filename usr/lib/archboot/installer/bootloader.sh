@@ -373,7 +373,7 @@ do_efistub_copy_to_efisys() {
         else
             _EFISTUB_KERNEL="${VMLINUZ}.efi"
         fi
-        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${INITRAMFS}"
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
