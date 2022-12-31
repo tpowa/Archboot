@@ -374,11 +374,11 @@ do_efistub_copy_to_efisys() {
             _EFISTUB_KERNEL="linux/arch/${VMLINUZ}.efi"
         fi
         _EFISTUB_INITRAMFS="linux/arch/${INITRAMFS}"
-        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}${UEFISYS_MOUNTPOINT}/EFI/arch/"
-        rm -f "${DESTDIR}${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        rm -f "${DESTDIR}${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/linux/arch/"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
