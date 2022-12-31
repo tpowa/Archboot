@@ -1050,7 +1050,7 @@ install_bootloader_uefi() {
 }
 
 install_bootloader_bios() {
-    DIALOG --menu "Which BIOS bootloader would you like to use?" 9 50 1 \
+    DIALOG --menu "Which BIOS bootloader would you like to use?" 8 50 1 \
         "GRUB_BIOS" "GRUB(2) BIOS" 2>"${ANSWER}" || CANCEL=1
     case $(cat "${ANSWER}") in
         "GRUB_BIOS") do_grub_bios ;;
