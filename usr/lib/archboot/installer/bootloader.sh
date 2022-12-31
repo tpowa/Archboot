@@ -401,7 +401,7 @@ Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INTEL_UCODE}
 ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/EFI/arch/${AMD_UCODE}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/EFI/arch/${INITRAMFS}
 CONFEOF
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
@@ -419,8 +419,9 @@ CONFEOF
             _KERNEL_NORMAL="/${VMLINUZ}"
             _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
         fi
-        _INITRD_AMD_UCODE="/${AMD_UCODE}"
-
+        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+            _INITRD_AMD_UCODE="/${AMD_UCODE}"
+        fi
         _INITRD_NORMAL="/${INITRAMFS}"
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -431,7 +432,7 @@ CONFEOF
         fi
         _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
 
-        _INITRD_NORMAL="/EFI/arch/${_EFISTUB_INITRAMFS}"
+        _INITRD_NORMAL="/EFI/arch/${INITRAMFS}"
     fi
 }
 
