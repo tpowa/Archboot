@@ -460,12 +460,10 @@ do_efistub_uefi() {
         else
             DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
                 "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
-                "NONE" "No Boot Manager" 2>"${ANSWER}" || CANCEL=1
+                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
             case $(cat "${ANSWER}") in
                 "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
                 "rEFInd") do_refind_uefi;;
-                "NONE") return 0 ;;
             esac
         fi
     fi
