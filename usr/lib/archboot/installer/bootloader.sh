@@ -369,12 +369,12 @@ EOF
 do_efistub_copy_to_efisys() {
     if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _EFISTUB_KERNEL="linux/arch/${VMLINUZ_EFISTUB}.efi"
+            _EFISTUB_KERNEL="${VMLINUZ_EFISTUB}.efi"
         else
-            _EFISTUB_KERNEL="linux/arch/${VMLINUZ}.efi"
+            _EFISTUB_KERNEL="${VMLINUZ}.efi"
         fi
         _EFISTUB_INITRAMFS="linux/arch/${INITRAMFS}"
-        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/linux/arch/"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}"
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}"
