@@ -446,8 +446,8 @@ do_efistub_uefi() {
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         _CONTINUE="1"
     else
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS}" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and ${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_INITRAMFS} respectively." 0 0
+        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/${INITRAMFS}" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MOUNTPOINT}/EFI/arch/${_EFISTUB_KERNEL} and\n${UEFISYS_MOUNTPOINT}/EFI/arch/${INITRAMFS} respectively." 0 0
             _CONTINUE="1"
         else
             DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
