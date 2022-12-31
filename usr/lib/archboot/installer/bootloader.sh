@@ -1110,7 +1110,7 @@ install_bootloader_menu() {
     elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
         ANSWER="UBOOT"
     else
-        DIALOG --menu "What is your boot system type?" 10 40 2 \
+        DIALOG --menu "What is your boot system type?" 9 35 2 \
             "UEFI" "UEFI" \
             "BIOS" "BIOS" 2>"${ANSWER}" || CANCEL=1
     fi
