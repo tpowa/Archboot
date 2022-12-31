@@ -38,6 +38,7 @@ setup/quickinst changes:
 - replaced vim editor with neovim editor
 - install neovim editor instead of vim editor to installed system
 - add nano editor syntax highlighting on installed system
+- fixed kernel, initramdisk and ucode copying to separate EFISYS partition
 ---
 2022.12 Highlights:
 - grub 2:2.06.r380.g151467888-1
