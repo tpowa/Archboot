@@ -414,25 +414,30 @@ CONFEOF
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
     if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-             _KERNEL_NORMAL="/${VMLINUZ_EFISTUB}"
+             _KERNEL="/${VMLINUZ_EFISTUB}"
         else
-            _KERNEL_NORMAL="/${VMLINUZ}"
-            _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
+            _KERNEL="/${VMLINUZ}"
+            if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+                _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
+            fi
         fi
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
             _INITRD_AMD_UCODE="/${AMD_UCODE}"
         fi
-        _INITRD_NORMAL="/${INITRAMFS}"
+        _INITRD="/${INITRAMFS}"
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL_NORMAL="/EFI/arch/${VMLINUZ_EFISTUB}"
+            _KERNEL="/EFI/arch/${VMLINUZ_EFISTUB}"
         else
-            _KERNEL_NORMAL="/EFI/arch/${_EFISTUB_KERNEL}"
-            _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
+            _KERNEL="/EFI/arch/${_EFISTUB_KERNEL}"
+            if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+                _INITRD_INTEL_UCODE="/EFI/arch/${INTEL_UCODE}"
+            fi
         fi
-        _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
-
-        _INITRD_NORMAL="/EFI/arch/${INITRAMFS}"
+        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+            _INITRD_AMD_UCODE="/EFI/arch/${AMD_UCODE}"
+        fi
+        _INITRD="/EFI/arch/${INITRAMFS}"
     fi
 }
 
@@ -476,7 +481,7 @@ do_systemd_boot_uefi() {
     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
-linux    ${_KERNEL_NORMAL}
+linux    ${_KERNEL}
 GUMEOF
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
     cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
@@ -485,7 +490,7 @@ GUMEOF
     fi
     cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
 initrd   ${_INITRD_AMD_UCODE}
-initrd   ${_INITRD_NORMAL}
+initrd   ${_INITRD}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
@@ -543,7 +548,7 @@ do_refind_uefi() {
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/arch/refind_linux.conf"
     fi
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD_NORMAL}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
 REFINDEOF
     if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
