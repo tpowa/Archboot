@@ -9,7 +9,7 @@ destdir_mounts(){
     # check if something is mounted on ${DESTDIR}
     PART_ROOT="$(mount | grep "${DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${DESTDIR}
-    if [[ "${PART_ROOT}" = "" ]]; then
+    if [[ "${PART_ROOT}" == "" ]]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
         detect_uefi_boot
         mountpoints || return 1
@@ -52,7 +52,7 @@ select_filesystem() {
     [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
     [[ "$(which mkfs.ext3 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext3 Ext3"
     [[ "$(which mkfs.ext2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext2 Ext2"
-    [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" = "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
+    [[ "$(which mkfs.vfat 2>/dev/null)" && "${DO_ROOT}" == "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     [[ "$(which mkfs.xfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} xfs XFS"
     [[ "$(which mkfs.f2fs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} f2fs F2FS"
     [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
@@ -67,7 +67,7 @@ select_filesystem() {
 enter_mountpoint() {
     FILESYSTEM_FINISH=""
     MP=""
-    while [[ "${MP}" = "" ]]; do
+    while [[ "${MP}" == "" ]]; do
         DIALOG --inputbox "Enter the mountpoint for ${PART}" 8 65 "/boot" 2>"${ANSWER}" || return 1
         MP=$(cat "${ANSWER}")
         if grep ":${MP}:" /tmp/.parts; then
@@ -80,13 +80,13 @@ enter_mountpoint() {
 # set sane values for paramaters, if not already set
 check_mkfs_values() {
     # Set values, to not confuse mkfs call!
-    [[ "${FS_OPTIONS}" = "" ]] && FS_OPTIONS="NONE"
-    [[ "${BTRFS_DEVICES}" = "" ]] && BTRFS_DEVICES="NONE"
-    [[ "${BTRFS_LEVEL}" = "" ]] && BTRFS_LEVEL="NONE"
-    [[ "${BTRFS_SUBVOLUME}" = "" ]] && BTRFS_SUBVOLUME="NONE"
-    [[ "${DOSUBVOLUME}" = "" ]] && DOSUBVOLUME="no"
-    [[ "${LABEL_NAME}" = "" && -n "$(${_LSBLK} LABEL "${PART}")" ]] && LABEL_NAME="$(${_LSBLK} LABEL "${PART}")"
-    [[ "${LABEL_NAME}" = "" ]] && LABEL_NAME="NONE"
+    [[ "${FS_OPTIONS}" == "" ]] && FS_OPTIONS="NONE"
+    [[ "${BTRFS_DEVICES}" == "" ]] && BTRFS_DEVICES="NONE"
+    [[ "${BTRFS_LEVEL}" == "" ]] && BTRFS_LEVEL="NONE"
+    [[ "${BTRFS_SUBVOLUME}" == "" ]] && BTRFS_SUBVOLUME="NONE"
+    [[ "${DOSUBVOLUME}" == "" ]] && DOSUBVOLUME="no"
+    [[ "${LABEL_NAME}" == "" && -n "$(${_LSBLK} LABEL "${PART}")" ]] && LABEL_NAME="$(${_LSBLK} LABEL "${PART}")"
+    [[ "${LABEL_NAME}" == "" ]] && LABEL_NAME="NONE"
 }
 
 create_filesystem() {
@@ -96,8 +96,8 @@ create_filesystem() {
     BTRFS_DEVICES=""
     BTRFS_LEVEL=""
     DIALOG --yesno "Would you like to create a filesystem on ${PART}?\n\n(This will overwrite existing data!)" 0 0 && DOMKFS="yes"
-    if [[ "${DOMKFS}" = "yes" ]]; then
-        while [[ "${LABEL_NAME}" = "" ]]; do
+    if [[ "${DOMKFS}" == "yes" ]]; then
+        while [[ "${LABEL_NAME}" == "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${PART}")" 2>"${ANSWER}" || return 1
             LABEL_NAME=$(cat "${ANSWER}")
@@ -106,7 +106,7 @@ create_filesystem() {
                 LABEL_NAME=""
             fi
         done
-        if [[ "${FSTYPE}" = "btrfs" ]]; then
+        if [[ "${FSTYPE}" == "btrfs" ]]; then
             prepare_btrfs || return 1
             btrfs_compress
         fi
@@ -126,7 +126,7 @@ mountpoints() {
         #
         # Select mountpoints
         #
-        if [[ "${NAME_SCHEME_PARAMETER_RUN}" = "" ]]; then
+        if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
             set_device_name_scheme || return 1
         fi
         DIALOG --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
@@ -139,7 +139,7 @@ mountpoints() {
             PART=$(cat "${ANSWER}")
             if [[ "${PART}" != "NONE" ]]; then
                 clear_fs_values
-                if [[ "${ASK_MOUNTPOINTS}" = "1" ]]; then
+                if [[ "${ASK_MOUNTPOINTS}" == "1" ]]; then
                     create_filesystem
                 else
                     FILESYSTEM_FINISH="yes"
@@ -147,7 +147,7 @@ mountpoints() {
             else
                 FILESYSTEM_FINISH="yes"
             fi
-            [[ "${FILESYSTEM_FINISH}" = "yes" ]] && DO_SWAP=DONE
+            [[ "${FILESYSTEM_FINISH}" == "yes" ]] && DO_SWAP=DONE
         done
         check_mkfs_values
         if [[ "${PART}" != "NONE" ]]; then
@@ -166,19 +166,19 @@ mountpoints() {
             # clear values first!
             clear_fs_values
             check_btrfs_filesystem_creation
-            if [[ "${ASK_MOUNTPOINTS}" = "1" && "${SKIP_FILESYSTEM}" = "no" ]]; then
+            if [[ "${ASK_MOUNTPOINTS}" == "1" && "${SKIP_FILESYSTEM}" == "no" ]]; then
                 select_filesystem && create_filesystem && btrfs_subvolume
             else
                 btrfs_subvolume
             fi
-            [[ "${FILESYSTEM_FINISH}" = "yes" ]] && DO_ROOT=DONE
+            [[ "${FILESYSTEM_FINISH}" == "yes" ]] && DO_ROOT=DONE
         done
         find_btrfs_raid_devices
         btrfs_parts
         check_mkfs_values
         echo "${PART}:${FSTYPE}:/:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
         #shellcheck disable=SC2001,SC2086
-        ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
+        ! [[ "${FSTYPE}" == "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
         #
         # Additional partitions
         #
@@ -194,7 +194,7 @@ mountpoints() {
                     clear_fs_values
                     check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [[ "${ASK_MOUNTPOINTS}" = "1" && "${SKIP_FILESYSTEM}" = "no" ]]; then
+                    if [[ "${ASK_MOUNTPOINTS}" == "1" && "${SKIP_FILESYSTEM}" == "no" ]]; then
                         enter_mountpoint && select_filesystem && create_filesystem && btrfs_subvolume
                     else
                         enter_mountpoint
@@ -203,7 +203,7 @@ mountpoints() {
                 else
                     FILESYSTEM_FINISH="yes"
                 fi
-                [[ "${FILESYSTEM_FINISH}" = "yes" ]] && DO_ADDITIONAL="DONE"
+                [[ "${FILESYSTEM_FINISH}" == "yes" ]] && DO_ADDITIONAL="DONE"
             done
             if [[ "${PART}" != "DONE" ]]; then
                 find_btrfs_raid_devices
@@ -211,7 +211,7 @@ mountpoints() {
                 check_mkfs_values
                 echo "${PART}:${FSTYPE}:${MP}:${DOMKFS}:${LABEL_NAME}:${FS_OPTIONS}:${BTRFS_DEVICES}:${BTRFS_LEVEL}:${BTRFS_SUBVOLUME}:${DOSUBVOLUME}:${BTRFS_COMPRESS}" >>/tmp/.parts
                 #shellcheck disable=SC2001,SC2086
-                ! [[ "${FSTYPE}" = "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
+                ! [[ "${FSTYPE}" == "btrfs" ]] && PARTS="$(echo ${PARTS} | sed -e "s#${PART} _##g")"
             fi
         done
         #shellcheck disable=SC2028
@@ -232,15 +232,15 @@ mountpoints() {
         BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
-        if [[ "${DOMKFS}" = "yes" ]]; then
-            if [[ "${FSTYPE}" = "swap" ]]; then
+        if [[ "${DOMKFS}" == "yes" ]]; then
+            if [[ "${FSTYPE}" == "swap" ]]; then
                 DIALOG --infobox "Creating and activating \nswapspace on \n${PART} ..." 0 0
             else
                 DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP} ..." 0 0
             fi
             _mkfs yes "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         else
-            if [[ "${FSTYPE}" = "swap" ]]; then
+            if [[ "${FSTYPE}" == "swap" ]]; then
                 DIALOG --infobox "Activating swapspace \non ${PART} ..." 0 0
             else
                 DIALOG --infobox "Mounting ${FSTYPE} \non ${PART} \nto ${DESTDIR}${MP} ..." 0 0
@@ -281,17 +281,17 @@ _mkfs() {
     local _dosubvolume=${11}
     local _btrfscompress=${12}
     # correct empty entries
-    [[ "${_fsoptions}" = "NONE" ]] && _fsoptions=""
-    [[ "${_btrfscompress}" = "NONE" ]] && _btrfscompress=""
-    [[ "${_btrfssubvolume}" = "NONE" ]] && _btrfssubvolume=""
+    [[ "${_fsoptions}" == "NONE" ]] && _fsoptions=""
+    [[ "${_btrfscompress}" == "NONE" ]] && _btrfscompress=""
+    [[ "${_btrfssubvolume}" == "NONE" ]] && _btrfssubvolume=""
     # add btrfs raid level, if needed
-    [[ ! "${_btrfslevel}" = "NONE" && "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -m ${_btrfslevel} -d ${_btrfslevel}"
+    [[ ! "${_btrfslevel}" == "NONE" && "${_fstype}" == "btrfs" ]] && _fsoptions="${_fsoptions} -m ${_btrfslevel} -d ${_btrfslevel}"
     # add btrfs options, minimum requirement linux 3.14 -O no-holes
-    [[ "${_fstype}" = "btrfs" ]] && _fsoptions="${_fsoptions} -O no-holes"
+    [[ "${_fstype}" == "btrfs" ]] && _fsoptions="${_fsoptions} -O no-holes"
     # we have two main cases: "swap" and everything else.
-    if [[ "${_fstype}" = "swap" ]]; then
+    if [[ "${_fstype}" == "swap" ]]; then
         swapoff "${_device}" >/dev/null 2>&1
-        if [[ "${_domk}" = "yes" ]]; then
+        if [[ "${_domk}" == "yes" ]]; then
             mkswap -L "${_labelname}" "${_device}" >"${LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
@@ -309,14 +309,14 @@ _mkfs() {
         # make sure the fstype is one we can handle
         local knownfs=0
         for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs3 vfat; do
-            [[ "${_fstype}" = "${fs}" ]] && knownfs=1 && break
+            [[ "${_fstype}" == "${fs}" ]] && knownfs=1 && break
         done
         if [[ ${knownfs} -eq 0 ]]; then
             DIALOG --msgbox "unknown fstype ${_fstype} for ${_device}" 0 0
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [[ "${_domk}" = "yes" ]]; then
+        if [[ "${_domk}" == "yes" ]]; then
             local ret
             #shellcheck disable=SC2086
             case ${_fstype} in
@@ -338,7 +338,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${_fstype}" = "btrfs" && -n "${_btrfssubvolume}" && "${_dosubvolume}" = "yes" ]]; then
+        if [[ "${_fstype}" == "btrfs" && -n "${_btrfssubvolume}" && "${_dosubvolume}" == "yes" ]]; then
             create_btrfs_subvolume
         fi
         btrfs_scan
@@ -353,7 +353,7 @@ _mkfs() {
         # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
         # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
-        [[ "${_fstype}" = "f2fs" ]] && _mountoptions="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
+        [[ "${_fstype}" == "f2fs" ]] && _mountoptions="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${_btrfssubvolume}" ]] && _mountoptions="${_mountoptions} subvol=${_btrfssubvolume}"
         [[ -n "${_btrfscompress}" ]] && _mountoptions="${_mountoptions} ${_btrfscompress}"
@@ -368,12 +368,12 @@ _mkfs() {
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_fstype}" = "btrfs" && "${_domk}" = "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
+        [[ "${_fstype}" == "btrfs" && "${_domk}" == "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
-        if [[ "${_mountpoint}" = "/tmp" ]]; then
+        if [[ "${_mountpoint}" == "/tmp" ]]; then
             chmod 1777 "${_dest}""${_mountpoint}"
-        elif [[ "${_mountpoint}" = "/root" ]]; then
+        elif [[ "${_mountpoint}" == "/root" ]]; then
             chmod 750 "${_dest}""${_mountpoint}"
         else
             chmod 755 "${_dest}""${_mountpoint}"
@@ -433,7 +433,7 @@ _mkfs() {
         else
             echo -n "${_device} ${_mountpoint} ${_fstype} defaults,${_mountoptions} 0 " >>/tmp/.fstab
         fi
-        if [[ "${_fstype}" = "swap" || "${_fstype}" = "btrfs" ]]; then
+        if [[ "${_fstype}" == "swap" || "${_fstype}" == "btrfs" ]]; then
             echo "0" >>/tmp/.fstab
         else
             echo "1" >>/tmp/.fstab
