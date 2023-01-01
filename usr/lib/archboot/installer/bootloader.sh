@@ -386,9 +386,9 @@ do_efistub_copy_to_efisys() {
     else
         # name .efi for uefisys partition
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="/${UEFISYS_PATH}/${VMLINUZ_EFISTUB}.efi"
+            _KERNEL="${UEFISYS_PATH}/${VMLINUZ_EFISTUB}.efi"
         else
-            _KERNEL="/${UEFISYS_PATH}/${_VMLINUZ}.efi"
+            _KERNEL="${UEFISYS_PATH}/${_VMLINUZ}.efi"
             if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="/${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
@@ -453,7 +453,8 @@ do_efistub_uefi() {
         _CONTINUE="1"
     else
         if [[ -e "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --msgbox "The kernel and initramfs have been copied to\n${UEFISYS_MP}/${_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" 0 0
+            DIALOG --infobox "The kernel and initramfs have been copied to\n${UEFISYS_MP}/${_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}\n\nContinuing in 3 seconds..." 0 0
+            sleep 3
             _CONTINUE="1"
         else
             DIALOG --msgbox "Error setting up kernel and initramfs in ${UEFISYS_MP}." 0 0
