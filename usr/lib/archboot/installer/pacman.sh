@@ -42,7 +42,7 @@ select_mirror() {
         "Custom" "_" 2>${ANSWER} || return 1
     #shellcheck disable=SC2155
     local _server=$(cat "${ANSWER}")
-    if [[ "${_server}" = "Custom" ]]; then
+    if [[ "${_server}" == "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to repositories." 8 65 \
             "" 2>"${ANSWER}" || return 1
             SYNC_URL=$(cat "${ANSWER}")
@@ -176,7 +176,7 @@ run_pacman(){
 # performs package installation to the target system
 install_packages() {
     destdir_mounts || return 1
-    if [[ "${S_SRC}" = "0" ]]; then
+    if [[ "${S_SRC}" == "0" ]]; then
         select_source || return 1
     fi
     prepare_pacman || return 1
