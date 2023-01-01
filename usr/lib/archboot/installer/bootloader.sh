@@ -367,48 +367,6 @@ EOF
 }
 
 do_efistub_copy_to_efisys() {
-    if [[ "${UEFISYS_MOUNTPOINT}" != "/boot" ]]; then
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _UEFISYS_VMLINUZ="${VMLINUZ_EFISTUB}.efi"
-        else
-            _UEFISYS_VMLINUZ="${VMLINUZ}.efi"
-        fi
-        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
-
-[Path]
-PathChanged=/boot/${VMLINUZ}
-PathChanged=/boot/${INTEL_UCODE}
-PathChanged=/boot/${AMD_UCODE}
-PathChanged=/boot/${INITRAMFS}
-Unit=efistub_copy.service
-
-[Install]
-WantedBy=multi-user.target
-CONFEOF
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
-[Unit]
-Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}
-ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INTEL_UCODE}
-ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${AMD_UCODE}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}
-CONFEOF
-        if [[ "${DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
-        else
-            systemctl enable efistub_copy.path
-        fi
-    fi
     _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
     _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
@@ -426,6 +384,12 @@ CONFEOF
         fi
         _INITRD="/${INITRAMFS}"
     else
+        # name .efi for uefisys partition
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            _UEFISYS_VMLINUZ="${VMLINUZ_EFISTUB}.efi"
+        else
+            _UEFISYS_VMLINUZ="${VMLINUZ}.efi"
+        fi
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="/${UEFISYS_PATH}/${VMLINUZ_EFISTUB}"
         else
@@ -438,6 +402,46 @@ CONFEOF
             _INITRD_AMD_UCODE="/${UEFISYS_PATH}/${AMD_UCODE}"
         fi
         _INITRD="/${UEFISYS_PATH}/${INITRAMFS}"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
+[Path]
+PathChanged=/boot/${VMLINUZ}
+PathChanged=/boot/${INITRAMFS}
+CONFEOF
+        [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
+            echo "PathChanged=/boot/${AMD_UCODE}" >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+            echo "PathChanged=/boot/${INTEL_UCODE}" >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+Unit=efistub_copy.service
+[Install]
+WantedBy=multi-user.target
+CONFEOF
+        cat << CONFEOF >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+[Unit]
+Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}
+CONFEOF
+        [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
+            echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${AMD_UCODE}" \
+            >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+            echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INTEL_UCODE}" \
+            >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        if [[ "${DESTDIR}" == "/install" ]]; then
+            systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
+        else
+            systemctl enable efistub_copy.path
+        fi
     fi
 }
 
