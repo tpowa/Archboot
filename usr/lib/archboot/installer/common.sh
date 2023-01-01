@@ -72,11 +72,11 @@ local_pacman_conf() {
     _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
     #shellcheck disable=SC2129
     echo "[options]" >> "${_PACMAN_CONF}"
-    echo "Architecture = auto" >> "${_PACMAN_CONF}"
-    echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
-    echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
+    echo "Architecture == auto" >> "${_PACMAN_CONF}"
+    echo "SigLevel    == Required DatabaseOptional" >> "${_PACMAN_CONF}"
+    echo "LocalFileSigLevel == Optional" >> "${_PACMAN_CONF}"
     echo "[archboot]" >> "${_PACMAN_CONF}"
-    echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+    echo "Server == file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
     PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
@@ -103,7 +103,7 @@ auto_packages() {
     if lsblk -rnpo FSTYPE | grep -q vfat; then
         ! echo "${PACKAGES}" | grep -qw dosfstools && PACKAGES="${PACKAGES} dosfstools"
     fi
-    if ! [[ "$(dmraid_devices)" = "" ]]; then
+    if ! [[ "$(dmraid_devices)" == "" ]]; then
         ! echo "${PACKAGES}" | grep -qw dmraid && PACKAGES="${PACKAGES} dmraid"
     fi
     if lsmod | grep -qw wl; then
