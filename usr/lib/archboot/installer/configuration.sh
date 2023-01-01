@@ -21,7 +21,7 @@ set_mkinitcpio() {
     for i in $(grep ^HOOKS "${DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
         [[ -e ${DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
     done
-    if [[ "${HOOK_ERROR}" = "1" ]]; then
+    if [[ "${HOOK_ERROR}" == "1" ]]; then
         DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
     else
         run_mkinitcpio
@@ -57,16 +57,16 @@ set_password() {
     PASSWORD=""
     PASS=""
     PASS2=""
-    while [[ "${PASSWORD}" = "" ]]; do
-        while [[ "${PASS}" = "" ]]; do
+    while [[ "${PASSWORD}" == "" ]]; do
+        while [[ "${PASS}" == "" ]]; do
             DIALOG --insecure --passwordbox "Enter new root password:" 0 0 2>"${ANSWER}" || return 1
             PASS=$(cat "${ANSWER}")
         done
-        while [[ "${PASS2}" = "" ]]; do
+        while [[ "${PASS2}" == "" ]]; do
             DIALOG --insecure --passwordbox "Retype new root password:" 0 0 2>"${ANSWER}" || return 1
             PASS2=$(cat "${ANSWER}")
         done
-        if [[ "${PASS}" = "${PASS2}" ]]; then
+        if [[ "${PASS}" == "${PASS2}" ]]; then
             PASSWORD=${PASS}
             echo "${PASSWORD}" > /tmp/.password
             echo "${PASSWORD}" >> /tmp/.password
