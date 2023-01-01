@@ -19,7 +19,7 @@ autoprepare() {
         DISC=$(cat "${ANSWER}")
     else
         DISC="${DISCS}"
-        if [[ "${DISC}" = "" ]]; then
+        if [[ "${DISC}" == "" ]]; then
             DIALOG --msgbox "ERROR: Setup cannot find available disk device, please use normal installation routine for partitioning and mounting devices." 0 0
             return 1
         fi
@@ -37,14 +37,14 @@ autoprepare() {
     CHOSEN_FS=""
     # get just the disk size in 1000*1000 MB
     DISC_SIZE="$(($(${_LSBLK} SIZE -d -b "${DISC}")/1000000))"
-    if [[ "${DISC_SIZE}" = "" ]]; then
+    if [[ "${DISC_SIZE}" == "" ]]; then
         DIALOG --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
-    if [[  "${GUIDPARAMETER}" = "1" ]]; then
+    if [[  "${GUIDPARAMETER}" == "1" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MP="$(cat "${ANSWER}")"
     fi
@@ -52,7 +52,7 @@ autoprepare() {
         DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
         _UEFISYS_BOOTPART="1"
     fi
-    while [[ "${DEFAULTFS}" = "" ]]; do
+    while [[ "${DEFAULTFS}" == "" ]]; do
         FSOPTS=""
         [[ "$(which mkfs.btrfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} btrfs Btrfs"
         [[ "$(which mkfs.ext4 2>/dev/null)" ]] && FSOPTS="${FSOPTS} ext4 Ext4"
@@ -63,22 +63,22 @@ autoprepare() {
         [[ "$(which mkfs.nilfs2 2>/dev/null)" ]] && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
         [[ "$(which mkfs.jfs 2>/dev/null)" ]] && FSOPTS="${FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
-        if [[ "${GUIDPARAMETER}" = "1" ]]; then
+        if [[ "${GUIDPARAMETER}" == "1" ]]; then
             GUID_PART_SIZE="2"
             GPT_BIOS_GRUB_PART_SIZE="${GUID_PART_SIZE}"
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             DISC_SIZE="$((DISC_SIZE-GUID_PART_SIZE))"
         fi
-        if [[ "${GUIDPARAMETER}" = "1" ]]; then
+        if [[ "${GUIDPARAMETER}" == "1" ]]; then
             if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
-                while [[ "${UEFISYS_PART_SET}" = "" ]]; do
+                while [[ "${UEFISYS_PART_SET}" == "" ]]; do
                     DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
                     UEFISYS_PART_SIZE="$(cat "${ANSWER}")"
-                    if [[ "${UEFISYS_PART_SIZE}" = "" ]]; then
+                    if [[ "${UEFISYS_PART_SIZE}" == "" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
-                        if [[ "${UEFISYS_PART_SIZE}" -ge "${DISC_SIZE}" || "${UEFISYS_PART_SIZE}" -lt "260" || "${UEFISYS_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                        if [[ "${UEFISYS_PART_SIZE}" -ge "${DISC_SIZE}" || "${UEFISYS_PART_SIZE}" -lt "260" || "${UEFISYS_PART_SIZE}" == "${DISC_SIZE}" ]]; then
                             DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
                             BOOT_PART_SET=1
@@ -89,13 +89,13 @@ autoprepare() {
                     fi
                 done
             else
-                while [[ "${UEFISYS_PART_SET}" = "" ]]; do
+                while [[ "${UEFISYS_PART_SET}" == "" ]]; do
                     DIALOG --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>"${ANSWER}" || return 1
                     UEFISYS_PART_SIZE="$(cat "${ANSWER}")"
-                    if [[ "${UEFISYS_PART_SIZE}" = "" ]]; then
+                    if [[ "${UEFISYS_PART_SIZE}" == "" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
-                        if [[ "${UEFISYS_PART_SIZE}" -ge "${DISC_SIZE}" || "${UEFISYS_PART_SIZE}" -lt "260" || "${UEFISYS_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                        if [[ "${UEFISYS_PART_SIZE}" -ge "${DISC_SIZE}" || "${UEFISYS_PART_SIZE}" -lt "260" || "${UEFISYS_PART_SIZE}" == "${DISC_SIZE}" ]]; then
                             DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
                             UEFISYS_PART_SET=1
@@ -106,13 +106,13 @@ autoprepare() {
                 done
             fi
             DISC_SIZE="$((DISC_SIZE-UEFISYS_PART_SIZE))"
-            while [[ "${BOOT_PART_SET}" = "" ]]; do
+            while [[ "${BOOT_PART_SET}" == "" ]]; do
                 DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
                 BOOT_PART_SIZE="$(cat "${ANSWER}")"
-                if [[ "${BOOT_PART_SIZE}" = "" ]]; then
+                if [[ "${BOOT_PART_SIZE}" == "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" == "${DISC_SIZE}" ]]; then
                         DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         BOOT_PART_SET=1
@@ -123,13 +123,13 @@ autoprepare() {
                 fi
             done
         else
-            while [[ "${BOOT_PART_SET}" = "" ]]; do
+            while [[ "${BOOT_PART_SET}" == "" ]]; do
                 DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
                 BOOT_PART_SIZE="$(cat "${ANSWER}")"
-                if [[ "${BOOT_PART_SIZE}" = "" ]]; then
+                if [[ "${BOOT_PART_SIZE}" == "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" = "${DISC_SIZE}" ]]; then
+                    if [[ "${BOOT_PART_SIZE}" -ge "${DISC_SIZE}" || "${BOOT_PART_SIZE}" -lt "16" || "${BOOT_PART_SIZE}" == "${DISC_SIZE}" ]]; then
                         DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                          BOOT_PART_SET=1
@@ -142,10 +142,10 @@ autoprepare() {
         fi
         SWAP_SIZE="256"
         [[ "${DISC_SIZE}" -lt "256" ]] && SWAP_SIZE="${DISC_SIZE}"
-        while [[ "${SWAP_PART_SET}" = "" ]]; do
+        while [[ "${SWAP_PART_SET}" == "" ]]; do
             DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>"${ANSWER}" || return 1
             SWAP_PART_SIZE=$(cat "${ANSWER}")
-            if [[ "${SWAP_PART_SIZE}" = "" || "${SWAP_PART_SIZE}" = "0" ]]; then
+            if [[ "${SWAP_PART_SIZE}" == "" || "${SWAP_PART_SIZE}" == "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
                 if [[ "${SWAP_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
@@ -157,21 +157,21 @@ autoprepare() {
                 fi
             fi
         done
-        while [[ "${CHOSEN_FS}" = "" ]]; do
+        while [[ "${CHOSEN_FS}" == "" ]]; do
             #shellcheck disable=SC2086
             DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>"${ANSWER}" || return 1
             FSTYPE=$(cat "${ANSWER}")
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
         # / and /home are subvolumes on btrfs
-        if ! [[ "${FSTYPE}" = "btrfs" ]]; then
+        if ! [[ "${FSTYPE}" == "btrfs" ]]; then
             DISC_SIZE="$((DISC_SIZE-SWAP_PART_SIZE))"
             ROOT_SIZE="7500"
             [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
-            while [[ "${ROOT_PART_SET}" = "" ]]; do
+            while [[ "${ROOT_PART_SET}" == "" ]]; do
             DIALOG --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
             ROOT_PART_SIZE=$(cat "${ANSWER}")
-                if [[ "${ROOT_PART_SIZE}" = "" || "${ROOT_PART_SIZE}" = "0" || "${ROOT_PART_SIZE}" -lt "2000" ]]; then
+                if [[ "${ROOT_PART_SIZE}" == "" || "${ROOT_PART_SIZE}" == "0" || "${ROOT_PART_SIZE}" -lt "2000" ]]; then
                     DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     if [[ "${ROOT_PART_SIZE}" -ge "${DISC_SIZE}" ]]; then
@@ -184,7 +184,7 @@ autoprepare() {
         fi
         _PART_NUM="$((_PART_NUM+1))"
         _ROOT_PART_NUM="${_PART_NUM}"
-        if ! [[ "${FSTYPE}" = "btrfs" ]]; then
+        if ! [[ "${FSTYPE}" == "btrfs" ]]; then
             _PART_NUM="$((_PART_NUM+1))"
         fi
         _HOME_PART_NUM="${_PART_NUM}"
@@ -227,7 +227,7 @@ autoprepare() {
             sgdisk --set-alignment="2048" --new="${_BOOT_PART_NUM}":0:+"${BOOT_PART_SIZE}"M --typecode="${_BOOT_PART_NUM}":8300 --attributes="${_BOOT_PART_NUM}":set:2 --change-name="${_BOOT_PART_NUM}":ARCHLINUX_BOOT "${DEVICE}" > "${LOG}"
         fi
         sgdisk --set-alignment="2048" --new="${_SWAP_PART_NUM}":0:+"${SWAP_PART_SIZE}"M --typecode="${_SWAP_PART_NUM}":8200 --change-name="${_SWAP_PART_NUM}":ARCHLINUX_SWAP "${DEVICE}" > "${LOG}"
-        if [[ "${FSTYPE}" = "btrfs" ]]; then
+        if [[ "${FSTYPE}" == "btrfs" ]]; then
             sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:0 --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
         else
             sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:+"${ROOT_PART_SIZE}"M --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
@@ -247,7 +247,7 @@ autoprepare() {
         parted -a optimal -s "${DEVICE}" unit MiB set 1 boot on >"${LOG}"
         parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) >"${LOG}"
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
-        if [[ "${FSTYPE}" = "btrfs" ]]; then
+        if [[ "${FSTYPE}" == "btrfs" ]]; then
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >"${LOG}"
         else
             parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >"${LOG}"
@@ -299,10 +299,10 @@ autoprepare() {
         [[ "${FS_OPTIONS}" == "" ]] && FS_OPTIONS="NONE"
         LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f5 -d:)"
         BTRFS_DEVICES="${PART}"
-        if [[ "${FSTYPE}" = "btrfs" ]]; then
+        if [[ "${FSTYPE}" == "btrfs" ]]; then
             BTRFS_COMPRESS="compress=zstd"
-            [[ "${MP}" = "/" ]] && BTRFS_SUBVOLUME="root"
-            [[ "${MP}" = "/home" ]] && BTRFS_SUBVOLUME="home" && DOMKFS="no"
+            [[ "${MP}" == "/" ]] && BTRFS_SUBVOLUME="root"
+            [[ "${MP}" == "/home" ]] && BTRFS_SUBVOLUME="home" && DOMKFS="no"
             DOSUBVOLUME="yes"
         else
             BTRFS_COMPRESS="NONE"
@@ -310,7 +310,7 @@ autoprepare() {
             DOSUBVOLUME="no"
         fi
         BTRFS_LEVEL="NONE"
-        if ! [[ "${FSTYPE}" = "swap" ]]; then
+        if ! [[ "${FSTYPE}" == "swap" ]]; then
             DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP} ..." 0 0
         else
             DIALOG --infobox "Creating and activating\nswapspace on\n${PART} ..." 0 0
