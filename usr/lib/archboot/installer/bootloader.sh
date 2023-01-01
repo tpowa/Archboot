@@ -372,17 +372,17 @@ do_efistub_copy_to_efisys() {
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="/${VMLINUZ_EFISTUB}"
+            _KERNEL="${VMLINUZ_EFISTUB}"
         else
-            _KERNEL="/${VMLINUZ}"
+            _KERNEL="${VMLINUZ}"
             if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-                _INITRD_INTEL_UCODE="/${INTEL_UCODE}"
+                _INITRD_INTEL_UCODE="${INTEL_UCODE}"
             fi
         fi
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
-            _INITRD_AMD_UCODE="/${AMD_UCODE}"
+            _INITRD_AMD_UCODE="${AMD_UCODE}"
         fi
-        _INITRD="/${INITRAMFS}"
+        _INITRD="${INITRAMFS}"
     else
         # name .efi for uefisys partition
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
@@ -390,18 +390,27 @@ do_efistub_copy_to_efisys() {
         else
             _KERNEL="${UEFISYS_PATH}/${VMLINUZ}.efi"
             if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-                _INITRD_INTEL_UCODE="/${UEFISYS_PATH}/${INTEL_UCODE}"
+                _INITRD_INTEL_UCODE="${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
         fi
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
-            _INITRD_AMD_UCODE="/${UEFISYS_PATH}/${AMD_UCODE}"
+            _INITRD_AMD_UCODE="${UEFISYS_PATH}/${AMD_UCODE}"
         fi
-        _INITRD="/${UEFISYS_PATH}/${INITRAMFS}"
+        _INITRD="${UEFISYS_PATH}/${INITRAMFS}"
+        # clean and copy to efisys
         ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
         rm -f "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
-        rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/${_INITRD}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MP}/${_INITRD}"
+        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+            rm -f "${DESTDIR}/${UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
+            cp -f "${DESTDIR}/boot/${INTEL_UCODE}" "${DESTDIR}/${UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
+        fi
+        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+            rm -f "${DESTDIR}/${UEFISYS_MP}/${_INITRD_AMD_UCODE}"
+            cp -f "${DESTDIR}/boot/${AMD_UCODE}" "${DESTDIR}/${UEFISYS_MP}/${_INITRD_AMD_UCODE}"
+        fi
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -424,13 +433,13 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${_KERNEL}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${_INITRD}
 CONFEOF
         [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${AMD_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MP}/${_INITRD_AMD_UCODE}" \
             >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
         [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${INTEL_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
             >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
@@ -481,17 +490,13 @@ do_systemd_boot_uefi() {
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MP}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    [[ "${UEFISYS_MP}" == "/boot" ]]
-    [[ "${UEFISYS_MP}" == "/boot" ]] && \
-        echo "linux    ${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    ! [[ "${UEFISYS_MP}" == "/boot" ]] && \
-        echo "linux    /${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    echo "linux    /${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "initrd   ${_INITRD_INTEL_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "initrd   ${_INITRD_AMD_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-initrd   ${_INITRD}
+initrd   /${_INITRD}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
@@ -540,26 +545,38 @@ do_refind_uefi() {
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
     sed "s|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g" -i "${_REFIND_CONFIG}"
-    sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
-        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/refind_linux.conf"
+        cat << CONFEOF >> "${_REFIND_CONFIG}"
+menuentry "Arch Linux" {
+    icon     /EFI/refind/icons/os_arch.png
+    volume   "Arch Linux"
+    loader   /${_KERNEL}
+CONFEOF
+    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
+    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
+        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
+        cat << CONFEOF >> "${_REFIND_CONFIG}"
+    initrd   /${_INITRD}
+    options  ${_KERNEL_PARAMS_UEFI_MOD}
+}
+CONFEOF
     else
-        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/refind_linux.conf"
-    fi
-    # initrd need to be sorted for each architecture
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
-REFINDEOF
-    elif   [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
-REFINDEOF
-    else
-        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
-"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD}"
-REFINDEOF
+        cat << CONFEOF >> "${_REFIND_CONFIG}"
+menuentry "Arch Linux" {
+    icon     /EFI/refind/icons/os_arch.png
+    volume   "Arch Linux"
+    loader   /${_KERNEL}
+CONFEOF
+    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
+    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
+        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
+        cat << CONFEOF >> "${_REFIND_CONFIG}"
+    initrd   /${_INITRD}
+    options  ${_KERNEL_PARAMS_UEFI_MOD}
+}
+CONFEOF
     fi
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
@@ -567,10 +584,9 @@ REFINDEOF
         do_uefi_bootmgr_setup
         DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
         sleep 3
-        DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf and refind_linux.conf\n\nAfter you save your changes, exit the editor." 8 50
+        DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
-        "${EDITOR}" "${_REFIND_LINUX_CONF}"
         DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
