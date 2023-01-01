@@ -485,7 +485,7 @@ do_systemd_boot_uefi() {
     [[ "${UEFISYS_MP}" == "/boot" ]] && \
         echo "linux    ${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     ! [[ "${UEFISYS_MP}" == "/boot" ]] && \
-        echo "linux    ${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+        echo "linux    /${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
         echo "initrd   ${_INITRD_INTEL_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
