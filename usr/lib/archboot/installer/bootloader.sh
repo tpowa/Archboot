@@ -134,7 +134,7 @@ check_bootpart() {
 # only allow ext2/3/4 and vfat on uboot bootloader
 abort_uboot(){
         FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
-        if ! [[ "${FSTYPE}" = "ext2" || "${FSTYPE}" = "ext3" || "${FSTYPE}" = "ext4" || "${FSTYPE}" = "vfat" ]]; then
+        if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "vfat" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
         fi
@@ -143,7 +143,7 @@ abort_uboot(){
 # check for nilfs2 bootpart and abort if detected
 abort_nilfs_bootpart() {
         FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
-        if [[ "${FSTYPE}" = "nilfs2" ]]; then
+        if [[ "${FSTYPE}" == "nilfs2" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
@@ -152,7 +152,7 @@ abort_nilfs_bootpart() {
 # check for f2fs bootpart and abort if detected
 abort_f2fs_bootpart() {
         FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
-        if [[ "${FSTYPE}" = "f2fs" ]]; then
+        if [[ "${FSTYPE}" == "f2fs" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
@@ -280,14 +280,14 @@ do_secureboot_keys() {
     CN=""
     MOK_PW=""
     KEYDIR=""
-    while [[ "${KEYDIR}" = "" ]]; do
+    while [[ "${KEYDIR}" == "" ]]; do
         DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${ANSWER}" || return 1
         KEYDIR=$(cat "${ANSWER}")
         #shellcheck disable=SC2086,SC2001
         KEYDIR="$(echo ${KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
-        while [[ "${CN}" = "" ]]; do
+        while [[ "${CN}" == "" ]]; do
             DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${ANSWER}" || return 1
             CN=$(cat "${ANSWER}")
         done
@@ -306,12 +306,12 @@ do_mok_sign () {
     MOK_PW=""
     DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && INSTALL_MOK="1"
     if [[ "${INSTALL_MOK}" == "1" ]]; then
-        while [[ "${MOK_PW}" = "" ]]; do
+        while [[ "${MOK_PW}" == "" ]]; do
             DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${ANSWER}" || return 1
             PASS=$(cat "${ANSWER}")
             DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${ANSWER}" || return 1
             PASS2=$(cat "${ANSWER}")
-            if [[ "${PASS}" = "${PASS2}" && -n "${PASS}" ]]; then
+            if [[ "${PASS}" == "${PASS2}" && -n "${PASS}" ]]; then
                 MOK_PW=${PASS}
                 echo "${MOK_PW}" > /tmp/.password
                 echo "${MOK_PW}" >> /tmp/.password
@@ -546,11 +546,11 @@ do_refind_uefi() {
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/refind_linux.conf"
     fi
     # initrd need to be sorted for each architecture
-    if [[ "${RUNNING_ARCH}" = "x86_64" ]]; then
+    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
 REFINDEOF
-    elif   [[ "${RUNNING_ARCH}" = "aarch64" ]]; then
+    elif   [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
 REFINDEOF
@@ -1082,7 +1082,7 @@ install_bootloader() {
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
-    if [[ "${S_SRC}" = "0" ]]; then
+    if [[ "${S_SRC}" == "0" ]]; then
         select_source || return 1
     fi
     prepare_pacman
@@ -1131,7 +1131,7 @@ install_bootloader_menu() {
         "BIOS") install_bootloader_bios ;;
         "UBOOT") install_bootloader_uboot ;;
     esac
-    if [[ "${CANCEL}" = "1" ]]; then
+    if [[ "${CANCEL}" == "1" ]]; then
         NEXTITEM="7"
     else
         NEXTITEM="8"
