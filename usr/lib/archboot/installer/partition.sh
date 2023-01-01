@@ -117,7 +117,7 @@ partition() {
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
     # update dmraid
-    ! [[ "$(dmraid_devices)" = "" ]] && _dmraid_update
+    ! [[ "$(dmraid_devices)" == "" ]] && _dmraid_update
     # switch for mbr usage
     set_guid
     # Select disk to partition
