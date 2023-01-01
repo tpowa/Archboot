@@ -553,9 +553,9 @@ menuentry "Arch Linux" {
     loader   /${_KERNEL}
 CONFEOF
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
+        echo "  initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
+        echo "  initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
         cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
     options  ${_KERNEL_PARAMS_UEFI_MOD}
@@ -569,9 +569,9 @@ menuentry "Arch Linux" {
     loader   /${_KERNEL}
 CONFEOF
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
+        echo "  initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
+        echo "  initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
         cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
     options  ${_KERNEL_PARAMS_UEFI_MOD}
