@@ -453,10 +453,10 @@ do_efistub_uefi() {
         _CONTINUE="1"
     else
         if [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MP}/${UEFISYS_PATH}/${_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS} respectively." 0 0
+            DIALOG --msgbox "The kernel and initramfs have been copied to\n${UEFISYS_MP}/${UEFISYS_PATH}/${_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" 0 0
             _CONTINUE="1"
         else
-            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MP}." 0 0
+            DIALOG --msgbox "Error setting up kernel and initramfs in ${UEFISYS_MP}." 0 0
             _CONTINUE="0"
         fi
     fi
