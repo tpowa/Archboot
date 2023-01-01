@@ -542,7 +542,6 @@ do_refind_uefi() {
     sed "s|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g" -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
     sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/refind_linux.conf"
     else
