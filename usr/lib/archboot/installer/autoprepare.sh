@@ -29,7 +29,7 @@ autoprepare() {
     UEFISYS_PART_SIZE=""
     DEFAULTFS=""
     _UEFISYS_BOOTPART=""
-    UEFISYS_MOUNTPOINT=""
+    UEFISYS_MP=""
     UEFISYS_PART_SET=""
     BOOT_PART_SET=""
     SWAP_PART_SET=""
@@ -46,9 +46,9 @@ autoprepare() {
     fi
     if [[  "${GUIDPARAMETER}" = "1" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
-        UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
+        UEFISYS_MP="$(cat "${ANSWER}")"
     fi
-    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
         _UEFISYS_BOOTPART="1"
     fi
@@ -273,7 +273,7 @@ autoprepare() {
     _FSSPEC_HOME_PART="${_HOME_PART_NUM}:/home:${FSTYPE}::HOME_ARCH"
     _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:swap::SWAP_ARCH"
     _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:ext2::BOOT_ARCH"
-    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MOUNTPOINT}:vfat:-F32:EFISYS"
+    _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MP}:vfat:-F32:EFISYS"
     if [[ "${GUIDPARAMETER}" == "1" ]]; then
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
             FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"

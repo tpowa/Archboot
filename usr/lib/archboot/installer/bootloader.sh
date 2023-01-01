@@ -218,7 +218,7 @@ EFIBEOF
         chmod a+x "/tmp/efibootmgr_run.sh"
         /tmp/efibootmgr_run.sh &>"/tmp/efibootmgr_run.log"
     else
-        DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${UEFISYS_MOUNTPOINT}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
+        DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${UEFISYS_MP}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
     fi
     unset _EFIBOOTMGR_LABEL
     unset _EFIBOOTMGR_DISC
@@ -234,7 +234,7 @@ do_apple_efi_hfs_bless() {
 }
 
 do_uefi_bootmgr_setup() {
-    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
+    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MP}")"
     _DISC="$(${_LSBLK} KNAME "${_uefisysdev}")"
     UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_uefisysdev}")"
     _BOOTMGR_DISC="${_DISC}"
@@ -261,14 +261,14 @@ do_uefi_secure_boot_efitools() {
     do_uefi_common
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
-        if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi" ]]; then
-            cp "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/HashTool.efi"
+        if [[ ! -f "${UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
+            cp "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MP}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
             do_uefi_bootmgr_setup
         fi
-        if [[ ! -f "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi" ]]; then
-            cp "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MOUNTPOINT}/EFI/BOOT/KeyTool.efi"
+        if [[ ! -f "${UEFISYS_MP}/EFI/BOOT/KeyTool.efi" ]]; then
+            cp "${DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${UEFISYS_MP}/EFI/BOOT/KeyTool.efi"
             _BOOTMGR_LABEL="KeyTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
             do_uefi_bootmgr_setup
@@ -301,7 +301,7 @@ do_secureboot_keys() {
 }
 
 do_mok_sign () {
-    UEFI_BOOTLOADER_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT"
+    UEFI_BOOTLOADER_DIR="${UEFISYS_MP}/EFI/BOOT"
     INSTALL_MOK=""
     MOK_PW=""
     DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && INSTALL_MOK="1"
@@ -368,9 +368,9 @@ EOF
 
 do_efistub_copy_to_efisys() {
     _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
-    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MOUNTPOINT}")"
+    _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MP}")"
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
-    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
              _KERNEL="/${VMLINUZ_EFISTUB}"
         else
@@ -402,11 +402,11 @@ do_efistub_copy_to_efisys() {
             _INITRD_AMD_UCODE="/${UEFISYS_PATH}/${AMD_UCODE}"
         fi
         _INITRD="/${UEFISYS_PATH}/${INITRAMFS}"
-        ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
-        rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
-        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}"
+        ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -428,14 +428,14 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}
-ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}
+ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}
+ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}
 CONFEOF
         [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${AMD_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${AMD_UCODE}" \
             >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
         [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INTEL_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${INTEL_UCODE}" \
             >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
@@ -454,14 +454,14 @@ do_efistub_uefi() {
     UEFISYS_PATH="EFI/arch"
     common_bootloader_checks
     do_efistub_copy_to_efisys
-    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
+    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         _CONTINUE="1"
     else
-        if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ} and\n${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/${INITRAMFS} respectively." 0 0
+        if [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS} respectively." 0 0
             _CONTINUE="1"
         else
-            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MOUNTPOINT}." 0 0
+            DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MP}." 0 0
             _CONTINUE="0"
         fi
     fi
@@ -483,44 +483,44 @@ do_efistub_uefi() {
 do_systemd_boot_uefi() {
     DIALOG --infobox "Setting up SYSTEMD-BOOT now ..." 3 40
     # create directory structure, if it doesn't exist
-    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries"
-    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+    ! [[ -d "${DESTDIR}/${UEFISYS_MP}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/loader/entries"
+    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 title    Arch Linux
 linux    ${_KERNEL}
 GUMEOF
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   ${_INITRD_INTEL_UCODE}
 GUMEOF
     fi
-    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
+    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
-    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
 timeout 5
 default archlinux-core-main
 GUMEOF
     uefi_mount_efivarfs
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" install >"${LOG}" 2>&1
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MOUNTPOINT}" update >"${LOG}" 2>&1
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MP}" install >"${LOG}" 2>&1
+    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
     chroot_umount
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/entries/archlinux-core-main.conf"
-        "${EDITOR}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/loader/loader.conf"
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+        "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 75 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 75 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
     else
         DIALOG --msgbox "Error installing systemd-boot ..." 0 0
@@ -534,28 +534,28 @@ do_refind_uefi() {
         run_pacman
     fi
     DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 60
-    ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
-    cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
-    cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
-    cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/"
-     ! [[ -d "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
-    cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/tools/"
-    _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind.conf"
+    ! [[ -d "${DESTDIR}/${UEFISYS_MP}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
+    cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
+    cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
+    cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
+     ! [[ -d "${DESTDIR}/${UEFISYS_MP}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/tools/"
+    cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/tools/"
+    _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical,manual|scanfor manual,internal,external,optical|g' -i "${_REFIND_CONFIG}"
     sed 's|^#also_scan_dirs boot,ESP2:EFI/linux/kernels|also_scan_dirs boot|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scan_all_linux_kernels|scan_all_linux_kernels|g' -i "${_REFIND_CONFIG}"
-    if [[ "${UEFISYS_MOUNTPOINT}" == "/boot" ]]; then
-        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/refind_linux.conf"
+    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
+        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/refind_linux.conf"
     else
-        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MOUNTPOINT}/${UEFISYS_PATH}/refind_linux.conf"
+        _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/refind_linux.conf"
     fi
     cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
 REFINDEOF
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
@@ -565,15 +565,15 @@ REFINDEOF
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         "${EDITOR}" "${_REFIND_LINUX_CONF}"
-        DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
+        DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf" || true
-            rm -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/icons" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-            cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/refind.conf"
-            cp -rf "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
+            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf" || true
+            rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons" || true
+            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
+            cp -rf "${DESTDIR}/${UEFISYS_MP}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
         fi
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
@@ -614,8 +614,8 @@ do_grub_config() {
     USR_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/usr" 2>/dev/null)"
     USR_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/usr" 2>/dev/null)"
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
-        UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MOUNTPOINT}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MP}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MP}" 2>/dev/null)"
     fi
     if [[ "${ROOT_PART_FS_UUID}" == "${BOOT_PART_FS_UUID}" ]]; then
         subdir="/boot"
@@ -954,16 +954,16 @@ do_grub_uefi() {
     chroot_mount
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
-        [[ ! -d  ${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
-        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".efi
-        cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MOUNTPOINT}"/EFI/BOOT/
-        GRUB_PREFIX_DIR="${UEFISYS_MOUNTPOINT}/EFI/BOOT/"
+        [[ ! -d  ${DESTDIR}/${UEFISYS_MP}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/
+        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".efi
+        cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/
+        GRUB_PREFIX_DIR="${UEFISYS_MP}/EFI/BOOT/"
     else
         ## Install GRUB
         chroot "${DESTDIR}" "/usr/bin/grub-install" \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --target="${_GRUB_ARCH}-efi" \
-            --efi-directory="${UEFISYS_MOUNTPOINT}" \
+            --efi-directory="${UEFISYS_MP}" \
             --bootloader-id="grub" \
             --boot-directory="/boot" \
             --no-nvram \
@@ -995,9 +995,9 @@ do_grub_uefi() {
                     grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
                 fi
         fi
-        cp /"${GRUB_PREFIX_DIR}"/"${GRUB_CFG}" "${UEFISYS_MOUNTPOINT}"/EFI/BOOT/grub"${_SPEC_UEFI_ARCH}".cfg
+        cp /"${GRUB_PREFIX_DIR}"/"${GRUB_CFG}" "${UEFISYS_MP}"/EFI/BOOT/grub"${_SPEC_UEFI_ARCH}".cfg
     fi
-    if [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "0" && -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "0" && -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
@@ -1006,14 +1006,14 @@ do_grub_uefi() {
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _UEFISYS_EFI_BOOT_DIR="1"
         else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
+            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
         fi
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
+            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
         fi
-    elif [[ -e "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys || return 1
         do_mok_sign
         do_pacman_sign

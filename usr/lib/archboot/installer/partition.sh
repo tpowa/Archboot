@@ -49,7 +49,7 @@ check_gpt() {
     fi
 }
 
-## check and mount EFISYS partition at ${UEFISYS_MOUNTPOINT}
+## check and mount EFISYS partition at ${UEFISYS_MP}
 check_efisys_part() {
     detect_DISC
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${DISC}")" != "gpt" ]]; then
@@ -81,24 +81,24 @@ check_efisys_part() {
             DIALOG --defaultno --yesno "Detected EFI System partition ${UEFISYS_PART} does not appear to be FAT32 formatted. Do you want to format ${UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         #autodetect efisys mountpoint, on fail ask for mountpoint
-        UEFISYS_MOUNTPOINT="/$(basename "$(mount | grep "${UEFISYS_PART}" | cut -d " " -f 3)")"
-        if [[ "${UEFISYS_MOUNTPOINT}" == "/" ]]; then
+        UEFISYS_MP="/$(basename "$(mount | grep "${UEFISYS_PART}" | cut -d " " -f 3)")"
+        if [[ "${UEFISYS_MP}" == "/" ]]; then
             DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${ANSWER}" || return 1
-            UEFISYS_MOUNTPOINT="$(cat "${ANSWER}")"
+            UEFISYS_MP="$(cat "${ANSWER}")"
         fi
-        umount "${DESTDIR}/${UEFISYS_MOUNTPOINT}" &> /dev/null
+        umount "${DESTDIR}/${UEFISYS_MP}" &> /dev/null
         umount "${UEFISYS_PART}" &> /dev/null
         if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
             mkfs.vfat -F32 -n "EFISYS" "${UEFISYS_PART}"
         fi
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
+        mkdir -p "${DESTDIR}/${UEFISYS_MP}"
         if [[ "$(${_LSBLK} FSTYPE "${UEFISYS_PART}")" == "vfat" ]]; then
-            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
+            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MP}"
         else
             DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
-            mount -o rw "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MOUNTPOINT}"
+            mount -o rw "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MP}"
         fi
-        mkdir -p "${DESTDIR}/${UEFISYS_MOUNTPOINT}/EFI" || true
+        mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI" || true
     else
         DIALOG --msgbox "Setup did not find any EFI System partition in ${DISC}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
