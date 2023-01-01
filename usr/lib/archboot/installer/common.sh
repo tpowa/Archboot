@@ -72,11 +72,11 @@ local_pacman_conf() {
     _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
     #shellcheck disable=SC2129
     echo "[options]" >> "${_PACMAN_CONF}"
-    echo "Architecture == auto" >> "${_PACMAN_CONF}"
-    echo "SigLevel    == Required DatabaseOptional" >> "${_PACMAN_CONF}"
-    echo "LocalFileSigLevel == Optional" >> "${_PACMAN_CONF}"
+    echo "Architecture = auto" >> "${_PACMAN_CONF}"
+    echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
+    echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
     echo "[archboot]" >> "${_PACMAN_CONF}"
-    echo "Server == file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+    echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
     PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
