@@ -480,10 +480,12 @@ do_systemd_boot_uefi() {
     DIALOG --infobox "Setting up SYSTEMD-BOOT now ..." 3 40
     # create directory structure, if it doesn't exist
     ! [[ -d "${DESTDIR}/${UEFISYS_MP}/loader/entries" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/loader/entries"
-    cat << GUMEOF > "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-title    Arch Linux
-linux    ${_KERNEL}
-GUMEOF
+    echo "title    Arch Linux" > "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    [[ "${UEFISYS_MP}" == "/boot" ]]
+    [[ "${UEFISYS_MP}" == "/boot" ]] && \
+        echo "linux    ${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    ! [[ "${UEFISYS_MP}" == "/boot" ]] && \
+        echo "linux    ${_KERNEL}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
         echo "initrd   ${_INITRD_INTEL_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
