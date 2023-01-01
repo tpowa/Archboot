@@ -386,14 +386,14 @@ do_efistub_copy_to_efisys() {
     else
         # name .efi for uefisys partition
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _UEFISYS_VMLINUZ="${VMLINUZ_EFISTUB}.efi"
+            _UEFISYS_KERNEL="${VMLINUZ_EFISTUB}.efi"
         else
-            _UEFISYS_VMLINUZ="${VMLINUZ}.efi"
+            _UEFISYS_KERNEL="${VMLINUZ}.efi"
         fi
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="/${UEFISYS_PATH}/${VMLINUZ_EFISTUB}"
         else
-            _KERNEL="/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+            _KERNEL="/${UEFISYS_PATH}/${_UEFISYS_KERNEL}"
             if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="/${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
@@ -403,9 +403,9 @@ do_efistub_copy_to_efisys() {
         fi
         _INITRD="/${UEFISYS_PATH}/${INITRAMFS}"
         ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
-        rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_KERNEL}"
         rm -f "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
-        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}"
+        cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_KERNEL}"
         cp -f "${DESTDIR}/boot/${INITRAMFS}" "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}"
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
@@ -428,7 +428,7 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}
+ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}
 CONFEOF
         [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
@@ -457,8 +457,8 @@ do_efistub_uefi() {
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         _CONTINUE="1"
     else
-        if [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_VMLINUZ} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS} respectively." 0 0
+        if [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
+            DIALOG --msgbox "The EFISTUB Kernel and initramfs have been copied to\n${UEFISYS_MP}/${UEFISYS_PATH}/${_UEFISYS_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS} respectively." 0 0
             _CONTINUE="1"
         else
             DIALOG --msgbox "Error setting up EFISTUB kernel and initramfs in ${UEFISYS_MP}." 0 0
