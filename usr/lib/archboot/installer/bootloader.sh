@@ -539,12 +539,11 @@ do_refind_uefi() {
     cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
-     ! [[ -d "${DESTDIR}/${UEFISYS_MP}/EFI/tools" ]] &&  mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/tools/"
-    cp -rf "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/tools/"
+    cp -r "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
-    sed "s|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/tools/drivers_${_SPEC_UEFI_ARCH}|g" -i "${_REFIND_CONFIG}"
+    sed "s|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/refind/drivers_${_SPEC_UEFI_ARCH}|g" -i "${_REFIND_CONFIG}"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         cat << CONFEOF >> "${_REFIND_CONFIG}"
 menuentry "Arch Linux" {
