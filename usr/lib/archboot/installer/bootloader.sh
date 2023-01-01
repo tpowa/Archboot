@@ -545,9 +545,20 @@ do_refind_uefi() {
     else
         _REFIND_LINUX_CONF="${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/refind_linux.conf"
     fi
-    cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
+    # initrd need to be sorted for each architecture
+    if [[ "${RUNNING_ARCH}" = "x86_64" ]]; then
+        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
 "Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_INTEL_UCODE} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
 REFINDEOF
+    elif   [[ "${RUNNING_ARCH}" = "aarch64" ]]; then
+        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD_AMD_UCODE} initrd=${_INITRD}"
+REFINDEOF
+    else
+        cat << REFINDEOF > "${_REFIND_LINUX_CONF}"
+"Boot with Defaults"              "${_KERNEL_PARAMS_UEFI_MOD} initrd=${_INITRD}"
+REFINDEOF
+    fi
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
