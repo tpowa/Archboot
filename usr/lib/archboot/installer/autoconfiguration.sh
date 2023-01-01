@@ -7,7 +7,7 @@
 # according to partitioning/formatting stage
 auto_fstab(){
     # Modify fstab
-    if [[ "${S_MKFS}" = "1" || "${S_MKFSAUTO}" = "1" ]]; then
+    if [[ "${S_MKFS}" == "1" || "${S_MKFSAUTO}" == "1" ]]; then
         DIALOG --infobox "Create new fstab on installed system ..." 3 70
         if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>"${DESTDIR}"/etc/fstab
@@ -116,7 +116,7 @@ auto_mkinitcpio() {
     HWDETECTMODULES=""
     HWDETECTHOOKS=""
     HWKVER=""
-    if [[ "${AUTO_MKINITCPIO}" = "" ]]; then
+    if [[ "${AUTO_MKINITCPIO}" == "" ]]; then
         AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
@@ -180,7 +180,7 @@ auto_vconsole() {
 
 auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${DESTDIR}"/etc/crypttab)"  = "" ]]; then
+    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${DESTDIR}"/etc/crypttab)"  == "" ]]; then
         DIALOG --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
         sed -i -e "/^$(basename "${PART_ROOT}") /d" /tmp/.crypttab
@@ -212,7 +212,7 @@ auto_pacman_mirror() {
     if [[ "${SYNC_URL}" != "" ]]; then
         DIALOG --infobox "Enable pacman mirror on installed system ..." 3 70
         #shellcheck disable=SC2027,SC2086
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
+        awk "BEGIN { printf(\"# Mirror used during installation\nServer == "${SYNC_URL}"\n\n\") } 1 " "${DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${DESTDIR}/etc/pacman.d/mirrorlist"
         sleep 1
     fi
