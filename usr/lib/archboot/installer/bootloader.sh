@@ -483,13 +483,11 @@ do_systemd_boot_uefi() {
 title    Arch Linux
 linux    ${_KERNEL}
 GUMEOF
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+        echo "initrd   ${_INITRD_INTEL_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
+        echo "initrd   ${_INITRD_AMD_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-initrd   ${_INITRD_INTEL_UCODE}
-GUMEOF
-    fi
-    cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-initrd   ${_INITRD_AMD_UCODE}
 initrd   ${_INITRD}
 options  ${_KERNEL_PARAMS_UEFI_MOD}
 GUMEOF
