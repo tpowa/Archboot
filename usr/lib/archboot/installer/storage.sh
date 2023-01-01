@@ -4,7 +4,7 @@
 create_special() {
     NEXTITEM=""
     SPECIALDONE=0
-    while [[ "${SPECIALDONE}" = "0" ]]; do
+    while [[ "${SPECIALDONE}" == "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
         else
@@ -29,7 +29,7 @@ create_special() {
                 SPECIALDONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" = "1" ]]; then
+    if [[ "${CANCEL}" == "1" ]]; then
         NEXTITEM="3"
     else
         NEXTITEM="4"
@@ -40,7 +40,7 @@ create_special() {
 _createmd() {
     NEXTITEM=""
     MDDONE=0
-    while [[ "${MDDONE}" = "0" ]]; do
+    while [[ "${MDDONE}" == "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
         else
@@ -77,7 +77,7 @@ _createmd() {
 _createlvm() {
     NEXTITEM=""
     LVMDONE=0
-    while [[ "${LVMDONE}" = "0" ]]; do
+    while [[ "${LVMDONE}" == "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
         else
@@ -115,7 +115,7 @@ _createlvm() {
 _createluks() {
     NEXTITEM=""
     LUKSDONE=0
-    while [[ "${LUKSDONE}" = "0" ]]; do
+    while [[ "${LUKSDONE}" == "0" ]]; do
         if [[ -n "${NEXTITEM}" ]]; then
             DEFAULT="--default-item ${NEXTITEM}"
         else

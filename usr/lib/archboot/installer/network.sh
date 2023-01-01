@@ -39,7 +39,7 @@ do_wireless() {
             "Hidden" "_" 2>"${ANSWER}" || return 1
         WLAN_SSID=$(cat "${ANSWER}")
         WLAN_CONNECT="connect"
-        if [[ "${WLAN_SSID}" = "Hidden" ]]; then
+        if [[ "${WLAN_SSID}" == "Hidden" ]]; then
             DIALOG --inputbox "Enter the hidden SSID:" 8 65 \
                 "secret" 2>"${ANSWER}" || return 1
             WLAN_SSID=$(cat "${ANSWER}")
@@ -84,11 +84,11 @@ do_wireless() {
 donetwork() {
     S_NET=0
     NETPARAMETERS=""
-    while [[ "${NETPARAMETERS}" = "" ]]; do
+    while [[ "${NETPARAMETERS}" == "" ]]; do
         # select network interface
         INTERFACE=
         ifaces=$(net_interfaces)
-        while [[ "${INTERFACE}" = "" ]]; do
+        while [[ "${INTERFACE}" == "" ]]; do
             #shellcheck disable=SC2086
             DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${ifaces} 2>"${ANSWER}"
             case $? in
@@ -128,7 +128,7 @@ donetwork() {
         DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
         PROXY=$(cat "${ANSWER}")
         PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
-        if [[ "${PROXY}" = "" ]]; then
+        if [[ "${PROXY}" == "" ]]; then
             for i in ${PROXIES}; do
                 unset "${i}"
             done
@@ -151,11 +151,11 @@ donetwork() {
     echo "" >> "${NETWORK_PROFILE}"
     echo "[Network]" >> "${NETWORK_PROFILE}"
     [[ "${IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${NETWORK_PROFILE}"
-    if [[ "${CONNECTION}" = "wireless" ]]; then
+    if [[ "${CONNECTION}" == "wireless" ]]; then
         #shellcheck disable=SC2129
         echo "IgnoreCarrierLoss=3s" >>"${NETWORK_PROFILE}"
     fi
-    if [[ "${IP}" = "static" ]]; then
+    if [[ "${IP}" == "static" ]]; then
         #shellcheck disable=SC2129
         echo "Address=${IPADDR}" >>"${NETWORK_PROFILE}"
         echo "Gateway=${GW}" >>"${NETWORK_PROFILE}"
