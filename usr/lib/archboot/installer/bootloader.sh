@@ -418,12 +418,12 @@ CONFEOF
             echo "PathChanged=/boot/${AMD_UCODE}" >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
         [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
             echo "PathChanged=/boot/${INTEL_UCODE}" >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
-        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+        cat << CONFEOF >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 Unit=efistub_copy.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-        cat << CONFEOF >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
+        cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.service"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
@@ -433,10 +433,10 @@ ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${UEFISYS_PATH}/${INIT
 CONFEOF
         [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
             echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${AMD_UCODE}" \
-            >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+            >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
         [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
             echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${UEFISYS_PATH}/${INTEL_UCODE}" \
-            >> "${DESTDIR}/etc/systemd/system/efistub_copy.path"
+            >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
         else
