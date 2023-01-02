@@ -462,7 +462,7 @@ do_efistub_uefi() {
         _CONTINUE="1"
     else
         if [[ -e "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --infobox "The kernel and initramfs have been copied to\n${UEFISYS_MP}/${_KERNEL} and\n${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}\n\nContinuing in 5 seconds..." 0 0
+            DIALOG --infobox "The kernel,ucode and initramfs files have been copied to\n${UEFISYS_MP}/\n\nContinuing in 5 seconds..." 0 0
             sleep 5
             _CONTINUE="1"
         else
