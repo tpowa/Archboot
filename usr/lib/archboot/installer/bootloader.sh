@@ -458,30 +458,16 @@ do_efistub_uefi() {
     UEFISYS_PATH="EFI/archlinux"
     common_bootloader_checks
     do_efistub_copy_to_efisys
-    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
-        _CONTINUE="1"
+    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        do_systemd_boot_uefi
     else
-        if [[ -e "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}" ]] && [[ -e "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}/${INITRAMFS}" ]]; then
-            DIALOG --infobox "Copyying kernel, ucode and initramfs to\n${UEFISYS_MP}/\n\nContinuing in 5 seconds..." 0 0
-            sleep 5
-            _CONTINUE="1"
-        else
-            DIALOG --msgbox "Error setting up kernel and initramfs in ${UEFISYS_MP}." 0 0
-            _CONTINUE="0"
-        fi
-    fi
-    if [[ "${_CONTINUE}" == "1" ]]; then
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            do_systemd_boot_uefi
-        else
-            DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
-                "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-                "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
-            case $(cat "${ANSWER}") in
-                "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
-                "rEFInd") do_refind_uefi;;
-            esac
-        fi
+        DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
+            "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
+            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
+        case $(cat "${ANSWER}") in
+            "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
+            "rEFInd") do_refind_uefi;;
+        esac
     fi
 }
 
