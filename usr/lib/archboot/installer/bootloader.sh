@@ -455,7 +455,7 @@ do_efistub_uefi() {
     FAIL_COMPLEX=""
     USE_DMRAID=""
     RAID_ON_LVM=""
-    UEFISYS_PATH="EFI/arch"
+    UEFISYS_PATH="EFI/archlinux"
     common_bootloader_checks
     do_efistub_copy_to_efisys
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
@@ -513,16 +513,6 @@ GUMEOF
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _UEFISYS_EFI_BOOT_DIR="1"
-        else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi -->\n${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 11 60 && _UEFISYS_EFI_BOOT_DIR="1"
-        fi
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-        fi
     else
         DIALOG --msgbox "Error installing systemd-boot ..." 0 0
     fi
@@ -589,10 +579,10 @@ CONFEOF
         DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
         if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
             mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf" || true
-            rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons" || true
-            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
+            rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons"
+            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
             cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
             cp -rf "${DESTDIR}/${UEFISYS_MP}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
         fi
