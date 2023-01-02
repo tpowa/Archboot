@@ -516,6 +516,7 @@ do_refind_uefi() {
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
+    mkdir -p
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
@@ -549,7 +550,7 @@ CONFEOF
         echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
         cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
-    options  ${_KERNEL_PARAMS_UEFI_MOD}
+    options  "${_KERNEL_PARAMS_UEFI_MOD}"
 }
 CONFEOF
     fi
