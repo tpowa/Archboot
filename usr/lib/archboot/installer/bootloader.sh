@@ -386,9 +386,9 @@ do_efistub_copy_to_efisys() {
     else
         # name .efi for uefisys partition
         if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="${UEFISYS_PATH}/${VMLINUZ_EFISTUB}.efi"
+            _KERNEL="${UEFISYS_PATH}/${VMLINUZ_EFISTUB}"
         else
-            _KERNEL="${UEFISYS_PATH}/${VMLINUZ}.efi"
+            _KERNEL="${UEFISYS_PATH}/${VMLINUZ}"
             if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
