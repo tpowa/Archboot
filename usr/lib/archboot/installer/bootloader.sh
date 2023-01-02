@@ -499,6 +499,9 @@ GUMEOF
     chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
     chroot_umount
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
+               "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
@@ -529,7 +532,6 @@ do_refind_uefi() {
         cat << CONFEOF >> "${_REFIND_CONFIG}"
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
-    volume   "Arch Linux"
     loader   /${_KERNEL}
 CONFEOF
     [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
@@ -546,8 +548,8 @@ CONFEOF
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
@@ -981,8 +983,8 @@ do_grub_uefi() {
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
         mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds ..." 5 60
         sleep 5
     elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
