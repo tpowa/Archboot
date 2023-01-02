@@ -39,6 +39,8 @@ setup/quickinst changes:
 - install neovim editor instead of vim editor to installed system
 - add nano editor syntax highlighting on installed system
 - fixed kernel, initramdisk and ucode copying to separate EFISYS partition
+- refind switched to only refind.conf usage for configuration
+- added dialogs to separate uefi system partition
 ---
 2022.12 Highlights:
 - grub 2:2.06.r380.g151467888-1
