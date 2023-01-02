@@ -570,8 +570,8 @@ CONFEOF
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
-        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
-        sleep 3
+        DIALOG --infobox "rEFInd has been setup successfully.Continuing in 5 seconds ..." 4 50
+        sleep 5
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
