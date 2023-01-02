@@ -505,8 +505,8 @@ _install_graphic () {
     # only start vnc on xorg environment
     echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser ...\033[0m"
     [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
-    which firefox > /dev/null 2>&1  && _firefox_flags
-    which chromium > /dev/null 2>&1 && _chromium_flags
+    command -v firefox > /dev/null 2>&1  && _firefox_flags
+    command -v chromium > /dev/null 2>&1 && _chromium_flags
     [[ "${_L_XFCE}" == "1" ]] && _start_xfce
     [[ "${_L_GNOME}" == "1" ]] && _start_gnome
     [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
