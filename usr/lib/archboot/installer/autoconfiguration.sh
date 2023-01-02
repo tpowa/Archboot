@@ -247,7 +247,7 @@ auto_set_locale() {
 
 auto_nano_syntax() {
 # enable glibc locales from locale.conf
-    DIALOG --infobox "Enable nano's syntax highlighting in /etc/nanorc on installed system ..." 3 70
+    DIALOG --infobox "Enable nano's syntax highlighting on installed system ..." 3 70
     grep -q '^include' "${DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${DESTDIR}/etc/nanorc"
     sleep 2
 }
