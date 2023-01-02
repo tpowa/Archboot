@@ -398,7 +398,7 @@ do_efistub_copy_to_efisys() {
         fi
         _INITRD="${UEFISYS_PATH}/${INITRAMFS}"
         # clean and copy to efisys
-        DIALOG --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 5 60
+        DIALOG --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 4 50
         ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
         rm -f "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
         cp -f "${DESTDIR}/boot/${VMLINUZ}" "${DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
@@ -413,7 +413,7 @@ do_efistub_copy_to_efisys() {
             cp -f "${DESTDIR}/boot/${AMD_UCODE}" "${DESTDIR}/${UEFISYS_MP}/${_INITRD_AMD_UCODE}"
         fi
         sleep 5
-        DIALOG --infobox "Enable automatic copying of system files to EFI system partition on installed system ..." 5 60
+        DIALOG --infobox "Enable automatic copying of system files to EFI system partition on installed system ..." 4 50
         cat << CONFEOF > "${DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
