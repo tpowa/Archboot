@@ -503,8 +503,8 @@ GUMEOF
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
-        DIALOG --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 3 seconds ..." 5 50
-        sleep 3
+        DIALOG --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds ..." 4 50
+        sleep 5
     else
         DIALOG --msgbox "Error installing SYSTEMD-BOOT ..." 0 0
     fi
