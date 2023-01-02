@@ -963,7 +963,7 @@ do_grub_uefi() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
         [[ ! -d  ${DESTDIR}/${UEFISYS_MP}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/
-        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".efi
+        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/
         GRUB_PREFIX_DIR="${UEFISYS_MP}/EFI/BOOT/"
     else
@@ -1009,25 +1009,18 @@ do_grub_uefi() {
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
+        mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
         DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds ..." 5 60
         sleep 3
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-            _UEFISYS_EFI_BOOT_DIR="1"
-        else
-            DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
-        fi
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi" || true
-            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi"
-        fi
     elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys || return 1
         do_mok_sign
         do_pacman_sign
         do_uefi_secure_boot_efitools
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
-        _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         do_uefi_bootmgr_setup
         DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds ..." 6 50
         sleep 5
