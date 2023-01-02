@@ -578,11 +578,7 @@ CONFEOF
         "${EDITOR}" "${_REFIND_CONFIG}"
         mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
         rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
-        rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons"
         cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
-        cp -rf "${DESTDIR}/${UEFISYS_MP}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
