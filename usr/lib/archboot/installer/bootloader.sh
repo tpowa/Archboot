@@ -519,7 +519,7 @@ do_refind_uefi() {
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
-    sed "s|^#scan_driver_dirs EFI/tools/drivers,drivers|scan_driver_dirs EFI/refind/drivers_${_SPEC_UEFI_ARCH}|g" -i "${_REFIND_CONFIG}"
+    sed 's|^#scanfor internal,external,optical,manual,firmware|scanfor manual,internal,external,optical,firmware|g' -i "${_REFIND_CONFIG}"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         cat << CONFEOF >> "${_REFIND_CONFIG}"
 menuentry "Arch Linux" {
