@@ -565,6 +565,7 @@ CONFEOF
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
+        cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
