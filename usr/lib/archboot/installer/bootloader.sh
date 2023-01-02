@@ -576,16 +576,13 @@ CONFEOF
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
-        DIALOG --defaultno --yesno "Do you want to copy?\n\n${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi --> ${UEFISYS_MP}/EFI/BOOT/boot${_SPEC_UEFI_ARCH}.efi\n\nThis might be needed in some systems,\nwhere efibootmgr may not work due to firmware issues." 10 70 && _UEFISYS_EFI_BOOT_DIR="1"
-        if [[ "${_UEFISYS_EFI_BOOT_DIR}" == "1" ]]; then
-            mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-            rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
-            rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons"
-            cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-            cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
-            cp -rf "${DESTDIR}/${UEFISYS_MP}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
-        fi
+        mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+        rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
+        rm -rf "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/icons"
+        cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
+        cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/refind.conf"
+        cp -rf "${DESTDIR}/${UEFISYS_MP}/EFI/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
