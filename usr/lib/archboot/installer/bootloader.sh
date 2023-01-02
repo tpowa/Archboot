@@ -445,9 +445,9 @@ CONFEOF
             echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
             >> "${DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path
+            systemd-nspawn -q -D "${DESTDIR}" systemctl enable efistub_copy.path >/dev/null 2>&1
         else
-            systemctl enable efistub_copy.path
+            systemctl enable efistub_copy.path >/dev/null 2>&1
         fi
         sleep 5
     fi
