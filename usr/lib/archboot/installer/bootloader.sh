@@ -499,8 +499,10 @@ GUMEOF
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
+        DIALOG --infobox "SYSTEMD-BOOT has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
+        sleep 3
     else
-        DIALOG --msgbox "Error installing systemd-boot ..." 0 0
+        DIALOG --msgbox "Error installing SYSTEMD-BOOT ..." 0 0
     fi
 }
 
@@ -560,12 +562,12 @@ CONFEOF
         mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
         rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
         cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
-        sleep 3
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
+        DIALOG --infobox "rEFInd has been setup successfully.\n\nContinuing in 3 seconds ..." 5 40
+        sleep 3
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
@@ -823,8 +825,8 @@ label linux
     initrd ${subdir}/${INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
-    DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 3 seconds ..." 5 55
-    sleep 3
+    DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
+    sleep 5
     unset _KERNEL_PARAMS_COMMON_UNMOD
     unset _KERNEL_PARAMS_COMMON_MOD
 }
@@ -927,8 +929,8 @@ do_grub_bios() {
     if [[ -e "${DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         GRUB_PREFIX_DIR="/boot/grub/"
         do_grub_config
-        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 3 seconds ..." 5 55
-        sleep 3
+        DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
+        sleep 5
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -995,8 +997,8 @@ do_grub_uefi() {
         mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT"
         rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
         cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_SPEC_UEFI_ARCH}.EFI"
-        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 3 seconds ..." 5 60
-        sleep 3
+        DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds ..." 5 60
+        sleep 5
     elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys || return 1
         do_mok_sign
