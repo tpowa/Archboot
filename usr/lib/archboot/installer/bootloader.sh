@@ -526,7 +526,6 @@ do_refind_uefi() {
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
     sed 's|^#scanfor internal,external,optical,manual,firmware|scanfor manual,internal,external,optical,firmware|g' -i "${_REFIND_CONFIG}"
-    if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         cat << CONFEOF >> "${_REFIND_CONFIG}"
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
@@ -537,28 +536,11 @@ CONFEOF
         echo "    initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
     [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
         echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
-        cat << CONFEOF >> "${_REFIND_CONFIG}"
-    initrd   /${_INITRD}
-    options  ${_KERNEL_PARAMS_UEFI_MOD}
-}
-CONFEOF
-    else
-        cat << CONFEOF >> "${_REFIND_CONFIG}"
-menuentry "Arch Linux" {
-    icon     /EFI/refind/icons/os_arch.png
-    volume   "Arch Linux"
-    loader   /${_KERNEL}
-CONFEOF
-    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "    initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
-    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
-        cat << CONFEOF >> "${_REFIND_CONFIG}"
+    cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
     options  "${_KERNEL_PARAMS_UEFI_MOD}"
 }
 CONFEOF
-    fi
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
