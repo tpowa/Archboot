@@ -52,7 +52,7 @@ select_filesystem() {
     command -v mkfs.ext4 2>/dev/null && FSOPTS="${FSOPTS} ext4 Ext4"
     command -v mkfs.ext3 2>/dev/null && FSOPTS="${FSOPTS} ext3 Ext3"
     command -v mkfs.ext2 2>/dev/null && FSOPTS="${FSOPTS} ext2 Ext2"
-    command -v mkfs.vfat 2>/dev/null "${DO_ROOT}" == "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
+    command -v mkfs.vfat 2>/dev/null && [[ "${DO_ROOT}" == "DONE" ]] && FSOPTS="${FSOPTS} vfat FAT32"
     command -v mkfs.xfs 2>/dev/null && FSOPTS="${FSOPTS} xfs XFS"
     command -v mkfs.f2fs 2>/dev/null && FSOPTS="${FSOPTS} f2fs F2FS"
     command -v mkfs.nilfs2 2>/dev/null && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
