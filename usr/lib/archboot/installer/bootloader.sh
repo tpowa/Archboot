@@ -495,13 +495,13 @@ default archlinux-core-main
 GUMEOF
     uefi_mount_efivarfs
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MP}" install >"${LOG}" 2>&1
-    chroot "${DESTDIR}" "/usr/bin/bootctl" --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
+    chroot "${DESTDIR}" bootctl --path="${UEFISYS_MP}" install >"${LOG}" 2>&1
+    chroot "${DESTDIR}" bootctl --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
     chroot_umount
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
-               "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+              "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
@@ -583,20 +583,20 @@ do_grub_common_before() {
 
 do_grub_config() {
     chroot_mount
-    BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    BOOT_PART_FS_LABEL="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_label" "/boot" 2>/dev/null)"
-    BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-    BOOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/boot" 2>/dev/null)"
-    BOOT_PART_DRIVE="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="drive" "/boot" 2>/dev/null)"
-    ROOT_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/" 2>/dev/null)"
-    ROOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/" 2>/dev/null)"
-    ROOT_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/" 2>/dev/null)"
-    USR_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
-    USR_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/usr" 2>/dev/null)"
-    USR_PART_FS="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs" "/usr" 2>/dev/null)"
+    BOOT_PART_FS_UUID="$(chroot "${DESTDIR}" grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
+    BOOT_PART_FS_LABEL="$(chroot "${DESTDIR}" grub-probe --target="fs_label" "/boot" 2>/dev/null)"
+    BOOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+    BOOT_PART_FS="$(chroot "${DESTDIR}" grub-probe --target="fs" "/boot" 2>/dev/null)"
+    BOOT_PART_DRIVE="$(chroot "${DESTDIR}" grub-probe --target="drive" "/boot" 2>/dev/null)"
+    ROOT_PART_FS_UUID="$(chroot "${DESTDIR}" grub-probe --target="fs_uuid" "/" 2>/dev/null)"
+    ROOT_PART_HINTS_STRING="$(chroot "${DESTDIR}" grub-probe --target="hints_string" "/" 2>/dev/null)"
+    ROOT_PART_FS="$(chroot "${DESTDIR}" grub-probe --target="fs" "/" 2>/dev/null)"
+    USR_PART_FS_UUID="$(chroot "${DESTDIR}" grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
+    USR_PART_HINTS_STRING="$(chroot "${DESTDIR}" grub-probe --target="hints_string" "/usr" 2>/dev/null)"
+    USR_PART_FS="$(chroot "${DESTDIR}" grub-probe --target="fs" "/usr" 2>/dev/null)"
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="fs_uuid" "/${UEFISYS_MP}" 2>/dev/null)"
-        UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" /usr/bin/grub-probe --target="hints_string" "/${UEFISYS_MP}" 2>/dev/null)"
+        UEFISYS_PART_FS_UUID="$(chroot "${DESTDIR}" grub-probe --target="fs_uuid" "/${UEFISYS_MP}" 2>/dev/null)"
+        UEFISYS_PART_HINTS_STRING="$(chroot "${DESTDIR}" grub-probe --target="hints_string" "/${UEFISYS_MP}" 2>/dev/null)"
     fi
     if [[ "${ROOT_PART_FS_UUID}" == "${BOOT_PART_FS_UUID}" ]]; then
         subdir="/boot"
@@ -904,7 +904,7 @@ do_grub_bios() {
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
     chroot_mount
-    chroot "${DESTDIR}" "/usr/bin/grub-install" \
+    chroot "${DESTDIR}" grub-install \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
         --boot-directory="/boot" \
@@ -941,7 +941,7 @@ do_grub_uefi() {
         GRUB_PREFIX_DIR="${UEFISYS_MP}/EFI/BOOT/"
     else
         ## Install GRUB
-        chroot "${DESTDIR}" "/usr/bin/grub-install" \
+        chroot "${DESTDIR}" grub-install \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --target="${_GRUB_ARCH}-efi" \
             --efi-directory="${UEFISYS_MP}" \
