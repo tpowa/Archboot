@@ -512,11 +512,10 @@ do_refind_uefi() {
     fi
     DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 60
     ! [[ -d "${DESTDIR}/${UEFISYS_MP}/EFI/refind" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
-    cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
+    cp -f "${DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/icons" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
-    mkdir -p
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
     cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
     sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
