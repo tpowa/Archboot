@@ -1057,31 +1057,29 @@ install_bootloader() {
         select_source || return 1
     fi
     prepare_pacman
-    CANCEL=""
     detect_uefi_boot
-    _ANOTHER="1"
     NEXTITEM="7"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
-         _ANOTHER="0"
+        install_bootloader_uefi || return 1
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            DIALOG --yesno "Setup has detected that you are using Secure Boot.\n\nDo you like to install SHIM and GRUB(2) ${_UEFI_ARCH} UEFI bootloader?" 7 70 || CANCEL="1"
-            if [[ "${CANCEL}" == "" ]]; then
-                install_bootloader_uefi || return 1
-                NEXTITEM="8"
-            else
-                NEXTITEM="7"
-            fi
-        else
-            DIALOG --yesno "Setup has detected that you are using ${_UEFI_ARCH} UEFI.\nDo you like to install a ${_UEFI_ARCH} UEFI bootloader?" 0 0 && install_bootloader_uefi
-            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 && _ANOTHER="1"
             NEXTITEM="8"
+        else
+            _ANOTHER="1"
         fi
+    else
+        install_bootloader_menu || return 1
+        _ANOTHER="1"
     fi
     while [[ "${_ANOTHER}" == "1" ]]; do
-        install_bootloader_menu
-        _ANOTHER="0"
-        DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 && _ANOTHER="1"
+        NEXTITEM="7"
+        if $(DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50); then
+            install_bootloader_menu || return 1
+            _ANOTHER="1"
+        else
+            _ANOTHER=""
+            NEXTITEM="8"
+        fi
     done
 }
 
