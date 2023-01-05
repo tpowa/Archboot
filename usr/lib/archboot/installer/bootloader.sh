@@ -526,10 +526,11 @@ do_refind_uefi() {
     cp -r "${DESTDIR}/usr/share/refind/fonts" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     cp -r "${DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${DESTDIR}/${UEFISYS_MP}/EFI/refind/"
     _REFIND_CONFIG="${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind.conf"
-    cp -f "${DESTDIR}/usr/share/refind/refind.conf-sample" "${_REFIND_CONFIG}"
-    sed 's|^#resolution 1024 768|resolution 1024 768|g' -i "${_REFIND_CONFIG}"
-    sed 's|^#scanfor internal,external,optical,manual,firmware|scanfor manual,internal,external,optical,firmware|g' -i "${_REFIND_CONFIG}"
-        cat << CONFEOF >> "${_REFIND_CONFIG}"
+    cat << CONFEOF > "${_REFIND_CONFIG}"
+timeout 20
+use_nvram false
+resolution 1024 768
+scanfor manual,internal,external,optical,firmware
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
     loader   /${_KERNEL}
