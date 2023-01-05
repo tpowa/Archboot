@@ -1077,6 +1077,7 @@ install_bootloader() {
             DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || break
             install_bootloader_menu || return 1
         done
+    fi
     NEXTITEM="8"
 }
 
