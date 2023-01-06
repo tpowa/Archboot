@@ -1072,11 +1072,10 @@ install_bootloader() {
         _ANOTHER="1"
     fi
     if [[ "${_ANOTHER}" == "1" ]]; then
+        NEXTITEM="8"
         while true; do
-            NEXTITEM="8"
             DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || break
-            NEXTITEM="7"
-            install_bootloader_menu || return 1
+            install_bootloader_menu
         done
     fi
 }
@@ -1088,9 +1087,14 @@ install_bootloader_menu() {
             ANSWER="UBOOT"
     elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
         ANSWER="UBOOT"
+    elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+            ANSWER="UEFI"
+    elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
+            ANSWER="BIOS"
     else
-        DIALOG --menu "What is your boot system type?" 9 35 2 \
+        DIALOG --menu "What is your boot system type?" 10 35 3 \
             "UEFI" "UEFI" \
+            "UBOOT" "UBOOT" \
             "BIOS" "BIOS" 2>"${ANSWER}" || CANCEL=1
     fi
     case $(cat "${ANSWER}") in
