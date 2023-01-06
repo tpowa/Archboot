@@ -1096,15 +1096,15 @@ install_bootloader_menu() {
             "UEFI" "UEFI" \
             "UBOOT" "UBOOT" \
             "BIOS" "BIOS" 2>"${ANSWER}" || CANCEL=1
-    fi
-    case $(cat "${ANSWER}") in
-        "UEFI") install_bootloader_uefi ;;
-        "BIOS") install_bootloader_bios ;;
-        "UBOOT") install_bootloader_uboot ;;
-    esac
-    if [[ "${CANCEL}" == "1" ]]; then
-        NEXTITEM="7"
-    else
-        NEXTITEM="8"
+        case $(cat "${ANSWER}") in
+            "UEFI") install_bootloader_uefi ;;
+            "BIOS") install_bootloader_bios ;;
+            "UBOOT") install_bootloader_uboot ;;
+        esac
+        if [[ "${CANCEL}" == "1" ]]; then
+            NEXTITEM="7"
+        else
+            NEXTITEM="8"
+        fi
     fi
 }
