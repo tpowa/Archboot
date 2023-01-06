@@ -1057,15 +1057,15 @@ install_bootloader() {
     NEXTITEM="7"
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         do_uefi_setup_env_vars
-        install_bootloader_uefi || return 1
+        install_bootloader_uefi
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
             NEXTITEM="8"
         else
             _ANOTHER="1"
         fi
     else
-        install_bootloader_menu || return 1
-        _ANOTHER="1"
+        install_bootloader_menu
+        [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
     fi
     if [[ "${_ANOTHER}" == "1" ]]; then
         NEXTITEM="8"
@@ -1077,6 +1077,7 @@ install_bootloader() {
 }
 
 install_bootloader_menu() {
+    CANCEL=""
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
     else
