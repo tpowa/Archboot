@@ -823,26 +823,15 @@ do_grub_bios() {
     fi
     # A switch is needed if complex ${bootdev} is used!
     # - LVM and RAID ${bootdev} needs the MBR of a device and cannot be used itself as ${bootdev}
-    if [[ "${FAIL_COMPLEX}" == "0" ]]; then
-        DEVS="$(findbootloaderdisks _)"
-        if [[ "${DEVS}" == "" ]]; then
-            DIALOG --msgbox "No storage drives were found" 0 0
-            return 1
-        fi
-        #shellcheck disable=SC2086
-        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
-        bootdev=$(cat "${ANSWER}")
-    else
-        ## grub BIOS install to partition is not supported
-        DEVS="$(findbootloaderdisks _)"
-        if [[ "${DEVS}" == "" ]]; then
-            DIALOG --msgbox "No storage drives were found" 0 0
-            return 1
-        fi
-        #shellcheck disable=SC2086
-        DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
-        bootdev=$(cat "${ANSWER}")
+    # -  grub BIOS install to partition is not supported
+    DEVS="$(findbootloaderdisks _)"
+    if [[ "${DEVS}" == "" ]]; then
+        DIALOG --msgbox "No storage drives were found" 0 0
+        return 1
     fi
+    #shellcheck disable=SC2086
+    DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
+    bootdev=$(cat "${ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${bootdev}")" == "gpt" ]]; then
         CHECK_BIOS_BOOT_GRUB="1"
         CHECK_UEFISYS_PART=""
@@ -858,7 +847,6 @@ do_grub_bios() {
         DIALOG --msgbox "Error:\nGRUB(2) cannot boot from ${bootdev}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
-
     DIALOG --infobox "Setting up GRUB(2) BIOS. This needs some time ..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     freeze_xfs
