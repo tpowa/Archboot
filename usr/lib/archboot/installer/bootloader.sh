@@ -104,11 +104,7 @@ bootloader_kernel_parameters() {
     [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
     [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
-    # add uncommon options here
-    _KERNEL_PARAMS_BIOS_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
-    _KERNEL_PARAMS_UEFI_UNMOD="${_KERNEL_PARAMS_COMMON_UNMOD}"
-    _KERNEL_PARAMS_BIOS_MOD="$(echo "${_KERNEL_PARAMS_BIOS_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-    _KERNEL_PARAMS_UEFI_MOD="$(echo "${_KERNEL_PARAMS_UEFI_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
 
 # basic checks needed for all bootloaders
@@ -487,7 +483,7 @@ do_systemd_boot_uefi() {
         echo "initrd   /${_INITRD_AMD_UCODE}" >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     cat << GUMEOF >> "${DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   /${_INITRD}
-options  ${_KERNEL_PARAMS_UEFI_MOD}
+options  ${_KERNEL_PARAMS_MOD}
 GUMEOF
     cat << GUMEOF > "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
 timeout 5
@@ -541,7 +537,7 @@ CONFEOF
         echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
     cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
-    options  "${_KERNEL_PARAMS_UEFI_MOD}"
+    options  "${_KERNEL_PARAMS_MOD}"
 }
 CONFEOF
     if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
@@ -704,9 +700,9 @@ EOF
         fi
     fi
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_UEFI_MOD}"
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     else
-        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_BIOS_MOD}"
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     fi
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     ## create default kernel entry
