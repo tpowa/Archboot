@@ -468,8 +468,8 @@ do_efistub_uefi() {
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         case $(cat "${ANSWER}") in
-            "SYSTEMD-BOOT") do_systemd_boot_uefi || return 1;;
-            "rEFInd") do_refind_uefi || return 1;;
+            "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
+            "rEFInd") do_refind_uefi ;;
         esac
     fi
 }
@@ -1019,8 +1019,9 @@ install_bootloader_uefi() {
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         case $(cat "${ANSWER}") in
-            "EFISTUB") do_efistub_uefi || return 1
-                       do_efistub_copy_to_efisys ;;
+            "EFISTUB") do_efistub_uefi
+                       [[ "${CANCEL}" == "" ]] && do_efistub_copy_to_efisys
+                        ;;
             "GRUB_UEFI") do_grub_uefi ;;
         esac
     fi
