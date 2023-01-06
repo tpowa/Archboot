@@ -461,7 +461,6 @@ do_efistub_uefi() {
     RAID_ON_LVM=""
     UEFISYS_PATH="EFI/archlinux"
     common_bootloader_checks
-    do_efistub_copy_to_efisys
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         do_systemd_boot_uefi
     else
@@ -473,6 +472,7 @@ do_efistub_uefi() {
             "rEFInd") do_refind_uefi;;
         esac
     fi
+    do_efistub_copy_to_efisys
 }
 
 do_systemd_boot_uefi() {
@@ -1016,15 +1016,9 @@ install_bootloader_uefi() {
     if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_grub_uefi
     else
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
-        else
-            DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
-                "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-                "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
-        fi
         case $(cat "${ANSWER}") in
             "EFISTUB") do_efistub_uefi ;;
             "GRUB_UEFI") do_grub_uefi ;;
