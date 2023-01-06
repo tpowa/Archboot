@@ -374,9 +374,11 @@ do_efistub_parameters() {
             _INITRD_AMD_UCODE="${UEFISYS_PATH}/${AMD_UCODE}"
         fi
         _INITRD="${UEFISYS_PATH}/${INITRAMFS}"
+    fi
 }
 
 do_efistub_copy_to_efisys() {
+    if ! [[ "${UEFISYS_MP}" == "/boot" ]]; then
         # clean and copy to efisys
         DIALOG --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 4 50
         ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
