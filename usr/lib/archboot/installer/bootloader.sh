@@ -1028,22 +1028,6 @@ install_bootloader_uefi() {
     fi
 }
 
-install_bootloader_bios() {
-    DIALOG --menu "Which BIOS bootloader would you like to use?" 8 50 1 \
-        "GRUB_BIOS" "GRUB(2) BIOS" 2>"${ANSWER}" || CANCEL=1
-    case $(cat "${ANSWER}") in
-        "GRUB_BIOS") do_grub_bios ;;
-    esac
-}
-
-install_bootloader_uboot() {
-    DIALOG --menu "Which bootloader would you like to use?" 9 50 1 \
-        "UBOOT" "UBOOT" 2>"${ANSWER}" || CANCEL=1
-    case $(cat "${ANSWER}") in
-        "UBOOT") do_uboot ;;
-    esac
-}
-
 install_bootloader() {
     CANCEL=""
     _ANOTHER=""
@@ -1066,26 +1050,26 @@ install_bootloader() {
             [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
         fi
     else
-        install_bootloader_menu
+        choose_bootloader
         [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
     fi
     if [[ "${_ANOTHER}" == "1" ]]; then
         NEXTITEM="8"
         while [[ "${CANCEL}" == "" ]]; do
             DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || break
-            install_bootloader_menu
+            choose_bootloader
         done
     fi
 }
 
-install_bootloader_menu() {
+choose_bootloader() {
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
-            install_bootloader_uboot
+            do_uboot
         else
-            install_bootloader_bios
+            do_grub_bios
         fi
     fi
 }
