@@ -154,14 +154,6 @@ abort_f2fs_bootpart() {
         fi
 }
 
-uefi_mount_efivarfs() {
-    ## Mount efivarfs if it is not already mounted
-    if ! mount | grep -q /sys/firmware/efi/efivars; then
-        modprobe -q efivarfs
-        mount -t efivarfs efivarfs /sys/firmware/efi/efivars
-    fi
-}
-
 do_uefi_setup_env_vars() {
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
@@ -197,7 +189,6 @@ do_uefi_common() {
 }
 
 do_uefi_efibootmgr() {
-    uefi_mount_efivarfs
     if [[ "$(/usr/bin/efivar -l)" ]]; then
         cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
@@ -489,7 +480,6 @@ GUMEOF
 timeout 5
 default archlinux-core-main
 GUMEOF
-    uefi_mount_efivarfs
     chroot_mount
     chroot "${DESTDIR}" bootctl --path="${UEFISYS_MP}" install >"${LOG}" 2>&1
     chroot "${DESTDIR}" bootctl --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
