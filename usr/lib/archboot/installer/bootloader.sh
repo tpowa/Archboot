@@ -207,11 +207,6 @@ EFIBEOF
     else
         DIALOG --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${UEFISYS_MP}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
     fi
-    unset _EFIBOOTMGR_LABEL
-    unset _EFIBOOTMGR_DISC
-    unset _EFIBOOTMGR_PART_NUM
-    unset _EFIBOOTMGR_LOADER_PATH
-    unset _EFIBOOTMGR_LOADER_PARAMETERS
 }
 
 do_apple_efi_hfs_bless() {
@@ -237,11 +232,6 @@ do_uefi_bootmgr_setup() {
         _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
         do_uefi_efibootmgr
     fi
-    unset _BOOTMGR_LABEL
-    unset _BOOTMGR_DISC
-    unset _BOOTMGR_PART_NUM
-    unset _BOOTMGR_LOADER_PATH
-    unset _BOOTMGR_LOADER_PARAMETERS
 }
 
 do_uefi_secure_boot_efitools() {
@@ -768,15 +758,6 @@ fi
     DIALOG --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     geteditor || return 1
     "${EDITOR}" "${DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
-    unset BOOT_PART_FS_UUID
-    unset BOOT_PART_FS
-    unset BOOT_PART_FS_LABEL
-    unset BOOT_PART_DRIVE
-    unset ROOT_PART_FS_UUID
-    unset ROOT_PART_FS
-    unset GRUB_ROOT_DRIVE
-    unset LINUX_UNMOD_COMMAND
-    unset LINUX_MOD_COMMAND
 }
 
 do_uboot() {
@@ -802,8 +783,6 @@ label linux
 EOF
     DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
     sleep 5
-    unset _KERNEL_PARAMS_COMMON_UNMOD
-    unset _KERNEL_PARAMS_COMMON_MOD
 }
 
 do_grub_bios() {
