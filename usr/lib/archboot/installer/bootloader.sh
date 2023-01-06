@@ -1082,15 +1082,15 @@ install_bootloader() {
 
 install_bootloader_menu() {
     if [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        ANSWER="UEFI"
+        install_bootloader_uefi
     elif [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
-            ANSWER="UBOOT"
+        install_bootloader_uboot
     elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
-        ANSWER="UBOOT"
+        install_bootloader_uboot
     elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-            ANSWER="UEFI"
+        install_bootloader_uefi
     elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
-            ANSWER="BIOS"
+        install_bootloader_bios
     else
         DIALOG --menu "What is your boot system type?" 10 35 3 \
             "UEFI" "UEFI" \
