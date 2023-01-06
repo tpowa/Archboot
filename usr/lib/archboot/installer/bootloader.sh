@@ -460,11 +460,11 @@ do_efistub_uefi() {
     USE_DMRAID=""
     RAID_ON_LVM=""
     UEFISYS_PATH="EFI/archlinux"
+    CANCEL=""
     common_bootloader_checks
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         do_systemd_boot_uefi
     else
-        CANCEL=""
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
