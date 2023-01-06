@@ -1081,30 +1081,13 @@ install_bootloader() {
 }
 
 install_bootloader_menu() {
-    if [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
-    elif [[ "${RUNNING_ARCH}" == "aarch64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
-        install_bootloader_uboot
-    elif [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
-        install_bootloader_uboot
-    elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        install_bootloader_uefi
-    elif [[ "${RUNNING_ARCH}" == "x86_64" && "${_DETECTED_UEFI_BOOT}" == "0" ]]; then
-        install_bootloader_bios
     else
-        DIALOG --menu "What is your boot system type?" 10 35 3 \
-            "UEFI" "UEFI" \
-            "UBOOT" "UBOOT" \
-            "BIOS" "BIOS" 2>"${ANSWER}" || CANCEL=1
-        case $(cat "${ANSWER}") in
-            "UEFI") install_bootloader_uefi ;;
-            "BIOS") install_bootloader_bios ;;
-            "UBOOT") install_bootloader_uboot ;;
-        esac
-        if [[ "${CANCEL}" == "1" ]]; then
-            NEXTITEM="7"
+        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
+            install_bootloader_uboot
         else
-            NEXTITEM="8"
+            install_bootloader_bios
         fi
     fi
 }
