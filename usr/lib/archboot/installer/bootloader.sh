@@ -129,7 +129,7 @@ check_bootpart() {
 
 # only allow ext2/3/4 and vfat on uboot bootloader
 abort_uboot(){
-        FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}")"
+        FSTYPE="$(${_LSBLK} FSTYPE "${bootdev}" 2>/dev/null)"
         if ! [[ "${FSTYPE}" == "ext2" || "${FSTYPE}" == "ext3" || "${FSTYPE}" == "ext4" || "${FSTYPE}" == "vfat" ]]; then
             DIALOG --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
