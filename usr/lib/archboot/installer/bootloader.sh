@@ -802,12 +802,10 @@ do_grub_bios() {
         # check if mapper is used
         if  echo "${bootdev}" | grep -q /dev/mapper; then
             RAID_ON_LVM="0"
-
             #check if mapper contains a md device!
             for devpath in $(pvs -o pv_name --noheading); do
                 if echo "${devpath}" | grep -v "/dev/md.p" | grep /dev/md; then
                     detectedvolumegroup="$(pvs -o vg_name --noheading "${devpath}")"
-
                     if echo /dev/mapper/"${detectedvolumegroup}"-* | grep "${bootdev}"; then
                         # change bootdev to md device!
                         bootdev=$(pvs -o pv_name --noheading "${devpath}")
@@ -817,7 +815,6 @@ do_grub_bios() {
                 fi
             done
         fi
-
         #check if raid is used
         USE_RAID=""
         if echo "${bootdev}" | grep -q /dev/md; then
@@ -828,7 +825,6 @@ do_grub_bios() {
     # - LVM and RAID ${bootdev} needs the MBR of a device and cannot be used itself as ${bootdev}
     if [[ "${FAIL_COMPLEX}" == "0" ]]; then
         DEVS="$(findbootloaderdisks _)"
-
         if [[ "${DEVS}" == "" ]]; then
             DIALOG --msgbox "No storage drives were found" 0 0
             return 1
@@ -837,11 +833,8 @@ do_grub_bios() {
         DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
         bootdev=$(cat "${ANSWER}")
     else
-        DEVS="$(findbootloaderdisks _)"
-
         ## grub BIOS install to partition is not supported
-        # DEVS="${DEVS} $(findbootloaderpartitions _)"
-
+        DEVS="$(findbootloaderdisks _)"
         if [[ "${DEVS}" == "" ]]; then
             DIALOG --msgbox "No storage drives were found" 0 0
             return 1

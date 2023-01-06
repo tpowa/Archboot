@@ -134,7 +134,7 @@ partitionable_raid_devices_partitions() {
 
 # lists dmraid devices
 dmraid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE  | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
     done
@@ -194,7 +194,6 @@ dmraid_partitions() {
 # - show device mapper devices:
 #   lvm2 and cryptdevices
 dm_devices() {
-
     for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
@@ -205,7 +204,7 @@ dm_devices() {
         #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
         # - part of running raid on encrypted device
         #   ${_LSBLK} TYPE ${dev} | grep "raid.*$
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" 2>/dev/null && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" 2>/dev/null && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "linux_raid_member$" && ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "raid.*$"; then
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "crypto_LUKS$" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "LVM2_member$" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "linux_raid_member$" && ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "raid.*$"; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -231,15 +230,6 @@ findbootloaderdisks() {
         blockdevices "${1}"
     else
         dmraid_devices "${1}"
-    fi
-}
-
-# don't list raid devices, lvm2 and devicemapper!
-findbootloaderpartitions() {
-    if ! [[ "${USE_DMRAID}" == "1" ]]; then
-        blockdevices_partitions "${1}"
-    else
-        dmraid_partitions "${1}"
     fi
 }
 
