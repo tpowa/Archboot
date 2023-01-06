@@ -1045,6 +1045,8 @@ install_bootloader_uboot() {
 }
 
 install_bootloader() {
+    CANCEL=""
+    _ANOTHER=""
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
@@ -1077,7 +1079,6 @@ install_bootloader() {
 }
 
 install_bootloader_menu() {
-    CANCEL=""
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
     else
