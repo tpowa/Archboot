@@ -192,14 +192,14 @@ do_uefi_efibootmgr() {
     if [[ "$(/usr/bin/efivar -l)" ]]; then
         cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
-_EFIBOOTMGR_LOADER_PARAMETERS="${_EFIBOOTMGR_LOADER_PARAMETERS}"
-for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_EFIBOOTMGR_LABEL}" | cut -b5-8) ; do
+_BOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
+for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
-if [[ "\${_EFIBOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
-    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" --unicode "\${_EFIBOOTMGR_LOADER_PARAMETERS}" -e "3"
+if [[ "\${_BOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DISC}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
 else
-    efibootmgr --quiet --create --disk "${_EFIBOOTMGR_DISC}" --part "${_EFIBOOTMGR_PART_NUM}" --loader "${_EFIBOOTMGR_LOADER_PATH}" --label "${_EFIBOOTMGR_LABEL}" -e "3"
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DISC}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
 fi
 EFIBEOF
         chmod a+x "/tmp/efibootmgr_run.sh"
@@ -224,12 +224,6 @@ do_uefi_bootmgr_setup() {
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         do_apple_efi_hfs_bless
     else
-        ## For all the non-Mac UEFI systems
-        _EFIBOOTMGR_LABEL="${_BOOTMGR_LABEL}"
-        _EFIBOOTMGR_DISC="${_BOOTMGR_DISC}"
-        _EFIBOOTMGR_PART_NUM="${_BOOTMGR_PART_NUM}"
-        _EFIBOOTMGR_LOADER_PATH="${_BOOTMGR_LOADER_PATH}"
-        _EFIBOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
         do_uefi_efibootmgr
     fi
 }
