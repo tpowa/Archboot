@@ -1072,9 +1072,9 @@ install_bootloader() {
         _ANOTHER="1"
     fi
     if [[ "${_ANOTHER}" == "1" ]]; then
-        NEXTITEM="8"
         while true; do
-            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || break
+            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || (break; NEXTITEM="8")
+            NEXTITEM="7"
             install_bootloader_menu || return 1
         done
     fi
