@@ -1061,7 +1061,7 @@ install_bootloader() {
         if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
             NEXTITEM="8"
         else
-            _ANOTHER="1"
+            [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
         fi
     else
         install_bootloader_menu
