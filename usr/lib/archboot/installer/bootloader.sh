@@ -337,7 +337,13 @@ EOF
     fi
 }
 
-do_efistub_copy_to_efisys() {
+do_efistub_parameters() {
+    bootdev=""
+    FAIL_COMPLEX=""
+    USE_DMRAID=""
+    RAID_ON_LVM=""
+    CANCEL=""
+    UEFISYS_PATH="EFI/archlinux"
     _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
     _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MP}")"
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
@@ -368,6 +374,9 @@ do_efistub_copy_to_efisys() {
             _INITRD_AMD_UCODE="${UEFISYS_PATH}/${AMD_UCODE}"
         fi
         _INITRD="${UEFISYS_PATH}/${INITRAMFS}"
+}
+
+do_efistub_copy_to_efisys() {
         # clean and copy to efisys
         DIALOG --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 4 50
         ! [[ -d "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
@@ -426,12 +435,7 @@ CONFEOF
 
 do_efistub_uefi() {
     do_uefi_common
-    bootdev=""
-    FAIL_COMPLEX=""
-    USE_DMRAID=""
-    RAID_ON_LVM=""
-    UEFISYS_PATH="EFI/archlinux"
-    CANCEL=""
+    do_efistub_parameters
     common_bootloader_checks
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
         do_systemd_boot_uefi
