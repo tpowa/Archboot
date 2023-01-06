@@ -462,17 +462,16 @@ do_efistub_uefi() {
     UEFISYS_PATH="EFI/archlinux"
     common_bootloader_checks
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        do_systemd_boot_uefi
+        do_systemd_boot_uefi || return 1
     else
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         case $(cat "${ANSWER}") in
-            "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
-            "rEFInd") do_refind_uefi;;
+            "SYSTEMD-BOOT") do_systemd_boot_uefi || return 1;;
+            "rEFInd") do_refind_uefi || return 1;;
         esac
     fi
-    do_efistub_copy_to_efisys
 }
 
 do_systemd_boot_uefi() {
@@ -1020,7 +1019,8 @@ install_bootloader_uefi() {
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         case $(cat "${ANSWER}") in
-            "EFISTUB") do_efistub_uefi ;;
+            "EFISTUB") do_efistub_uefi || return 1
+                       do_efistub_copy_to_efisys ;;
             "GRUB_UEFI") do_grub_uefi ;;
         esac
     fi
