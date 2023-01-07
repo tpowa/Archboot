@@ -985,6 +985,7 @@ choose_bootloader() {
 }
 
 install_bootloader() {
+    CANCEL=""
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
@@ -999,4 +1000,3 @@ install_bootloader() {
     choose_bootloader
     [[ -z "${CANCEL}" ]] && NEXTITEM="8"
 }
-
