@@ -341,7 +341,6 @@ do_efistub_parameters() {
     FAIL_COMPLEX=""
     USE_DMRAID=""
     RAID_ON_LVM=""
-    CANCEL=""
     UEFISYS_PATH="EFI/archlinux"
     _bootdev="$(findmnt -vno SOURCE "${DESTDIR}/boot")"
     _uefisysdev="$(findmnt -vno SOURCE "${DESTDIR}/${UEFISYS_MP}")"
@@ -443,7 +442,7 @@ do_efistub_uefi() {
     else
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
+            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}"
         case $(cat "${ANSWER}") in
             "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
             "rEFInd") do_refind_uefi ;;
@@ -483,6 +482,7 @@ GUMEOF
         "${EDITOR}" "${DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
         DIALOG --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
+        S_BOOTLOADER="1"
     else
         DIALOG --msgbox "Error installing SYSTEMD-BOOT ..." 0 0
     fi
@@ -532,6 +532,7 @@ CONFEOF
         cp -f "${_REFIND_CONFIG}" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
         DIALOG --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
+        S_BOOTLOADER="1"
     else
         DIALOG --msgbox "Error setting up rEFInd." 3 40
     fi
@@ -782,6 +783,7 @@ label linux
 EOF
     DIALOG --infobox "UBOOT has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
     sleep 5
+    S_BOOTLOADER="1"
 }
 
 do_grub_bios() {
@@ -865,6 +867,7 @@ do_grub_bios() {
         do_grub_config
         DIALOG --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
         sleep 5
+        S_BOOTLOADER="1"
     else
         DIALOG --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -933,6 +936,7 @@ do_grub_uefi() {
         cp -f "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds ..." 5 60
         sleep 5
+        S_BOOTLOADER="1"
     elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys || return 1
         do_mok_sign
@@ -943,6 +947,7 @@ do_grub_uefi() {
         do_uefi_bootmgr_setup
         DIALOG --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds ..." 6 50
         sleep 5
+        S_BOOTLOADER="1"
     else
         DIALOG --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${DESTDIR} before chrooting." 0 0
         return 1
@@ -962,10 +967,10 @@ install_bootloader_uefi() {
     else
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
+            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}"
         case $(cat "${ANSWER}") in
             "EFISTUB") do_efistub_uefi
-                       [[ -z "${CANCEL}" ]] && do_efistub_copy_to_efisys
+                       [[ -z "${S_BOOTLOADER}" ]] || do_efistub_copy_to_efisys
                         ;;
             "GRUB_UEFI") do_grub_uefi ;;
         esac
@@ -985,7 +990,7 @@ choose_bootloader() {
 }
 
 install_bootloader() {
-    CANCEL=""
+    S_BOOTLOADER=""
     destdir_mounts || return 1
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
@@ -996,7 +1001,10 @@ install_bootloader() {
     prepare_pacman
     detect_uefi_boot
     do_uefi_setup_env_vars
-    NEXTITEM="7"
     choose_bootloader
-    [[ -z "${CANCEL}" ]] && NEXTITEM="8"
+    if [[ -z "${S_BOOTLOADER}" ]]; then
+        NEXTITEM="7"
+    else
+        NEXTITEM="8"
+    fi
 }
