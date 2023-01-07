@@ -7,7 +7,7 @@ MIRRORLIST="/etc/pacman.d/mirrorlist"
 getsource() {
     S_SRC=0
     PACMAN_CONF=""
-    if [[ -e "${LOCAL_DB}" ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
         local_pacman_conf
         DIALOG --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70

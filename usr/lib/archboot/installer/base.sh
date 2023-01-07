@@ -26,7 +26,7 @@ _NEXTITEM=""
 _EDITOR=""
 
 set_title() {
-    if [[ -e "${LOCAL_DB}" ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
     else
         _TITLE="Archboot Arch Linux Installation (Online mode) --> https://bit.ly/archboot"
