@@ -14,8 +14,8 @@ if pgrep -x Xorg > /dev/null 2>&1; then
 else
     _LOG="/dev/tty7"
 fi
-VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
-VC="VC${VC_NUM}"
+_VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
+_VC="VC${_VC_NUM}"
 # install stages
 S_SRC=0         # choose mirror
 S_MKFS=0        # formatting

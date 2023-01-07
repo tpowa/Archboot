@@ -103,7 +103,7 @@ update_environment() {
                 else
                     DIALOG --defaultno --yesno "New online kernel version ${ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
                     if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
-                        DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
+                        DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         update-installer -latest-install > "${_LOG}" 2>&1
                     fi
                 fi
@@ -144,7 +144,7 @@ run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${PACKAGES} ...\n\nCheck ${VC} console (ALT-F${VC_NUM}) for progress ..." 10 70
+    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${PACKAGES} ...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress ..." 10 70
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
@@ -187,7 +187,7 @@ install_packages() {
     auto_packages
     # fix double spaces
     PACKAGES="${PACKAGES//  / }"
-    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${VC} console.\n\nDo you wish to continue?" 12 75 || return 1
+    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${_VC} console.\n\nDo you wish to continue?" 12 75 || return 1
     run_pacman
     NEXTITEM="6"
     chroot_mount
