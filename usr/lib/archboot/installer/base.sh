@@ -66,7 +66,7 @@ geteditor() {
     fi
 }
 
-detect_uefi_paramaters() {
+detect_uefi_parameters() {
     _UEFI_BOOT="0"
     _UEFI_SECURE_BOOT="0"
     _GUIDPARAMETER="0"
