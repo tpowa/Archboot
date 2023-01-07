@@ -977,18 +977,6 @@ install_bootloader_uefi() {
     fi
 }
 
-choose_bootloader() {
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        install_bootloader_uefi
-    else
-        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
-            do_uboot
-        else
-            do_grub_bios
-        fi
-    fi
-}
-
 install_bootloader() {
     S_BOOTLOADER=""
     destdir_mounts || return 1
@@ -1001,7 +989,15 @@ install_bootloader() {
     prepare_pacman
     detect_uefi_boot
     do_uefi_setup_env_vars
-    choose_bootloader
+    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+        install_bootloader_uefi
+    else
+        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
+            do_uboot
+        else
+            do_grub_bios
+        fi
+    fi
     if [[ -z "${S_BOOTLOADER}" ]]; then
         NEXTITEM="7"
     else
