@@ -14,9 +14,9 @@ check_gpt() {
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${DISC}")" == "gpt" ]] && GUID_DETECTED="1"
     if [[ "${GUID_DETECTED}" == "" ]]; then
         DIALOG --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
+        sgdisk --mbrtogpt "${DISC}" > "${_LOG}" && GUID_DETECTED="1"
         # reread partitiontable for kernel
-        partprobe "${DISC}" > "${LOG}"
+        partprobe "${DISC}" > "${_LOG}"
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --defaultno --yesno "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${DISC}?\n\n${DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
@@ -56,8 +56,8 @@ check_efisys_part() {
         GUID_DETECTED=""
         DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${DISC}.\nUEFI boot requires ${DISC} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         DIALOG --msgbox "Setup will now try to non-destructively convert ${DISC} to GPT using sgdisk." 0 0
-        sgdisk --mbrtogpt "${DISC}" > "${LOG}" && GUID_DETECTED="1"
-        partprobe "${DISC}" > "${LOG}"
+        sgdisk --mbrtogpt "${DISC}" > "${_LOG}" && GUID_DETECTED="1"
+        partprobe "${DISC}" > "${_LOG}"
         if [[ "${GUID_DETECTED}" == "" ]]; then
             DIALOG --msgbox "Conversion failed on ${DISC}.\nSetup detected no GUID (gpt) partition table on ${DISC}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1
@@ -151,7 +151,7 @@ partition() {
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of="${DEVICE}" bs=512 count=2048 >/dev/null 2>&1
                     wipefs -a "${DEVICE}" /dev/null 2>&1
-                    parted -a optimal -s "${DISC}" mktable msdos >"${LOG}"
+                    parted -a optimal -s "${DISC}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
                 DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70

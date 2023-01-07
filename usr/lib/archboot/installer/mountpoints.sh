@@ -289,14 +289,14 @@ _mkfs() {
     if [[ "${_fstype}" == "swap" ]]; then
         swapoff "${_device}" >/dev/null 2>&1
         if [[ "${_domk}" == "yes" ]]; then
-            mkswap -L "${_labelname}" "${_device}" >"${LOG}" 2>&1
+            mkswap -L "${_labelname}" "${_device}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
                 DIALOG --msgbox "Error creating swap: mkswap ${_device}" 0 0
                 return 1
             fi
         fi
-        swapon "${_device}" >"${LOG}" 2>&1
+        swapon "${_device}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error activating swap: swapon ${_device}" 0 0
@@ -317,16 +317,16 @@ _mkfs() {
             local ret
             #shellcheck disable=SC2086
             case ${_fstype} in
-                xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs ${_fsoptions} -L "${_labelname}" -f ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${_fsoptions} -L "${_labelname}" ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${_fsoptions} "${_labelname}" ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                ext3)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext3 ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                ext4)     mke2fs -F ${_fsoptions} -L "${_labelname}" -t ext4 ${_device} >"${_LOG}" 2>&1; ret=$? ;;
                 f2fs)     mkfs.f2fs ${_fsoptions} -f -l "${_labelname}" \
-                                    -O extra_attr,inode_checksum,sb_checksum ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >"${LOG}" 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >"${LOG}" 2>&1; ret=$? ;;
+                                    -O extra_attr,inode_checksum,sb_checksum ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${_fsoptions} -L "${_labelname}" ${_btrfsdevices} >"${_LOG}" 2>&1; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 -f ${_fsoptions} -L "${_labelname}" ${_device} >"${_LOG}" 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat -F32 ${_fsoptions} -n "${_labelname}" ${_device} >"${_LOG}" 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
@@ -358,14 +358,14 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _mountoptions="$(echo "${_mountoptions}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${_fstype}" -o "${_mountoptions}" "${_device}" "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
+        mount -t "${_fstype}" -o "${_mountoptions}" "${_device}" "${_dest}""${_mountpoint}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             DIALOG --msgbox "Error mounting ${_dest}${_mountpoint}" 0 0
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_fstype}" == "btrfs" && "${_domk}" == "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >"${LOG}" 2>&1
+        [[ "${_fstype}" == "btrfs" && "${_domk}" == "yes" ]] && btrfs balance start --full-balance "${_dest}""${_mountpoint}" >"${_LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${_mountpoint}" == "/tmp" ]]; then

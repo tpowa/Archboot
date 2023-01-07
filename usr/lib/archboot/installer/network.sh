@@ -162,15 +162,15 @@ donetwork() {
         echo "DNS=${DNS}" >>"${NETWORK_PROFILE}"
     fi
     if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then
-        echo "Disabled Archboot's bootup wired auto dhcp browsing." > "${LOG}"
+        echo "Disabled Archboot's bootup wired auto dhcp browsing." > "${_LOG}"
         rm /etc/systemd/network/10-wired-auto-dhcp.network
     fi
-    echo "Using setup's network profile ${NETWORK_PROFILE} now..." > "${LOG}"
+    echo "Using setup's network profile ${NETWORK_PROFILE} now..." > "${_LOG}"
     systemctl restart systemd-networkd
     NETWORK_COUNT="0"
     DIALOG --infobox "Waiting 30 seconds for network link to come up ..." 3 60
     # add sleep here dhcp can need some time to get link
-    while ! ping -c1 www.google.com > "${LOG}" 2>&1; do
+    while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
         sleep 1
         NETWORK_COUNT="$((NETWORK_COUNT+1))"
         [[ "${NETWORK_COUNT}" == "30" ]] && break

@@ -212,7 +212,7 @@ check_btrfs_subvolume(){
 # create btrfs subvolume
 create_btrfs_subvolume() {
     mount_btrfs
-    btrfs subvolume create "${BTRFSMP}"/"${_btrfssubvolume}" > "${LOG}"
+    btrfs subvolume create "${BTRFSMP}"/"${_btrfssubvolume}" > "${_LOG}"
     # change permission from 700 to 755
     # to avoid warnings during package installation
     chmod 755 "${BTRFSMP}"/"${_btrfssubvolume}"

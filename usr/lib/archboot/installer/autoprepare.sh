@@ -219,21 +219,21 @@ autoprepare() {
         # create fresh GPT
         sgdisk --clear "${DEVICE}" &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_PART_NUM}":0:+"${GPT_BIOS_GRUB_PART_SIZE}"M --typecode="${_GPT_BIOS_GRUB_PART_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_PART_NUM}":BIOS_GRUB "${DEVICE}" > "${LOG}"
-        sgdisk --set-alignment="2048" --new="${_UEFISYS_PART_NUM}":0:+"${UEFISYS_PART_SIZE}"M --typecode="${_UEFISYS_PART_NUM}":EF00 --change-name="${_UEFISYS_PART_NUM}":UEFI_SYSTEM "${DEVICE}" > "${LOG}"
+        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_PART_NUM}":0:+"${GPT_BIOS_GRUB_PART_SIZE}"M --typecode="${_GPT_BIOS_GRUB_PART_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_PART_NUM}":BIOS_GRUB "${DEVICE}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_UEFISYS_PART_NUM}":0:+"${UEFISYS_PART_SIZE}"M --typecode="${_UEFISYS_PART_NUM}":EF00 --change-name="${_UEFISYS_PART_NUM}":UEFI_SYSTEM "${DEVICE}" > "${_LOG}"
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
-            sgdisk --attributes="${_UEFISYS_PART_NUM}":set:2 "${DEVICE}" > "${LOG}"
+            sgdisk --attributes="${_UEFISYS_PART_NUM}":set:2 "${DEVICE}" > "${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_BOOT_PART_NUM}":0:+"${BOOT_PART_SIZE}"M --typecode="${_BOOT_PART_NUM}":8300 --attributes="${_BOOT_PART_NUM}":set:2 --change-name="${_BOOT_PART_NUM}":ARCHLINUX_BOOT "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_BOOT_PART_NUM}":0:+"${BOOT_PART_SIZE}"M --typecode="${_BOOT_PART_NUM}":8300 --attributes="${_BOOT_PART_NUM}":set:2 --change-name="${_BOOT_PART_NUM}":ARCHLINUX_BOOT "${DEVICE}" > "${_LOG}"
         fi
-        sgdisk --set-alignment="2048" --new="${_SWAP_PART_NUM}":0:+"${SWAP_PART_SIZE}"M --typecode="${_SWAP_PART_NUM}":8200 --change-name="${_SWAP_PART_NUM}":ARCHLINUX_SWAP "${DEVICE}" > "${LOG}"
+        sgdisk --set-alignment="2048" --new="${_SWAP_PART_NUM}":0:+"${SWAP_PART_SIZE}"M --typecode="${_SWAP_PART_NUM}":8200 --change-name="${_SWAP_PART_NUM}":ARCHLINUX_SWAP "${DEVICE}" > "${_LOG}"
         if [[ "${FSTYPE}" == "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:0 --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:0 --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:+"${ROOT_PART_SIZE}"M --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${LOG}"
-            sgdisk --set-alignment="2048" --new="${_HOME_PART_NUM}":0:0 --typecode="${_HOME_PART_NUM}":8302 --change-name="${_HOME_PART_NUM}":ARCHLINUX_HOME "${DEVICE}" > "${LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_PART_NUM}":0:+"${ROOT_PART_SIZE}"M --typecode="${_ROOT_PART_NUM}":8300 --change-name="${_ROOT_PART_NUM}":ARCHLINUX_ROOT "${DEVICE}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_HOME_PART_NUM}":0:0 --typecode="${_HOME_PART_NUM}":8302 --change-name="${_HOME_PART_NUM}":ARCHLINUX_HOME "${DEVICE}" > "${_LOG}"
         fi
-        sgdisk --print "${DEVICE}" > "${LOG}"
+        sgdisk --print "${DEVICE}" > "${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
         printk off
@@ -243,20 +243,20 @@ autoprepare() {
         wipefs -a "${DEVICE}" &>/dev/null
         # create DOS MBR with parted
         parted -a optimal -s "${DEVICE}" unit MiB mktable msdos >/dev/null 2>&1
-        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary 1 $((GUID_PART_SIZE+BOOT_PART_SIZE)) >"${LOG}"
-        parted -a optimal -s "${DEVICE}" unit MiB set 1 boot on >"${LOG}"
-        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) >"${LOG}"
+        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary 1 $((GUID_PART_SIZE+BOOT_PART_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${DEVICE}" unit MiB set 1 boot on >"${_LOG}"
+        parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) >"${_LOG}"
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${FSTYPE}" == "btrfs" ]]; then
-            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >"${LOG}"
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >"${_LOG}"
         else
-            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >"${LOG}"
-            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >"${LOG}"
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE)) $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) >"${_LOG}"
+            parted -a optimal -s "${DEVICE}" unit MiB mkpart primary $((GUID_PART_SIZE+BOOT_PART_SIZE+SWAP_PART_SIZE+ROOT_PART_SIZE)) "$(sgdisk -E "${DEVICE}" | grep "^[0-9]")S" >"${_LOG}"
         fi
     fi
     #shellcheck disable=SC2181
     if [[ $? -gt 0 ]]; then
-        DIALOG --msgbox "Error: Partitioning ${DEVICE} (see ${LOG} for details)." 0 0
+        DIALOG --msgbox "Error: Partitioning ${DEVICE} (see ${_LOG} for details)." 0 0
         printk on
         return 1
     fi

@@ -380,15 +380,15 @@ _stopmd()
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                wipefs -a --force "/dev/${i}" > "${LOG}"  2>&1
-                mdadm --manage --stop "/dev/${i}" > "${LOG}" 2>&1
+                wipefs -a --force "/dev/${i}" > "${_LOG}"  2>&1
+                mdadm --manage --stop "/dev/${i}" > "${_LOG}" 2>&1
             done
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > "${LOG}" 2>&1
-                wipefs -a --force "${i}" > "${LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${LOG}" 2>&1
+                sgdisk --zap "${i}" > "${_LOG}" 2>&1
+                wipefs -a --force "${i}" > "${_LOG}" 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${_LOG}" 2>&1
             done
         fi
     fi
@@ -400,9 +400,9 @@ _stopmd()
             DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > "${LOG}" 2>&1
-                wipefs -a "${i}" > "${LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${LOG}"  2>&1
+                sgdisk --zap "${i}" > "${_LOG}" 2>&1
+                wipefs -a "${i}" > "${_LOG}" 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${_LOG}"  2>&1
             done
         fi
     fi
@@ -426,15 +426,15 @@ _stoplvm()
         _umountall
         DIALOG --infobox "Removing logical volumes ..." 0 0
         for i in ${LV_VOLUMES}; do
-            lvremove -f "/dev/mapper/${i}" 2>/dev/null> "${LOG}"
+            lvremove -f "/dev/mapper/${i}" 2>/dev/null> "${_LOG}"
         done
         DIALOG --infobox "Removing logical groups ..." 0 0
         for i in ${LV_GROUPS}; do
-            vgremove -f "${i}" 2>/dev/null > "${LOG}"
+            vgremove -f "${i}" 2>/dev/null > "${_LOG}"
         done
         DIALOG --infobox "Removing physical volumes ..." 0 0
         for i in ${LV_PHYSICAL}; do
-            pvremove -f "${i}" 2>/dev/null > "${LOG}"
+            pvremove -f "${i}" 2>/dev/null > "${_LOG}"
         done
     fi
 }
@@ -456,9 +456,9 @@ _stopluks()
         DIALOG --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${LUKSDEVICE}; do
             LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
-            cryptsetup remove "${i}" > "${LOG}"
+            cryptsetup remove "${i}" > "${_LOG}"
             # delete header from device
-            wipefs -a "${LUKS_REAL_DEVICE}" > "${LOG}" 2>&1
+            wipefs -a "${LUKS_REAL_DEVICE}" > "${_LOG}" 2>&1
         done
     fi
     DISABLELUKS=""
@@ -472,7 +472,7 @@ _stopluks()
         DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a "${i}" > "${LOG}" 2>&1
+           wipefs -a "${i}" > "${_LOG}" 2>&1
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
@@ -654,11 +654,11 @@ _createraid()
     ! [[ "${PARITY}" == "" ]] && RAIDOPTIONS="${RAIDOPTIONS} --layout=${PARITY}"
     DIALOG --infobox "Creating ${RAIDDEVICE}..." 0 0
     #shellcheck disable=SC2086
-    if mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >"${LOG}" 2>&1; then
+    if mdadm --create ${RAIDDEVICE} ${RAIDOPTIONS} ${DEVICES} >"${_LOG}" 2>&1; then
         DIALOG --infobox "${RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${LOG} for details)." 0 0
+        DIALOG --msgbox "Error creating ${RAIDDEVICE} (see ${_LOG} for details)." 0 0
         return 1
     fi
     if [[ ${RAID_PARTITION} == "1" ]]; then
@@ -746,11 +746,11 @@ _createpv()
     #shellcheck disable=SC2028,SC2086
     _umountall
     #shellcheck disable=SC2086
-    if pvcreate -y ${PART} >"${LOG}" 2>&1; then
+    if pvcreate -y ${PART} >"${_LOG}" 2>&1; then
         DIALOG --infobox "Creating physical volume on ${PART} successful.\n\nContinuing in 3 seconds..." 6 75
         sleep 3
     else
-        DIALOG --msgbox "Error creating physical volume on ${PART} (see ${LOG} for details)." 0 0; return 1
+        DIALOG --msgbox "Error creating physical volume on ${PART} (see ${_LOG} for details)." 0 0; return 1
     fi
     # run udevadm to get values exported
     udevadm trigger
@@ -859,11 +859,11 @@ _createvg()
     PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
-    if vgcreate ${VGDEVICE} ${PV} >"${LOG}" 2>&1; then
+    if vgcreate ${VGDEVICE} ${PV} >"${_LOG}" 2>&1; then
         DIALOG --infobox "Creating Volume Group ${VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${LOG} for details)." 0 0
+        DIALOG --msgbox "Error creating Volume Group ${VGDEVICE} (see ${_LOG} for details)." 0 0
         return 1
     fi
 }
@@ -933,20 +933,20 @@ _createlv()
     _umountall
     if [[ "${LV_ALL}" == "1" ]]; then
         #shellcheck disable=SC2086
-        if lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
+        if lvcreate ${LV_EXTRA} -l +100%FREE ${LV} -n ${LVDEVICE} >"${_LOG}" 2>&1; then
             DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${_LOG} for details)." 0 0
             return 1
         fi
     else
         #shellcheck disable=SC2086
-        if lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${LOG}" 2>&1; then
+        if lvcreate ${LV_EXTRA} -L ${LV_SIZE} ${LV} -n ${LVDEVICE} >"${_LOG}" 2>&1; then
             DIALOG --infobox "Creating Logical Volume ${LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${LOG} for details)." 0 0
+            DIALOG --msgbox "Error creating Logical Volume ${LVDEVICE} (see ${_LOG} for details)." 0 0
             return 1
         fi
     fi
@@ -988,7 +988,7 @@ _opening_luks() {
     DIALOG --infobox "Opening encrypted ${PART}..." 0 0
     luksOpen_success="0"
     while [[ "${luksOpen_success}" == "0" ]]; do
-        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" <"${LUKSPASSPHRASE}" >"${LOG}" && luksOpen_success=1
+        cryptsetup luksOpen "${PART}" "${LUKSDEVICE}" <"${LUKSPASSPHRASE}" >"${_LOG}" && luksOpen_success=1
         if [[ "${luksOpen_success}" == "0" ]]; then
             DIALOG --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
@@ -1056,6 +1056,6 @@ _luks()
     _enter_luks_passphrase || return 1
     _umountall
     DIALOG --infobox "Encrypting ${PART}..." 0 0
-    cryptsetup -q luksFormat "${PART}" <"${LUKSPASSPHRASE}" >"${LOG}"
+    cryptsetup -q luksFormat "${PART}" <"${LUKSPASSPHRASE}" >"${_LOG}"
     _opening_luks
 }

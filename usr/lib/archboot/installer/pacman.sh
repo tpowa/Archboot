@@ -54,7 +54,7 @@ select_mirror() {
         SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
     NEXTITEM="4"
-    echo "Using mirror: ${SYNC_URL}" > "${LOG}"
+    echo "Using mirror: ${SYNC_URL}" > "${_LOG}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
 }
@@ -75,7 +75,7 @@ dotesting() {
 # check for updating complete environment with packages
 update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
-        echo "Packages are already in pacman cache ..."  > "${LOG}"
+        echo "Packages are already in pacman cache ..."  > "${_LOG}"
         DIALOG --infobox "Packages are already in pacman cache. Continuing in 3 seconds ..." 3 70
         sleep 3
     else
@@ -83,7 +83,7 @@ update_environment() {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
                 DIALOG --infobox "Refreshing package database ..." 3 70
-                pacman -Sy > "${LOG}" 2>&1
+                pacman -Sy > "${_LOG}" 2>&1
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 #shellcheck disable=SC2086
@@ -95,7 +95,7 @@ update_environment() {
                     #shellcheck disable=SC2086
                     ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 fi
-                echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${LOG}"
+                echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${_LOG}"
                 sleep 2
                 if [[ "${LOCAL_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
                     DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
@@ -104,7 +104,7 @@ update_environment() {
                     DIALOG --defaultno --yesno "New online kernel version ${ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
                     if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
                         DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${VC} console (ALT-F${VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
-                        update-installer -latest-install > "${LOG}" 2>&1
+                        update-installer -latest-install > "${_LOG}" 2>&1
                     fi
                 fi
             fi
@@ -131,12 +131,12 @@ prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     DIALOG --infobox "Refreshing package database ..." 3 40
-    ${PACMAN} -Sy > "${LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${LOG} for errors." 6 60; return 1)
+    ${PACMAN} -Sy > "${_LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
     KEYRING="archlinux-keyring"
     [[ "${RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${LOG} for errors." 6 60; return 1)
+    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
 # Set PACKAGES parameter before running to install wanted packages
@@ -148,7 +148,7 @@ run_pacman(){
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
-    ${PACMAN} -S ${PACKAGES} |& tee -a "${LOG}" /tmp/pacman.log >/dev/null 2>&1
+    ${PACMAN} -S ${PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >/dev/null 2>&1
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log

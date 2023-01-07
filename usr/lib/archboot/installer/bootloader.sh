@@ -242,7 +242,7 @@ do_secureboot_keys() {
             DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
             CN=$(cat "${_ANSWER}")
         done
-        secureboot-keys.sh -name="${CN}" "${_DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
+        secureboot-keys.sh -name="${CN}" "${_DESTDIR}/${KEYDIR}" > "${_LOG}" 2>&1 || return 1
          DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN}\nused for your keys in ${_DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds ..." 8 60
          sleep 10
     else
@@ -271,7 +271,7 @@ do_mok_sign () {
                 DIALOG --msgbox "Password didn't match or was empty, please enter again." 6 65
             fi
         done
-        mokutil -i "${_DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${LOG}"
+        mokutil -i "${_DESTDIR}"/"${KEYDIR}"/MOK/MOK.cer < ${MOK_PW} > "${_LOG}"
         rm /tmp/.password
         DIALOG --infobox "MOK keys have been installed successfully.\n\nContinuing in 5 seconds ..." 5 50
         sleep 5
@@ -280,11 +280,11 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         if [[ "${_DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" 2>&1
-            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${LOG}" 2>&1
+            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${_LOG}" 2>&1
+            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${_LOG}" 2>&1
         else
-            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${LOG}" 2>&1
-            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${LOG}" 2>&1
+            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${_LOG}" 2>&1
+            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${_LOG}" 2>&1
         fi
         DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds ..." 7 60
         sleep 5
@@ -450,8 +450,8 @@ timeout 5
 default archlinux-core-main
 GUMEOF
     chroot_mount
-    chroot "${_DESTDIR}" bootctl --path="${UEFISYS_MP}" install >"${LOG}" 2>&1
-    chroot "${_DESTDIR}" bootctl --path="${UEFISYS_MP}" update >"${LOG}" 2>&1
+    chroot "${_DESTDIR}" bootctl --path="${UEFISYS_MP}" install >"${_LOG}" 2>&1
+    chroot "${_DESTDIR}" bootctl --path="${UEFISYS_MP}" update >"${_LOG}" 2>&1
     chroot_umount
     if [[ -e "${_DESTDIR}/${UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -880,7 +880,7 @@ do_grub_uefi() {
             --no-nvram \
             --recheck \
             --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
-        cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${LOG}"
+        cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${_LOG}"
         GRUB_PREFIX_DIR="/boot/grub/"
     fi
     chroot_umount

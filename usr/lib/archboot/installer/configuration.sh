@@ -89,9 +89,9 @@ run_mkinitcpio() {
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     else
-        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     fi
     echo $? > /tmp/.mkinitcpio-retcode
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then

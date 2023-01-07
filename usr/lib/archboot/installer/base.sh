@@ -10,11 +10,11 @@ else
     _DESTDIR="/"
 fi
 if pgrep -x Xorg > /dev/null 2>&1; then
-    LOG="/dev/tty8"
+    _LOG="/dev/tty8"
 else
-    LOG="/dev/tty7"
+    _LOG="/dev/tty7"
 fi
-VC_NUM="$(basename ${LOG} | sed -e 's#tty##g')"
+VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 VC="VC${VC_NUM}"
 # install stages
 S_SRC=0         # choose mirror
