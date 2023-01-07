@@ -459,8 +459,8 @@ GUMEOF
               "${_DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
-        "${EDITOR}" "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-        "${EDITOR}" "${_DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
+        "${_EDITOR}" "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+        "${_EDITOR}" "${_DESTDIR}/${UEFISYS_MP}/loader/loader.conf"
         DIALOG --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
         S_BOOTLOADER="1"
@@ -509,7 +509,7 @@ CONFEOF
         cp -f "${_DESTDIR}/${UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         DIALOG --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         geteditor || return 1
-        "${EDITOR}" "${_REFIND_CONFIG}"
+        "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${UEFISYS_MP}/EFI/BOOT/"
         DIALOG --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
@@ -738,7 +738,7 @@ fi
     ## Edit grub.cfg config file
     DIALOG --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     geteditor || return 1
-    "${EDITOR}" "${_DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
+    "${_EDITOR}" "${_DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 }
 
 do_uboot() {

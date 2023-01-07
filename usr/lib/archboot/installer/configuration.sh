@@ -16,7 +16,7 @@ check_root_password() {
 set_mkinitcpio() {
     DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 12 70
     HOOK_ERROR=""
-    ${EDITOR} "${_DESTDIR}""${FILE}"
+    ${_EDITOR} "${_DESTDIR}""${FILE}"
     #shellcheck disable=SC2013
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
         [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1

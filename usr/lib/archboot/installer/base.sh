@@ -23,7 +23,7 @@ _S_MKFSAUTO=0    # auto fs part/formatting
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
-EDITOR=""
+_EDITOR=""
 
 set_title() {
     if [[ -e "${LOCAL_DB}" ]]; then
@@ -55,7 +55,7 @@ printk()
 # prompts the user to choose an editor
 # sets EDITOR global variable
 geteditor() {
-    if ! [[ "${EDITOR}" ]]; then
+    if ! [[ "${_EDITOR}" ]]; then
         DIALOG --menu "Select a Text Editor to Use" 9 35 3 \
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
