@@ -2,10 +2,10 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 detect_DISC() {
     if [[ "${DISC}" == "" ]] || ! echo "${DISC}" | grep -q '/dev/'; then
-        DISC="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${DESTDIR}/boot")")"
+        DISC="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot")")"
     fi
     if [[ "${DISC}" == "" ]]; then
-        DISC="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${DESTDIR}/")")"
+        DISC="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/")")"
     fi
 }
 
@@ -86,19 +86,19 @@ check_efisys_part() {
             DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
             UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
-        umount "${DESTDIR}/${UEFISYS_MP}" &> /dev/null
+        umount "${_DESTDIR}/${UEFISYS_MP}" &> /dev/null
         umount "${UEFISYS_PART}" &> /dev/null
         if [[ "${_FORMAT_UEFISYS_FAT32}" == "1" ]]; then
             mkfs.vfat -F32 -n "EFISYS" "${UEFISYS_PART}"
         fi
-        mkdir -p "${DESTDIR}/${UEFISYS_MP}"
+        mkdir -p "${_DESTDIR}/${UEFISYS_MP}"
         if [[ "$(${_LSBLK} FSTYPE "${UEFISYS_PART}")" == "vfat" ]]; then
-            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MP}"
+            mount -o rw,flush -t vfat "${UEFISYS_PART}" "${_DESTDIR}/${UEFISYS_MP}"
         else
             DIALOG --msgbox "${UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
-            mount -o rw "${UEFISYS_PART}" "${DESTDIR}/${UEFISYS_MP}"
+            mount -o rw "${UEFISYS_PART}" "${_DESTDIR}/${UEFISYS_MP}"
         fi
-        mkdir -p "${DESTDIR}/${UEFISYS_MP}/EFI" || true
+        mkdir -p "${_DESTDIR}/${UEFISYS_MP}/EFI" || true
     else
         DIALOG --msgbox "Setup did not find any EFI System partition in ${DISC}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1

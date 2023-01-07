@@ -13,7 +13,7 @@ if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
-PACMAN="pacman --root ${DESTDIR} ${PACMAN_CONF} --cachedir=${DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+PACMAN="pacman --root ${_DESTDIR} ${PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
 linux_firmware() {
     PACKAGES="${PACKAGES//\ linux-firmware\ / }"
@@ -46,14 +46,14 @@ marvell_firmware() {
 chroot_mount()
 {
     if grep -qw archboot /etc/hostname; then
-        [[ -e "${DESTDIR}/proc" ]] || mkdir -m 555 "${DESTDIR}/proc"
-        [[ -e "${DESTDIR}/sys" ]] || mkdir -m 555 "${DESTDIR}/sys"
-        [[ -e "${DESTDIR}/dev" ]] || mkdir -m 755 "${DESTDIR}/dev"
-        mount proc "${DESTDIR}/proc" -t proc -o nosuid,noexec,nodev
-        mount sys "${DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
-        mount udev "${DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid
-        mount devpts "${DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
-        mount shm "${DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
+        [[ -e "${_DESTDIR}/proc" ]] || mkdir -m 555 "${_DESTDIR}/proc"
+        [[ -e "${_DESTDIR}/sys" ]] || mkdir -m 555 "${_DESTDIR}/sys"
+        [[ -e "${_DESTDIR}/dev" ]] || mkdir -m 755 "${_DESTDIR}/dev"
+        mount proc "${_DESTDIR}/proc" -t proc -o nosuid,noexec,nodev
+        mount sys "${_DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
+        mount udev "${_DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid
+        mount devpts "${_DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
+        mount shm "${_DESTDIR}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     fi
 }
 
@@ -62,9 +62,9 @@ chroot_mount()
 chroot_umount()
 {
     if grep -qw archboot /etc/hostname; then
-        umount -R "${DESTDIR}/proc"
-        umount -R "${DESTDIR}/sys"
-        umount -R "${DESTDIR}/dev"
+        umount -R "${_DESTDIR}/proc"
+        umount -R "${_DESTDIR}/sys"
+        umount -R "${_DESTDIR}/dev"
     fi
 }
 
@@ -146,8 +146,8 @@ auto_packages() {
 # /etc/locale.gen
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 locale_gen() {
-    if [[ "${DESTDIR}" == "/install" ]]; then
-        systemd-nspawn -q -D "${DESTDIR}" locale-gen >/dev/null 2>&1
+    if [[ "${_DESTDIR}" == "/install" ]]; then
+        systemd-nspawn -q -D "${_DESTDIR}" locale-gen >/dev/null 2>&1
     else
         locale-gen >/dev/null 2>&1
     fi

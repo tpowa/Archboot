@@ -2,12 +2,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
-# don't use DESTDIR=/mnt because it's intended to mount other things there!
+# don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
 if grep -qw archboot /etc/hostname; then
-    DESTDIR="/install"
+    _DESTDIR="/install"
 else
-    DESTDIR="/"
+    _DESTDIR="/"
 fi
 if pgrep -x Xorg > /dev/null 2>&1; then
     LOG="/dev/tty8"

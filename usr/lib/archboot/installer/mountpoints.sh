@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # destdir_mounts()
-# check if PART_ROOT is set and if something is mounted on ${DESTDIR}
+# check if PART_ROOT is set and if something is mounted on ${_DESTDIR}
 destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     ASK_MOUNTPOINTS=""
     PART_ROOT=""
-    # check if something is mounted on ${DESTDIR}
-    PART_ROOT="$(mount | grep "${DESTDIR} " | cut -d' ' -f 1)"
-    # Run mountpoints, if nothing is mounted on ${DESTDIR}
+    # check if something is mounted on ${_DESTDIR}
+    PART_ROOT="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+    # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ "${PART_ROOT}" == "" ]]; then
-        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
+        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
         mountpoints || return 1
     fi
 }
@@ -233,16 +233,16 @@ mountpoints() {
             if [[ "${FSTYPE}" == "swap" ]]; then
                 DIALOG --infobox "Creating and activating \nswapspace on \n${PART} ..." 0 0
             else
-                DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${DESTDIR}${MP} ..." 0 0
+                DIALOG --infobox "Creating ${FSTYPE} on ${PART},\nmounting to ${_DESTDIR}${MP} ..." 0 0
             fi
-            _mkfs yes "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
+            _mkfs yes "${PART}" "${FSTYPE}" "${_DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         else
             if [[ "${FSTYPE}" == "swap" ]]; then
                 DIALOG --infobox "Activating swapspace \non ${PART} ..." 0 0
             else
-                DIALOG --infobox "Mounting ${FSTYPE} \non ${PART} \nto ${DESTDIR}${MP} ..." 0 0
+                DIALOG --infobox "Mounting ${FSTYPE} \non ${PART} \nto ${_DESTDIR}${MP} ..." 0 0
             fi
-            _mkfs no "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
+            _mkfs no "${PART}" "${FSTYPE}" "${_DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" "${BTRFS_LEVEL}" "${BTRFS_SUBVOLUME}" "${DOSUBVOLUME}" "${BTRFS_COMPRESS}" || return 1
         fi
         sleep 1
     done < /tmp/.parts

@@ -358,12 +358,12 @@ _getavailpartitions()
 # the destination root partition last!
 _umountall()
 {
-    if [[ "${DESTDIR}" == "/install" ]] && mountpoint -q "${DESTDIR}"; then
+    if [[ "${_DESTDIR}" == "/install" ]] && mountpoint -q "${_DESTDIR}"; then
         swapoff -a >/dev/null 2>&1
-        for i in $(findmnt --list --submounts "${DESTDIR}" -o TARGET -n | tac); do
+        for i in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
         done
-        DIALOG --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
+        DIALOG --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
         sleep 3
     fi
 }

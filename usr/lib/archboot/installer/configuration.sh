@@ -2,12 +2,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 check_root_password() {
     # check if empty password is set
-    if chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
+    if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
         DIALOG --msgbox "Setup detected no password set for root user,\nplease set new password now." 6 50
         set_password || return 1
     fi
     # check if account is locked
-    if chroot "${DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
+    if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
         DIALOG --msgbox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
         set_password || return 1
     fi
@@ -16,10 +16,10 @@ check_root_password() {
 set_mkinitcpio() {
     DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 12 70
     HOOK_ERROR=""
-    ${EDITOR} "${DESTDIR}""${FILE}"
+    ${EDITOR} "${_DESTDIR}""${FILE}"
     #shellcheck disable=SC2013
-    for i in $(grep ^HOOKS "${DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        [[ -e ${DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
+    for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
+        [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
     done
     if [[ "${HOOK_ERROR}" == "1" ]]; then
         DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
@@ -31,7 +31,7 @@ set_mkinitcpio() {
 set_locale() {
     if [[ ${SET_LOCALE} == "" ]]; then
         LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
-        CHECK_LOCALES="$(grep 'UTF' "${DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
+        CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
         OTHER_LOCALES=""
         for i in ${CHECK_LOCALES}; do
             OTHER_LOCALES="${OTHER_LOCALES} ${i} -"
@@ -44,7 +44,7 @@ set_locale() {
             DIALOG --menu "Select A System-Wide Locale:" 18 40 12 ${OTHER_LOCALES} 2>${_ANSWER} || return 1
             set_locale=$(cat "${_ANSWER}")
         fi
-        sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${DESTDIR}"/etc/locale.conf
+        sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${_DESTDIR}"/etc/locale.conf
         DIALOG --infobox "Setting locale LANG=${set_locale} on installed system ..." 3 70
         SET_LOCALE="1"
         sleep 2
@@ -78,7 +78,7 @@ set_password() {
             PASS2=""
         fi
     done
-    chroot "${DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
+    chroot "${_DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
     rm /tmp/.password
 }
 
@@ -89,9 +89,9 @@ run_mkinitcpio() {
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     else
-        chroot "${DESTDIR}" mkinitcpio -p "${KERNELPKG}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}" |& tee -a "${LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     fi
     echo $? > /tmp/.mkinitcpio-retcode
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then

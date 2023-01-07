@@ -118,8 +118,8 @@ update_environment() {
 prepare_pacman() {
     NEXTITEM="5"
     # Set up the necessary directories for pacman use
-    [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
-    [[ ! -d "${DESTDIR}/var/lib/pacman" ]] && mkdir -p "${DESTDIR}/var/lib/pacman"
+    [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     DIALOG --infobox "Waiting for Arch Linux keyring initialization ..." 3 40
     # pacman-key process itself
     while pgrep -x pacman-key > /dev/null 2>&1; do
@@ -144,7 +144,7 @@ run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${DESTDIR}:\n${PACKAGES} ...\n\nCheck ${VC} console (ALT-F${VC_NUM}) for progress ..." 10 70
+    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${PACKAGES} ...\n\nCheck ${VC} console (ALT-F${VC_NUM}) for progress ..." 10 70
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069

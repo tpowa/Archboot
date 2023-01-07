@@ -199,8 +199,8 @@ autoprepare() {
       return 1
     fi
     # validate DEST
-    if [[ ! -d "${DESTDIR}" ]]; then
-        DIALOG --msgbox "Error: Destination directory '${DESTDIR}' is not valid." 0 0
+    if [[ ! -d "${_DESTDIR}" ]]; then
+        DIALOG --msgbox "Error: Destination directory '${_DESTDIR}' is not valid." 0 0
         return 1
     fi
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
@@ -311,11 +311,11 @@ autoprepare() {
         fi
         BTRFS_LEVEL="NONE"
         if ! [[ "${FSTYPE}" == "swap" ]]; then
-            DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${DESTDIR}${MP} ..." 0 0
+            DIALOG --infobox "Creating ${FSTYPE} on ${PART}\nwith FSLABEL ${LABEL_NAME} ,\nmounting to ${_DESTDIR}${MP} ..." 0 0
         else
             DIALOG --infobox "Creating and activating\nswapspace on\n${PART} ..." 0 0
         fi
-        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} "${BTRFS_SUBVOLUME}" ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
+        _mkfs "${DOMKFS}" "${PART}" "${FSTYPE}" "${_DESTDIR}" "${MP}" "${LABEL_NAME}" "${FS_OPTIONS}" "${BTRFS_DEVICES}" ${BTRFS_LEVEL} "${BTRFS_SUBVOLUME}" ${DOSUBVOLUME} ${BTRFS_COMPRESS} || return 1
         sleep 1
     done
     DIALOG --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70
