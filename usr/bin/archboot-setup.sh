@@ -17,9 +17,9 @@
 
 set_vconsole() {
     if [[ -e /usr/bin/km ]]; then
-        km --setup && NEXTITEM="1"
+        km --setup && _NEXTITEM="1"
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
-        archboot-km.sh --setup && NEXTITEM="1"
+        archboot-km.sh --setup && _NEXTITEM="1"
     else
         DIALOG --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
     fi
@@ -28,13 +28,13 @@ set_vconsole() {
 select_source() {
     NEXTITEM="2"
     set_title
-    if [[ -e "${LOCAL_DB}" ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         getsource || return 1
     else
-        if [[ ${S_NET} -eq 0 ]]; then
+        if [[ ${_S_NET} -eq 0 ]]; then
             check_nework || return 1
         fi
-        [[ "${RUNNING_ARCH}" == "x86_64" ]] && dotesting
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && dotesting
         getsource || return 1
     fi
     NEXTITEM="3"
@@ -42,56 +42,56 @@ select_source() {
 
 set_clock() {
     if [[ -e /usr/bin/tz ]]; then
-        tz --setup && NEXTITEM="4"
+        tz --setup && _NEXTITEM="4"
     elif [[ -e /usr/bin/archboot-tz.sh ]]; then
-        archboot-tz.sh --setup && NEXTITEM="4"
+        archboot-tz.sh --setup && _NEXTITEM="4"
     else
         DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
 }
 
 prepare_storagedrive() {
-    S_MKFSAUTO=0
-    S_MKFS=0
-    DONE=0
-    NEXTITEM=""
-    while [[ "${DONE}" = "0" ]]; do
-        if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
+    _S_MKFSAUTO=0
+    _S_MKFS=0
+    _DONE=0
+    _NEXTITEM=""
+    while [[ "${_DONE}" = "0" ]]; do
+        if [[ -n "${_NEXTITEM}" ]]; then
+            _DEFAULT="--default-item ${_NEXTITEM}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
-        CANCEL=""
+        _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
             "1" "Auto-Prepare (erases the ENTIRE storage drive)" \
             "2" "Partition Storage Drives" \
             "3" "Manage Software Raid, Lvm2 and Luks encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "5" "Return to Main Menu" 2>${ANSWER} || CANCEL="1"
-        NEXTITEM="$(cat ${ANSWER})"
-        [[ "${S_MKFSAUTO}" = "1" ]] && DONE=1
-        case $(cat ${ANSWER}) in
+            "5" "Return to Main Menu" 2>${_ANSWER} || _CANCEL="1"
+        _NEXTITEM="$(cat ${_ANSWER})"
+        [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
+        case $(cat ${_ANSWER}) in
             "1")
                 autoprepare
-                [[ "${S_MKFSAUTO}" = "1" ]] && DONE=1
+                [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
                 ;;
             "2")
                 partition ;;
             "3")
                 create_special ;;
             "4")
-                PARTFINISH=""
-                ASK_MOUNTPOINTS="1"
+                _PARTFINISH=""
+                _ASK_MOUNTPOINTS="1"
                 mountpoints ;;
             *)
-                DONE=1 ;;
+                _DONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" = "1" ]]; then
-        NEXTITEM="4"
+    if [[ "${_CANCEL}" = "1" ]]; then
+        _NEXTITEM="4"
     else
-        NEXTITEM="5"
+        _NEXTITEM="5"
     fi
 }
 
@@ -104,17 +104,17 @@ configure_system() {
     auto_mkinitcpio
     ## END PREPROCESS ##
 
-    FILE=""
-    S_CONFIG=""
+    _FILE=""
+    _S_CONFIG=""
     # main menu loop
     while true; do
-        if [[ -n "${FILE}" ]]; then
-            DEFAULT="--default-item ${FILE}"
+        if [[ -n "${_FILE}" ]]; then
+            DEFAULT="--default-item ${_FILE}"
         else
             DEFAULT=""
         fi
         #shellcheck disable=SC2086
-        DIALOG ${DEFAULT} --menu "Configuration" 20 60 16 \
+        DIALOG ${_DEFAULT} --menu "Configuration" 20 60 16 \
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
@@ -127,36 +127,36 @@ configure_system() {
             "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
             "/etc/pacman.conf"              "Pacman Config File" \
             "Root-Password"                 "Set the root password" \
-            "Return"                        "Return to Main Menu" 2>${ANSWER} || break
-        FILE="$(cat ${ANSWER})"
-        if [[ "${FILE}" = "Return" || -z "${FILE}" ]]; then       # exit
-            S_CONFIG=1
+            "Return"                        "Return to Main Menu" 2>${_ANSWER} || break
+        _FILE="$(cat ${_ANSWER})"
+        if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then       # exit
+            _S_CONFIG=1
             break           
-        elif [[ "${FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
+        elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
             set_mkinitcpio
-        elif [[ "${FILE}" = "/etc/locale.gen" ]]; then            # non-file
+        elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then            # non-file
             _auto_set_locale
-            ${EDITOR} "${DESTDIR}""${FILE}"
+            ${_EDITOR} "${_DESTDIR}""${_FILE}"
             run_locale_gen
-        elif [[ "${FILE}" = "Root-Password" ]]; then              # non-file
+        elif [[ "${_FILE}" = "Root-Password" ]]; then              # non-file
             set_password
         else                                                      #regular file
-            ${EDITOR} "${DESTDIR}""${FILE}"
+            ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi
     done
-    if [[ ${S_CONFIG} -eq 1 ]]; then
-        NEXTITEM="7"
+    if [[ ${_S_CONFIG} -eq 1 ]]; then
+        _NEXTITEM="7"
     fi
 }
 
 mainmenu() {
-    if [[ -n "${NEXTITEM}" ]]; then
-        DEFAULT="--default-item ${NEXTITEM}"
+    if [[ -n "${_NEXTITEM}" ]]; then
+        _DEFAULT="--default-item ${_NEXTITEM}"
     else
-        DEFAULT=""
+        _DEFAULT=""
     fi
     #shellcheck disable=SC2086
-    dialog ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
+    dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Set Console Font And Keymap" \
     "1" "Set up Network" \
@@ -166,9 +166,9 @@ mainmenu() {
     "5" "Install Packages" \
     "6" "Configure System" \
     "7" "Install Bootloader" \
-    "8" "Exit Install" 2>${ANSWER}
-    NEXTITEM="$(cat ${ANSWER})"
-    case $(cat ${ANSWER}) in
+    "8" "Exit Install" 2>${_ANSWER}
+    _NEXTITEM="$(cat ${_ANSWER})"
+    case $(cat ${_ANSWER}) in
         "0")
             set_vconsole ;;
         "1")
@@ -212,7 +212,7 @@ fi
 set_title
 set_uefi_parameters
 
-DIALOG --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${VC} console (ALT-F${VC_NUM}). ALT-F1 will bring you back here." 14 65
+DIALOG --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${_VC} console (ALT-F${_VC_NUM}). ALT-F1 will bring you back here." 14 65
 
 while true; do
     mainmenu
