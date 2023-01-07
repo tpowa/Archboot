@@ -57,16 +57,16 @@ select_filesystem() {
     command -v mkfs.nilfs2 2>/dev/null && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
     command -v mkfs.jfs 2>/dev/null && FSOPTS="${FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select a filesystem for ${PART}:" 15 50 12 ${FSOPTS} 2>"${ANSWER}" || return 1
-    FSTYPE=$(cat "${ANSWER}")
+    DIALOG --menu "Select a filesystem for ${PART}:" 15 50 12 ${FSOPTS} 2>"${_ANSWER}" || return 1
+    FSTYPE=$(cat "${_ANSWER}")
 }
 
 enter_mountpoint() {
     FILESYSTEM_FINISH=""
     MP=""
     while [[ "${MP}" == "" ]]; do
-        DIALOG --inputbox "Enter the mountpoint for ${PART}" 8 65 "/boot" 2>"${ANSWER}" || return 1
-        MP=$(cat "${ANSWER}")
+        DIALOG --inputbox "Enter the mountpoint for ${PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
+        MP=$(cat "${_ANSWER}")
         if grep ":${MP}:" /tmp/.parts; then
             DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
             MP=""
@@ -96,8 +96,8 @@ create_filesystem() {
     if [[ "${DOMKFS}" == "yes" ]]; then
         while [[ "${LABEL_NAME}" == "" ]]; do
             DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_LSBLK} LABEL "${PART}")" 2>"${ANSWER}" || return 1
-            LABEL_NAME=$(cat "${ANSWER}")
+            "$(${_LSBLK} LABEL "${PART}")" 2>"${_ANSWER}" || return 1
+            LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${LABEL_NAME}$" /tmp/.parts; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
                 LABEL_NAME=""
@@ -107,8 +107,8 @@ create_filesystem() {
             prepare_btrfs || return 1
             btrfs_compress
         fi
-        DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${ANSWER}" || return 1
-        FS_OPTIONS=$(cat "${ANSWER}")
+        DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
+        FS_OPTIONS=$(cat "${_ANSWER}")
     fi
     FILESYSTEM_FINISH="yes"
 }
@@ -132,8 +132,8 @@ mountpoints() {
         while [[ "${DO_SWAP}" != "DONE" ]]; do
             FSTYPE="swap"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to use as swap:" 15 50 12 NONE - ${PARTS} 2>"${ANSWER}" || return 1
-            PART=$(cat "${ANSWER}")
+            DIALOG --menu "Select the partition to use as swap:" 15 50 12 NONE - ${PARTS} 2>"${_ANSWER}" || return 1
+            PART=$(cat "${_ANSWER}")
             if [[ "${PART}" != "NONE" ]]; then
                 clear_fs_values
                 if [[ "${ASK_MOUNTPOINTS}" == "1" ]]; then
@@ -155,8 +155,8 @@ mountpoints() {
         DO_ROOT=""
         while [[ "${DO_ROOT}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to mount as /:" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
-            PART=$(cat "${ANSWER}")
+            DIALOG --menu "Select the partition to mount as /:" 15 50 12 ${PARTS} 2>"${_ANSWER}" || return 1
+            PART=$(cat "${_ANSWER}")
             PART_ROOT=${PART}
             # Select root filesystem type
             FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
@@ -183,8 +183,8 @@ mountpoints() {
             DO_ADDITIONAL=""
             while [[ "${DO_ADDITIONAL}" != "DONE" ]]; do
                 #shellcheck disable=SC2086
-                DIALOG --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
-                PART=$(cat "${ANSWER}")
+                DIALOG --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${PARTS} DONE _ 2>"${_ANSWER}" || return 1
+                PART=$(cat "${_ANSWER}")
                 if [[ "${PART}" != "DONE" ]]; then
                     FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
                     # clear values first!

@@ -37,12 +37,12 @@ set_locale() {
             OTHER_LOCALES="${OTHER_LOCALES} ${i} -"
         done
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A System-Wide Locale:" 14 40 8 ${LOCALES} 2>${ANSWER} || return 1
-        set_locale=$(cat "${ANSWER}")
+        DIALOG --menu "Select A System-Wide Locale:" 14 40 8 ${LOCALES} 2>${_ANSWER} || return 1
+        set_locale=$(cat "${_ANSWER}")
         if [[ "${set_locale}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
-            DIALOG --menu "Select A System-Wide Locale:" 18 40 12 ${OTHER_LOCALES} 2>${ANSWER} || return 1
-            set_locale=$(cat "${ANSWER}")
+            DIALOG --menu "Select A System-Wide Locale:" 18 40 12 ${OTHER_LOCALES} 2>${_ANSWER} || return 1
+            set_locale=$(cat "${_ANSWER}")
         fi
         sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${DESTDIR}"/etc/locale.conf
         DIALOG --infobox "Setting locale LANG=${set_locale} on installed system ..." 3 70
@@ -59,12 +59,12 @@ set_password() {
     PASS2=""
     while [[ "${PASSWORD}" == "" ]]; do
         while [[ "${PASS}" == "" ]]; do
-            DIALOG --insecure --passwordbox "Enter new root password:" 0 0 2>"${ANSWER}" || return 1
-            PASS=$(cat "${ANSWER}")
+            DIALOG --insecure --passwordbox "Enter new root password:" 0 0 2>"${_ANSWER}" || return 1
+            PASS=$(cat "${_ANSWER}")
         done
         while [[ "${PASS2}" == "" ]]; do
-            DIALOG --insecure --passwordbox "Retype new root password:" 0 0 2>"${ANSWER}" || return 1
-            PASS2=$(cat "${ANSWER}")
+            DIALOG --insecure --passwordbox "Retype new root password:" 0 0 2>"${_ANSWER}" || return 1
+            PASS2=$(cat "${_ANSWER}")
         done
         if [[ "${PASS}" == "${PASS2}" ]]; then
             PASSWORD=${PASS}

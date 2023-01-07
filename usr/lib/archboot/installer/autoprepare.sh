@@ -15,8 +15,8 @@ autoprepare() {
     if [[ "$(echo "${DISCS}" | wc -w)" -gt 1 ]]; then
         DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         #shellcheck disable=SC2046
-        DIALOG --menu "Select the storage drive to use:" 14 55 7 $(blockdevices _) 2>"${ANSWER}" || return 1
-        DISC=$(cat "${ANSWER}")
+        DIALOG --menu "Select the storage drive to use:" 14 55 7 $(blockdevices _) 2>"${_ANSWER}" || return 1
+        DISC=$(cat "${_ANSWER}")
     else
         DISC="${DISCS}"
         if [[ "${DISC}" == "" ]]; then
@@ -45,8 +45,8 @@ autoprepare() {
         set_device_name_scheme || return 1
     fi
     if [[  "${_GUIDPARAMETER}" == "1" ]]; then
-        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
-        UEFISYS_MP="$(cat "${ANSWER}")"
+        DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
+        UEFISYS_MP="$(cat "${_ANSWER}")"
     fi
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         DIALOG --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
@@ -73,8 +73,8 @@ autoprepare() {
         if [[ "${_GUIDPARAMETER}" == "1" ]]; then
             if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
                 while [[ "${UEFISYS_PART_SET}" == "" ]]; do
-                    DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
-                    UEFISYS_PART_SIZE="$(cat "${ANSWER}")"
+                    DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                    UEFISYS_PART_SIZE="$(cat "${_ANSWER}")"
                     if [[ "${UEFISYS_PART_SIZE}" == "" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
@@ -90,8 +90,8 @@ autoprepare() {
                 done
             else
                 while [[ "${UEFISYS_PART_SET}" == "" ]]; do
-                    DIALOG --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>"${ANSWER}" || return 1
-                    UEFISYS_PART_SIZE="$(cat "${ANSWER}")"
+                    DIALOG --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
+                    UEFISYS_PART_SIZE="$(cat "${_ANSWER}")"
                     if [[ "${UEFISYS_PART_SIZE}" == "" ]]; then
                         DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
@@ -107,8 +107,8 @@ autoprepare() {
             fi
             DISC_SIZE="$((DISC_SIZE-UEFISYS_PART_SIZE))"
             while [[ "${BOOT_PART_SET}" == "" ]]; do
-                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
-                BOOT_PART_SIZE="$(cat "${ANSWER}")"
+                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                BOOT_PART_SIZE="$(cat "${_ANSWER}")"
                 if [[ "${BOOT_PART_SIZE}" == "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
@@ -124,8 +124,8 @@ autoprepare() {
             done
         else
             while [[ "${BOOT_PART_SET}" == "" ]]; do
-                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
-                BOOT_PART_SIZE="$(cat "${ANSWER}")"
+                DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                BOOT_PART_SIZE="$(cat "${_ANSWER}")"
                 if [[ "${BOOT_PART_SIZE}" == "" ]]; then
                     DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
@@ -143,8 +143,8 @@ autoprepare() {
         SWAP_SIZE="256"
         [[ "${DISC_SIZE}" -lt "256" ]] && SWAP_SIZE="${DISC_SIZE}"
         while [[ "${SWAP_PART_SET}" == "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>"${ANSWER}" || return 1
-            SWAP_PART_SIZE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "${SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            SWAP_PART_SIZE=$(cat "${_ANSWER}")
             if [[ "${SWAP_PART_SIZE}" == "" || "${SWAP_PART_SIZE}" == "0" ]]; then
                 DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
@@ -159,8 +159,8 @@ autoprepare() {
         done
         while [[ "${CHOSEN_FS}" == "" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>"${ANSWER}" || return 1
-            FSTYPE=$(cat "${ANSWER}")
+            DIALOG --menu "Select a filesystem for / and /home:" 16 45 9 ${FSOPTS} 2>"${_ANSWER}" || return 1
+            FSTYPE=$(cat "${_ANSWER}")
             DIALOG --yesno "${FSTYPE} will be used for / and /home. Is this OK?" 0 0 && CHOSEN_FS=1
         done
         # / and /home are subvolumes on btrfs
@@ -169,8 +169,8 @@ autoprepare() {
             ROOT_SIZE="7500"
             [[ "${DISC_SIZE}" -lt "7500" ]] && ROOT_SIZE="${DISC_SIZE}"
             while [[ "${ROOT_PART_SET}" == "" ]]; do
-            DIALOG --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${ANSWER}" || return 1
-            ROOT_PART_SIZE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${DISC_SIZE} MB" 10 65 "${ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+            ROOT_PART_SIZE=$(cat "${_ANSWER}")
                 if [[ "${ROOT_PART_SIZE}" == "" || "${ROOT_PART_SIZE}" == "0" || "${ROOT_PART_SIZE}" -lt "2000" ]]; then
                     DIALOG --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else

@@ -83,8 +83,8 @@ check_efisys_part() {
         #autodetect efisys mountpoint, on fail ask for mountpoint
         UEFISYS_MP="/$(basename "$(mount | grep "${UEFISYS_PART}" | cut -d " " -f 3)")"
         if [[ "${UEFISYS_MP}" == "/" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${ANSWER}" || return 1
-            UEFISYS_MP="$(cat "${ANSWER}")"
+            DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
+            UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
         umount "${DESTDIR}/${UEFISYS_MP}" &> /dev/null
         umount "${UEFISYS_PART}" &> /dev/null
@@ -128,11 +128,11 @@ partition() {
     while true; do
         # Prompt the user with a list of known disks
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the disk you want to partition:" 14 55 7 ${DISCS} 2>"${ANSWER}" || return 1
-        DISC=$(cat "${ANSWER}")
+        DIALOG --menu "Select the disk you want to partition:" 14 55 7 ${DISCS} 2>"${_ANSWER}" || return 1
+        DISC=$(cat "${_ANSWER}")
         if [[ "${DISC}" == "OTHER" ]]; then
-            DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${ANSWER}" || DISC=""
-            DISC=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || DISC=""
+            DISC=$(cat "${_ANSWER}")
         fi
         # Leave our loop if the user is done partitioning
         [[ "${DISC}" == "DONE" ]] && break

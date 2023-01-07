@@ -36,13 +36,13 @@ do_wireless() {
         #shellcheck disable=SC2086,SC2046
         DIALOG --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
         $(essid_scan _) \
-            "Hidden" "_" 2>"${ANSWER}" || return 1
-        WLAN_SSID=$(cat "${ANSWER}")
+            "Hidden" "_" 2>"${_ANSWER}" || return 1
+        WLAN_SSID=$(cat "${_ANSWER}")
         WLAN_CONNECT="connect"
         if [[ "${WLAN_SSID}" == "Hidden" ]]; then
             DIALOG --inputbox "Enter the hidden SSID:" 8 65 \
-                "secret" 2>"${ANSWER}" || return 1
-            WLAN_SSID=$(cat "${ANSWER}")
+                "secret" 2>"${_ANSWER}" || return 1
+            WLAN_SSID=$(cat "${_ANSWER}")
             WLAN_CONNECT="connect-hidden"
             WLAN_HIDDEN="yes"
         fi
@@ -54,8 +54,8 @@ do_wireless() {
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
             if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
-                DIALOG --inputbox "Enter your KEY for SSID='${WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${ANSWER}" || return 1
-                WLAN_KEY=$(cat "${ANSWER}")
+                DIALOG --inputbox "Enter your KEY for SSID='${WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}" || return 1
+                WLAN_KEY=$(cat "${_ANSWER}")
             fi
             # time to connect
             DIALOG --infobox "Connection to SSID='${WLAN_SSID}' with interface ${INTERFACE} ..." 3 70
@@ -90,10 +90,10 @@ donetwork() {
         ifaces=$(net_interfaces)
         while [[ "${INTERFACE}" == "" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${ifaces} 2>"${ANSWER}"
+            DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${ifaces} 2>"${_ANSWER}"
             case $? in
                 1) return 1 ;;
-                0) INTERFACE=$(cat "${ANSWER}") ;;
+                0) INTERFACE=$(cat "${_ANSWER}") ;;
             esac
         done
         echo "${INTERFACE}" >/tmp/.network-interface
@@ -105,8 +105,8 @@ donetwork() {
         fi
         # profile name
         NETWORK_PROFILE=""
-        DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${ANSWER}" || return 1
-        NETWORK_PROFILE=/etc/systemd/network/$(cat "${ANSWER}").network
+        DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${_ANSWER}" || return 1
+        NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
         do_wireless || return 1
         # dhcp switch
@@ -117,16 +117,16 @@ donetwork() {
             IP="dhcp"
         else
             IP="static"
-            DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${ANSWER}" || return 1
-            IPADDR=$(cat "${ANSWER}")
-            DIALOG --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
-            GW=$(cat "${ANSWER}")
-            DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${ANSWER}" || return 1
-            DNS=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
+            IPADDR=$(cat "${_ANSWER}")
+            DIALOG --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
+            GW=$(cat "${_ANSWER}")
+            DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
+            DNS=$(cat "${_ANSWER}")
         fi
             # http/ftp proxy settings
-        DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${ANSWER}" || return 1
-        PROXY=$(cat "${ANSWER}")
+        DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
+        PROXY=$(cat "${_ANSWER}")
         PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
         if [[ "${PROXY}" == "" ]]; then
             for i in ${PROXIES}; do

@@ -16,9 +16,9 @@ create_special() {
             "1" "Manage Software Raid" \
             "2" "Manage LVM2" \
             "3" "Manage Luks encryption" \
-            "4" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${ANSWER}")"
-        case $(cat "${ANSWER}") in
+            "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${_ANSWER}")"
+        case $(cat "${_ANSWER}") in
             "1")
                 _createmd ;;
             "2")
@@ -53,9 +53,9 @@ _createmd() {
             "2" "Create Partitionable Software Raid" \
             "3" "Reset Software Raid" \
             "4" "Raid Help" \
-            "5" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${ANSWER}")"
-        case $(cat "${ANSWER}") in
+            "5" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${_ANSWER}")"
+        case $(cat "${_ANSWER}") in
             "1")
                 RAID_PARTITION=""
                 _raid ;;
@@ -91,9 +91,9 @@ _createlvm() {
             "3" "Create Logical Volume" \
             "4" "Reset Logical Volume" \
             "5" "LVM Help" \
-            "6" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${ANSWER}")"
-        case $(cat "${ANSWER}") in
+            "6" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${_ANSWER}")"
+        case $(cat "${_ANSWER}") in
             "1")
                 _createpv ;;
             "2")
@@ -127,9 +127,9 @@ _createluks() {
             "1" "Create Luks" \
             "2" "Reset Luks Encryption completely" \
             "3" "Luks Help" \
-            "4" "Return to Previous Menu" 2>"${ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${ANSWER}")"
-        case $(cat "${ANSWER}") in
+            "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+        NEXTITEM="$(cat "${_ANSWER}")"
+        case $(cat "${_ANSWER}") in
             "1")
                 _luks ;;
             "2")

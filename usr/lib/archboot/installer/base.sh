@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-ANSWER="/tmp/.setup"
+_ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
 # don't use DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
@@ -58,8 +58,8 @@ geteditor() {
     if ! [[ "${EDITOR}" ]]; then
         DIALOG --menu "Select a Text Editor to Use" 9 35 3 \
         "1" "nano (easier)" \
-        "2" "neovim" 2>${ANSWER} || return 1
-        case $(cat ${ANSWER}) in
+        "2" "neovim" 2>${_ANSWER} || return 1
+        case $(cat ${_ANSWER}) in
             "1") EDITOR="nano" ;;
             "2") EDITOR="nvim" ;;
         esac
@@ -94,5 +94,16 @@ set_uefi_parameters() {
             _UEFI_ARCH="AA64"
             _SPEC_UEFI_ARCH="aa64"
         fi
+    fi
+}
+
+# set GUID (gpt) usage
+set_guid() {
+    # all uefi systems should use GUID layout
+    if [[ "${_UEFI_BOOT}" == "0" ]]; then
+        ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
+        ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
+        #shellcheck disable=SC2034
+        DIALOG --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && _GUIDPARAMETER="1"
     fi
 }

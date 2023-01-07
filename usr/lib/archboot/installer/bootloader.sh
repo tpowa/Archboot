@@ -232,15 +232,15 @@ do_secureboot_keys() {
     MOK_PW=""
     KEYDIR=""
     while [[ "${KEYDIR}" == "" ]]; do
-        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${ANSWER}" || return 1
-        KEYDIR=$(cat "${ANSWER}")
+        DIALOG --inputbox "Setup keys:\nEnter the directory to store the keys on ${DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${_ANSWER}" || return 1
+        KEYDIR=$(cat "${_ANSWER}")
         #shellcheck disable=SC2086,SC2001
         KEYDIR="$(echo ${KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${DESTDIR}/${KEYDIR}" ]]; then
         while [[ "${CN}" == "" ]]; do
-            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${ANSWER}" || return 1
-            CN=$(cat "${ANSWER}")
+            DIALOG --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
+            CN=$(cat "${_ANSWER}")
         done
         secureboot-keys.sh -name="${CN}" "${DESTDIR}/${KEYDIR}" > "${LOG}" 2>&1 || return 1
          DIALOG --infobox "Setup keys created:\n\nCommon name(CN) ${CN}\nused for your keys in ${DESTDIR}/${KEYDIR}\n\nContinuing in 10 seconds ..." 8 60
@@ -258,10 +258,10 @@ do_mok_sign () {
     DIALOG --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && INSTALL_MOK="1"
     if [[ "${INSTALL_MOK}" == "1" ]]; then
         while [[ "${MOK_PW}" == "" ]]; do
-            DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${ANSWER}" || return 1
-            PASS=$(cat "${ANSWER}")
-            DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${ANSWER}" || return 1
-            PASS2=$(cat "${ANSWER}")
+            DIALOG --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${_ANSWER}" || return 1
+            PASS=$(cat "${_ANSWER}")
+            DIALOG --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${_ANSWER}" || return 1
+            PASS2=$(cat "${_ANSWER}")
             if [[ "${PASS}" == "${PASS2}" && -n "${PASS}" ]]; then
                 MOK_PW=${PASS}
                 echo "${MOK_PW}" > /tmp/.password
@@ -423,8 +423,8 @@ do_efistub_uefi() {
     else
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}"
-        case $(cat "${ANSWER}") in
+            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
+        case $(cat "${_ANSWER}") in
             "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
             "rEFInd") do_refind_uefi ;;
         esac
@@ -812,8 +812,8 @@ do_grub_bios() {
         return 1
     fi
     #shellcheck disable=SC2086
-    DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${ANSWER}" || return 1
-    bootdev=$(cat "${ANSWER}")
+    DIALOG --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${DEVS} 2>"${_ANSWER}" || return 1
+    bootdev=$(cat "${_ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${bootdev}")" == "gpt" ]]; then
         CHECK_BIOS_BOOT_GRUB="1"
         CHECK_UEFISYS_PART=""
@@ -948,8 +948,8 @@ install_bootloader_uefi() {
     else
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
-            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}"
-        case $(cat "${ANSWER}") in
+            "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
+        case $(cat "${_ANSWER}") in
             "EFISTUB") do_efistub_uefi
                        [[ -z "${S_BOOTLOADER}" ]] || do_efistub_copy_to_efisys
                         ;;

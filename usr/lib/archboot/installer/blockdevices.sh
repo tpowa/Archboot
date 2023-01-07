@@ -327,8 +327,8 @@ set_device_name_scheme() {
     fi
     NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>"${ANSWER}" || return 1
-    NAME_SCHEME_PARAMETER=$(cat "${ANSWER}")
+    DIALOG --menu "Select the device name scheme you want to use in config files. ${MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
+    NAME_SCHEME_PARAMETER=$(cat "${_ANSWER}")
     NAME_SCHEME_PARAMETER_RUN="1"
 }
 
@@ -578,8 +578,8 @@ _raid()
         # enter raid device name
         RAIDDEVICE=""
         while [[ "${RAIDDEVICE}" == "" ]]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${ANSWER}" || return 1
-            RAIDDEVICE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
+            RAIDDEVICE=$(cat "${_ANSWER}")
             if grep -q "^${RAIDDEVICE//\/dev\//}" /proc/mdstat; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 RAIDDEVICE=""
@@ -587,23 +587,23 @@ _raid()
         done
         RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid level you want to use:" 14 50 7 ${RAIDLEVELS} 2>"${ANSWER}" || return 1
-        LEVEL=$(cat "${ANSWER}")
+        DIALOG --menu "Select the raid level you want to use:" 14 50 7 ${RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        LEVEL=$(cat "${_ANSWER}")
         # raid5 and raid10 support parity parameter
         PARITY=""
         if [[ "${LEVEL}" == "raid5" || "${LEVEL}" == "raid6" || "${LEVEL}" == "raid10" ]]; then
             PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${PARITYLEVELS} 2>"${ANSWER}" || return 1
-            PARITY=$(cat "${ANSWER}")
+            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${PARITYLEVELS} 2>"${_ANSWER}" || return 1
+            PARITY=$(cat "${_ANSWER}")
         fi
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         RAIDNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${RAIDNUMBER}:" 21 50 13 ${PARTS} 2>"${ANSWER}" || return 1
-        PART=$(cat "${ANSWER}")
+        DIALOG --menu "Select device ${RAIDNUMBER}:" 21 50 13 ${PARTS} 2>"${_ANSWER}" || return 1
+        PART=$(cat "${_ANSWER}")
         echo "${PART}" >>/tmp/.raid
         while [[ "${PART}" != "DONE" ]]; do
             RAIDNUMBER=$((RAIDNUMBER + 1))
@@ -613,8 +613,8 @@ _raid()
             ! [[ "${LEVEL}" == "raid0" || "${LEVEL}" == "linear" ]] && MDEXTRA="MISSING _"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device ${RAIDNUMBER}:" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>"${ANSWER}" || return 1
-            PART=$(cat "${ANSWER}")
+            DIALOG --menu "Select additional device ${RAIDNUMBER}:" 21 50 13 ${PARTS} ${MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
+            PART=$(cat "${_ANSWER}")
             SPARE=""
             ! [[ "${LEVEL}" == "raid0" || "${LEVEL}" == "linear" ]] && DIALOG --yesno --defaultno "Would you like to use ${PART} as spare device?" 0 0 && SPARE="1"
             [[ "${PART}" == "DONE" ]] && break
@@ -724,8 +724,8 @@ _createpv()
         # select the first device to use
         DEVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume:" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
-        PART=$(cat "${ANSWER}")
+        DIALOG --menu "Select device number ${DEVNUMBER} for physical volume:" 15 50 12 ${PARTS} 2>"${_ANSWER}" || return 1
+        PART=$(cat "${_ANSWER}")
         echo "${PART}" >>/tmp/.pvs-create
         while [[ "${PART}" != "DONE" ]]; do
             DEVNUMBER="$((DEVNUMBER + 1))"
@@ -733,8 +733,8 @@ _createpv()
             PARTS="${PARTS//${PART}\ _/}"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume:" 15 60 12 ${PARTS} DONE _ 2>"${ANSWER}" || return 1
-            PART=$(cat "${ANSWER}")
+            DIALOG --menu "Select additional device number ${DEVNUMBER} for physical volume:" 15 60 12 ${PARTS} DONE _ 2>"${_ANSWER}" || return 1
+            PART=$(cat "${_ANSWER}")
             [[ "${PART}" == "DONE" ]] && break
             echo "${PART}" >>/tmp/.pvs-create
         done
@@ -824,8 +824,8 @@ _createvg()
         # enter volume group name
         VGDEVICE=""
         while [[ "${VGDEVICE}" == "" ]]; do
-            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${ANSWER}" || return 1
-            VGDEVICE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
+            VGDEVICE=$(cat "${_ANSWER}")
             if vgs -o vg_name --noheading 2>/dev/null | grep -q "^  ${VGDEVICE}"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 VGDEVICE=""
@@ -837,8 +837,8 @@ _createvg()
         # select the first device to use, no missing option available!
         PVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} 2>"${ANSWER}" || return 1
-        PV=$(cat "${ANSWER}")
+        DIALOG --menu "Select Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} 2>"${_ANSWER}" || return 1
+        PV=$(cat "${_ANSWER}")
         echo "${PV}" >>/tmp/.pvs
         while [[ "${PVS}" != "DONE" ]]; do
             PVNUMBER=$((PVNUMBER + 1))
@@ -847,8 +847,8 @@ _createvg()
             PVS="$(echo ${PVS} | sed -e "s#${PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} DONE _ 2>"${ANSWER}" || return 1
-            PV=$(cat "${ANSWER}")
+            DIALOG --menu "Select additional Physical Volume ${PVNUMBER} for ${VGDEVICE}:" 13 50 10 ${PVS} DONE _ 2>"${_ANSWER}" || return 1
+            PV=$(cat "${_ANSWER}")
             [[ "${PV}" == "DONE" ]] && break
             echo "${PV}" >>/tmp/.pvs
         done
@@ -884,13 +884,13 @@ _createlv()
         # show all devices with sizes, which are not 100% in use!
         DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Volume Group:" 11 50 5 ${LVS} 2>"${ANSWER}" || return 1
-        LV=$(cat "${ANSWER}")
+        DIALOG --menu "Select Volume Group:" 11 50 5 ${LVS} 2>"${_ANSWER}" || return 1
+        LV=$(cat "${_ANSWER}")
         # enter logical volume name
         LVDEVICE=""
         while [[ "${LVDEVICE}" == "" ]]; do
-            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${ANSWER}" || return 1
-            LVDEVICE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+            LVDEVICE=$(cat "${_ANSWER}")
             if lvs -o lv_name,vg_name --noheading 2>/dev/null | grep -q " ${LVDEVICE} ${LV}$"; then
                 DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 LVDEVICE=""
@@ -898,8 +898,8 @@ _createlv()
         done
         while [[ "${LV_SIZE_SET}" == "" ]]; do
             LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${ANSWER}" || return 1
-                LV_SIZE=$(cat "${ANSWER}")
+            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${_ANSWER}" || return 1
+                LV_SIZE=$(cat "${_ANSWER}")
                 if [[ "${LV_SIZE}" == "" ]]; then
                     DIALOG --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && LV_ALL="1"
                     if ! [[ "${LV_ALL}" == "1" ]]; then
@@ -956,8 +956,8 @@ _createlv()
 _enter_luks_name() {
     LUKSDEVICE=""
     while [[ "${LUKSDEVICE}" == "" ]]; do
-        DIALOG --inputbox "Enter the name for luks encrypted device ${PART}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${ANSWER}" || return 1
-        LUKSDEVICE=$(cat "${ANSWER}")
+        DIALOG --inputbox "Enter the name for luks encrypted device ${PART}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+        LUKSDEVICE=$(cat "${_ANSWER}")
         if ! cryptsetup status "${LUKSDEVICE}" | grep -q inactive; then
             DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
             LUKSDEVICE=""
@@ -969,10 +969,10 @@ _enter_luks_name() {
 _enter_luks_passphrase () {
     LUKSPASSPHRASE=""
     while [[ "${LUKSPASSPHRASE}" == "" ]]; do
-        DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device ${PART}:" 0 0 2>"${ANSWER}" || return 1
-        LUKSPASS=$(cat "${ANSWER}")
-        DIALOG --insecure --passwordbox "Retype passphrase for luks encrypted device ${PART}:" 0 0 2>"${ANSWER}" || return 1
-        LUKSPASS2=$(cat "${ANSWER}")
+        DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device ${PART}:" 0 0 2>"${_ANSWER}" || return 1
+        LUKSPASS=$(cat "${_ANSWER}")
+        DIALOG --insecure --passwordbox "Retype passphrase for luks encrypted device ${PART}:" 0 0 2>"${_ANSWER}" || return 1
+        LUKSPASS2=$(cat "${_ANSWER}")
         if [[ -n "${LUKSPASS}" && -n "${LUKSPASS2}" && "${LUKSPASS}" == "${LUKSPASS2}" ]]; then
             LUKSPASSPHRASE=${LUKSPASS}
             echo "${LUKSPASSPHRASE}" > "/tmp/passphrase-${LUKSDEVICE}"
@@ -1044,8 +1044,8 @@ _luks()
         # show all devices with sizes
         DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device for luks encryption:" 15 50 12 ${PARTS} 2>"${ANSWER}" || return 1
-        PART=$(cat "${ANSWER}")
+        DIALOG --menu "Select device for luks encryption:" 15 50 12 ${PARTS} 2>"${_ANSWER}" || return 1
+        PART=$(cat "${_ANSWER}")
         # enter luks name
         _enter_luks_name || return 1
         ### TODO: offer more options for encrypt!

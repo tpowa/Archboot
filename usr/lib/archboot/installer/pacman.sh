@@ -39,13 +39,13 @@ select_mirror() {
     #shellcheck disable=SC2086
     DIALOG --menu "Select a mirror:" 14 55 7 \
         ${MIRRORS} \
-        "Custom" "_" 2>${ANSWER} || return 1
+        "Custom" "_" 2>${_ANSWER} || return 1
     #shellcheck disable=SC2155
-    local _server=$(cat "${ANSWER}")
+    local _server=$(cat "${_ANSWER}")
     if [[ "${_server}" == "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to repositories." 8 65 \
-            "" 2>"${ANSWER}" || return 1
-            SYNC_URL=$(cat "${ANSWER}")
+            "" 2>"${_ANSWER}" || return 1
+            SYNC_URL=$(cat "${_ANSWER}")
     else
         # Form the full URL for our mirror by grepping for the server name in
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
