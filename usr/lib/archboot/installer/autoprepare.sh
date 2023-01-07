@@ -44,7 +44,7 @@ autoprepare() {
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
-    if [[  "${GUIDPARAMETER}" == "1" ]]; then
+    if [[  "${_GUIDPARAMETER}" == "1" ]]; then
         DIALOG --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${ANSWER}" || return 1
         UEFISYS_MP="$(cat "${ANSWER}")"
     fi
@@ -63,14 +63,14 @@ autoprepare() {
         command -v mkfs.nilfs2 2>/dev/null && FSOPTS="${FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs 2>/dev/null && FSOPTS="${FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
-        if [[ "${GUIDPARAMETER}" == "1" ]]; then
+        if [[ "${_GUIDPARAMETER}" == "1" ]]; then
             GUID_PART_SIZE="2"
             GPT_BIOS_GRUB_PART_SIZE="${GUID_PART_SIZE}"
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             DISC_SIZE="$((DISC_SIZE-GUID_PART_SIZE))"
         fi
-        if [[ "${GUIDPARAMETER}" == "1" ]]; then
+        if [[ "${_GUIDPARAMETER}" == "1" ]]; then
             if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
                 while [[ "${UEFISYS_PART_SET}" == "" ]]; do
                     DIALOG --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${DISC_SIZE} MB" 10 65 "512" 2>"${ANSWER}" || return 1
@@ -207,7 +207,7 @@ autoprepare() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
-    if [[ "${GUIDPARAMETER}" == "1" ]]; then
+    if [[ "${_GUIDPARAMETER}" == "1" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         printk off
         DIALOG --infobox "Partitioning ${DEVICE} ..." 0 0
@@ -274,7 +274,7 @@ autoprepare() {
     _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:swap::SWAP_ARCH"
     _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:ext2::BOOT_ARCH"
     _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${UEFISYS_MP}:vfat:-F32:EFISYS"
-    if [[ "${GUIDPARAMETER}" == "1" ]]; then
+    if [[ "${_GUIDPARAMETER}" == "1" ]]; then
         if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
             FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
         else

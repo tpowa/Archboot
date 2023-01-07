@@ -96,7 +96,7 @@ freeze_xfs() {
 
 ## Setup kernel cmdline parameters to be added to bootloader configs
 bootloader_kernel_parameters() {
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == "1" ]]; then
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && getrootpartuuid
         [[ "${NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && getrootpartlabel
     fi
@@ -154,31 +154,12 @@ abort_f2fs_bootpart() {
         fi
 }
 
-do_uefi_setup_env_vars() {
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
-            _EFI_MIXED="1"
-            _UEFI_ARCH="IA32"
-            _SPEC_UEFI_ARCH="ia32"
-        else
-            _EFI_MIXED="0"
-            _UEFI_ARCH="X64"
-            _SPEC_UEFI_ARCH="x64"
-        fi
-    fi
-    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        _EFI_MIXED="0"
-        _UEFI_ARCH="AA64"
-        _SPEC_UEFI_ARCH="aa64"
-    fi
-}
-
 do_uefi_common() {
     PACKAGES=""
     [[ ! -f "${DESTDIR}/usr/bin/mkfs.vfat" ]] && PACKAGES="${PACKAGES} dosfstools"
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
     [[ ! -f "${DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         [[ ! -f "${DESTDIR}/usr/bin/mokutil" ]] && PACKAGES="${PACKAGES} mokutil"
         [[ ! -f "${DESTDIR}/usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
         [[ ! -f "${DESTDIR}/usr/bin/sbsign" ]] && PACKAGES="${PACKAGES} sbsigntools"
@@ -230,7 +211,7 @@ do_uefi_bootmgr_setup() {
 do_uefi_secure_boot_efitools() {
     do_uefi_common
     # install helper tools and create entries in UEFI boot manager, if not present
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         if [[ ! -f "${UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
             cp "${DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${UEFISYS_MP}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
@@ -592,7 +573,7 @@ do_grub_config() {
         fi
     fi
     ## Move old config file, if any
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         GRUB_CFG="grub${_SPEC_UEFI_ARCH}.cfg"
     else
         GRUB_CFG="grub.cfg"
@@ -882,7 +863,7 @@ do_grub_uefi() {
     do_grub_common_before
     DIALOG --infobox "Setting up GRUB(2) UEFI. This needs some time ..." 3 55
     chroot_mount
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
         [[ ! -d  ${DESTDIR}/${UEFISYS_MP}/EFI/BOOT ]] && mkdir -p "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${DESTDIR}"/"${UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
@@ -906,7 +887,7 @@ do_grub_uefi() {
     GRUB_UEFI="1"
     do_grub_config
     GRUB_UEFI=""
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${DESTDIR}"/"${GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
@@ -927,7 +908,7 @@ do_grub_uefi() {
         fi
         cp /"${GRUB_PREFIX_DIR}"/"${GRUB_CFG}" "${UEFISYS_MP}"/EFI/BOOT/grub"${_SPEC_UEFI_ARCH}".cfg
     fi
-    if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "0" && -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
+    if [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && "${_UEFI_SECURE_BOOT}" == "0" && -e "${DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         do_uefi_bootmgr_setup
@@ -937,7 +918,7 @@ do_grub_uefi() {
         DIALOG --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds ..." 5 60
         sleep 5
         S_BOOTLOADER="1"
-    elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    elif [[ -e "${DESTDIR}/${UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_secureboot_keys || return 1
         do_mok_sign
         do_pacman_sign
@@ -962,7 +943,7 @@ install_bootloader_uefi() {
         _EFISTUB_MENU_LABEL="EFISTUB"
         _EFISTUB_MENU_TEXT="EFISTUB for ${_UEFI_ARCH} UEFI"
     fi
-    if [[ "${_DETECTED_UEFI_SECURE_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         do_grub_uefi
     else
         DIALOG --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
@@ -987,9 +968,7 @@ install_bootloader() {
         select_source || return 1
     fi
     prepare_pacman
-    detect_uefi_boot
-    do_uefi_setup_env_vars
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then

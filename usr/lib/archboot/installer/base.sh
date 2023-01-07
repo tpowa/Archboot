@@ -66,3 +66,33 @@ geteditor() {
     fi
 }
 
+detect_uefi_paramaters() {
+    _UEFI_BOOT="0"
+    _UEFI_SECURE_BOOT="0"
+    _GUIDPARAMETER="0"
+    [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT="1"
+    if [[ "${_UEFI_BOOT}" == "1" ]]; then
+        _GUIDPARAMETER="1"
+        _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
+        _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
+        if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
+            _UEFI_SECURE_BOOT="1"
+        fi
+        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+            if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
+                _EFI_MIXED="1"
+                _UEFI_ARCH="IA32"
+                _SPEC_UEFI_ARCH="ia32"
+            else
+                _EFI_MIXED="0"
+                _UEFI_ARCH="X64"
+                _SPEC_UEFI_ARCH="x64"
+            fi
+        fi
+        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+            _EFI_MIXED="0"
+            _UEFI_ARCH="AA64"
+            _SPEC_UEFI_ARCH="aa64"
+        fi
+    fi
+}

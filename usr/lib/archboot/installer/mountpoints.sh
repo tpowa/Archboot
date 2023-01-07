@@ -11,7 +11,6 @@ destdir_mounts(){
     # Run mountpoints, if nothing is mounted on ${DESTDIR}
     if [[ "${PART_ROOT}" == "" ]]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${DESTDIR}, please set mountpoints first." 0 0
-        detect_uefi_boot
         mountpoints || return 1
     fi
 }
@@ -383,7 +382,7 @@ _mkfs() {
     #shellcheck disable=SC2155
     local _fslabel="$(getfslabel "${_device}")"
 
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == "1" ]]; then
         #shellcheck disable=SC2155
         local _partuuid="$(getpartuuid "${_device}")"
         #shellcheck disable=SC2155
@@ -404,7 +403,7 @@ _mkfs() {
             _device="LABEL=${_fslabel}"
         fi
     else
-        if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+        if [[ "${_UEFI_BOOT}" == "1" ]]; then
            if [[ "${NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_partuuid}" ]]; then
                    _device="PARTUUID=${_partuuid}"
@@ -425,7 +424,7 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${_device}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
-    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_mountpoint}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_mountpoint}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_mountpoint}" == "/boot" && "${_DETECTED_UEFI_BOOT}" == "1" || "${_mountpoint}" == "/" ]]; then
+    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_mountpoint}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_mountpoint}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_mountpoint}" == "/boot" && "${_UEFI_BOOT}" == "1" || "${_mountpoint}" == "/" ]]; then
         if [[ "${_mountoptions}" == "" ]]; then
             echo -n "${_device} ${_mountpoint} ${_fstype} defaults 0 " >>/tmp/.fstab
         else

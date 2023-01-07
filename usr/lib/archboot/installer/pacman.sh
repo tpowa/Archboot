@@ -79,7 +79,6 @@ update_environment() {
         DIALOG --infobox "Packages are already in pacman cache. Continuing in 3 seconds ..." 3 70
         sleep 3
     else
-        detect_uefi_boot
         UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${RUNNING_ARCH}" == "riscv64" ]]; then

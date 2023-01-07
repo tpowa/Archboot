@@ -319,10 +319,9 @@ set_device_name_scheme() {
     NAME_SCHEME_PARAMETER=""
     NAME_SCHEME_LEVELS=""
     MENU_DESC_TEXT=""
-    detect_uefi_boot
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == "1" ]]; then
         NAME_SCHEME_LEVELS="${NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
         MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
@@ -665,7 +664,7 @@ _createraid()
     if [[ ${RAID_PARTITION} == "1" ]]; then
         # switch for mbr usage
         set_guid
-        if [[ "${GUIDPARAMETER}" == "0" ]]; then
+        if [[ "${_GUIDPARAMETER}" == "0" ]]; then
             DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
             cfdisk "${RAIDDEVICE}"
         else
