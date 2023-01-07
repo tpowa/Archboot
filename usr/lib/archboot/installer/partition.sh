@@ -164,5 +164,5 @@ partition() {
     done
     # update dmraid
     _dmraid_update
-    NEXTITEM="3"
+    _NEXTITEM="3"
 }

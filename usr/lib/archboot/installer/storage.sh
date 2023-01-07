@@ -2,11 +2,11 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # menu for raid, lvm and encrypt
 create_special() {
-    NEXTITEM=""
+    _NEXTITEM=""
     SPECIALDONE=0
     while [[ "${SPECIALDONE}" == "0" ]]; do
-        if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
+        if [[ -n "${_NEXTITEM}" ]]; then
+            DEFAULT="--default-item ${_NEXTITEM}"
         else
             DEFAULT=""
         fi
@@ -17,7 +17,7 @@ create_special() {
             "2" "Manage LVM2" \
             "3" "Manage Luks encryption" \
             "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${_ANSWER}")"
+        _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
                 _createmd ;;
@@ -30,19 +30,19 @@ create_special() {
         esac
     done
     if [[ "${CANCEL}" == "1" ]]; then
-        NEXTITEM="3"
+        _NEXTITEM="3"
     else
-        NEXTITEM="4"
+        _NEXTITEM="4"
     fi
 }
 
 # menu for md creation
 _createmd() {
-    NEXTITEM=""
+    _NEXTITEM=""
     MDDONE=0
     while [[ "${MDDONE}" == "0" ]]; do
-        if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
+        if [[ -n "${_NEXTITEM}" ]]; then
+            DEFAULT="--default-item ${_NEXTITEM}"
         else
             DEFAULT=""
         fi
@@ -54,7 +54,7 @@ _createmd() {
             "3" "Reset Software Raid" \
             "4" "Raid Help" \
             "5" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${_ANSWER}")"
+        _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
                 RAID_PARTITION=""
@@ -70,16 +70,16 @@ _createmd() {
                 MDDONE=1 ;;
         esac
     done
-    NEXTITEM="1"
+    _NEXTITEM="1"
 }
 
 # menu for lvm creation
 _createlvm() {
-    NEXTITEM=""
+    _NEXTITEM=""
     LVMDONE=0
     while [[ "${LVMDONE}" == "0" ]]; do
-        if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
+        if [[ -n "${_NEXTITEM}" ]]; then
+            DEFAULT="--default-item ${_NEXTITEM}"
         else
             DEFAULT=""
         fi
@@ -92,7 +92,7 @@ _createlvm() {
             "4" "Reset Logical Volume" \
             "5" "LVM Help" \
             "6" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${_ANSWER}")"
+        _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
                 _createpv ;;
@@ -108,16 +108,16 @@ _createlvm() {
                 LVMDONE=1 ;;
         esac
     done
-    NEXTITEM="2"
+    _NEXTITEM="2"
 }
 
 # menu for luks creation
 _createluks() {
-    NEXTITEM=""
+    _NEXTITEM=""
     LUKSDONE=0
     while [[ "${LUKSDONE}" == "0" ]]; do
-        if [[ -n "${NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${NEXTITEM}"
+        if [[ -n "${_NEXTITEM}" ]]; then
+            DEFAULT="--default-item ${_NEXTITEM}"
         else
             DEFAULT=""
         fi
@@ -128,7 +128,7 @@ _createluks() {
             "2" "Reset Luks Encryption completely" \
             "3" "Luks Help" \
             "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
-        NEXTITEM="$(cat "${_ANSWER}")"
+        _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
                 _luks ;;
@@ -140,5 +140,5 @@ _createluks() {
                 LUKSDONE=1 ;;
         esac
     done
-    NEXTITEM="3"
+    _NEXTITEM="3"
 }

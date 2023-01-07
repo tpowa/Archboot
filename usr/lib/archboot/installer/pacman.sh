@@ -8,7 +8,7 @@ getsource() {
     S_SRC=0
     PACMAN_CONF=""
     if [[ -e "${LOCAL_DB}" ]]; then
-        NEXTITEM="4"
+        _NEXTITEM="4"
         local_pacman_conf
         DIALOG --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
         S_SRC=1
@@ -24,7 +24,7 @@ getsource() {
 # args: none
 # returns: nothing
 select_mirror() {
-    NEXTITEM="2"
+    _NEXTITEM="2"
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
         dialog --infobox "Downloading latest mirrorlist ..." 3 40
@@ -53,7 +53,7 @@ select_mirror() {
         # only return one line for the mirror.
         SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
     fi
-    NEXTITEM="4"
+    _NEXTITEM="4"
     echo "Using mirror: ${SYNC_URL}" > "${_LOG}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
@@ -116,7 +116,7 @@ update_environment() {
 # params: none
 # returns: 1 on error
 prepare_pacman() {
-    NEXTITEM="5"
+    _NEXTITEM="5"
     # Set up the necessary directories for pacman use
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
@@ -189,7 +189,7 @@ install_packages() {
     PACKAGES="${PACKAGES//  / }"
     DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${_VC} console.\n\nDo you wish to continue?" 12 75 || return 1
     run_pacman
-    NEXTITEM="6"
+    _NEXTITEM="6"
     chroot_mount
     # automagic time!
     # any automatic configuration should go here

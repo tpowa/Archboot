@@ -19,9 +19,9 @@ _VC="VC${_VC_NUM}"
 # install stages
 _S_SRC=0         # choose mirror
 _S_MKFS=0        # formatting
-S_MKFSAUTO=0    # auto fs part/formatting
+_S_MKFSAUTO=0    # auto fs part/formatting
 # menu item tracker- autoselect the next item
-NEXTITEM=""
+_NEXTITEM=""
 # To allow choice in script set EDITOR=""
 EDITOR=""
 

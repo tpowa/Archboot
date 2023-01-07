@@ -978,8 +978,8 @@ install_bootloader() {
         fi
     fi
     if [[ -z "${S_BOOTLOADER}" ]]; then
-        NEXTITEM="7"
+        _NEXTITEM="7"
     else
-        NEXTITEM="8"
+        _NEXTITEM="8"
     fi
 }

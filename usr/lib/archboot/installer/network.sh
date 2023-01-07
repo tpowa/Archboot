@@ -182,6 +182,6 @@ donetwork() {
         DIALOG --infobox "Link is up. Continuing in 3 seconds ..." 3 60
         sleep 3
     fi
-    NEXTITEM="2"
+    _NEXTITEM="2"
     S_NET=1
 }
