@@ -2,12 +2,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # we rely on some output which is parsed in english!
 LANG=C.UTF8
-LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
-RUNNING_ARCH="$(uname -m)"
+_LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
+_RUNNING_ARCH="$(uname -m)"
 KERNELPKG="linux"
 # name of the kernel image
-[[ "${RUNNING_ARCH}" == "x86_64" || "${RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
-if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
+if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     VMLINUZ="Image.gz"
     #shellcheck disable=SC2034
     VMLINUZ_EFISTUB="Image"
@@ -16,11 +16,11 @@ fi
 PACMAN="pacman --root ${_DESTDIR} ${PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
 linux_firmware() {
-    PACKAGES="${PACKAGES//\ linux-firmware\ / }"
+    _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
         if modinfo "${i}" | grep -qw 'firmware:'; then
-            PACKAGES="${PACKAGES} linux-firmware"
+            _PACKAGES="${_PACKAGES} linux-firmware"
             break
         fi
     done
@@ -28,14 +28,14 @@ linux_firmware() {
 
 marvell_firmware() {
     unset MARVELL
-    PACKAGES="${PACKAGES// linux-firmware-marvell/ }"
+    _PACKAGES="${_PACKAGES// linux-firmware-marvell/ }"
     for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
         [[ -f $i ]] && MARVELL="$MARVELL $(basename "${i}" | sed -e 's#\..*$##g')"
     done
     # check marvell modules if already loaded
     for i in ${MARVELL}; do
         if lsmod | grep -qw "${i}"; then
-            PACKAGES="${PACKAGES} linux-firmware-marvell"
+            _PACKAGES="${_PACKAGES} linux-firmware-marvell"
             break
         fi
     done
@@ -83,64 +83,64 @@ local_pacman_conf() {
 auto_packages() {
     # Add filesystem packages
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
-        ! echo "${PACKAGES}" | grep -qw btrfs-progs && PACKAGES="${PACKAGES} btrfs-progs"
+        ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
     fi
     if lsblk -rnpo FSTYPE | grep -q nilfs2; then
-        ! echo "${PACKAGES}" | grep -qw nilfs-utils && PACKAGES="${PACKAGES} nilfs-utils"
+        ! echo "${_PACKAGES}" | grep -qw nilfs-utils && _PACKAGES="${_PACKAGES} nilfs-utils"
     fi
     if lsblk -rnpo FSTYPE | grep -q ext; then
-        ! echo "${PACKAGES}" | grep -qw e2fsprogs && PACKAGES="${PACKAGES} e2fsprogs"
+        ! echo "${_PACKAGES}" | grep -qw e2fsprogs && _PACKAGES="${_PACKAGES} e2fsprogs"
     fi
     if lsblk -rnpo FSTYPE | grep -q xfs; then
-        ! echo "${PACKAGES}" | grep -qw xfsprogs && PACKAGES="${PACKAGES} xfsprogs"
+        ! echo "${_PACKAGES}" | grep -qw xfsprogs && _PACKAGES="${_PACKAGES} xfsprogs"
     fi
     if lsblk -rnpo FSTYPE | grep -q jfs; then
-        ! echo "${PACKAGES}" | grep -qw jfsutils && PACKAGES="${PACKAGES} jfsutils"
+        ! echo "${_PACKAGES}" | grep -qw jfsutils && _PACKAGES="${_PACKAGES} jfsutils"
     fi
     if lsblk -rnpo FSTYPE | grep -q f2fs; then
-        ! echo "${PACKAGES}" | grep -qw f2fs-tools && PACKAGES="${PACKAGES} f2fs-tools"
+        ! echo "${_PACKAGES}" | grep -qw f2fs-tools && _PACKAGES="${_PACKAGES} f2fs-tools"
     fi
     if lsblk -rnpo FSTYPE | grep -q vfat; then
-        ! echo "${PACKAGES}" | grep -qw dosfstools && PACKAGES="${PACKAGES} dosfstools"
+        ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
     fi
     if ! [[ "$(dmraid_devices)" == "" ]]; then
-        ! echo "${PACKAGES}" | grep -qw dmraid && PACKAGES="${PACKAGES} dmraid"
+        ! echo "${_PACKAGES}" | grep -qw dmraid && _PACKAGES="${_PACKAGES} dmraid"
     fi
     if lsmod | grep -qw wl; then
-        ! echo "${PACKAGES}" | grep -qw broadcom-wl && PACKAGES="${PACKAGES} broadcom-wl"
+        ! echo "${_PACKAGES}" | grep -qw broadcom-wl && _PACKAGES="${_PACKAGES} broadcom-wl"
     fi
     #shellcheck disable=SC2010
     if ls /sys/class/net | grep -q wlan; then
-        ! echo "${PACKAGES}" | grep -qw iwd && PACKAGES="${PACKAGES} iwd"
+        ! echo "${_PACKAGES}" | grep -qw iwd && _PACKAGES="${_PACKAGES} iwd"
     fi
     # only add firmware if already used
     linux_firmware
     marvell_firmware
     ### HACK:
     # always add intel-ucode on x86_64
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
-        PACKAGES="${PACKAGES//\ intel-ucode\ / }"
-        PACKAGES="${PACKAGES} intel-ucode"
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _PACKAGES="${_PACKAGES//\ intel-ucode\ / }"
+        _PACKAGES="${_PACKAGES} intel-ucode"
     fi
     # always add amd-ucode
-    if [[ "${RUNNING_ARCH}" == "x86_64" ||  "${RUNNING_ARCH}" == "aarch64"  ]]; then
-        PACKAGES="${PACKAGES//\ amd-ucode\ / }"
-        PACKAGES="${PACKAGES} amd-ucode"
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ||  "${_RUNNING_ARCH}" == "aarch64"  ]]; then
+        _PACKAGES="${_PACKAGES//\ amd-ucode\ / }"
+        _PACKAGES="${_PACKAGES} amd-ucode"
     fi
     ### HACK:
     # always add lvm2, cryptsetup and mdadm
-    PACKAGES="${PACKAGES//\ lvm2\ / }"
-    PACKAGES="${PACKAGES} lvm2"
-    PACKAGES="${PACKAGES//\ cryptsetup\ / }"
-    PACKAGES="${PACKAGES} cryptsetup"
-    PACKAGES="${PACKAGES//\ mdadm\ / }"
-    PACKAGES="${PACKAGES} mdadm"
+    _PACKAGES="${_PACKAGES//\ lvm2\ / }"
+    _PACKAGES="${_PACKAGES} lvm2"
+    _PACKAGES="${_PACKAGES//\ cryptsetup\ / }"
+    _PACKAGES="${_PACKAGES} cryptsetup"
+    _PACKAGES="${_PACKAGES//\ mdadm\ / }"
+    _PACKAGES="${_PACKAGES} mdadm"
     ### HACK
     # always add nano and neovim
-    PACKAGES="${PACKAGES//\ nano\ / }"
-    PACKAGES="${PACKAGES} nano"
-    PACKAGES="${PACKAGES//\ neovim\ / }"
-    PACKAGES="${PACKAGES} neovim"
+    _PACKAGES="${_PACKAGES//\ nano\ / }"
+    _PACKAGES="${_PACKAGES} nano"
+    _PACKAGES="${_PACKAGES//\ neovim\ / }"
+    _PACKAGES="${_PACKAGES} neovim"
 }
 
 # /etc/locale.gen

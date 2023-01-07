@@ -155,16 +155,16 @@ abort_f2fs_bootpart() {
 }
 
 do_uefi_common() {
-    PACKAGES=""
-    [[ ! -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] && PACKAGES="${PACKAGES} dosfstools"
-    [[ ! -f "${_DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
-    [[ ! -f "${_DESTDIR}/usr/bin/efibootmgr" ]] && PACKAGES="${PACKAGES} efibootmgr"
+    _PACKAGES=""
+    [[ ! -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] && _PACKAGES="${_PACKAGES} dosfstools"
+    [[ ! -f "${_DESTDIR}/usr/bin/efivar" ]] && _PACKAGES="${_PACKAGES} efivar"
+    [[ ! -f "${_DESTDIR}/usr/bin/efibootmgr" ]] && _PACKAGES="${_PACKAGES} efibootmgr"
     if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
-        [[ ! -f "${_DESTDIR}/usr/bin/mokutil" ]] && PACKAGES="${PACKAGES} mokutil"
-        [[ ! -f "${_DESTDIR}/usr/bin/efi-readvar" ]] && PACKAGES="${PACKAGES} efitools"
-        [[ ! -f "${_DESTDIR}/usr/bin/sbsign" ]] && PACKAGES="${PACKAGES} sbsigntools"
+        [[ ! -f "${_DESTDIR}/usr/bin/mokutil" ]] && _PACKAGES="${_PACKAGES} mokutil"
+        [[ ! -f "${_DESTDIR}/usr/bin/efi-readvar" ]] && _PACKAGES="${_PACKAGES} efitools"
+        [[ ! -f "${_DESTDIR}/usr/bin/sbsign" ]] && _PACKAGES="${_PACKAGES} sbsigntools"
     fi
-    ! [[ "${PACKAGES}" == "" ]] && run_pacman
+    ! [[ "${_PACKAGES}" == "" ]] && run_pacman
     check_efisys_part
 }
 
@@ -327,29 +327,29 @@ do_efistub_parameters() {
     _uefisysdev="$(findmnt -vno SOURCE "${_DESTDIR}/${UEFISYS_MP}")"
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="${VMLINUZ_EFISTUB}"
         else
             _KERNEL="${VMLINUZ}"
-            if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+            if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="${INTEL_UCODE}"
             fi
         fi
-        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
             _INITRD_AMD_UCODE="${AMD_UCODE}"
         fi
         _INITRD="${INITRAMFS}"
     else
         # name .efi for uefisys partition
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="${UEFISYS_PATH}/${VMLINUZ_EFISTUB}"
         else
             _KERNEL="${UEFISYS_PATH}/${VMLINUZ}"
-            if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+            if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
         fi
-        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
             _INITRD_AMD_UCODE="${UEFISYS_PATH}/${AMD_UCODE}"
         fi
         _INITRD="${UEFISYS_PATH}/${INITRAMFS}"
@@ -365,11 +365,11 @@ do_efistub_copy_to_efisys() {
         cp -f "${_DESTDIR}/boot/${VMLINUZ}" "${_DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${UEFISYS_MP}/${_INITRD}"
         cp -f "${_DESTDIR}/boot/${INITRAMFS}" "${_DESTDIR}/${UEFISYS_MP}/${_INITRD}"
-        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             rm -f "${_DESTDIR}/${UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
             cp -f "${_DESTDIR}/boot/${INTEL_UCODE}" "${_DESTDIR}/${UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
         fi
-        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
             rm -f "${_DESTDIR}/${UEFISYS_MP}/${_INITRD_AMD_UCODE}"
             cp -f "${_DESTDIR}/boot/${AMD_UCODE}" "${_DESTDIR}/${UEFISYS_MP}/${_INITRD_AMD_UCODE}"
         fi
@@ -382,9 +382,9 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 PathChanged=/boot/${VMLINUZ}
 PathChanged=/boot/${INITRAMFS}
 CONFEOF
-        [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
+        [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
             echo "PathChanged=/boot/${AMD_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
-        [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
             echo "PathChanged=/boot/${INTEL_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
         cat << CONFEOF >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
 Unit=efistub_copy.service
@@ -399,10 +399,10 @@ Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${_INITRD}
 CONFEOF
-        [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "x86_64" ]] && \
+        [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
             echo "ExecStart=/usr/bin/cp -f /boot/${AMD_UCODE} ${UEFISYS_MP}/${_INITRD_AMD_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
-        [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
             echo "ExecStart=/usr/bin/cp -f /boot/${INTEL_UCODE} ${UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${_DESTDIR}" == "/install" ]]; then
@@ -418,7 +418,7 @@ do_efistub_uefi() {
     do_uefi_common
     do_efistub_parameters
     common_bootloader_checks
-    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         do_systemd_boot_uefi
     else
         DIALOG --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
@@ -437,9 +437,9 @@ do_systemd_boot_uefi() {
     ! [[ -d "${_DESTDIR}/${UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     echo "linux    /${_KERNEL}" >> "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
         echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
+    [[ "${_RUNNING_ARCH}" == "x86_64"  || "${_RUNNING_ARCH}" == "aarch64" ]] && \
         echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     cat << GUMEOF >> "${_DESTDIR}/${UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   /${_INITRD}
@@ -472,7 +472,7 @@ GUMEOF
 do_refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         DIALOG --infobox "Installing refind ..." 0 0
-        PACKAGES="refind"
+        _PACKAGES="refind"
         run_pacman
     fi
     DIALOG --infobox "Setting up rEFInd now. This needs some time ..." 3 60
@@ -491,9 +491,9 @@ menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
     loader   /${_KERNEL}
 CONFEOF
-    [[ "${RUNNING_ARCH}" == "x86_64" ]] && \
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
         echo "    initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
-    [[ "${RUNNING_ARCH}" == "x86_64"  || "${RUNNING_ARCH}" == "aarch64" ]] && \
+    [[ "${_RUNNING_ARCH}" == "x86_64"  || "${_RUNNING_ARCH}" == "aarch64" ]] && \
         echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
     cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
@@ -534,7 +534,7 @@ do_grub_common_before() {
     fi
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         DIALOG --infobox "Installing grub ..." 0 0
-        PACKAGES="grub"
+        _PACKAGES="grub"
         run_pacman
     fi
 }
@@ -668,7 +668,7 @@ EOF
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     ## create default kernel entry
     NUMBER="0"
-if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     cat << EOF >> "${_DESTDIR}/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
 # (${NUMBER}) Arch Linux
 menuentry "Arch Linux" {
@@ -748,8 +748,8 @@ do_uboot() {
     [[ -d "${_DESTDIR}/boot/extlinux" ]] || mkdir -p "${_DESTDIR}/boot/extlinux"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
-    [[ "${RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
-    [[ "${RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
     # write extlinux.conf
     DIALOG --infobox "Installing UBOOT ..." 0 0
     cat << EOF >> "${_DESTDIR}/boot/extlinux/extlinux.conf"
@@ -893,13 +893,13 @@ do_grub_uefi() {
         [[ -f "${_DESTDIR}/${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
         # add -v for verbose
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                 if [[ "${_DESTDIR}" == "/install" ]]; then
                     systemd-nspawn -q -D "${_DESTDIR}" grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
                 else
                     grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
                 fi
-        elif [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
                 if [[ "${_DESTDIR}" == "/install" ]]; then
                     systemd-nspawn -q -D "${_DESTDIR}" grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="unicode" --locales="en@quot" --themes="" -o "${GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${GRUB_PREFIX_DIR}/${GRUB_CFG}"
                 else
@@ -971,7 +971,7 @@ install_bootloader() {
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
     else
-        if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             do_uboot
         else
             do_grub_bios

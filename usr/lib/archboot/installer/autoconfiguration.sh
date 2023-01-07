@@ -138,10 +138,10 @@ auto_mkinitcpio() {
             fi
         fi
         # get kernel version
-        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_DESTDIR}/boot/${VMLINUZ}")
             read -r HWKVER _ < <(dd if="${_DESTDIR}/boot/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
-        elif [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
+        elif [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             reader="cat"
             # try if the image is gzip compressed
             [[ $(file -b --mime-type "${_DESTDIR}/boot/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"

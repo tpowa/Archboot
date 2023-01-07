@@ -88,8 +88,8 @@ run_mkinitcpio() {
     DIALOG --infobox "Rebuilding initramfs on installed system ..." 3 70
     chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
-    if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     else
         chroot "${_DESTDIR}" mkinitcpio -p "${KERNELPKG}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
     fi

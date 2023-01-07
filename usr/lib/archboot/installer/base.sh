@@ -78,7 +78,7 @@ set_uefi_parameters() {
         if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
             _UEFI_SECURE_BOOT="1"
         fi
-        if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
                 _EFI_MIXED="1"
                 _UEFI_ARCH="IA32"
@@ -89,7 +89,7 @@ set_uefi_parameters() {
                 _SPEC_UEFI_ARCH="x64"
             fi
         fi
-        if [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _EFI_MIXED="0"
             _UEFI_ARCH="AA64"
             _SPEC_UEFI_ARCH="aa64"

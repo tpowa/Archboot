@@ -26,7 +26,7 @@ getsource() {
 select_mirror() {
     _NEXTITEM="2"
     ## Download updated mirrorlist, if possible (only on x86_64)
-    if [[ "${RUNNING_ARCH}" == "x86_64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         dialog --infobox "Downloading latest mirrorlist ..." 3 40
         ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
@@ -81,16 +81,16 @@ update_environment() {
     else
         UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
-            if ! [[ "${RUNNING_ARCH}" == "riscv64" ]]; then
+            if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 DIALOG --infobox "Refreshing package database ..." 3 70
                 pacman -Sy > "${_LOG}" 2>&1
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 #shellcheck disable=SC2086
                 LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-                if  [[ "${RUNNING_ARCH}" == "aarch64" ]]; then
+                if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                     #shellcheck disable=SC2086
-                    ONLINE_KERNEL="$(pacman -Si ${KERNELPKG}-${RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    ONLINE_KERNEL="$(pacman -Si ${KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     #shellcheck disable=SC2086
                     ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
@@ -134,21 +134,21 @@ prepare_pacman() {
     ${PACMAN} -Sy > "${_LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
     KEYRING="archlinux-keyring"
-    [[ "${RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
     pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
-# Set PACKAGES parameter before running to install wanted packages
+# Set _PACKAGES parameter before running to install wanted packages
 run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
     chroot_mount
-    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${PACKAGES} ...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress ..." 10 70
+    DIALOG --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${_PACKAGES} ...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress ..." 10 70
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
-    ${PACMAN} -S ${PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >/dev/null 2>&1
+    ${PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >/dev/null 2>&1
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
@@ -179,15 +179,15 @@ install_packages() {
         select_source || return 1
     fi
     prepare_pacman || return 1
-    PACKAGES=""
+    _PACKAGES=""
     # add packages from archboot defaults
-    PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
-    # fallback if _PACKAGES is empty
-    [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
+    _PACKAGES=$(grep '^__PACKAGES' /etc/archboot/defaults | sed -e 's#__PACKAGES=##g' -e 's#"##g')
+    # fallback if __PACKAGES is empty
+    [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
     auto_packages
     # fix double spaces
-    PACKAGES="${PACKAGES//  / }"
-    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${PACKAGES}\n\nYou can watch the progress on your ${_VC} console.\n\nDo you wish to continue?" 12 75 || return 1
+    _PACKAGES="${_PACKAGES//  / }"
+    DIALOG --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console.\n\nDo you wish to continue?" 12 75 || return 1
     run_pacman
     _NEXTITEM="6"
     chroot_mount
