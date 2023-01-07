@@ -974,7 +974,7 @@ install_bootloader_uefi() {
 
 choose_bootloader() {
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        install_bootloader_uefi
+        install_bootloader_uefi || return 1
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
             do_uboot
@@ -996,6 +996,7 @@ install_bootloader() {
     detect_uefi_boot
     do_uefi_setup_env_vars
     NEXTITEM="7"
-    choose_bootloader && NEXTITEM="8"
+    choose_bootloader || return 1
+    NEXTITEM="8"
 }
 
