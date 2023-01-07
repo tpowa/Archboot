@@ -27,9 +27,9 @@ _EDITOR=""
 
 set_title() {
     if [[ -e "${LOCAL_DB}" ]]; then
-        TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
+        _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
     else
-        TITLE="Archboot Arch Linux Installation (Online mode) --> https://bit.ly/archboot"
+        _TITLE="Archboot Arch Linux Installation (Online mode) --> https://bit.ly/archboot"
     fi
 }
 
@@ -39,7 +39,7 @@ set_title() {
 # parameters: see dialog(1)
 # returns: whatever dialog did
 DIALOG() {
-    dialog --backtitle "${TITLE}" --aspect 15 "$@"
+    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
