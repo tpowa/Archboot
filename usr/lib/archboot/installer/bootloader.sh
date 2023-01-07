@@ -996,7 +996,6 @@ install_bootloader() {
     detect_uefi_boot
     do_uefi_setup_env_vars
     NEXTITEM="7"
-    choose_bootloader || return 1
-    NEXTITEM="8"
+    choose_bootloader && NEXTITEM="8"
 }
 
