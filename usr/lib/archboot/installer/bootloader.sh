@@ -965,7 +965,7 @@ install_bootloader_uefi() {
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${ANSWER}" || CANCEL=1
         case $(cat "${ANSWER}") in
             "EFISTUB") do_efistub_uefi
-                       [[ "${CANCEL}" == "" ]] && do_efistub_copy_to_efisys
+                       [[ -z "${CANCEL}" ]] && do_efistub_copy_to_efisys
                         ;;
             "GRUB_UEFI") do_grub_uefi ;;
         esac
@@ -974,7 +974,7 @@ install_bootloader_uefi() {
 
 choose_bootloader() {
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        install_bootloader_uefi || return 1
+        install_bootloader_uefi
     else
         if [[ "${RUNNING_ARCH}" == "aarch64" || "${RUNNING_ARCH}" == "riscv64" ]]; then
             do_uboot
@@ -996,7 +996,7 @@ install_bootloader() {
     detect_uefi_boot
     do_uefi_setup_env_vars
     NEXTITEM="7"
-    choose_bootloader || return 1
-    NEXTITEM="8"
+    choose_bootloader
+    [[ -z "${CANCEL}" ]] && NEXTITEM="8"
 }
 
