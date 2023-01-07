@@ -964,7 +964,7 @@ install_bootloader() {
     if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         set_device_name_scheme || return 1
     fi
-    if [[ "${S_SRC}" == "0" ]]; then
+    if [[ "${_S_SRC}" == "0" ]]; then
         select_source || return 1
     fi
     prepare_pacman

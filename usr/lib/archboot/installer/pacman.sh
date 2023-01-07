@@ -175,7 +175,7 @@ run_pacman(){
 # performs package installation to the target system
 install_packages() {
     destdir_mounts || return 1
-    if [[ "${S_SRC}" == "0" ]]; then
+    if [[ "${_S_SRC}" == "0" ]]; then
         select_source || return 1
     fi
     prepare_pacman || return 1
