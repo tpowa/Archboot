@@ -174,7 +174,6 @@ do_uefi_setup_env_vars() {
 }
 
 do_uefi_common() {
-    do_uefi_setup_env_vars
     PACKAGES=""
     [[ ! -f "${DESTDIR}/usr/bin/mkfs.vfat" ]] && PACKAGES="${PACKAGES} dosfstools"
     [[ ! -f "${DESTDIR}/usr/bin/efivar" ]] && PACKAGES="${PACKAGES} efivar"
@@ -951,7 +950,6 @@ do_grub_uefi() {
 }
 
 install_bootloader_uefi() {
-    do_uefi_setup_env_vars
     if [[ "${_EFI_MIXED}" == "1" ]]; then
         _EFISTUB_MENU_LABEL=""
         _EFISTUB_MENU_TEXT=""
@@ -974,40 +972,6 @@ install_bootloader_uefi() {
     fi
 }
 
-install_bootloader() {
-    CANCEL=""
-    _ANOTHER=""
-    destdir_mounts || return 1
-    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        set_device_name_scheme || return 1
-    fi
-    if [[ "${S_SRC}" == "0" ]]; then
-        select_source || return 1
-    fi
-    prepare_pacman
-    detect_uefi_boot
-    NEXTITEM="7"
-    if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
-        do_uefi_setup_env_vars
-        install_bootloader_uefi
-        if [[ "${_DETECTED_UEFI_SECURE_BOOT}" ==  "1" ]]; then
-            NEXTITEM="8"
-        else
-            [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
-        fi
-    else
-        choose_bootloader
-        [[ "${CANCEL}" == "" ]] && _ANOTHER="1"
-    fi
-    if [[ "${_ANOTHER}" == "1" ]]; then
-        NEXTITEM="8"
-        while [[ "${CANCEL}" == "" ]]; do
-            DIALOG --defaultno --yesno "Do you want to install another bootloader?" 5 50 || break
-            choose_bootloader
-        done
-    fi
-}
-
 choose_bootloader() {
     if [[ "${_DETECTED_UEFI_BOOT}" == "1" ]]; then
         install_bootloader_uefi
@@ -1019,3 +983,20 @@ choose_bootloader() {
         fi
     fi
 }
+
+install_bootloader() {
+    destdir_mounts || return 1
+    if [[ "${NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+        set_device_name_scheme || return 1
+    fi
+    if [[ "${S_SRC}" == "0" ]]; then
+        select_source || return 1
+    fi
+    prepare_pacman
+    detect_uefi_boot
+    do_uefi_setup_env_vars
+    NEXTITEM="7"
+    choose_bootloader || return 1
+    NEXTITEM="8"
+}
+
