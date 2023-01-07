@@ -18,7 +18,7 @@ _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
 _S_SRC=0         # choose mirror
-S_MKFS=0        # formatting
+_S_MKFS=0        # formatting
 S_MKFSAUTO=0    # auto fs part/formatting
 # menu item tracker- autoselect the next item
 NEXTITEM=""

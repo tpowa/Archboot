@@ -7,7 +7,7 @@
 # according to partitioning/formatting stage
 auto_fstab(){
     # Modify fstab
-    if [[ "${S_MKFS}" == "1" || "${S_MKFSAUTO}" == "1" ]]; then
+    if [[ "${_S_MKFS}" == "1" || "${_S_MKFSAUTO}" == "1" ]]; then
         DIALOG --infobox "Create new fstab on installed system ..." 3 70
         if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
