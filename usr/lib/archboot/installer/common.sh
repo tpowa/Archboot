@@ -4,13 +4,13 @@
 LANG=C.UTF8
 _LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 _RUNNING_ARCH="$(uname -m)"
-KERNELPKG="linux"
+_KERNELPKG="linux"
 # name of the kernel image
-[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-${KERNELPKG}"
+[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-    VMLINUZ="Image.gz"
+    _VMLINUZ="Image.gz"
     #shellcheck disable=SC2034
-    VMLINUZ_EFISTUB="Image"
+    _VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
 PACMAN="pacman --root ${_DESTDIR} ${PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"

@@ -6,7 +6,7 @@ INTEL_UCODE="intel-ucode.img"
 AMD_UCODE="amd-ucode.img"
 ROOTFS=""
 # name of the initramfs filesystem
-INITRAMFS="initramfs-${KERNELPKG}.img"
+INITRAMFS="initramfs-${_KERNELPKG}.img"
 
 getrootfstype() {
     ROOTFS="$(getfstype "${PART_ROOT}")"
@@ -277,23 +277,23 @@ do_mok_sign () {
         sleep 5
     fi
     SIGN_MOK=""
-    DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
+    DIALOG --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && SIGN_MOK="1"
     if [[ "${SIGN_MOK}" == "1" ]]; then
         if [[ "${_DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${_LOG}" 2>&1
+            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" > "${_LOG}" 2>&1
             systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${_LOG}" 2>&1
         else
-            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${VMLINUZ}" /boot/"${VMLINUZ}" > "${_LOG}" 2>&1
+            sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" > "${_LOG}" 2>&1
             sbsign --key /"${KEYDIR}"/MOK/MOK.key --cert /"${KEYDIR}"/MOK/MOK.crt --output "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi > "${_LOG}" 2>&1
         fi
-        DIALOG --infobox "/boot/${VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds ..." 7 60
+        DIALOG --infobox "/boot/${_VMLINUZ} and ${UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds ..." 7 60
         sleep 5
     fi
 }
 
 do_pacman_sign() {
     SIGN_KERNEL=""
-    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${VMLINUZ} on updates?" 6 60 && SIGN_KERNEL="1"
+    DIALOG --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && SIGN_KERNEL="1"
     if [[ "${SIGN_KERNEL}" == "1" ]]; then
         [[ ! -d "${_DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks/
         HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
@@ -328,9 +328,9 @@ do_efistub_parameters() {
     UEFISYS_PART_FS_UUID="$(getfsuuid "${_uefisysdev}")"
     if [[ "${UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="${VMLINUZ_EFISTUB}"
+            _KERNEL="${_VMLINUZ_EFISTUB}"
         else
-            _KERNEL="${VMLINUZ}"
+            _KERNEL="${_VMLINUZ}"
             if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="${INTEL_UCODE}"
             fi
@@ -342,9 +342,9 @@ do_efistub_parameters() {
     else
         # name .efi for uefisys partition
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="${UEFISYS_PATH}/${VMLINUZ_EFISTUB}"
+            _KERNEL="${UEFISYS_PATH}/${_VMLINUZ_EFISTUB}"
         else
-            _KERNEL="${UEFISYS_PATH}/${VMLINUZ}"
+            _KERNEL="${UEFISYS_PATH}/${_VMLINUZ}"
             if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
                 _INITRD_INTEL_UCODE="${UEFISYS_PATH}/${INTEL_UCODE}"
             fi
@@ -362,7 +362,7 @@ do_efistub_copy_to_efisys() {
         DIALOG --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 4 50
         ! [[ -d "${_DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}" ]] && mkdir -p "${_DESTDIR}/${UEFISYS_MP}/${UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
-        cp -f "${_DESTDIR}/boot/${VMLINUZ}" "${_DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
+        cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${UEFISYS_MP}/${_INITRD}"
         cp -f "${_DESTDIR}/boot/${INITRAMFS}" "${_DESTDIR}/${UEFISYS_MP}/${_INITRD}"
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -379,7 +379,7 @@ do_efistub_copy_to_efisys() {
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Path]
-PathChanged=/boot/${VMLINUZ}
+PathChanged=/boot/${_VMLINUZ}
 PathChanged=/boot/${INITRAMFS}
 CONFEOF
         [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
@@ -396,7 +396,7 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${VMLINUZ} ${UEFISYS_MP}/${_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} ${UEFISYS_MP}/${_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${INITRAMFS} ${UEFISYS_MP}/${_INITRD}
 CONFEOF
         [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
@@ -661,9 +661,9 @@ EOF
         fi
     fi
     if [[ "${GRUB_UEFI}" == "1" ]]; then
-        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_MOD}"
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     else
-        LINUX_UNMOD_COMMAND="linux ${subdir}/${VMLINUZ} ${_KERNEL_PARAMS_MOD}"
+        LINUX_UNMOD_COMMAND="linux ${subdir}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     fi
     LINUX_MOD_COMMAND=$(echo "${LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     ## create default kernel entry
@@ -758,7 +758,7 @@ timeout 100
 default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds ...)
-    kernel ${subdir}/${VMLINUZ}
+    kernel ${subdir}/${_VMLINUZ}
     initrd ${subdir}/${INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF

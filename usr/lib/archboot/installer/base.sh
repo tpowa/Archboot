@@ -20,6 +20,7 @@ _VC="VC${_VC_NUM}"
 _S_SRC=0         # choose mirror
 _S_MKFS=0        # formatting
 _S_MKFSAUTO=0    # auto fs part/formatting
+_S_BOOTLOADER=0  # bootloader installation
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""

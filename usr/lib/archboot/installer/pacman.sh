@@ -2,19 +2,19 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # downloader
 DLPROG="wget"
-MIRRORLIST="/etc/pacman.d/mirrorlist"
+_MIRRORLIST="/etc/pacman.d/mirrorlist"
 
 getsource() {
-    S_SRC=0
-    PACMAN_CONF=""
+    _S_SRC=0
+    _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
         local_pacman_conf
         DIALOG --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
-        S_SRC=1
+        _S_SRC=1
     else
         select_mirror || return 1
-        S_SRC=1
+        _S_SRC=1
     fi
 }
 
@@ -30,12 +30,12 @@ select_mirror() {
         dialog --infobox "Downloading latest mirrorlist ..." 3 40
         ${DLPROG} -q "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
-            mv "${MIRRORLIST}" "${MIRRORLIST}.bak"
-            cp /tmp/pacman_mirrorlist.txt "${MIRRORLIST}"
+            mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
+            cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
         fi
     fi
     # FIXME: this regex doesn't honor commenting
-    MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${MIRRORLIST}" | sed 's|$| _|g')
+    MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
     DIALOG --menu "Select a mirror:" 14 55 7 \
         ${MIRRORS} \
@@ -51,7 +51,7 @@ select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(grep -E -o "${_server}.*" "${MIRRORLIST}" | head -n1)
+        SYNC_URL=$(grep -E -o "${_server}.*" "${_MIRRORLIST}" | head -n1)
     fi
     _NEXTITEM="4"
     echo "Using mirror: ${SYNC_URL}" > "${_LOG}"
@@ -87,13 +87,13 @@ update_environment() {
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 #shellcheck disable=SC2086
-                LOCAL_KERNEL="$(pacman -Qi ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                     #shellcheck disable=SC2086
-                    ONLINE_KERNEL="$(pacman -Si ${KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     #shellcheck disable=SC2086
-                    ONLINE_KERNEL="$(pacman -Si ${KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 fi
                 echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${_LOG}"
                 sleep 2
@@ -136,7 +136,7 @@ prepare_pacman() {
     KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
+    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
 # Set _PACKAGES parameter before running to install wanted packages

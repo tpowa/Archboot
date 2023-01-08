@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-DESTDIR="${1}"
+_DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 
 usage() {
@@ -11,7 +11,7 @@ usage() {
     echo "This script is for users who would rather partition/mkfs/mount their target"
     echo "media manually than go through the routines in the setup script."
     echo
-    if ! [[ -e "${LOCAL_DB}" ]]; then
+    if ! [[ -e "${_LOCAL_DB}" ]]; then
         echo -e "First configure \033[1m/etc/pacman.conf\033[0m which repositories to use"
         echo -e "and set a mirror in \033[1m/etc/pacman.d/mirrorlist\033[0m"
     fi
@@ -31,11 +31,11 @@ usage() {
 # returns: 1 on error
 prepare_pacman() {
     # Set up the necessary directories for pacman use
-    if [[ ! -d "${DESTDIR}/var/cache/pacman/pkg" ]]; then
-        mkdir -p "${DESTDIR}/var/cache/pacman/pkg"
+    if [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]]; then
+        mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     fi
-    if [[ ! -d "${DESTDIR}/var/lib/pacman" ]]; then
-        mkdir -p "${DESTDIR}/var/lib/pacman"
+    if [[ ! -d "${_DESTDIR}/var/lib/pacman" ]]; then
+        mkdir -p "${_DESTDIR}/var/lib/pacman"
     fi
     # pacman-key process itself
     while pgrep -x pacman-key > /dev/null 2>&1; do
@@ -47,21 +47,21 @@ prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     ${PACMAN} -Sy
-    KEYRING="archlinux-keyring"
-    [[ "$(uname -m)" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
+    _KEYRING="archlinux-keyring"
+    [[ "$(uname -m)" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} || exit 1
+    pacman -Sy ${PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} || exit 1
 }
 
 # package_installation
 install_packages() {
     # add packages from archboot defaults
-    PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
+    _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
     # fallback if _PACKAGES is empty
-    [[ -z "${PACKAGES}" ]] && PACKAGES="base linux linux-firmware"
+    [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
     auto_packages
     #shellcheck disable=SC2086
-    ${PACMAN} -S ${PACKAGES}
+    ${PACMAN} -S ${_PACKAGES}
 }
 
 # start script
@@ -71,7 +71,7 @@ fi
 
 ! [[ -d /tmp ]] && mkdir /tmp
 
-if [[ -e "${LOCAL_DB}" ]]; then
+if [[ -e "${_LOCAL_DB}" ]]; then
     local_pacman_conf
 else
     PACMAN_CONF=""
@@ -94,18 +94,18 @@ echo
 echo -e "\033[1mPackage installation complete.\033[0m"
 echo
 echo -e "Please install a \033[1mbootloader\033[0m. Edit the appropriate config file for"
-echo -e "your loader. Please use \033[1m${VMLINUZ}\033[0m as kernel image."
+echo -e "your loader. Please use \033[1m${_VMLINUZ}\033[0m as kernel image."
 echo -e "Chroot into your system to install it:"
-echo -e "  \033[1m# mount -o bind /dev ${DESTDIR}/dev\033[0m"
-echo -e "  \033[1m# mount -t proc none ${DESTDIR}/proc\033[0m"
-echo -e "  \033[1m# mount -t sysfs none ${DESTDIR}/sys\033[0m"
-echo -e "  \033[1m# chroot ${DESTDIR} /bin/bash\033[0m"
+echo -e "  \033[1m# mount -o bind /dev ${_DESTDIR}/dev\033[0m"
+echo -e "  \033[1m# mount -t proc none ${_DESTDIR}/proc\033[0m"
+echo -e "  \033[1m# mount -t sysfs none ${_DESTDIR}/sys\033[0m"
+echo -e "  \033[1m# chroot ${_DESTDIR} /bin/bash\033[0m"
 echo
 echo "Next step, initramfs setup:"
 echo -e "Edit your \033[1m/etc/mkinitcpio.conf\033[0m to fit your needs. After that run:"
-echo -e "  \033[1m# mkinitcpio -p ${KERNELPKG}\033[0m"
+echo -e "  \033[1m# mkinitcpio -p ${_KERNELPKG}\033[0m"
 echo
-echo -e "Then \033[1mexit\033[0m your chroot shell, edit \033[1m${DESTDIR}/etc/fstab\033[0m and \033[1mreboot\033[0m! "
+echo -e "Then \033[1mexit\033[0m your chroot shell, edit \033[1m${_DESTDIR}/etc/fstab\033[0m and \033[1mreboot\033[0m! "
 exit 0
 
 # vim: set ts=4 sw=4 et:
