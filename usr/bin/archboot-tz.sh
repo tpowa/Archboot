@@ -12,7 +12,7 @@ fi
 abort()
 {
     DIALOG --yesno "Abort Time And Date Setting?" 6 40 || return 0
-    [[ -e /tmp/.time_zone ]] && rm -f /tmp/.time_zone
+    [[ -e /tmp/.timezone ]] && rm -f /tmp/.timezone
     [[ -e /tmp/.hardwareclock ]] && rm -f /tmp/.hardwareclock
     [[ -e /tmp/.tz ]] && rm -f /tmp/.tz
     [[ -e /etc/localtime ]] && rm -f /etc/localtime
@@ -51,7 +51,7 @@ else
 fi
 }
 
-dotime_zone () {
+dotimezone () {
 _SET_ZONE=""
 while ! [[ "${_SET_ZONE}" = "1" ]]; do
     _REGIONS="America - Europe - Africa - Asia - Australia -"
@@ -59,17 +59,17 @@ while ! [[ "${_SET_ZONE}" = "1" ]]; do
     DIALOG --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}
     _REGION=$(cat ${_ANSWER})
     _ZONES=""
-    for i in $(timedatectl --no-pager list-time_ZONEs | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
+    for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
         _ZONES="${_ZONES} ${i} -"
     done
     #shellcheck disable=SC2086
-    DIALOG --menu "Please Select A Time_ZONE:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
+    DIALOG --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
     _ZONE=$(cat ${_ANSWER})
     [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
     if [[ "${_SET_ZONE}" = "1" ]]; then
-        DIALOG --infobox "Setting Time_ZONE to ${_ZONE} ..." 0 0
-        echo "${_ZONE}" > /tmp/.time_zone
-        timedatectl set-time_ZONE "${_ZONE}"
+        DIALOG --infobox "Setting Timezone to ${_ZONE} ..." 0 0
+        echo "${_ZONE}" > /tmp/.timezone
+        timedatectl set-timezone "${_ZONE}"
         _S_NEXTITEM="2"
     else
         _S_NEXTITEM="1"
@@ -79,10 +79,10 @@ done
 }
 
 dotimeset() {
-if [[ ! -s /tmp/.time_zone ]]; then
-    DIALOG --msgbox "Error:\nYou have to select time_ZONE first." 0 0
+if [[ ! -s /tmp/.timezone ]]; then
+    DIALOG --msgbox "Error:\nYou have to select timezone first." 0 0
     _S_NEXTITEM="1"
-    dotime_zone || return 1
+    dotimezone || return 1
 fi
 _SET_TIME=""
 while [[ "${_SET_TIME}" == "" ]]; do
@@ -142,12 +142,12 @@ mainmenu() {
     #shellcheck disable=SC2086
     DIALOG ${DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
-        "1" "Select Time_ZONE" \
+        "1" "Select Timezone" \
         "2" "Set Time and Date" \
         "3" "${_EXIT}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
-            dotime_zone
+            dotimezone
             ;;
         "2")
             dotimeset
@@ -162,7 +162,7 @@ mainmenu() {
 }
 
 : >/tmp/.hardwareclock
-: >/tmp/.time_zone
+: >/tmp/.timezone
 : >/tmp/.tz
 
 if [[ -e /tmp/.tz-running ]]; then
