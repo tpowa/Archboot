@@ -181,8 +181,8 @@ install_packages() {
     prepare_pacman || return 1
     _PACKAGES=""
     # add packages from archboot defaults
-    _PACKAGES=$(grep '^__PACKAGES' /etc/archboot/defaults | sed -e 's#__PACKAGES=##g' -e 's#"##g')
-    # fallback if __PACKAGES is empty
+    _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
+    # fallback if _PACKAGES is empty
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
     auto_packages
     # fix double spaces
