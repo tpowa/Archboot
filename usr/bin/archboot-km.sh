@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # written by Tobias Powalowski <tpowa@archlinux.org>
-
 _ANSWER="/tmp/.km"
 _TITLE="Arch Linux Console Font And Keymap Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
