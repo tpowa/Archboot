@@ -118,7 +118,7 @@ donetwork() {
         else
             _IP="static"
             DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
-            IPADDR=$(cat "${_ANSWER}")
+            _IPADDR=$(cat "${_ANSWER}")
             DIALOG --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
             _GW=$(cat "${_ANSWER}")
             DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
@@ -172,7 +172,7 @@ donetwork() {
     # add sleep here dhcp can need some time to get link
     while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
         sleep 1
-        _NETWORK_COUNT="$((NETWORK_COUNT+1))"
+        _NETWORK_COUNT="$((_NETWORK_COUNT+1))"
         [[ "${_NETWORK_COUNT}" == "30" ]] && break
     done
     if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
