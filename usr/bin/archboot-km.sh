@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # written by Tobias Powalowski <tpowa@archlinux.org>
 
-ANSWER="/tmp/.km"
-TITLE="Arch Linux Console Font And Keymap Setting"
+_ANSWER="/tmp/.km"
+_TITLE="Arch Linux Console Font And Keymap Setting"
 LIST_MAPS="localectl list-keymaps --no-pager"
 
 abort()
@@ -16,8 +16,8 @@ abort()
 }
 
 abort_dialog() {
-    if [[ "${CANCEL}" = "1" ]]; then
-        S_NEXTITEM="1"
+    if [[ "${_CANCEL}" = "1" ]]; then
+        _S_NEXTITEM="1"
         return 1
     fi
 }
@@ -28,14 +28,14 @@ abort_dialog() {
 # parameters: see dialog(1)
 # returns: whatever dialog did
 DIALOG() {
-    dialog --backtitle "${TITLE}" --aspect 15 "$@"
+    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
 do_vconsole() {
-    DIALOG --infobox "Setting console font ${font} and keymap ${keymap} ..." 3 80
-    echo KEYMAP="${keymap}" > /etc/vconsole.conf
-    echo FONT="${font}" >> /etc/vconsole.conf
+    DIALOG --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP} ..." 3 80
+    echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
+    echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
 }
@@ -43,59 +43,59 @@ do_vconsole() {
 set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
         DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 60
-        font="latarcyrheb-sun32"
+        _FONT="latarcyrheb-sun32"
         sleep 2
     else
-        FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
-        CANCEL=
+        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
+        _CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${FONTS} 2>${ANSWER} || CANCEL=1
+        DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
         abort_dialog || return 1
         #shellcheck disable=SC2086
-        font=$(cat ${ANSWER})
+        _FONT=$(cat ${_ANSWER})
     fi
-    echo "${font}" > /tmp/.font
+    echo "${_FONT}" > /tmp/.font
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
-    KEYMAPS="us English de German es Spanish fr French pt Portuguese ru Russian OTHER More"
-    OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
-    CANCEL=""
+    _KEYMAPS="us English de German es Spanish fr French pt Portuguese ru Russian OTHER More"
+    OTHER__KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
+    _CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Region:" 14 30 8 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
-    keymap=$(cat ${ANSWER})
-    if [[ "${keymap}" == "OTHER" ]]; then
+    DIALOG --menu "Select A Keymap Region:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+    _KEYMAP=$(cat ${_ANSWER})
+    if [[ "${_KEYMAP}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Keymap Region:" 18 30 12 ${OTHER_KEYMAPS} 2>${ANSWER} || CANCEL="1"
-        keymap=$(cat ${ANSWER})
+        DIALOG --menu "Select A Keymap Region:" 18 30 12 ${OTHER__KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+        _KEYMAP=$(cat ${_ANSWER})
     fi
     abort_dialog || return 1
-    KEYMAPS=""
-    for i in $(${LIST_MAPS} | grep "^${keymap}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
-        KEYMAPS="${KEYMAPS} ${i} -"
+    _KEYMAPS=""
+    for i in $(${LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+        _KEYMAPS="${_KEYMAPS} ${i} -"
     done
-    CANCEL=""
+    _CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Layout:" 14 30 8 ${KEYMAPS} 2>${ANSWER} || CANCEL="1"
+    DIALOG --menu "Select A Keymap Layout:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     abort_dialog || return 1
     #shellcheck disable=SC2086
-    keymap=$(cat ${ANSWER})
-    echo "${keymap}" > /tmp/.keymap
-    S_NEXTITEM=2
+    _KEYMAP=$(cat ${_ANSWER})
+    echo "${_KEYMAP}" > /tmp/.keymap
+    _S_NEXTITEM=2
 }
 
 mainmenu() {
-    if [[ -n "${S_NEXTITEM}" ]]; then
-        DEFAULT="--default-item ${S_NEXTITEM}"
+    if [[ -n "${_S_NEXTITEM}" ]]; then
+        _DEFAULT="--default-item ${_S_NEXTITEM}"
     else
-        DEFAULT=""
+        _DEFAULT=""
     fi
     #shellcheck disable=SC2086
-    DIALOG ${DEFAULT} --backtitle "${TITLE}" --title " MAIN MENU " \
+    DIALOG ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 10 58 12 \
         "1" "Set Console Font And Keymap" \
-        "2" "${EXIT}" 2>${ANSWER}
+        "2" "${EXIT}" 2>${_ANSWER}
     #shellcheck disable=SC2086
-    case $(cat ${ANSWER}) in
+    case $(cat ${_ANSWER}) in
         "1")
             set_vconsole || return 1
             do_vconsole

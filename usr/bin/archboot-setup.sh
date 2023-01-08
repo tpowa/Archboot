@@ -103,7 +103,6 @@ configure_system() {
     set_locale || return 1
     auto_mkinitcpio
     ## END PREPROCESS ##
-
     _FILE=""
     _S_CONFIG=""
     # main menu loop
