@@ -15,13 +15,13 @@ check_root_password() {
 
 set_mkinitcpio() {
     DIALOG --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 12 70
-    HOOK_ERROR=""
-    ${_EDITOR} "${_DESTDIR}""${FILE}"
+    _HOOK_ERROR=""
+    ${_EDITOR} "${_DESTDIR}""${_FILE}"
     #shellcheck disable=SC2013
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || HOOK_ERROR=1
+        [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || _HOOK_ERROR=1
     done
-    if [[ "${HOOK_ERROR}" == "1" ]]; then
+    if [[ "${_HOOK_ERROR}" == "1" ]]; then
         DIALOG --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
     else
         run_mkinitcpio
@@ -29,53 +29,53 @@ set_mkinitcpio() {
 }
 
 set_locale() {
-    if [[ ${SET_LOCALE} == "" ]]; then
-        LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
-        CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
-        OTHER_LOCALES=""
-        for i in ${CHECK_LOCALES}; do
-            OTHER_LOCALES="${OTHER_LOCALES} ${i} -"
+    if [[ -z ${_SET_LOCALE} ]]; then
+        _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
+        _CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
+        _OTHER_LOCALES=""
+        for i in ${_CHECK_LOCALES}; do
+            _OTHER_LOCALES="${_OTHER_LOCALES} ${i} -"
         done
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A System-Wide Locale:" 14 40 8 ${LOCALES} 2>${_ANSWER} || return 1
-        set_locale=$(cat "${_ANSWER}")
-        if [[ "${set_locale}" == "OTHER" ]]; then
+        DIALOG --menu "Select A System-Wide Locale:" 14 40 8 ${_LOCALES} 2>${_ANSWER} || return 1
+        _SET_LOCALE=$(cat "${_ANSWER}")
+        if [[ "${_SET_LOCALE}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
-            DIALOG --menu "Select A System-Wide Locale:" 18 40 12 ${OTHER_LOCALES} 2>${_ANSWER} || return 1
-            set_locale=$(cat "${_ANSWER}")
+            DIALOG --menu "Select A System-Wide Locale:" 18 40 12 ${_OTHER_LOCALES} 2>${_ANSWER} || return 1
+            _SET_LOCALE=$(cat "${_ANSWER}")
         fi
-        sed -i -e "s#LANG=.*#LANG=${set_locale}#g" "${_DESTDIR}"/etc/locale.conf
-        DIALOG --infobox "Setting locale LANG=${set_locale} on installed system ..." 3 70
-        SET_LOCALE="1"
+        sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}#g" "${_DESTDIR}"/etc/locale.conf
+        DIALOG --infobox "Setting locale LANG=${_SET_LOCALE} on installed system ..." 3 70
+        _SET_LOCALE="1"
         sleep 2
-        auto_set_locale
+        auto_SET_LOCALE
         run_locale_gen
     fi
 }
 
 set_password() {
-    PASSWORD=""
-    PASS=""
-    PASS2=""
-    while [[ "${PASSWORD}" == "" ]]; do
-        while [[ "${PASS}" == "" ]]; do
+    _PASSWORD=""
+    _PASS=""
+    _PASS2=""
+    while [[ -z "${_PASSWORD}" ]]; do
+        while [[ -z "${_PASS}" ]]; do
             DIALOG --insecure --passwordbox "Enter new root password:" 0 0 2>"${_ANSWER}" || return 1
-            PASS=$(cat "${_ANSWER}")
+            _PASS=$(cat "${_ANSWER}")
         done
-        while [[ "${PASS2}" == "" ]]; do
+        while [[ -z  "${_PASS2}" ]]; do
             DIALOG --insecure --passwordbox "Retype new root password:" 0 0 2>"${_ANSWER}" || return 1
-            PASS2=$(cat "${_ANSWER}")
+            _PASS2=$(cat "${_ANSWER}")
         done
-        if [[ "${PASS}" == "${PASS2}" ]]; then
-            PASSWORD=${PASS}
-            echo "${PASSWORD}" > /tmp/.password
-            echo "${PASSWORD}" >> /tmp/.password
-            PASSWORD=/tmp/.password
+        if [[ "${_PASS}" == "${_PASS2}" ]]; then
+            _PASSWORD=${_PASS}
+            echo "${_PASSWORD}" > /tmp/.password
+            echo "${_PASSWORD}" >> /tmp/.password
+            _PASSWORD=/tmp/.password
         else
             DIALOG --msgbox "Error:\nPassword didn't match, please enter again." 6 50
-            PASSWORD=""
-            PASS=""
-            PASS2=""
+            _PASSWORD=""
+            _PASS=""
+            _PASS2=""
         fi
     done
     chroot "${_DESTDIR}" passwd root < /tmp/.password >/dev/null 2>&1
