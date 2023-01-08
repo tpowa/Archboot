@@ -320,7 +320,7 @@ EOF
 do_efistub_parameters() {
     bootdev=""
     FAIL_COMPLEX=""
-    USE_DMRAID=""
+    _USE_DMRAID=""
     RAID_ON_LVM=""
     UEFISYS_PATH="EFI/archlinux"
     _bootdev="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
@@ -525,12 +525,12 @@ do_grub_common_before() {
     ## - Encryption is not recommended for grub(2) /boot!
     bootdev=""
     FAIL_COMPLEX=""
-    USE_DMRAID=""
+    _USE_DMRAID=""
     RAID_ON_LVM=""
     common_bootloader_checks
     abort_f2fs_bootpart || return 1
     if ! dmraid -r | grep -q ^no; then
-        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && USE_DMRAID="1"
+        DIALOG --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && _USE_DMRAID="1"
     fi
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         DIALOG --infobox "Installing grub ..." 0 0
