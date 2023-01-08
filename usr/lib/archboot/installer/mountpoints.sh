@@ -250,7 +250,7 @@ mountpoints() {
     DIALOG --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
     sleep 3
     _NEXTITEM="5"
-    S_MKFS=1
+    _S_MKFS=1
 }
 
 # _mkfs()

@@ -13,7 +13,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
-PACMAN="pacman --root ${_DESTDIR} ${PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
 linux_firmware() {
     _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
@@ -77,7 +77,7 @@ local_pacman_conf() {
     echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
     echo "[archboot]" >> "${_PACMAN_CONF}"
     echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
-    PACMAN_CONF="--config ${_PACMAN_CONF}"
+    _PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
 auto_packages() {

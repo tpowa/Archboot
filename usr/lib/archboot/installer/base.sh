@@ -60,8 +60,8 @@ geteditor() {
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
-            "1") EDITOR="nano" ;;
-            "2") EDITOR="nvim" ;;
+            "1") _EDITOR="nano" ;;
+            "2") _EDITOR="nvim" ;;
         esac
     fi
 }
