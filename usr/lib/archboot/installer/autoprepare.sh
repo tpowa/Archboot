@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-autoprepare() {
+_autoprepare() {
     # check on encrypted devices, else weird things can happen!
     _stopluks
     # check on raid devices, else weird things can happen during partitioning!

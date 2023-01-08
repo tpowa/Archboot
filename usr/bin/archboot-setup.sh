@@ -73,7 +73,7 @@ prepare_storagedrive() {
         [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
         case $(cat ${_ANSWER}) in
             "1")
-                autoprepare
+                _autoprepare
                 [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
                 ;;
             "2")
@@ -101,7 +101,7 @@ configure_system() {
     geteditor || return 1
     ## PREPROCESSING ##
     set_locale || return 1
-    auto_mkinitcpio
+    _auto_mkinitcpio
     ## END PREPROCESS ##
     _FILE=""
     _S_CONFIG=""
