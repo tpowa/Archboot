@@ -19,7 +19,7 @@ getsource() {
 }
 
 # select_mirror()
-# Prompt user for preferred mirror and set ${SYNC_URL}
+# Prompt user for preferred mirror and set ${_SYNC_URL}
 #
 # args: none
 # returns: nothing
@@ -35,36 +35,36 @@ select_mirror() {
         fi
     fi
     # FIXME: this regex doesn't honor commenting
-    MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
+    _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
     DIALOG --menu "Select a mirror:" 14 55 7 \
-        ${MIRRORS} \
+        ${_MIRRORS} \
         "Custom" "_" 2>${_ANSWER} || return 1
     #shellcheck disable=SC2155
-    local _server=$(cat "${_ANSWER}")
-    if [[ "${_server}" == "Custom" ]]; then
+    local _SERVER=$(cat "${_ANSWER}")
+    if [[ "${_SERVER}" == "Custom" ]]; then
         DIALOG --inputbox "Enter the full URL to repositories." 8 65 \
             "" 2>"${_ANSWER}" || return 1
-            SYNC_URL=$(cat "${_ANSWER}")
+            _SYNC_URL=$(cat "${_ANSWER}")
     else
         # Form the full URL for our mirror by grepping for the server name in
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        SYNC_URL=$(grep -E -o "${_server}.*" "${_MIRRORLIST}" | head -n1)
+        _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_MIRRORLIST}" | head -n1)
     fi
     _NEXTITEM="4"
-    echo "Using mirror: ${SYNC_URL}" > "${_LOG}"
+    echo "Using mirror: ${_SYNC_URL}" > "${_LOG}"
     #shellcheck disable=SC2027,SC2086
-    echo "Server = "${SYNC_URL}"" >> /etc/pacman.d/mirrorlist
+    echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
 }
 
 # dotesting()
 # enable testing repository on network install
 dotesting() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
-        DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && DOTESTING="yes"
-        if [[ "${DOTESTING}" == "yes" ]]; then
+        DIALOG --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING="yes"
+        if [[ "${_DOTESTING}" == "yes" ]]; then
             sed -i -e '/^#\[testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' /etc/pacman.conf
@@ -79,7 +79,7 @@ update_environment() {
         DIALOG --infobox "Packages are already in pacman cache. Continuing in 3 seconds ..." 3 70
         sleep 3
     else
-        UPDATE_ENVIRONMENT=""
+        _UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 DIALOG --infobox "Refreshing package database ..." 3 70
@@ -87,22 +87,22 @@ update_environment() {
                 sleep 1
                 DIALOG --infobox "Checking on new online kernel version ..." 3 70
                 #shellcheck disable=SC2086
-                LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                     #shellcheck disable=SC2086
-                    ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     #shellcheck disable=SC2086
-                    ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 fi
-                echo "${LOCAL_KERNEL} local kernel version and ${ONLINE_KERNEL} online kernel version." > "${_LOG}"
+                echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." > "${_LOG}"
                 sleep 2
-                if [[ "${LOCAL_KERNEL}" == "${ONLINE_KERNEL}" ]]; then
+                if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
                     DIALOG --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
                     sleep 3
                 else
-                    DIALOG --defaultno --yesno "New online kernel version ${ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && UPDATE_ENVIRONMENT="1"
-                    if [[ "${UPDATE_ENVIRONMENT}" == "1" ]]; then
+                    DIALOG --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT="1"
+                    if [[ "${_UPDATE_ENVIRONMENT}" == "1" ]]; then
                         DIALOG --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         update-installer -latest-install > "${_LOG}" 2>&1
                     fi
@@ -133,10 +133,10 @@ prepare_pacman() {
     DIALOG --infobox "Refreshing package database ..." 3 40
     ${PACMAN} -Sy > "${_LOG}" 2>&1 || (DIALOG --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
     DIALOG --infobox "Update Arch Linux keyring ..." 3 40
-    KEYRING="archlinux-keyring"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KEYRING="${KEYRING} archlinuxarm-keyring"
+    _KEYRING="archlinux-keyring"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
+    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} > "${_LOG}" 2>&1 || (DIALOG --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
 # Set _PACKAGES parameter before running to install wanted packages
@@ -156,10 +156,10 @@ run_pacman(){
         echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
     fi
     # pacman finished, display scrollable output
-    local _result=''
+    local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
-        _result="Installation Failed (see errors below)"
-        DIALOG --title "${_result}" --exit-label "Continue" \
+        _RESULT="Installation Failed (see errors below)"
+        DIALOG --title "${_RESULT}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
         DIALOG --infobox "Package installation complete.\nContinuing in 3 seconds ..." 4 40
