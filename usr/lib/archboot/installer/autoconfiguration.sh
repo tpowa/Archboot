@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-# auto_fstab()
+# _auto_fstab()
 # preprocess fstab file
 # comments out old fields and inserts new ones
 # according to partitioning/formatting stage
-auto_fstab(){
+_auto_fstab(){
     # Modify fstab
     if [[ "${_S_MKFS}" == "1" || "${_S_MKFSAUTO}" == "1" ]]; then
         DIALOG --infobox "Create new fstab on installed system ..." 3 70
@@ -22,7 +22,7 @@ auto_fstab(){
 }
 
 # add udev rule for schedulers by default
-auto_scheduler () {
+_auto_scheduler () {
     if [[ ! -f ${_DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
         DIALOG --infobox "Enable performance ioscheduler settings on installed system ..." 3 70
         cp /etc/udev/rules.d/60-ioschedulers.rules "${_DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
@@ -31,7 +31,7 @@ auto_scheduler () {
 }
 
 # add sysctl file for swaps
-auto_swap () {
+_auto_swap () {
     if [[ ! -f ${_DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
         DIALOG --infobox "Enable sysctl swap settings on installed system ..." 3 70
         cp /etc/sysctl.d/99-sysctl.conf "${_DESTDIR}"/etc/sysctl.d/99-sysctl.conf
@@ -39,9 +39,9 @@ auto_swap () {
     fi
 }
 
-# auto_mdadm()
+# _auto_mdadm()
 # add mdadm setup to existing /etc/mdadm.conf
-auto_mdadm()
+_auto_mdadm()
 {
     if [[ -e ${_DESTDIR}/etc/mdadm.conf ]]; then
         if grep -q ^md /proc/mdstat 2>/dev/null; then
@@ -52,11 +52,11 @@ auto_mdadm()
     fi
 }
 
-# auto_network()
+# _auto_network()
 # configures network on host system according to installer
 # settings if user wishes to do so
 #
-auto_network()
+_auto_network()
 {
     # exit if network wasn't configured in installer
     if [[ ${_S_NET} == "0" ]]; then
@@ -88,7 +88,7 @@ auto_network()
 # Pacman signature check is enabled by default
 # add gnupg pacman files to installed system
 # in order to have a working pacman on installed system
-auto_pacman()
+_auto_pacman()
 {
     if ! [[ -d ${_DESTDIR}/etc/pacman.d/gnupg ]]; then
         DIALOG --infobox "Enable pacman's GPG keyring files on installed system ..." 3 70
@@ -99,7 +99,7 @@ auto_pacman()
 
 # If [testing] repository was enabled during installation,
 # enable it on installed system too!
-auto_testing()
+_auto_testing()
 {
     if [[ "${DOTESTING}" == "yes" ]]; then
         DIALOG --infobox "Enable [testing] repository on installed system ..." 3 70
@@ -110,7 +110,7 @@ auto_testing()
     fi
 }
 
-auto_mkinitcpio() {
+_auto_mkinitcpio() {
     _FBPARAMETER=""
     _HWPARAMETER=""
     _HWDETECTMODULES=""
@@ -164,7 +164,7 @@ auto_mkinitcpio() {
     fi
 }
 
-auto_vconsole() {
+_auto_vconsole() {
     if [[ ! -f ${_DESTDIR}/etc/vconsole.conf ]]; then
         DIALOG --infobox "Setting keymap and font on installed system ..." 3 70
         : >"${_DESTDIR}"/etc/vconsole.conf
@@ -178,7 +178,7 @@ auto_vconsole() {
     fi
 }
 
-auto_luks() {
+_auto_luks() {
     # remove root device from crypttab
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)"  == "" ]]; then
         DIALOG --infobox "Enable luks settings on installed system ..." 3 70
@@ -191,7 +191,7 @@ auto_luks() {
     fi
 }
 
-auto_timesetting() {
+_auto_timesetting() {
     if [[ -e /etc/localtime && ! -e "${_DESTDIR}"/etc/localtime ]]; then
         DIALOG --infobox "Enable timezone setting on installed system ..." 3 70
         cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
@@ -206,7 +206,7 @@ auto_timesetting() {
     fi
 }
 
-auto_pacman_mirror() {
+_auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
     if [[ "${_SYNC_URL}" != "" ]]; then
@@ -218,7 +218,7 @@ auto_pacman_mirror() {
     fi
 }
 
-auto_hostname() {
+_auto_hostname() {
     if [[ ! -f ${_DESTDIR}/etc/hostname ]]; then
         DIALOG --infobox "Set default hostname on installed system ..." 3 70
         echo "myhostname" > "${_DESTDIR}"/etc/hostname
@@ -226,7 +226,7 @@ auto_hostname() {
     fi
 }
 
-auto_locale() {
+_auto_locale() {
     if [[ ! -f ${_DESTDIR}/etc/locale.conf ]]; then
         DIALOG --infobox "Set default locale on installed system ..." 3 70
         echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
@@ -235,7 +235,7 @@ auto_locale() {
     fi
 }
 
-auto_set_locale() {
+_auto_set_locale() {
     # enable glibc locales from locale.conf
     DIALOG --infobox "Enable glibc locales based on locale.conf on installed system ..." 3 70
     #shellcheck disable=SC2013
@@ -245,7 +245,7 @@ auto_set_locale() {
     sleep 2
 }
 
-auto_nano_syntax() {
+_auto_nano_syntax() {
 # enable glibc locales from locale.conf
     DIALOG --infobox "Enable nano's syntax highlighting on installed system ..." 3 70
     grep -q '^include' "${_DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
