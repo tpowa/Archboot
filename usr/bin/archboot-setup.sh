@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
 # source base and common first, contains basic parameters
 . /usr/lib/archboot/installer/base.sh
 . /usr/lib/archboot/installer/common.sh
@@ -15,7 +16,7 @@
 . /usr/lib/archboot/installer/partition.sh
 . /usr/lib/archboot/installer/storage.sh
 
-set_vconsole() {
+_set_vconsole() {
     if [[ -e /usr/bin/km ]]; then
         km --setup && _NEXTITEM="1"
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
@@ -169,7 +170,7 @@ mainmenu() {
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
         "0")
-            set_vconsole ;;
+            _set_vconsole ;;
         "1")
             donetwork ;;
         "2")
