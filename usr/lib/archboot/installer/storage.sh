@@ -3,20 +3,20 @@
 # menu for raid, lvm and encrypt
 create_special() {
     _NEXTITEM=""
-    SPECIALDONE=0
-    while [[ "${SPECIALDONE}" == "0" ]]; do
+    _SPECIALDONE=0
+    while [[ "${_SPECIALDONE}" == "0" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT="--default-item ${_NEXTITEM}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
-        CANCEL=""
+        _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 11 60 5 \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 11 60 5 \
             "1" "Manage Software Raid" \
             "2" "Manage LVM2" \
             "3" "Manage Luks encryption" \
-            "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+            "4" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL="1"
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
@@ -26,10 +26,10 @@ create_special() {
             "3")
                 _createluks ;;
             *)
-                SPECIALDONE=1 ;;
+                _SPECIALDONE=1 ;;
         esac
     done
-    if [[ "${CANCEL}" == "1" ]]; then
+    if [[ "${_CANCEL}" == "1" ]]; then
         _NEXTITEM="3"
     else
         _NEXTITEM="4"
@@ -39,35 +39,35 @@ create_special() {
 # menu for md creation
 _createmd() {
     _NEXTITEM=""
-    MDDONE=0
-    while [[ "${MDDONE}" == "0" ]]; do
+    _MDDONE=0
+    while [[ "${_MDDONE}" == "0" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT="--default-item ${_NEXTITEM}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
-        CANCEL=""
+        _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid" 12 60 5 \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid" 12 60 5 \
             "1" "Create Software Raid" \
             "2" "Create Partitionable Software Raid" \
             "3" "Reset Software Raid" \
             "4" "Raid Help" \
-            "5" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+            "5" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL="1"
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
-                RAID_PARTITION=""
+                _RAID_PARTITION=""
                 _raid ;;
             "2")
-                RAID_PARTITION="1"
+                _RAID_PARTITION="1"
                 _raid ;;
             "3")
                 _stopmd ;;
             "4")
                 _helpraid ;;
               *)
-                MDDONE=1 ;;
+                _MDDONE=1 ;;
         esac
     done
     _NEXTITEM="1"
@@ -76,22 +76,22 @@ _createmd() {
 # menu for lvm creation
 _createlvm() {
     _NEXTITEM=""
-    LVMDONE=0
-    while [[ "${LVMDONE}" == "0" ]]; do
+    _LVMDONE=0
+    while [[ "${_LVMDONE}" == "0" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT="--default-item ${_NEXTITEM}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
-        CANCEL=""
+        _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${_TITLE}" --menu "Manage physical volume, volume group or logical volume" 13 60 7 \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage physical volume, volume group or logical volume" 13 60 7 \
             "1" "Create Physical Volume" \
             "2" "Create Volume Group" \
             "3" "Create Logical Volume" \
             "4" "Reset Logical Volume" \
             "5" "LVM Help" \
-            "6" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+            "6" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL="1"
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
@@ -105,7 +105,7 @@ _createlvm() {
             "5")
                 _helplvm ;;
               *)
-                LVMDONE=1 ;;
+                _LVMDONE=1 ;;
         esac
     done
     _NEXTITEM="2"
@@ -114,20 +114,20 @@ _createlvm() {
 # menu for luks creation
 _createluks() {
     _NEXTITEM=""
-    LUKSDONE=0
-    while [[ "${LUKSDONE}" == "0" ]]; do
+    _LUKSDONE=0
+    while [[ "${_LUKSDONE}" == "0" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT="--default-item ${_NEXTITEM}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
-        CANCEL=""
+        _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${DEFAULT} --backtitle "${_TITLE}" --menu "Manage Luks Encryption" 11 60 5 \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Luks Encryption" 11 60 5 \
             "1" "Create Luks" \
             "2" "Reset Luks Encryption completely" \
             "3" "Luks Help" \
-            "4" "Return to Previous Menu" 2>"${_ANSWER}" || CANCEL="1"
+            "4" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL="1"
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
@@ -137,7 +137,7 @@ _createluks() {
             "3")
                 _helpluks ;;
               *)
-                LUKSDONE=1 ;;
+                _LUKSDONE=1 ;;
         esac
     done
     _NEXTITEM="3"
