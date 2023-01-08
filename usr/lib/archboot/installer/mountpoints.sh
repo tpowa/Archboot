@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # destdir_mounts()
-# check if PART_ROOT is set and if something is mounted on ${_DESTDIR}
+# check if _PART_ROOT is set and if something is mounted on ${_DESTDIR}
 destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     ASK_MOUNTPOINTS=""
-    PART_ROOT=""
+    _PART_ROOT=""
     # check if something is mounted on ${_DESTDIR}
-    PART_ROOT="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+    _PART_ROOT="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
-    if [[ "${PART_ROOT}" == "" ]]; then
+    if [[ "${_PART_ROOT}" == "" ]]; then
         DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
         mountpoints || return 1
     fi
@@ -157,7 +157,7 @@ mountpoints() {
             #shellcheck disable=SC2086
             DIALOG --menu "Select the partition to mount as /:" 15 50 12 ${PARTS} 2>"${_ANSWER}" || return 1
             PART=$(cat "${_ANSWER}")
-            PART_ROOT=${PART}
+            _PART_ROOT=${PART}
             # Select root filesystem type
             FSTYPE="$(${_LSBLK} FSTYPE "${PART}")"
             # clear values first!

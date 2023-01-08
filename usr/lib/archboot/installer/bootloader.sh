@@ -9,7 +9,7 @@ ROOTFS=""
 INITRAMFS="initramfs-${_KERNELPKG}.img"
 
 getrootfstype() {
-    ROOTFS="$(getfstype "${PART_ROOT}")"
+    ROOTFS="$(getfstype "${_PART_ROOT}")"
 }
 
 getrootflags() {
@@ -31,49 +31,49 @@ getraidarrays() {
 
 getcryptsetup() {
     CRYPTSETUP=""
-    if ! cryptsetup status "$(basename "${PART_ROOT}")" | grep -q inactive; then
+    if ! cryptsetup status "$(basename "${_PART_ROOT}")" | grep -q inactive; then
         #avoid clash with dmraid here
-        if cryptsetup status "$(basename "${PART_ROOT}")"; then
+        if cryptsetup status "$(basename "${_PART_ROOT}")"; then
             if [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
+                CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
+                CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
             else
-                CRYPTDEVICE="$(cryptsetup status "$(basename "${PART_ROOT}")" | grep device: | sed -e 's#device:##g'))"
+                CRYPTDEVICE="$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g'))"
             fi
-            CRYPTNAME="$(basename "${PART_ROOT}")"
+            CRYPTNAME="$(basename "${_PART_ROOT}")"
             CRYPTSETUP="cryptdevice=${CRYPTDEVICE}:${CRYPTNAME}"
         fi
     fi
 }
 
 getrootpartuuid() {
-    _rootpart="${PART_ROOT}"
-    _partuuid="$(getpartuuid "${PART_ROOT}")"
+    _rootpart="${_PART_ROOT}"
+    _partuuid="$(getpartuuid "${_PART_ROOT}")"
     if [[ -n "${_partuuid}" ]]; then
         _rootpart="PARTUUID=${_partuuid}"
     fi
 }
 
 getrootpartlabel() {
-    _rootpart="${PART_ROOT}"
-    _partlabel="$(getpartlabel "${PART_ROOT}")"
+    _rootpart="${_PART_ROOT}"
+    _partlabel="$(getpartlabel "${_PART_ROOT}")"
     if [[ -n "${_partlabel}" ]]; then
         _rootpart="PARTLABEL=${_partlabel}"
     fi
 }
 
 getrootfsuuid() {
-    _rootpart="${PART_ROOT}"
-    _fsuuid="$(getfsuuid "${PART_ROOT}")"
+    _rootpart="${_PART_ROOT}"
+    _fsuuid="$(getfsuuid "${_PART_ROOT}")"
     if [[ -n "${_fsuuid}" ]]; then
         _rootpart="UUID=${_fsuuid}"
     fi
 }
 
 getrootfslabel() {
-    _rootpart="${PART_ROOT}"
-    _fslabel="$(getfslabel "${PART_ROOT}")"
+    _rootpart="${_PART_ROOT}"
+    _fslabel="$(getfslabel "${_PART_ROOT}")"
     if [[ -n "${_fslabel}" ]]; then
         _rootpart="LABEL=${_fslabel}"
     fi
@@ -102,7 +102,7 @@ bootloader_kernel_parameters() {
     fi
     [[ "${NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && getrootfsuuid
     [[ "${NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
-    [[ "${_rootpart}" == "" ]] && _rootpart="${PART_ROOT}"
+    [[ "${_rootpart}" == "" ]] && _rootpart="${_PART_ROOT}"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_rootpart} rootfstype=${ROOTFS} rw ${ROOTFLAGS} ${RAIDARRAYS} ${CRYPTSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
@@ -123,7 +123,7 @@ check_bootpart() {
     bootdev="$(mount | grep "${_DESTDIR}/boot " | cut -d' ' -f 1)"
     if [[ "${bootdev}" == "" ]]; then
         subdir="/boot"
-        bootdev="${PART_ROOT}"
+        bootdev="${_PART_ROOT}"
     fi
 }
 
