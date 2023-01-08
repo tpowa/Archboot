@@ -13,59 +13,59 @@ check_nework() {
 # scan for available essids
 essid_scan() {
     # scan the area
-    iwctl station "${INTERFACE}" scan
+    iwctl station "${_INTERFACE}" scan
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
-    for dev in $(iwctl station "${INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
+    for dev in $(iwctl station "${_INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
 }
 
 do_wireless() {
-    WLAN_HIDDEN=""
-    WLAN_SSID=""
-    WLAN_KEY=""
-    WLAN_AUTH=""
-    if [[ "${CONNECTION}" == "wireless" ]]; then
+    _WLAN_HIDDEN=""
+    _WLAN_SSID=""
+    _WLAN_KEY=""
+    _WLAN_AUTH=""
+    if [[ "${_CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
-        iwctl station "${INTERFACE}" disconnect > /dev/null 2>&1
+        iwctl station "${_INTERFACE}" disconnect > /dev/null 2>&1
         # clean old keys first!
         rm -f /var/lib/iwd/* > /dev/null 2>&1
         #shellcheck disable=SC2086,SC2046
         DIALOG --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
         $(essid_scan _) \
             "Hidden" "_" 2>"${_ANSWER}" || return 1
-        WLAN_SSID=$(cat "${_ANSWER}")
-        WLAN_CONNECT="connect"
-        if [[ "${WLAN_SSID}" == "Hidden" ]]; then
+        _WLAN_SSID=$(cat "${_ANSWER}")
+        _WLAN_CONNECT="connect"
+        if [[ "${_WLAN_SSID}" == "Hidden" ]]; then
             DIALOG --inputbox "Enter the hidden SSID:" 8 65 \
                 "secret" 2>"${_ANSWER}" || return 1
-            WLAN_SSID=$(cat "${_ANSWER}")
-            WLAN_CONNECT="connect-hidden"
-            WLAN_HIDDEN="yes"
+            _WLAN_SSID=$(cat "${_ANSWER}")
+            _WLAN_CONNECT="connect-hidden"
+            _WLAN_HIDDEN="yes"
         fi
         # replace # with spaces again
         #shellcheck disable=SC2001,SC2086
-        WLAN_SSID="$(echo ${WLAN_SSID} | sed -e 's|\+|\ |g')"
+        _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
         #shellcheck disable=SC2001,SC2086
-        while [[ -z "${WLAN_AUTH}" ]]; do
+        while [[ -z "${_WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${INTERFACE}" get-networks | grep -w "${WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${WLAN_CONNECT}" == "connect-hidden" ]]; then
-                DIALOG --inputbox "Enter your KEY for SSID='${WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}" || return 1
-                WLAN_KEY=$(cat "${_ANSWER}")
+            if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
+                DIALOG --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}" || return 1
+                _WLAN_KEY=$(cat "${_ANSWER}")
             fi
             # time to connect
-            DIALOG --infobox "Connection to SSID='${WLAN_SSID}' with interface ${INTERFACE} ..." 3 70
+            DIALOG --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE} ..." 3 70
             printk off
-            if [[ -z "${WLAN_KEY}" ]]; then
-                iwctl station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" > /dev/null 2>&1 && WLAN_AUTH="1"
+            if [[ -z "${_WLAN_KEY}" ]]; then
+                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH="1"
             else
-                iwctl --passphrase="${WLAN_KEY}" station "${INTERFACE}" "${WLAN_CONNECT}" "${WLAN_SSID}" > /dev/null 2>&1 && WLAN_AUTH="1"
+                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH="1"
             fi
-            if [[ "${WLAN_AUTH}" == "1" ]]; then
+            if [[ "${_WLAN_AUTH}" == "1" ]]; then
                 DIALOG --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
                 sleep 3
             else
@@ -83,46 +83,46 @@ do_wireless() {
 # returns: 1 on failure
 donetwork() {
     _S_NET=0
-    NETPARAMETERS=""
-    while [[ "${NETPARAMETERS}" == "" ]]; do
+    _NETPARAMETERS=""
+    while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface
-        INTERFACE=
-        ifaces=$(net_interfaces)
-        while [[ "${INTERFACE}" == "" ]]; do
+        _INTERFACE=""
+        _INTERFACES=$(net_interfaces)
+        while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${ifaces} 2>"${_ANSWER}"
+            DIALOG --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${_INTERFACES} 2>"${_ANSWER}"
             case $? in
                 1) return 1 ;;
-                0) INTERFACE=$(cat "${_ANSWER}") ;;
+                0) _INTERFACE=$(cat "${_ANSWER}") ;;
             esac
         done
-        echo "${INTERFACE}" >/tmp/.network-interface
+        echo "${_INTERFACE}" >/tmp/.network-interface
         # iwd renames wireless devices to wlanX
-        if echo "${INTERFACE}" | grep -q wlan >/dev/null; then
-            CONNECTION="wireless"
+        if echo "${_INTERFACE}" | grep -q wlan >/dev/null; then
+            _CONNECTION="wireless"
         else
-            CONNECTION="ethernet"
+            _CONNECTION="ethernet"
         fi
         # profile name
-        NETWORK_PROFILE=""
-        DIALOG --inputbox "Enter your network profile name:" 7 40 "${INTERFACE}-${CONNECTION}" 2>"${_ANSWER}" || return 1
-        NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
+        _NETWORK_PROFILE=""
+        DIALOG --inputbox "Enter your network profile name:" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}" || return 1
+        _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
         do_wireless || return 1
         # dhcp switch
-        IP=""
+        _IP=""
         DIALOG --yesno "Do you want to use DHCP?" 5 40
         #shellcheck disable=SC2181
         if [[ $? -eq 0 ]]; then
-            IP="dhcp"
+            _IP="dhcp"
         else
-            IP="static"
+            _IP="static"
             DIALOG --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
             IPADDR=$(cat "${_ANSWER}")
             DIALOG --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
-            GW=$(cat "${_ANSWER}")
+            _GW=$(cat "${_ANSWER}")
             DIALOG --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
-            DNS=$(cat "${_ANSWER}")
+            _DNS=$(cat "${_ANSWER}")
         fi
             # http/ftp proxy settings
         DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
@@ -137,45 +137,45 @@ donetwork() {
                 export "${i}"="${_PROXY}"
             done
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetwork profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${_PROXY}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0
         case $? in
             1) ;;
-            0) NETPARAMETERS="1" ;;
+            0) _NETPARAMETERS="1" ;;
         esac
     done
     # write systemd-networkd profile
-    echo "#$NETWORK_PROFILE generated by archboot setup" > "${NETWORK_PROFILE}"
+    echo "#$_NETWORK_PROFILE generated by archboot setup" > "${_NETWORK_PROFILE}"
     #shellcheck disable=SC2129
-    echo "[Match]"  >> "${NETWORK_PROFILE}"
-    echo "Name=${INTERFACE}" >> "${NETWORK_PROFILE}"
-    echo "" >> "${NETWORK_PROFILE}"
-    echo "[Network]" >> "${NETWORK_PROFILE}"
-    [[ "${IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${NETWORK_PROFILE}"
-    if [[ "${CONNECTION}" == "wireless" ]]; then
+    echo "[Match]"  >> "${_NETWORK_PROFILE}"
+    echo "Name=${_INTERFACE}" >> "${_NETWORK_PROFILE}"
+    echo "" >> "${_NETWORK_PROFILE}"
+    echo "[Network]" >> "${_NETWORK_PROFILE}"
+    [[ "${_IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${_NETWORK_PROFILE}"
+    if [[ "${_CONNECTION}" == "wireless" ]]; then
         #shellcheck disable=SC2129
-        echo "IgnoreCarrierLoss=3s" >>"${NETWORK_PROFILE}"
+        echo "IgnoreCarrierLoss=3s" >>"${_NETWORK_PROFILE}"
     fi
-    if [[ "${IP}" == "static" ]]; then
+    if [[ "${_IP}" == "static" ]]; then
         #shellcheck disable=SC2129
-        echo "Address=${IPADDR}" >>"${NETWORK_PROFILE}"
-        echo "Gateway=${GW}" >>"${NETWORK_PROFILE}"
-        echo "DNS=${DNS}" >>"${NETWORK_PROFILE}"
+        echo "Address=${_IPADDR}" >>"${_NETWORK_PROFILE}"
+        echo "Gateway=${_GW}" >>"${_NETWORK_PROFILE}"
+        echo "DNS=${_DNS}" >>"${_NETWORK_PROFILE}"
     fi
     if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then
         echo "Disabled Archboot's bootup wired auto dhcp browsing." > "${_LOG}"
         rm /etc/systemd/network/10-wired-auto-dhcp.network
     fi
-    echo "Using setup's network profile ${NETWORK_PROFILE} now..." > "${_LOG}"
+    echo "Using setup's network profile ${_NETWORK_PROFILE} now..." > "${_LOG}"
     systemctl restart systemd-networkd
-    NETWORK_COUNT="0"
+    _NETWORK_COUNT="0"
     DIALOG --infobox "Waiting 30 seconds for network link to come up ..." 3 60
     # add sleep here dhcp can need some time to get link
     while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
         sleep 1
-        NETWORK_COUNT="$((NETWORK_COUNT+1))"
-        [[ "${NETWORK_COUNT}" == "30" ]] && break
+        _NETWORK_COUNT="$((NETWORK_COUNT+1))"
+        [[ "${_NETWORK_COUNT}" == "30" ]] && break
     done
-    if ! grep -qw up /sys/class/net/"${INTERFACE}"/operstate; then
+    if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
         DIALOG --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
         return 1
     else
