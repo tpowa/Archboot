@@ -59,7 +59,7 @@ auto_mdadm()
 auto_network()
 {
     # exit if network wasn't configured in installer
-    if [[ ${S_NET} -eq 0 ]]; then
+    if [[ ${_S_NET} == "0" ]]; then
         return 1
     fi
     DIALOG --infobox "Enable network and proxy settings on installed system ..." 3 70
@@ -76,9 +76,9 @@ auto_network()
         chroot "${_DESTDIR}" systemctl enable systemd-resolved >/dev/null 2>&1
     fi
     # copy proxy settings
-    if [[ -n "${PROXY}" ]]; then
-        for i in ${PROXIES}; do
-            echo "export ${i}=${PROXY}" >> "${_DESTDIR}"/etc/profile.d/proxy.sh
+    if [[ -n "${_PROXY}" ]]; then
+        for i in ${_PROXIES}; do
+            echo "export ${i}=${_PROXY}" >> "${_DESTDIR}"/etc/profile.d/proxy.sh
             chmod a+x "${_DESTDIR}"/etc/profile.d/proxy.sh
         done
     fi

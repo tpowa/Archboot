@@ -7,7 +7,7 @@ net_interfaces() {
 
 # check for already active profile
 check_nework() {
-    [[ "${S_NET}" == "1" ]] || donetwork
+    [[ "${_S_NET}" == "1" ]] || donetwork
 }
 
 # scan for available essids
@@ -82,7 +82,7 @@ do_wireless() {
 # args: none
 # returns: 1 on failure
 donetwork() {
-    S_NET=0
+    _S_NET=0
     NETPARAMETERS=""
     while [[ "${NETPARAMETERS}" == "" ]]; do
         # select network interface
@@ -126,18 +126,18 @@ donetwork() {
         fi
             # http/ftp proxy settings
         DIALOG --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
-        PROXY=$(cat "${_ANSWER}")
-        PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
-        if [[ "${PROXY}" == "" ]]; then
-            for i in ${PROXIES}; do
+        _PROXY=$(cat "${_ANSWER}")
+        _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP__PROXY HTTPS__PROXY FTP__PROXY RSYNC__PROXY"
+        if [[ "${_PROXY}" == "" ]]; then
+            for i in ${_PROXIES}; do
                 unset "${i}"
             done
         else
-            for i in ${PROXIES}; do
-                export "${i}"="${PROXY}"
+            for i in ${_PROXIES}; do
+                export "${i}"="${_PROXY}"
             done
         fi
-        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetwork profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${PROXY}" 0 0
+        DIALOG --yesno "Are these settings correct?\n\nInterface:    ${INTERFACE}\nConnection:   ${CONNECTION}\nNetwork profile: ${NETWORK_PROFILE}\nSSID:      ${WLAN_SSID}\nHidden:     ${WLAN_HIDDEN}\nKey:        ${WLAN_KEY}\ndhcp or static: ${IP}\nIP address: ${IPADDR}\nGateway:    ${GW}\nDNS server: ${DNS}\nProxy setting: ${_PROXY}" 0 0
         case $? in
             1) ;;
             0) NETPARAMETERS="1" ;;
@@ -183,5 +183,5 @@ donetwork() {
         sleep 3
     fi
     _NEXTITEM="2"
-    S_NET=1
+    _S_NET=1
 }
