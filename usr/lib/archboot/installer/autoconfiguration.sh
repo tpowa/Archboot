@@ -111,55 +111,55 @@ auto_testing()
 }
 
 auto_mkinitcpio() {
-    FBPARAMETER=""
-    HWPARAMETER=""
-    HWDETECTMODULES=""
-    HWDETECTHOOKS=""
-    HWKVER=""
-    if [[ "${AUTO_MKINITCPIO}" == "" ]]; then
-        AUTO_MKINITCPIO=""
+    _FBPARAMETER=""
+    _HWPARAMETER=""
+    _HWDETECTMODULES=""
+    _HWDETECTHOOKS=""
+    _HWKVER=""
+    if [[ "${_AUTO_MKINITCPIO}" == "" ]]; then
+        _AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
-            DIALOG --defaultno --yesno "Setup detected nfs driver ...\nDo you need support for booting from nfs shares?" 0 0 && HWPARAMETER="${HWPARAMETER} --nfs"
+            DIALOG --defaultno --yesno "Setup detected nfs driver ...\nDo you need support for booting from nfs shares?" 0 0 && _HWPARAMETER="${_HWPARAMETER} --nfs"
         fi
         DIALOG --infobox "Preconfiguring mkinitcpio settings on installed system ..." 3 70
         # check on framebuffer modules and kms FBPARAMETER
-        grep -q "^radeon" /proc/modules && FBPARAMETER="--ati-kms"
-        grep -q "^amdgpu" /proc/modules && FBPARAMETER="--amd-kms"
-        grep -q "^i915" /proc/modules && FBPARAMETER="--intel-kms"
-        grep -q "^nouveau" /proc/modules && FBPARAMETER="--nvidia-kms"
+        grep -q "^radeon" /proc/modules && _FBPARAMETER="--ati-kms"
+        grep -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
+        grep -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
+        grep -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
         # check on nfs,dmraid and keymap HWPARAMETER
         # check on used keymap, if not us keyboard layout
-        ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && HWPARAMETER="${HWPARAMETER} --keymap"
+        ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && _HWPARAMETER="${_HWPARAMETER} --keymap"
         # check on dmraid
         if [[ -e ${_DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
             if ! dmraid -r | grep ^no; then
-                HWPARAMETER="${HWPARAMETER} --dmraid"
+                _HWPARAMETER="${_HWPARAMETER} --dmraid"
             fi
         fi
         # get kernel version
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_DESTDIR}/boot/${_VMLINUZ}")
-            read -r HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+            read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
         elif [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             reader="cat"
             # try if the image is gzip compressed
             [[ $(file -b --mime-type "${_DESTDIR}/boot/${_VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-            read -r _ _ HWKVER _ < <($reader "${_DESTDIR}/boot/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+            read -r _ _ _HWKVER _ < <($reader "${_DESTDIR}/boot/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
         fi
         # arrange MODULES for mkinitcpio.conf
-        HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${HWKVER}" --hostcontroller --filesystem ${FBPARAMETER})"
+        _HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --hostcontroller --filesystem ${_FBPARAMETER})"
         # arrange HOOKS for mkinitcpio.conf
-        HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${HWKVER}" --rootdevice="${PART_ROOT}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${HWPARAMETER}" --hooks)"
+        _HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --rootdevice="${_PART_ROOT}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${_HWPARAMETER}" --hooks)"
         # change mkinitcpio.conf
-        [[ -n "${HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
-        [[ -n "${HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
+        [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
+        [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
         # disable fallpack preset
         sed -i -e "s# 'fallback'##g" "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # remove fallback initramfs
         [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
         sleep 2
-        AUTO_MKINITCPIO="1"
+        _AUTO_MKINITCPIO="1"
         run_mkinitcpio
     fi
 }
@@ -183,7 +183,7 @@ auto_luks() {
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)"  == "" ]]; then
         DIALOG --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
-        sed -i -e "/^$(basename "${PART_ROOT}") /d" /tmp/.crypttab
+        sed -i -e "/^$(basename "${_PART_ROOT}") /d" /tmp/.crypttab
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
         chmod 700 /tmp/passphrase-* 2>/dev/null
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>/dev/null
@@ -209,10 +209,10 @@ auto_timesetting() {
 auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if [[ "${SYNC_URL}" != "" ]]; then
+    if [[ "${_SYNC_URL}" != "" ]]; then
         DIALOG --infobox "Enable pacman mirror on installed system ..." 3 70
         #shellcheck disable=SC2027,SC2086
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer == "${SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
+        awk "BEGIN { printf(\"# Mirror used during installation\nServer == "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
         sleep 1
     fi
