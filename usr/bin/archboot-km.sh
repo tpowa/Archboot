@@ -6,7 +6,7 @@ LIST_MAPS="localectl list-keymaps --no-pager"
 
 abort()
 {
-    DIALOG --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
+    _dialog --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
     [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
     [[ -e /tmp/.font ]] && rm -f /tmp/.font
     [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
@@ -21,18 +21,18 @@ abort_dialog() {
     fi
 }
 
-# DIALOG()
+# _dialog()
 # an el-cheapo dialog wrapper
 #
 # parameters: see dialog(1)
 # returns: whatever dialog did
-DIALOG() {
+_dialog() {
     dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
 do_vconsole() {
-    DIALOG --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP} ..." 3 80
+    _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP} ..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
@@ -41,14 +41,14 @@ do_vconsole() {
 
 set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
-        DIALOG --infobox "Detected big screen size, using 32 font size now ..." 3 60
+        _dialog --infobox "Detected big screen size, using 32 font size now ..." 3 60
         _FONT="latarcyrheb-sun32"
         sleep 2
     else
         _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
         _CANCEL=
         #shellcheck disable=SC2086
-        DIALOG --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
         abort_dialog || return 1
         #shellcheck disable=SC2086
         _FONT=$(cat ${_ANSWER})
@@ -60,11 +60,11 @@ set_vconsole() {
     OTHER__KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
     _CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Region:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+    _dialog --menu "Select A Keymap Region:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     _KEYMAP=$(cat ${_ANSWER})
     if [[ "${_KEYMAP}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        DIALOG --menu "Select A Keymap Region:" 18 30 12 ${OTHER__KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+        _dialog --menu "Select A Keymap Region:" 18 30 12 ${OTHER__KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
         _KEYMAP=$(cat ${_ANSWER})
     fi
     abort_dialog || return 1
@@ -74,7 +74,7 @@ set_vconsole() {
     done
     _CANCEL=""
     #shellcheck disable=SC2086
-    DIALOG --menu "Select A Keymap Layout:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+    _dialog --menu "Select A Keymap Layout:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     abort_dialog || return 1
     #shellcheck disable=SC2086
     _KEYMAP=$(cat ${_ANSWER})
@@ -89,7 +89,7 @@ mainmenu() {
         _DEFAULT=""
     fi
     #shellcheck disable=SC2086
-    DIALOG ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
+    _dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 10 58 12 \
         "1" "Set Console Font And Keymap" \
         "2" "${EXIT}" 2>${_ANSWER}

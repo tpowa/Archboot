@@ -21,13 +21,13 @@ set_vconsole() {
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
         archboot-km.sh --setup && _NEXTITEM="1"
     else
-        DIALOG --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
+        _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
     fi
 }
 
 select_source() {
     NEXTITEM="2"
-    set_title
+    _set_title
     if [[ -e "${_LOCAL_DB}" ]]; then
         getsource || return 1
     else
@@ -46,7 +46,7 @@ set_clock() {
     elif [[ -e /usr/bin/archboot-tz.sh ]]; then
         archboot-tz.sh --setup && _NEXTITEM="4"
     else
-        DIALOG --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
+        _dialog --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
 }
 
@@ -98,7 +98,7 @@ prepare_storagedrive() {
 configure_system() {
     destdir_mounts || return 1
     check_root_password || return 1
-    geteditor || return 1
+    _geteditor || return 1
     ## PREPROCESSING ##
     set_locale || return 1
     _auto_mkinitcpio
@@ -113,7 +113,7 @@ configure_system() {
             DEFAULT=""
         fi
         #shellcheck disable=SC2086
-        DIALOG ${_DEFAULT} --menu "Configuration" 20 60 16 \
+        _dialog ${_DEFAULT} --menu "Configuration" 20 60 16 \
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
@@ -194,7 +194,7 @@ mainmenu() {
             echo ""
             exit 0 ;;
         *)
-            DIALOG --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
+            _dialog --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
             ;;
     esac
 }
@@ -202,16 +202,16 @@ mainmenu() {
 #####################
 ## begin execution ##
 if [[ -e /tmp/.setup-running ]]; then
-    DIALOG --msgbox "Attention:\n\nSetup already runs on a different console!\nPlease remove /tmp/.setup-running first to launch setup!" 8 60
+    _dialog --msgbox "Attention:\n\nSetup already runs on a different console!\nPlease remove /tmp/.setup-running first to launch setup!" 8 60
     exit 1
 fi
 : >/tmp/.setup-running
 : >/tmp/.setup
 
-set_title
-set_uefi_parameters
+_set_title
+_set_uefi_parameters
 
-DIALOG --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${_VC} console (ALT-F${_VC_NUM}). ALT-F1 will bring you back here." 14 65
+_dialog --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${_VC} console (ALT-F${_VC_NUM}). ALT-F1 will bring you back here." 14 65
 
 while true; do
     mainmenu

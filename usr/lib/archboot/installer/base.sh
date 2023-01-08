@@ -26,7 +26,7 @@ _NEXTITEM=""
 # To allow choice in script set EDITOR=""
 _EDITOR=""
 
-set_title() {
+_set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
     else
@@ -34,30 +34,30 @@ set_title() {
     fi
 }
 
-# DIALOG()
+# _dialog()
 # an el-cheapo dialog wrapper
 #
 # parameters: see dialog(1)
 # returns: whatever dialog did
-DIALOG() {
+_dialog() {
     dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
-printk()
+_printk()
 {
     case ${1} in
-        "on")  echo 4 >/proc/sys/kernel/printk ;;
-        "off") echo 0 >/proc/sys/kernel/printk ;;
+        "on")  echo 4 >/proc/sys/kernel/_printk ;;
+        "off") echo 0 >/proc/sys/kernel/_printk ;;
     esac
 }
 
-# geteditor()
+# _geteditor()
 # prompts the user to choose an editor
 # sets EDITOR global variable
-geteditor() {
+_geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
-        DIALOG --menu "Select a Text Editor to Use" 9 35 3 \
+        _dialog --menu "Select a Text Editor to Use" 9 35 3 \
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
@@ -67,7 +67,7 @@ geteditor() {
     fi
 }
 
-set_uefi_parameters() {
+_set_uefi_parameters() {
     _UEFI_BOOT="0"
     _UEFI_SECURE_BOOT="0"
     _GUIDPARAMETER="0"
@@ -99,12 +99,12 @@ set_uefi_parameters() {
 }
 
 # set GUID (gpt) usage
-set_guid() {
+_set_guid() {
     # all uefi systems should use GUID layout
     if [[ "${_UEFI_BOOT}" == "0" ]]; then
         ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
         ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
         #shellcheck disable=SC2034
-        DIALOG --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && _GUIDPARAMETER="1"
+        _dialog --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && _GUIDPARAMETER="1"
     fi
 }

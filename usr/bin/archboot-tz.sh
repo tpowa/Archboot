@@ -11,7 +11,7 @@ fi
 
 abort()
 {
-    DIALOG --yesno "Abort Time And Date Setting?" 6 40 || return 0
+    _dialog --yesno "Abort Time And Date Setting?" 6 40 || return 0
     [[ -e /tmp/.timezone ]] && rm -f /tmp/.timezone
     [[ -e /tmp/.hardwareclock ]] && rm -f /tmp/.hardwareclock
     [[ -e /tmp/.tz ]] && rm -f /tmp/.tz
@@ -22,12 +22,12 @@ abort()
     exit 1
 }
 
-# DIALOG()
+# _dialog()
 # an el-cheapo dialog wrapper
 #
 # parameters: see dialog(1)
 # returns: whatever dialog did
-DIALOG() {
+_dialog() {
     dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
@@ -56,18 +56,18 @@ _SET_ZONE=""
 while ! [[ "${_SET_ZONE}" = "1" ]]; do
     _REGIONS="America - Europe - Africa - Asia - Australia -"
     #shellcheck disable=SC2086
-    DIALOG --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}
+    _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}
     _REGION=$(cat ${_ANSWER})
     _ZONES=""
     for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
         _ZONES="${_ZONES} ${i} -"
     done
     #shellcheck disable=SC2086
-    DIALOG --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
+    _dialog --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
     _ZONE=$(cat ${_ANSWER})
     [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
     if [[ "${_SET_ZONE}" = "1" ]]; then
-        DIALOG --infobox "Setting Timezone to ${_ZONE} ..." 0 0
+        _dialog --infobox "Setting Timezone to ${_ZONE} ..." 0 0
         echo "${_ZONE}" > /tmp/.timezone
         timedatectl set-timezone "${_ZONE}"
         _S_NEXTITEM="2"
@@ -80,7 +80,7 @@ done
 
 dotimeset() {
 if [[ ! -s /tmp/.timezone ]]; then
-    DIALOG --msgbox "Error:\nYou have to select timezone first." 0 0
+    _dialog --msgbox "Error:\nYou have to select timezone first." 0 0
     _S_NEXTITEM="1"
     dotimezone || return 1
 fi
@@ -88,16 +88,16 @@ _SET_TIME=""
 while [[ "${_SET_TIME}" == "" ]]; do
     _HARDWARECLOCK=""
     DATE_PROGRAM=""
-    DIALOG --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
+    _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
     dohwclock
     # check internet connection
     if ping -c1 www.google.com >/dev/null 2>&1; then
-        if DIALOG --yesno \
+        if _dialog --yesno \
         "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-            DIALOG --infobox "Syncing clock with NTP pool ..." 3 45
+            _dialog --infobox "Syncing clock with NTP pool ..." 3 45
             # sync immediatly with standard pool
             if ! systemctl restart systemd-timesyncd; then
-                DIALOG --msgbox "An error has occured, time was not changed!" 0 0
+                _dialog --msgbox "An error has occured, time was not changed!" 0 0
                 _S_NEXTITEM="2"
                 return 1
             fi
@@ -128,7 +128,7 @@ while [[ "${_SET_TIME}" == "" ]]; do
         timedatectl set-time "${_DATETIME}"
         _SET_TIME="1"
     fi
-    DIALOG --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && _SET_TIME=""
+    _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && _SET_TIME=""
 done
 _S_NEXTITEM="3"
 }
@@ -140,7 +140,7 @@ mainmenu() {
         DEFAULT=""
     fi
     #shellcheck disable=SC2086
-    DIALOG ${DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
+    _dialog ${DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
                 --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
         "1" "Select Timezone" \
         "2" "Set Time and Date" \

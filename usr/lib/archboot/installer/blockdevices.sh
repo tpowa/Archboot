@@ -64,8 +64,8 @@ blockdevices() {
 # lists linux blockdevice partitions
 blockdevices_partitions() {
     # all available block devices partitions
-    # printk off needed cause of parted usage
-    printk off
+    # _printk off needed cause of parted usage
+    _printk off
     for part in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
@@ -87,7 +87,7 @@ blockdevices_partitions() {
             [[ "${1}" ]] && echo "${1}"
         fi
     done
-    printk on
+    _printk on
 }
 
 # list none partitionable raid md devices
@@ -238,7 +238,7 @@ findbootloaderdisks() {
 activate_dmraid()
 {
     if [[ -e /usr/bin/dmraid ]]; then
-        DIALOG --infobox "Activating dmraid arrays..." 0 0
+        _dialog --infobox "Activating dmraid arrays..." 0 0
         dmraid -ay -I -Z >/dev/null 2>&1
     fi
 }
@@ -251,9 +251,9 @@ activate_lvm2()
     if [[ -e /usr/bin/lvm ]]; then
         _OLD_LVM2_GROUPS=${_LVM2_GROUPS}
         _OLD_LVM2_VOLUMES=${_LVM2_VOLUMES}
-        DIALOG --infobox "Scanning logical volumes..." 0 0
+        _dialog --infobox "Scanning logical volumes..." 0 0
         lvm vgscan --ignorelockingfailure >/dev/null 2>&1
-        DIALOG --infobox "Activating logical volumes..." 0 0
+        _dialog --infobox "Activating logical volumes..." 0 0
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
@@ -267,7 +267,7 @@ activate_raid()
 {
     _ACTIVATE_RAID=""
     if [[ -e /usr/bin/mdadm ]]; then
-        DIALOG --infobox "Activating RAID arrays..." 0 0
+        _dialog --infobox "Activating RAID arrays..." 0 0
         mdadm --assemble --scan >/dev/null 2>&1 || _ACTIVATE_RAID="no"
     fi
 }
@@ -278,13 +278,13 @@ activate_luks()
 {
     _ACTIVATE_LUKS=""
     if [[ -e /usr/bin/cryptsetup ]]; then
-        DIALOG --infobox "Scanning for luks encrypted devices..." 0 0
+        _dialog --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
             for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
-                    DIALOG --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS="1"
+                    _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS="1"
                     [[ "${_RUN_LUKS}" == "1" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
                     [[ "${_RUN_LUKS}" == "" ]] && _ACTIVATE_LUKS="no"
                 else
@@ -327,7 +327,7 @@ set_device_name_scheme() {
     fi
     _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select the device name scheme you want to use in config files. ${_MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select the device name scheme you want to use in config files. ${_MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
     _NAME_SCHEME_PARAMETER=$(cat "${_ANSWER}")
     _NAME_SCHEME_PARAMETER_RUN="1"
 }
@@ -363,7 +363,7 @@ _umountall()
         for i in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
         done
-        DIALOG --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
+        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
         sleep 3
     fi
 }
@@ -373,17 +373,17 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        DIALOG --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD="1"
+        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD="1"
         if [[ "${_DISABLEMD}" == "1" ]]; then
             _umountall
-            DIALOG --infobox "Disabling all software raid devices..." 0 0
+            _dialog --infobox "Disabling all software raid devices..." 0 0
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
                 wipefs -a --force "/dev/${i}" > "${_LOG}"  2>&1
                 mdadm --manage --stop "/dev/${i}" > "${_LOG}" 2>&1
             done
-            DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
+            _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
                 sgdisk --zap "${i}" > "${_LOG}" 2>&1
@@ -394,10 +394,10 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        DIALOG --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB="1"
+        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB="1"
         if [[ "${_DISABLEMDSB}" == "1" ]]; then
             _umountall
-            DIALOG --infobox "Cleaning superblocks of all software raid devices..." 0 0
+            _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
                 sgdisk --zap "${i}" > "${_LOG}" 2>&1
@@ -420,19 +420,19 @@ _stoplvm()
     ! [[ "${_LV_GROUPS}" == "" ]] && _DETECTED_LVM=1
     ! [[ "${_LV_PHYSICAL}" == "" ]] && _DETECTED_LVM=1
     if [[ "${_DETECTED_LVM}" == "1" ]]; then
-        DIALOG --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM="1"
+        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM="1"
     fi
     if [[ "${_DISABLELVM}" == "1" ]]; then
         _umountall
-        DIALOG --infobox "Removing logical volumes ..." 0 0
+        _dialog --infobox "Removing logical volumes ..." 0 0
         for i in ${_LV_VOLUMES}; do
             lvremove -f "/dev/mapper/${i}" 2>/dev/null> "${_LOG}"
         done
-        DIALOG --infobox "Removing logical groups ..." 0 0
+        _dialog --infobox "Removing logical groups ..." 0 0
         for i in ${_LV_GROUPS}; do
             vgremove -f "${i}" 2>/dev/null > "${_LOG}"
         done
-        DIALOG --infobox "Removing physical volumes ..." 0 0
+        _dialog --infobox "Removing physical volumes ..." 0 0
         for i in ${_LV_PHYSICAL}; do
             pvremove -f "${i}" 2>/dev/null > "${_LOG}"
         done
@@ -449,11 +449,11 @@ _stopluks()
     _LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ "${_LUKSDEVICE}" == "" ]] || _DETECTED_LUKS=1
     if [[ "${_DETECTED_LUKS}" == "1" ]]; then
-        DIALOG --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
+        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
     fi
     if [[ "${_DISABLELUKS}" == "1" ]]; then
         _umountall
-        DIALOG --infobox "Removing luks encrypted devices ..." 0 0
+        _dialog --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${_LUKSDEVICE}; do
             _LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
             cryptsetup remove "${i}" > "${_LOG}"
@@ -466,10 +466,10 @@ _stopluks()
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
     if [[ "${_DETECTED_LUKS}" == "1" ]]; then
-        DIALOG --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
+        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
     fi
     if [[ "${_DISABLELUKS}" == "1" ]]; then
-        DIALOG --infobox "Removing not running luks encrypted devices ..." 0 0
+        _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
            wipefs -a "${i}" > "${_LOG}" 2>&1
@@ -481,28 +481,28 @@ _stopluks()
 #_dmraid_update
 _dmraid_update()
 {
-    printk off
-    DIALOG --infobox "Deactivating dmraid devices ..." 0 0
+    _printk off
+    _dialog --infobox "Deactivating dmraid devices ..." 0 0
     dmraid -an >/dev/null 2>&1
     if [[ "${_DETECTED_LVM}" == "1" || "${_DETECTED_LUKS}" == "1" ]]; then
-        DIALOG --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM="1"
+        _dialog --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM="1"
         if [[ "${_RESETDM}" == "1" ]]; then
-            DIALOG --infobox "Resetting devicemapper devices ..." 0 0
+            _dialog --infobox "Resetting devicemapper devices ..." 0 0
             dmsetup remove_all >/dev/null 2>&1
         fi
     else
-        DIALOG --infobox "Resetting devicemapper devices ..." 0 0
+        _dialog --infobox "Resetting devicemapper devices ..." 0 0
         dmsetup remove_all >/dev/null 2>&1
     fi
-    DIALOG --infobox "Reactivating dmraid devices ..." 0 0
+    _dialog --infobox "Reactivating dmraid devices ..." 0 0
     dmraid -ay -I -Z >/dev/null 2>&1
-    printk on
+    _printk on
 }
 
 #helpbox for raid
 _helpraid()
 {
-DIALOG --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
+_dialog --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
 -----------------------------\n\n
 Linear mode:\n
 You have two or more partitions which are not necessarily the same size\n
@@ -572,37 +572,37 @@ _raid()
                 done)"
         # break if all devices are in use
         if [[ "${_PARTS}" == "" ]]; then
-            DIALOG --msgbox "All devices in use. No more devices left for new creation." 0 0
+            _dialog --msgbox "All devices in use. No more devices left for new creation." 0 0
             return 1
         fi
         # enter raid device name
         _RAIDDEVICE=""
         while [[ -z "${_RAIDDEVICE}" ]]; do
-            DIALOG --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
             _RAIDDEVICE=$(cat "${_ANSWER}")
             if grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
+                _dialog --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 _RAIDDEVICE=""
             fi
         done
         _RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the raid level you want to use:" 14 50 7 ${_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the raid level you want to use:" 14 50 7 ${_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _LEVEL=$(cat "${_ANSWER}")
         # raid5 and raid10 support parity parameter
         _PARITY=""
         if [[ "${_LEVEL}" == "raid5" || "${_LEVEL}" == "raid6" || "${_LEVEL}" == "raid10" ]]; then
             _PARITYLEVELS="left-asymmetric - left-symmetric - right-asymmetric - right-symmetric -"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${_PARITYLEVELS} 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${_PARITYLEVELS} 2>"${_ANSWER}" || return 1
             _PARITY=$(cat "${_ANSWER}")
         fi
         # show all devices with sizes
-        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
+        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         _RAIDNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device ${_RAIDNUMBER}:" 21 50 13 ${_PARTS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select device ${_RAIDNUMBER}:" 21 50 13 ${_PARTS} 2>"${_ANSWER}" || return 1
         _PART=$(cat "${_ANSWER}")
         echo "${_PART}" >>/tmp/.raid
         while [[ "${_PART}" != "DONE" ]]; do
@@ -613,13 +613,13 @@ _raid()
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_PARTS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_PARTS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             _SPARE=""
-            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && DIALOG --yesno --defaultno "Would you like to use ${_PART} as spare device?" 0 0 && _SPARE="1"
+            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_PART} as spare device?" 0 0 && _SPARE="1"
             [[ "${_PART}" == "DONE" ]] && break
             if [[ "${_PART}" == "MISSING" ]]; then
-                DIALOG --yesno "Would you like to create a degraded raid on ${_RAIDDEVICE}?" 0 0 && _DEGRADED="missing"
+                _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEVICE}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
             else
                 if [[ "${_SPARE}" == "1" ]]; then
@@ -631,7 +631,7 @@ _raid()
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
-        DIALOG --yesno "Would you like to create ${_RAIDDEVICE} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
+        _dialog --yesno "Would you like to create ${_RAIDDEVICE} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
     done
     _umountall
     _createraid
@@ -652,20 +652,20 @@ _createraid()
     ! [[ "${_RAID_DEVICES}" == "0" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVICES}"
     ! [[ "${_SPARE_DEVICES}" == "0" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVICES}"
     ! [[ "${_PARITY}" == "" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
-    DIALOG --infobox "Creating ${_RAIDDEVICE}..." 0 0
+    _dialog --infobox "Creating ${_RAIDDEVICE}..." 0 0
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEVICE} ${_RAIDOPTIONS} ${_DEVICES} >"${_LOG}" 2>&1; then
-        DIALOG --infobox "${_RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
+        _dialog --infobox "${_RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating ${_RAIDDEVICE} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error creating ${_RAIDDEVICE} (see ${_LOG} for details)." 0 0
         return 1
     fi
     if [[ ${_RAID_PARTITION} == "1" ]]; then
         # switch for mbr usage
-        set_guid
+        _set_guid
         if [[ "${_GUIDPARAMETER}" == "0" ]]; then
-            DIALOG --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
+            _dialog --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
             cfdisk "${_RAIDDEVICE}"
         else
             _DISC="${_RAIDDEVICE}"
@@ -680,7 +680,7 @@ _createraid()
 # help for lvm
 _helplvm()
 {
-DIALOG --msgbox "LOGICAL VOLUME SUMMARY:\n
+_dialog --msgbox "LOGICAL VOLUME SUMMARY:\n
 -----------------------------\n\n
 LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
 abstract your storage space and have \"virtual partitions\" which are easier\n
@@ -716,15 +716,15 @@ _createpv()
                 done)"
         # break if all devices are in use
         if [[ "${_PARTS}" == "" ]]; then
-            DIALOG --msgbox "No devices left for physical volume creation." 0 0
+            _dialog --msgbox "No devices left for physical volume creation." 0 0
             return 1
         fi
         # show all devices with sizes
-        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         _DEVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device number ${_DEVNUMBER} for physical volume:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select device number ${_DEVNUMBER} for physical volume:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
         _PART=$(cat "${_ANSWER}")
         echo "${_PART}" >>/tmp/.pvs-create
         while [[ "${_PART}" != "DONE" ]]; do
@@ -733,24 +733,24 @@ _createpv()
             _PARTS="${_PARTS//${_PART}\ _/}"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             [[ "${_PART}" == "DONE" ]] && break
             echo "${_PART}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && _PVFINISH="DONE"
+        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && _PVFINISH="DONE"
     done
-    DIALOG --infobox "Creating physical volume on ${_PART}..." 0 0
+    _dialog --infobox "Creating physical volume on ${_PART}..." 0 0
     _PART="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
     _umountall
     #shellcheck disable=SC2086
     if pvcreate -y ${_PART} >"${_LOG}" 2>&1; then
-        DIALOG --infobox "Creating physical volume on ${_PART} successful.\n\nContinuing in 3 seconds..." 6 75
+        _dialog --infobox "Creating physical volume on ${_PART} successful.\n\nContinuing in 3 seconds..." 6 75
         sleep 3
     else
-        DIALOG --msgbox "Error creating physical volume on ${_PART} (see ${_LOG} for details)." 0 0; return 1
+        _dialog --msgbox "Error creating physical volume on ${_PART} (see ${_LOG} for details)." 0 0; return 1
     fi
     # run udevadm to get values exported
     udevadm trigger
@@ -818,26 +818,26 @@ _createvg()
         _PVS=$(findpv _)
         # break if all devices are in use
         if [[ -z "${PVS}" ]]; then
-            DIALOG --msgbox "No devices left for Volume Group creation." 0 0
+            _dialog --msgbox "No devices left for Volume Group creation." 0 0
             return 1
         fi
         # enter volume group name
         _VGDEVICE=""
         while [[ -z "${_VGDEVICE}" ]]; do
-            DIALOG --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
             _VGDEVICE=$(cat "${_ANSWER}")
             if vgs -o vg_name --noheading 2>/dev/null | grep -q "^  ${_VGDEVICE}"; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
+                _dialog --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 _VGDEVICE=""
             fi
         done
         # show all devices with sizes, which are not in use
         #shellcheck disable=SC2086
-        DIALOG --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
+        _dialog --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         _PVNUMBER=1
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
         _PV=$(cat "${_ANSWER}")
         echo "${_PV}" >>/tmp/.pvs
         while [[ "${_PVS}" != "DONE" ]]; do
@@ -847,23 +847,23 @@ _createvg()
             _PVS="$(echo ${_PVS} | sed -e "s#${_PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
-            DIALOG --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
             _PV=$(cat "${_ANSWER}")
             [[ "${_PV}" == "DONE" ]] && break
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create Volume Group like this?\n\n${_VGDEVICE}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
+        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEVICE}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
     done
-    DIALOG --infobox "Creating Volume Group ${_VGDEVICE}..." 0 0
+    _dialog --infobox "Creating Volume Group ${_VGDEVICE}..." 0 0
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEVICE} ${_PV} >"${_LOG}" 2>&1; then
-        DIALOG --infobox "Creating Volume Group ${_VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+        _dialog --infobox "Creating Volume Group ${_VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        DIALOG --msgbox "Error creating Volume Group ${_VGDEVICE} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error creating Volume Group ${_VGDEVICE} (see ${_LOG} for details)." 0 0
         return 1
     fi
 }
@@ -878,39 +878,39 @@ _createlv()
         _LVS=$(findvg _)
         # break if all devices are in use
         if [[ "${_LVS}" == "" ]]; then
-            DIALOG --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
+            _dialog --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
             return 1
         fi
         # show all devices with sizes, which are not 100% in use!
-        DIALOG --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
+        _dialog --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select Volume Group:" 11 50 5 ${_LVS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select Volume Group:" 11 50 5 ${_LVS} 2>"${_ANSWER}" || return 1
         _LV=$(cat "${_ANSWER}")
         # enter logical volume name
         _LVDEVICE=""
         while [[ -z "${LVDEVICE}" ]]; do
-            DIALOG --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
             _LVDEVICE=$(cat "${_ANSWER}")
             if lvs -o lv_name,vg_name --noheading 2>/dev/null | grep -q " ${_LVDEVICE} ${_LV}$"; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
+                _dialog --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 _LVDEVICE=""
             fi
         done
         while [[ -z "${_LV_SIZE_SET}" ]]; do
             _LV_ALL=""
-            DIALOG --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${_LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${_LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
-                    DIALOG --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL="1"
+                    _dialog --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL="1"
                     if ! [[ "${_LV_ALL}" == "1" ]]; then
                          _LV_SIZE=0
                     fi
                 fi
                 if [[ "${_LV_SIZE}" == "0" ]]; then
-                    DIALOG --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                    _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
                     if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]]; then
-                        DIALOG --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
+                        _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         _LV_SIZE_SET=1
                     fi
@@ -918,7 +918,7 @@ _createlv()
         done
         #Contiguous doesn't work with +100%FREE
         _LV_CONTIGUOUS=""
-        [[ -z "${_LV_ALL}" ]] && DIALOG --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS="1"
+        [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS="1"
         if [[ "${_LV_CONTIGUOUS}" == "1" ]]; then
             _CONTIGUOUS=yes
             _LV_EXTRA="-C y"
@@ -928,25 +928,25 @@ _createlv()
         fi
         [[ "${_LV_SIZE}" == "" ]] && _LV_SIZE="All free space left"
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to create Logical Volume ${_LVDEVICE} like this?\nVolume Group:\n${_LV}\nVolume Size:\n${_LV_SIZE}\nContiguous Volume:\n${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
+        _dialog --yesno "Would you like to create Logical Volume ${_LVDEVICE} like this?\nVolume Group:\n${_LV}\nVolume Size:\n${_LV_SIZE}\nContiguous Volume:\n${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
     done
     _umountall
     if [[ "${_LV_ALL}" == "1" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEVICE} >"${_LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
             return 1
         fi
     else
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEVICE} >"${_LOG}" 2>&1; then
-            DIALOG --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            DIALOG --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
             return 1
         fi
     fi
@@ -956,10 +956,10 @@ _createlv()
 _enter_luks_name() {
     _LUKSDEVICE=""
     while [[ -z "${_LUKSDEVICE}" ]]; do
-        DIALOG --inputbox "Enter the name for luks encrypted device ${_PART}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the name for luks encrypted device ${_PART}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
         _LUKSDEVICE=$(cat "${_ANSWER}")
         if ! cryptsetup status "${_LUKSDEVICE}" | grep -q inactive; then
-            DIALOG --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
+            _dialog --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
             _LUKSDEVICE=""
         fi
     done
@@ -969,39 +969,39 @@ _enter_luks_name() {
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
     while [[ -z "${LUKSPASSPHRASE}" ]]; do
-        DIALOG --insecure --passwordbox "Enter passphrase for luks encrypted device ${_PART}:" 0 0 2>"${_ANSWER}" || return 1
+        _dialog --insecure --passwordbox "Enter passphrase for luks encrypted device ${_PART}:" 0 0 2>"${_ANSWER}" || return 1
         _LUKSPASS=$(cat "${_ANSWER}")
-        DIALOG --insecure --passwordbox "Retype passphrase for luks encrypted device ${_PART}:" 0 0 2>"${_ANSWER}" || return 1
+        _dialog --insecure --passwordbox "Retype passphrase for luks encrypted device ${_PART}:" 0 0 2>"${_ANSWER}" || return 1
         _LUKSPASS2=$(cat "${_ANSWER}")
         if [[ -n "${_LUKSPASS}" && -n "${_LUKSPASS2}" && "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEVICE}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEVICE}"
         else
-             DIALOG --msgbox "Passphrases didn't match or was empty, please enter again." 0 0
+             _dialog --msgbox "Passphrases didn't match or was empty, please enter again." 0 0
         fi
     done
 }
 
 # opening luks
 _opening_luks() {
-    DIALOG --infobox "Opening encrypted ${_PART}..." 0 0
+    _dialog --infobox "Opening encrypted ${_PART}..." 0 0
     _LUKSOPEN_SUCCESS=0
     while [[ "${_LUKSOPEN_SUCCESS}" == "0" ]]; do
         cryptsetup luksOpen "${_PART}" "${_LUKSDEVICE}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
         if [[ "${_LUKSOPEN_SUCCESS}" == "0" ]]; then
-            DIALOG --msgbox "Error: Passphrase didn't match, please enter again." 0 0
+            _dialog --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi
     done
-    DIALOG --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEVICE}" 0 0 || _LUKSPASSPHRASE="ASK"
+    _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEVICE}" 0 0 || _LUKSPASSPHRASE="ASK"
     echo "${_LUKSDEVICE}" "${_PART}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
 }
 
 # help for luks
 _helpluks()
 {
-DIALOG --msgbox "LUKS ENCRYPTION SUMMARY:\n
+_dialog --msgbox "LUKS ENCRYPTION SUMMARY:\n
 -----------------------------\n\n
 Encryption is useful for two (related) reasons.\n
 Firstly, it prevents anyone with physical access to your computer,\n
@@ -1038,24 +1038,24 @@ _luks()
                 done)"
         # break if all devices are in use
         if [[ "${_PARTS}" == "" ]]; then
-            DIALOG --msgbox "No devices left for luks encryption." 0 0
+            _dialog --msgbox "No devices left for luks encryption." 0 0
             return 1
         fi
         # show all devices with sizes
-        DIALOG --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
+        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         #shellcheck disable=SC2086
-        DIALOG --menu "Select device for luks encryption:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select device for luks encryption:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
         _PART=$(cat "${_ANSWER}")
         # enter luks name
         _enter_luks_name || return 1
         ### TODO: offer more options for encrypt!
         ###       defaults are used only
         # final step ask if everything is ok?
-        DIALOG --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEVICE}\nDevice:${_PART}\n" 0 0 && _LUKSFINISH="DONE"
+        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEVICE}\nDevice:${_PART}\n" 0 0 && _LUKSFINISH="DONE"
     done
     _enter_luks_passphrase || return 1
     _umountall
-    DIALOG --infobox "Encrypting ${_PART}..." 0 0
+    _dialog --infobox "Encrypting ${_PART}..." 0 0
     cryptsetup -q luksFormat "${_PART}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     _opening_luks
 }

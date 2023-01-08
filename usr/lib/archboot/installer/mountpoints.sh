@@ -10,7 +10,7 @@ destdir_mounts(){
     _PART_ROOT="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ "${_PART_ROOT}" == "" ]]; then
-        DIALOG --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
+        _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
         mountpoints || return 1
     fi
 }
@@ -57,7 +57,7 @@ select_filesystem() {
     command -v mkfs.nilfs2 2>/dev/null && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
     command -v mkfs.jfs 2>/dev/null && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    DIALOG --menu "Select a filesystem for ${_PART}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select a filesystem for ${_PART}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
@@ -65,10 +65,10 @@ enter_MOUNTPOINT() {
     _FILESYSTEM_FINISH=""
     _MP=""
     while [[ "${_MP}" == "" ]]; do
-        DIALOG --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         if grep ":${_MP}:" /tmp/.parts; then
-            DIALOG --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
+            _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
             _MP=""
         fi
     done
@@ -92,14 +92,14 @@ create_filesystem() {
     _FS_OPTIONS=""
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
-    DIALOG --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS="yes"
+    _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS="yes"
     if [[ "${_DOMKFS}" == "yes" ]]; then
         while [[ "${_LABEL_NAME}" == "" ]]; do
-            DIALOG --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
+            _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_PART}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${_LABEL_NAME}$" /tmp/.parts; then
-                DIALOG --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
+                _dialog --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
                 _LABEL_NAME=""
             fi
         done
@@ -107,7 +107,7 @@ create_filesystem() {
             prepare_btrfs || return 1
             btrfs_compress
         fi
-        DIALOG --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     fi
     _FILESYSTEM_FINISH="yes"
@@ -126,13 +126,13 @@ mountpoints() {
         if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
             set_device_name_scheme || return 1
         fi
-        DIALOG --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+        _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         _PARTS=$(findpartitions _)
         _DO_SWAP=""
         while [[ "${_DO_SWAP}" != "DONE" ]]; do
             _FSTYPE="swap"
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             if [[ "${_PART}" != "NONE" ]]; then
                 clear_fs_values
@@ -155,7 +155,7 @@ mountpoints() {
         _DO_ROOT=""
         while [[ "${_DO_ROOT}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            DIALOG --menu "Select the partition to mount as /:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             _PART_ROOT=${_PART}
             # Select root filesystem type
@@ -183,7 +183,7 @@ mountpoints() {
             _DO_ADDITIONAL=""
             while [[ "${_DO_ADDITIONAL}" != "DONE" ]]; do
                 #shellcheck disable=SC2086
-                DIALOG --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
                 _PART=$(cat "${_ANSWER}")
                 if [[ "${_PART}" != "DONE" ]]; then
                     _FSTYPE="$(${_LSBLK} _FSTYPE "${_PART}")"
@@ -212,11 +212,11 @@ mountpoints() {
             fi
         done
         #shellcheck disable=SC2028
-        DIALOG --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _PARTFINISH="DONE"
+        _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _PARTFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
-    printk off
+    _printk off
     while read -r line; do
         _PART=$(echo "${line}" | cut -d: -f 1)
         _FSTYPE=$(echo "${line}" | cut -d: -f 2)
@@ -231,23 +231,23 @@ mountpoints() {
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         if [[ "${_DOMKFS}" == "yes" ]]; then
             if [[ "${_FSTYPE}" == "swap" ]]; then
-                DIALOG --infobox "Creating and activating \nswapspace on \n${_PART} ..." 0 0
+                _dialog --infobox "Creating and activating \nswapspace on \n${_PART} ..." 0 0
             else
-                DIALOG --infobox "Creating ${_FSTYPE} on ${_PART},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
+                _dialog --infobox "Creating ${_FSTYPE} on ${_PART},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
             fi
             _mkfs yes "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
             if [[ "${_FSTYPE}" == "swap" ]]; then
-                DIALOG --infobox "Activating swapspace \non ${_PART} ..." 0 0
+                _dialog --infobox "Activating swapspace \non ${_PART} ..." 0 0
             else
-                DIALOG --infobox "Mounting ${_FSTYPE} \non ${_PART} \nto ${_DESTDIR}${_MP} ..." 0 0
+                _dialog --infobox "Mounting ${_FSTYPE} \non ${_PART} \nto ${_DESTDIR}${_MP} ..." 0 0
             fi
             _mkfs no "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         fi
         sleep 1
     done < /tmp/.parts
-    printk on
-    DIALOG --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
+    _printk on
+    _dialog --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
     sleep 3
     _NEXTITEM="5"
     _S_MKFS=1
@@ -292,14 +292,14 @@ _mkfs() {
             mkswap -L "${_LABELNAME}" "${_DEVICE}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
-                DIALOG --msgbox "Error creating swap: mkswap ${_DEVICE}" 0 0
+                _dialog --msgbox "Error creating swap: mkswap ${_DEVICE}" 0 0
                 return 1
             fi
         fi
         swapon "${_DEVICE}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            DIALOG --msgbox "Error activating swap: swapon ${_DEVICE}" 0 0
+            _dialog --msgbox "Error activating swap: swapon ${_DEVICE}" 0 0
             return 1
         fi
     else
@@ -309,7 +309,7 @@ _mkfs() {
             [[ "${_FSTYPE}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
-            DIALOG --msgbox "unknown fstype ${_FSTYPE} for ${_DEVICE}" 0 0
+            _dialog --msgbox "unknown fstype ${_FSTYPE} for ${_DEVICE}" 0 0
             return 1
         fi
         # if we were tasked to create the filesystem, do so
@@ -330,7 +330,7 @@ _mkfs() {
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
-                DIALOG --msgbox "Error creating filesystem ${_FSTYPE} on ${_DEVICE}" 0 0
+                _dialog --msgbox "Error creating filesystem ${_FSTYPE} on ${_DEVICE}" 0 0
                 return 1
             fi
             sleep 2
@@ -361,7 +361,7 @@ _mkfs() {
         mount -t "${_FSTYPE}" -o "${_MOUNTOPTIONS}" "${_DEVICE}" "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            DIALOG --msgbox "Error mounting ${_DEST}${_MOUNTPOINT}" 0 0
+            _dialog --msgbox "Error mounting ${_DEST}${_MOUNTPOINT}" 0 0
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen

@@ -13,12 +13,12 @@ check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISC}")" == "gpt" ]] && _GUID_DETECTED="1"
     if [[ -z "${_GUID_DETECTED}" ]]; then
-        DIALOG --yesno "Setup detected no GUID (gpt) partition table on ${_DISC}.\n\nDo you want to convert the existing MBR table in ${_DISC} to a GUID (gpt) partition table?" 0 0 || return 1
+        _dialog --yesno "Setup detected no GUID (gpt) partition table on ${_DISC}.\n\nDo you want to convert the existing MBR table in ${_DISC} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt "${_DISC}" > "${_LOG}" && _GUID_DETECTED="1"
         # reread partitiontable for kernel
         partprobe "${_DISC}" > "${_LOG}"
         if [[ -z "${_GUID_DETECTED}" ]]; then
-            DIALOG --defaultno --yesno "Conversion failed on ${_DISC}.\nSetup detected no GUID (gpt) partition table on ${_DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISC}?\n\n${_DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+            _dialog --defaultno --yesno "Conversion failed on ${_DISC}.\nSetup detected no GUID (gpt) partition table on ${_DISC}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISC}?\n\n${_DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
             sgdisk --zap "${_DISC}" &>/dev/null
             # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
@@ -36,13 +36,13 @@ check_gpt() {
         fi
         if [[ "${_CHECK_BIOS_BOOT_GRUB}" == "1" ]]; then
             if ! sgdisk -p "${_DISC}" | grep -q 'EF02'; then
-                DIALOG --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISC}. Please create a >=1 MB BIOS Boot partition for grub BIOS GPT support." 0 0
+                _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISC}. Please create a >=1 MB BIOS Boot partition for grub BIOS GPT support." 0 0
                 _RUN_CFDISK="1"
             fi
         fi
     fi
     if [[ "${_RUN_CFDISK}" == "1" ]]; then
-        DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
+        _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
         clear && cfdisk "${_DISC}"
         # reread partitiontable for kernel
         partprobe "${_DEVICE}"
@@ -54,18 +54,18 @@ check_efisys_part() {
     detect_DISC
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISC}")" != "gpt" ]]; then
         _GUID_DETECTED=""
-        DIALOG --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISC}.\nUEFI boot requires ${_DISC} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${_DISC} to a GUID (gpt) partition table?" 0 0 || return 1
-        DIALOG --msgbox "Setup will now try to non-destructively convert ${_DISC} to GPT using sgdisk." 0 0
+        _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISC}.\nUEFI boot requires ${_DISC} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${_DISC} to a GUID (gpt) partition table?" 0 0 || return 1
+        _dialog --msgbox "Setup will now try to non-destructively convert ${_DISC} to GPT using sgdisk." 0 0
         sgdisk --mbrtogpt "${_DISC}" > "${_LOG}" && _GUID_DETECTED="1"
         partprobe "${_DISC}" > "${_LOG}"
         if [[ "${_GUID_DETECTED}" == "" ]]; then
-            DIALOG --msgbox "Conversion failed on ${_DISC}.\nSetup detected no GUID (gpt) partition table on ${_DISC}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
+            _dialog --msgbox "Conversion failed on ${_DISC}.\nSetup detected no GUID (gpt) partition table on ${_DISC}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1
         fi
     fi
     if ! sgdisk -p "${_DISC}" | grep -q 'EF00'; then
         # Windows 10 recommends a minimum of 260MB Efi Systen Partition
-        DIALOG --msgbox "Setup detected no EFI System partition in ${_DISC}. You will now be put into cfdisk. Please create a >= 260 MB partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260 MB FAT32 EFI System partition, check whether that partition has EFI System cfdisk type code." 0 0
+        _dialog --msgbox "Setup detected no EFI System partition in ${_DISC}. You will now be put into cfdisk. Please create a >= 260 MB partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260 MB FAT32 EFI System partition, check whether that partition has EFI System cfdisk type code." 0 0
         clear && cfdisk "${_DISC}"
         _RUN_CFDISK=""
     fi
@@ -74,16 +74,16 @@ check_efisys_part() {
         _UEFISYS_PART="$(${_LSBLK} NAME,PARTTYPE "${_DISC}" | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
         if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" != "vfat" ]]; then
             ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
-            DIALOG --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT formatted. UEFI Specification requires EFI System partition to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFI System partition. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32="1"
+            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT formatted. UEFI Specification requires EFI System partition to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFI System partition. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYS_PART}")" != "FAT32" ]]; then
             ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
-            DIALOG --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32="1"
+            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32="1"
         fi
         #autodetect efisys mountpoint, on fail ask for mountpoint
         _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYS_PART}" | cut -d " " -f 3)")"
         if [[ "${_UEFISYS_MP}" == "/" ]]; then
-            DIALOG --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
         umount "${_DESTDIR}/${_UEFISYS_MP}" &> /dev/null
@@ -95,12 +95,12 @@ check_efisys_part() {
         if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${_UEFISYS_PART}" "${_DESTDIR}/${_UEFISYS_MP}"
         else
-            DIALOG --msgbox "${_UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
+            _dialog --msgbox "${_UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
             mount -o rw "${_UEFISYS_PART}" "${_DESTDIR}/${_UEFISYS_MP}"
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
     else
-        DIALOG --msgbox "Setup did not find any EFI System partition in ${_DISC}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
+        _dialog --msgbox "Setup did not find any EFI System partition in ${_DISC}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
     fi
 }
@@ -119,19 +119,19 @@ partition() {
     # update dmraid
     [[ -n "$(dmraid_devices)" ]] && _dmraid_update
     # switch for mbr usage
-    set_guid
+    _set_guid
     # Select disk to partition
     _DISCS=$(finddisks _)
     _DISCS="${_DISCS} OTHER _ DONE +"
-    DIALOG --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
+    _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
     _DISC=""
     while true; do
         # Prompt the user with a list of known disks
         #shellcheck disable=SC2086
-        DIALOG --menu "Select the disk you want to partition:" 14 55 7 ${_DISCS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the disk you want to partition:" 14 55 7 ${_DISCS} 2>"${_ANSWER}" || return 1
         _DISC=$(cat "${_ANSWER}")
         if [[ "${_DISC}" == "OTHER" ]]; then
-            DIALOG --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || _DISC=""
+            _dialog --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || _DISC=""
             _DISC=$(cat "${_ANSWER}")
         fi
         # Leave our loop if the user is done partitioning
@@ -147,14 +147,14 @@ partition() {
                 [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISC}")" == "dos" ]] && _MSDOS_DETECTED="1"
 
                 if [[ "${_MSDOS_DETECTED}" == "" ]]; then
-                    DIALOG --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISC}.\nDo you want to create a MS-DOS partition table now on ${_DISC}?\n\n${_DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+                    _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISC}.\nDo you want to create a MS-DOS partition table now on ${_DISC}?\n\n${_DISC} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 >/dev/null 2>&1
                     wipefs -a "${_DEVICE}" /dev/null 2>&1
                     parted -a optimal -s "${_DISC}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
-                DIALOG --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70
+                _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70
                 clear
                 cfdisk "${_DISC}"
                 # reread partitiontable for kernel
