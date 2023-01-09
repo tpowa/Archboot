@@ -378,9 +378,9 @@ _mkfs() {
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
-    local _FSUUID="$(getfsuuid "${_DEVICE}")"
+    local _FSUUID="$(_getfsuuid "${_DEVICE}")"
     #shellcheck disable=SC2155
-    local _FSLABEL="$(getfslabel "${_DEVICE}")"
+    local _FSLABEL="$(_getfslabel "${_DEVICE}")"
 
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
         #shellcheck disable=SC2155

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getrootfstype() {
-    _ROOTFS="$(getfstype "${_PART_ROOT}")"
+    _ROOTFS="$(_getfstype "${_PART_ROOT}")"
 }
 
 _getrootflags() {
