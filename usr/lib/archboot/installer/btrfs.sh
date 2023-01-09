@@ -223,7 +223,7 @@ _create_btrfs_subvolume() {
 _choose_btrfs_subvolume () {
     _BTRFS_SUBVOLUME="NONE"
     _SUBVOLUMES_DETECTED=""
-    _SUBVOLUMES=$(find_btrfs_subvolume _)
+    _SUBVOLUMES=$(_find_btrfs_subvolume _)
     # check if subvolumes are present
     [[ -n "${_SUBVOLUMES}" ]] && _SUBVOLUMES_DETECTED=1
     _subvolumes_in_use
