@@ -812,7 +812,7 @@ _createvg()
     while [[ "${_VGFINISH}" != "DONE" ]]; do
         : >/tmp/.pvs
         _VGDEVICE=""
-        _PVS=$(findpv _)
+        _PVS=$(_findpv _)
         # break if all devices are in use
         if [[ -z "${PVS}" ]]; then
             _dialog --msgbox "No devices left for Volume Group creation." 0 0
