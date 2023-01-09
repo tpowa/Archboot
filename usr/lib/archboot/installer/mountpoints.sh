@@ -169,7 +169,7 @@ _mountpoints() {
             fi
             [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
         done
-        _find_btrfs_raid_DEVICEs
+        _find_btrfs_raid_devices
         _btrfs_parts
         _check_mkfs_values
         echo "${_PART}:${_FSTYPE}:/:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
@@ -202,7 +202,7 @@ _mountpoints() {
                 [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ADDITIONAL="DONE"
             done
             if [[ "${_PART}" != "DONE" ]]; then
-                _find_btrfs_raid_DEVICEs
+                _find_btrfs_raid_devices
                 _btrfs_parts
                 _check_mkfs_values
                 echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
