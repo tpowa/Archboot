@@ -15,7 +15,7 @@ fi
 # abstract the common pacman args
 PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 
-linux_firmware() {
+_linux_firmware() {
     _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
@@ -26,7 +26,7 @@ linux_firmware() {
     done
 }
 
-marvell_firmware() {
+_marvell_firmware() {
     unset MARVELL
     _PACKAGES="${_PACKAGES// linux-firmware-marvell/ }"
     for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
@@ -43,7 +43,7 @@ marvell_firmware() {
 
 # chroot_mount()
 # prepares target system as a chroot
-chroot_mount()
+_chroot_mount()
 {
     if grep -qw archboot /etc/hostname; then
         [[ -e "${_DESTDIR}/proc" ]] || mkdir -m 555 "${_DESTDIR}/proc"
@@ -59,7 +59,7 @@ chroot_mount()
 
 # chroot_umount()
 # tears down chroot in target system
-chroot_umount()
+_chroot_umount()
 {
     if grep -qw archboot /etc/hostname; then
         umount -R "${_DESTDIR}/proc"
@@ -68,7 +68,7 @@ chroot_umount()
     fi
 }
 
-local_pacman_conf() {
+_local_pacman_conf() {
     _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
     #shellcheck disable=SC2129
     echo "[options]" >> "${_PACMAN_CONF}"
@@ -80,7 +80,7 @@ local_pacman_conf() {
     _PACMAN_CONF="--config ${_PACMAN_CONF}"
 }
 
-auto_packages() {
+_auto_packages() {
     # Add filesystem packages
     if lsblk -rnpo FSTYPE | grep -q btrfs; then
         ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
@@ -145,7 +145,7 @@ auto_packages() {
 
 # /etc/locale.gen
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
-locale_gen() {
+_locale_gen() {
     if [[ "${_DESTDIR}" == "/install" ]]; then
         systemd-nspawn -q -D "${_DESTDIR}" locale-gen >/dev/null 2>&1
     else

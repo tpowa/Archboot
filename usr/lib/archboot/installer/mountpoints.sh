@@ -11,12 +11,12 @@ _destdir_mounts(){
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ "${_PART_ROOT}" == "" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
-        mountpoints || return 1
+        _mountpoints || return 1
     fi
 }
 
 # values that are needed for fs creation
-clear_fs_values() {
+_clear_fs_values() {
     : >/tmp/.btrfs-devices
     _DOMKFS="no"
     _LABEL_NAME=""
@@ -29,7 +29,7 @@ clear_fs_values() {
 }
 
 # add ssd mount options
-ssd_optimization() {
+_ssd_optimization() {
     # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
     if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|btrfs|xfs|nilfs2|f2fs'; then
@@ -43,7 +43,7 @@ ssd_optimization() {
     fi
 }
 
-select_filesystem() {
+_select_filesystem() {
     _FILESYSTEM_FINISH=""
     # don't allow vfat as / filesystem, it will not work!
     _FSOPTS=""
@@ -61,7 +61,7 @@ select_filesystem() {
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
-enter_MOUNTPOINT() {
+_enter_mountpoint() {
     _FILESYSTEM_FINISH=""
     _MP=""
     while [[ "${_MP}" == "" ]]; do
@@ -75,7 +75,7 @@ enter_MOUNTPOINT() {
 }
 
 # set sane values for paramaters, if not already set
-check_mkfs_values() {
+_check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [[ "${_FS_OPTIONS}" == "" ]] && _FS_OPTIONS="NONE"
     [[ "${_BTRFS_DEVICES}" == "" ]] && _BTRFS_DEVICES="NONE"
@@ -86,7 +86,7 @@ check_mkfs_values() {
     [[ "${_LABEL_NAME}" == "" ]] && _LABEL_NAME="NONE"
 }
 
-create_filesystem() {
+_create_filesystem() {
     _FILESYSTEM_FINISH=""
     _LABEL_NAME=""
     _FS_OPTIONS=""
@@ -104,8 +104,8 @@ create_filesystem() {
             fi
         done
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            prepare_btrfs || return 1
-            btrfs_compress
+            _prepare_btrfs || return 1
+            _btrfs_compress
         fi
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
@@ -116,7 +116,7 @@ create_filesystem() {
 mountpoints() {
     _NAME_SCHEME_PARAMETER_RUN=""
     while [[ "${_PARTFINISH}" != "DONE" ]]; do
-        activate_special_DEVICEs
+        _activate_special_devices
         : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
@@ -124,10 +124,10 @@ mountpoints() {
         # Select mountpoints
         #
         if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-            set_device_name_scheme || return 1
+            _set_device_name_scheme || return 1
         fi
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-        _PARTS=$(findpartitions _)
+        _PARTS=$(_findpartitions _)
         _DO_SWAP=""
         while [[ "${_DO_SWAP}" != "DONE" ]]; do
             _FSTYPE="swap"
@@ -135,9 +135,9 @@ mountpoints() {
             _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             if [[ "${_PART}" != "NONE" ]]; then
-                clear_fs_values
+                _clear_fs_values
                 if [[ "${_ASK_MOUNTPOINTS}" == "1" ]]; then
-                    create_filesystem
+                    _create_filesystem
                 else
                     _FILESYSTEM_FINISH="yes"
                 fi
@@ -146,7 +146,7 @@ mountpoints() {
             fi
             [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_SWAP=DONE
         done
-        check_mkfs_values
+        _check_mkfs_values
         if [[ "${_PART}" != "NONE" ]]; then
             #shellcheck disable=SC2001,SC2086
             _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
@@ -161,18 +161,18 @@ mountpoints() {
             # Select root filesystem type
             _FSTYPE="$(${_LSBLK} _FSTYPE "${_PART}")"
             # clear values first!
-            clear_fs_values
-            check_btrfs_filesystem_creation
+            _clear_fs_values
+            _check_btrfs_filesystem_creation
             if [[ "${_ASK_MOUNTPOINTS}" == "1" && "${_SKIP_FILESYSTEM}" == "no" ]]; then
-                select_filesystem && create_filesystem && btrfs_subvolume
+                _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
-                btrfs_subvolume
+                _btrfs_subvolume
             fi
             [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_ROOT=DONE
         done
-        find_btrfs_raid_DEVICEs
-        btrfs_parts
-        check_mkfs_values
+        _find_btrfs_raid_DEVICEs
+        _btrfs_parts
+        _check_mkfs_values
         echo "${_PART}:${_FSTYPE}:/:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         #shellcheck disable=SC2001,SC2086
         ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
@@ -188,14 +188,14 @@ mountpoints() {
                 if [[ "${_PART}" != "DONE" ]]; then
                     _FSTYPE="$(${_LSBLK} _FSTYPE "${_PART}")"
                     # clear values first!
-                    clear_fs_values
-                    check_btrfs_filesystem_creation
+                    _clear_fs_values
+                    _check_btrfs_filesystem_creation
                     # Select a filesystem type
                     if [[ "${_ASK_MOUNTPOINTS}" == "1" && "${_SKIP_FILESYSTEM}" == "no" ]]; then
-                        enter_MOUNTPOINT && select_filesystem && create_filesystem && btrfs_subvolume
+                        _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
-                        enter_MOUNTPOINT
-                        btrfs_subvolume
+                        _enter_mountpoint
+                        _btrfs_subvolume
                     fi
                 else
                     _FILESYSTEM_FINISH="yes"
@@ -203,9 +203,9 @@ mountpoints() {
                 [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_ADDITIONAL="DONE"
             done
             if [[ "${_PART}" != "DONE" ]]; then
-                find_btrfs_raid_DEVICEs
-                btrfs_parts
-                check_mkfs_values
+                _find_btrfs_raid_DEVICEs
+                _btrfs_parts
+                _check_mkfs_values
                 echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                 #shellcheck disable=SC2001,SC2086
                 ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
@@ -336,14 +336,14 @@ _mkfs() {
             sleep 2
         fi
         if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFSSUBVOLUME}" && "${_DOSUBVOLUME}" == "yes" ]]; then
-            create_btrfs_subvolume
+            _create_btrfs_subvolume
         fi
-        btrfs_scan
+        _btrfs_scan
         sleep 2
         # create our mount directory
         mkdir -p "${_DEST}""${_MOUNTPOINT}"
         # add ssd optimization before mounting
-        ssd_optimization
+        _ssd_optimization
         _MOUNTOPTIONS=""
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
@@ -384,9 +384,9 @@ _mkfs() {
 
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
         #shellcheck disable=SC2155
-        local _PARTUUID="$(getpartuuid "${_DEVICE}")"
+        local _PARTUUID="$(_getpartuuid "${_DEVICE}")"
         #shellcheck disable=SC2155
-        local _PARTLABEL="$(getpartlabel "${_DEVICE}")"
+        local _PARTLABEL="$(_getpartlabel "${_DEVICE}")"
 
         echo "# DEVICE DETAILS: ${_DEVICE} _PARTUUID=${_PARTUUID} _PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     else

@@ -4,16 +4,16 @@ _check_root_password() {
     # check if empty password is set
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --msgbox "Setup detected no password set for root user,\nplease set new password now." 6 50
-        set_password || return 1
+        _set_password || return 1
     fi
     # check if account is locked
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --msgbox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
-        set_password || return 1
+        _set_password || return 1
     fi
 }
 
-set_mkinitcpio() {
+_set_mkinitcpio() {
     _dialog --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 12 70
     _HOOK_ERROR=""
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
@@ -24,11 +24,11 @@ set_mkinitcpio() {
     if [[ "${_HOOK_ERROR}" == "1" ]]; then
         _dialog --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
     else
-        run_mkinitcpio
+        _run_mkinitcpio
     fi
 }
 
-set_locale() {
+_set_locale() {
     if [[ -z ${_SET_LOCALE} ]]; then
         _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
         _CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
@@ -48,12 +48,12 @@ set_locale() {
         _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system ..." 3 70
         _SET_LOCALE="1"
         sleep 2
-        auto_SET_LOCALE
-        run_locale_gen
+        _auto_set_locale
+        _run_locale_gen
     fi
 }
 
-set_password() {
+_set_password() {
     _PASSWORD=""
     _PASS=""
     _PASS2=""
@@ -84,9 +84,9 @@ set_password() {
 
 # run_mkinitcpio()
 # runs mkinitcpio on the target system, displays output
-run_mkinitcpio() {
+_run_mkinitcpio() {
     _dialog --infobox "Rebuilding initramfs on installed system ..." 3 70
-    chroot_mount
+    _chroot_mount
     echo "Initramfs progress ..." > /tmp/mkinitcpio.log
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log >/dev/null 2>&1
@@ -107,12 +107,12 @@ run_mkinitcpio() {
         --textbox "/tmp/mkinitcpio.log" 18 70 || return 1
     fi
     rm /tmp/.mkinitcpio-retcode
-    chroot_umount
+    _chroot_umount
     sleep 1
 }
 
-run_locale_gen() {
+_run_locale_gen() {
     _dialog --infobox "Rebuilding glibc locales on installed system ..." 3 70
-    locale_gen
+    _locale_gen
     sleep 1
 }
