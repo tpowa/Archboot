@@ -959,7 +959,7 @@ _install_bootloader() {
     if [[ "${_S_SRC}" == "0" ]]; then
         _select_source || return 1
     fi
-    prepare_pacman
+    _prepare_pacman
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
         _install_bootloader_uefi
     else
