@@ -2,7 +2,7 @@
 _DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 
-usage() {
+_usage() {
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1m QUICKINST INSTALLER:\033[0m"
     echo -e "\033[1m-------------------------------------------\033[0m"
     echo -e "Usage:"
@@ -29,7 +29,7 @@ usage() {
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
-prepare_pacman() {
+_prepare_pacman() {
     # Set up the necessary directories for pacman use
     if [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]]; then
         mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
@@ -54,41 +54,41 @@ prepare_pacman() {
 }
 
 # package_installation
-install_packages() {
+_install_packages() {
     # add packages from archboot defaults
     _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
     # fallback if _PACKAGES is empty
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
-    auto_packages
+    _auto_packages
     #shellcheck disable=SC2086
     ${PACMAN} -S ${_PACKAGES}
 }
 
 # start script
 if [[ -z "${1}" ]]; then
-    usage
+    _usage
 fi
 
 ! [[ -d /tmp ]] && mkdir /tmp
 
 if [[ -e "${_LOCAL_DB}" ]]; then
-    local_pacman_conf
+    _local_pacman_conf
 else
-    PACMAN_CONF=""
+    _PACMAN_CONF=""
 fi
 
-if ! prepare_pacman; then
+if ! _prepare_pacman; then
     echo -e "Pacman preparation \033[91mFAILED\033[0m."
     exit 1
 fi
-chroot_mount
-if ! install_packages; then
+_chroot_mount
+if ! _install_packages; then
     echo -e "Package installation \033[91mFAILED\033[0m."
-    chroot_umount
+    _chroot_umount
     exit 1
 fi
-locale_gen
-chroot_umount
+_locale_gen
+_chroot_umount
 
 echo
 echo -e "\033[1mPackage installation complete.\033[0m"
