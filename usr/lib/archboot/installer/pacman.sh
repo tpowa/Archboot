@@ -127,7 +127,7 @@ _prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     _dialog --infobox "Refreshing package database ..." 3 40
-    ${PACMAN} -Sy > "${_LOG}" 2>&1 || (_dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
+    ${_PACMAN} -Sy > "${_LOG}" 2>&1 || (_dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
     _dialog --infobox "Update Arch Linux keyring ..." 3 40
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
@@ -144,7 +144,7 @@ _run_pacman(){
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
-    ${PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >/dev/null 2>&1
+    ${_PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >/dev/null 2>&1
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log

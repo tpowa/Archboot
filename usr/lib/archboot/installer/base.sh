@@ -29,7 +29,6 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c /dev/null"
 
-
 _set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
