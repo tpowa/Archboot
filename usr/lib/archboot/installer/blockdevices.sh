@@ -665,7 +665,7 @@ _createraid()
             _dialog --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
             cfdisk "${_RAIDDEVICE}"
         else
-            _DISC="${_RAIDDEVICE}"
+            _DISK="${_RAIDDEVICE}"
             _RUN_CFDISK="1"
             _CHECK_BIOS_BOOT_GRUB=""
             _CHECK_UEFISYS_PART=""

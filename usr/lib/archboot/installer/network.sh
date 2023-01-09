@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # list all net devices with mac adress
-net_interfaces() {
+_net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
 
 # check for already active profile
-check_nework() {
-    [[ "${_S_NET}" == "1" ]] || donetwork
+_check_nework() {
+    [[ "${_S_NET}" == "1" ]] || _donetwork
 }
 
 # scan for available essids
-essid_scan() {
+_essid_scan() {
     # scan the area
     iwctl station "${_INTERFACE}" scan
     # only show lines with signal '*'
@@ -23,7 +23,7 @@ essid_scan() {
     done
 }
 
-do_wireless() {
+_do_wireless() {
     _WLAN_HIDDEN=""
     _WLAN_SSID=""
     _WLAN_KEY=""
@@ -35,7 +35,7 @@ do_wireless() {
         rm -f /var/lib/iwd/* > /dev/null 2>&1
         #shellcheck disable=SC2086,SC2046
         _dialog --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
-        $(essid_scan _) \
+        $(_essid_scan _) \
             "Hidden" "_" 2>"${_ANSWER}" || return 1
         _WLAN_SSID=$(cat "${_ANSWER}")
         _WLAN_CONNECT="connect"
@@ -81,13 +81,13 @@ do_wireless() {
 #
 # args: none
 # returns: 1 on failure
-donetwork() {
+_donetwork() {
     _S_NET=0
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface
         _INTERFACE=""
-        _INTERFACES=$(net_interfaces)
+        _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
             _dialog --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${_INTERFACES} 2>"${_ANSWER}"
@@ -108,7 +108,7 @@ donetwork() {
         _dialog --inputbox "Enter your network profile name:" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}" || return 1
         _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
-        do_wireless || return 1
+        _do_wireless || return 1
         # dhcp switch
         _IP=""
         _dialog --yesno "Do you want to use DHCP?" 5 40

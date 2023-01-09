@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# downloader
-DLPROG="wget"
-_MIRRORLIST="/etc/pacman.d/mirrorlist"
-
 _getsource() {
     _S_SRC=0
     _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
-        local_pacman_conf
+        _local_pacman_conf
         _dialog --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
         _S_SRC=1
     else
-        select_mirror || return 1
+        _select_mirror || return 1
         _S_SRC=1
     fi
 }
@@ -23,7 +19,7 @@ _getsource() {
 #
 # args: none
 # returns: nothing
-select_mirror() {
+_select_mirror() {
     _NEXTITEM="2"
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -61,7 +57,7 @@ select_mirror() {
 
 # dotesting()
 # enable testing repository on network install
-dotesting() {
+_dotesting() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
         _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING="yes"
         if [[ "${_DOTESTING}" == "yes" ]]; then
@@ -73,7 +69,7 @@ dotesting() {
 }
 
 # check for updating complete environment with packages
-update_environment() {
+_update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache ..."  > "${_LOG}"
         _dialog --infobox "Packages are already in pacman cache. Continuing in 3 seconds ..." 3 70
@@ -115,7 +111,7 @@ update_environment() {
 # configures pacman and syncs db on destination system
 # params: none
 # returns: 1 on error
-prepare_pacman() {
+_prepare_pacman() {
     _NEXTITEM="5"
     # Set up the necessary directories for pacman use
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
@@ -140,10 +136,10 @@ prepare_pacman() {
 }
 
 # Set _PACKAGES parameter before running to install wanted packages
-run_pacman(){
+_run_pacman(){
     # create chroot environment on target system
     # code straight from mkarchroot
-    chroot_mount
+    _chroot_mount
     _dialog --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${_PACKAGES} ...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress ..." 10 70
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
@@ -168,29 +164,29 @@ run_pacman(){
     rm /tmp/.pacman-retcode
     # ensure the disk is synced
     sync
-    chroot_umount
+    _chroot_umount
 }
 
 # install_packages()
 # performs package installation to the target system
-install_packages() {
+_install_packages() {
     _destdir_mounts || return 1
     if [[ "${_S_SRC}" == "0" ]]; then
         _select_source || return 1
     fi
-    prepare_pacman || return 1
+    _prepare_pacman || return 1
     _PACKAGES=""
     # add packages from archboot defaults
     _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
     # fallback if _PACKAGES is empty
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
-    auto_packages
+    _auto_packages
     # fix double spaces
     _PACKAGES="${_PACKAGES//  / }"
     _dialog --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console.\n\nDo you wish to continue?" 12 75 || return 1
-    run_pacman
+    _run_pacman
     _NEXTITEM="6"
-    chroot_mount
+    _chroot_mount
     # automagic time!
     # any automatic configuration should go here
     _dialog --infobox "Writing base configuration ..." 6 40
@@ -209,5 +205,5 @@ install_packages() {
     _auto_locale
     _auto_nano_syntax
     # tear down the chroot environment
-    chroot_umount
+    _chroot_umount
 }

@@ -169,9 +169,9 @@ for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 if [[ "\${_BOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
-    efibootmgr --quiet --create --disk "${_BOOTMGR_DISC}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DISK}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
 else
-    efibootmgr --quiet --create --disk "${_BOOTMGR_DISC}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DISK}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
 fi
 EFIBEOF
         chmod a+x "/tmp/efibootmgr_run.sh"
@@ -189,9 +189,9 @@ _do_apple_efi_hfs_bless() {
 
 _do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
-    _DISC="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
+    _DISK="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
     _UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY__NUMBER -o value "${_UEFISYSDEV}")"
-    _BOOTMGR_DISC="${_DISC}"
+    _BOOTMGR_DISK="${_DISK}"
     _BOOTMGR_PART_NUM="${_UEFISYS_PART_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
@@ -810,7 +810,7 @@ _do_grub_bios() {
         _CHECK_BIOS_BOOT_GRUB="1"
         _CHECK_UEFISYS_PART=""
         _RUN_CFDISK=""
-        _DISC="${_BOOTDEV}"
+        _DISK="${_BOOTDEV}"
         _check_gpt
     else
         if [[ "${_FAIL_COMPLEX}" == "0" ]]; then
