@@ -112,7 +112,7 @@ _create_filesystem() {
     _FILESYSTEM_FINISH=1
 }
 
-mountpoints() {
+_mountpoints() {
     _NAME_SCHEME_PARAMETER_RUN=""
     while [[ "${_PARTFINISH}" != "DONE" ]]; do
         _activate_special_devices
