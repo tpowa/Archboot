@@ -131,15 +131,6 @@ _donetwork() {
         _dialog --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
         _PROXY=$(cat "${_ANSWER}")
         _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
-        if [[ -z "${_PROXY}" ]]; then
-            for i in ${_PROXIES}; do
-                unset "${i}"
-            done
-        else
-            for i in ${_PROXIES}; do
-                export "${i}"="${_PROXY}"
-            done
-        fi
         _dialog --yesno "Are these settings correct?\n\nInterface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0
         case $? in
             1) ;;
@@ -163,6 +154,16 @@ _donetwork() {
         echo "Address=${_IPADDR}" >>"${_NETWORK_PROFILE}"
         echo "Gateway=${_GW}" >>"${_NETWORK_PROFILE}"
         echo "DNS=${_DNS}" >>"${_NETWORK_PROFILE}"
+    fi
+    # set proxies
+    if [[ -z "${_PROXY}" ]]; then
+        for i in ${_PROXIES}; do
+            unset "${i}"
+        done
+    else
+        for i in ${_PROXIES}; do
+            export "${i}"="${_PROXY}"
+        done
     fi
     if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then
         echo "Disabled Archboot's bootup wired auto dhcp browsing." > "${_LOG}"
