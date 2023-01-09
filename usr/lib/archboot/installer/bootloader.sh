@@ -122,7 +122,7 @@ _check_bootpart() {
 
 # only allow ext2/3/4 and vfat on uboot bootloader
 _abort_uboot(){
-        _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if ! [[ "${_FSTYPE}" == "ext2" || "${_FSTYPE}" == "ext3" || "${_FSTYPE}" == "ext4" || "${_FSTYPE}" == "vfat" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
@@ -131,7 +131,7 @@ _abort_uboot(){
 
 # check for nilfs2 bootpart and abort if detected
 _abort_nilfs_bootpart() {
-        _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "nilfs2" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
@@ -140,7 +140,7 @@ _abort_nilfs_bootpart() {
 
 # check for f2fs bootpart and abort if detected
 _abort_f2fs_bootpart() {
-        _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "f2fs" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1

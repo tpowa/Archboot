@@ -54,7 +54,7 @@ _find_btrfs_subvolume() {
 }
 
 _find_btrfs_bootloader_subvolume() {
-    if [[ "$(${_LSBLK} _FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
         _BTRFS_SUBVOLUMES=""
         _PART="${_BOOTDEV}"
         _mount_btrfs
