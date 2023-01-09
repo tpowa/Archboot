@@ -29,7 +29,7 @@ _create_special() {
                 _SPECIALDONE=1 ;;
         esac
     done
-    if [[ "${_CANCEL}" == 1 ]]; then
+    if [[ -n "${_CANCEL}" ]]; then
         _NEXTITEM="3"
     else
         _NEXTITEM="4"

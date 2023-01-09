@@ -6,7 +6,7 @@
 # according to partitioning/formatting stage
 _auto_fstab(){
     # Modify fstab
-    if [[ "${_S_MKFS}" == 1 || "${_S_MKFSAUTO}" == 1 ]]; then
+    if [[ -n "${_S_MKFS}" || -n "${_S_MKFSAUTO}" ]]; then
         _dialog --infobox "Create new fstab on installed system ..." 3 70
         if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
@@ -100,7 +100,7 @@ _auto_pacman()
 # enable it on installed system too!
 _auto_testing()
 {
-    if [[ "${_DOTESTING}" == 1 ]]; then
+    if [[ -n "${_DOTESTING}" ]]; then
         _dialog --infobox "Enable [testing] repository on installed system ..." 3 70
         sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
         sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
@@ -115,7 +115,7 @@ _auto_mkinitcpio() {
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     _HWKVER=""
-    if [[ "${_AUTO_MKINITCPIO}" == "" ]]; then
+    if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
         _AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
@@ -179,7 +179,7 @@ _auto_vconsole() {
 
 _auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)"  == "" ]]; then
+    if [[ -e /tmp/.crypttab && -z "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)" ]]; then
         _dialog --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
         sed -i -e "/^$(basename "${_PART_ROOT}") /d" /tmp/.crypttab

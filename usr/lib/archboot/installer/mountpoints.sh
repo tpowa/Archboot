@@ -9,7 +9,7 @@ _destdir_mounts(){
     # check if something is mounted on ${_DESTDIR}
     _PART_ROOT="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
-    if [[ "${_PART_ROOT}" == "" ]]; then
+    if [[ -z "${_PART_ROOT}" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
         _mountpoints || return 1
     fi
@@ -64,7 +64,7 @@ _select_filesystem() {
 _enter_mountpoint() {
     _FILESYSTEM_FINISH=""
     _MP=""
-    while [[ "${_MP}" == "" ]]; do
+    while [[ -z "${_MP}" ]]; do
         _dialog --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         if grep ":${_MP}:" /tmp/.parts; then
@@ -77,12 +77,12 @@ _enter_mountpoint() {
 # set sane values for paramaters, if not already set
 _check_mkfs_values() {
     # Set values, to not confuse mkfs call!
-    [[ "${_FS_OPTIONS}" == "" ]] && _FS_OPTIONS="NONE"
-    [[ "${_BTRFS_DEVICES}" == "" ]] && _BTRFS_DEVICES="NONE"
-    [[ "${_BTRFS_LEVEL}" == "" ]] && _BTRFS_LEVEL="NONE"
-    [[ "${_BTRFS_SUBVOLUME}" == "" ]] && _BTRFS_SUBVOLUME="NONE"
-    [[ "${_LABEL_NAME}" == "" && -n "$(${_LSBLK} LABEL "${_PART}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_PART}")"
-    [[ "${_LABEL_NAME}" == "" ]] && _LABEL_NAME="NONE"
+    [[ -z "${_FS_OPTIONS}" ]] && _FS_OPTIONS="NONE"
+    [[ -z "${_BTRFS_DEVICES}" ]] && _BTRFS_DEVICES="NONE"
+    [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
+    [[ -z "${_BTRFS_SUBVOLUME}" ]] && _BTRFS_SUBVOLUME="NONE"
+    [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_PART}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_PART}")"
+    [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
 
 _create_filesystem() {
@@ -93,7 +93,7 @@ _create_filesystem() {
     _BTRFS_LEVEL=""
     _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ -n "${_DOMKFS}" ]]; then
-        while [[ "${_LABEL_NAME}" == "" ]]; do
+        while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_PART}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
@@ -122,7 +122,7 @@ mountpoints() {
         #
         # Select mountpoints
         #
-        if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+        if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
@@ -135,7 +135,7 @@ mountpoints() {
             _PART=$(cat "${_ANSWER}")
             if [[ "${_PART}" != "NONE" ]]; then
                 _clear_fs_values
-                if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
+                if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
                     _create_filesystem
                 else
                     _FILESYSTEM_FINISH=1
@@ -143,7 +143,7 @@ mountpoints() {
             else
                 _FILESYSTEM_FINISH=1
             fi
-            [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_SWAP=DONE
+            [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_SWAP=DONE
         done
         _check_mkfs_values
         if [[ "${_PART}" != "NONE" ]]; then
@@ -162,12 +162,12 @@ mountpoints() {
             # clear values first!
             _clear_fs_values
             _check_btrfs_filesystem_creation
-            if [[ "${_ASK_MOUNTPOINTS}" == 1 && -z "${_SKIP_FILESYSTEM}" ]]; then
+            if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
                 _btrfs_subvolume
             fi
-            [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_ROOT=DONE
+            [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
         done
         _find_btrfs_raid_DEVICEs
         _btrfs_parts
@@ -190,7 +190,7 @@ mountpoints() {
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [[ "${_ASK_MOUNTPOINTS}" == 1 && -z "${_SKIP_FILESYSTEM}" ]]; then
+                    if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
@@ -199,7 +199,7 @@ mountpoints() {
                 else
                     _FILESYSTEM_FINISH=1
                 fi
-                [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_ADDITIONAL="DONE"
+                [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ADDITIONAL="DONE"
             done
             if [[ "${_PART}" != "DONE" ]]; then
                 _find_btrfs_raid_DEVICEs
@@ -287,7 +287,7 @@ _mkfs() {
     # we have two main cases: "swap" and everything else.
     if [[ "${_FSTYPE}" == "swap" ]]; then
         swapoff "${_DEVICE}" >/dev/null 2>&1
-        if [[ "${_DOMK}" == 1 ]]; then
+        if [[ -n "${_DOMK}" ]]; then
             mkswap -L "${_LABELNAME}" "${_DEVICE}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
@@ -312,7 +312,7 @@ _mkfs() {
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [[ "${_DOMK}" == 1 ]]; then
+        if [[ -n "${_DOMK}" ]]; then
             local ret
             #shellcheck disable=SC2086
             case ${_FSTYPE} in
@@ -364,7 +364,7 @@ _mkfs() {
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_FSTYPE}" == "btrfs" && "${_DOMK}" == 1 ]] && btrfs balance start --full-balance "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
+        [[ "${_FSTYPE}" == "btrfs" && -n "${_DOMK}" ]] && btrfs balance start --full-balance "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${_MOUNTPOINT}" == "/tmp" ]]; then
@@ -381,7 +381,7 @@ _mkfs() {
     #shellcheck disable=SC2155
     local _FSLABEL="$(_getfslabel "${_DEVICE}")"
 
-    if [[ "${_UEFI_BOOT}" == 1 ]]; then
+    if [[ -n "${_UEFI_BOOT}" ]]; then
         #shellcheck disable=SC2155
         local _PARTUUID="$(_getpartuuid "${_DEVICE}")"
         #shellcheck disable=SC2155
@@ -402,7 +402,7 @@ _mkfs() {
             _DEVICE="LABEL=${_FSLABEL}"
         fi
     else
-        if [[ "${_UEFI_BOOT}" == 1 ]]; then
+        if [[ -n "${_UEFI_BOOT}" ]]; then
            if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
                    _DEVICE="PARTUUID=${_PARTUUID}"
@@ -423,8 +423,8 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${_DEVICE}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
-    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && "${_UEFI_BOOT}" == 1 || "${_MOUNTPOINT}" == "/" ]]; then
-        if [[ "${_MOUNTOPTIONS}" == "" ]]; then
+    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && -n "${_UEFI_BOOT}" || "${_MOUNTPOINT}" == "/" ]]; then
+        if [[ -z "${_MOUNTOPTIONS}" ]]; then
             echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults 0 " >>/tmp/.fstab
         else
             echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab

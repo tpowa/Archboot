@@ -128,7 +128,7 @@ _donetwork() {
         _dialog --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
         _PROXY=$(cat "${_ANSWER}")
         _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
-        if [[ "${_PROXY}" == "" ]]; then
+        if [[ -z "${_PROXY}" ]]; then
             for i in ${_PROXIES}; do
                 unset "${i}"
             done

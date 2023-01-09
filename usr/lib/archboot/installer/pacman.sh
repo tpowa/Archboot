@@ -60,7 +60,7 @@ _select_mirror() {
 _dotesting() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
         _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING=1
-        if [[ "${_DOTESTING}" == 1 ]]; then
+        if [[ -n "${_DOTESTING}" ]]; then
             sed -i -e '/^#\[testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' /etc/pacman.conf
@@ -98,7 +98,7 @@ _update_environment() {
                     sleep 3
                 else
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT=1
-                    if [[ "${_UPDATE_ENVIRONMENT}" == 1 ]]; then
+                    if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                         _dialog --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         update-installer -latest-install > "${_LOG}" 2>&1
                     fi

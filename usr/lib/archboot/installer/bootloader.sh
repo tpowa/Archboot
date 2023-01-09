@@ -95,7 +95,7 @@ _bootloader_kernel_parameters() {
     fi
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
-    [[ "${_ROOTPART}" == "" ]] && _ROOTPART="${_PART_ROOT}"
+    [[ -z "${_ROOTPART}" ]] && _ROOTPART="${_PART_ROOT}"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTPART} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
@@ -225,14 +225,14 @@ _do_secureboot_keys() {
     _CN=""
     _MOK_PW=""
     _KEYDIR=""
-    while [[ "${_KEYDIR}" == "" ]]; do
+    while [[ -z "${_KEYDIR}" ]]; do
         _dialog --inputbox "Setup keys:\nEnter the directory to store the keys on ${_DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${_ANSWER}" || return 1
         _KEYDIR=$(cat "${_ANSWER}")
         #shellcheck disable=SC2086,SC2001
         _KEYDIR="$(echo ${_KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${_DESTDIR}/${_KEYDIR}" ]]; then
-        while [[ "${_CN}" == "" ]]; do
+        while [[ -z "${_CN}" ]]; do
             _dialog --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
             _CN=$(cat "${_ANSWER}")
         done
@@ -955,7 +955,7 @@ _install_bootloader_uefi() {
 _install_bootloader() {
     _S_BOOTLOADER=""
     _destdir_mounts || return 1
-    if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
+    if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
         _set_device_name_scheme || return 1
     fi
     if [[ -z "${_S_SRC}" ]]; then

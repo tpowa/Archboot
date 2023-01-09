@@ -85,7 +85,7 @@ _check_btrfs_filesystem_creation() {
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
             echo "${i}" | cut -d: -f 4 | grep -q yes && _DETECT_CREATE_FILESYSTEM=1
-            [[ "${_DETECT_CREATE_FILESYSTEM}" == 1 ]] && _SKIP_ASK_SUBVOLUME=1
+            [[ -n "${_DETECT_CREATE_FILESYSTEM}" ]] && _SKIP_ASK_SUBVOLUME=1
         fi
     done
 }
@@ -176,7 +176,7 @@ _prepare_btrfs_subvolume() {
     else
         _DOSUBVOLUME=1
     fi
-    if [[ "${_DOSUBVOLUME}" == 1 ]]; then
+    if [[ -n "${_DOSUBVOLUME}" ]]; then
         _BTRFS_SUBVOLUME="NONE"
         while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
             _dialog --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>"${_ANSWER}" || return 1
@@ -236,7 +236,7 @@ _choose_btrfs_subvolume () {
         _dialog --menu "Select the subvolume to mount:" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
     else
-        if [[ "${_SUBVOLUMES_DETECTED}" == 1 ]]; then
+        if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
             _dialog --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
             _SKIP_ASK_SUBVOLUME=1
             _prepare_btrfs_subvolume || return 1
@@ -248,7 +248,7 @@ _choose_btrfs_subvolume () {
 _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
     if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" ]]; then
-        if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
+        if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
             _prepare_btrfs_subvolume || return 1

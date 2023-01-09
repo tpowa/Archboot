@@ -29,19 +29,19 @@ _check_gpt() {
             _GUID_DETECTED=1
         fi
     fi
-    if [[ "${_GUID_DETECTED}" == 1 ]]; then
+    if [[ -n "${_GUID_DETECTED}" ]]; then
         ### This check is not enabled in any function yet!
-        if [[ "${_CHECK_UEFISYS_PART}" == 1 ]]; then
+        if [[ -n "${_CHECK_UEFISYS_PART}" ]]; then
             _check_efisys_part
         fi
-        if [[ "${_CHECK_BIOS_BOOT_GRUB}" == 1 ]]; then
+        if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
             if ! sgdisk -p "${_DISK}" | grep -q 'EF02'; then
                 _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1 MB BIOS Boot partition for grub BIOS GPT support." 0 0
                 _RUN_CFDISK=1
             fi
         fi
     fi
-    if [[ "${_RUN_CFDISK}" == 1 ]]; then
+    if [[ -n "${_RUN_CFDISK}" ]]; then
         _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
         clear && cfdisk "${_DISK}"
         # reread partitiontable for kernel
@@ -58,7 +58,7 @@ _check_efisys_part() {
         _dialog --msgbox "Setup will now try to non-destructively convert ${_DISK} to GPT using sgdisk." 0 0
         sgdisk --mbrtogpt "${_DISK}" > "${_LOG}" && _GUID_DETECTED=1
         partprobe "${_DISK}" > "${_LOG}"
-        if [[ "${_GUID_DETECTED}" == "" ]]; then
+        if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --msgbox "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1
         fi
@@ -88,7 +88,7 @@ _check_efisys_part() {
         fi
         umount "${_DESTDIR}/${_UEFISYS_MP}" &> /dev/null
         umount "${_UEFISYS_PART}" &> /dev/null
-        if [[ "${_FORMAT_UEFISYS_FAT32}" == 1 ]]; then
+        if [[ -n "${_FORMAT_UEFISYS_FAT32}" ]]; then
             mkfs.vfat -F32 -n "EFISYS" "${_UEFISYS_PART}"
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}"
@@ -137,8 +137,8 @@ _partition() {
         # Leave our loop if the user is done partitioning
         [[ "${_DISK}" == "DONE" ]] && break
         _MSDOS_DETECTED=""
-        if ! [[ "${_DISK}" == "" ]]; then
-            if [[ "${_GUIDPARAMETER}" == 1 ]]; then
+        if [[ -n "${_DISK}" ]]; then
+            if [[ -n "${_GUIDPARAMETER}" ]]; then
                 _CHECK_BIOS_BOOT_GRUB=""
                 _CHECK_UEFISYS_PART=""
                 _RUN_CFDISK=1
@@ -146,7 +146,7 @@ _partition() {
             else
                 [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" == "dos" ]] && _MSDOS_DETECTED=1
 
-                if [[ "${_MSDOS_DETECTED}" == "" ]]; then
+                if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 >/dev/null 2>&1
