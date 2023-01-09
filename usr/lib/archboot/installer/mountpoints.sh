@@ -249,14 +249,14 @@ _mountpoints() {
             else
                 _dialog --infobox "Creating ${_FSTYPE} on ${_PART},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
             fi
-            _mkfs yes "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+            _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
             if [[ "${_FSTYPE}" == "swap" ]]; then
                 _dialog --infobox "Activating swapspace \non ${_PART} ..." 0 0
             else
                 _dialog --infobox "Mounting ${_FSTYPE} \non ${_PART} \nto ${_DESTDIR}${_MP} ..." 0 0
             fi
-            _mkfs no "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+            _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         fi
         sleep 1
     done < /tmp/.parts
@@ -317,7 +317,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
-        for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 ntfs3 vfat; do
+        for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 vfat; do
             [[ "${_FSTYPE}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
