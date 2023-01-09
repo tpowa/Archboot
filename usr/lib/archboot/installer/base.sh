@@ -73,7 +73,7 @@ _geteditor() {
 
 _set_uefi_parameters() {
     _UEFI_BOOT=""
-    _UEFI_SECURE_BOOT="0"
+    _UEFI_SECURE_BOOT=""
     _GUIDPARAMETER="0"
     [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT="1"
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
