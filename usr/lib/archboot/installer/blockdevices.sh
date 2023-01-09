@@ -223,7 +223,7 @@ _findpartitions() {
 
 # don't check on raid devices!
 _findbootloaderdisks() {
-    if ! [[ "${_USE_DMRAID}" == "1" ]]; then
+    if ! [[ "${_USE_DMRAID}" == 1 ]]; then
         _blockdevices "${1}"
     else
         _dmraid_devices "${1}"
@@ -282,7 +282,7 @@ _activate_luks()
                 if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
                     _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS="1"
-                    [[ "${_RUN_LUKS}" == "1" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
+                    [[ "${_RUN_LUKS}" == 1 ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
                     [[ "${_RUN_LUKS}" == "" ]] && _ACTIVATE_LUKS="no"
                 else
                     _ACTIVATE_LUKS="no"
@@ -318,7 +318,7 @@ _set_device_name_scheme() {
     _MENU_DESC_TEXT=""
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
-    if [[ "${_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == 1 ]]; then
         _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
         _MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
@@ -371,7 +371,7 @@ _stopmd()
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
         _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD="1"
-        if [[ "${_DISABLEMD}" == "1" ]]; then
+        if [[ "${_DISABLEMD}" == 1 ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
             # shellcheck disable=SC2013
@@ -392,7 +392,7 @@ _stopmd()
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
         _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB="1"
-        if [[ "${_DISABLEMDSB}" == "1" ]]; then
+        if [[ "${_DISABLEMDSB}" == 1 ]]; then
             _umountall
             _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
@@ -416,10 +416,10 @@ _stoplvm()
     ! [[ "${_LV_VOLUMES}" == "" ]] && _DETECTED_LVM=1
     ! [[ "${_LV_GROUPS}" == "" ]] && _DETECTED_LVM=1
     ! [[ "${_LV_PHYSICAL}" == "" ]] && _DETECTED_LVM=1
-    if [[ "${_DETECTED_LVM}" == "1" ]]; then
+    if [[ "${_DETECTED_LVM}" == 1 ]]; then
         _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM="1"
     fi
-    if [[ "${_DISABLELVM}" == "1" ]]; then
+    if [[ "${_DISABLELVM}" == 1 ]]; then
         _umountall
         _dialog --infobox "Removing logical volumes ..." 0 0
         for i in ${_LV_VOLUMES}; do
@@ -445,10 +445,10 @@ _stopluks()
     # detect already running luks devices
     _LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ "${_LUKSDEVICE}" == "" ]] || _DETECTED_LUKS=1
-    if [[ "${_DETECTED_LUKS}" == "1" ]]; then
+    if [[ "${_DETECTED_LUKS}" == 1 ]]; then
         _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
     fi
-    if [[ "${_DISABLELUKS}" == "1" ]]; then
+    if [[ "${_DISABLELUKS}" == 1 ]]; then
         _umountall
         _dialog --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${_LUKSDEVICE}; do
@@ -462,10 +462,10 @@ _stopluks()
     _DETECTED_LUKS=""
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
-    if [[ "${_DETECTED_LUKS}" == "1" ]]; then
+    if [[ "${_DETECTED_LUKS}" == 1 ]]; then
         _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
     fi
-    if [[ "${_DISABLELUKS}" == "1" ]]; then
+    if [[ "${_DISABLELUKS}" == 1 ]]; then
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
@@ -481,9 +481,9 @@ _dmraid_update()
     _printk off
     _dialog --infobox "Deactivating dmraid devices ..." 0 0
     dmraid -an >/dev/null 2>&1
-    if [[ "${_DETECTED_LVM}" == "1" || "${_DETECTED_LUKS}" == "1" ]]; then
+    if [[ "${_DETECTED_LVM}" == 1 || "${_DETECTED_LUKS}" == 1 ]]; then
         _dialog --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM="1"
-        if [[ "${_RESETDM}" == "1" ]]; then
+        if [[ "${_RESETDM}" == 1 ]]; then
             _dialog --infobox "Resetting devicemapper devices ..." 0 0
             dmsetup remove_all >/dev/null 2>&1
         fi
@@ -619,7 +619,7 @@ _raid()
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEVICE}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
             else
-                if [[ "${_SPARE}" == "1" ]]; then
+                if [[ "${_SPARE}" == 1 ]]; then
                     echo "${_PART}" >>/tmp/.raid-spare
                 else
                     echo "${_PART}" >>/tmp/.raid
@@ -646,8 +646,8 @@ _createraid()
     _SPARE_DEVICES="$(wc -l < /tmp/.raid-spare)"
     # generate options for mdadm
     _RAIDOPTIONS="--force --run --level=${_LEVEL}"
-    ! [[ "${_RAID_DEVICES}" == "0" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVICES}"
-    ! [[ "${_SPARE_DEVICES}" == "0" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVICES}"
+    ! [[ "${_RAID_DEVICES}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVICES}"
+    ! [[ "${_SPARE_DEVICES}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVICES}"
     ! [[ "${_PARITY}" == "" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
     _dialog --infobox "Creating ${_RAIDDEVICE}..." 0 0
     #shellcheck disable=SC2086
@@ -658,7 +658,7 @@ _createraid()
         _dialog --msgbox "Error creating ${_RAIDDEVICE} (see ${_LOG} for details)." 0 0
         return 1
     fi
-    if [[ ${_RAID_PARTITION} == "1" ]]; then
+    if [[ ${_RAID_PARTITION} == 1 ]]; then
         # switch for mbr usage
         _set_guid
         if [[ -z "${_GUIDPARAMETER}" ]]; then
@@ -899,11 +899,11 @@ _createlv()
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
                     _dialog --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL="1"
-                    if ! [[ "${_LV_ALL}" == "1" ]]; then
+                    if ! [[ "${_LV_ALL}" == 1 ]]; then
                          _LV_SIZE=0
                     fi
                 fi
-                if [[ "${_LV_SIZE}" == "0" ]]; then
+                if [[ "${_LV_SIZE}" == 0 ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
                     if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]]; then
@@ -916,7 +916,7 @@ _createlv()
         #Contiguous doesn't work with +100%FREE
         _LV_CONTIGUOUS=""
         [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS="1"
-        if [[ "${_LV_CONTIGUOUS}" == "1" ]]; then
+        if [[ "${_LV_CONTIGUOUS}" == 1 ]]; then
             _CONTIGUOUS=yes
             _LV_EXTRA="-C y"
         else
@@ -928,7 +928,7 @@ _createlv()
         _dialog --yesno "Would you like to create Logical Volume ${_LVDEVICE} like this?\nVolume Group:\n${_LV}\nVolume Size:\n${_LV_SIZE}\nContiguous Volume:\n${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
     done
     _umountall
-    if [[ "${_LV_ALL}" == "1" ]]; then
+    if [[ "${_LV_ALL}" == 1 ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEVICE} >"${_LOG}" 2>&1; then
             _dialog --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50

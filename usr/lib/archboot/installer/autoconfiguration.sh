@@ -6,7 +6,7 @@
 # according to partitioning/formatting stage
 _auto_fstab(){
     # Modify fstab
-    if [[ "${_S_MKFS}" == "1" || "${_S_MKFSAUTO}" == "1" ]]; then
+    if [[ "${_S_MKFS}" == 1 || "${_S_MKFSAUTO}" == 1 ]]; then
         _dialog --infobox "Create new fstab on installed system ..." 3 70
         if [[ -f /tmp/.device-names ]]; then
             sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
@@ -198,8 +198,8 @@ _auto_timesetting() {
     fi
     if [[ ! -f "${_DESTDIR}"/etc/adjtime ]]; then
         _dialog --infobox "Enable clock setting on installed system ..." 3 70
-        echo "0.0 0 0.0" > "${_DESTDIR}"/etc/adjtime
-        echo "0" >> "${_DESTDIR}"/etc/adjtime
+        echo 0.0 0 0.0 > "${_DESTDIR}"/etc/adjtime
+        echo 0 >> "${_DESTDIR}"/etc/adjtime
         [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>"${_DESTDIR}"/etc/adjtime
         sleep 1
     fi

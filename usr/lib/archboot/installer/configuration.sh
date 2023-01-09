@@ -21,7 +21,7 @@ _set_mkinitcpio() {
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
         [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || _HOOK_ERROR=1
     done
-    if [[ "${_HOOK_ERROR}" == "1" ]]; then
+    if [[ "${_HOOK_ERROR}" == 1 ]]; then
         _dialog --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
     else
         _run_mkinitcpio

@@ -98,7 +98,7 @@ _update_environment() {
                     sleep 3
                 else
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT="1"
-                    if [[ "${_UPDATE_ENVIRONMENT}" == "1" ]]; then
+                    if [[ "${_UPDATE_ENVIRONMENT}" == 1 ]]; then
                         _dialog --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         update-installer -latest-install > "${_LOG}" 2>&1
                     fi
@@ -171,7 +171,7 @@ _run_pacman(){
 # performs package installation to the target system
 _install_packages() {
     _destdir_mounts || return 1
-    if [[ "${_S_SRC}" == "0" ]]; then
+    if [[ -z "${_S_SRC}" ]]; then
         _select_source || return 1
     fi
     _prepare_pacman || return 1

@@ -65,7 +65,7 @@ _do_wireless() {
             else
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH="1"
             fi
-            if [[ "${_WLAN_AUTH}" == "1" ]]; then
+            if [[ -n "${_WLAN_AUTH}" ]]; then
                 _dialog --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
                 sleep 3
             else
@@ -167,7 +167,7 @@ _donetwork() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." > "${_LOG}"
     systemctl restart systemd-networkd
-    _NETWORK_COUNT="0"
+    _NETWORK_COUNT=0
     _dialog --infobox "Waiting 30 seconds for network link to come up ..." 3 60
     # add sleep here dhcp can need some time to get link
     while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do

@@ -661,7 +661,7 @@ EOF
     fi
     _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     ## create default kernel entry
-    _NUMBER="0"
+    _NUMBER=0
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 # (${_NUMBER}) Arch Linux
@@ -777,7 +777,7 @@ _do_grub_bios() {
     if [[ -z "${_FAIL_COMPLEX}" ]]; then
         # check if mapper is used
         if  echo "${_BOOTDEV}" | grep -q /dev/mapper; then
-            _RAID_ON_LVM="0"
+            _RAID_ON_LVM=""
             #check if mapper contains a md device!
             for devpath in $(pvs -o pv_name --noheading); do
                 if echo "${devpath}" | grep -v "/dev/md.p" | grep /dev/md; then
@@ -958,7 +958,7 @@ _install_bootloader() {
     if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
         _set_device_name_scheme || return 1
     fi
-    if [[ "${_S_SRC}" == "0" ]]; then
+    if [[ -z "${_S_SRC}" ]]; then
         _select_source || return 1
     fi
     _prepare_pacman

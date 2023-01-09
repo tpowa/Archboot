@@ -3,8 +3,8 @@
 # menu for raid, lvm and encrypt
 _create_special() {
     _NEXTITEM=""
-    _SPECIALDONE=0
-    while [[ "${_SPECIALDONE}" == "0" ]]; do
+    _SPECIALDONE=""
+    while [[ -z "${_SPECIALDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else
@@ -29,7 +29,7 @@ _create_special() {
                 _SPECIALDONE=1 ;;
         esac
     done
-    if [[ "${_CANCEL}" == "1" ]]; then
+    if [[ "${_CANCEL}" == 1 ]]; then
         _NEXTITEM="3"
     else
         _NEXTITEM="4"
@@ -39,8 +39,8 @@ _create_special() {
 # menu for md creation
 _createmd() {
     _NEXTITEM=""
-    _MDDONE=0
-    while [[ "${_MDDONE}" == "0" ]]; do
+    _MDDONE=""
+    while [[ -z "${_MDDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else
@@ -76,8 +76,8 @@ _createmd() {
 # menu for lvm creation
 _createlvm() {
     _NEXTITEM=""
-    _LVMDONE=0
-    while [[ "${_LVMDONE}" == "0" ]]; do
+    _LVMDONE=""
+    while [[ -z "${_LVMDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else
@@ -114,8 +114,8 @@ _createlvm() {
 # menu for luks creation
 _createluks() {
     _NEXTITEM=""
-    _LUKSDONE=0
-    while [[ "${_LUKSDONE}" == "0" ]]; do
+    _LUKSDONE=""
+    while [[ -z "${_LUKSDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else

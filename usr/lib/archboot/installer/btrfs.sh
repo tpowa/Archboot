@@ -248,7 +248,7 @@ _choose_btrfs_subvolume () {
 _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
     if [[ "${_FSTYPE}" == "btrfs" && "${_DOMKFS}" == "no" ]]; then
-        if [[ "${_ASK_MOUNTPOINTS}" == "1" ]]; then
+        if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
             _prepare_btrfs_subvolume || return 1

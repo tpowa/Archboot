@@ -18,9 +18,9 @@ _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
 _S_NET=""         # network setting
-_S_SRC=0         # choose mirror
-_S_MKFS=0        # formatting
-_S_MKFSAUTO=0    # auto fs part/formatting
+_S_SRC=""         # choose mirror
+_S_MKFS=""        # formatting
+_S_MKFSAUTO=""    # auto fs part/formatting
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
@@ -149,11 +149,11 @@ _set_clock() {
 }
 
 _prepare_storagedrive() {
-    _S_MKFSAUTO=0
-    _S_MKFS=0
-    _DONE=0
+    _S_MKFSAUTO=""
+    _S_MKFS=""
+    _DONE=""
     _NEXTITEM=""
-    while [[ "${_DONE}" = "0" ]]; do
+    while [[ -z "${_DONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else

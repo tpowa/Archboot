@@ -36,7 +36,7 @@ _ssd_optimization() {
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE "${_DEVICE}" -s | grep "disk$" | cut -d' ' -f 1); do
             # check for ssd
-            if [[ "$(cat /sys/block/"$(basename "${i}")"/queue/rotational)" == "0" ]]; then
+            if [[ "$(cat /sys/block/"$(basename "${i}")"/queue/rotational)" == 0 ]]; then
                 _SSD_MOUNT_OPTIONS="noatime"
             fi
         done
@@ -136,7 +136,7 @@ mountpoints() {
             _PART=$(cat "${_ANSWER}")
             if [[ "${_PART}" != "NONE" ]]; then
                 _clear_fs_values
-                if [[ "${_ASK_MOUNTPOINTS}" == "1" ]]; then
+                if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
                     _create_filesystem
                 else
                     _FILESYSTEM_FINISH="yes"
@@ -163,7 +163,7 @@ mountpoints() {
             # clear values first!
             _clear_fs_values
             _check_btrfs_filesystem_creation
-            if [[ "${_ASK_MOUNTPOINTS}" == "1" && "${_SKIP_FILESYSTEM}" == "no" ]]; then
+            if [[ "${_ASK_MOUNTPOINTS}" == 1 && "${_SKIP_FILESYSTEM}" == "no" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
                 _btrfs_subvolume
@@ -191,7 +191,7 @@ mountpoints() {
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [[ "${_ASK_MOUNTPOINTS}" == "1" && "${_SKIP_FILESYSTEM}" == "no" ]]; then
+                    if [[ "${_ASK_MOUNTPOINTS}" == 1 && "${_SKIP_FILESYSTEM}" == "no" ]]; then
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
@@ -382,7 +382,7 @@ _mkfs() {
     #shellcheck disable=SC2155
     local _FSLABEL="$(_getfslabel "${_DEVICE}")"
 
-    if [[ "${_UEFI_BOOT}" == "1" ]]; then
+    if [[ "${_UEFI_BOOT}" == 1 ]]; then
         #shellcheck disable=SC2155
         local _PARTUUID="$(_getpartuuid "${_DEVICE}")"
         #shellcheck disable=SC2155
@@ -403,7 +403,7 @@ _mkfs() {
             _DEVICE="LABEL=${_FSLABEL}"
         fi
     else
-        if [[ "${_UEFI_BOOT}" == "1" ]]; then
+        if [[ "${_UEFI_BOOT}" == 1 ]]; then
            if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
                    _DEVICE="PARTUUID=${_PARTUUID}"
@@ -424,16 +424,16 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${_DEVICE}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
-    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && "${_UEFI_BOOT}" == "1" || "${_MOUNTPOINT}" == "/" ]]; then
+    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && "${_UEFI_BOOT}" == 1 || "${_MOUNTPOINT}" == "/" ]]; then
         if [[ "${_MOUNTOPTIONS}" == "" ]]; then
             echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults 0 " >>/tmp/.fstab
         else
             echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         fi
         if [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "btrfs" ]]; then
-            echo "0" >>/tmp/.fstab
+            echo 0 >>/tmp/.fstab
         else
-            echo "1" >>/tmp/.fstab
+            echo 1 >>/tmp/.fstab
         fi
     fi
     unset _MOUNTOPTIONS

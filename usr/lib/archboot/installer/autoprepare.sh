@@ -44,7 +44,7 @@ _autoprepare() {
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
         _set_device_name_scheme || return 1
     fi
-    if [[  "${_GUIDPARAMETER}" == "1" ]]; then
+    if [[  "${_GUIDPARAMETER}" == 1 ]]; then
         _dialog --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
         _UEFISYS_MP="$(cat "${_ANSWER}")"
     fi
@@ -63,15 +63,15 @@ _autoprepare() {
         command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
-        if [[ "${_GUIDPARAMETER}" == "1" ]]; then
+        if [[ "${_GUIDPARAMETER}" == 1 ]]; then
             _GUID_PART_SIZE="2"
             _GPT_BIOS_GRUB_PART_SIZE="${_GUID_PART_SIZE}"
             _PART_NUM="1"
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             _DISK_SIZE="$((_DISK_SIZE-_GUID_PART_SIZE))"
         fi
-        if [[ "${_GUIDPARAMETER}" == "1" ]]; then
-            if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+        if [[ "${_GUIDPARAMETER}" == 1 ]]; then
+            if [[ "${_UEFISYS_BOOTPART}" == 1 ]]; then
                 while [[ -z "${_UEFISYS_PART_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYS_PART_SIZE="$(cat "${_ANSWER}")"
@@ -145,7 +145,7 @@ _autoprepare() {
         while [[ -z "${_SWAP_PART_SET}" ]]; do
             _dialog --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAP_PART_SIZE=$(cat "${_ANSWER}")
-            if [[ -z "${_SWAP_PART_SIZE}" || "${_SWAP_PART_SIZE}" == "0" ]]; then
+            if [[ -z "${_SWAP_PART_SIZE}" || "${_SWAP_PART_SIZE}" == 0 ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
                 if [[ "${_SWAP_PART_SIZE}" -ge "${_DISK_SIZE}" ]]; then
@@ -171,7 +171,7 @@ _autoprepare() {
             while [[ -z "${_ROOT_PART_SET}" ]]; do
             _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 10 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
             _ROOT_PART_SIZE=$(cat "${_ANSWER}")
-                if [[ -z "${_ROOT_PART_SIZE}" || "${_ROOT_PART_SIZE}" == "0" || "${_ROOT_PART_SIZE}" -lt "2000" ]]; then
+                if [[ -z "${_ROOT_PART_SIZE}" || "${_ROOT_PART_SIZE}" == 0 || "${_ROOT_PART_SIZE}" -lt "2000" ]]; then
                     _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
                     if [[ "${_ROOT_PART_SIZE}" -ge "${_DISK_SIZE}" ]]; then
@@ -207,7 +207,7 @@ _autoprepare() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
-    if [[ "${_GUIDPARAMETER}" == "1" ]]; then
+    if [[ "${_GUIDPARAMETER}" == 1 ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         _printk off
         _dialog --infobox "Partitioning ${_DEVICE} ..." 0 0
@@ -221,7 +221,7 @@ _autoprepare() {
         # create actual partitions
         sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_PART_NUM}":0:+"${_GPT_BIOS_GRUB_PART_SIZE}"M --typecode="${_GPT_BIOS_GRUB_PART_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_PART_NUM}":BIOS_GRUB "${_DEVICE}" > "${_LOG}"
         sgdisk --set-alignment="2048" --new="${_UEFISYS_PART_NUM}":0:+"${_UEFISYS_PART_SIZE}"M --typecode="${_UEFISYS_PART_NUM}":EF00 --change-name="${_UEFISYS_PART_NUM}":UEFI_SYSTEM "${_DEVICE}" > "${_LOG}"
-        if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+        if [[ "${_UEFISYS_BOOTPART}" == 1 ]]; then
             sgdisk --attributes="${_UEFISYS_PART_NUM}":set:2 "${_DEVICE}" > "${_LOG}"
         else
             sgdisk --set-alignment="2048" --new="${_BOOT_PART_NUM}":0:+"${_BOOT_PART_SIZE}"M --typecode="${_BOOT_PART_NUM}":8300 --attributes="${_BOOT_PART_NUM}":set:2 --change-name="${_BOOT_PART_NUM}":ARCHLINUX_BOOT "${_DEVICE}" > "${_LOG}"
@@ -274,8 +274,8 @@ _autoprepare() {
     _FSSPEC_SWAP_PART="${_SWAP_PART_NUM}:swap:swap::SWAP_ARCH"
     _FSSPEC_BOOT_PART="${_BOOT_PART_NUM}:/boot:ext2::BOOT_ARCH"
     _FSSPEC_UEFISYS_PART="${_UEFISYS_PART_NUM}:${_UEFISYS_MP}:vfat:-F32:EFISYS"
-    if [[ "${_GUIDPARAMETER}" == "1" ]]; then
-        if [[ "${_UEFISYS_BOOTPART}" == "1" ]]; then
+    if [[ "${_GUIDPARAMETER}" == 1 ]]; then
+        if [[ "${_UEFISYS_BOOTPART}" == 1 ]]; then
             _FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
         else
             _FSSPECS="${_FSSPEC_ROOT_PART} ${_FSSPEC_BOOT_PART} ${_FSSPEC_UEFISYS_PART} ${_FSSPEC_HOME_PART} ${_FSSPEC_SWAP_PART}"
