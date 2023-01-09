@@ -304,7 +304,7 @@ _activate_special_devices()
     _LUKS_READY=""
     _LVM2_READY=""
     _activate_dmraid
-    while [[ -n"${_LVM2_READY}" && -n "${_RAID_READY}" && -n "${_LUKS_READY}" ]]; do
+    while [[ -n "${_LVM2_READY}" && -n "${_RAID_READY}" && -n "${_LUKS_READY}" ]]; do
         _activate_raid
         _activate_lvm2
         _activate_luks

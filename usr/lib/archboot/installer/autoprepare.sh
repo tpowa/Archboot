@@ -302,12 +302,12 @@ _autoprepare() {
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _BTRFS_COMPRESS="compress=zstd"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
-            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS="no"
+            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
             _DOSUBVOLUME=1
         else
             _BTRFS_COMPRESS="NONE"
             _BTRFS_SUBVOLUME="NONE"
-            _DOSUBVOLUME="no"
+            _DOSUBVOLUME=""
         fi
         _BTRFS_LEVEL="NONE"
         if ! [[ "${_FSTYPE}" == "swap" ]]; then
@@ -315,7 +315,7 @@ _autoprepare() {
         else
             _dialog --infobox "Creating and activating\nswapspace on\n${_PART} ..." 0 0
         fi
-        _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" ${_BTRFS_LEVEL} "${_BTRFS_SUBVOLUME}" ${_DOSUBVOLUME} ${_BTRFS_COMPRESS} || return 1
+        _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" ${_BTRFS_LEVEL} "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
     _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70

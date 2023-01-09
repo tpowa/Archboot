@@ -18,7 +18,7 @@ _destdir_mounts(){
 # values that are needed for fs creation
 _clear_fs_values() {
     : >/tmp/.btrfs-devices
-    _DOMKFS="no"
+    _DOMKFS=""
     _LABEL_NAME=""
     _FS_OPTIONS=""
     _BTRFS_DEVICES=""
@@ -81,7 +81,6 @@ _check_mkfs_values() {
     [[ "${_BTRFS_DEVICES}" == "" ]] && _BTRFS_DEVICES="NONE"
     [[ "${_BTRFS_LEVEL}" == "" ]] && _BTRFS_LEVEL="NONE"
     [[ "${_BTRFS_SUBVOLUME}" == "" ]] && _BTRFS_SUBVOLUME="NONE"
-    [[ "${_DOSUBVOLUME}" == "" ]] && _DOSUBVOLUME="no"
     [[ "${_LABEL_NAME}" == "" && -n "$(${_LSBLK} LABEL "${_PART}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_PART}")"
     [[ "${_LABEL_NAME}" == "" ]] && _LABEL_NAME="NONE"
 }
@@ -93,7 +92,7 @@ _create_filesystem() {
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
     _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
-    if [[ "${_DOMKFS}" == 1 ]]; then
+    if [[ -n "${_DOMKFS}" ]]; then
         while [[ "${_LABEL_NAME}" == "" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_PART}")" 2>"${_ANSWER}" || return 1
@@ -163,7 +162,7 @@ mountpoints() {
             # clear values first!
             _clear_fs_values
             _check_btrfs_filesystem_creation
-            if [[ "${_ASK_MOUNTPOINTS}" == 1 && "${_SKIP_FILESYSTEM}" == "no" ]]; then
+            if [[ "${_ASK_MOUNTPOINTS}" == 1 && -z "${_SKIP_FILESYSTEM}" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
                 _btrfs_subvolume
@@ -191,7 +190,7 @@ mountpoints() {
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
                     # Select a filesystem type
-                    if [[ "${_ASK_MOUNTPOINTS}" == 1 && "${_SKIP_FILESYSTEM}" == "no" ]]; then
+                    if [[ "${_ASK_MOUNTPOINTS}" == 1 && -z "${_SKIP_FILESYSTEM}" ]]; then
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
@@ -229,7 +228,7 @@ mountpoints() {
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
-        if [[ "${_DOMKFS}" == 1 ]]; then
+        if [[ -n "${_DOMKFS}" ]]; then
             if [[ "${_FSTYPE}" == "swap" ]]; then
                 _dialog --infobox "Creating and activating \nswapspace on \n${_PART} ..." 0 0
             else
@@ -335,7 +334,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && "${_DOSUBVOLUME}" == 1 ]]; then
+        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && -n "${_DOSUBVOLUME}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan

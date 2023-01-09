@@ -21,7 +21,7 @@ _umount_btrfs() {
 # Set _BTRFS_DEVICES on detected btrfs devices
 _find_btrfs_raid_devices() {
     _btrfs_scan
-    if [[ "${_DETECT_CREATE_FILESYSTEM}" == "no" && "${_FSTYPE}" == "btrfs" ]]; then
+    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
         for i in $(btrfs filesystem show "${_PART}" | cut -d " " -f 11); do
             _BTRFS_DEVICES="${_BTRFS_DEVICES}#${i}"
         done
@@ -42,7 +42,7 @@ _find_btrfs_raid_bootloader_devices() {
 
 # find btrfs subvolume
 _find_btrfs_subvolume() {
-    if [[ "${_DETECT_CREATE_FILESYSTEM}" == "no" ]]; then
+    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" ]]; then
         # existing btrfs subvolumes
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9 | grep -v 'var/lib/machines' | grep -v '/var/lib/portables'); do
@@ -75,9 +75,9 @@ _subvolumes_in_use() {
 
 # do not ask for btrfs filesystem creation, if already prepared for creation!
 _check_btrfs_filesystem_creation() {
-    _DETECT_CREATE_FILESYSTEM="no"
-    _SKIP_FILESYSTEM="no"
-    _SKIP_ASK_SUBVOLUME="no"
+    _DETECT_CREATE_FILESYSTEM=""
+    _SKIP_FILESYSTEM=""
+    _SKIP_ASK_SUBVOLUME=""
     #shellcheck disable=SC2013
     for i in $(grep "${_PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
@@ -169,9 +169,9 @@ _prepare_btrfs() {
 
 # prepare btrfs subvolume
 _prepare_btrfs_subvolume() {
-    _DOSUBVOLUME="no"
+    _DOSUBVOLUME=""
     _BTRFS_SUBVOLUME="NONE"
-    if [[ "${_SKIP_ASK_SUBVOLUME}" == "no" ]]; then
+    if [[ -z "${_SKIP_ASK_SUBVOLUME}" ]]; then
         _dialog --defaultno --yesno "Would you like to create a new subvolume on ${_PART}?" 0 0 && _DOSUBVOLUME=1
     else
         _DOSUBVOLUME=1
@@ -190,8 +190,8 @@ _prepare_btrfs_subvolume() {
 
 # check btrfs subvolume
 _check_btrfs_subvolume(){
-    [[ "${_DOMKFS}" == 1 && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
-    if [[ "${_DETECT_CREATE_FILESYSTEM}" == "no" ]]; then
+    [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
+    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 7); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
@@ -222,7 +222,7 @@ _create_btrfs_subvolume() {
 # choose btrfs subvolume from list
 _choose_btrfs_subvolume () {
     _BTRFS_SUBVOLUME="NONE"
-    _SUBVOLUMES_DETECTED="no"
+    _SUBVOLUMES_DETECTED=""
     _SUBVOLUMES=$(find_btrfs_subvolume _)
     # check if subvolumes are present
     [[ -n "${_SUBVOLUMES}" ]] && _SUBVOLUMES_DETECTED=1
@@ -238,7 +238,7 @@ _choose_btrfs_subvolume () {
     else
         if [[ "${_SUBVOLUMES_DETECTED}" == 1 ]]; then
             _dialog --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
-            _SKIP_ASK_SUBVOLUME=yes
+            _SKIP_ASK_SUBVOLUME=1
             _prepare_btrfs_subvolume || return 1
         fi
     fi
@@ -247,7 +247,7 @@ _choose_btrfs_subvolume () {
 # btrfs subvolume menu
 _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
-    if [[ "${_FSTYPE}" == "btrfs" && "${_DOMKFS}" == "no" ]]; then
+    if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" ]]; then
         if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
             # create subvolume if requested
             # choose btrfs subvolume if present
