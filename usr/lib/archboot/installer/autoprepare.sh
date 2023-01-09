@@ -41,8 +41,8 @@ _autoprepare() {
         _dialog --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1
     fi
-    if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        set_device_name_scheme || return 1
+    if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
+        _set_device_name_scheme || return 1
     fi
     if [[  "${_GUIDPARAMETER}" == "1" ]]; then
         _dialog --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
