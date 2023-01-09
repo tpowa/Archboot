@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # menu for raid, lvm and encrypt
-create_special() {
+_create_special() {
     _NEXTITEM=""
     _SPECIALDONE=0
     while [[ "${_SPECIALDONE}" == "0" ]]; do

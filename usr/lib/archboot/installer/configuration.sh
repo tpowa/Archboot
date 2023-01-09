@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-check_root_password() {
+_check_root_password() {
     # check if empty password is set
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --msgbox "Setup detected no password set for root user,\nplease set new password now." 6 50

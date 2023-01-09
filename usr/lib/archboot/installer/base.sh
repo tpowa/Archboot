@@ -25,6 +25,9 @@ _S_MKFSAUTO=0    # auto fs part/formatting
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
 _EDITOR=""
+_LSBLK="lsblk -rpno"
+_BLKID="blkid -c /dev/null"
+
 _set_title
 _set_uefi_parameters
 
@@ -125,13 +128,13 @@ _select_source() {
     NEXTITEM="2"
     _set_title
     if [[ -e "${_LOCAL_DB}" ]]; then
-        getsource || return 1
+        _getsource || return 1
     else
         if [[ ${_S_NET} -eq 0 ]]; then
             check_nework || return 1
         fi
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && dotesting
-        getsource || return 1
+        _getsource || return 1
     fi
     NEXTITEM="3"
 }
@@ -173,13 +176,13 @@ _prepare_storagedrive() {
                 [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
                 ;;
             "2")
-                partition ;;
+                _partition ;;
             "3")
-                create_special ;;
+                _create_special ;;
             "4")
                 _PARTFINISH=""
                 _ASK_MOUNTPOINTS="1"
-                mountpoints ;;
+                _mountpoints ;;
             *)
                 _DONE=1 ;;
         esac
@@ -192,11 +195,11 @@ _prepare_storagedrive() {
 }
 
 _configure_system() {
-    destdir_mounts || return 1
-    check_root_password || return 1
+    _destdir_mounts || return 1
+    _check_root_password || return 1
     _geteditor || return 1
     ## PREPROCESSING ##
-    set_locale || return 1
+    _set_locale || return 1
     _auto_mkinitcpio
     ## END PREPROCESS ##
     _FILE=""
@@ -228,13 +231,13 @@ _configure_system() {
             _S_CONFIG=1
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
-            set_mkinitcpio
+            _set_mkinitcpio
         elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then            # non-file
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             run_locale_gen
         elif [[ "${_FILE}" = "Root-Password" ]]; then              # non-file
-            set_password
+            _set_password
         else                                                      #regular file
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi
@@ -267,20 +270,20 @@ _mainmenu() {
         "0")
             _set_vconsole ;;
         "1")
-            donetwork ;;
+            _donetwork ;;
         "2")
             _select_source || return 1
-            update_environment ;;
+            _update_environment ;;
         "3")
             _set_clock ;;
         "4")
             _prepare_storagedrive ;;
         "5")
-            install_packages ;;
+            _install_packages ;;
         "6")
             _configure_system ;;
         "7")
-            install_bootloader ;;
+            _install_bootloader ;;
         "8")
             [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear

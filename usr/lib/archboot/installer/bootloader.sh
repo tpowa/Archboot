@@ -1,18 +1,10 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# name of intel ucode initramfs image
-_INTEL_UCODE="intel-ucode.img"
-# name of amd ucode initramfs image
-_AMD_UCODE="amd-ucode.img"
-_ROOTFS=""
-# name of the initramfs filesystem
-_INITRAMFS="initramfs-${_KERNELPKG}.img"
-
-getrootfstype() {
+_getrootfstype() {
     _ROOTFS="$(getfstype "${_PART_ROOT}")"
 }
 
-getrootflags() {
+_getrootflags() {
     _ROOTFLAGS=""
     _ROOTFLAGS="$(findmnt -m -n -o options -T "${_DESTDIR}")"
     # add subvolume for btrfs
@@ -22,14 +14,14 @@ getrootflags() {
     [[ -n "${_ROOTFLAGS}" ]] && _ROOTFLAGS="rootflags=${_ROOTFLAGS}"
 }
 
-getraidarrays() {
+_getraidarrays() {
     _RAIDARRAYS=""
     if ! grep -q ^ARRAY "${_DESTDIR}"/etc/mdadm.conf; then
         _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>/dev/null | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
     fi
 }
 
-getcryptsetup() {
+_getcryptsetup() {
     _CRYPTSETUP=""
     if ! cryptsetup status "$(basename "${_PART_ROOT}")" | grep -q inactive; then
         #avoid clash with dmraid here
@@ -47,40 +39,40 @@ getcryptsetup() {
     fi
 }
 
-getrootpartuuid() {
+_getrootpartuuid() {
     _ROOTPART="${_PART_ROOT}"
-    _PARTUUID="$(getpartuuid "${_PART_ROOT}")"
+    _PARTUUID="$(_getpartuuid "${_PART_ROOT}")"
     if [[ -n "${_PARTUUID}" ]]; then
         _ROOTPART="PARTUUID=${_PARTUUID}"
     fi
 }
 
-getrootpartlabel() {
+_getrootpartlabel() {
     _ROOTPART="${_PART_ROOT}"
-    _PARTLABEL="$(getpartlabel "${_PART_ROOT}")"
+    _PARTLABEL="$(_getpartlabel "${_PART_ROOT}")"
     if [[ -n "${_PARTLABEL}" ]]; then
         _ROOTPART="PARTLABEL=${_PARTLABEL}"
     fi
 }
 
-getrootfsuuid() {
+_getrootfsuuid() {
     _ROOTPART="${_PART_ROOT}"
-    _FSUUID="$(getfsuuid "${_PART_ROOT}")"
+    _FSUUID="$(_getfsuuid "${_PART_ROOT}")"
     if [[ -n "${_FSUUID}" ]]; then
         _ROOTPART="UUID=${_FSUUID}"
     fi
 }
 
-getrootfslabel() {
+_getrootfslabel() {
     _ROOTPART="${_PART_ROOT}"
-    _FSLABEL="$(getfslabel "${_PART_ROOT}")"
+    _FSLABEL="$(_getfslabel "${_PART_ROOT}")"
     if [[ -n "${_FSLABEL}" ]]; then
         _ROOTPART="LABEL=${_FSLABEL}"
     fi
 }
 
 # freeze and unfreeze xfs, as hack for grub(2) installing
-freeze_xfs() {
+_freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
         if grep -q "${_DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
@@ -95,30 +87,30 @@ freeze_xfs() {
 }
 
 ## Setup kernel cmdline parameters to be added to bootloader configs
-bootloader_kernel_parameters() {
+_bootloader_kernel_parameters() {
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
-        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && getrootpartuuid
-        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && getrootpartlabel
+        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _getrootpartuuid
+        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _getrootpartlabel
     fi
-    [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && getrootfsuuid
-    [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && getrootfslabel
+    [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
+    [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
     [[ "${_ROOTPART}" == "" ]] && _ROOTPART="${_PART_ROOT}"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTPART} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
 
 # basic checks needed for all bootloaders
-common_bootloader_checks() {
-    activate_special_devices
-    getrootfstype
-    getraidarrays
-    getcryptsetup
-    getrootflags
-    bootloader_kernel_parameters
+_common_bootloader_checks() {
+    _activate_special_devices
+    _getrootfstype
+    _getraidarrays
+    _getcryptsetup
+    _getrootflags
+    _bootloader_kernel_parameters
 }
 
 # look for a separately-mounted /boot partition
-check_bootpart() {
+_check_bootpart() {
     _SUBDIR=""
     _BOOTDEV="$(mount | grep "${_DESTDIR}/boot " | cut -d' ' -f 1)"
     if [[ -z "${_BOOTDEV}" ]]; then
@@ -128,7 +120,7 @@ check_bootpart() {
 }
 
 # only allow ext2/3/4 and vfat on uboot bootloader
-abort_uboot(){
+_abort_uboot(){
         _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if ! [[ "${_FSTYPE}" == "ext2" || "${_FSTYPE}" == "ext3" || "${_FSTYPE}" == "ext4" || "${_FSTYPE}" == "vfat" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
@@ -137,7 +129,7 @@ abort_uboot(){
 }
 
 # check for nilfs2 bootpart and abort if detected
-abort_nilfs_bootpart() {
+_abort_nilfs_bootpart() {
         _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "nilfs2" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
@@ -146,7 +138,7 @@ abort_nilfs_bootpart() {
 }
 
 # check for f2fs bootpart and abort if detected
-abort_f2fs_bootpart() {
+_abort_f2fs_bootpart() {
         _FSTYPE="$(${_LSBLK} _FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "f2fs" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
@@ -154,7 +146,7 @@ abort_f2fs_bootpart() {
         fi
 }
 
-do_uefi_common() {
+_do_uefi_common() {
     _PACKAGES=""
     [[ ! -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] && _PACKAGES="${_PACKAGES} dosfstools"
     [[ ! -f "${_DESTDIR}/usr/bin/efivar" ]] && _PACKAGES="${_PACKAGES} efivar"
@@ -164,11 +156,11 @@ do_uefi_common() {
         [[ ! -f "${_DESTDIR}/usr/bin/efi-readvar" ]] && _PACKAGES="${_PACKAGES} efitools"
         [[ ! -f "${_DESTDIR}/usr/bin/sbsign" ]] && _PACKAGES="${_PACKAGES} sbsigntools"
     fi
-    [[ -n "${_PACKAGES}" ]] && run_pacman
-    check_efisys_part
+    [[ -n "${_PACKAGES}" ]] && _run_pacman
+    _check_efisys_part
 }
 
-do_uefi_efibootmgr() {
+_do_uefi_efibootmgr() {
     if [[ "$(/usr/bin/efivar -l)" ]]; then
         cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
@@ -189,45 +181,45 @@ EFIBEOF
     fi
 }
 
-do_apple_efi_hfs_bless() {
+_do_apple_efi_hfs_bless() {
     ## Grub upstream bzr mactel branch => http://bzr.savannah.gnu.org/lh/grub/branches/mactel/changes
     ## Fedora's mactel-boot => https://bugzilla.redhat.com/show_bug.cgi?id=755093
     _dialog --msgbox "TODO: Apple Mac EFI Bootloader Setup" 0 0
 }
 
-do_uefi_bootmgr_setup() {
+_do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
     _DISC="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
     _UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY__NUMBER -o value "${_UEFISYSDEV}")"
     _BOOTMGR_DISC="${_DISC}"
     _BOOTMGR_PART_NUM="${_UEFISYS_PART_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
-        do_apple_efi_hfs_bless
+        _do_apple_efi_hfs_bless
     else
-        do_uefi_efibootmgr
+        _do_uefi_efibootmgr
     fi
 }
 
-do_uefi_secure_boot_efitools() {
-    do_uefi_common
+_do_uefi_secure_boot_efitools() {
+    _do_uefi_common
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
             cp "${_DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/HashTool.efi"
-            do_uefi_bootmgr_setup
+            _do_uefi_bootmgr_setup
         fi
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/KeyTool.efi" ]]; then
             cp "${_DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${_UEFISYS_MP}/EFI/BOOT/KeyTool.efi"
             _BOOTMGR_LABEL="KeyTool (Secure Boot)"
             _BOOTMGR_LOADER_DIR="/EFI/BOOT/KeyTool.efi"
-            do_uefi_bootmgr_setup
+            _do_uefi_bootmgr_setup
         fi
     fi
 }
 
-do_secureboot_keys() {
+_do_secureboot_keys() {
     _CN=""
     _MOK_PW=""
     _KEYDIR=""
@@ -251,7 +243,7 @@ do_secureboot_keys() {
     fi
 }
 
-do_mok_sign () {
+_do_mok_sign () {
     _UEFI_BOOTLOADER_DIR="${_UEFISYS_MP}/EFI/BOOT"
     _INSTALL_MOK=""
     _MOK_PW=""
@@ -291,7 +283,7 @@ do_mok_sign () {
     fi
 }
 
-do_pacman_sign() {
+_do_pacman_sign() {
     _SIGN_KERNEL=""
     _dialog --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && _SIGN_KERNEL="1"
     if [[ "${_SIGN_KERNEL}" == "1" ]]; then
@@ -317,7 +309,7 @@ EOF
     fi
 }
 
-do_efistub_parameters() {
+_do_efistub_parameters() {
     _BOOTDEV=""
     _FAIL_COMPLEX=""
     _USE_DMRAID=""
@@ -325,7 +317,7 @@ do_efistub_parameters() {
     _UEFISYS_PATH="EFI/archlinux"
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
-    _UEFISYS_PART_FS_UUID="$(getfsuuid "${_UEFISYSDEV}")"
+    _UEFISYS_PART_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="${_VMLINUZ_EFISTUB}"
@@ -356,7 +348,7 @@ do_efistub_parameters() {
     fi
 }
 
-do_efistub_copy_to_efisys() {
+_do_efistub_copy_to_efisys() {
     if ! [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         # clean and copy to efisys
         _dialog --infobox "Copying kernel, ucode and initramfs to EFI system partition now ..." 4 50
@@ -414,24 +406,24 @@ CONFEOF
     fi
 }
 
-do_efistub_uefi() {
-    do_uefi_common
-    do_efistub_parameters
-    common_bootloader_checks
+_do_efistub_uefi() {
+    _do_uefi_common
+    _do_efistub_parameters
+    _common_bootloader_checks
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        do_systemd_boot_uefi
+        _do_systemd_boot_uefi
     else
         _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
-            "SYSTEMD-BOOT") do_systemd_boot_uefi ;;
-            "rEFInd") do_refind_uefi ;;
+            "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
+            "rEFInd") _do_refind_uefi ;;
         esac
     fi
 }
 
-do_systemd_boot_uefi() {
+_do_systemd_boot_uefi() {
     _dialog --infobox "Setting up SYSTEMD-BOOT now ..." 3 40
     # create directory structure, if it doesn't exist
     ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
@@ -449,10 +441,10 @@ GUMEOF
 timeout 5
 default archlinux-core-main
 GUMEOF
-    chroot_mount
+    _chroot_mount
     chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" install >"${_LOG}" 2>&1
     chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" update >"${_LOG}" 2>&1
-    chroot_umount
+    _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
@@ -469,11 +461,11 @@ GUMEOF
     fi
 }
 
-do_refind_uefi() {
+_do_refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _dialog --infobox "Installing refind ..." 0 0
         _PACKAGES="refind"
-        run_pacman
+        _run_pacman
     fi
     _dialog --infobox "Setting up rEFInd now. This needs some time ..." 3 60
     ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
@@ -503,7 +495,7 @@ CONFEOF
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
         _BOOTMGR_LOADER_DIR="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
-        do_uefi_bootmgr_setup
+        _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -519,7 +511,7 @@ CONFEOF
     fi
 }
 
-do_grub_common_before() {
+_do_grub_common_before() {
     ##### Check whether the below limitations still continue with ver 2.00~beta4
     ### Grub(2) restrictions:
     ## - Encryption is not recommended for grub(2) /boot!
@@ -527,20 +519,20 @@ do_grub_common_before() {
     _FAIL_COMPLEX=""
     _USE_DMRAID=""
     _RAID_ON_LVM=""
-    common_bootloader_checks
-    abort_f2fs_bootpart || return 1
+    _common_bootloader_checks
+    _abort_f2fs_bootpart || return 1
     if ! dmraid -r | grep -q ^no; then
         _dialog --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && _USE_DMRAID="1"
     fi
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _dialog --infobox "Installing grub ..." 0 0
         _PACKAGES="grub"
-        run_pacman
+        _run_pacman
     fi
 }
 
-do_grub_config() {
-    chroot_mount
+_do_grub_config() {
+    _chroot_mount
     _BOOT_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
     _BOOT_PART_FS_LABEL="$(chroot "${_DESTDIR}" grub-probe --target="fs_label" "/boot" 2>/dev/null)"
     _BOOT_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
@@ -734,17 +726,17 @@ EOF
 fi
     ## copy unicode.pf2 font file
     cp -f "${_DESTDIR}/usr/share/grub/unicode.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/unicode.pf2"
-    chroot_umount
+    _chroot_umount
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
     "${_EDITOR}" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 }
 
-do_uboot() {
-    common_bootloader_checks
-    check_bootpart
-    abort_uboot
+_do_uboot() {
+    _common_bootloader_checks
+    _check_bootpart
+    _abort_uboot
     [[ -d "${_DESTDIR}/boot/extlinux" ]] || mkdir -p "${_DESTDIR}/boot/extlinux"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTPART} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
@@ -767,10 +759,10 @@ EOF
     _S_BOOTLOADER="1"
 }
 
-do_grub_bios() {
-    do_grub_common_before
+_do_grub_bios() {
+    _do_grub_common_before
     # try to auto-configure GRUB(2)...
-    check_bootpart
+    _check_bootpart
     # check if raid, raid partition, dmraid or device devicemapper is used
     if echo "${_BOOTDEV}" | grep -q /dev/md || echo "${_BOOTDEV}" | grep /dev/mapper; then
         # boot from lvm, raid, partitioned raid and dmraid devices is supported
@@ -806,7 +798,7 @@ do_grub_bios() {
     # A switch is needed if complex ${_BOOTDEV} is used!
     # - LVM and RAID ${_BOOTDEV} needs the MBR of a device and cannot be used itself as ${_BOOTDEV}
     # -  grub BIOS install to partition is not supported
-    _DEVS="$(findbootloaderdisks _)"
+    _DEVS="$(_findbootloaderdisks _)"
     if [[ -z "${_DEVS}" ]]; then
         _dialog --msgbox "No storage drives were found" 0 0
         return 1
@@ -819,7 +811,7 @@ do_grub_bios() {
         _CHECK_UEFISYS_PART=""
         _RUN_CFDISK=""
         _DISC="${_BOOTDEV}"
-        check_gpt
+        _check_gpt
     else
         if [[ "${_FAIL_COMPLEX}" == "0" ]]; then
             _dialog --defaultno --yesno "Warning:\nSetup detected no GUID (gpt) partition table.\n\nGrub(2) has only space for approx. 30k core.img file. Depending on your setup, it might not fit into this gap and fail.\n\nDo you really want to install GRUB(2) to a msdos partition table?" 0 0 || return 1
@@ -831,8 +823,8 @@ do_grub_bios() {
     fi
     _dialog --infobox "Setting up GRUB(2) BIOS. This needs some time ..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
-    freeze_xfs
-    chroot_mount
+    _freeze_xfs
+    _chroot_mount
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
@@ -840,12 +832,12 @@ do_grub_bios() {
         --recheck \
         --debug \
         "${_BOOTDEV}" &>"/tmp/grub_bios_install.log"
-    chroot_umount
+    _chroot_umount
     mkdir -p "${_DESTDIR}/boot/grub/locale"
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
-        do_grub_config
+        _do_grub_config
         _dialog --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
         sleep 5
         _S_BOOTLOADER="1"
@@ -855,14 +847,14 @@ do_grub_bios() {
     fi
 }
 
-do_grub_uefi() {
-    do_uefi_common
+_do_grub_uefi() {
+    _do_uefi_common
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
-    do_grub_common_before
+    _do_grub_common_before
     _dialog --infobox "Setting up GRUB(2) UEFI. This needs some time ..." 3 55
-    chroot_mount
+    _chroot_mount
     if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         # install fedora shim
         [[ ! -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] && mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
@@ -883,9 +875,9 @@ do_grub_uefi() {
         cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >> "${_LOG}"
         _GRUB_PREFIX_DIR="/boot/grub/"
     fi
-    chroot_umount
+    _chroot_umount
     _GRUB_UEFI="1"
-    do_grub_config
+    _do_grub_config
     _GRUB_UEFI=""
     if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
         # generate GRUB with config embeded
@@ -911,7 +903,7 @@ do_grub_uefi() {
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && "${_UEFI_SECURE_BOOT}" == "0" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_DIR="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
-        do_uefi_bootmgr_setup
+        _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -919,13 +911,13 @@ do_grub_uefi() {
         sleep 5
         _S_BOOTLOADER="1"
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && "${_UEFI_SECURE_BOOT}" == "1" ]]; then
-        do_secureboot_keys || return 1
-        do_mok_sign
-        do_pacman_sign
-        do_uefi_secure_boot_efitools
+        _do_secureboot_keys || return 1
+        _do_mok_sign
+        _do_pacman_sign
+        _do_uefi_secure_boot_efitools
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        do_uefi_bootmgr_setup
+        _do_uefi_bootmgr_setup
         _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds ..." 6 50
         sleep 5
         _S_BOOTLOADER="1"
@@ -944,37 +936,37 @@ install_bootloader_uefi() {
         _EFISTUB_MENU_TEXT="EFISTUB for ${_UEFI_ARCH} UEFI"
     fi
     if [[ "${_UEFI_SECURE_BOOT}" == "1" ]]; then
-        do_grub_uefi
+        _do_grub_uefi
     else
         _dialog --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
-            "EFISTUB") do_efistub_uefi
-                       [[ -z "${_S_BOOTLOADER}" ]] || do_efistub_copy_to_efisys
+            "EFISTUB") _do_efistub_uefi
+                       [[ -z "${_S_BOOTLOADER}" ]] || _do_efistub_copy_to_efisys
                         ;;
-            "GRUB_UEFI") do_grub_uefi ;;
+            "GRUB_UEFI") _do_grub_uefi ;;
         esac
     fi
 }
 
 install_bootloader() {
     _S_BOOTLOADER=""
-    destdir_mounts || return 1
+    _destdir_mounts || return 1
     if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
-        set_device_name_scheme || return 1
+        _set_device_name_scheme || return 1
     fi
     if [[ "${_S_SRC}" == "0" ]]; then
         _select_source || return 1
     fi
     prepare_pacman
     if [[ "${_UEFI_BOOT}" == "1" ]]; then
-        install_bootloader_uefi
+        _install_bootloader_uefi
     else
         if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
-            do_uboot
+            _do_uboot
         else
-            do_grub_bios
+            _do_grub_bios
         fi
     fi
     if [[ -z "${_S_BOOTLOADER}" ]]; then

@@ -4,7 +4,7 @@
 DLPROG="wget"
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
 
-getsource() {
+_getsource() {
     _S_SRC=0
     _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
@@ -174,7 +174,7 @@ run_pacman(){
 # install_packages()
 # performs package installation to the target system
 install_packages() {
-    destdir_mounts || return 1
+    _destdir_mounts || return 1
     if [[ "${_S_SRC}" == "0" ]]; then
         _select_source || return 1
     fi

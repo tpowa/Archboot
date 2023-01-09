@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_LSBLK="lsblk -rpno"
-_BLKID="blkid -c /dev/null"
-
-getfstype()
+_getfstype()
 {
     ${_LSBLK} FSTYPE "${1}"
 }
@@ -15,7 +12,7 @@ getfstype()
 # outputs:    FSUUID on success
 #             nothing on failure
 # returns:    nothing
-getfsuuid()
+_getfsuuid()
 {
     ${_LSBLK} UUID "${1}"
 }
@@ -24,23 +21,23 @@ getfsuuid()
 # outputs:    LABEL on success
 #             nothing on failure
 # returns:    nothing
-getfslabel()
+_getfslabel()
 {
     ${_LSBLK} LABEL "${1}"
 }
 
-getpartuuid()
+_getpartuuid()
 {
     ${_LSBLK} PARTUUID "${1}"
 }
 
-getpartlabel()
+_getpartlabel()
 {
     ${_LSBLK} PARTLABEL "${1}"
 }
 
 # lists linux blockdevices
-blockdevices() {
+_blockdevices() {
      # all available block disk devices
      for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
          # exclude checks:
@@ -62,7 +59,7 @@ blockdevices() {
 }
 
 # lists linux blockdevice partitions
-blockdevices_partitions() {
+_blockdevices_partitions() {
     # all available block devices partitions
     # _printk off needed cause of parted usage
     _printk off
@@ -91,7 +88,7 @@ blockdevices_partitions() {
 }
 
 # list none partitionable raid md devices
-raid_devices() {
+_raid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
@@ -110,7 +107,7 @@ raid_devices() {
 }
 
 # lists linux partitionable raid devices partitions
-partitionable_raid_devices_partitions() {
+_partitionable_raid_devices_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md.*p" 2>/dev/null | cut -d' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
@@ -133,7 +130,7 @@ partitionable_raid_devices_partitions() {
 }
 
 # lists dmraid devices
-dmraid_devices() {
+_dmraid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
@@ -156,7 +153,7 @@ dmraid_devices() {
 
 # dmraid_partitions
 # - show dmraid partitions
-dmraid_partitions() {
+_dmraid_partitions() {
     for part in $(${_LSBLK} NAME,TYPE | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
         # exclude checks:
         # - part of lvm2 device
@@ -193,7 +190,7 @@ dmraid_partitions() {
 # dm_devices
 # - show device mapper devices:
 #   lvm2 and cryptdevices
-dm_devices() {
+_dm_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
@@ -211,31 +208,31 @@ dm_devices() {
     done
 }
 
-finddisks() {
-    blockdevices "${1}"
-    dmraid_devices "${1}"
+_finddisks() {
+    _blockdevices "${1}"
+    _dmraid_devices "${1}"
 }
 
-findpartitions() {
-    blockdevices_partitions "${1}"
-    dm_devices "${1}"
-    dmraid_partitions "${1}"
-    raid_devices "${1}"
-    partitionable_raid_devices_partitions "${1}"
+_findpartitions() {
+    _blockdevices_partitions "${1}"
+    _dm_devices "${1}"
+    _dmraid_partitions "${1}"
+    _raid_devices "${1}"
+    _partitionable_raid_devices_partitions "${1}"
 }
 
 # don't check on raid devices!
-findbootloaderdisks() {
+_findbootloaderdisks() {
     if ! [[ "${_USE_DMRAID}" == "1" ]]; then
-        blockdevices "${1}"
+        _blockdevices "${1}"
     else
-        dmraid_devices "${1}"
+        _dmraid_devices "${1}"
     fi
 }
 
 # activate_dmraid()
 # activate dmraid devices
-activate_dmraid()
+_activate_dmraid()
 {
     if [[ -e /usr/bin/dmraid ]]; then
         _dialog --infobox "Activating dmraid arrays..." 0 0
@@ -245,7 +242,7 @@ activate_dmraid()
 
 # activate_lvm2
 # activate lvm2 devices
-activate_lvm2()
+_activate_lvm2()
 {
     _ACTIVATE_LVM2=""
     if [[ -e /usr/bin/lvm ]]; then
@@ -263,7 +260,7 @@ activate_lvm2()
 
 # activate_raid
 # activate md devices
-activate_raid()
+_activate_raid()
 {
     _ACTIVATE_RAID=""
     if [[ -e /usr/bin/mdadm ]]; then
@@ -274,7 +271,7 @@ activate_raid()
 
 # activate_luks
 # activate luks devices
-activate_luks()
+_activate_luks()
 {
     _ACTIVATE_LUKS=""
     if [[ -e /usr/bin/cryptsetup ]]; then
@@ -297,25 +294,25 @@ activate_luks()
     fi
 }
 
-# activate_special_devices()
+# _activate_special_devices()
 # activate special devices:
 # activate dmraid, lvm2 and raid devices, if not already activated during bootup!
 # run it more times if needed, it can be hidden by each other!
-activate_special_devices()
+_activate_special_devices()
 {
     _ACTIVATE_RAID=""
     _ACTIVATE_LUKS=""
     _ACTIVATE_LVM2=""
-    activate_dmraid
+    _activate_dmraid
     while ! [[ "${_ACTIVATE_LVM2}" == "no" && "${_ACTIVATE_RAID}" == "no"  && "${_ACTIVATE_LUKS}" == "no" ]]; do
-        activate_raid
-        activate_lvm2
-        activate_luks
+        _activate_raid
+        _activate_lvm2
+        _activate_luks
     done
 }
 
 # set device name scheme
-set_device_name_scheme() {
+_set_device_name_scheme() {
     _NAME_SCHEME_PARAMETER=""
     _NAME_SCHEME_LEVELS=""
     _MENU_DESC_TEXT=""
@@ -338,7 +335,7 @@ set_device_name_scheme() {
 _getavaildisks()
 {
     #shellcheck disable=SC2119
-    for i in $(finddisks); do
+    for i in $(_finddisks); do
         ${_LSBLK} NAME,SIZE -d "${i}"
     done
 }
@@ -349,7 +346,7 @@ _getavaildisks()
 _getavailpartitions()
 {
     #shellcheck disable=SC2119
-    for i in $(findpartitions); do
+    for i in $(_findpartitions); do
         ${_LSBLK} NAME,SIZE -d "${i}"
     done
 }
@@ -560,14 +557,14 @@ _raid()
 {
     _MDFINISH=""
     while [[ "${_MDFINISH}" != "DONE" ]]; do
-        activate_special_devices
+        _activate_special_devices
         : >/tmp/.raid
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        _RAID_BLACKLIST="$(raid_devices;partitionable_raid_devices_partitions)"
+        _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(findpartitions); do
+        _PARTS="$(for i in $(_findpartitions); do
                 echo "${_RAID_BLACKLIST}" | grep -qw "${i}" || echo "${i}" _
                 done)"
         # break if all devices are in use
@@ -672,7 +669,7 @@ _createraid()
             _RUN_CFDISK="1"
             _CHECK_BIOS_BOOT_GRUB=""
             _CHECK_UEFISYS_PART=""
-            check_gpt
+            _check_gpt
         fi
     fi
 }
@@ -704,14 +701,14 @@ _createpv()
 {
     _PVFINISH=""
     while [[ "${_PVFINISH}" != "DONE" ]]; do
-        activate_special_devices
+        _activate_special_devices
         : >/tmp/.pvs-create
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
                     echo "$(${_LSBLK} NAME "${i}")" _
                     done)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(findpartitions); do
+        _PARTS="$(for i in $(_findpartitions); do
                 ! echo "${_LVM_BLACKLIST}" | grep -E "${i} _" && echo "${i}" _
                 done)"
         # break if all devices are in use
@@ -758,7 +755,7 @@ _createpv()
 }
 
 #find physical volumes that are not in use
-findpv()
+_findpv()
 {
     for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
          # exclude checks:
@@ -773,7 +770,7 @@ findpv()
     done
 }
 
-getavailablepv()
+_getavailablepv()
 {
     for i in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
@@ -788,7 +785,7 @@ getavailablepv()
 }
 
 #find volume groups that are not already full in use
-findvg()
+_findvg()
 {
     for dev in $(vgs -o vg_name --noheading);do
         if ! vgs -o vg_free --noheading --units m "${dev}" | grep -q " 0m$"; then
@@ -798,7 +795,7 @@ findvg()
     done
 }
 
-getavailablevg()
+_getavailablevg()
 {
     for i in $(vgs -o vg_name,vg_free --noheading --units m); do
         if ! echo "${i}" | grep -q " 0m$"; then
@@ -875,7 +872,7 @@ _createlv()
     while [[ "${_LVFINISH}" != "DONE" ]]; do
         _LVDEVICE=""
         _LV_SIZE_SET=""
-        _LVS=$(findvg _)
+        _LVS=$(_findvg _)
         # break if all devices are in use
         if [[ "${_LVS}" == "" ]]; then
             _dialog --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
@@ -1027,13 +1024,13 @@ _luks()
     _NAME_SCHEME_PARAMETER_RUN=""
     _LUKSFINISH=""
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
-        activate_special_devices
+        _activate_special_devices
         # Remove all crypt devices with children
         _CRYPT_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     ${_LSBLK} NAME "${i}"
                     done)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(findpartitions); do
+        _PARTS="$(for i in $(_findpartitions); do
                 echo "${_CRYPT_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
                 done)"
         # break if all devices are in use

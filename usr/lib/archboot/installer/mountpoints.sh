@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# destdir_mounts()
+# _destdir_mounts()
 # check if _PART_ROOT is set and if something is mounted on ${_DESTDIR}
-destdir_mounts(){
+_destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     _ASK_MOUNTPOINTS=""
     _PART_ROOT=""
