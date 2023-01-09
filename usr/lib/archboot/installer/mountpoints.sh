@@ -423,7 +423,7 @@ _mkfs() {
     # Complex devices, like mdadm, encrypt or lvm are not supported
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
-    _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,_PARTLABEL,_PARTUUID | grep "$(echo "${_DEVICE}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
+    _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${_DEVICE}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
     if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && "${_UEFI_BOOT}" == "1" || "${_MOUNTPOINT}" == "/" ]]; then
         if [[ "${_MOUNTOPTIONS}" == "" ]]; then
             echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults 0 " >>/tmp/.fstab
