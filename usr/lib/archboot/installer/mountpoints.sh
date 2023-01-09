@@ -274,13 +274,13 @@ _mkfs() {
     local _FSOPTIONS=${7}
     local _BTRFSDEVICES="${8//#/\ }"
     local _BTRFSLEVEL=${9}
-    local _BTRFSSUBVOLUME=${10}
+    local _BTRFS_SUBVOLUME=${10}
     local _DOSUBVOLUME=${11}
     local _BTRFSCOMPRESS=${12}
     # correct empty entries
     [[ "${_FSOPTIONS}" == "NONE" ]] && _FSOPTIONS=""
     [[ "${_BTRFSCOMPRESS}" == "NONE" ]] && _BTRFSCOMPRESS=""
-    [[ "${_BTRFSSUBVOLUME}" == "NONE" ]] && _BTRFSSUBVOLUME=""
+    [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
     # add btrfs raid level, if needed
     [[ ! "${_BTRFSLEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _FSOPTIONS="${_FSOPTIONS} -m ${_BTRFSLEVEL} -d ${_BTRFSLEVEL}"
     # add btrfs options, minimum requirement linux 3.14 -O no-holes
@@ -335,7 +335,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFSSUBVOLUME}" && "${_DOSUBVOLUME}" == "yes" ]]; then
+        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && "${_DOSUBVOLUME}" == "yes" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
@@ -352,7 +352,7 @@ _mkfs() {
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
         [[ "${_FSTYPE}" == "f2fs" ]] && _MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
-        [[ -n "${_BTRFSSUBVOLUME}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${_BTRFSSUBVOLUME}"
+        [[ -n "${_BTRFS_SUBVOLUME}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${_BTRFS_SUBVOLUME}"
         [[ -n "${_BTRFSCOMPRESS}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_BTRFSCOMPRESS}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
@@ -437,6 +437,6 @@ _mkfs() {
         fi
     fi
     unset _MOUNTOPTIONS
-    unset _BTRFSSUBVOLUME
+    unset _BTRFS_SUBVOLUME
     unset _BTRFSCOMPRESS
 }
