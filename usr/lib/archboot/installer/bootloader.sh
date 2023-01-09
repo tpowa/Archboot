@@ -520,6 +520,7 @@ _do_grub_common_before() {
     _FAIL_COMPLEX=""
     _USE_DMRAID=""
     _RAID_ON_LVM=""
+    _DISK=""
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if ! dmraid -r | grep -q ^no; then
