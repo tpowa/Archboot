@@ -204,9 +204,9 @@ _configure_system() {
     # main menu loop
     while true; do
         if [[ -n "${_FILE}" ]]; then
-            DEFAULT="--default-item ${_FILE}"
+            _DEFAULT="--default-item ${_FILE}"
         else
-            DEFAULT=""
+            _DEFAULT=""
         fi
         #shellcheck disable=SC2086
         _dialog ${_DEFAULT} --menu "Configuration" 20 60 16 \
