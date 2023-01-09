@@ -109,7 +109,7 @@ _auto_packages() {
     if lsblk -rnpo FSTYPE | grep -q vfat; then
         ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
     fi
-    if ! [[ -z "$(_dmraid_devices)" ]]; then
+    if [[ -n "$(_dmraid_devices)" ]]; then
         ! echo "${_PACKAGES}" | grep -qw dmraid && _PACKAGES="${_PACKAGES} dmraid"
     fi
     if lsmod | grep -qw wl; then
