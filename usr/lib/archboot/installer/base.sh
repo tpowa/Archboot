@@ -25,6 +25,12 @@ _S_MKFSAUTO=0    # auto fs part/formatting
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
 _EDITOR=""
+_INTEL_UCODE="intel-ucode.img"
+# name of amd ucode initramfs image
+_AMD_UCODE="amd-ucode.img"
+# name of the initramfs filesystem
+_INITRAMFS="initramfs-${_KERNELPKG}.img"
+
 # programs
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c /dev/null"
