@@ -54,14 +54,14 @@ _autoprepare() {
     fi
     while [[ "${_DEFAULTFS}" == "" ]]; do
         _FSOPTS=""
-        command -v mkfs.btrfs 2>/dev/null && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-        command -v mkfs.ext4 2>/dev/null && _FSOPTS="${_FSOPTS} ext4 Ext4"
-        command -v mkfs.ext3 2>/dev/null && _FSOPTS="${_FSOPTS} ext3 Ext3"
-        command -v mkfs.ext2 2>/dev/null && _FSOPTS="${_FSOPTS} ext2 Ext2"
-        command -v mkfs.xfs 2>/dev/null && _FSOPTS="${_FSOPTS} xfs XFS"
-        command -v mkfs.f2fs 2>/dev/null && _FSOPTS="${_FSOPTS} f2fs F2FS"
-        command -v mkfs.nilfs2 2>/dev/null && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-        command -v mkfs.jfs 2>/dev/null && _FSOPTS="${_FSOPTS} jfs JFS"
+        command -v mkfs.btrfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} btrfs Btrfs"
+        command -v mkfs.ext4 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext4 Ext4"
+        command -v mkfs.ext3 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext3 Ext3"
+        command -v mkfs.ext2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext2 Ext2"
+        command -v mkfs.xfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} xfs XFS"
+        command -v mkfs.f2fs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} f2fs F2FS"
+        command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
+        command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ "${_GUIDPARAMETER}" == "1" ]]; then
             _GUID_PART_SIZE="2"

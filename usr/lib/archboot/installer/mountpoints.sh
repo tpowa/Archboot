@@ -47,15 +47,15 @@ _select_filesystem() {
     _FILESYSTEM_FINISH=""
     # don't allow vfat as / filesystem, it will not work!
     _FSOPTS=""
-    command -v mkfs.btrfs 2>/dev/null && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-    command -v mkfs.ext4 2>/dev/null && _FSOPTS="${_FSOPTS} ext4 Ext4"
-    command -v mkfs.ext3 2>/dev/null && _FSOPTS="${_FSOPTS} ext3 Ext3"
-    command -v mkfs.ext2 2>/dev/null && _FSOPTS="${_FSOPTS} ext2 Ext2"
-    command -v mkfs.vfat 2>/dev/null && [[ "${_DO_ROOT}" == "DONE" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
-    command -v mkfs.xfs 2>/dev/null && _FSOPTS="${_FSOPTS} xfs XFS"
-    command -v mkfs.f2fs 2>/dev/null && _FSOPTS="${_FSOPTS} f2fs F2FS"
-    command -v mkfs.nilfs2 2>/dev/null && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-    command -v mkfs.jfs 2>/dev/null && _FSOPTS="${_FSOPTS} jfs JFS"
+    command -v mkfs.btrfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} btrfs Btrfs"
+    command -v mkfs.ext4 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext4 Ext4"
+    command -v mkfs.ext3 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext3 Ext3"
+    command -v mkfs.ext2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext2 Ext2"
+    command -v mkfs.vfat > /dev/null 2>&1 && [[ "${_DO_ROOT}" == "DONE" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
+    command -v mkfs.xfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} xfs XFS"
+    command -v mkfs.f2fs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} f2fs F2FS"
+    command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
+    command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
     _dialog --menu "Select a filesystem for ${_PART}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
