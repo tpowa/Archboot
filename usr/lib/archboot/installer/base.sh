@@ -130,7 +130,7 @@ _select_source() {
         _getsource || return 1
     else
         if [[ ${_S_NET} -eq 0 ]]; then
-            check_nework || return 1
+            _check_network || return 1
         fi
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && dotesting
         _getsource || return 1

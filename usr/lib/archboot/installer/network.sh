@@ -6,7 +6,7 @@ _net_interfaces() {
 }
 
 # check for already active profile
-_check_nework() {
+_check_network() {
     [[ "${_S_NET}" == "1" ]] || _donetwork
 }
 
