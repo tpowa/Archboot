@@ -121,7 +121,7 @@ _partition() {
     # switch for mbr usage
     _set_guid
     # Select disk to partition
-    _DISKS=$(finddisks _)
+    _DISKS=$(_finddisks _)
     _DISKS="${_DISKS} OTHER _ DONE +"
     _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
     _DISK=""
