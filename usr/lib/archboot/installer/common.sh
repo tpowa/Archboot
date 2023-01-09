@@ -14,6 +14,7 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
 fi
 # abstract the common pacman args
 _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+_MIRRORLIST="/etc/pacman.d/mirrorlist"
 
 _linux_firmware() {
     _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
