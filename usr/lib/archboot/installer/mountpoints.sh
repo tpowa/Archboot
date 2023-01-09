@@ -211,19 +211,17 @@ _mountpoints() {
                             _btrfs_subvolume
                         fi
                     fi
+                     _find_btrfs_raid_devices
+                    _btrfs_parts
+                    _check_mkfs_values
+                    echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    #shellcheck disable=SC2001,SC2086
+                    ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
                 else
                     _FILESYSTEM_FINISH=1
                 fi
                 [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ADDITIONAL="DONE"
             done
-            if [[ "${_PART}" != "DONE" ]]; then
-                _find_btrfs_raid_devices
-                _btrfs_parts
-                _check_mkfs_values
-                echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                #shellcheck disable=SC2001,SC2086
-                ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
-            fi
         done
         #shellcheck disable=SC2028
         _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _PARTFINISH="DONE"
