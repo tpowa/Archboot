@@ -17,14 +17,10 @@ _usage()
     echo -e "usage: \033[1m${_APPNAME} <oldmountpoint> <newmountpoint>\033[0m"
     exit "$1"
 }
-
 ##################################################
-
 if [ $# -ne 2 ]; then
     _usage 1
 fi
-
 _NEWMOUNTPOINT="${2}"
 _OLDMOUNTPOINT="${1}"
-
 tar -C "${_OLDMOUNTPOINT}" -clpf - . | tar -C "${_NEWMOUNTPOINT}" -vxlspf -

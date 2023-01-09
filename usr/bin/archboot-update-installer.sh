@@ -10,9 +10,7 @@
 . /usr/lib/archboot/update-installer/gnome-wayland.sh
 . /usr/lib/archboot/update-installer/plasma.sh
 . /usr/lib/archboot/update-installer/plasma-wayland.sh
-
 [[ -z "${1}" ]] && usage
-
 while [ $# -gt 0 ]; do
     case ${1} in
         -u|--u) _D_SCRIPTS="1" ;;
@@ -32,7 +30,6 @@ while [ $# -gt 0 ]; do
         esac
     shift
 done
-
 _archboot_check
 _download_latest
 echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
@@ -41,17 +38,14 @@ _zram_initialize
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _new_environment
 fi
-
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
     _new_image
 fi
-
 # install custom xorg or wayland
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
     _custom_wayland_xorg
 fi
-
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" || -n "${_L_GNOME_WAYLAND}" || -n "${_L_PLASMA_WAYLAND}" ]]; then
     if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
@@ -60,9 +54,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" || -n "${_L_GNOME
         _install_graphic
     fi
 fi
-
 # Switch to full Arch Linux system
 if [[ -n "${_FULL_SYSTEM}" ]]; then
     _full_system
 fi
-

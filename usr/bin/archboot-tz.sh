@@ -2,13 +2,6 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.tz"
 _TITLE="Arch Linux Time And Date Setting"
-
-if [[ "${1}" = "--setup" ]]; then
-    _EXIT="Return to Main Menu"
-else
-    _EXIT="Exit"
-fi
-
 # _dialog()
 # an el-cheapo dialog wrapper
 #
@@ -160,11 +153,14 @@ _mainmenu() {
             _abort ;;
     esac
 }
-
 : >/tmp/.hardwareclock
 : >/tmp/.timezone
 : >/tmp/.tz
-
+if [[ "${1}" = "--setup" ]]; then
+    _EXIT="Return to Main Menu"
+else
+    _EXIT="Exit"
+fi
 if [[ -e /tmp/.tz-running ]]; then
     echo "tz already runs on a different console!"
     echo "Please remove /tmp/.tz-running first to launch tz!"
@@ -178,5 +174,4 @@ done
 
 clear
 exit 0
-
 # vim: set ts=4 sw=4 et:

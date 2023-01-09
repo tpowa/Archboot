@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
 _DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 

@@ -5,7 +5,6 @@
 # usage(exitvalue)
 # outputs a usage message and exits with value
 _APPNAME=$(basename "${0}")
-
 _usage()
 {
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mHWSIM:\033[0m"
@@ -17,11 +16,7 @@ _usage()
     echo -e "usage: \033[1m${_APPNAME} <SSID>\033[0m"
     exit 0
 }
-
-if [[ -z "${1}" ]]; then
-    _usage
-fi
-
+[[ -z "${1}" ]] && _usage
 if ! grep -qw mac80211_hwsim /proc/modules; then
 	modprobe mac80211_hwsim
 fi

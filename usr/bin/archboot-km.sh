@@ -3,7 +3,6 @@
 _ANSWER="/tmp/.km"
 _TITLE="Arch Linux Console Font And Keymap Setting"
 _LIST_MAPS="localectl list-keymaps --no-pager"
-
 # _dialog()
 # an el-cheapo dialog wrapper
 #
@@ -110,14 +109,12 @@ _mainmenu() {
 
 : >/tmp/.keymap
 : >/tmp/.font
-
 if [[ -e /tmp/.km-running ]]; then
     echo "km already runs on a different console!"
     echo "Please remove /tmp/.km-running first to launch tz!"
     exit 1
 fi 
 : >/tmp/.km-running
-
 if [[ "${1}" = "--setup" ]]; then
     if ! _set_vconsole; then
         [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
@@ -131,12 +128,9 @@ if [[ "${1}" = "--setup" ]]; then
 else
     EXIT="Exit"
 fi
-
 while true; do
     _mainmenu
 done
-
 clear
 exit 0
-
 # vim: set ts=4 sw=4 et:

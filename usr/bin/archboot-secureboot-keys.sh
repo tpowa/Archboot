@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-
 usage () {
     echo -e "\033[1mGenerate Secure Boot keys,MOK files and backup existing keys:\033[0m"
     echo -e "\033[1m-------------------------------------------------------------\033[0m"
@@ -17,11 +16,8 @@ usage () {
     echo " -h             This message."
     exit 0
 }
-
 [[ -z "${1}" || -z "${2}" ]] && usage
-
-_DIR="$2"
-
+_DIR="${2}"
 while [ $# -gt 0 ]; do
 	case ${1} in
 		-name=*|--name=*) NAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
@@ -29,21 +25,17 @@ while [ $# -gt 0 ]; do
         esac
 	shift
 done
-
 if [[ -z "${NAME}" ]]; then
     echo "ERROR: no name specified"
     usage
     #shellcheck disable=2317
     exit 1
 fi
-
 _root_check
-
 # archboot
 [[ -e /usr/bin/mkkeys.sh ]] && MKKEYS="mkkeys.sh"
 # normal system
 [[ -e /usr/bin/archboot-mkkeys.sh ]] && MKKEYS="archboot-mkkeys.sh"
-
 if [[ -n "${_DIR}" ]]; then
     [[ ! -d "${_DIR}" ]] && mkdir -p "${_DIR}"
     cd "${_DIR}" || exit 1

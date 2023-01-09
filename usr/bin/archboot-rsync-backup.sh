@@ -4,8 +4,8 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
-APPNAME=$(basename "${0}")
-usage()
+_APPNAME=$(basename "${0}")
+_usage()
 {
     echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mRSYNC BACKUP:\033[0m"
     echo -e "\033[1m-----------------------------------\033[0m"
@@ -15,18 +15,16 @@ usage()
     echo -e "- \033[1mexcluded\033[0m directories are \033[1m/dev /tmp /proc /sys /run /mnt /media /lost+found\033[0m"
     echo -e "- \033[1m--numeric-ids\033[0m option is invoked to \033[1mpreserve\033[0m users"
     echo ""
-    echo -e "usage: \033[1m${APPNAME} <backupdir> <backupdestination>\033[0m"
+    echo -e "usage: \033[1m${_APPNAME} <backupdir> <backupdestination>\033[0m"
     exit "$1"
 }
-
 ##################################################
-
 if [ $# -ne 2 ]; then
-    usage 1
+    _usage 1
 fi
-
-BACKUPDESTINATION="${2}"
-BACKUPDIR="${1}"
-
-rsync -aAXv --numeric-ids --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} "$BACKUPDIR" "$BACKUPDESTINATION"
+_BACKUPDESTINATION="${2}"
+_BACKUPDIR="${1}"
+rsync -aAXv --numeric-ids \
+--exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} \
+"${_BACKUPDIR}" "{_$BACKUPDESTINATION}"
 
