@@ -7,7 +7,7 @@ _net_interfaces() {
 
 # check for already active profile
 _check_network() {
-    [[ "${_S_NET}" == "1" ]] || _donetwork
+    [[ -z "${_S_NET}" ]] && _donetwork
 }
 
 # scan for available essids
@@ -82,7 +82,7 @@ _do_wireless() {
 # args: none
 # returns: 1 on failure
 _donetwork() {
-    _S_NET=0
+    _S_NET=""
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface

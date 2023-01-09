@@ -17,7 +17,7 @@ fi
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
-_S_NET=0         # network setting
+_S_NET=""         # network setting
 _S_SRC=0         # choose mirror
 _S_MKFS=0        # formatting
 _S_MKFSAUTO=0    # auto fs part/formatting
@@ -129,7 +129,7 @@ _select_source() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _getsource || return 1
     else
-        if [[ ${_S_NET} -eq 0 ]]; then
+        if [[ -z ${_S_NET} ]]; then
             _check_network || return 1
         fi
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && dotesting

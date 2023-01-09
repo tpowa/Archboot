@@ -58,7 +58,7 @@ _auto_mdadm()
 _auto_network()
 {
     # exit if network wasn't configured in installer
-    if [[ ${_S_NET} == "0" ]]; then
+    if [[ -z ${_S_NET} ]]; then
         return 1
     fi
     _dialog --infobox "Enable network and proxy settings on installed system ..." 3 70
