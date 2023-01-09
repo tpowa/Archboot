@@ -172,6 +172,7 @@ _mountpoints() {
             if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
+                _SKIP_FILESYSTEM=1
                 _btrfs_subvolume
             fi
             [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
@@ -201,6 +202,7 @@ _mountpoints() {
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
+                        _SKIP_FILESYSTEM=1
                         _btrfs_subvolume
                     fi
                 else
