@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
         echo -e "\033[1mStep 1/4:\033[0m Installing XFCE desktop now ..."

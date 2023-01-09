@@ -89,7 +89,7 @@ _clean_kernel_cache () {
 
 _download_latest() {
     # Download latest setup and quickinst script from git repository
-    if [[ "${_D_SCRIPTS}" == "1" ]]; then
+    if [[ -n "${_D_SCRIPTS}" ]]; then
         if ! ping -c1 www.google.com >/dev/tty7 2>&1; then
             echo -e "\033[91mError: Network not yet ready, aborting!\033[0m"
             exit 1
@@ -241,7 +241,7 @@ _gpg_check() {
 
 _create_container() {
     # create container without package cache
-    if [[ "${_L_COMPLETE}" == "1" ]]; then
+    if [[ -n "${_L_COMPLETE}" ]]; then
         "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
     fi
     # create container with package cache
@@ -249,14 +249,14 @@ _create_container() {
         # offline mode, for local image
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db "${_W_DIR}"/var/cache/pacman/pkg/archboot.db
-        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
+        if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
     else
         #online mode
-        if [[ "${_L_INSTALL_COMPLETE}" == "1" ]]; then
+        if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
         fi
     fi
@@ -493,25 +493,25 @@ _install_graphic () {
     _initialize_zram_usr
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
     echo -e "\033[1mInitializing desktop environment ...\033[0m"
-    [[ "${_L_XFCE}" == "1" ]] && _install_xfce
-    [[ "${_L_GNOME}" == "1" ]] && _install_gnome
-    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _install_gnome_wayland
-    [[ "${_L_PLASMA}" == "1" ]] && _install_plasma
-    [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _install_plasma_wayland
+    [[ -n "${_L_XFCE}" ]] && _install_xfce
+    [[ -n "${_L_GNOME}" ]] && _install_gnome
+    [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
+    [[ -n "${_L_PLASMA}" ]] && _install_plasma
+    [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
     echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi ..."
     systemctl restart systemd-sysusers
     systemctl restart dbus
     systemctl restart avahi-daemon
     # only start vnc on xorg environment
     echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser ...\033[0m"
-    [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" ]] && _autostart_vnc
+    [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
     command -v firefox > /dev/null 2>&1  && _firefox_flags
     command -v chromium > /dev/null 2>&1 && _chromium_flags
-    [[ "${_L_XFCE}" == "1" ]] && _start_xfce
-    [[ "${_L_GNOME}" == "1" ]] && _start_gnome
-    [[ "${_L_GNOME_WAYLAND}" == "1" ]] && _start_gnome_wayland
-    [[ "${_L_PLASMA}" == "1" ]] && _start_plasma
-    [[ "${_L_PLASMA_WAYLAND}" == "1" ]] && _start_plasma_wayland
+    [[ -n "${_L_XFCE}" ]] && _start_xfce
+    [[ -n "${_L_GNOME}" ]] && _start_gnome
+    [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
+    [[ -n "${_L_PLASMA}" ]] && _start_plasma
+    [[ -n "${_L_PLASMA_WAYLAND}" ]] && _start_plasma_wayland
 }
 
 _hint_graphic_installed () {
@@ -632,12 +632,12 @@ EOF
 
 _custom_wayland_xorg() {
     _initialize_zram_usr
-    if [[ "${_CUSTOM_WAYLAND}" == "1" ]]; then
+    if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Installing custom wayland ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
-    if [[ "${_CUSTOM_X}" == "1" ]]; then
+    if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\033[1mStep 1/3:\033[0m Installing custom xorg ..."
         echo "          This will need some time ..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
