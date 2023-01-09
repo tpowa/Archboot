@@ -965,7 +965,7 @@ install_bootloader() {
         set_device_name_scheme || return 1
     fi
     if [[ "${_S_SRC}" == "0" ]]; then
-        select_source || return 1
+        _select_source || return 1
     fi
     prepare_pacman
     if [[ "${_UEFI_BOOT}" == "1" ]]; then

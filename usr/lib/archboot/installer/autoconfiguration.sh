@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-
 # _auto_fstab()
 # preprocess fstab file
 # comments out old fields and inserts new ones
