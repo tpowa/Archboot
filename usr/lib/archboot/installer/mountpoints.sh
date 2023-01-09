@@ -172,8 +172,11 @@ _mountpoints() {
             if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
-                _SKIP_FILESYSTEM=1
-                _btrfs_subvolume
+                if [[ "$(${_LSBLK} FSTYPE ${_PART_ROOT})" == "btrfs" ]]; then
+                    _FSTYPE="btrfs"
+                    _SKIP_FILESYSTEM=1
+                    _btrfs_subvolume
+                fi
             fi
             [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
         done
@@ -202,8 +205,11 @@ _mountpoints() {
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
-                        _SKIP_FILESYSTEM=1
-                        _btrfs_subvolume
+                        if [[ "$(${_LSBLK} FSTYPE ${_PART})" == "btrfs" ]]; then
+                            _FSTYPE="btrfs"
+                            _SKIP_FILESYSTEM=1
+                            _btrfs_subvolume
+                        fi
                     fi
                 else
                     _FILESYSTEM_FINISH=1
