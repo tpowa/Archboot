@@ -33,8 +33,8 @@ _abort()
 }
 
 _dohwclock() {
-    echo "0.0 0 0.0" > /etc/adjtime
-    echo "0" >> /etc/adjtime
+    echo 0.0 0 0.0 > /etc/adjtime
+    echo 0 >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
     if [[ "${_HARDWARECLOCK}" = "UTC" ]]; then
@@ -53,7 +53,7 @@ _dohwclock() {
 
 _dotimezone () {
     _SET_ZONE=""
-    while ! [[ "${_SET_ZONE}" = "1" ]]; do
+    while [[ -z "${_SET_ZONE}" ]]; do
         _REGIONS="America - Europe - Africa - Asia - Australia -"
         #shellcheck disable=SC2086
         _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}
@@ -66,7 +66,7 @@ _dotimezone () {
         _dialog --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
         _ZONE=$(cat ${_ANSWER})
         [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-        if [[ "${_SET_ZONE}" = "1" ]]; then
+        if [[ -n "${_SET_ZONE}" ]]; then
             _dialog --infobox "Setting Timezone to ${_ZONE} ..." 0 0
             echo "${_ZONE}" > /tmp/.timezone
             timedatectl set-timezone "${_ZONE}"
@@ -106,18 +106,18 @@ _dotimeset() {
                 _SET_TIME="1"
             fi
         fi
-        if [[ "${_SET_TIME}" == "" ]]; then
+        if [[ -z "${_SET_TIME}" ]]; then
             timedatectl set-ntp 0
             # display and ask to set date/time
             _CANCEL=""
             dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER} || _CANCEL="1"
-            if [[ "${_CANCEL}" = "1" ]]; then
+            if [[ -n "${_CANCEL}" ]]; then
                 _S_NEXTITEM="2"
                 return 1
             fi
             _DATE="$(cat ${_ANSWER})"
             dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER} || _CANCEL="1"
-            if [[ "${_CANCEL}" = "1" ]]; then
+            if [[ -n "${_CANCEL}" ]]; then
                 _S_NEXTITEM="2"
                 return 1
             fi
