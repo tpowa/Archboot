@@ -38,22 +38,22 @@ _download_latest
 echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
 _zram_initialize
 # Generate new environment and launch it with kexec
-if [[ "${_L_COMPLETE}" == "1" || "${_L_INSTALL_COMPLETE}" == "1" ]]; then
+if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _new_environment
 fi
 
 # Generate new images
-if [[ "${_G_RELEASE}" == "1" ]]; then
+if [[ -n "${_G_RELEASE}" ]]; then
     _new_image
 fi
 
 # install custom xorg or wayland
-if [[ "${_CUSTOM_X}" == "1" || "${_CUSTOM_WAYLAND}" == "1" ]]; then
+if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
     _custom_wayland_xorg
 fi
 
 # Gnome, KDE/PLASMA or XFCE launch
-if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "${_L_GNOME_WAYLAND}" == "1" || "${_L_PLASMA_WAYLAND}" == "1" ]]; then
+if [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" || -n "${_L_GNOME_WAYLAND}" || -n "${_L_PLASMA_WAYLAND}" ]]; then
     if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
         _hint_graphic_installed
     else
@@ -62,7 +62,7 @@ if [[ "${_L_XFCE}" == "1" || "${_L_PLASMA}" == "1" || "${_L_GNOME}" == "1" || "$
 fi
 
 # Switch to full Arch Linux system
-if [[ "${_FULL_SYSTEM}" == "1" ]]; then
+if [[ -n "${_FULL_SYSTEM}" ]]; then
     _full_system
 fi
 
