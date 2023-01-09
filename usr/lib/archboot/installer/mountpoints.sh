@@ -282,8 +282,6 @@ _mkfs() {
     [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
     # add btrfs raid level, if needed
     [[ ! "${_BTRFSLEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _FSOPTIONS="${_FSOPTIONS} -m ${_BTRFSLEVEL} -d ${_BTRFSLEVEL}"
-    # add btrfs options, minimum requirement linux 3.14 -O no-holes
-    [[ "${_FSTYPE}" == "btrfs" ]] && _FSOPTIONS="${_FSOPTIONS} -O no-holes"
     # we have two main cases: "swap" and everything else.
     if [[ "${_FSTYPE}" == "swap" ]]; then
         swapoff "${_DEVICE}" >/dev/null 2>&1
