@@ -19,7 +19,7 @@ _autoprepare() {
         _DISK=$(cat "${_ANSWER}")
     else
         _DISK="${_DISKS}"
-        if [[ "${_DISK}" == "" ]]; then
+        if [[ -z "${_DISK}" ]]; then
             _dialog --msgbox "ERROR: Setup cannot find available disk device, please use normal installation routine for partitioning and mounting devices." 0 0
             return 1
         fi
