@@ -158,7 +158,7 @@ _mountpoints() {
             _PART=$(cat "${_ANSWER}")
             _PART_ROOT=${_PART}
             # Select root filesystem type
-            _FSTYPE="$(${_LSBLK} _FSTYPE "${_PART}")"
+            _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
             # clear values first!
             _clear_fs_values
             _check_btrfs_filesystem_creation
@@ -185,7 +185,7 @@ _mountpoints() {
                 _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
                 _PART=$(cat "${_ANSWER}")
                 if [[ "${_PART}" != "DONE" ]]; then
-                    _FSTYPE="$(${_LSBLK} _FSTYPE "${_PART}")"
+                    _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
