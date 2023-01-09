@@ -109,7 +109,7 @@ _auto_packages() {
     if lsblk -rnpo FSTYPE | grep -q vfat; then
         ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
     fi
-    if ! [[ "$(dmraid_devices)" == "" ]]; then
+    if ! [[ -z "$(_dmraid_devices)" ]]; then
         ! echo "${_PACKAGES}" | grep -qw dmraid && _PACKAGES="${_PACKAGES} dmraid"
     fi
     if lsmod | grep -qw wl; then
@@ -120,8 +120,8 @@ _auto_packages() {
         ! echo "${_PACKAGES}" | grep -qw iwd && _PACKAGES="${_PACKAGES} iwd"
     fi
     # only add firmware if already used
-    linux_firmware
-    marvell_firmware
+    _linux_firmware
+    _marvell_firmware
     ### HACK:
     # always add intel-ucode on x86_64
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
