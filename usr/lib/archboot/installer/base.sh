@@ -72,7 +72,7 @@ _geteditor() {
 }
 
 _set_uefi_parameters() {
-    _UEFI_BOOT="0"
+    _UEFI_BOOT=""
     _UEFI_SECURE_BOOT="0"
     _GUIDPARAMETER="0"
     [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT="1"
@@ -105,7 +105,7 @@ _set_uefi_parameters() {
 # set GUID (gpt) usage
 _set_guid() {
     # all uefi systems should use GUID layout
-    if [[ "${_UEFI_BOOT}" == "0" ]]; then
+    if [[ -z "${_UEFI_BOOT}" ]]; then
         ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
         ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
         #shellcheck disable=SC2034
