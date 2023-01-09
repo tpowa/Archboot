@@ -25,8 +25,10 @@ _S_MKFSAUTO=0    # auto fs part/formatting
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
 _EDITOR=""
+# programs
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c /dev/null"
+
 
 _set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then

@@ -190,7 +190,7 @@ _do_apple_efi_hfs_bless() {
 _do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
     _DISK="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
-    _UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY__NUMBER -o value "${_UEFISYSDEV}")"
+    _UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
     _BOOTMGR_DISK="${_DISK}"
     _BOOTMGR_PART_NUM="${_UEFISYS_PART_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
