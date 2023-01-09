@@ -927,7 +927,7 @@ _do_grub_uefi() {
     fi
 }
 
-install_bootloader_uefi() {
+_install_bootloader_uefi() {
     if [[ "${_EFI_MIXED}" == "1" ]]; then
         _EFISTUB_MENU_LABEL=""
         _EFISTUB_MENU_TEXT=""
@@ -950,7 +950,7 @@ install_bootloader_uefi() {
     fi
 }
 
-install_bootloader() {
+_install_bootloader() {
     _S_BOOTLOADER=""
     _destdir_mounts || return 1
     if [[ "${_NAME_SCHEME_PARAMETER_RUN}" == "" ]]; then
