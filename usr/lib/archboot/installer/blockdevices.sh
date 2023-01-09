@@ -983,10 +983,10 @@ _enter_luks_passphrase () {
 # opening luks
 _opening_luks() {
     _dialog --infobox "Opening encrypted ${_PART}..." 0 0
-    _LUKSOPEN_SUCCESS=0
-    while [[ "${_LUKSOPEN_SUCCESS}" == "0" ]]; do
+    _LUKSOPEN_SUCCESS=""
+    while [[ -z "${_LUKSOPEN_SUCCESS}" ]]; do
         cryptsetup luksOpen "${_PART}" "${_LUKSDEVICE}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
-        if [[ "${_LUKSOPEN_SUCCESS}" == "0" ]]; then
+        if [[ -z "${_LUKSOPEN_SUCCESS}" ]]; then
             _dialog --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi

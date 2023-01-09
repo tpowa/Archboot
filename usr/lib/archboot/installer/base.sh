@@ -76,7 +76,7 @@ _set_uefi_parameters() {
     _UEFI_SECURE_BOOT=""
     _GUIDPARAMETER=""
     [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT="1"
-    if [[ "${_UEFI_BOOT}" == "1" ]]; then
+    if [[ -n "${_UEFI_BOOT}" ]]; then
         _GUIDPARAMETER="1"
         _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
         _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
