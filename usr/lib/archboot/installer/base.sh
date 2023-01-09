@@ -51,8 +51,8 @@ _dialog() {
 _printk()
 {
     case ${1} in
-        "on")  echo 4 >/proc/sys/kernel/_printk ;;
-        "off") echo 0 >/proc/sys/kernel/_printk ;;
+        "on")  echo 4 >/proc/sys/kernel/printk ;;
+        "off") echo 0 >/proc/sys/kernel/printk ;;
     esac
 }
 
