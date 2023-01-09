@@ -2,24 +2,7 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.km"
 _TITLE="Arch Linux Console Font And Keymap Setting"
-LIST_MAPS="localectl list-keymaps --no-pager"
-
-abort()
-{
-    _dialog --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
-    [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
-    [[ -e /tmp/.font ]] && rm -f /tmp/.font
-    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
-    clear
-    exit 1
-}
-
-abort_dialog() {
-    if [[ "${_CANCEL}" = "1" ]]; then
-        _S_NEXTITEM="1"
-        return 1
-    fi
-}
+_LIST_MAPS="localectl list-keymaps --no-pager"
 
 # _dialog()
 # an el-cheapo dialog wrapper
@@ -31,7 +14,24 @@ _dialog() {
     return $?
 }
 
-do_vconsole() {
+_abort()
+{
+    _dialog --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
+    [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
+    [[ -e /tmp/.font ]] && rm -f /tmp/.font
+    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+    clear
+    exit 1
+}
+
+_abort_dialog() {
+    if [[ "${_CANCEL}" = "1" ]]; then
+        _S_NEXTITEM="1"
+        return 1
+    fi
+}
+
+_do_vconsole() {
     _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP} ..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
@@ -39,7 +39,7 @@ do_vconsole() {
     sleep 2
 }
 
-set_vconsole() {
+_set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
         _dialog --infobox "Detected big screen size, using 32 font size now ..." 3 60
         _FONT="latarcyrheb-sun32"
@@ -49,7 +49,7 @@ set_vconsole() {
         _CANCEL=
         #shellcheck disable=SC2086
         _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
-        abort_dialog || return 1
+        _abort_dialog || return 1
         #shellcheck disable=SC2086
         _FONT=$(cat ${_ANSWER})
     fi
@@ -57,17 +57,17 @@ set_vconsole() {
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     _KEYMAPS="us English de German es Spanish fr French pt Portuguese ru Russian OTHER More"
-    OTHER__KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
+    _OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Danish et Estonian fa Iran fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian  sk Slovak sr Serbian sv Swedish uk Ukrainian"
     _CANCEL=""
     #shellcheck disable=SC2086
     _dialog --menu "Select A Keymap Region:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     _KEYMAP=$(cat ${_ANSWER})
     if [[ "${_KEYMAP}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        _dialog --menu "Select A Keymap Region:" 18 30 12 ${OTHER__KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+        _dialog --menu "Select A Keymap Region:" 18 30 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
         _KEYMAP=$(cat ${_ANSWER})
     fi
-    abort_dialog || return 1
+    _abort_dialog || return 1
     _KEYMAPS=""
     for i in $(${LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
         _KEYMAPS="${_KEYMAPS} ${i} -"
@@ -75,7 +75,7 @@ set_vconsole() {
     _CANCEL=""
     #shellcheck disable=SC2086
     _dialog --menu "Select A Keymap Layout:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
-    abort_dialog || return 1
+    _abort_dialog || return 1
     #shellcheck disable=SC2086
     _KEYMAP=$(cat ${_ANSWER})
     echo "${_KEYMAP}" > /tmp/.keymap
@@ -96,15 +96,15 @@ mainmenu() {
     #shellcheck disable=SC2086
     case $(cat ${_ANSWER}) in
         "1")
-            set_vconsole || return 1
-            do_vconsole
+            _set_vconsole || return 1
+            _do_vconsole
             ;;
         "2")
             [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
             clear
             exit 0 ;;
         *)
-            abort ;;
+            _abort ;;
     esac
 }
 
@@ -119,21 +119,21 @@ fi
 : >/tmp/.km-running
 
 if [[ "${1}" = "--setup" ]]; then
-    if ! set_vconsole; then
+    if ! _set_vconsole; then
         [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
         clear
         exit 1
     fi
     [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
     clear
-    do_vconsole
+    _do_vconsole
     exit 0
 else
     EXIT="Exit"
 fi
 
 while true; do
-    mainmenu
+    _mainmenu
 done
 
 clear
