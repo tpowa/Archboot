@@ -28,9 +28,6 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c /dev/null"
 
-_set_title
-_set_uefi_parameters
-
 _set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
@@ -125,7 +122,7 @@ _set_vconsole() {
 }
 
 _select_source() {
-    NEXTITEM="2"
+    _NEXTITEM="2"
     _set_title
     if [[ -e "${_LOCAL_DB}" ]]; then
         _getsource || return 1
@@ -136,7 +133,7 @@ _select_source() {
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && dotesting
         _getsource || return 1
     fi
-    NEXTITEM="3"
+    _NEXTITEM="3"
 }
 
 _set_clock() {
