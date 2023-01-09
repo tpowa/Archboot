@@ -4,7 +4,7 @@
 
 _BASENAME="$(basename "${0}")"
 
-usage () {
+_usage () {
     echo "${_BASENAME}: usage"
     echo "Check on missing binaries in archboot environment"
     echo "-------------------------------------------------"
@@ -14,7 +14,7 @@ usage () {
     exit 0
 }
 
-[[ -z "${1}" ]] && usage
+[[ -z "${1}" ]] && _usage
 
 if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
     echo "This script should only be run in booted archboot environment. Aborting..."
@@ -24,12 +24,12 @@ fi
 # update pacman db first
 pacman -Sy
 if [[ "${1}" == "base" ]]; then
-    PACKAGE="$(pacman -Qi base | grep Depends | cut -d ":" -f2)"
+    _PACKAGE="$(pacman -Qi base | grep Depends | cut -d ":" -f2)"
 else
-    PACKAGE="${1}"
+    _PACKAGE="${1}"
 fi
-echo "${PACKAGE}" >binary.txt
+echo "${_PACKAGE}" >binary.txt
 #shellcheck disable=SC2086
-for i in $(pacman -Ql ${PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
+for i in $(pacman -Ql ${_PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
 	command -v "${i}" >/dev/null 2>&1 || echo "${i}" >>binary.txt
 done
