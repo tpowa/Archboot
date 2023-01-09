@@ -46,7 +46,7 @@ _prepare_pacman() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    ${PACMAN} -Sy
+    ${_PACMAN} -Sy
     _KEYRING="archlinux-keyring"
     [[ "$(uname -m)" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
@@ -61,7 +61,7 @@ _install_packages() {
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
     _auto_packages
     #shellcheck disable=SC2086
-    ${PACMAN} -S ${_PACKAGES}
+    ${_PACMAN} -S ${_PACKAGES}
 }
 
 # start script
