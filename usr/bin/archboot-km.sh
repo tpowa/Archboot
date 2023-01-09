@@ -69,7 +69,7 @@ _set_vconsole() {
     fi
     _abort_dialog || return 1
     _KEYMAPS=""
-    for i in $(${LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+    for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
         _KEYMAPS="${_KEYMAPS} ${i} -"
     done
     _CANCEL=""
@@ -82,7 +82,7 @@ _set_vconsole() {
     _S_NEXTITEM=2
 }
 
-mainmenu() {
+_mainmenu() {
     if [[ -n "${_S_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_S_NEXTITEM}"
     else
