@@ -26,5 +26,5 @@ _BACKUPDESTINATION="${2}"
 _BACKUPDIR="${1}"
 rsync -aAXv --numeric-ids \
 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} \
-"${_BACKUPDIR}" "{_$BACKUPDESTINATION}"
+"${_BACKUPDIR}" "${_BACKUPDESTINATION}"
 
