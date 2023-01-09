@@ -100,7 +100,7 @@ _auto_pacman()
 # enable it on installed system too!
 _auto_testing()
 {
-    if [[ "${DOTESTING}" == "yes" ]]; then
+    if [[ "${_DOTESTING}" == "yes" ]]; then
         _dialog --infobox "Enable [testing] repository on installed system ..." 3 70
         sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
         sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
