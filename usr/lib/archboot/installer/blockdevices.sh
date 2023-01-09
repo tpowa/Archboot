@@ -648,7 +648,7 @@ _createraid()
     _RAIDOPTIONS="--force --run --level=${_LEVEL}"
     ! [[ "${_RAID_DEVICES}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVICES}"
     ! [[ "${_SPARE_DEVICES}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVICES}"
-    ! [[ -z "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
+    [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
     _dialog --infobox "Creating ${_RAIDDEVICE}..." 0 0
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEVICE} ${_RAIDOPTIONS} ${_DEVICES} >"${_LOG}" 2>&1; then

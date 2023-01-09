@@ -179,7 +179,7 @@ _auto_vconsole() {
 
 _auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && -z "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)" ]]; then
+    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
         _dialog --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
         sed -i -e "/^$(basename "${_PART_ROOT}") /d" /tmp/.crypttab
