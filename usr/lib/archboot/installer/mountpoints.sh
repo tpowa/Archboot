@@ -388,7 +388,7 @@ _mkfs() {
         #shellcheck disable=SC2155
         local _PARTLABEL="$(_getpartlabel "${_DEVICE}")"
 
-        echo "# DEVICE DETAILS: ${_DEVICE} _PARTUUID=${_PARTUUID} _PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
+        echo "# DEVICE DETAILS: ${_DEVICE} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     else
         echo "# DEVICE DETAILS: ${_DEVICE} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     fi
@@ -404,13 +404,13 @@ _mkfs() {
         fi
     else
         if [[ "${_UEFI_BOOT}" == "1" ]]; then
-           if [[ "${_NAME_SCHEME_PARAMETER}" == "_PARTUUID" ]]; then
+           if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
-                   _DEVICE="_PARTUUID=${_PARTUUID}"
+                   _DEVICE="PARTUUID=${_PARTUUID}"
                fi
-           elif [[ "${_NAME_SCHEME_PARAMETER}" == "_PARTLABEL" ]]; then
+           elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
                if [[ -n "${_PARTLABEL}" ]]; then
-                   _DEVICE="_PARTLABEL=${_PARTLABEL}"
+                   _DEVICE="PARTLABEL=${_PARTLABEL}"
                fi
            fi
         fi
