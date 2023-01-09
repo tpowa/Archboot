@@ -244,7 +244,7 @@ _activate_dmraid()
 # activate lvm2 devices
 _activate_lvm2()
 {
-    _ACTIVATE_LVM2=""
+    _LVM2_READY=""
     if [[ -e /usr/bin/lvm ]]; then
         _OLD_LVM2_GROUPS=${_LVM2_GROUPS}
         _OLD_LVM2_VOLUMES=${_LVM2_VOLUMES}
@@ -254,7 +254,7 @@ _activate_lvm2()
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
-        [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _ACTIVATE_LVM2="no"
+        [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _LVM2_READY="1"
     fi
 }
 
@@ -262,10 +262,10 @@ _activate_lvm2()
 # activate md devices
 _activate_raid()
 {
-    _ACTIVATE_RAID=""
+    _RAID_READY=""
     if [[ -e /usr/bin/mdadm ]]; then
         _dialog --infobox "Activating RAID arrays..." 0 0
-        mdadm --assemble --scan >/dev/null 2>&1 || _ACTIVATE_RAID="no"
+        mdadm --assemble --scan >/dev/null 2>&1 || _RAID_READY="1"
     fi
 }
 
@@ -273,7 +273,7 @@ _activate_raid()
 # activate luks devices
 _activate_luks()
 {
-    _ACTIVATE_LUKS=""
+    _LUKS_READY=""
     if [[ -e /usr/bin/cryptsetup ]]; then
         _dialog --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
@@ -283,13 +283,13 @@ _activate_luks()
                     _RUN_LUKS=""
                     _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS=1
                     [[ "${_RUN_LUKS}" == 1 ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
-                    [[ "${_RUN_LUKS}" == "" ]] && _ACTIVATE_LUKS="no"
+                    [[ "${_RUN_LUKS}" == "" ]] && _LUKS_READY="1"
                 else
-                    _ACTIVATE_LUKS="no"
+                    _LUKS_READY="1"
                 fi
             done
         else
-            _ACTIVATE_LUKS="no"
+            _LUKS_READY="1"
         fi
     fi
 }
@@ -300,11 +300,11 @@ _activate_luks()
 # run it more times if needed, it can be hidden by each other!
 _activate_special_devices()
 {
-    _ACTIVATE_RAID=""
-    _ACTIVATE_LUKS=""
-    _ACTIVATE_LVM2=""
+    _RAID_READY=""
+    _LUKS_READY=""
+    _LVM2_READY=""
     _activate_dmraid
-    while ! [[ "${_ACTIVATE_LVM2}" == "no" && "${_ACTIVATE_RAID}" == "no"  && "${_ACTIVATE_LUKS}" == "no" ]]; do
+    while [[ -n"${_LVM2_READY}" && -n "${_RAID_READY}" && -n "${_LUKS_READY}" ]]; do
         _activate_raid
         _activate_lvm2
         _activate_luks

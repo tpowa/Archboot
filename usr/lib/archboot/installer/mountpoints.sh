@@ -92,8 +92,8 @@ _create_filesystem() {
     _FS_OPTIONS=""
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
-    _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS="yes"
-    if [[ "${_DOMKFS}" == "yes" ]]; then
+    _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
+    if [[ "${_DOMKFS}" == 1 ]]; then
         while [[ "${_LABEL_NAME}" == "" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_PART}")" 2>"${_ANSWER}" || return 1
@@ -110,7 +110,7 @@ _create_filesystem() {
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     fi
-    _FILESYSTEM_FINISH="yes"
+    _FILESYSTEM_FINISH=1
 }
 
 mountpoints() {
@@ -139,12 +139,12 @@ mountpoints() {
                 if [[ "${_ASK_MOUNTPOINTS}" == 1 ]]; then
                     _create_filesystem
                 else
-                    _FILESYSTEM_FINISH="yes"
+                    _FILESYSTEM_FINISH=1
                 fi
             else
-                _FILESYSTEM_FINISH="yes"
+                _FILESYSTEM_FINISH=1
             fi
-            [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_SWAP=DONE
+            [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_SWAP=DONE
         done
         _check_mkfs_values
         if [[ "${_PART}" != "NONE" ]]; then
@@ -168,7 +168,7 @@ mountpoints() {
             else
                 _btrfs_subvolume
             fi
-            [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_ROOT=DONE
+            [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_ROOT=DONE
         done
         _find_btrfs_raid_DEVICEs
         _btrfs_parts
@@ -198,9 +198,9 @@ mountpoints() {
                         _btrfs_subvolume
                     fi
                 else
-                    _FILESYSTEM_FINISH="yes"
+                    _FILESYSTEM_FINISH=1
                 fi
-                [[ "${_FILESYSTEM_FINISH}" == "yes" ]] && _DO_ADDITIONAL="DONE"
+                [[ "${_FILESYSTEM_FINISH}" == 1 ]] && _DO_ADDITIONAL="DONE"
             done
             if [[ "${_PART}" != "DONE" ]]; then
                 _find_btrfs_raid_DEVICEs
@@ -229,7 +229,7 @@ mountpoints() {
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
-        if [[ "${_DOMKFS}" == "yes" ]]; then
+        if [[ "${_DOMKFS}" == 1 ]]; then
             if [[ "${_FSTYPE}" == "swap" ]]; then
                 _dialog --infobox "Creating and activating \nswapspace on \n${_PART} ..." 0 0
             else
@@ -288,7 +288,7 @@ _mkfs() {
     # we have two main cases: "swap" and everything else.
     if [[ "${_FSTYPE}" == "swap" ]]; then
         swapoff "${_DEVICE}" >/dev/null 2>&1
-        if [[ "${_DOMK}" == "yes" ]]; then
+        if [[ "${_DOMK}" == 1 ]]; then
             mkswap -L "${_LABELNAME}" "${_DEVICE}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
@@ -313,7 +313,7 @@ _mkfs() {
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [[ "${_DOMK}" == "yes" ]]; then
+        if [[ "${_DOMK}" == 1 ]]; then
             local ret
             #shellcheck disable=SC2086
             case ${_FSTYPE} in
@@ -335,7 +335,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && "${_DOSUBVOLUME}" == "yes" ]]; then
+        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && "${_DOSUBVOLUME}" == 1 ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
@@ -365,7 +365,7 @@ _mkfs() {
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_FSTYPE}" == "btrfs" && "${_DOMK}" == "yes" ]] && btrfs balance start --full-balance "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
+        [[ "${_FSTYPE}" == "btrfs" && "${_DOMK}" == 1 ]] && btrfs balance start --full-balance "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${_MOUNTPOINT}" == "/tmp" ]]; then

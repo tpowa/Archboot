@@ -285,7 +285,7 @@ _autoprepare() {
     fi
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
-        _DOMKFS="yes"
+        _DOMKFS=1
         _PART="${_DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
@@ -303,7 +303,7 @@ _autoprepare() {
             _BTRFS_COMPRESS="compress=zstd"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS="no"
-            _DOSUBVOLUME="yes"
+            _DOSUBVOLUME=1
         else
             _BTRFS_COMPRESS="NONE"
             _BTRFS_SUBVOLUME="NONE"

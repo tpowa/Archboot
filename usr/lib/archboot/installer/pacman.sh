@@ -59,8 +59,8 @@ _select_mirror() {
 # enable testing repository on network install
 _dotesting() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
-        _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING="yes"
-        if [[ "${_DOTESTING}" == "yes" ]]; then
+        _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING=1
+        if [[ "${_DOTESTING}" == 1 ]]; then
             sed -i -e '/^#\[testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' /etc/pacman.conf

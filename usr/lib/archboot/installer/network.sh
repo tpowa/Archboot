@@ -44,7 +44,7 @@ _do_wireless() {
                 "secret" 2>"${_ANSWER}" || return 1
             _WLAN_SSID=$(cat "${_ANSWER}")
             _WLAN_CONNECT="connect-hidden"
-            _WLAN_HIDDEN="yes"
+            _WLAN_HIDDEN=1
         fi
         # replace # with spaces again
         #shellcheck disable=SC2001,SC2086
