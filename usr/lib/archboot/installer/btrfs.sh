@@ -31,7 +31,7 @@ _find_btrfs_raid_devices() {
 _find_btrfs_raid_bootloader_devices() {
     _btrfs_scan
     _BTRFS_COUNT=1
-    if [[ "$(${_LSBLK} _FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
+    if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
         _BTRFS_DEVICES=""
         for i in $(btrfs filesystem show "${_BOOTDEV}" | cut -d " " -f 11); do
             _BTRFS_DEVICES="${_BTRFS_DEVICES}#${i}"

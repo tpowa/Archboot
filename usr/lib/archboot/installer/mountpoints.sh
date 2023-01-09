@@ -91,6 +91,7 @@ _create_filesystem() {
     _FS_OPTIONS=""
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
+    _SKIP_FILESYSTEM=""
     _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ -n "${_DOMKFS}" ]]; then
         while [[ -z "${_LABEL_NAME}" ]]; do
@@ -108,6 +109,10 @@ _create_filesystem() {
         fi
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
+    else
+        if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            _SKIP_FILESYSTEM=1
+        fi
     fi
     _FILESYSTEM_FINISH=1
 }
