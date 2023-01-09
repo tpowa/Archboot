@@ -115,6 +115,9 @@ _donetwork() {
         #shellcheck disable=SC2181
         if [[ $? -eq 0 ]]; then
             _IP="dhcp"
+            _IPADDR=""
+            _GW=""
+            _DNS=""
         else
             _IP="static"
             _dialog --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
