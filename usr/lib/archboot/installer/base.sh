@@ -28,6 +28,7 @@ _EDITOR=""
 # programs
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c /dev/null"
+_DLPROG="wget -q"
 
 _set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then
