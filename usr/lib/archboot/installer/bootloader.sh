@@ -149,6 +149,7 @@ _abort_f2fs_bootpart() {
 
 _do_uefi_common() {
     _PACKAGES=""
+    _DISK=""
     [[ ! -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] && _PACKAGES="${_PACKAGES} dosfstools"
     [[ ! -f "${_DESTDIR}/usr/bin/efivar" ]] && _PACKAGES="${_PACKAGES} efivar"
     [[ ! -f "${_DESTDIR}/usr/bin/efibootmgr" ]] && _PACKAGES="${_PACKAGES} efibootmgr"
@@ -520,7 +521,6 @@ _do_grub_common_before() {
     _FAIL_COMPLEX=""
     _USE_DMRAID=""
     _RAID_ON_LVM=""
-    _DISK=""
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if ! dmraid -r | grep -q ^no; then

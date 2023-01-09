@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _detect_disk() {
-    if [[ "${_DISK}" == "" ]] || ! echo "${_DISK}" | grep -q '/dev/'; then
+    if [[ -z "${_DISK}" ]] || ! echo "${_DISK}" | grep -q '/dev/'; then
         _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot")")"
     fi
-    if [[ "${_DISK}" == "" ]]; then
+    if [[ -z "${_DISK}" ]]; then
         _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/")")"
     fi
 }
