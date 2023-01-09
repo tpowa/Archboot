@@ -50,7 +50,7 @@ _autoprepare() {
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         _dialog --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
-        _UEFISYS_BOOTPART="1"
+        _UEFISYS_BOOTPART=1
     fi
     while [[ "${_DEFAULTFS}" == "" ]]; do
         _FSOPTS=""
@@ -66,7 +66,7 @@ _autoprepare() {
         if [[ "${_GUIDPARAMETER}" == 1 ]]; then
             _GUID_PART_SIZE="2"
             _GPT_BIOS_GRUB_PART_SIZE="${_GUID_PART_SIZE}"
-            _PART_NUM="1"
+            _PART_NUM=1
             _GPT_BIOS_GRUB_PART_NUM="${_PART_NUM}"
             _DISK_SIZE="$((_DISK_SIZE-_GUID_PART_SIZE))"
         fi
@@ -133,7 +133,7 @@ _autoprepare() {
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOT_PART_SET=1
-                        _PART_NUM="1"
+                        _PART_NUM=1
                         _BOOT_PART_NUM="${_PART_NUM}"
                         _DISK_SIZE="$((_DISK_SIZE-_BOOT_PART_SIZE))"
                     fi

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getsource() {
-    _S_SRC=0
+    _S_SRC=""
     _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
@@ -97,7 +97,7 @@ _update_environment() {
                     _dialog --infobox "No new kernel online available. Continuing in 3 seconds ..." 3 70
                     sleep 3
                 else
-                    _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT="1"
+                    _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT=1
                     if [[ "${_UPDATE_ENVIRONMENT}" == 1 ]]; then
                         _dialog --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
                         update-installer -latest-install > "${_LOG}" 2>&1

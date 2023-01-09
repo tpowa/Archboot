@@ -61,9 +61,9 @@ _do_wireless() {
             _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE} ..." 3 70
             _printk off
             if [[ -z "${_WLAN_KEY}" ]]; then
-                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH="1"
+                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH=1
             else
-                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH="1"
+                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > /dev/null 2>&1 && _WLAN_AUTH=1
             fi
             if [[ -n "${_WLAN_AUTH}" ]]; then
                 _dialog --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
@@ -140,7 +140,7 @@ _donetwork() {
         _dialog --yesno "Are these settings correct?\n\nInterface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0
         case $? in
             1) ;;
-            0) _NETPARAMETERS="1" ;;
+            0) _NETPARAMETERS=1 ;;
         esac
     done
     # write systemd-networkd profile

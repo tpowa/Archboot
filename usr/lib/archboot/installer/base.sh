@@ -75,17 +75,17 @@ _set_uefi_parameters() {
     _UEFI_BOOT=""
     _UEFI_SECURE_BOOT=""
     _GUIDPARAMETER=""
-    [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT="1"
+    [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT=1
     if [[ -n "${_UEFI_BOOT}" ]]; then
-        _GUIDPARAMETER="1"
+        _GUIDPARAMETER=1
         _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
         _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
         if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
-            _UEFI_SECURE_BOOT="1"
+            _UEFI_SECURE_BOOT=1
         fi
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
-                _EFI_MIXED="1"
+                _EFI_MIXED=1
                 _UEFI_ARCH="IA32"
                 _SPEC_UEFI_ARCH="ia32"
             else
@@ -109,15 +109,15 @@ _set_guid() {
         ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 , https://bbs.archlinux.org/viewtopic.php?id=133330 , https://bbs.archlinux.org/viewtopic.php?id=138958
         ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733, https://bugzilla.redhat.com/show_bug.cgi?id=749325 , http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
         #shellcheck disable=SC2034
-        _dialog --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && _GUIDPARAMETER="1"
+        _dialog --yesno "You are running in BIOS/MBR mode.\n\nDo you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical storage disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard, it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows 10 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n   bootloader used). " 0 0 && _GUIDPARAMETER=1
     fi
 }
 
 _set_vconsole() {
     if [[ -e /usr/bin/km ]]; then
-        km --setup && _NEXTITEM="1"
+        km --setup && _NEXTITEM=1
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
-        archboot-km.sh --setup && _NEXTITEM="1"
+        archboot-km.sh --setup && _NEXTITEM=1
     else
         _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
     fi
@@ -166,7 +166,7 @@ _prepare_storagedrive() {
             "2" "Partition Storage Drives" \
             "3" "Manage Software Raid, Lvm2 and Luks encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "5" "Return to Main Menu" 2>${_ANSWER} || _CANCEL="1"
+            "5" "Return to Main Menu" 2>${_ANSWER} || _CANCEL=1
         _NEXTITEM="$(cat ${_ANSWER})"
         [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
         case $(cat ${_ANSWER}) in
@@ -180,7 +180,7 @@ _prepare_storagedrive() {
                 _create_special ;;
             "4")
                 _PARTFINISH=""
-                _ASK_MOUNTPOINTS="1"
+                _ASK_MOUNTPOINTS=1
                 _mountpoints ;;
             *)
                 _DONE=1 ;;

@@ -249,7 +249,7 @@ _do_mok_sign () {
     _UEFI_BOOTLOADER_DIR="${_UEFISYS_MP}/EFI/BOOT"
     _INSTALL_MOK=""
     _MOK_PW=""
-    _dialog --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && _INSTALL_MOK="1"
+    _dialog --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && _INSTALL_MOK=1
     if [[ -n "${_INSTALL_MOK}" ]]; then
         while [[ -z "${_MOK_PW}" ]]; do
             _dialog --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${_ANSWER}" || return 1
@@ -271,7 +271,7 @@ _do_mok_sign () {
         sleep 5
     fi
     _SIGN_MOK=""
-    _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK="1"
+    _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK=1
     if [[ -n "${_SIGN_MOK}" ]]; then
         if [[ "${_DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" > "${_LOG}" 2>&1
@@ -287,7 +287,7 @@ _do_mok_sign () {
 
 _do_pacman_sign() {
     _SIGN_KERNEL=""
-    _dialog --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && _SIGN_KERNEL="1"
+    _dialog --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && _SIGN_KERNEL=1
     if [[ -n "${_SIGN_KERNEL}" ]]; then
         [[ ! -d "${_DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks/
         _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
@@ -457,7 +457,7 @@ GUMEOF
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _dialog --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
-        _S_BOOTLOADER="1"
+        _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT ..." 0 0
     fi
@@ -507,7 +507,7 @@ CONFEOF
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _dialog --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds ..." 4 50
         sleep 5
-        _S_BOOTLOADER="1"
+        _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error setting up rEFInd." 3 40
     fi
@@ -524,7 +524,7 @@ _do_grub_common_before() {
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if ! dmraid -r | grep -q ^no; then
-        _dialog --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && _USE_DMRAID="1"
+        _dialog --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && _USE_DMRAID=1
     fi
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _dialog --infobox "Installing grub ..." 0 0
@@ -600,7 +600,7 @@ insmod search_fs_uuid
 insmod search_label
 insmod linux
 insmod chain
-set pager="1"
+set pager=1
 # set debug="all"
 set locale_dir="\${prefix}/locale"
 EOF
@@ -758,7 +758,7 @@ label linux
 EOF
     _dialog --infobox "UBOOT has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
     sleep 5
-    _S_BOOTLOADER="1"
+    _S_BOOTLOADER=1
 }
 
 _do_grub_bios() {
@@ -771,7 +771,7 @@ _do_grub_bios() {
         _FAIL_COMPLEX=""
         if cryptsetup status "${_BOOTDEV}"; then
             # encryption devices are not supported
-            _FAIL_COMPLEX="1"
+            _FAIL_COMPLEX=1
         fi
     fi
     if [[ -z "${_FAIL_COMPLEX}" ]]; then
@@ -785,7 +785,7 @@ _do_grub_bios() {
                     if echo /dev/mapper/"${_DETECTEDVOLUMEGROUP}"-* | grep "${_BOOTDEV}"; then
                         # change _BOOTDEV to md device!
                         _BOOTDEV=$(pvs -o pv_name --noheading "${devpath}")
-                        _RAID_ON_LVM="1"
+                        _RAID_ON_LVM=1
                         break
                     fi
                 fi
@@ -794,7 +794,7 @@ _do_grub_bios() {
         #check if raid is used
         _USE_RAID=""
         if echo "${_BOOTDEV}" | grep -q /dev/md; then
-            _USE_RAID="1"
+            _USE_RAID=1
         fi
     fi
     # A switch is needed if complex ${_BOOTDEV} is used!
@@ -809,7 +809,7 @@ _do_grub_bios() {
     _dialog --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${_DEVS} 2>"${_ANSWER}" || return 1
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
-        _CHECK_BIOS_BOOT_GRUB="1"
+        _CHECK_BIOS_BOOT_GRUB=1
         _CHECK_UEFISYS_PART=""
         _RUN_CFDISK=""
         _DISK="${_BOOTDEV}"
@@ -842,7 +842,7 @@ _do_grub_bios() {
         _do_grub_config
         _dialog --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 5 seconds ..." 5 55
         sleep 5
-        _S_BOOTLOADER="1"
+        _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${_DESTDIR} before chrooting." 0 0
         return 1
@@ -878,7 +878,7 @@ _do_grub_uefi() {
         _GRUB_PREFIX_DIR="/boot/grub/"
     fi
     _chroot_umount
-    _GRUB_UEFI="1"
+    _GRUB_UEFI=1
     _do_grub_config
     _GRUB_UEFI=""
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
@@ -911,7 +911,7 @@ _do_grub_uefi() {
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds ..." 5 60
         sleep 5
-        _S_BOOTLOADER="1"
+        _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _do_secureboot_keys || return 1
         _do_mok_sign
@@ -922,7 +922,7 @@ _do_grub_uefi() {
         _do_uefi_bootmgr_setup
         _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds ..." 6 50
         sleep 5
-        _S_BOOTLOADER="1"
+        _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${_DESTDIR} before chrooting." 0 0
         return 1

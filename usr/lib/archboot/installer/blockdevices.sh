@@ -281,7 +281,7 @@ _activate_luks()
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
-                    _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS="1"
+                    _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS=1
                     [[ "${_RUN_LUKS}" == 1 ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
                     [[ "${_RUN_LUKS}" == "" ]] && _ACTIVATE_LUKS="no"
                 else
@@ -326,7 +326,7 @@ _set_device_name_scheme() {
     #shellcheck disable=SC2086
     _dialog --menu "Select the device name scheme you want to use in config files. ${_MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
     _NAME_SCHEME_PARAMETER=$(cat "${_ANSWER}")
-    _NAME_SCHEME_PARAMETER_RUN="1"
+    _NAME_SCHEME_PARAMETER_RUN=1
 }
 
 # Get a list of available disks for use in the "Available disks" dialogs.
@@ -370,7 +370,7 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD="1"
+        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD=1
         if [[ "${_DISABLEMD}" == 1 ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
@@ -391,7 +391,7 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB="1"
+        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB=1
         if [[ "${_DISABLEMDSB}" == 1 ]]; then
             _umountall
             _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
@@ -417,7 +417,7 @@ _stoplvm()
     ! [[ "${_LV_GROUPS}" == "" ]] && _DETECTED_LVM=1
     ! [[ "${_LV_PHYSICAL}" == "" ]] && _DETECTED_LVM=1
     if [[ "${_DETECTED_LVM}" == 1 ]]; then
-        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM="1"
+        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM=1
     fi
     if [[ "${_DISABLELVM}" == 1 ]]; then
         _umountall
@@ -446,7 +446,7 @@ _stopluks()
     _LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ "${_LUKSDEVICE}" == "" ]] || _DETECTED_LUKS=1
     if [[ "${_DETECTED_LUKS}" == 1 ]]; then
-        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
+        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS=1
     fi
     if [[ "${_DISABLELUKS}" == 1 ]]; then
         _umountall
@@ -463,7 +463,7 @@ _stopluks()
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
     if [[ "${_DETECTED_LUKS}" == 1 ]]; then
-        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS="1"
+        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS=1
     fi
     if [[ "${_DISABLELUKS}" == 1 ]]; then
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
@@ -482,7 +482,7 @@ _dmraid_update()
     _dialog --infobox "Deactivating dmraid devices ..." 0 0
     dmraid -an >/dev/null 2>&1
     if [[ "${_DETECTED_LVM}" == 1 || "${_DETECTED_LUKS}" == 1 ]]; then
-        _dialog --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM="1"
+        _dialog --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM=1
         if [[ "${_RESETDM}" == 1 ]]; then
             _dialog --infobox "Resetting devicemapper devices ..." 0 0
             dmsetup remove_all >/dev/null 2>&1
@@ -613,7 +613,7 @@ _raid()
             _dialog --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_PARTS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
             _PART=$(cat "${_ANSWER}")
             _SPARE=""
-            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_PART} as spare device?" 0 0 && _SPARE="1"
+            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_PART} as spare device?" 0 0 && _SPARE=1
             [[ "${_PART}" == "DONE" ]] && break
             if [[ "${_PART}" == "MISSING" ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEVICE}?" 0 0 && _DEGRADED="missing"
@@ -666,7 +666,7 @@ _createraid()
             cfdisk "${_RAIDDEVICE}"
         else
             _DISK="${_RAIDDEVICE}"
-            _RUN_CFDISK="1"
+            _RUN_CFDISK=1
             _CHECK_BIOS_BOOT_GRUB=""
             _CHECK_UEFISYS_PART=""
             _check_gpt
@@ -898,7 +898,7 @@ _createlv()
             _dialog --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${_LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
-                    _dialog --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL="1"
+                    _dialog --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL=1
                     if ! [[ "${_LV_ALL}" == 1 ]]; then
                          _LV_SIZE=0
                     fi
@@ -915,7 +915,7 @@ _createlv()
         done
         #Contiguous doesn't work with +100%FREE
         _LV_CONTIGUOUS=""
-        [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS="1"
+        [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS=1
         if [[ "${_LV_CONTIGUOUS}" == 1 ]]; then
             _CONTIGUOUS=yes
             _LV_EXTRA="-C y"
