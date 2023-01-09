@@ -1,4 +1,5 @@
 #!/bin/bash
+# created by Tobias Powalowski <tpowa@archlinux.org>
 # don't run ttyS0 as first device
 _vconsole() {
     if ! [[ -e "/.vconsole-run" ]]; then
