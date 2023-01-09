@@ -89,13 +89,13 @@ _set_uefi_parameters() {
                 _UEFI_ARCH="IA32"
                 _SPEC_UEFI_ARCH="ia32"
             else
-                _EFI_MIXED="0"
+                _EFI_MIXED=""
                 _UEFI_ARCH="X64"
                 _SPEC_UEFI_ARCH="x64"
             fi
         fi
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _EFI_MIXED="0"
+            _EFI_MIXED=""
             _UEFI_ARCH="AA64"
             _SPEC_UEFI_ARCH="aa64"
         fi
