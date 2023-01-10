@@ -172,31 +172,20 @@ _prepare_btrfs() {
 
 # prepare btrfs subvolume
 _prepare_btrfs_subvolume() {
-    #_BTRFS_SUBVOLUME="NONE"
-    #if [[ -z "${_SKIP_ASK_SUBVOLUME}" ]]; then
-    #    _dialog --defaultno --yesno "Would you like to create a new subvolume on ${_PART}?" 0 0 && _DOSUBVOLUME=1
-    #else
-    #    _DOSUBVOLUME=1
-    #fi
-
-    #if [[ -n "${_DOSUBVOLUME}" ]]; then
-        _BTRFS_SUBVOLUME="NONE"
-        while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
-            _DOSUBVOLUME=""
-            _dialog --inputbox "Enter the SUBVOLUME name on ${_PART}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
-            _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
-            _check_btrfs_subvolume
-            _DOSUBVOLUME=1
-        done
-    #else
-    #    _BTRFS_SUBVOLUME="NONE"
-    #fi
+    _BTRFS_SUBVOLUME="NONE"
+    while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
+        _DOSUBVOLUME=""
+        _dialog --inputbox "Enter the SUBVOLUME name on ${_PART}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
+        _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
+        _check_btrfs_subvolume
+        _DOSUBVOLUME=1
+    done
 }
 
 # check btrfs subvolume
 _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
-    if [[ -z "$(cat ${_ANSWER})" ]]; then
+    if [[ -z "$(cat "${_ANSWER}")" ]]; then
         _dialog --msgbox "ERROR: You have defined an empty name!\nPlease enter another name." 6 50
         _BTRFS_SUBVOLUME="NONE"
     fi
@@ -259,14 +248,8 @@ _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
     if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" ]]; then
         if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
-            # create subvolume if requested
-            # choose btrfs subvolume if present
             _prepare_btrfs_subvolume || return 1
-            #if [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; then
-            #    _choose_btrfs_subvolume || return 1
-            #fi
         else
-            # use device if no subvolume is present
             _choose_btrfs_subvolume || return 1
         fi
         _btrfs_compress
@@ -279,7 +262,7 @@ _btrfs_compress() {
     _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
     #shellcheck disable=SC2086
     _dialog --menu "Select the compression method you want to use:\nDevice -> ${_PART} subvolume=${_BTRFS_SUBVOLUME}" 12 50 10 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
-    if [[ "$(cat ${_ANSWER})" == "NONE" ]]; then
+    if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
         _BTRFS_COMPRESS="NONE"
     else
         _BTRFS_COMPRESS="compress=$(cat "${_ANSWER}")"
