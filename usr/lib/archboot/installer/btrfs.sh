@@ -207,12 +207,12 @@ _check_btrfs_subvolume(){
         _umount_btrfs
     else
         if [[ -z "$(cat ${_ANSWER})" ]]; then
-            _dialog --msgbox "ERROR: You have defined an empty name! Please enter another name." 8 65
+            _dialog --msgbox "ERROR:\nYou have defined an empty name!\nPlease enter another name." 8 50
             _BTRFS_SUBVOLUME="NONE"
         fi
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
-            _dialog --msgbox "ERROR: You have defined 2 identical SUBVOLUME names or an empty name! Please enter another name." 8 65
+            _dialog --msgbox "ERROR:\You have defined 2 identical SUBVOLUME name!\nPlease enter another name." 8 50
             _BTRFS_SUBVOLUME="NONE"
         fi
     fi
