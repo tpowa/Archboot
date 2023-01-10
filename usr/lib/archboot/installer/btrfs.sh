@@ -172,23 +172,24 @@ _prepare_btrfs() {
 
 # prepare btrfs subvolume
 _prepare_btrfs_subvolume() {
-    _DOSUBVOLUME=""
-    _BTRFS_SUBVOLUME="NONE"
-    if [[ -z "${_SKIP_ASK_SUBVOLUME}" ]]; then
-        _dialog --defaultno --yesno "Would you like to create a new subvolume on ${_PART}?" 0 0 && _DOSUBVOLUME=1
-    else
-        _DOSUBVOLUME=1
-    fi
-    if [[ -n "${_DOSUBVOLUME}" ]]; then
+    #_DOSUBVOLUME=""
+    #_BTRFS_SUBVOLUME="NONE"
+    #if [[ -z "${_SKIP_ASK_SUBVOLUME}" ]]; then
+    #    _dialog --defaultno --yesno "Would you like to create a new subvolume on ${_PART}?" 0 0 && _DOSUBVOLUME=1
+    #else
+    #    _DOSUBVOLUME=1
+    #fi
+
+    #if [[ -n "${_DOSUBVOLUME}" ]]; then
         _BTRFS_SUBVOLUME="NONE"
         while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
             _dialog --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>"${_ANSWER}" || return 1
             _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
             _check_btrfs_subvolume
         done
-    else
-        _BTRFS_SUBVOLUME="NONE"
-    fi
+    #else
+    #    _BTRFS_SUBVOLUME="NONE"
+    #fi
 }
 
 # check btrfs subvolume
