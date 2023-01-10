@@ -269,7 +269,7 @@ _btrfs_subvolume() {
 _btrfs_compress() {
     _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
     #shellcheck disable=SC2086
-    _dialog --menu "Select the compression method you want to use:\n-> ${_PART} subvolume=${_BTRFS_SUBVOLUME}" 10 50 8 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select the compression method you want to use:\n-> ${_PART} subvolume=${_BTRFS_SUBVOLUME}" 12 50 10 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
     if [[ "$(cat ${_ANSWER})" == "NONE" ]]; then
         _BTRFS_COMPRESS="NONE"
     else
