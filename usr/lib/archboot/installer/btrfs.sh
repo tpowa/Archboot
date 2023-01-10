@@ -112,7 +112,6 @@ _btrfs_raid_level() {
     _BTRFS_LEVEL=""
     _BTRFS_DEVICE="${_PART}"
     : >/tmp/.btrfs-devices
-    _dialog --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!\n\nIf you don't need this feature select NONE." 0 0
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
         _dialog --menu "Select the raid data level you want to use:" 14 50 10 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
@@ -121,6 +120,9 @@ _btrfs_raid_level() {
             echo "${_BTRFS_DEVICE}" >>/tmp/.btrfs-devices
             break
         else
+            if [[ "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
+                _dialog --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
+            fi
             # take selected device as 1st device, add additional devices in part below.
             _select_btrfs_raid_devices
         fi
