@@ -169,10 +169,12 @@ _mountpoints() {
             # clear values first!
             _clear_fs_values
             _check_btrfs_filesystem_creation
+            # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+            # _SKIP_FILESYSTEM for btrfs
             if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                 _select_filesystem && _create_filesystem && _btrfs_subvolume
             else
-                if [[ "$(${_LSBLK} FSTYPE ${_PART_ROOT})" == "btrfs" ]]; then
+                if [[ "${_FSTYPE}" == "btrfs" ]]; then
                     _FSTYPE="btrfs"
                     _SKIP_FILESYSTEM=1
                     _btrfs_subvolume
@@ -200,18 +202,19 @@ _mountpoints() {
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
-                    # Select a filesystem type
+                    # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                    # _SKIP_FILESYSTEM for btrfs
                     if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                         _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
                     else
                         _enter_mountpoint
-                        if [[ "$(${_LSBLK} FSTYPE ${_PART})" == "btrfs" ]]; then
+                        if [[ "${_FSTYPE}" == "btrfs" ]]; then
                             _FSTYPE="btrfs"
                             _SKIP_FILESYSTEM=1
                             _btrfs_subvolume
                         fi
                     fi
-                     _find_btrfs_raid_devices
+                    _find_btrfs_raid_devices
                     _btrfs_parts
                     _check_mkfs_values
                     echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
