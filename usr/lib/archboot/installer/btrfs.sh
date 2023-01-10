@@ -79,7 +79,6 @@ _check_btrfs_filesystem_creation() {
     _SKIP_FILESYSTEM=""
     _SKIP_ASK_SUBVOLUME=""
     #shellcheck disable=SC2013
-
     for i in $(grep "${_PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             _FSTYPE="btrfs"
@@ -247,13 +246,11 @@ _choose_btrfs_subvolume () {
 _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
     if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" ]]; then
-        if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
-            _prepare_btrfs_subvolume || return 1
-        else
-            _choose_btrfs_subvolume || return 1
-        fi
-        _btrfs_compress
+        _choose_btrfs_subvolume || return 1
+    else
+        _prepare_btrfs_subvolume || return 1
     fi
+    _btrfs_compress
     _FILESYSTEM_FINISH=1
 }
 
