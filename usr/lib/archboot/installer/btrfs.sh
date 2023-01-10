@@ -197,10 +197,10 @@ _prepare_btrfs_subvolume() {
 _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
     if [[ -z "$(cat ${_ANSWER})" ]]; then
-        _dialog --msgbox "ERROR:\nYou have defined an empty name!\nPlease enter another name." 8 50
+        _dialog --msgbox "ERROR: You have defined an empty name!\nPlease enter another name." 6 40
         _BTRFS_SUBVOLUME="NONE"
     fi
-    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" ]]; then
+    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_ASK_MOUNTPOINTS}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 7); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
@@ -210,6 +210,7 @@ _check_btrfs_subvolume(){
         done
         _umount_btrfs
     else
+        # existing subvolumes
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
             _dialog --msgbox "ERROR:\You have defined 2 identical SUBVOLUME name!\nPlease enter another name." 8 50
