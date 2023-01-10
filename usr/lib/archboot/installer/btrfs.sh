@@ -183,7 +183,7 @@ _prepare_btrfs_subvolume() {
     #if [[ -n "${_DOSUBVOLUME}" ]]; then
         _BTRFS_SUBVOLUME="NONE"
         while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
-            _dialog --inputbox "Enter the SUBVOLUME name for the device, keep it short\nand use no spaces or special\ncharacters." 10 65 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the SUBVOLUME name on ${_PART}, keep it short\nand use no spaces or specia ncharacters." 10 70 2>"${_ANSWER}" || return 1
             _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
             _check_btrfs_subvolume
         done
