@@ -79,6 +79,7 @@ _check_btrfs_filesystem_creation() {
     _SKIP_FILESYSTEM=""
     _SKIP_ASK_SUBVOLUME=""
     #shellcheck disable=SC2013
+
     for i in $(grep "${_PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             _FSTYPE="btrfs"
@@ -266,16 +267,12 @@ _btrfs_subvolume() {
 
 # ask for btrfs compress option
 _btrfs_compress() {
-    _BTRFS_COMPRESS="NONE"
-    _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib -"
-    if [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; then
-        _dialog --yesno "Would you like to compress the data on ${_PART}?" 0 0 && _BTRFS_COMPRESS="compress"
+    _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
+    #shellcheck disable=SC2086
+    _dialog --menu "Select the compression method you want to use:\n-> ${_PART} subvolume=${_BTRFS_SUBVOLUME}" 10 50 8 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    if [[ "$(cat ${_ANSWER})" == "NONE" ]]; then
+        _BTRFS_COMPRESS="NONE"
     else
-        _dialog --yesno "Would you like to compress the data on ${_PART} subvolume=${_BTRFS_SUBVOLUME}?" 0 0 && _BTRFS_COMPRESS="compress"
-    fi
-    if [[ "${_BTRFS_COMPRESS}" == "compress" ]]; then
-        #shellcheck disable=SC2086
-        _dialog --menu "Select the compression method you want to use:" 10 50 8 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
         _BTRFS_COMPRESS="compress=$(cat "${_ANSWER}")"
     fi
 }
