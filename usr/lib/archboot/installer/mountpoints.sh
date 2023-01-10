@@ -130,9 +130,9 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
-        _dialog --infobox "Scanning devices ..." 3 40
+        _dialog --infobox "Scanning blockdevices for sizes ..." 3 40
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-        _dialog --infobox "Scanning devices ..." 3 40
+        _dialog --infobox "Scanning blockdevices for selection ..." 3 40
         _PARTS=$(_findpartitions _)
         _DO_SWAP=""
         while [[ "${_DO_SWAP}" != "DONE" ]]; do
