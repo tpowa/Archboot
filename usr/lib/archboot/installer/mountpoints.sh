@@ -130,9 +130,9 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
-        _dialog --infobox "Scanning blockdevices for sizes ..." 3 40
+        _dialog --infobox "Scanning blockdevices for sizes ..." 3 60
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
-        _dialog --infobox "Scanning blockdevices for selection ..." 3 40
+        _dialog --infobox "Scanning blockdevices for selection ..." 3 60
         _PARTS=$(_findpartitions _)
         _DO_SWAP=""
         while [[ "${_DO_SWAP}" != "DONE" ]]; do
@@ -250,15 +250,14 @@ _mountpoints() {
             else
                 _dialog --infobox "Creating ${_FSTYPE} on ${_PART},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
             fi
-            _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
             if [[ "${_FSTYPE}" == "swap" ]]; then
                 _dialog --infobox "Activating swapspace \non ${_PART} ..." 0 0
             else
                 _dialog --infobox "Mounting ${_FSTYPE} \non ${_PART} \nto ${_DESTDIR}${_MP} ..." 0 0
             fi
-            _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         fi
+        _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done < /tmp/.parts
     _printk on
