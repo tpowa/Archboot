@@ -172,7 +172,7 @@ _mountpoints() {
             # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
             # _SKIP_FILESYSTEM for btrfs
             if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                _select_filesystem && _create_filesystem && _btrfs_subvolume
+                _select_filesystem && _create_filesystem
             else
                 if [[ "${_FSTYPE}" == "btrfs" ]]; then
                     _FSTYPE="btrfs"
@@ -205,11 +205,10 @@ _mountpoints() {
                     # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                     # _SKIP_FILESYSTEM for btrfs
                     if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                        _enter_mountpoint && _select_filesystem && _create_filesystem && _btrfs_subvolume
+                        _enter_mountpoint && _select_filesystem && _create_filesystem
                     else
                         _enter_mountpoint
                         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                            _FSTYPE="btrfs"
                             _SKIP_FILESYSTEM=1
                             _btrfs_subvolume
                         fi
