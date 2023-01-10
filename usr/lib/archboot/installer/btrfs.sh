@@ -195,6 +195,7 @@ _prepare_btrfs_subvolume() {
 
 # check btrfs subvolume
 _check_btrfs_subvolume(){
+    _DETECT_CREATE_FILESYSTEM=""
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
     if [[ -z "$(cat ${_ANSWER})" ]]; then
         _dialog --msgbox "ERROR: You have defined an empty name!\nPlease enter another name." 6 50
