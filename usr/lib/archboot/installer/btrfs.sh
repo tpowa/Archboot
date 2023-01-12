@@ -243,7 +243,6 @@ _choose_btrfs_subvolume () {
 
 # btrfs subvolume menu
 _btrfs_subvolume() {
-    _FILESYSTEM_FINISH=""
     if [[ "${_FSTYPE}" == "btrfs" && -z "${_ASK_MOUNTPOINTS}" ]]; then
         _choose_btrfs_subvolume || return 1
     else
@@ -253,7 +252,6 @@ _btrfs_subvolume() {
             _prepare_btrfs_subvolume || return 1
         fi
     fi
-    _FILESYSTEM_FINISH=1
 }
 
 # ask for btrfs compress option

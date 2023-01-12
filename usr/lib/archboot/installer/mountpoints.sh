@@ -44,7 +44,6 @@ _ssd_optimization() {
 }
 
 _select_filesystem() {
-    _FILESYSTEM_FINISH=""
     # don't allow vfat as / filesystem, it will not work!
     _FSOPTS=""
     command -v mkfs.btrfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} btrfs Btrfs"
@@ -62,16 +61,19 @@ _select_filesystem() {
 }
 
 _enter_mountpoint() {
-    _FILESYSTEM_FINISH=""
-    _MP=""
-    while [[ -z "${_MP}" ]]; do
-        _dialog --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
-        _MP=$(cat "${_ANSWER}")
-        if grep ":${_MP}:" /tmp/.parts; then
-            _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
-            _MP=""
-        fi
-    done
+    if [[ -n "${_DO_ROOT}" ]]; then
+        MP="/"
+    else
+        _MP=""
+        while [[ -z "${_MP}" ]]; do
+            _dialog --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
+            _MP=$(cat "${_ANSWER}")
+            if grep ":${_MP}:" /tmp/.parts; then
+                _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
+                _MP=""
+            fi
+        done
+    fi
 }
 
 # set sane values for paramaters, if not already set
@@ -86,7 +88,6 @@ _check_mkfs_values() {
 }
 
 _create_filesystem() {
-    _FILESYSTEM_FINISH=""
     _LABEL_NAME=""
     _FS_OPTIONS=""
     _BTRFS_DEVICES=""
@@ -114,7 +115,6 @@ _create_filesystem() {
             _btrfs_subvolume || return 1
         fi
     fi
-    _FILESYSTEM_FINISH=1
 }
 
 _mountpoints() {
@@ -134,94 +134,58 @@ _mountpoints() {
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         _dialog --infobox "Scanning blockdevices for selection ..." 3 60
         _PARTS=$(_findpartitions _)
-        _DO_SWAP=""
-        while [[ "${_DO_SWAP}" != "DONE" ]]; do
-            _FSTYPE="swap"
-            #shellcheck disable=SC2086
-            _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
-            _PART=$(cat "${_ANSWER}")
-            if [[ "${_PART}" != "NONE" ]]; then
-                _clear_fs_values
-                if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
-                    _create_filesystem || return 1
-                else
-                    _FILESYSTEM_FINISH=1
-                fi
-            else
-                _FILESYSTEM_FINISH=1
+        _FSTYPE="swap"
+        #shellcheck disable=SC2086
+        _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
+        _PART=$(cat "${_ANSWER}")
+        if [[ "${_PART}" != "NONE" ]]; then
+            _clear_fs_values
+            if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
+                _create_filesystem || return 1
             fi
-            [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_SWAP=DONE
-        done
+        fi
         _check_mkfs_values
         if [[ "${_PART}" != "NONE" ]]; then
             #shellcheck disable=SC2001,SC2086
             _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
             echo "${_PART}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         fi
-        _DO_ROOT=""
-        while [[ "${_DO_ROOT}" != "DONE" ]]; do
-            #shellcheck disable=SC2086
-            _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
-            _PART=$(cat "${_ANSWER}")
-            _PART_ROOT=${_PART}
-            # Select root filesystem type
-            _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
-            # clear values first!
-            _clear_fs_values
-            _check_btrfs_filesystem_creation
-            # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-            # _SKIP_FILESYSTEM for btrfs
-            if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                _select_filesystem && _create_filesystem || return 1
-            else
-                if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                    _FSTYPE="btrfs"
-                    _btrfs_subvolume || return 1
-                fi
-            fi
-            [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
-        done
-        _find_btrfs_raid_devices
-        _btrfs_parts
-        _check_mkfs_values
-        echo "${_PART}:${_FSTYPE}:/:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-        #shellcheck disable=SC2001,SC2086
-        ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
         #
-        # Additional partitions
+        # mountpoints setting
         #
+         _DO_ROOT="1"
         while [[ "${_PART}" != "DONE" ]]; do
-            _DO_ADDITIONAL=""
-            while [[ "${_DO_ADDITIONAL}" != "DONE" ]]; do
-                #shellcheck disable=SC2086
+            #shellcheck disable=SC2086
+            if [[ -n ${_DO_ROOT} ]]; then
+                _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
+            else
                 _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
-                _PART=$(cat "${_ANSWER}")
-                if [[ "${_PART}" != "DONE" ]]; then
-                    _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
-                    # clear values first!
-                    _clear_fs_values
-                    _check_btrfs_filesystem_creation
-                    # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-                    # _SKIP_FILESYSTEM for btrfs
-                    if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                        _enter_mountpoint && _select_filesystem && _create_filesystem || return 1
-                    else
-                        _enter_mountpoint
-                        if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                            _btrfs_subvolume || return 1
-                        fi
-                    fi
-                    _find_btrfs_raid_devices
-                    _btrfs_parts
-                    _check_mkfs_values
-                    echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                    #shellcheck disable=SC2001,SC2086
-                    ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
+            fi
+            _PART=$(cat "${_ANSWER}")
+            [[ -n ${_DO_ROOT} ]] && _PART_ROOT=${_PART}
+            if [[ "${_PART}" != "DONE" ]]; then
+                _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
+                # clear values first!
+                _clear_fs_values
+                _check_btrfs_filesystem_creation
+                # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                # _SKIP_FILESYSTEM for btrfs
+                if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
+                    _enter_mountpoint && _select_filesystem && _create_filesystem || return 1
                 else
-                    _FILESYSTEM_FINISH=1
+                    _enter_mountpoint
+                    if [[ "${_FSTYPE}" == "btrfs" ]]; then
+                        _btrfs_subvolume || return 1
+                    fi
                 fi
-                [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ADDITIONAL="DONE"
-            done
+                _find_btrfs_raid_devices
+                _btrfs_parts
+                _check_mkfs_values
+                echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    #shellcheck disable=SC2001,SC2086
+                ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
+            fi
+            _DO_ROOT=""
         done
         #shellcheck disable=SC2028
         _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _PARTFINISH="DONE"
