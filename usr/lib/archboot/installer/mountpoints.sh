@@ -62,7 +62,7 @@ _select_filesystem() {
 
 _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
-        MP="/"
+        _MP="/"
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
@@ -134,6 +134,9 @@ _mountpoints() {
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         _dialog --infobox "Scanning blockdevices for selection ..." 3 60
         _PARTS=$(_findpartitions _)
+        #
+        # swap setting
+        #
         _FSTYPE="swap"
         #shellcheck disable=SC2086
         _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
