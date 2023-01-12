@@ -305,7 +305,7 @@ _mkfs() {
         mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
         _ssd_optimization
-        _MOUNTOPTIONS="defaults"
+        _MOUNTOPTIONS=""
         _F2FS_MOUNTOPTIONS=""
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
@@ -320,7 +320,7 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
+        mount -t "${2}" -o ${_MOUNTOPTIONS} "${1}" "${3}""${5}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
