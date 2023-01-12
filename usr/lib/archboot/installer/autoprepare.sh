@@ -194,10 +194,9 @@ _autoprepare() {
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
     || return 1
-    _DEVICE=${_DISK}
     # validate DEVICE
-    if [[ ! -b "${_DEVICE}" ]]; then
-      _dialog --msgbox "Error: Device '${_DEVICE}' is not valid." 0 0
+    if [[ ! -b "${_DISK}" ]]; then
+      _dialog --msgbox "Error: Device '${_DISK}' is not valid." 0 0
       return 1
     fi
     # validate DEST
@@ -212,58 +211,58 @@ _autoprepare() {
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         _printk off
-        _dialog --infobox "Partitioning ${_DEVICE} ..." 0 0
+        _dialog --infobox "Partitioning ${_DISK} ..." 0 0
         # clean partition table to avoid issues!
-        sgdisk --zap "${_DEVICE}" &>/dev/null
+        sgdisk --zap "${_DISK}" &>/dev/null
         # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-        dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 &>/dev/null
-        wipefs -a "${_DEVICE}" &>/dev/null
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 &>/dev/null
+        wipefs -a "${_DISK}" &>/dev/null
         # create fresh GPT
-        sgdisk --clear "${_DEVICE}" &>/dev/null
+        sgdisk --clear "${_DISK}" &>/dev/null
         # create actual partitions
-        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DEVICE}" > "${_LOG}"
-        sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DEVICE}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" > "${_LOG}"
         if [[ -n "${_UEFISYS_BOOTPART}" ]]; then
-            sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DEVICE}" > "${_LOG}"
+            sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DISK}" > "${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DEVICE}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DISK}" > "${_LOG}"
         fi
-        sgdisk --set-alignment="2048" --new="${_SWAP_DEVICE_NUM}":0:+"${_SWAP_DEVICE_SIZE}"M --typecode="${_SWAP_DEVICE_NUM}":8200 --change-name="${_SWAP_DEVICE_NUM}":ARCHLINUX_SWAP "${_DEVICE}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_SWAP_DEVICE_NUM}":0:+"${_SWAP_DEVICE_SIZE}"M --typecode="${_SWAP_DEVICE_NUM}":8200 --change-name="${_SWAP_DEVICE_NUM}":ARCHLINUX_SWAP "${_DISK}" > "${_LOG}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:0 --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DEVICE}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:0 --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" > "${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:+"${_ROOT_DEVICE_SIZE}"M --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DEVICE}" > "${_LOG}"
-            sgdisk --set-alignment="2048" --new="${_HOME_DEVICE_NUM}":0:0 --typecode="${_HOME_DEVICE_NUM}":8302 --change-name="${_HOME_DEVICE_NUM}":ARCHLINUX_HOME "${_DEVICE}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:+"${_ROOT_DEVICE_SIZE}"M --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_HOME_DEVICE_NUM}":0:0 --typecode="${_HOME_DEVICE_NUM}":8302 --change-name="${_HOME_DEVICE_NUM}":ARCHLINUX_HOME "${_DISK}" > "${_LOG}"
         fi
-        sgdisk --print "${_DEVICE}" > "${_LOG}"
+        sgdisk --print "${_DISK}" > "${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
         _printk off
-        _dialog --infobox "Partitioning ${_DEVICE}" 0 0
+        _dialog --infobox "Partitioning ${_DISK}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 >/dev/null 2>&1
-        wipefs -a "${_DEVICE}" &>/dev/null
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >/dev/null 2>&1
+        wipefs -a "${_DISK}" &>/dev/null
         # create DOS MBR with parted
-        parted -a optimal -s "${_DEVICE}" unit MiB mktable msdos >/dev/null 2>&1
-        parted -a optimal -s "${_DEVICE}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
-        parted -a optimal -s "${_DEVICE}" unit MiB set 1 boot on >"${_LOG}"
-        parted -a optimal -s "${_DEVICE}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mktable msdos >/dev/null 2>&1
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) >"${_LOG}"
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            parted -a optimal -s "${_DEVICE}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) "$(sgdisk -E "${_DEVICE}" | grep "^[0-9]")S" >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
         else
-            parted -a optimal -s "${_DEVICE}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) >"${_LOG}"
-            parted -a optimal -s "${_DEVICE}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) "$(sgdisk -E "${_DEVICE}" | grep "^[0-9]")S" >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
         fi
     fi
     #shellcheck disable=SC2181
     if [[ $? -gt 0 ]]; then
-        _dialog --msgbox "Error: Partitioning ${_DEVICE} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error: Partitioning ${_DISK} (see ${_LOG} for details)." 0 0
         _printk on
         return 1
     fi
     # reread partitiontable for kernel
-    partprobe "${_DEVICE}"
+    partprobe "${_DISK}"
     _printk on
     ## wait until /dev initialized correct devices
     udevadm settle
@@ -288,12 +287,12 @@ _autoprepare() {
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
         _DOMKFS=1
-        _DEVICE="${_DEVICE}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        _DEVICE="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
         # MMC uses /dev/mmcblk0pX
-        if echo "${_DEVICE}" | grep -q "nvme" || echo "${_DEVICE}" | grep -q "mmc"; then
-            _DEVICE="${_DEVICE}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
+            _DEVICE="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         fi
         _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
         _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"

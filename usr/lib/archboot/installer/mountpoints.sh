@@ -351,30 +351,30 @@ _mkfs() {
     else
         echo "# DEVICE DETAILS: ${1} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     fi
-    _DEV=""
+
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
-            _DEV="UUID=${_FSUUID}"
+            _DEVICE="UUID=${_FSUUID}"
         fi
     elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
         if [[ -n "${_FSLABEL}" ]]; then
-            _DEV="LABEL=${_FSLABEL}"
+            _DEVICE="LABEL=${_FSLABEL}"
         fi
     else
         if [[ -n "${_UEFI_BOOT}" ]]; then
            if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
-                   _DEV="PARTUUID=${_PARTUUID}"
+                   _DEVICE="PARTUUID=${_PARTUUID}"
                fi
            elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
                if [[ -n "${_PARTLABEL}" ]]; then
-                    _DEV="PARTLABEL=${_PARTLABEL}"
+                    _DEVICE="PARTLABEL=${_PARTLABEL}"
                fi
            fi
         else
             # fallback to device name
-            _DEV="${1}"
+            _DEVICE="${1}"
         fi
     fi
     # / root is not needed in fstab, it's mounted automatically
@@ -388,9 +388,9 @@ _mkfs() {
     _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
     if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${5}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" && -n "${_UEFI_BOOT}" || "${5}" == "/" ]]; then
         if [[ -z "${_MOUNTOPTIONS}" ]]; then
-            echo -n "${_DEV} ${5} ${2} defaults 0 " >>/tmp/.fstab
+            echo -n "${_DEVICE} ${5} ${2} defaults 0 " >>/tmp/.fstab
         else
-            echo -n "${_DEV} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
+            echo -n "${_DEVICE} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         fi
         if [[ "${2}" == "swap" || "${2}" == "btrfs" ]]; then
             echo 0 >>/tmp/.fstab
