@@ -318,9 +318,9 @@ _mkfs() {
         [[ -n "${12}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${12}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
-        _MOUNTOPTIONS="-o $(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
+        _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
