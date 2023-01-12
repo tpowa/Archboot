@@ -210,7 +210,6 @@ _mountpoints() {
                     else
                         _enter_mountpoint
                         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                            _SKIP_FILESYSTEM=1
                             _btrfs_subvolume
                         fi
                     fi
