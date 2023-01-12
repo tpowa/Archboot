@@ -66,7 +66,7 @@ _enter_mountpoint() {
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
-            _dialog --inputbox "Enter the mountpoint for ${_PART}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the mountpoint for ${_DEVICE}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
             if grep ":${_MP}:" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
