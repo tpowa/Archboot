@@ -226,8 +226,6 @@ _mountpoints() {
 
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
-
-
 # returns: 1 on failure
 _mkfs() {
     if [[ -n "${4}" ]]; then

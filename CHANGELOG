@@ -35,6 +35,9 @@ setup/quickinst changes:
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
+- cleaned up mountpoints and btrfs function
+- new btrfs configuration implemented, subvolume is now mandatory
+- filesystem mounting dialogs redone
 - replaced vim editor with neovim editor
 - install neovim editor instead of vim editor to installed system
 - add nano editor syntax highlighting on installed system
