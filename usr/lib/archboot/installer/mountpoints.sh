@@ -305,7 +305,7 @@ _mkfs() {
         mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
         _ssd_optimization
-        _MOUNTOPTIONS=""
+        _MOUNTOPTIONS="defaults"
         _F2FS_MOUNTOPTIONS=""
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
