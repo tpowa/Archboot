@@ -177,12 +177,8 @@ _donetwork() {
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
         return 1
     fi
-    if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
-        _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
-        return 1
-    else
-        _dialog --infobox "Link is up. Continuing in 3 seconds ..." 3 60
-        sleep 3
+    _dialog --infobox "Link is up. Continuing in 3 seconds ..." 3 60
+    sleep 3
     fi
     _NEXTITEM="2"
     _S_NET=1
