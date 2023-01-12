@@ -110,7 +110,6 @@ _create_filesystem() {
         _FS_OPTIONS=$(cat "${_ANSWER}")
     else
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _SKIP_FILESYSTEM=1
             _btrfs_subvolume
         fi
     fi

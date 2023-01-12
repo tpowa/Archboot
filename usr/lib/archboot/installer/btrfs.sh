@@ -77,15 +77,13 @@ _subvolumes_in_use() {
 _check_btrfs_filesystem_creation() {
     _DETECT_CREATE_FILESYSTEM=""
     _SKIP_FILESYSTEM=""
-    _SKIP_ASK_SUBVOLUME=""
     #shellcheck disable=SC2013
     for i in $(grep "${_PART}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
-            echo "${i}" | cut -d: -f 4 | grep -q yes && _DETECT_CREATE_FILESYSTEM=1
-            [[ -n "${_DETECT_CREATE_FILESYSTEM}" ]] && _SKIP_ASK_SUBVOLUME=1
+            echo "${i}" | cut -d: -f 4 | grep -q 1 && _DETECT_CREATE_FILESYSTEM=1
         fi
     done
 }
@@ -238,7 +236,6 @@ _choose_btrfs_subvolume () {
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
             _dialog --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
-            _SKIP_ASK_SUBVOLUME=1
             _prepare_btrfs_subvolume || return 1
         fi
     fi
@@ -250,7 +247,7 @@ _btrfs_subvolume() {
     if [[ "${_FSTYPE}" == "btrfs" && -z "${_ASK_MOUNTPOINTS}" ]]; then
         _choose_btrfs_subvolume || return 1
     else
-        if [[ -n "${_SKIP_FILESYSTEM}" ]]; then
+        if [[ -n "${_SKIP_FILESYSTEM}" && -z ${_DETECT_CREATE_FILESYSTEM}"" ]]; then
             _choose_btrfs_subvolume || return 1
         else
             _prepare_btrfs_subvolume || return 1
