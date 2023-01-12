@@ -105,7 +105,6 @@ _create_filesystem() {
         done
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _prepare_btrfs || return 1
-            _btrfs_compress
         fi
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
@@ -173,12 +172,11 @@ _mountpoints() {
             # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
             # _SKIP_FILESYSTEM for btrfs
             if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                _select_filesystem && _create_filesystem
+                _select_filesystem && _create_filesystem || return 1
             else
                 if [[ "${_FSTYPE}" == "btrfs" ]]; then
                     _FSTYPE="btrfs"
-                    _SKIP_FILESYSTEM=1
-                    _btrfs_subvolume
+                    _btrfs_subvolume || return 1
                 fi
             fi
             [[ -n "${_FILESYSTEM_FINISH}" ]] && _DO_ROOT=DONE
@@ -206,11 +204,11 @@ _mountpoints() {
                     # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                     # _SKIP_FILESYSTEM for btrfs
                     if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                        _enter_mountpoint && _select_filesystem && _create_filesystem
+                        _enter_mountpoint && _select_filesystem && _create_filesystem || return 1
                     else
                         _enter_mountpoint
                         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                            _btrfs_subvolume
+                            _btrfs_subvolume || return 1
                         fi
                     fi
                     _find_btrfs_raid_devices
