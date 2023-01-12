@@ -171,8 +171,8 @@ _donetwork() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." > "${_LOG}"
     systemctl restart systemd-networkd
-    sleep 5
     _dialog --infobox "Waiting for network link to come up ..." 3 60
+    sleep 5
     # add sleep here dhcp can need some time to get link
     if ! getent hosts www.google.com > "${_LOG}" 2>&1; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
