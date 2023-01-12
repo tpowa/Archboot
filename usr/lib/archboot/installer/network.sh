@@ -171,17 +171,12 @@ _donetwork() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." > "${_LOG}"
     systemctl restart systemd-networkd
-    _NETWORK_COUNT=0
-    _dialog --infobox "Waiting 30 seconds for network link to come up ..." 3 60
+    _dialog --infobox "Waiting for network link to come up ..." 3 60
     # add sleep here dhcp can need some time to get link
-    while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
-        sleep 1
-        _NETWORK_COUNT=$((_NETWORK_COUNT+1))
-        if [[ "${_NETWORK_COUNT}" == "10" ]]; then
-            _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
-            return 1
-        fi
-    done
+    if ! getent hosts www.google.com > "${_LOG}" 2>&1; then
+        _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
+        return 1
+    fi
     if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
         return 1
