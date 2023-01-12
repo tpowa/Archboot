@@ -50,7 +50,7 @@ _select_filesystem() {
     command -v mkfs.ext4 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext4 Ext4"
     command -v mkfs.ext3 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext3 Ext3"
     command -v mkfs.ext2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext2 Ext2"
-    command -v mkfs.vfat > /dev/null 2>&1 && [[ "${_DO_ROOT}" == "DONE" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
+    command -v mkfs.vfat > /dev/null 2>&1 && [[ -z "${_DO_ROOT}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
     command -v mkfs.xfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} xfs XFS"
     command -v mkfs.f2fs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} f2fs F2FS"
     command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
