@@ -245,7 +245,7 @@ _choose_btrfs_subvolume () {
 # btrfs subvolume menu
 _btrfs_subvolume() {
     _FILESYSTEM_FINISH=""
-    if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" ]]; then
+    if [[ "${_FSTYPE}" == "btrfs" && -n "${_SKIP_FILESYSTEM}" && -z "${_ASK_MOUNTPOINTS}" ]]; then
         _choose_btrfs_subvolume || return 1
     else
         _prepare_btrfs_subvolume || return 1
