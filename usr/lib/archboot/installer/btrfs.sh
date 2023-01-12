@@ -179,6 +179,7 @@ _prepare_btrfs_subvolume() {
         _check_btrfs_subvolume
         _DOSUBVOLUME=1
     done
+     _btrfs_compress || return 1
 }
 
 # check btrfs subvolume
@@ -250,7 +251,7 @@ _btrfs_subvolume() {
     else
         _prepare_btrfs_subvolume || return 1
     fi
-    _btrfs_compress
+    _btrfs_compress || return 1
     _FILESYSTEM_FINISH=1
 }
 
