@@ -180,7 +180,6 @@ _donetwork() {
     fi
     _dialog --infobox "Link is up. Continuing in 3 seconds ..." 3 60
     sleep 3
-    fi
     _NEXTITEM="2"
     _S_NET=1
 }
