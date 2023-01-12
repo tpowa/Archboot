@@ -179,7 +179,6 @@ _prepare_btrfs_subvolume() {
         _check_btrfs_subvolume
         _DOSUBVOLUME=1
     done
-     _btrfs_compress || return 1
 }
 
 # check btrfs subvolume
