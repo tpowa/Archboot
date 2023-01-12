@@ -306,20 +306,21 @@ _mkfs() {
         # add ssd optimization before mounting
         _ssd_optimization
         _MOUNTOPTIONS=""
+        _F2FS_MOUNTOPTIONS=""
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
         # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
         # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
-        [[ "${2}" == "f2fs" ]] && _MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
+        [[ "${2}" == "f2fs" ]] && _F2FS_MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
         [[ -n "${12}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${12}"
-        _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
+        _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
-        _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
+        _MOUNTOPTIONS="-o $(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
+        mount -t "${2}" "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
