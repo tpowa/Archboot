@@ -212,6 +212,7 @@ _mountpoints() {
         _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
         [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
+        [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
@@ -320,7 +321,7 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o ${_MOUNTOPTIONS} "${1}" "${3}""${5}" >"${_LOG}" 2>&1
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
