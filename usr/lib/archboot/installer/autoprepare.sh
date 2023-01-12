@@ -296,7 +296,6 @@ _autoprepare() {
         _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
         _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
         _FS_OPTIONS="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
-        [[ -z "${_FS_OPTIONS}" ]] && _FS_OPTIONS="NONE"
         _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f5 -d:)"
         _BTRFS_DEVICES="${_DEVICE}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
@@ -305,11 +304,11 @@ _autoprepare() {
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
             _DOSUBVOLUME=1
         else
-            _BTRFS_COMPRESS="NONE"
-            _BTRFS_SUBVOLUME="NONE"
+            _BTRFS_COMPRESS=""
+            _BTRFS_SUBVOLUME=""
             _DOSUBVOLUME=""
         fi
-        _BTRFS_LEVEL="NONE"
+        _BTRFS_LEVEL=""
         if ! [[ "${_FSTYPE}" == "swap" ]]; then
             _dialog --infobox "Creating ${_FSTYPE} on ${_DEVICE}\nwith FSLABEL ${_LABEL_NAME} ,\nmounting to ${_DESTDIR}${_MP} ..." 0 0
         else
