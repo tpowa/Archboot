@@ -108,16 +108,12 @@ _check_efisys_part() {
 _partition() {
     # disable swap and all mounted partitions, umount / last!
     _umountall
-    # activate dmraid
-    _activate_dmraid
     # check on encrypted devices, else weird things can happen!
     _stopluks
     # check on raid devices, else weird things can happen during partitioning!
     _stopmd
     # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    # update dmraid
-    [[ -n "$(_dmraid_devices)" ]] && _dmraid_update
     # switch for mbr usage
     _set_guid
     # Select disk to partition
@@ -162,7 +158,5 @@ _partition() {
             fi
         fi
     done
-    # update dmraid
-    _dmraid_update
     _NEXTITEM="3"
 }

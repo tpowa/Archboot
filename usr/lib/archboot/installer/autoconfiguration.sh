@@ -127,15 +127,9 @@ _auto_mkinitcpio() {
         grep -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
         grep -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
         grep -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
-        # check on nfs,dmraid and keymap HWPARAMETER
+        # check on nfs and keymap HWPARAMETER
         # check on used keymap, if not us keyboard layout
         ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && _HWPARAMETER="${_HWPARAMETER} --keymap"
-        # check on dmraid
-        if [[ -e ${_DESTDIR}/lib/initcpio/hooks/dmraid ]]; then
-            if ! dmraid -r | grep ^no; then
-                _HWPARAMETER="${_HWPARAMETER} --dmraid"
-            fi
-        fi
         # get kernel version
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_DESTDIR}/boot/${_VMLINUZ}")

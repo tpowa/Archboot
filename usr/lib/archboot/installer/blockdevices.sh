@@ -41,8 +41,6 @@ _blockdevices() {
      # all available block disk devices
      for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
          # exclude checks:
-         #- dmraid_devices
-         #  ${_LSBLK} TYPE ${dev} | grep "dmraid"
          #- iso9660 devices
          #  (${_LSBLK} FSTYPE ${dev} | grep "iso9660"
          #- fakeraid isw devices
@@ -51,7 +49,7 @@ _blockdevices() {
          #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
          # - zram devices
          #  echo "${dev}" | grep -q 'zram'
-         if ! ${_LSBLK} TYPE "${dev}" 2>/dev/null | grep -q "dmraid" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "iso9660" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "ddf_raid_member" && ! echo "${dev}" | grep -q 'zram'; then
+         if ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "iso9660" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" 2>/dev/null | grep -q "ddf_raid_member" && ! echo "${dev}" | grep -q 'zram'; then
              echo "${dev}"
              [[ "${1}" ]] && echo "${1}"
          fi
@@ -131,10 +129,6 @@ _partitionable_raid_devices_partitions() {
 
 # lists dmraid devices
 _dmraid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep "dmraid$" | cut -d' ' -f 1 | grep -v "_.*p.*$" | sort -u); do
-            echo "${dev}"
-            [[ "${1}" ]] && echo "${1}"
-    done
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$"; then
@@ -154,23 +148,6 @@ _dmraid_devices() {
 # dmraid_partitions
 # - show dmraid partitions
 _dmraid_partitions() {
-    for part in $(${_LSBLK} NAME,TYPE | grep "dmraid$" | cut -d' ' -f 1 | grep "_.*p.*$" | sort -u); do
-        # exclude checks:
-        # - part of lvm2 device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
-        # - part of luks device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
-        # - part of raid device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
-        # - extended partition
-        #   $(sfdisk -l 2>/dev/null | grep "${part}" | grep "Extended$"
-        # - extended partition (LBA)
-        #   sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$")
-        if ! ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "crypto_LUKS$" && ! ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "LVM2_member$" && ! ${_LSBLK} FSTYPE "${part}" 2>/dev/null | grep -q "linux_raid_member$" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$"&& ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$"; then
-            echo "${part}"
-            [[ "${1}" ]] && echo "${1}"
-        fi
-    done
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>/dev/null | grep "isw_raid_member$" | cut -d' ' -f 1; then
@@ -230,16 +207,6 @@ _findbootloaderdisks() {
     fi
 }
 
-# activate_dmraid()
-# activate dmraid devices
-_activate_dmraid()
-{
-    if [[ -e /usr/bin/dmraid ]]; then
-        _dialog --infobox "Activating dmraid arrays..." 0 0
-        dmraid -ay -I -Z >/dev/null 2>&1
-    fi
-}
-
 # activate_lvm2
 # activate lvm2 devices
 _activate_lvm2()
@@ -296,14 +263,13 @@ _activate_luks()
 
 # _activate_special_devices()
 # activate special devices:
-# activate dmraid, lvm2 and raid devices, if not already activated during bootup!
+# activate lvm2 and raid devices, if not already activated during bootup!
 # run it more times if needed, it can be hidden by each other!
 _activate_special_devices()
 {
     _RAID_READY=""
     _LUKS_READY=""
     _LVM2_READY=""
-    _activate_dmraid
     while [[ -n "${_LVM2_READY}" && -n "${_RAID_READY}" && -n "${_LUKS_READY}" ]]; do
         _activate_raid
         _activate_lvm2
@@ -473,27 +439,6 @@ _stopluks()
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
-}
-
-#_dmraid_update
-_dmraid_update()
-{
-    _printk off
-    _dialog --infobox "Deactivating dmraid devices ..." 0 0
-    dmraid -an >/dev/null 2>&1
-    if [[ -n "${_DETECTED_LVM}" || -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?" 0 0 && _RESETDM=1
-        if [[ -n "${_RESETDM}" ]]; then
-            _dialog --infobox "Resetting devicemapper devices ..." 0 0
-            dmsetup remove_all >/dev/null 2>&1
-        fi
-    else
-        _dialog --infobox "Resetting devicemapper devices ..." 0 0
-        dmsetup remove_all >/dev/null 2>&1
-    fi
-    _dialog --infobox "Reactivating dmraid devices ..." 0 0
-    dmraid -ay -I -Z >/dev/null 2>&1
-    _printk on
 }
 
 #helpbox for raid

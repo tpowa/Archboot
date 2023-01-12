@@ -25,7 +25,6 @@ _getraidarrays() {
 _getcryptsetup() {
     _CRYPTSETUP=""
     if ! cryptsetup status "$(basename "${_PART_ROOT}")" | grep -q inactive; then
-        #avoid clash with dmraid here
         if cryptsetup status "$(basename "${_PART_ROOT}")"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
                 _CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
@@ -314,7 +313,6 @@ EOF
 _do_efistub_parameters() {
     _BOOTDEV=""
     _FAIL_COMPLEX=""
-    _USE_DMRAID=""
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
@@ -519,13 +517,9 @@ _do_grub_common_before() {
     ## - Encryption is not recommended for grub(2) /boot!
     _BOOTDEV=""
     _FAIL_COMPLEX=""
-    _USE_DMRAID=""
     _RAID_ON_LVM=""
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
-    if ! dmraid -r | grep -q ^no; then
-        _dialog --yesno "Setup detected dmraid device.\nDo you want to install grub on this device?" 6 50 && _USE_DMRAID=1
-    fi
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _dialog --infobox "Installing grub ..." 0 0
         _PACKAGES="grub"
@@ -765,9 +759,9 @@ _do_grub_bios() {
     _do_grub_common_before
     # try to auto-configure GRUB(2)...
     _check_bootpart
-    # check if raid, raid partition, dmraid or device devicemapper is used
+    # check if raid, raid partition, or device devicemapper is used
     if echo "${_BOOTDEV}" | grep -q /dev/md || echo "${_BOOTDEV}" | grep /dev/mapper; then
-        # boot from lvm, raid, partitioned raid and dmraid devices is supported
+        # boot from lvm, raid, partitioned and raid devices is supported
         _FAIL_COMPLEX=""
         if cryptsetup status "${_BOOTDEV}"; then
             # encryption devices are not supported
