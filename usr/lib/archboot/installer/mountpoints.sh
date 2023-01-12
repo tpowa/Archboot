@@ -119,7 +119,7 @@ _create_filesystem() {
 
 _mountpoints() {
     _NAME_SCHEME_PARAMETER_RUN=""
-    while [[ "${_PARTFINISH}" != "DONE" ]]; do
+    while [[ "${_DEVICEFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.device-names
         : >/tmp/.fstab
@@ -133,41 +133,41 @@ _mountpoints() {
         _dialog --infobox "Scanning blockdevices for sizes ..." 3 60
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         _dialog --infobox "Scanning blockdevices for selection ..." 3 60
-        _PARTS=$(_findpartitions _)
+        _DEVICES=$(_findpartitions _)
         #
         # swap setting
         #
         _FSTYPE="swap"
         #shellcheck disable=SC2086
-        _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_PARTS} 2>"${_ANSWER}" || return 1
-        _PART=$(cat "${_ANSWER}")
-        if [[ "${_PART}" != "NONE" ]]; then
+        _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_DEVICES} 2>"${_ANSWER}" || return 1
+        _DEVICE=$(cat "${_ANSWER}")
+        if [[ "${_DEVICE}" != "NONE" ]]; then
             _clear_fs_values
             if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
                 _create_filesystem || return 1
             fi
         fi
         _check_mkfs_values
-        if [[ "${_PART}" != "NONE" ]]; then
+        if [[ "${_DEVICE}" != "NONE" ]]; then
             #shellcheck disable=SC2001,SC2086
-            _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
-            echo "${_PART}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+            _DEVICES="$(echo ${_DEVICES} | sed -e "s#${_DEVICE} _##g")"
+            echo "${_DEVICE}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         #
         # mountpoints setting
         #
          _DO_ROOT="1"
-        while [[ "${_PART}" != "DONE" ]]; do
+        while [[ "${_DEVICE}" != "DONE" ]]; do
             #shellcheck disable=SC2086
             if [[ -n ${_DO_ROOT} ]]; then
-                _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_PARTS} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_DEVICES} 2>"${_ANSWER}" || return 1
             else
-                _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_PARTS} DONE _ 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_DEVICES} DONE _ 2>"${_ANSWER}" || return 1
             fi
-            _PART=$(cat "${_ANSWER}")
-            [[ -n ${_DO_ROOT} ]] && _PART_ROOT=${_PART}
-            if [[ "${_PART}" != "DONE" ]]; then
-                _FSTYPE="$(${_LSBLK} FSTYPE "${_PART}")"
+            _DEVICE=$(cat "${_ANSWER}")
+            [[ -n ${_DO_ROOT} ]] && _DEVICE_ROOT=${_DEVICE}
+            if [[ "${_DEVICE}" != "DONE" ]]; then
+                _FSTYPE="$(${_LSBLK} FSTYPE "${_DEVICE}")"
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
@@ -184,44 +184,46 @@ _mountpoints() {
                 _find_btrfs_raid_devices
                 _btrfs_parts
                 _check_mkfs_values
-                echo "${_PART}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                    #shellcheck disable=SC2001,SC2086
-                ! [[ "${_FSTYPE}" == "btrfs" ]] && _PARTS="$(echo ${_PARTS} | sed -e "s#${_PART} _##g")"
+                echo "${_DEVICE}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                #shellcheck disable=SC2001,SC2086
+                ! [[ "${_FSTYPE}" == "btrfs" ]] && _DEVICES="$(echo ${_DEVICES} | sed -e "s#${_DEVICE} _##g")"
             fi
             _DO_ROOT=""
         done
         #shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _PARTFINISH="DONE"
+        _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVICEFINISH="DONE"
     done
     # disable swap and all mounted partitions
     _umountall
     _printk off
     while read -r line; do
-        _PART=$(echo "${line}" | cut -d: -f 1)
+        _DEVICE=$(echo "${line}" | cut -d: -f 1)
         _FSTYPE=$(echo "${line}" | cut -d: -f 2)
         _MP=$(echo "${line}" | cut -d: -f 3)
         _DOMKFS=$(echo "${line}" | cut -d: -f 4)
         _LABEL_NAME=$(echo "${line}" | cut -d: -f 5)
         _FS_OPTIONS=$(echo "${line}" | cut -d: -f 6)
         _BTRFS_DEVICES=$(echo "${line}" | cut -d: -f 7)
+        # remove # from array
+        _BTRFS_DEVICES="${_BTRFS_DEVICES//#/\ }"
         _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         if [[ -n "${_DOMKFS}" ]]; then
             if [[ "${_FSTYPE}" == "swap" ]]; then
-                _dialog --infobox "Creating and activating \nswapspace on \n${_PART} ..." 0 0
+                _dialog --infobox "Creating and activating \nswapspace on \n${_DEVICE} ..." 0 0
             else
-                _dialog --infobox "Creating ${_FSTYPE} on ${_PART},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
+                _dialog --infobox "Creating ${_FSTYPE} on ${_DEVICE},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
             fi
         else
             if [[ "${_FSTYPE}" == "swap" ]]; then
-                _dialog --infobox "Activating swapspace \non ${_PART} ..." 0 0
+                _dialog --infobox "Activating swapspace \non ${_DEVICE} ..." 0 0
             else
-                _dialog --infobox "Mounting ${_FSTYPE} \non ${_PART} \nto ${_DESTDIR}${_MP} ..." 0 0
+                _dialog --infobox "Mounting ${_FSTYPE} \non ${_DEVICE} \nto ${_DESTDIR}${_MP} ..." 0 0
             fi
         fi
-        _mkfs "${_DOMKFS}" "${_PART}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done < /tmp/.parts
     _printk on
@@ -243,81 +245,69 @@ _mountpoints() {
 
 # returns: 1 on failure
 _mkfs() {
-    local _DOMK=${1}
-    local _DEVICE=${2}
-    local _FSTYPE=${3}
-    local _DEST=${4}
-    local _MOUNTPOINT=${5}
-    local _LABELNAME=${6}
-    local _FSOPTIONS=${7}
-    local _BTRFSDEVICES="${8//#/\ }"
-    local _BTRFSLEVEL=${9}
-    local _BTRFS_SUBVOLUME=${10}
-    local _DOSUBVOLUME=${11}
-    local _BTRFSCOMPRESS=${12}
     # correct empty entries
-    [[ "${_FSOPTIONS}" == "NONE" ]] && _FSOPTIONS=""
-    [[ "${_BTRFSCOMPRESS}" == "NONE" ]] && _BTRFSCOMPRESS=""
-    [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
+    [[ "${7}" == "NONE" ]] && 7=""
+    [[ "${12}" == "NONE" ]] && 12=""
+    [[ "${10}" == "NONE" ]] && 10=""
     # add btrfs raid level, if needed
-    [[ ! "${_BTRFSLEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _FSOPTIONS="${_FSOPTIONS} -m ${_BTRFSLEVEL} -d ${_BTRFSLEVEL}"
+    [[ ! "${9}" == "NONE" && "${2}" == "btrfs" ]] && 7="${7} -m ${9} -d ${9}"
     # we have two main cases: "swap" and everything else.
-    if [[ "${_FSTYPE}" == "swap" ]]; then
-        swapoff "${_DEVICE}" >/dev/null 2>&1
-        if [[ -n "${_DOMK}" ]]; then
-            mkswap -L "${_LABELNAME}" "${_DEVICE}" >"${_LOG}" 2>&1
+    if [[ "${2}" == "swap" ]]; then
+        swapoff "${1}" >/dev/null 2>&1
+        if [[ -n "${4}" ]]; then
+            mkswap -L "${6}" "${1}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
-                _dialog --msgbox "Error creating swap: mkswap ${_DEVICE}" 0 0
+                _dialog --msgbox "Error creating swap: mkswap ${1}" 0 0
                 return 1
             fi
         fi
-        swapon "${_DEVICE}" >"${_LOG}" 2>&1
+        swapon "${1}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --msgbox "Error activating swap: swapon ${_DEVICE}" 0 0
+            _dialog --msgbox "Error activating swap: swapon ${1}" 0 0
             return 1
         fi
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
         for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 vfat; do
-            [[ "${_FSTYPE}" == "${fs}" ]] && _KNOWNFS=1 && break
+            [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
-            _dialog --msgbox "unknown fstype ${_FSTYPE} for ${_DEVICE}" 0 0
+            _dialog --msgbox "unknown fstype ${2} for ${1}" 0 0
             return 1
         fi
         # if we were tasked to create the filesystem, do so
-        if [[ -n "${_DOMK}" ]]; then
+        if [[ -n "${4}" ]]; then
             local ret
             #shellcheck disable=SC2086
-            case ${_FSTYPE} in
-                xfs)      mkfs.xfs ${_FSOPTIONS} -L "${_LABELNAME}" -f ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${_FSOPTIONS} -L "${_LABELNAME}" ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${_FSOPTIONS} "${_LABELNAME}" ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                ext3)     mke2fs -F ${_FSOPTIONS} -L "${_LABELNAME}" -t ext3 ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                ext4)     mke2fs -F ${_FSOPTIONS} -L "${_LABELNAME}" -t ext4 ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                f2fs)     mkfs.f2fs ${_FSOPTIONS} -f -l "${_LABELNAME}" \
-                                    -O extra_attr,inode_checksum,sb_checksum ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${_FSOPTIONS} -L "${_LABELNAME}" ${_BTRFSDEVICES} >"${_LOG}" 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f ${_FSOPTIONS} -L "${_LABELNAME}" ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -F32 ${_FSOPTIONS} -n "${_LABELNAME}" ${_DEVICE} >"${_LOG}" 2>&1; ret=$? ;;
+            case ${2} in
+                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${7} -L "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                ext3)     mke2fs -F ${7} -L "${6}" -t ext3 ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
+                                    -O extra_attr,inode_checksum,sb_checksum ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} >"${_LOG}" 2>&1; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
-                _dialog --msgbox "Error creating filesystem ${_FSTYPE} on ${_DEVICE}" 0 0
+                _dialog --msgbox "Error creating filesystem ${2} on ${1}" 0 0
                 return 1
             fi
             sleep 2
         fi
-        if [[ "${_FSTYPE}" == "btrfs" && -n "${_BTRFS_SUBVOLUME}" && -n "${_DOSUBVOLUME}" ]]; then
+        if [[ "${2}" == "btrfs" && -n "${10}" && -n "${_DOSUBVOLUME}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
         sleep 2
         # create our mount directory
-        mkdir -p "${_DEST}""${_MOUNTPOINT}"
+        mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
         _ssd_optimization
         _MOUNTOPTIONS=""
@@ -326,67 +316,67 @@ _mkfs() {
         # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
         # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
-        [[ "${_FSTYPE}" == "f2fs" ]] && _MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
+        [[ "${2}" == "f2fs" ]] && _MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
-        [[ -n "${_BTRFS_SUBVOLUME}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${_BTRFS_SUBVOLUME}"
-        [[ -n "${_BTRFSCOMPRESS}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_BTRFSCOMPRESS}"
+        [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
+        [[ -n "${12}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${12}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${_FSTYPE}" -o "${_MOUNTOPTIONS}" "${_DEVICE}" "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --msgbox "Error mounting ${_DEST}${_MOUNTPOINT}" 0 0
+            _dialog --msgbox "Error mounting ${3}${5}" 0 0
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${_FSTYPE}" == "btrfs" && -n "${_DOMK}" ]] && btrfs balance start --full-balance "${_DEST}""${_MOUNTPOINT}" >"${_LOG}" 2>&1
+        [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" >"${_LOG}" 2>&1
         # change permission of base directories to correct permission
         # to avoid btrfs issues
-        if [[ "${_MOUNTPOINT}" == "/tmp" ]]; then
-            chmod 1777 "${_DEST}""${_MOUNTPOINT}"
-        elif [[ "${_MOUNTPOINT}" == "/root" ]]; then
-            chmod 750 "${_DEST}""${_MOUNTPOINT}"
+        if [[ "${5}" == "/tmp" ]]; then
+            chmod 1777 "${3}""${5}"
+        elif [[ "${5}" == "/root" ]]; then
+            chmod 750 "${3}""${5}"
         else
-            chmod 755 "${_DEST}""${_MOUNTPOINT}"
+            chmod 755 "${3}""${5}"
         fi
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
-    local _FSUUID="$(_getfsuuid "${_DEVICE}")"
+    local _FSUUID="$(_getfsuuid "${1}")"
     #shellcheck disable=SC2155
-    local _FSLABEL="$(_getfslabel "${_DEVICE}")"
+    local _FSLABEL="$(_getfslabel "${1}")"
 
     if [[ -n "${_UEFI_BOOT}" ]]; then
         #shellcheck disable=SC2155
-        local _PARTUUID="$(_getpartuuid "${_DEVICE}")"
+        local _PARTUUID="$(_getpartuuid "${1}")"
         #shellcheck disable=SC2155
-        local _PARTLABEL="$(_getpartlabel "${_DEVICE}")"
+        local _PARTLABEL="$(_getpartlabel "${1}")"
 
-        echo "# DEVICE DETAILS: ${_DEVICE} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
+        echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     else
-        echo "# DEVICE DETAILS: ${_DEVICE} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
+        echo "# DEVICE DETAILS: ${1} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     fi
 
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
-            _DEVICE="UUID=${_FSUUID}"
+            1="UUID=${_FSUUID}"
         fi
     elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
         if [[ -n "${_FSLABEL}" ]]; then
-            _DEVICE="LABEL=${_FSLABEL}"
+            1="LABEL=${_FSLABEL}"
         fi
     else
         if [[ -n "${_UEFI_BOOT}" ]]; then
            if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
-                   _DEVICE="PARTUUID=${_PARTUUID}"
+                   1="PARTUUID=${_PARTUUID}"
                fi
            elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
                if [[ -n "${_PARTLABEL}" ]]; then
-                   _DEVICE="PARTLABEL=${_PARTLABEL}"
+                   1="PARTLABEL=${_PARTLABEL}"
                fi
            fi
         fi
@@ -399,20 +389,17 @@ _mkfs() {
     # Complex devices, like mdadm, encrypt or lvm are not supported
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
-    _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${_DEVICE}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
-    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${_MOUNTPOINT}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${_MOUNTPOINT}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${_MOUNTPOINT}" == "/boot" && -n "${_UEFI_BOOT}" || "${_MOUNTPOINT}" == "/" ]]; then
+    _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
+    if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${5}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" && -n "${_UEFI_BOOT}" || "${5}" == "/" ]]; then
         if [[ -z "${_MOUNTOPTIONS}" ]]; then
-            echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults 0 " >>/tmp/.fstab
+            echo -n "${1} ${5} ${2} defaults 0 " >>/tmp/.fstab
         else
-            echo -n "${_DEVICE} ${_MOUNTPOINT} ${_FSTYPE} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
+            echo -n "${1} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         fi
-        if [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "btrfs" ]]; then
+        if [[ "${2}" == "swap" || "${2}" == "btrfs" ]]; then
             echo 0 >>/tmp/.fstab
         else
             echo 1 >>/tmp/.fstab
         fi
     fi
-    unset _MOUNTOPTIONS
-    unset _BTRFS_SUBVOLUME
-    unset _BTRFSCOMPRESS
 }
