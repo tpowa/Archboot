@@ -315,7 +315,8 @@ _autoprepare() {
         else
             _dialog --infobox "Creating and activating\nswapspace on\n${_DEVICE} ..." 0 0
         fi
-        _mkfs "${_DOMKFS}" "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" ${_BTRFS_LEVEL} "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
     _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70
