@@ -215,21 +215,8 @@ _mountpoints() {
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
         [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
-
-        if [[ -n "${_DOMKFS}" ]]; then
-            if [[ "${_FSTYPE}" == "swap" ]]; then
-                _dialog --infobox "Creating and activating \nswapspace on \n${_DEVICE} ..." 0 0
-            else
-                _dialog --infobox "Creating ${_FSTYPE} on ${_DEVICE},\nmounting to ${_DESTDIR}${_MP} ..." 0 0
-            fi
-        else
-            if [[ "${_FSTYPE}" == "swap" ]]; then
-                _dialog --infobox "Activating swapspace \non ${_DEVICE} ..." 0 0
-            else
-                _dialog --infobox "Mounting ${_FSTYPE} \non ${_DEVICE} \nto ${_DESTDIR}${_MP} ..." 0 0
-            fi
-        fi
-        _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done < /tmp/.parts
     _printk on
@@ -245,6 +232,19 @@ _mountpoints() {
 
 # returns: 1 on failure
 _mkfs() {
+    if [[ -n "${4}" ]]; then
+        if [[ "${2}" == "swap" ]]; then
+            _dialog --infobox "Creating and activating \nswapspace on \n${1} ..." 0 0
+        else
+            _dialog --infobox "Creating ${2} on ${1},\nmounting to ${3}${5} ..." 0 0
+        fi
+    else
+        if [[ "${2}" == "swap" ]]; then
+            _dialog --infobox "Activating swapspace \non ${1} ..." 0 0
+        else
+            _dialog --infobox "Mounting ${2} \non ${1} \nto ${3}${5} ..." 0 0
+        fi
+    fi
     # add btrfs raid level, if needed
     # we have two main cases: "swap" and everything else.
     if [[ "${2}" == "swap" ]]; then
@@ -339,16 +339,15 @@ _mkfs() {
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
-    local _FSUUID="$(_getfsuuid "${1}")"
+    _FSUUID="$(_getfsuuid "${1}")"
     #shellcheck disable=SC2155
-    local _FSLABEL="$(_getfslabel "${1}")"
+    _FSLABEL="$(_getfslabel "${1}")"
 
     if [[ -n "${_UEFI_BOOT}" ]]; then
         #shellcheck disable=SC2155
-        local _PARTUUID="$(_getpartuuid "${1}")"
+        _PARTUUID="$(_getpartuuid "${1}")"
         #shellcheck disable=SC2155
-        local _PARTLABEL="$(_getpartlabel "${1}")"
-
+        _PARTLABEL="$(_getpartlabel "${1}")"
         echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     else
         echo "# DEVICE DETAILS: ${1} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
@@ -357,23 +356,26 @@ _mkfs() {
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
-            1="UUID=${_FSUUID}"
+            _DEVICE="UUID=${_FSUUID}"
         fi
     elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
         if [[ -n "${_FSLABEL}" ]]; then
-            1="LABEL=${_FSLABEL}"
+            _DEVICE="LABEL=${_FSLABEL}"
         fi
     else
         if [[ -n "${_UEFI_BOOT}" ]]; then
            if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
                if [[ -n "${_PARTUUID}" ]]; then
-                   1="PARTUUID=${_PARTUUID}"
+                   _DEVICE="PARTUUID=${_PARTUUID}"
                fi
            elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
                if [[ -n "${_PARTLABEL}" ]]; then
-                   1="PARTLABEL=${_PARTLABEL}"
+                    _DEVICE="PARTLABEL=${_PARTLABEL}"
                fi
            fi
+        else
+            # fallback to device name
+            _DEVICE="${1}"
         fi
     fi
     # / root is not needed in fstab, it's mounted automatically
@@ -387,9 +389,9 @@ _mkfs() {
     _GUID_VALUE="$(${_BLKID} -p -i -s _PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
     if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" &&  "${5}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" && -n "${_UEFI_BOOT}" || "${5}" == "/" ]]; then
         if [[ -z "${_MOUNTOPTIONS}" ]]; then
-            echo -n "${1} ${5} ${2} defaults 0 " >>/tmp/.fstab
+            echo -n "${_DEVICE} ${5} ${2} defaults 0 " >>/tmp/.fstab
         else
-            echo -n "${1} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
+            echo -n "${_DEVICE} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         fi
         if [[ "${2}" == "swap" || "${2}" == "btrfs" ]]; then
             echo 0 >>/tmp/.fstab
