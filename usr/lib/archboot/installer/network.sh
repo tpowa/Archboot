@@ -178,7 +178,7 @@ _donetwork() {
         sleep 1
         _NETWORK_COUNT=$((_NETWORK_COUNT+1))
         if [[ "${_NETWORK_COUNT}" == "10" ]]; then
-            _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
+            _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
             return 1
         fi
     done
