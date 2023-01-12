@@ -57,7 +57,7 @@ _select_filesystem() {
     command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
     command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    _dialog --menu "Select a filesystem for ${_DEVICE}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select a filesystem for ${_DEVICE}:" 16 50 13 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
