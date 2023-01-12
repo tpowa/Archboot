@@ -111,7 +111,7 @@ _create_filesystem() {
     else
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _SKIP_FILESYSTEM="1"
-            _btrfs_subvolume
+            _btrfs_subvolume || return 1
         fi
     fi
     _FILESYSTEM_FINISH=1
@@ -143,7 +143,7 @@ _mountpoints() {
             if [[ "${_PART}" != "NONE" ]]; then
                 _clear_fs_values
                 if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
-                    _create_filesystem
+                    _create_filesystem || return 1
                 else
                     _FILESYSTEM_FINISH=1
                 fi
