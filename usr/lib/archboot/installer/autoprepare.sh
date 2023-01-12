@@ -11,6 +11,7 @@ _autoprepare() {
     # switch for mbr usage
     _set_guid
     : >/tmp/.device-names
+    _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
