@@ -179,6 +179,7 @@ _prepare_btrfs_subvolume() {
         _check_btrfs_subvolume
         _DOSUBVOLUME=1
     done
+    _btrfs_compress || return 1
 }
 
 # check btrfs subvolume
@@ -233,6 +234,7 @@ _choose_btrfs_subvolume () {
     #shellcheck disable=SC2086
         _dialog --menu "Select the subvolume to mount:" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
+        _btrfs_compress || return 1
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
             _dialog --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
@@ -250,7 +252,6 @@ _btrfs_subvolume() {
     else
         _prepare_btrfs_subvolume || return 1
     fi
-    _btrfs_compress || return 1
     _FILESYSTEM_FINISH=1
 }
 
