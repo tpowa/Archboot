@@ -56,7 +56,7 @@ _select_filesystem() {
     command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
     command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    _dialog --menu "Select a filesystem for ${_PART}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select a filesystem for ${_DEVICE}:" 15 50 12 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
@@ -83,7 +83,7 @@ _check_mkfs_values() {
     [[ -z "${_BTRFS_DEVICES}" ]] && _BTRFS_DEVICES="NONE"
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_BTRFS_SUBVOLUME}" ]] && _BTRFS_SUBVOLUME="NONE"
-    [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_PART}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_PART}")"
+    [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEVICE}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEVICE}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
 
@@ -93,11 +93,11 @@ _create_filesystem() {
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
-    _dialog --yesno "Would you like to create a filesystem on ${_PART}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
+    _dialog --yesno "Would you like to create a filesystem on ${_DEVICE}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ -n "${_DOMKFS}" ]]; then
         while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_LSBLK} LABEL "${_PART}")" 2>"${_ANSWER}" || return 1
+            "$(${_LSBLK} LABEL "${_DEVICE}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${_LABEL_NAME}$" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
