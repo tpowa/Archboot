@@ -109,12 +109,12 @@ _autoprepare() {
             fi
             _DISK_SIZE="$((_DISK_SIZE-_UEFISYS_DEVICE_SIZE))"
             while [[ -z "${_BOOT_DEVICE_SET}" ]]; do
-                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOT_DEVICE_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOT_DEVICE_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "16" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "100" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOT_DEVICE_SET=1
@@ -126,12 +126,12 @@ _autoprepare() {
             done
         else
             while [[ -z "${BOOT_DEVICE_SET}" ]]; do
-                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 16.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOT_DEVICE_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOT_DEVICE_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "16" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "100" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOT_DEVICE_SET=1
