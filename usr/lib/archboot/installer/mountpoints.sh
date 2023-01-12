@@ -205,13 +205,17 @@ _mountpoints() {
         _DOMKFS=$(echo "${line}" | cut -d: -f 4)
         _LABEL_NAME=$(echo "${line}" | cut -d: -f 5)
         _FS_OPTIONS=$(echo "${line}" | cut -d: -f 6)
+        [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         _BTRFS_DEVICES=$(echo "${line}" | cut -d: -f 7)
         # remove # from array
         _BTRFS_DEVICES="${_BTRFS_DEVICES//#/\ }"
         _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
+        [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
         _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
+        [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
+
         if [[ -n "${_DOMKFS}" ]]; then
             if [[ "${_FSTYPE}" == "swap" ]]; then
                 _dialog --infobox "Creating and activating \nswapspace on \n${_DEVICE} ..." 0 0
@@ -237,14 +241,11 @@ _mountpoints() {
 
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
+
+
 # returns: 1 on failure
 _mkfs() {
-    # correct empty entries
-    [[ "${7}" == "NONE" ]] && 7=""
-    [[ "${12}" == "NONE" ]] && 12=""
-    [[ "${10}" == "NONE" ]] && 10=""
     # add btrfs raid level, if needed
-    [[ ! "${9}" == "NONE" && "${2}" == "btrfs" ]] && 7="${7} -m ${9} -d ${9}"
     # we have two main cases: "swap" and everything else.
     if [[ "${2}" == "swap" ]]; then
         swapoff "${1}" >/dev/null 2>&1
