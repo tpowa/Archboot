@@ -213,7 +213,7 @@ _finddisks() {
     _dmraid_devices "${1}"
 }
 
-_findpartitions() {
+_finddevices() {
     _blockdevices_partitions "${1}"
     _dm_devices "${1}"
     _dmraid_partitions "${1}"
@@ -346,7 +346,7 @@ _getavaildisks()
 _getavailpartitions()
 {
     #shellcheck disable=SC2119
-    for i in $(_findpartitions); do
+    for i in $(_finddevices); do
         ${_LSBLK} NAME,SIZE -d "${i}"
     done
 }
@@ -564,7 +564,7 @@ _raid()
         # Remove all raid devices with children
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(_findpartitions); do
+        _PARTS="$(for i in $(_finddevices); do
                 echo "${_RAID_BLACKLIST}" | grep -qw "${i}" || echo "${i}" _
                 done)"
         # break if all devices are in use
@@ -708,7 +708,7 @@ _createpv()
                     echo "$(${_LSBLK} NAME "${i}")" _
                     done)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(_findpartitions); do
+        _PARTS="$(for i in $(_finddevices); do
                 ! echo "${_LVM_BLACKLIST}" | grep -E "${i} _" && echo "${i}" _
                 done)"
         # break if all devices are in use
@@ -1030,7 +1030,7 @@ _luks()
                     ${_LSBLK} NAME "${i}"
                     done)"
         #shellcheck disable=SC2119
-        _PARTS="$(for i in $(_findpartitions); do
+        _PARTS="$(for i in $(_finddevices); do
                 echo "${_CRYPT_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
                 done)"
         # break if all devices are in use

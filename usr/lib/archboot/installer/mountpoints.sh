@@ -132,9 +132,9 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
-        _dialog --infobox "Scanning blockdevices. This may need some time ..." 3 60
-        _DEVICES=$(_findpartitions _)
-        _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
+        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _DEVICES=$(_finddevices _)
+        _dialog --cr-wrap --msgbox "Available devices:\n\n$(_getavailpartitions)\n" 0 0
         #
         # swap setting
         #
@@ -161,9 +161,9 @@ _mountpoints() {
         while [[ "${_DEVICE}" != "DONE" ]]; do
             #shellcheck disable=SC2086
             if [[ -n ${_DO_ROOT} ]]; then
-                _dialog --menu "Select the partition to mount as /:" 15 50 12 ${_DEVICES} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVICES} 2>"${_ANSWER}" || return 1
             else
-                _dialog --menu "Select any additional partitions to mount under your new root:" 15 52 12 ${_DEVICES} DONE _ 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select any additional devices to mount under your new root:" 15 52 12 ${_DEVICES} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEVICE=$(cat "${_ANSWER}")
             [[ -n ${_DO_ROOT} ]] && _DEVICE_ROOT=${_DEVICE}
@@ -194,7 +194,7 @@ _mountpoints() {
         #shellcheck disable=SC2028
         _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVICEFINISH="DONE"
     done
-    # disable swap and all mounted partitions
+    # disable swap and all mounted devices
     _umountall
     _printk off
     while read -r line; do
