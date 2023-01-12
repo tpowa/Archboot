@@ -19,6 +19,7 @@ Environment changes:
 - removed bind, dnsmasq, nmap, tcpdump, inetutils, net-tools, b43-fwcutter,
   ntp and wireless_tools
 - removed xfs_scrub, arpd, archinstall, testdisk, ntfs-3g, python and perl
+- removed old and unmaintained dmraid support
 - fixed /etc/request-key.d directory addition
 - use systemd defaults for shadow, gshadow and passwd
 - use system's shells file
@@ -35,6 +36,7 @@ setup/quickinst changes:
 - reordered manage devices menus
 - removed netctl support
 - added systemd-networkd, systemd-resolved, iwd support
+- removed old and unmaintained dmraid support
 - cleaned up mountpoints and btrfs function
 - new btrfs configuration implemented, subvolume is now mandatory
 - filesystem mounting dialogs redone
