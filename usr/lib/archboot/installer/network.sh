@@ -176,7 +176,7 @@ _donetwork() {
     # add sleep here dhcp can need some time to get link
     while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
         sleep 1
-        _NETWORK_COUNT="$((_NETWORK_COUNT+1))"
+        _NETWORK_COUNT=$((_NETWORK_COUNT+1))
         [[ "${_NETWORK_COUNT}" == "30" ]] && break
     done
     if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
