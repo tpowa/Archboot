@@ -120,6 +120,7 @@ _create_filesystem() {
 
 _mountpoints() {
     _NAME_SCHEME_PARAMETER_RUN=""
+    _DEVICEFINISH=""
     while [[ "${_DEVICEFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.device-names
@@ -236,14 +237,6 @@ _mountpoints() {
 
 # _mkfs()
 # Create and mount filesystems in our destination system directory.
-#
-# args:
-#  DOMK: Whether to make the filesystem or use what is already there
-#  device: Device filesystem is on
-#  fstype: type of filesystem located at the device (or what to create)
-#  dest: Mounting location for the destination system
-#  mountpoint: Mount point inside the destination system, e.g. '/boot'
-
 # returns: 1 on failure
 _mkfs() {
     # correct empty entries
