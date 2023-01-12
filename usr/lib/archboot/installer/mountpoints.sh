@@ -18,6 +18,7 @@ _destdir_mounts(){
 # values that are needed for fs creation
 _clear_fs_values() {
     : >/tmp/.btrfs-devices
+    _SKIP_FILESYSTEM=""
     _DOMKFS=""
     _LABEL_NAME=""
     _FS_OPTIONS=""
