@@ -96,6 +96,7 @@ _create_filesystem() {
     _SKIP_FILESYSTEM=""
     _dialog --yesno "Would you like to create a filesystem on ${_DEVICE}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ -n "${_DOMKFS}" ]]; then
+        _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_DEVICE}")" 2>"${_ANSWER}" || return 1
@@ -173,9 +174,8 @@ _mountpoints() {
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-                # _SKIP_FILESYSTEM for btrfs
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                    _enter_mountpoint && _select_filesystem && _create_filesystem || return 1
+                    _enter_mountpoint && _create_filesystem || return 1
                 else
                     _enter_mountpoint
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
@@ -192,7 +192,7 @@ _mountpoints() {
             _DO_ROOT=""
         done
         #shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVICEFINISH="DONE"
+        _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVICEFINISH="DONE"
     done
     # disable swap and all mounted devices
     _umountall
