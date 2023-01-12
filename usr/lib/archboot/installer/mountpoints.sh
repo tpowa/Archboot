@@ -132,7 +132,7 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
-        _dialog --infobox "Scanning blockdevices ..." 3 60
+        _dialog --infobox "Scanning blockdevices. This may need some time ..." 3 60
         _DEVICES=$(_findpartitions _)
         _dialog --cr-wrap --msgbox "Available partitions:\n\n$(_getavailpartitions)\n" 0 0
         #
