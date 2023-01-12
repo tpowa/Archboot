@@ -177,7 +177,10 @@ _donetwork() {
     while ! ping -c1 www.google.com > "${_LOG}" 2>&1; do
         sleep 1
         _NETWORK_COUNT=$((_NETWORK_COUNT+1))
-        [[ "${_NETWORK_COUNT}" == "30" ]] && break
+        if [[ "${_NETWORK_COUNT}" == "10" ]]; then
+            _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
+            return 1
+        fi
     done
     if ! grep -qw up /sys/class/net/"${_INTERFACE}"/operstate; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 4 70
