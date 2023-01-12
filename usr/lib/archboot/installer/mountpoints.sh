@@ -294,7 +294,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${2}" == "btrfs" && -n "${10}" ]]; then
+        if [[ "${2}" == "btrfs" && -n "${10}" && -n "${4}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
@@ -341,7 +341,6 @@ _mkfs() {
     _FSUUID="$(_getfsuuid "${1}")"
     #shellcheck disable=SC2155
     _FSLABEL="$(_getfslabel "${1}")"
-
     if [[ -n "${_UEFI_BOOT}" ]]; then
         #shellcheck disable=SC2155
         _PARTUUID="$(_getpartuuid "${1}")"
@@ -351,7 +350,6 @@ _mkfs() {
     else
         echo "# DEVICE DETAILS: ${1} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     fi
-
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
