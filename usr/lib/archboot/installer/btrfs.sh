@@ -171,11 +171,9 @@ _prepare_btrfs() {
 _prepare_btrfs_subvolume() {
     _BTRFS_SUBVOLUME="NONE"
     while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
-        _DOSUBVOLUME=""
         _dialog --inputbox "Enter the SUBVOLUME name on ${_DEVICE}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _check_btrfs_subvolume
-        _DOSUBVOLUME=1
     done
     _btrfs_compress || return 1
 }

@@ -12,7 +12,7 @@ _autoprepare() {
     _set_guid
     : >/tmp/.device-names
     _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
-    sleep 3
+    sleep 2
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
@@ -304,11 +304,9 @@ _autoprepare() {
             _BTRFS_COMPRESS="compress=zstd"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
-            _DOSUBVOLUME=1
         else
             _BTRFS_COMPRESS=""
             _BTRFS_SUBVOLUME=""
-            _DOSUBVOLUME=""
         fi
         _BTRFS_LEVEL=""
         if ! [[ "${_FSTYPE}" == "swap" ]]; then
@@ -317,7 +315,7 @@ _autoprepare() {
             _dialog --infobox "Creating and activating\nswapspace on\n${_DEVICE} ..." 0 0
         fi
         _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
     _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70

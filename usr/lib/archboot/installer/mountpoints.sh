@@ -25,7 +25,6 @@ _clear_fs_values() {
     _BTRFS_DEVICES=""
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
-    _DOSUBVOLUME=""
     _BTRFS_COMPRESS=""
 }
 
@@ -153,7 +152,7 @@ _mountpoints() {
         if [[ "${_DEVICE}" != "NONE" ]]; then
             #shellcheck disable=SC2001,SC2086
             _DEVICES="$(echo ${_DEVICES} | sed -e "s#${_DEVICE} _##g")"
-            echo "${_DEVICE}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+            echo "${_DEVICE}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         #
         # mountpoints setting
@@ -185,7 +184,7 @@ _mountpoints() {
                 _find_btrfs_raid_devices
                 _btrfs_parts
                 _check_mkfs_values
-                echo "${_DEVICE}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_DOSUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                echo "${_DEVICE}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVICES}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                 #shellcheck disable=SC2001,SC2086
                 ! [[ "${_FSTYPE}" == "btrfs" ]] && _DEVICES="$(echo ${_DEVICES} | sed -e "s#${_DEVICE} _##g")"
             fi
@@ -212,11 +211,10 @@ _mountpoints() {
         [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
         _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
-        _DOSUBVOLUME=$(echo "${line}" | cut -d: -f 10)
-        _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 11)
+        _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 10)
         [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
         _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_DOSUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done < /tmp/.parts
     _printk on
@@ -296,7 +294,7 @@ _mkfs() {
             fi
             sleep 2
         fi
-        if [[ "${2}" == "btrfs" && -n "${10}" && -n "${_DOSUBVOLUME}" ]]; then
+        if [[ "${2}" == "btrfs" && -n "${10}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
@@ -315,7 +313,7 @@ _mkfs() {
         [[ "${2}" == "f2fs" ]] && _F2FS_MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
-        [[ -n "${12}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${12}"
+        [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
