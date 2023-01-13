@@ -30,7 +30,7 @@ _autoprepare() {
     _GUID_DEVICE_SIZE=""
     _UEFISYS_DEVICE_SIZE=""
     _DEFAULTFS=""
-    _UEFISYS_BOOTPART=""
+    _UEFISYS_BOOTDEV=""
     _UEFISYS_MP=""
     _UEFISYS_DEVICE_SET=""
     _BOOT_DEVICE_SET=""
@@ -52,7 +52,7 @@ _autoprepare() {
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         _dialog --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
-        _UEFISYS_BOOTPART=1
+        _UEFISYS_BOOTDEV=1
     fi
     while [[ -z "${_DEFAULTFS}" ]]; do
         _FSOPTS=""
@@ -73,7 +73,7 @@ _autoprepare() {
             _DISK_SIZE="$((_DISK_SIZE-_GUID_DEVICE_SIZE))"
         fi
         if [[ -n "${_GUIDPARAMETER}" ]]; then
-            if [[ -n "${_UEFISYS_BOOTPART}" ]]; then
+            if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYS_DEVICE_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYS_DEVICE_SIZE="$(cat "${_ANSWER}")"
@@ -222,7 +222,7 @@ _autoprepare() {
         # create actual partitions
         sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" > "${_LOG}"
         sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" > "${_LOG}"
-        if [[ -n "${_UEFISYS_BOOTPART}" ]]; then
+        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DISK}" > "${_LOG}"
         else
             sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DISK}" > "${_LOG}"
@@ -276,7 +276,7 @@ _autoprepare() {
     _FSSPEC_BOOT_DEVICE="${_BOOT_DEVICE_NUM}:/boot:ext2::BOOT_ARCH"
     _FSSPEC_UEFISYS_DEVICE="${_UEFISYS_DEVICE_NUM}:${_UEFISYS_MP}:vfat::EFISYS"
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        if [[ -n "${_UEFISYS_BOOTPART}" ]]; then
+        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_UEFISYS_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
         else
             _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_BOOT_DEVICE} ${_FSSPEC_UEFISYS_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
