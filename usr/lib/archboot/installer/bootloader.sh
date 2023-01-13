@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getrootfstype() {
     _ROOTFS=""
-    _ROOTFS="$(_getfstype "${_PART_ROOT}")"
+    _ROOTFS="$(_getfstype "${_ROOTDEV}")"
 }
 
 _getrootflags() {
@@ -24,50 +24,50 @@ _getraidarrays() {
 
 _getcryptsetup() {
     _CRYPTSETUP=""
-    if ! cryptsetup status "$(basename "${_PART_ROOT}")" | grep -q inactive; then
-        if cryptsetup status "$(basename "${_PART_ROOT}")"; then
+    if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
+        if cryptsetup status "$(basename "${_ROOTDEV}")"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                _CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
+                _CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                _CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g')")"
+                _CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             else
-                _CRYPTDEVICE="$(cryptsetup status "$(basename "${_PART_ROOT}")" | grep device: | sed -e 's#device:##g'))"
+                _CRYPTDEVICE="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
             fi
-            _CRYPTNAME="$(basename "${_PART_ROOT}")"
+            _CRYPTNAME="$(basename "${_ROOTDEV}")"
             _CRYPTSETUP="cryptdevice=${_CRYPTDEVICE}:${_CRYPTNAME}"
         fi
     fi
 }
 
 _getrootpartuuid() {
-    _ROOTPART="${_PART_ROOT}"
-    _PARTUUID="$(_getpartuuid "${_PART_ROOT}")"
+    _ROOTDEV="${_ROOTDEV}"
+    _PARTUUID="$(_getpartuuid "${_ROOTDEV}")"
     if [[ -n "${_PARTUUID}" ]]; then
-        _ROOTPART="PARTUUID=${_PARTUUID}"
+        _ROOTDEV="PARTUUID=${_PARTUUID}"
     fi
 }
 
 _getrootpartlabel() {
-    _ROOTPART="${_PART_ROOT}"
-    _PARTLABEL="$(_getpartlabel "${_PART_ROOT}")"
+    _ROOTDEV="${_ROOTDEV}"
+    _PARTLABEL="$(_getpartlabel "${_ROOTDEV}")"
     if [[ -n "${_PARTLABEL}" ]]; then
-        _ROOTPART="PARTLABEL=${_PARTLABEL}"
+        _ROOTDEV="PARTLABEL=${_PARTLABEL}"
     fi
 }
 
 _getrootfsuuid() {
-    _ROOTPART="${_PART_ROOT}"
-    _FSUUID="$(_getfsuuid "${_PART_ROOT}")"
+    _ROOTDEV="${_ROOTDEV}"
+    _FSUUID="$(_getfsuuid "${_ROOTDEV}")"
     if [[ -n "${_FSUUID}" ]]; then
-        _ROOTPART="UUID=${_FSUUID}"
+        _ROOTDEV="UUID=${_FSUUID}"
     fi
 }
 
 _getrootfslabel() {
-    _ROOTPART="${_PART_ROOT}"
-    _FSLABEL="$(_getfslabel "${_PART_ROOT}")"
+    _ROOTDEV="${_ROOTDEV}"
+    _FSLABEL="$(_getfslabel "${_ROOTDEV}")"
     if [[ -n "${_FSLABEL}" ]]; then
-        _ROOTPART="LABEL=${_FSLABEL}"
+        _ROOTDEV="LABEL=${_FSLABEL}"
     fi
 }
 
@@ -94,8 +94,8 @@ _bootloader_kernel_parameters() {
     fi
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
-    [[ -z "${_ROOTPART}" ]] && _ROOTPART="${_PART_ROOT}"
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTPART} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
+    [[ -z "${_ROOTDEV}" ]] && _ROOTDEV="${_ROOTDEV}"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
 
@@ -115,7 +115,7 @@ _check_bootpart() {
     _BOOTDEV="$(mount | grep "${_DESTDIR}/boot " | cut -d' ' -f 1)"
     if [[ -z "${_BOOTDEV}" ]]; then
         _SUBDIR="/boot"
-        _BOOTDEV="${_PART_ROOT}"
+        _BOOTDEV="${_ROOTDEV}"
     fi
 }
 
@@ -148,7 +148,7 @@ _abort_f2fs_bootpart() {
 
 _do_uefi_common() {
     _PACKAGES=""
-    _DISK=""
+    _DEVICE=""
     [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES="${_PACKAGES} dosfstools"
     [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES="${_PACKAGES} efivar"
     [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES="${_PACKAGES} efibootmgr"
@@ -170,9 +170,9 @@ for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL
     efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
 done
 if [[ "\${_BOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
-    efibootmgr --quiet --create --disk "${_BOOTMGR_DISK}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DEVICE}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
 else
-    efibootmgr --quiet --create --disk "${_BOOTMGR_DISK}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
+    efibootmgr --quiet --create --disk "${_BOOTMGR_DEVICE}" --part "${_BOOTMGR_PART_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
 fi
 EFIBEOF
         chmod a+x "/tmp/efibootmgr_run.sh"
@@ -190,9 +190,9 @@ _do_apple_efi_hfs_bless() {
 
 _do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
-    _DISK="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
+    _DEVICE="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
     _UEFISYS_PART_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
-    _BOOTMGR_DISK="${_DISK}"
+    _BOOTMGR_DEVICE="${_DEVICE}"
     _BOOTMGR_PART_NUM="${_UEFISYS_PART_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
@@ -534,9 +534,9 @@ _do_grub_config() {
     _BOOT_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
     _BOOT_PART_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/boot" 2>/dev/null)"
     _BOOT_PART_DRIVE="$(chroot "${_DESTDIR}" grub-probe --target="drive" "/boot" 2>/dev/null)"
-    _ROOT_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/" 2>/dev/null)"
-    _ROOT_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/" 2>/dev/null)"
-    _ROOT_PART_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/" 2>/dev/null)"
+    _ROOTDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/" 2>/dev/null)"
+    _ROOTDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/" 2>/dev/null)"
+    _ROOTDEV_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/" 2>/dev/null)"
     _USR_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
     _USR_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/usr" 2>/dev/null)"
     _USR_PART_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/usr" 2>/dev/null)"
@@ -544,7 +544,7 @@ _do_grub_config() {
         _UEFISYS_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
         _UEFISYS_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
     fi
-    if [[ "${_ROOT_PART_FS_UUID}" == "${_BOOT_PART_FS_UUID}" ]]; then
+    if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOT_PART_FS_UUID}" ]]; then
         _SUBDIR="/boot"
         # on btrfs we need to check on subvol
         if mount | grep "${_DESTDIR} " | grep btrfs | grep subvol; then
@@ -587,7 +587,7 @@ insmod part_gpt
 insmod part_msdos
 insmod fat
 insmod ${_BOOT_PART_FS}
-insmod ${_ROOT_PART_FS}
+insmod ${_ROOTDEV_FS}
 insmod ${_USR_PART_FS}
 insmod search_fs_file
 insmod search_fs_uuid
@@ -618,7 +618,7 @@ else
 fi
 insmod font
 search --fs-uuid --no-floppy --set=usr_part ${_USR_PART_HINTS_STRING} ${_USR_PART_FS_UUID}
-search --fs-uuid --no-floppy --set=root_part ${_ROOT_PART_HINTS_STRING} ${_ROOT_PART_FS_UUID}
+search --fs-uuid --no-floppy --set=root_part ${_ROOTDEV_HINTS_STRING} ${_ROOTDEV_FS_UUID}
 if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
     set _fontfile="\${prefix}/fonts/unicode.pf2"
 else
@@ -734,7 +734,7 @@ _do_uboot() {
     _check_bootpart
     _abort_uboot
     [[ -d "${_DESTDIR}/boot/extlinux" ]] || mkdir -p "${_DESTDIR}/boot/extlinux"
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTPART} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
@@ -806,7 +806,7 @@ _do_grub_bios() {
         _CHECK_BIOS_BOOT_GRUB=1
         _CHECK_UEFISYS_PART=""
         _RUN_CFDISK=""
-        _DISK="${_BOOTDEV}"
+        _DEVICE="${_BOOTDEV}"
         _check_gpt
     else
         if [[ -z "${_FAIL_COMPLEX}" ]]; then

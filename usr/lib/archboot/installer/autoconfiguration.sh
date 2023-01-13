@@ -143,7 +143,7 @@ _auto_mkinitcpio() {
         # arrange MODULES for mkinitcpio.conf
         _HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --hostcontroller --filesystem ${_FBPARAMETER})"
         # arrange HOOKS for mkinitcpio.conf
-        _HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --rootdevice="${_PART_ROOT}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${_HWPARAMETER}" --hooks)"
+        _HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --rootdevice="${_ROOTDEV}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${_HWPARAMETER}" --hooks)"
         # change mkinitcpio.conf
         [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
         [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
@@ -176,7 +176,7 @@ _auto_luks() {
     if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
         _dialog --infobox "Enable luks settings on installed system ..." 3 70
         # add to temp crypttab
-        sed -i -e "/^$(basename "${_PART_ROOT}") /d" /tmp/.crypttab
+        sed -i -e "/^$(basename "${_ROOTDEV}") /d" /tmp/.crypttab
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
         chmod 700 /tmp/passphrase-* 2>/dev/null
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>/dev/null
