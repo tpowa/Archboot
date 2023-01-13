@@ -40,7 +40,6 @@ _getcryptsetup() {
 }
 
 _getrootpartuuid() {
-    _ROOTDEV="${_ROOTDEV}"
     _PARTUUID="$(_getpartuuid "${_ROOTDEV}")"
     if [[ -n "${_PARTUUID}" ]]; then
         _ROOTDEV="PARTUUID=${_PARTUUID}"
@@ -48,7 +47,6 @@ _getrootpartuuid() {
 }
 
 _getrootpartlabel() {
-    _ROOTDEV="${_ROOTDEV}"
     _PARTLABEL="$(_getpartlabel "${_ROOTDEV}")"
     if [[ -n "${_PARTLABEL}" ]]; then
         _ROOTDEV="PARTLABEL=${_PARTLABEL}"
@@ -56,7 +54,6 @@ _getrootpartlabel() {
 }
 
 _getrootfsuuid() {
-    _ROOTDEV="${_ROOTDEV}"
     _FSUUID="$(_getfsuuid "${_ROOTDEV}")"
     if [[ -n "${_FSUUID}" ]]; then
         _ROOTDEV="UUID=${_FSUUID}"
@@ -64,7 +61,6 @@ _getrootfsuuid() {
 }
 
 _getrootfslabel() {
-    _ROOTDEV="${_ROOTDEV}"
     _FSLABEL="$(_getfslabel "${_ROOTDEV}")"
     if [[ -n "${_FSLABEL}" ]]; then
         _ROOTDEV="LABEL=${_FSLABEL}"
@@ -94,7 +90,6 @@ _bootloader_kernel_parameters() {
     fi
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
-    [[ -z "${_ROOTDEV}" ]] && _ROOTDEV="${_ROOTDEV}"
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
