@@ -179,7 +179,7 @@ _prepare_storagedrive() {
             "3")
                 _create_special ;;
             "4")
-                _PARTFINISH=""
+                _DEVICEFINISH=""
                 _ASK_MOUNTPOINTS=1
                 _mountpoints ;;
             *)
