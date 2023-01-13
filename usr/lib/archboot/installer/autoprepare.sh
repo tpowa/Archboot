@@ -266,8 +266,8 @@ _autoprepare() {
     _printk on
     ## wait until /dev initialized correct devices
     udevadm settle
-    ## FSSPECS - default filesystem specs (the + is bootable flag)
-    ## <partnum>:<mountpoint>:<partsize>:<fstype>[:<fsoptions>][:+]:labelname
+    ## FSSPECS - default filesystem specs
+    ## <partnum>:<mountpoint>:<fstype>:<fsoptions>:labelname
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
     _FSSPEC_ROOT_DEVICE="${_ROOT_DEVICE_NUM}:/:${_FSTYPE}::ROOT_ARCH"
