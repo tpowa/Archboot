@@ -39,7 +39,7 @@ setup/quickinst changes:
 - removed old and unmaintained dmraid support, use mdadm instead
 - cleaned up mountpoints and btrfs function
 - new btrfs configuration implemented, subvolume is now mandatory
-- filesystem mounting dialogs redone
+- redone filesystem mounting dialogs
 - replaced vim editor with neovim editor
 - install neovim editor instead of vim editor to installed system
 - add nano editor syntax highlighting on installed system
