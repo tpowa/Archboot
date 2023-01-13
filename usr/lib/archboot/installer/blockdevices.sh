@@ -5,22 +5,11 @@ _getfstype()
     ${_LSBLK} FSTYPE "${1}"
 }
 
-# getfsuuid()
-# converts /dev devices to FSUUIDs
-#
-# parameters: device file
-# outputs:    FSUUID on success
-#             nothing on failure
-# returns:    nothing
 _getfsuuid()
 {
     ${_LSBLK} UUID "${1}"
 }
 
-# parameters: device file
-# outputs:    LABEL on success
-#             nothing on failure
-# returns:    nothing
 _getfslabel()
 {
     ${_LSBLK} LABEL "${1}"
@@ -127,7 +116,6 @@ _partitionable_raid_devices_partitions() {
     done
 }
 
-# lists dmraid devices
 _dmraid_devices() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>/dev/null | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
@@ -145,8 +133,6 @@ _dmraid_devices() {
     done
 }
 
-# dmraid_partitions
-# - show dmraid partitions
 _dmraid_partitions() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
@@ -207,8 +193,6 @@ _findbootloaderdisks() {
     fi
 }
 
-# activate_lvm2
-# activate lvm2 devices
 _activate_lvm2()
 {
     _LVM2_READY=""
@@ -225,8 +209,6 @@ _activate_lvm2()
     fi
 }
 
-# activate_raid
-# activate md devices
 _activate_raid()
 {
     _RAID_READY=""
@@ -236,8 +218,6 @@ _activate_raid()
     fi
 }
 
-# activate_luks
-# activate luks devices
 _activate_luks()
 {
     _LUKS_READY=""
@@ -261,7 +241,6 @@ _activate_luks()
     fi
 }
 
-# _activate_special_devices()
 # activate special devices:
 # activate lvm2 and raid devices, if not already activated during bootup!
 # run it more times if needed, it can be hidden by each other!
@@ -277,7 +256,6 @@ _activate_special_devices()
     done
 }
 
-# set device name scheme
 _set_device_name_scheme() {
     _NAME_SCHEME_PARAMETER=""
     _NAME_SCHEME_LEVELS=""
@@ -331,7 +309,6 @@ _umountall()
     fi
 }
 
-# Disable all software raid devices
 _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
@@ -371,7 +348,6 @@ _stopmd()
     fi
 }
 
-# Disable all lvm devices
 _stoplvm()
 {
     _DISABLELVM=""
@@ -402,7 +378,6 @@ _stoplvm()
     fi
 }
 
-# Disable all luks encrypted devices
 _stopluks()
 {
     _DISABLELUKS=""
@@ -441,7 +416,6 @@ _stopluks()
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
 }
 
-#helpbox for raid
 _helpraid()
 {
 _dialog --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
@@ -497,7 +471,6 @@ disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
 }
 
-# Create raid or raid_partition
 _raid()
 {
     _MDFINISH=""
@@ -579,7 +552,6 @@ _raid()
     _createraid
 }
 
-# create raid device
 _createraid()
 {
     _DEVICES="$(echo -n "$(cat /tmp/.raid)")"
@@ -619,7 +591,6 @@ _createraid()
     fi
 }
 
-# help for lvm
 _helplvm()
 {
 _dialog --msgbox "LOGICAL VOLUME SUMMARY:\n
@@ -641,7 +612,6 @@ to modify.\n\nThe basic building block of LVM are:\n
   partitions." 0 0
 }
 
-# Creates physical volume
 _createpv()
 {
     _PVFINISH=""
@@ -750,7 +720,6 @@ _getavailablevg()
     done
 }
 
-# Creates volume group
 _createvg()
 {
     _VGFINISH=""
@@ -810,7 +779,6 @@ _createvg()
     fi
 }
 
-# Creates logical volume
 _createlv()
 {
     _LVFINISH=""
@@ -894,7 +862,6 @@ _createlv()
     fi
 }
 
-# enter luks name
 _enter_luks_name() {
     _LUKSDEVICE=""
     while [[ -z "${_LUKSDEVICE}" ]]; do
@@ -907,7 +874,6 @@ _enter_luks_name() {
     done
 }
 
-# enter luks passphrase
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
     while [[ -z "${LUKSPASSPHRASE}" ]]; do
@@ -940,7 +906,6 @@ _opening_luks() {
     echo "${_LUKSDEVICE}" "${_DEVICE}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
 }
 
-# help for luks
 _helpluks()
 {
 _dialog --msgbox "LUKS ENCRYPTION SUMMARY:\n
@@ -963,7 +928,6 @@ attacks. The encryption is only as good as your key management, and there\n
 are other ways to break into computers, while they are running." 0 0
 }
 
-# create luks device
 _luks()
 {
     _NAME_SCHEME_PARAMETER_RUN=""

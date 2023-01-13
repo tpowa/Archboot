@@ -227,7 +227,7 @@ _choose_btrfs_subvolume () {
         _SUBVOLUMES="$(echo ${_SUBVOLUMES} | sed -e "s#${i} _##g")"
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
-    #shellcheck disable=SC2086
+        #shellcheck disable=SC2086
         _dialog --menu "Select the subvolume to mount:" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _btrfs_compress || return 1
