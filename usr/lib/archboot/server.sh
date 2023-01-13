@@ -29,6 +29,8 @@ _update_pacman_chroot() {
     rm "${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
     # update container to latest packages
     echo "Update container to latest packages..."
+    # fix mirrorlist
+    [[ "${_ARCH}" == "riscv64" ]] && sed -i -e 's|^#Server = https://riscv|Server = https://riscv|g' "${_ARCH_DIR}"/etc/pacman.d/mirrorlist
     ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
     _fix_network "${_ARCH_DIR}"
     _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" >/dev/null 2>&1
