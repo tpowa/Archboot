@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # _destdir_mounts()
-# check if _ROOTPART is set and if something is mounted on ${_DESTDIR}
+# check if _ROOTDEV is set and if something is mounted on ${_DESTDIR}
 _destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
     _ASK_MOUNTPOINTS=""
-    _ROOTPART=""
+    _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
-    _ROOTPART="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
-    if [[ -z "${_ROOTPART}" ]]; then
+    if [[ -z "${_ROOTDEV}" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
         _mountpoints || return 1
     fi
@@ -219,7 +219,7 @@ _mountpoints() {
         sleep 1
     done < /tmp/.parts
     _printk on
-     _ROOTPART="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     _dialog --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
     sleep 3
     _NEXTITEM="5"
