@@ -71,8 +71,6 @@ _autoprepare() {
             _DEVICE_NUM=1
             _GPT_BIOS_GRUB_DEVICE_NUM="${_DEVICE_NUM}"
             _DISK_SIZE="$((_DISK_SIZE-_GUID_DEVICE_SIZE))"
-        fi
-        if [[ -n "${_GUIDPARAMETER}" ]]; then
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYS_DEVICE_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
@@ -267,14 +265,14 @@ _autoprepare() {
     ## wait until /dev initialized correct devices
     udevadm settle
     ## FSSPECS - default filesystem specs
-    ## <partnum>:<mountpoint>:<fstype>:<fsoptions>:labelname
+    ## <partnum>:<fstype>:<mountpoint>:<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    _FSSPEC_ROOT_DEVICE="${_ROOT_DEVICE_NUM}:/:${_FSTYPE}::ROOT_ARCH"
-    _FSSPEC_HOME_DEVICE="${_HOME_DEVICE_NUM}:/home:${_FSTYPE}::HOME_ARCH"
-    _FSSPEC_SWAP_DEVICE="${_SWAP_DEVICE_NUM}:swap:swap::SWAP_ARCH"
-    _FSSPEC_BOOT_DEVICE="${_BOOT_DEVICE_NUM}:/boot:ext2::BOOT_ARCH"
-    _FSSPEC_UEFISYS_DEVICE="${_UEFISYS_DEVICE_NUM}:${_UEFISYS_MP}:vfat::EFISYS"
+    _FSSPEC_ROOT_DEVICE="${_ROOT_DEVICE_NUM}:${_FSTYPE}:/:ROOT_ARCH"
+    _FSSPEC_HOME_DEVICE="${_HOME_DEVICE_NUM}:${_FSTYPE}:/home:HOME_ARCH"
+    _FSSPEC_SWAP_DEVICE="${_SWAP_DEVICE_NUM}:swap:swap:SWAP_ARCH"
+    _FSSPEC_BOOT_DEVICE="${_BOOT_DEVICE_NUM}:ext2:/boot:BOOT_ARCH"
+    _FSSPEC_UEFISYS_DEVICE="${_UEFISYS_DEVICE_NUM}:vfat:${_UEFISYS_MP}:EFISYS"
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_UEFISYS_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
@@ -286,7 +284,6 @@ _autoprepare() {
     fi
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
-        _DOMKFS=1
         _DEVICE="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
@@ -294,20 +291,20 @@ _autoprepare() {
         if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
             _DEVICE="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         fi
-        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
-        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
-        _FS_OPTIONS="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
-        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f5 -d:)"
+        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
+        _DOMKFS=1
+        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
+        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
+        _FS_OPTIONS=""
         _BTRFS_DEVICES="${_DEVICE}"
+        _BTRFS_LEVEL=""
+        _BTRFS_SUBVOLUME=""
+        _BTRFS_COMPRESS=""
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _BTRFS_COMPRESS="compress=zstd"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
-        else
-            _BTRFS_COMPRESS=""
-            _BTRFS_SUBVOLUME=""
+            _BTRFS_COMPRESS="compress=zstd"
         fi
-        _BTRFS_LEVEL=""
         _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
               "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
