@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getrootfstype() {
-    _ROOTFS=""
     _ROOTFS="$(_getfstype "${_ROOTDEV}")"
 }
 
 _getrootflags() {
-    _ROOTFLAGS=""
     _ROOTFLAGS="$(findmnt -m -n -o options -T "${_DESTDIR}")"
     # add subvolume for btrfs
     if [[ "${_ROOTFS}" == "btrfs" ]]; then
@@ -524,17 +522,18 @@ _do_grub_common_before() {
 
 _do_grub_config() {
     _chroot_mount
-    _BOOTDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    _BOOTDEV_FS_LABEL="$(chroot "${_DESTDIR}" grub-probe --target="fs_label" "/boot" 2>/dev/null)"
-    _BOOTDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-    _BOOTDEV_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/boot" 2>/dev/null)"
-    _BOOTDEV_DRIVE="$(chroot "${_DESTDIR}" grub-probe --target="drive" "/boot" 2>/dev/null)"
-    _ROOTDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/" 2>/dev/null)"
-    _ROOTDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/" 2>/dev/null)"
-    _ROOTDEV_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/" 2>/dev/null)"
-    _USR_DEVICE_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/usr" 2>/dev/null)"
-    _USR_DEVICE_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/usr" 2>/dev/null)"
-    _USR_DEVICE_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/usr" 2>/dev/null)"
+    _GRUB_PROBE="chroot ${_DESTDIR} grub-probe"
+    _BOOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/boot" 2>/dev/null)"
+    _BOOTDEV_FS_LABEL="$(${_GRUB_PROBE} --target="fs_label" "/boot" 2>/dev/null)"
+    _BOOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/boot" 2>/dev/null)"
+    _BOOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/boot" 2>/dev/null)"
+    _BOOTDEV_DRIVE="$(${_GRUB_PROBE} --target="drive" "/boot" 2>/dev/null)"
+    _ROOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/" 2>/dev/null)"
+    _ROOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/" 2>/dev/null)"
+    _ROOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/" 2>/dev/null)"
+    _USR_DEVICE_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/usr" 2>/dev/null)"
+    _USR_DEVICE_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>/dev/null)"
+    _USR_DEVICE_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>/dev/null)"
     if [[ -n "${_GRUB_UEFI}" ]]; then
         _UEFISYS_DEVICE_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
         _UEFISYS_DEVICE_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
