@@ -529,11 +529,11 @@ _do_grub_common_before() {
 
 _do_grub_config() {
     _chroot_mount
-    _BOOT_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
-    _BOOT_PART_FS_LABEL="$(chroot "${_DESTDIR}" grub-probe --target="fs_label" "/boot" 2>/dev/null)"
-    _BOOT_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
-    _BOOT_PART_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/boot" 2>/dev/null)"
-    _BOOT_PART_DRIVE="$(chroot "${_DESTDIR}" grub-probe --target="drive" "/boot" 2>/dev/null)"
+    _BOOTDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/boot" 2>/dev/null)"
+    _BOOTDEV_FS_LABEL="$(chroot "${_DESTDIR}" grub-probe --target="fs_label" "/boot" 2>/dev/null)"
+    _BOOTDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/boot" 2>/dev/null)"
+    _BOOTDEV_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/boot" 2>/dev/null)"
+    _BOOTDEV_DRIVE="$(chroot "${_DESTDIR}" grub-probe --target="drive" "/boot" 2>/dev/null)"
     _ROOTDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/" 2>/dev/null)"
     _ROOTDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/" 2>/dev/null)"
     _ROOTDEV_FS="$(chroot "${_DESTDIR}" grub-probe --target="fs" "/" 2>/dev/null)"
@@ -544,7 +544,7 @@ _do_grub_config() {
         _UEFISYS_PART_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
         _UEFISYS_PART_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
     fi
-    if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOT_PART_FS_UUID}" ]]; then
+    if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
         _SUBDIR="/boot"
         # on btrfs we need to check on subvol
         if mount | grep "${_DESTDIR} " | grep btrfs | grep subvol; then
@@ -586,7 +586,7 @@ fi
 insmod part_gpt
 insmod part_msdos
 insmod fat
-insmod ${_BOOT_PART_FS}
+insmod ${_BOOTDEV_FS}
 insmod ${_ROOTDEV_FS}
 insmod ${_USR_PART_FS}
 insmod search_fs_file
@@ -640,12 +640,12 @@ fi
 EOF
     [[ -e "/tmp/.device-names" ]] && sort "/tmp/.device-names" >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
-        _GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${_BOOT_PART_HINTS_STRING} ${_BOOT_PART_FS_UUID}"
+        _GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${_BOOTDEV_HINTS_STRING} ${_BOOTDEV_FS_UUID}"
     else
         if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] || [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] ; then
-            _GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${_BOOT_PART_HINTS_STRING} ${_BOOT_PART_FS_LABEL}"
+            _GRUB_ROOT_DRIVE="search --label --no-floppy --set=root ${_BOOTDEV_HINTS_STRING} ${_BOOTDEV_FS_LABEL}"
         else
-            _GRUB_ROOT_DRIVE="set root=${_BOOT_PART_DRIVE}"
+            _GRUB_ROOT_DRIVE="set root=${_BOOTDEV_DRIVE}"
         fi
     fi
     if [[ -n "${_GRUB_UEFI}" ]]; then
