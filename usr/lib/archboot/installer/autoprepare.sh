@@ -308,11 +308,6 @@ _autoprepare() {
             _BTRFS_SUBVOLUME=""
         fi
         _BTRFS_LEVEL=""
-        if ! [[ "${_FSTYPE}" == "swap" ]]; then
-            _dialog --infobox "Creating ${_FSTYPE} on ${_DEVICE}\nwith FSLABEL ${_LABEL_NAME} ,\nmounting to ${_DESTDIR}${_MP} ..." 0 0
-        else
-            _dialog --infobox "Creating and activating\nswapspace on\n${_DEVICE} ..." 0 0
-        fi
         _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
               "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
