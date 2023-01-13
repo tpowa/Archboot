@@ -190,18 +190,7 @@ _autoprepare() {
         _HOME_DEVICE_NUM="${_DEVICE_NUM}"
         _DEFAULTFS=1
     done
-    _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 \
-    || return 1
-    # validate DEVICE
-    if [[ ! -b "${_DISK}" ]]; then
-      _dialog --msgbox "Error: Device '${_DISK}' is not valid." 0 0
-      return 1
-    fi
-    # validate DEST
-    if [[ ! -d "${_DESTDIR}" ]]; then
-        _dialog --msgbox "Error: Destination directory '${_DESTDIR}' is not valid." 0 0
-        return 1
-    fi
+    _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
