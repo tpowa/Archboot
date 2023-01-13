@@ -31,7 +31,7 @@ _check_gpt() {
     fi
     if [[ -n "${_GUID_DETECTED}" ]]; then
         ### This check is not enabled in any function yet!
-        if [[ -n "${_CHECK_UEFISYS_PART}" ]]; then
+        if [[ -n "${_CHECK_UEFISYS_DEVICE}" ]]; then
             _check_efisys_part
         fi
         if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
@@ -71,32 +71,32 @@ _check_efisys_part() {
     fi
     if sgdisk -p "${_DISK}" | grep -q 'EF00'; then
         # check on unique PARTTYPE c12a7328-f81f-11d2-ba4b-00a0c93ec93b for EFI System Partition type UUID
-        _UEFISYS_PART="$(${_LSBLK} NAME,PARTTYPE "${_DISK}" | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" != "vfat" ]]; then
+        _UEFISYS_DEVICE="$(${_LSBLK} NAME,PARTTYPE "${_DISK}" | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
+        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_DEVICE}")" != "vfat" ]]; then
             ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
-            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT formatted. UEFI Specification requires EFI System partition to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFI System partition. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32=1
+            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_DEVICE} does not appear to be FAT formatted. UEFI Specification requires EFI System partition to be FAT32 formatted. Do you want to format ${_UEFISYS_DEVICE} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFI System partition. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32=1
         fi
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYS_PART}")" != "FAT32" ]]; then
+        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_DEVICE}")" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYS_DEVICE}")" != "FAT32" ]]; then
             ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
-            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_PART} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYS_PART} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
+            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYS_DEVICE} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYS_DEVICE} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
         fi
         #autodetect efisys mountpoint, on fail ask for mountpoint
-        _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYS_PART}" | cut -d " " -f 3)")"
+        _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYS_DEVICE}" | cut -d " " -f 3)")"
         if [[ "${_UEFISYS_MP}" == "/" ]]; then
             _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
         umount "${_DESTDIR}/${_UEFISYS_MP}" &> /dev/null
-        umount "${_UEFISYS_PART}" &> /dev/null
+        umount "${_UEFISYS_DEVICE}" &> /dev/null
         if [[ -n "${_FORMAT_UEFISYS_FAT32}" ]]; then
-            mkfs.vfat -F32 -n "EFISYS" "${_UEFISYS_PART}"
+            mkfs.vfat -F32 -n "EFISYS" "${_UEFISYS_DEVICE}"
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}"
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_PART}")" == "vfat" ]]; then
-            mount -o rw,flush -t vfat "${_UEFISYS_PART}" "${_DESTDIR}/${_UEFISYS_MP}"
+        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYS_DEVICE}")" == "vfat" ]]; then
+            mount -o rw,flush -t vfat "${_UEFISYS_DEVICE}" "${_DESTDIR}/${_UEFISYS_MP}"
         else
-            _dialog --msgbox "${_UEFISYS_PART} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
-            mount -o rw "${_UEFISYS_PART}" "${_DESTDIR}/${_UEFISYS_MP}"
+            _dialog --msgbox "${_UEFISYS_DEVICE} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
+            mount -o rw "${_UEFISYS_DEVICE}" "${_DESTDIR}/${_UEFISYS_MP}"
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
     else
@@ -136,7 +136,7 @@ _partition() {
         if [[ -n "${_DISK}" ]]; then
             if [[ -n "${_GUIDPARAMETER}" ]]; then
                 _CHECK_BIOS_BOOT_GRUB=""
-                _CHECK_UEFISYS_PART=""
+                _CHECK_UEFISYS_DEVICE=""
                 _RUN_CFDISK=1
                 _check_gpt
             else
