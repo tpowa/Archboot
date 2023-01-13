@@ -174,9 +174,10 @@ _mountpoints() {
                 _check_btrfs_filesystem_creation
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                    _enter_mountpoint && _create_filesystem || return 1
+                    _enter_mountpoint || return 1
+                    _create_filesystem || return 1
                 else
-                    _enter_mountpoint
+                    _enter_mountpoint || return 1
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
                         _btrfs_subvolume || return 1
                     fi
