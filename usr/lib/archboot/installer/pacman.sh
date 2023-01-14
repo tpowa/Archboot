@@ -14,11 +14,6 @@ _getsource() {
     fi
 }
 
-# select_mirror()
-# Prompt user for preferred mirror and set ${_SYNC_URL}
-#
-# args: none
-# returns: nothing
 _select_mirror() {
     _NEXTITEM="2"
     ## Download updated mirrorlist, if possible (only on x86_64)

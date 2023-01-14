@@ -92,7 +92,6 @@ _bootloader_kernel_parameters() {
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
 
-# basic checks needed for all bootloaders
 _common_bootloader_checks() {
     _activate_special_devices
     _getrootfstype
@@ -102,7 +101,6 @@ _common_bootloader_checks() {
     _bootloader_kernel_parameters
 }
 
-# look for a separately-mounted /boot partition
 _check_bootpart() {
     _SUBDIR=""
     _BOOTDEV="$(mount | grep "${_DESTDIR}/boot " | cut -d' ' -f 1)"
