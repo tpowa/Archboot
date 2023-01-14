@@ -51,7 +51,7 @@ _marvell_firmware() {
 # prepares target system as a chroot
 _chroot_mount()
 {
-    i| grep -qw archboot /etc/hostname; then
+    if grep -qw archboot /etc/hostname; then
         [[ -e "${_DESTDIR}/proc" ]] || mkdir -m 555 "${_DESTDIR}/proc"
         [[ -e "${_DESTDIR}/sys" ]] || mkdir -m 555 "${_DESTDIR}/sys"
         [[ -e "${_DESTDIR}/dev" ]] || mkdir -m 755 "${_DESTDIR}/dev"
@@ -67,7 +67,7 @@ _chroot_mount()
 # tears down chroot in target system
 _chroot_umount()
 {
-    i| grep -qw archboot /etc/hostname; then
+    if grep -qw archboot /etc/hostname; then
         umount -R "${_DESTDIR}/proc"
         umount -R "${_DESTDIR}/sys"
         umount -R "${_DESTDIR}/dev"

@@ -43,7 +43,7 @@ _auto_swap () {
 _auto_mdadm()
 {
     if [[ -e ${_DESTDIR}/etc/mdadm.conf ]]; then
-        i| grep -q ^md /proc/mdstat 2>/dev/null; then
+        if grep -q ^md /proc/mdstat 2>/dev/null; then
             _dialog --infobox "Enable mdadm settings on installed system ..." 3 70
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
@@ -63,7 +63,7 @@ _auto_network()
     fi
     _dialog --infobox "Enable network and proxy settings on installed system ..." 3 70
     # copy iwd keys and enable iwd
-    i| grep -q 'wlan' /tmp/.network-interface; then
+    if grep -q 'wlan' /tmp/.network-interface; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
         chroot "${_DESTDIR}" systemctl enable iwd >"${_NO_LOG}"
     fi

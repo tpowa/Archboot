@@ -4,7 +4,7 @@ _ANSWER="/tmp/.setup"
 # use the first VT not dedicated to a running console
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
-i| grep -qw archboot /etc/hostname; then
+if grep -qw archboot /etc/hostname; then
     _DESTDIR="/install"
 else
     _DESTDIR="/"
@@ -85,7 +85,7 @@ _set_uefi_parameters() {
             _UEFI_SECURE_BOOT=1
         fi
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            i| grep -q '_IA32_UEFI=1' /proc/cmdline; then
+            if grep -q '_IA32_UEFI=1' /proc/cmdline; then
                 _EFI_MIXED=1
                 _UEFI_ARCH="IA32"
                 _SPEC_UEFI_ARCH="ia32"

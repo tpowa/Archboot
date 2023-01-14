@@ -69,11 +69,11 @@ _getrootfslabel() {
 _freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
-        i| grep -q "${_DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
+        if grep -q "${_DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
             xfs_freeze -f "${_DESTDIR}"/boot >"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}"/boot >"${_NO_LOG}"
         fi
-        i| grep -q "${_DESTDIR} " /proc/mounts | grep -q " xfs "; then
+        if grep -q "${_DESTDIR} " /proc/mounts | grep -q " xfs "; then
             xfs_freeze -f "${_DESTDIR}" >"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}" >"${_NO_LOG}"
         fi

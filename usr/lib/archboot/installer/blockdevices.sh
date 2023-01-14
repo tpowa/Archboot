@@ -311,7 +311,7 @@ _umountall()
 
 _stopmd()
 {
-    i| grep -q ^md /proc/mdstat 2>/dev/null; then
+    if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
         _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
@@ -495,7 +495,7 @@ _raid()
         while [[ -z "${_RAIDDEVICE}" ]]; do
             _dialog --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
             _RAIDDEVICE=$(cat "${_ANSWER}")
-            i| grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
+            if grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
                 _dialog --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 _RAIDDEVICE=""
             fi
