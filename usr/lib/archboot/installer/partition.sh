@@ -20,12 +20,12 @@ _check_gpt() {
         if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
-            sgdisk --zap "${_DISK}" >"${_NO_LOG}"
+            sgdisk --zap "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
             # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-            dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}"
-            wipefs -a "${_DISK}" >"${_NO_LOG}"
+            dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}">"${_NO_LOG}"
+            wipefs -a "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
             # create fresh GPT
-            sgdisk --clear "${_DISK}" >"${_NO_LOG}"
+            sgdisk --clear "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
             _GUID_DETECTED=1
         fi
     fi
@@ -86,8 +86,8 @@ _check_efisys_part() {
             _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
-        umount "${_DESTDIR}/${_UEFISYS_MP}" >"${_NO_LOG}"
-        umount "${_UEFISYSDEV}" >"${_NO_LOG}"
+        umount "${_DESTDIR}/${_UEFISYS_MP}" >"${_NO_LOG}">"${_NO_LOG}"
+        umount "${_UEFISYSDEV}" >"${_NO_LOG}">"${_NO_LOG}"
         if [[ -n "${_FORMAT_UEFISYS_FAT32}" ]]; then
             mkfs.vfat -F32 -n "EFISYS" "${_UEFISYSDEV}"
         fi
@@ -141,8 +141,8 @@ _partition() {
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
-                    dd if=/dev/zero of="${_DEV}" bs=512 count=2048 >"${_NO_LOG}"
-                    wipefs -a "${_DEV}" >"${_NO_LOG}"
+                    dd if=/dev/zero of="${_DEV}" bs=512 count=2048 >"${_NO_LOG}">"${_NO_LOG}"
+                    wipefs -a "${_DEV}" >"${_NO_LOG}">"${_NO_LOG}"
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc

@@ -53,14 +53,14 @@ _autoprepare() {
     fi
     while [[ -z "${_DEFAULTFS}" ]]; do
         _FSOPTS=""
-        command -v mkfs.btrfs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-        command -v mkfs.ext4 >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
-        command -v mkfs.ext3 >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
-        command -v mkfs.ext2 >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
-        command -v mkfs.xfs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
-        command -v mkfs.f2fs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
-        command -v mkfs.nilfs2 >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-        command -v mkfs.jfs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
+        command -v mkfs.btrfs >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
+        command -v mkfs.ext4 >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
+        command -v mkfs.ext3 >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
+        command -v mkfs.ext2 >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
+        command -v mkfs.xfs >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
+        command -v mkfs.f2fs >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
+        command -v mkfs.nilfs2 >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
+        command -v mkfs.jfs >"${_NO_LOG}">"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
             _GPT_BIOS_GRUB_DEV_SIZE="2"
@@ -196,12 +196,12 @@ _autoprepare() {
         _printk off
         _dialog --infobox "Partitioning ${_DISK} ..." 0 0
         # clean partition table to avoid issues!
-        sgdisk --zap "${_DISK}" >"${_NO_LOG}"
+        sgdisk --zap "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
         # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}"
-        wipefs -a "${_DISK}" >"${_NO_LOG}"
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}">"${_NO_LOG}"
+        wipefs -a "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
         # create fresh GPT
-        sgdisk --clear "${_DISK}" >"${_NO_LOG}"
+        sgdisk --clear "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
         # create actual partitions
         sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
         sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
@@ -223,10 +223,10 @@ _autoprepare() {
         _printk off
         _dialog --infobox "Partitioning ${_DISK}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}"
-        wipefs -a "${_DISK}" >"${_NO_LOG}"
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}">"${_NO_LOG}"
+        wipefs -a "${_DISK}" >"${_NO_LOG}">"${_NO_LOG}"
         # create DOS MBR with parted
-        parted -a optimal -s "${_DISK}" unit MiB mktable msdos >"${_NO_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mktable msdos >"${_NO_LOG}">"${_NO_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
