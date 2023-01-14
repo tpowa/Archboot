@@ -65,14 +65,14 @@ _auto_network()
     # copy iwd keys and enable iwd
     if grep -q 'wlan' /tmp/.network-interface; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
-        chroot "${_DESTDIR}" systemctl enable iwd >${_NO_LOG}
+        chroot "${_DESTDIR}" systemctl enable iwd >"${_NO_LOG}"
     fi
     # copy network profiles
     if [[ -d ${_DESTDIR}/etc/systemd/network ]]; then
         # enable network profiles
-        cp /etc/systemd/network/* "${_DESTDIR}"/etc/systemd/network/ >${_NO_LOG}
-        chroot "${_DESTDIR}" systemctl enable systemd-networkd >${_NO_LOG}
-        chroot "${_DESTDIR}" systemctl enable systemd-resolved >${_NO_LOG}
+        cp /etc/systemd/network/* "${_DESTDIR}"/etc/systemd/network/ >"${_NO_LOG}"
+        chroot "${_DESTDIR}" systemctl enable systemd-networkd >"${_NO_LOG}"
+        chroot "${_DESTDIR}" systemctl enable systemd-resolved >"${_NO_LOG}"
     fi
     # copy proxy settings
     if [[ -n "${_PROXY}" ]]; then
