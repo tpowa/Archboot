@@ -21,18 +21,18 @@ _getraidarrays() {
 }
 
 _getcryptsetup() {
-    _CRYPTSETUP=""
+    _LUKSSETUP=""
     if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
         if cryptsetup status "$(basename "${_ROOTDEV}")"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                _CRYPTDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                _CRYPTDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             else
-                _CRYPTDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
+                _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
             fi
-            _CRYPTNAME="$(basename "${_ROOTDEV}")"
-            _CRYPTSETUP="cryptdevice=${_CRYPTDEV}:${_CRYPTNAME}"
+            _LUKSNAME="$(basename "${_ROOTDEV}")"
+            _LUKSSETUP="cryptdevice=${_LUKSDEV}:${_LUKSNAME}"
         fi
     fi
 }
@@ -88,7 +88,7 @@ _bootloader_kernel_parameters() {
     fi
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
     _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
 }
 
@@ -724,7 +724,7 @@ _do_uboot() {
     _check_bootpart
     _abort_uboot
     [[ -d "${_DESTDIR}/boot/extlinux" ]] || mkdir -p "${_DESTDIR}/boot/extlinux"
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_CRYPTSETUP}"
+    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"

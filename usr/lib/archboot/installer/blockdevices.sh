@@ -908,7 +908,7 @@ _opening_luks() {
 
 _helpluks()
 {
-_dialog --msgbox "LUKS ENCRYPTION SUMMARY:\n
+_dialog --msgbox "LUKS ENLUKSION SUMMARY:\n
 -----------------------------\n\n
 Encryption is useful for two (related) reasons.\n
 Firstly, it prevents anyone with physical access to your computer,\n
@@ -935,12 +935,12 @@ _luks()
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
         _activate_special_devices
         # Remove all crypt devices with children
-        _CRYPT_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
+        _LUKS_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     ${_LSBLK} NAME "${i}"
                     done)"
         #shellcheck disable=SC2119
         _DEVS="$(for i in $(_finddevices); do
-                echo "${_CRYPT_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
+                echo "${_LUKS_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then

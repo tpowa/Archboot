@@ -1,41 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_create_special() {
-    _NEXTITEM=""
-    _SPECIALDONE=""
-    while [[ -z "${_SPECIALDONE}" ]]; do
-        if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
-        else
-            _DEFAULT=""
-        fi
-        _CANCEL=""
-        #shellcheck disable=SC2086
-        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 11 60 5 \
-            "1" "Manage Software Raid" \
-            "2" "Manage LVM2" \
-            "3" "Manage Luks encryption" \
-            "4" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL=1
-        _NEXTITEM="$(cat "${_ANSWER}")"
-        case $(cat "${_ANSWER}") in
-            "1")
-                _createraid_menu ;;
-            "2")
-                _createlvm_menu ;;
-            "3")
-                _createluks_menu ;;
-            *)
-                _SPECIALDONE=1 ;;
-        esac
-    done
-    if [[ -n "${_CANCEL}" ]]; then
-        _NEXTITEM="3"
-    else
-        _NEXTITEM="4"
-    fi
-}
-
-_createraid_menu() {
+_create_raid_menu() {
     _NEXTITEM=""
     _MDDONE=""
     while [[ -z "${_MDDONE}" ]]; do
@@ -71,7 +36,7 @@ _createraid_menu() {
     _NEXTITEM=1
 }
 
-_createlvm_menu() {
+_create_lvm_menu() {
     _NEXTITEM=""
     _LVMDONE=""
     while [[ -z "${_LVMDONE}" ]]; do
@@ -108,7 +73,7 @@ _createlvm_menu() {
     _NEXTITEM="2"
 }
 
-_createluks_menu() {
+_create_luks_menu() {
     _NEXTITEM=""
     _LUKSDONE=""
     while [[ -z "${_LUKSDONE}" ]]; do
@@ -137,4 +102,39 @@ _createluks_menu() {
         esac
     done
     _NEXTITEM="3"
+}
+
+_create_special_menu() {
+    _NEXTITEM=""
+    _SPECIALDONE=""
+    while [[ -z "${_SPECIALDONE}" ]]; do
+        if [[ -n "${_NEXTITEM}" ]]; then
+            _DEFAULT="--default-item ${_NEXTITEM}"
+        else
+            _DEFAULT=""
+        fi
+        _CANCEL=""
+        #shellcheck disable=SC2086
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Software Raid, LVM2 and Luks encryption" 11 60 5 \
+            "1" "Manage Software Raid" \
+            "2" "Manage LVM2" \
+            "3" "Manage Luks encryption" \
+            "4" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL=1
+        _NEXTITEM="$(cat "${_ANSWER}")"
+        case $(cat "${_ANSWER}") in
+            "1")
+                _create_raid_menu ;;
+            "2")
+                _create_lvm_menu ;;
+            "3")
+                _create_luks_menu ;;
+            *)
+                _SPECIALDONE=1 ;;
+        esac
+    done
+    if [[ -n "${_CANCEL}" ]]; then
+        _NEXTITEM="3"
+    else
+        _NEXTITEM="4"
+    fi
 }
