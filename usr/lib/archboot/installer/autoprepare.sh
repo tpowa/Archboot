@@ -200,12 +200,12 @@ _autoprepare() {
         _printk off
         _dialog --infobox "Partitioning ${_DISK} ..." 0 0
         # clean partition table to avoid issues!
-        sgdisk --zap "${_DISK}" &>/dev/null
+        sgdisk --zap "${_DISK}" >"${_NO_LOG}"
         # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 &>/dev/null
-        wipefs -a "${_DISK}" &>/dev/null
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}"
+        wipefs -a "${_DISK}" >"${_NO_LOG}"
         # create fresh GPT
-        sgdisk --clear "${_DISK}" &>/dev/null
+        sgdisk --clear "${_DISK}" >"${_NO_LOG}"
         # create actual partitions
         sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" > "${_LOG}"
         sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" > "${_LOG}"
@@ -228,7 +228,7 @@ _autoprepare() {
         _dialog --infobox "Partitioning ${_DISK}" 0 0
         # clean partitiontable to avoid issues!
         dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >"${_NO_LOG}"
-        wipefs -a "${_DISK}" &>/dev/null
+        wipefs -a "${_DISK}" >"${_NO_LOG}"
         # create DOS MBR with parted
         parted -a optimal -s "${_DISK}" unit MiB mktable msdos >"${_NO_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
