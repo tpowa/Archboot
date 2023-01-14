@@ -82,8 +82,6 @@ _set_password() {
     rm /tmp/.password
 }
 
-# run_mkinitcpio()
-# runs mkinitcpio on the target system, displays output
 _run_mkinitcpio() {
     _dialog --infobox "Rebuilding initramfs on installed system ..." 3 70
     _chroot_mount

@@ -47,7 +47,6 @@ _marvell_firmware() {
     done
 }
 
-# chroot_mount()
 # prepares target system as a chroot
 _chroot_mount()
 {
@@ -63,7 +62,6 @@ _chroot_mount()
     fi
 }
 
-# chroot_umount()
 # tears down chroot in target system
 _chroot_umount()
 {

@@ -106,15 +106,11 @@ _check_efisys_part() {
 }
 
 _partition() {
-    # disable swap and all mounted partitions, umount / last!
     _umountall
-    # check on encrypted devices, else weird things can happen!
+    # stop special devices, else weird things can happen during partitioning
     _stopluks
-    # check on raid devices, else weird things can happen during partitioning!
     _stopmd
-    # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
-    # switch for mbr usage
     _set_guid
     # Select disk to partition
     _DISKS=$(_finddisks _)
