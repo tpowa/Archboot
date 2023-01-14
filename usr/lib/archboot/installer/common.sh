@@ -150,8 +150,8 @@ _auto_packages() {
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 _locale_gen() {
     if [[ "${_DESTDIR}" == "/install" ]]; then
-        systemd-nspawn -q -D "${_DESTDIR}" locale-gen > ${_NO_LOG}
+        systemd-nspawn -q -D "${_DESTDIR}" locale-gen >${_NO_LOG}
     else
-        locale-gen > ${_NO_LOG}
+        locale-gen >${_NO_LOG}
     fi
 }

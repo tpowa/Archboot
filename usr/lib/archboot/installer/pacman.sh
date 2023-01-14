@@ -118,11 +118,11 @@ _prepare_pacman() {
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     _dialog --infobox "Waiting for Arch Linux keyring initialization ..." 3 40
     # pacman-key process itself
-    while pgrep -x pacman-key > ${_NO_LOG}; do
+    while pgrep -x pacman-key >${_NO_LOG}; do
         sleep 1
     done
     # gpg finished in background
-    while pgrep -x gpg > ${_NO_LOG}; do
+    while pgrep -x gpg >${_NO_LOG}; do
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
@@ -144,7 +144,7 @@ _run_pacman(){
     echo "Installing Packages ..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log > ${_NO_LOG}
+    ${_PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log >${_NO_LOG}
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log

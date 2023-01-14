@@ -56,14 +56,14 @@ _autoprepare() {
     fi
     while [[ -z "${_DEFAULTFS}" ]]; do
         _FSOPTS=""
-        command -v mkfs.btrfs > ${_NO_LOG} && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-        command -v mkfs.ext4 > ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext4 Ext4"
-        command -v mkfs.ext3 > ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext3 Ext3"
-        command -v mkfs.ext2 > ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext2 Ext2"
-        command -v mkfs.xfs > ${_NO_LOG} && _FSOPTS="${_FSOPTS} xfs XFS"
-        command -v mkfs.f2fs > ${_NO_LOG} && _FSOPTS="${_FSOPTS} f2fs F2FS"
-        command -v mkfs.nilfs2 > ${_NO_LOG} && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-        command -v mkfs.jfs > ${_NO_LOG} && _FSOPTS="${_FSOPTS} jfs JFS"
+        command -v mkfs.btrfs >${_NO_LOG} && _FSOPTS="${_FSOPTS} btrfs Btrfs"
+        command -v mkfs.ext4 >${_NO_LOG} && _FSOPTS="${_FSOPTS} ext4 Ext4"
+        command -v mkfs.ext3 >${_NO_LOG} && _FSOPTS="${_FSOPTS} ext3 Ext3"
+        command -v mkfs.ext2 >${_NO_LOG} && _FSOPTS="${_FSOPTS} ext2 Ext2"
+        command -v mkfs.xfs >${_NO_LOG} && _FSOPTS="${_FSOPTS} xfs XFS"
+        command -v mkfs.f2fs >${_NO_LOG} && _FSOPTS="${_FSOPTS} f2fs F2FS"
+        command -v mkfs.nilfs2 >${_NO_LOG} && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
+        command -v mkfs.jfs >${_NO_LOG} && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
             _GUID_DEVICE_SIZE="2"
@@ -227,10 +227,10 @@ _autoprepare() {
         _printk off
         _dialog --infobox "Partitioning ${_DISK}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 > ${_NO_LOG}
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >${_NO_LOG}
         wipefs -a "${_DISK}" &>/dev/null
         # create DOS MBR with parted
-        parted -a optimal -s "${_DISK}" unit MiB mktable msdos > ${_NO_LOG}
+        parted -a optimal -s "${_DISK}" unit MiB mktable msdos >${_NO_LOG}
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) >"${_LOG}"

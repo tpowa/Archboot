@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # scan and update btrfs devices
 _btrfs_scan() {
-    btrfs device scan > ${_NO_LOG}
+    btrfs device scan >${_NO_LOG}
 }
 
 # mount btrfs for checks

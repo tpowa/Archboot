@@ -30,9 +30,9 @@ _do_wireless() {
     _WLAN_AUTH=""
     if [[ "${_CONNECTION}" == "wireless" ]]; then
         # disconnect the interface first!
-        iwctl station "${_INTERFACE}" disconnect > ${_NO_LOG}
+        iwctl station "${_INTERFACE}" disconnect >${_NO_LOG}
         # clean old keys first!
-        rm -f /var/lib/iwd/* > ${_NO_LOG}
+        rm -f /var/lib/iwd/* >${_NO_LOG}
         #shellcheck disable=SC2086,SC2046
         _dialog --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
         $(_essid_scan _) \
@@ -61,9 +61,9 @@ _do_wireless() {
             _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE} ..." 3 70
             _printk off
             if [[ -z "${_WLAN_KEY}" ]]; then
-                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > ${_NO_LOG} && _WLAN_AUTH=1
+                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" >${_NO_LOG} && _WLAN_AUTH=1
             else
-                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" > ${_NO_LOG} && _WLAN_AUTH=1
+                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" >${_NO_LOG} && _WLAN_AUTH=1
             fi
             if [[ -n "${_WLAN_AUTH}" ]]; then
                 _dialog --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
