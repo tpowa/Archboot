@@ -70,12 +70,12 @@ _freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
         if grep -q "${_DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f "${_DESTDIR}"/boot >/dev/null 2>&1
-            xfs_freeze -u "${_DESTDIR}"/boot >/dev/null 2>&1
+            xfs_freeze -f "${_DESTDIR}"/boot ${_NO_LOG}
+            xfs_freeze -u "${_DESTDIR}"/boot ${_NO_LOG}
         fi
         if grep -q "${_DESTDIR} " /proc/mounts | grep -q " xfs "; then
-            xfs_freeze -f "${_DESTDIR}" >/dev/null 2>&1
-            xfs_freeze -u "${_DESTDIR}" >/dev/null 2>&1
+            xfs_freeze -f "${_DESTDIR}" ${_NO_LOG}
+            xfs_freeze -u "${_DESTDIR}" ${_NO_LOG}
         fi
     fi
 }
@@ -391,9 +391,9 @@ CONFEOF
             echo "ExecStart=/usr/bin/cp -f /boot/${_INTEL_UCODE} ${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${_DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${_DESTDIR}" systemctl enable efistub_copy.path >/dev/null 2>&1
+            systemd-nspawn -q -D "${_DESTDIR}" systemctl enable efistub_copy.path ${_NO_LOG}
         else
-            systemctl enable efistub_copy.path >/dev/null 2>&1
+            systemctl enable efistub_copy.path ${_NO_LOG}
         fi
         sleep 5
     fi

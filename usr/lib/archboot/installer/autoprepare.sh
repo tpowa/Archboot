@@ -227,10 +227,10 @@ _autoprepare() {
         _printk off
         _dialog --infobox "Partitioning ${_DISK}" 0 0
         # clean partitiontable to avoid issues!
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 >/dev/null 2>&1
+        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 ${_NO_LOG}
         wipefs -a "${_DISK}" &>/dev/null
         # create DOS MBR with parted
-        parted -a optimal -s "${_DISK}" unit MiB mktable msdos >/dev/null 2>&1
+        parted -a optimal -s "${_DISK}" unit MiB mktable msdos ${_NO_LOG}
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) >"${_LOG}"

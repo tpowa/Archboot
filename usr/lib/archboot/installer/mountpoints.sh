@@ -246,7 +246,7 @@ _mkfs() {
     # add btrfs raid level, if needed
     # we have two main cases: "swap" and everything else.
     if [[ "${2}" == "swap" ]]; then
-        swapoff "${1}" >/dev/null 2>&1
+        swapoff "${1}" ${_NO_LOG}
         if [[ -n "${4}" ]]; then
             mkswap -L "${6}" "${1}" >"${_LOG}" 2>&1
             #shellcheck disable=SC2181

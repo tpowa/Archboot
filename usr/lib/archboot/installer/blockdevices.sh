@@ -200,9 +200,9 @@ _activate_lvm2()
         _OLD_LVM2_GROUPS=${_LVM2_GROUPS}
         _OLD_LVM2_VOLUMES=${_LVM2_VOLUMES}
         _dialog --infobox "Scanning logical volumes..." 0 0
-        lvm vgscan --ignorelockingfailure >/dev/null 2>&1
+        lvm vgscan --ignorelockingfailure ${_NO_LOG}
         _dialog --infobox "Activating logical volumes..." 0 0
-        lvm vgchange --ignorelockingfailure --ignoremonitoring -ay >/dev/null 2>&1
+        lvm vgchange --ignorelockingfailure --ignoremonitoring -ay ${_NO_LOG}
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>/dev/null)"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>/dev/null)"
         [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _LVM2_READY="1"
@@ -214,7 +214,7 @@ _activate_raid()
     _RAID_READY=""
     if [[ -e /usr/bin/mdadm ]]; then
         _dialog --infobox "Activating RAID arrays..." 0 0
-        mdadm --assemble --scan >/dev/null 2>&1 || _RAID_READY="1"
+        mdadm --assemble --scan ${_NO_LOG} || _RAID_READY="1"
     fi
 }
 
@@ -300,7 +300,7 @@ _getavailpartitions()
 _umountall()
 {
     if [[ "${_DESTDIR}" == "/install" ]] && mountpoint -q "${_DESTDIR}"; then
-        swapoff -a >/dev/null 2>&1
+        swapoff -a ${_NO_LOG}
         for i in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
         done
