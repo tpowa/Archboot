@@ -737,7 +737,7 @@ _createvg()
         while [[ -z "${_VGDEVICE}" ]]; do
             _dialog --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
             _VGDEVICE=$(cat "${_ANSWER}")
-            if vgs -o vg_name --noheadin| grep -q "^  ${_VGDEVICE}"; then
+            if vgs -o vg_name --noheading | grep -q "^  ${_VGDEVICE}"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 _VGDEVICE=""
             fi
@@ -801,7 +801,7 @@ _createlv()
         while [[ -z "${LVDEVICE}" ]]; do
             _dialog --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
             _LVDEVICE=$(cat "${_ANSWER}")
-            if lvs -o lv_name,vg_name --noheadin| grep -q " ${_LVDEVICE} ${_LV}$"; then
+            if lvs -o lv_name,vg_name --noheading | grep -q " ${_LVDEVICE} ${_LV}$"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 _LVDEVICE=""
             fi
