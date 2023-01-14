@@ -235,7 +235,7 @@ _configure_system() {
         elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
-            run_locale_gen
+            _run_locale_gen
         elif [[ "${_FILE}" = "Root-Password" ]]; then
             _set_password
         else
