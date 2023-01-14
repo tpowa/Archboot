@@ -19,7 +19,7 @@ _umount_btrfs() {
 }
 
 # Set _BTRFS_DEVS on detected btrfs devices
-_find_btrfs_raid_devices() {
+_find_btrfsraid_devices() {
     _btrfs_scan
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
         for i in $(btrfs filesystem show "${_DEV}" | cut -d " " -f 11); do
@@ -28,7 +28,7 @@ _find_btrfs_raid_devices() {
     fi
 }
 
-_find_btrfs_raid_bootloader_devices() {
+_find_btrfsraid_bootloader_devices() {
     _btrfs_scan
     _BTRFS_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
@@ -103,7 +103,7 @@ _btrfs_parts() {
 }
 
 # choose raid level to use on btrfs device
-_btrfs_raid_level() {
+_btrfsraid_level() {
     _BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid5 - raid6 - raid10 - single -"
     _BTRFS_RAID_FINISH=""
     _BTRFS_LEVEL=""
@@ -121,13 +121,13 @@ _btrfs_raid_level() {
                 _dialog --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
             fi
             # take selected device as 1st device, add additional devices in part below.
-            _select_btrfs_raid_devices
+            _select_btrfsraid_devices
         fi
     done
 }
 
 # select btrfs raid devices
-_select_btrfs_raid_devices () {
+_select_btrfsraid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
@@ -163,7 +163,7 @@ _select_btrfs_raid_devices () {
 
 # prepare new btrfs device
 _prepare_btrfs() {
-    _btrfs_raid_level || return 1
+    _btrfsraid_level || return 1
     _prepare_btrfs_subvolume || return 1
 }
 
