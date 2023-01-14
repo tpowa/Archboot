@@ -92,7 +92,7 @@ _create_luks_menu() {
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
-                _luks ;;
+                _createluks ;;
             "2")
                 _stopluks ;;
             "3")

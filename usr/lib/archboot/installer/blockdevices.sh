@@ -928,7 +928,7 @@ attacks. The encryption is only as good as your key management, and there\n
 are other ways to break into computers, while they are running." 0 0
 }
 
-_luks()
+_createluks()
 {
     _NAME_SCHEME_PARAMETER_RUN=""
     _LUKSFINISH=""
