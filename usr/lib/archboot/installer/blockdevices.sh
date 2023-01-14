@@ -491,13 +491,13 @@ _raid()
             return 1
         fi
         # enter raid device name
-        _RAIDDEVICE=""
-        while [[ -z "${_RAIDDEVICE}" ]]; do
+        _RAIDDEV=""
+        while [[ -z "${_RAIDDEV}" ]]; do
             _dialog --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
-            _RAIDDEVICE=$(cat "${_ANSWER}")
-            if grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
+            _RAIDDEV=$(cat "${_ANSWER}")
+            if grep -q "^${_RAIDDEV//\/dev\//}" /proc/mdstat; then
                 _dialog --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
-                _RAIDDEVICE=""
+                _RAIDDEV=""
             fi
         done
         _RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
@@ -534,7 +534,7 @@ _raid()
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
             [[ "${_DEV}" == "DONE" ]] && break
             if [[ "${_DEV}" == "MISSING" ]]; then
-                _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEVICE}?" 0 0 && _DEGRADED="missing"
+                _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
             else
                 if [[ -n "${_SPARE}" ]]; then
@@ -546,7 +546,7 @@ _raid()
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create ${_RAIDDEVICE} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
     done
     _umountall
     _createraid
@@ -566,13 +566,13 @@ _createraid()
     ! [[ "${_RAID_DEVS}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVS}"
     ! [[ "${_SPARE_DEVS}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVS}"
     [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
-    _dialog --infobox "Creating ${_RAIDDEVICE}..." 0 0
+    _dialog --infobox "Creating ${_RAIDDEV}..." 0 0
     #shellcheck disable=SC2086
-    if mdadm --create ${_RAIDDEVICE} ${_RAIDOPTIONS} ${_DEVS} >"${_LOG}" 2>&1; then
-        _dialog --infobox "${_RAIDDEVICE} created successfully.\n\nContinuing in 3 seconds..." 5 50
+    if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} >"${_LOG}" 2>&1; then
+        _dialog --infobox "${_RAIDDEV} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        _dialog --msgbox "Error creating ${_RAIDDEVICE} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error creating ${_RAIDDEV} (see ${_LOG} for details)." 0 0
         return 1
     fi
     if [[ -n ${_RAID_DEVITION} ]]; then
@@ -580,9 +580,9 @@ _createraid()
         _set_guid
         if [[ -z "${_GUIDPARAMETER}" ]]; then
             _dialog --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
-            cfdisk "${_RAIDDEVICE}"
+            cfdisk "${_RAIDDEV}"
         else
-            _DISK="${_RAIDDEVICE}"
+            _DISK="${_RAIDDEV}"
             _RUN_CFDISK=1
             _CHECK_BIOS_BOOT_GRUB=""
             _CHECK_UEFISYSDEV=""
@@ -725,7 +725,7 @@ _createvg()
     _VGFINISH=""
     while [[ "${_VGFINISH}" != "DONE" ]]; do
         : >/tmp/.pvs
-        _VGDEVICE=""
+        _VGDEV=""
         _PVS=$(_findpv _)
         # break if all devices are in use
         if [[ -z "${PVS}" ]]; then
@@ -733,13 +733,13 @@ _createvg()
             return 1
         fi
         # enter volume group name
-        _VGDEVICE=""
-        while [[ -z "${_VGDEVICE}" ]]; do
+        _VGDEV=""
+        while [[ -z "${_VGDEV}" ]]; do
             _dialog --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
-            _VGDEVICE=$(cat "${_ANSWER}")
-            if vgs -o vg_name --noheading | grep -q "^  ${_VGDEVICE}"; then
+            _VGDEV=$(cat "${_ANSWER}")
+            if vgs -o vg_name --noheading | grep -q "^  ${_VGDEV}"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
-                _VGDEVICE=""
+                _VGDEV=""
             fi
         done
         # show all devices with sizes, which are not in use
@@ -748,7 +748,7 @@ _createvg()
         # select the first device to use, no missing option available!
         _PVNUMBER=1
         #shellcheck disable=SC2086
-        _dialog --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
         _PV=$(cat "${_ANSWER}")
         echo "${_PV}" >>/tmp/.pvs
         while [[ "${_PVS}" != "DONE" ]]; do
@@ -758,23 +758,23 @@ _createvg()
             _PVS="$(echo ${_PVS} | sed -e "s#${_PV} _##g")"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEVICE}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
             _PV=$(cat "${_ANSWER}")
             [[ "${_PV}" == "DONE" ]] && break
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEVICE}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
+        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
     done
-    _dialog --infobox "Creating Volume Group ${_VGDEVICE}..." 0 0
+    _dialog --infobox "Creating Volume Group ${_VGDEV}..." 0 0
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
-    if vgcreate ${_VGDEVICE} ${_PV} >"${_LOG}" 2>&1; then
-        _dialog --infobox "Creating Volume Group ${_VGDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+    if vgcreate ${_VGDEV} ${_PV} >"${_LOG}" 2>&1; then
+        _dialog --infobox "Creating Volume Group ${_VGDEV} successful.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        _dialog --msgbox "Error creating Volume Group ${_VGDEVICE} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
         return 1
     fi
 }
@@ -783,7 +783,7 @@ _createlv()
 {
     _LVFINISH=""
     while [[ "${_LVFINISH}" != "DONE" ]]; do
-        _LVDEVICE=""
+        _LVDEV=""
         _LV_SIZE_SET=""
         _LVS=$(_findvg _)
         # break if all devices are in use
@@ -797,13 +797,13 @@ _createlv()
         _dialog --menu "Select Volume Group:" 11 50 5 ${_LVS} 2>"${_ANSWER}" || return 1
         _LV=$(cat "${_ANSWER}")
         # enter logical volume name
-        _LVDEVICE=""
-        while [[ -z "${LVDEVICE}" ]]; do
+        _LVDEV=""
+        while [[ -z "${_LVDEV}" ]]; do
             _dialog --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
-            _LVDEVICE=$(cat "${_ANSWER}")
-            if lvs -o lv_name,vg_name --noheading | grep -q " ${_LVDEVICE} ${_LV}$"; then
+            _LVDEV=$(cat "${_ANSWER}")
+            if lvs -o lv_name,vg_name --noheading | grep -q " ${_LVDEV} ${_LV}$"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
-                _LVDEVICE=""
+                _LVDEV=""
             fi
         done
         while [[ -z "${_LV_SIZE_SET}" ]]; do
@@ -838,25 +838,25 @@ _createlv()
         fi
         [[ -z "${_LV_SIZE}" ]] && _LV_SIZE="All free space left"
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Logical Volume ${_LVDEVICE} like this?\nVolume Group:\n${_LV}\nVolume Size:\n${_LV_SIZE}\nContiguous Volume:\n${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
+        _dialog --yesno "Would you like to create Logical Volume ${_LVDEV} like this?\nVolume Group:\n${_LV}\nVolume Size:\n${_LV_SIZE}\nContiguous Volume:\n${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
     done
     _umountall
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
-        if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEVICE} >"${_LOG}" 2>&1; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+        if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} >"${_LOG}" 2>&1; then
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            _dialog --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
         fi
     else
         #shellcheck disable=SC2086
-        if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEVICE} >"${_LOG}" 2>&1; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEVICE} successful.\n\nContinuing in 3 seconds..." 5 50
+        if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} >"${_LOG}" 2>&1; then
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            _dialog --msgbox "Error creating Logical Volume ${_LVDEVICE} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
         fi
     fi

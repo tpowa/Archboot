@@ -25,14 +25,14 @@ _getcryptsetup() {
     if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
         if cryptsetup status "$(basename "${_ROOTDEV}")"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                _CRYPTDEVICE="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _CRYPTDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                _CRYPTDEVICE="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _CRYPTDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
             else
-                _CRYPTDEVICE="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
+                _CRYPTDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
             fi
             _CRYPTNAME="$(basename "${_ROOTDEV}")"
-            _CRYPTSETUP="cryptdevice=${_CRYPTDEVICE}:${_CRYPTNAME}"
+            _CRYPTSETUP="cryptdevice=${_CRYPTDEV}:${_CRYPTNAME}"
         fi
     fi
 }
