@@ -98,7 +98,7 @@ _donetwork() {
         done
         echo "${_INTERFACE}" >/tmp/.network-interface
         # iwd renames wireless devices to wlanX
-        if echo "${_INTERFACE}" | grep -q wlan >/dev/null; then
+        if echo "${_INTERFACE}" | grep -q wlan; then
             _CONNECTION="wireless"
         else
             _CONNECTION="ethernet"
