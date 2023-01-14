@@ -382,18 +382,18 @@ _stopluks()
 {
     _DISABLELUKS=""
     _DETECTED_LUKS=""
-    _LUKSDEVICE=""
+    _LUKSDEV=""
     # detect already running luks devices
-    _LUKSDEVICE="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
-    [[ -z "${_LUKSDEVICE}" ]] || _DETECTED_LUKS=1
+    _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
+    [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
         _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
         _dialog --infobox "Removing luks encrypted devices ..." 0 0
-        for i in ${_LUKSDEVICE}; do
-            _LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
+        for i in ${_LUKSDEV}; do
+            _LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
             cryptsetup remove "${i}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEVICE}" >"${_LOG}" 2>&1
@@ -863,13 +863,13 @@ _createlv()
 }
 
 _enter_luks_name() {
-    _LUKSDEVICE=""
-    while [[ -z "${_LUKSDEVICE}" ]]; do
+    _LUKSDEV=""
+    while [[ -z "${_LUKSDEV}" ]]; do
         _dialog --inputbox "Enter the name for luks encrypted device ${_DEVICE}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
-        _LUKSDEVICE=$(cat "${_ANSWER}")
-        if ! cryptsetup status "${_LUKSDEVICE}" | grep -q inactive; then
+        _LUKSDEV=$(cat "${_ANSWER}")
+        if ! cryptsetup status "${_LUKSDEV}" | grep -q inactive; then
             _dialog --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
-            _LUKSDEVICE=""
+            _LUKSDEV=""
         fi
     done
 }
@@ -883,8 +883,8 @@ _enter_luks_passphrase () {
         _LUKSPASS2=$(cat "${_ANSWER}")
         if [[ -n "${_LUKSPASS}" && -n "${_LUKSPASS2}" && "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
-            echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEVICE}"
-            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEVICE}"
+            echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
+            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
         else
              _dialog --msgbox "Passphrases didn't match or was empty, please enter again." 0 0
         fi
@@ -896,14 +896,14 @@ _opening_luks() {
     _dialog --infobox "Opening encrypted ${_DEVICE}..." 0 0
     _LUKSOPEN_SUCCESS=""
     while [[ -z "${_LUKSOPEN_SUCCESS}" ]]; do
-        cryptsetup luksOpen "${_DEVICE}" "${_LUKSDEVICE}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
+        cryptsetup luksOpen "${_DEVICE}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
         if [[ -z "${_LUKSOPEN_SUCCESS}" ]]; then
             _dialog --msgbox "Error: Passphrase didn't match, please enter again." 0 0
             _enter_luks_passphrase || return 1
         fi
     done
-    _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEVICE}" 0 0 || _LUKSPASSPHRASE="ASK"
-    echo "${_LUKSDEVICE}" "${_DEVICE}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
+    _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0 || _LUKSPASSPHRASE="ASK"
+    echo "${_LUKSDEV}" "${_DEVICE}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
 }
 
 _helpluks()
@@ -957,7 +957,7 @@ _luks()
         ### TODO: offer more options for encrypt!
         ###       defaults are used only
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEVICE}\nDevice:${_DEVICE}\n" 0 0 && _LUKSFINISH="DONE"
+        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEV}\nDevice:${_DEVICE}\n" 0 0 && _LUKSFINISH="DONE"
     done
     _enter_luks_passphrase || return 1
     _umountall
