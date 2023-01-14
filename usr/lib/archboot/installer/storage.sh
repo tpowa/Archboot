@@ -104,7 +104,7 @@ _create_luks_menu() {
     _NEXTITEM="3"
 }
 
-_create_special_menu() {
+_create_special() {
     _NEXTITEM=""
     _SPECIALDONE=""
     while [[ -z "${_SPECIALDONE}" ]]; do

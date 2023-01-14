@@ -178,7 +178,7 @@ _prepare_storagedrive() {
             "2")
                 _partition ;;
             "3")
-                _create_special_menu ;;
+                _create_special ;;
             "4")
                 _DEVFINISH=""
                 _ASK_MOUNTPOINTS=1
