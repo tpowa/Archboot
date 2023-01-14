@@ -184,9 +184,9 @@ _do_apple_efi_hfs_bless() {
 _do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
     _DEVICE="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
-    _UEFISYS_DEVICE_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
+    _UEFISYSDEV_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
     _BOOTMGR_DEVICE="${_DEVICE}"
-    _BOOTMGR_DEVICE_NUM="${_UEFISYS_DEVICE_NUM}"
+    _BOOTMGR_DEVICE_NUM="${_UEFISYSDEV_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
     else
@@ -310,7 +310,7 @@ _do_efistub_parameters() {
     _UEFISYS_PATH="EFI/archlinux"
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
-    _UEFISYS_DEVICE_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
+    _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="${_VMLINUZ_EFISTUB}"
@@ -531,12 +531,12 @@ _do_grub_config() {
     _ROOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/" 2>/dev/null)"
     _ROOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/" 2>/dev/null)"
     _ROOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/" 2>/dev/null)"
-    _USR_DEVICE_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/usr" 2>/dev/null)"
-    _USR_DEVICE_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>/dev/null)"
-    _USR_DEVICE_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>/dev/null)"
+    _USRDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/usr" 2>/dev/null)"
+    _USRDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>/dev/null)"
+    _USRDEV_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>/dev/null)"
     if [[ -n "${_GRUB_UEFI}" ]]; then
-        _UEFISYS_DEVICE_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
-        _UEFISYS_DEVICE_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
+        _UEFISYSDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
+        _UEFISYSDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
     fi
     if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
         _SUBDIR="/boot"
@@ -582,7 +582,7 @@ insmod part_msdos
 insmod fat
 insmod ${_BOOTDEV_FS}
 insmod ${_ROOTDEV_FS}
-insmod ${_USR_DEVICE_FS}
+insmod ${_USRDEV_FS}
 insmod search_fs_file
 insmod search_fs_uuid
 insmod search_label
@@ -611,7 +611,7 @@ else
     insmod video_cirrus
 fi
 insmod font
-search --fs-uuid --no-floppy --set=usr_part ${_USR_DEVICE_HINTS_STRING} ${_USR_DEVICE_FS_UUID}
+search --fs-uuid --no-floppy --set=usr_part ${_USRDEV_HINTS_STRING} ${_USRDEV_FS_UUID}
 search --fs-uuid --no-floppy --set=root_part ${_ROOTDEV_HINTS_STRING} ${_ROOTDEV_FS_UUID}
 if [ -e "\${prefix}/fonts/unicode.pf2" ]; then
     set _fontfile="\${prefix}/fonts/unicode.pf2"
@@ -676,7 +676,7 @@ EOF
 if [ "\${grub_platform}" == "efi" ]; then
     ## UEFI Shell
     #menuentry "UEFI Shell \${_UEFI_ARCH} v2" {
-    #    search --fs-uuid --no-floppy --set=root ${_UEFISYS_DEVICE_HINTS_STRING} ${_UEFISYS_DEVICE_FS_UUID}
+    #    search --fs-uuid --no-floppy --set=root ${_UEFISYSDEV_HINTS_STRING} ${_UEFISYSDEV_FS_UUID}
     #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
     #}
 fi
@@ -691,7 +691,7 @@ if [ "\${grub_platform}" == "efi" ]; then
         #    insmod fat
         #    insmod search_fs_uuid
         #    insmod chain
-        #    search --fs-uuid --no-floppy --set=root ${_UEFISYS_DEVICE_HINTS_STRING} ${_UEFISYS_DEVICE_FS_UUID}
+        #    search --fs-uuid --no-floppy --set=root ${_UEFISYSDEV_HINTS_STRING} ${_UEFISYSDEV_FS_UUID}
         #    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
         #}
     fi
@@ -798,7 +798,7 @@ _do_grub_bios() {
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
-        _CHECK_UEFISYS_DEVICE=""
+        _CHECK_UEFISYSDEV=""
         _RUN_CFDISK=""
         _DEVICE="${_BOOTDEV}"
         _check_gpt
