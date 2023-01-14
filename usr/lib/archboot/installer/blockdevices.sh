@@ -86,7 +86,7 @@ _raid_devices() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${dev}| grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}| grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE "${dev}" -s grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s grep -q "ddf_raid_member" && ! find "$dev"*p* -type f -exec echo {} \; 2>/dev/null; then
+        if ! ${_LSBLK} FSTYPE "${dev}| grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}| grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE "${dev}" -| grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -| grep -q "ddf_raid_member" && ! find "$dev"*p* -type f -exec echo {} \; 2>/dev/null; then
             echo "${dev}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -109,7 +109,7 @@ _partitionable_raid_devices_partitions() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${part}| grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${part}| grep -q "crypto_LUKS" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" && ! ${_LSBLK} FSTYPE "${dev}" -s grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s grep -q "ddf_raid_member"; then
+        if ! ${_LSBLK} FSTYPE "${part}| grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${part}| grep -q "crypto_LUKS" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" && ! ${_LSBLK} FSTYPE "${dev}" -| grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -| grep -q "ddf_raid_member"; then
             echo "${part}"
             [[ "${1}" ]] && echo "${1}"
         fi
@@ -311,7 +311,7 @@ _umountall()
 
 _stopmd()
 {
-    if grep -q ^md /proc/mdstat 2>/dev/null; then
+    i| grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
         _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
@@ -495,7 +495,7 @@ _raid()
         while [[ -z "${_RAIDDEVICE}" ]]; do
             _dialog --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
             _RAIDDEVICE=$(cat "${_ANSWER}")
-            if grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
+            i| grep -q "^${_RAIDDEVICE//\/dev\//}" /proc/mdstat; then
                 _dialog --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 _RAIDDEVICE=""
             fi
@@ -737,7 +737,7 @@ _createvg()
         while [[ -z "${_VGDEVICE}" ]]; do
             _dialog --inputbox "Enter the Volume Group name:\nfoogroup\n<yourvolumegroupname>\n\n" 11 40 "foogroup" 2>"${_ANSWER}" || return 1
             _VGDEVICE=$(cat "${_ANSWER}")
-            if vgs -o vg_name --noheading grep -q "^  ${_VGDEVICE}"; then
+            if vgs -o vg_name --noheadin| grep -q "^  ${_VGDEVICE}"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Volume Group names! Please enter another name." 8 65
                 _VGDEVICE=""
             fi
@@ -801,7 +801,7 @@ _createlv()
         while [[ -z "${LVDEVICE}" ]]; do
             _dialog --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
             _LVDEVICE=$(cat "${_ANSWER}")
-            if lvs -o lv_name,vg_name --noheading grep -q " ${_LVDEVICE} ${_LV}$"; then
+            if lvs -o lv_name,vg_name --noheadin| grep -q " ${_LVDEVICE} ${_LV}$"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
                 _LVDEVICE=""
             fi
