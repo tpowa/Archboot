@@ -886,7 +886,6 @@ _enter_luks_passphrase () {
     done
 }
 
-# opening luks
 _opening_luks() {
     _dialog --infobox "Opening encrypted ${_DEV}..." 0 0
     _LUKSOPEN_SUCCESS=""
