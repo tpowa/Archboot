@@ -28,7 +28,7 @@ _create_raid_menu() {
             "3")
                 _stopmd ;;
             "4")
-                _helpraid ;;
+                _helpmd ;;
               *)
                 _MDDONE=1 ;;
         esac

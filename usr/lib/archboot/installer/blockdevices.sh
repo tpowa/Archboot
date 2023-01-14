@@ -416,7 +416,7 @@ _stopluks()
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
 }
 
-_helpraid()
+_helpmd()
 {
 _dialog --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
 -----------------------------\n\n
