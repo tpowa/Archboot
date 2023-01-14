@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _autoprepare() {
-    # check on encrypted devices, else weird things can happen!
+    # check on special devices and stop them, else weird things can happen during partitioning!
     _stopluks
-    # check on raid devices, else weird things can happen during partitioning!
     _stopmd
-    # check on lvm devices, else weird things can happen during partitioning!
     _stoplvm
     _NAME_SCHEME_PARAMETER_RUN=""
     # switch for mbr usage
@@ -26,17 +24,16 @@ _autoprepare() {
             return 1
         fi
     fi
-    _BOOT_DEVICE_SIZE=""
-    _GUID_DEVICE_SIZE=""
-    _UEFISYS_DEVICE_SIZE=""
+    _BOOTDEV_SIZE=""
+    _UEFISYSDEV_SIZE=""
     _DEFAULTFS=""
     _UEFISYS_BOOTDEV=""
     _UEFISYS_MP=""
-    _UEFISYS_DEVICE_SET=""
-    _BOOT_DEVICE_SET=""
-    _SWAP_DEVICE_SET=""
-    _ROOT_DEVICE_SET=""
-    _CHOSEN_FS=""
+    _UEFISYSDEV_SET=""
+    _BOOTDEV_SET=""
+    _SWAPDEV_SET=""
+    _ROOTDEV_SET=""
+    _CHOSENFS=""
     # get just the disk size in 1000*1000 MB
     _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}")/1000000))"
     if [[ -z "${_DISK_SIZE}" ]]; then
@@ -66,128 +63,127 @@ _autoprepare() {
         command -v mkfs.jfs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
-            _GUID_DEVICE_SIZE="2"
-            _GPT_BIOS_GRUB_DEVICE_SIZE="${_GUID_DEVICE_SIZE}"
+            _GPT_BIOS_GRUB_DEVICE_SIZE="2"
             _DEVICE_NUM=1
             _GPT_BIOS_GRUB_DEVICE_NUM="${_DEVICE_NUM}"
-            _DISK_SIZE="$((_DISK_SIZE-_GUID_DEVICE_SIZE))"
+            _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEVICE_SIZE))"
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-                while [[ -z "${_UEFISYS_DEVICE_SET}" ]]; do
+                while [[ -z "${_UEFISYSDEV_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
-                    _UEFISYS_DEVICE_SIZE="$(cat "${_ANSWER}")"
-                    if [[ -z "${_UEFISYS_DEVICE_SIZE}" ]]; then
+                    _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
+                    if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
-                        if [[ "${_UEFISYS_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYS_DEVICE_SIZE}" -lt "260" || "${_UEFISYS_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                        if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
-                            _BOOT_DEVICE_SET=1
-                            _UEFISYS_DEVICE_SET=1
+                            _BOOTDEV_SET=1
+                            _UEFISYSDEV_SET=1
                             _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                            _UEFISYS_DEVICE_NUM="${_DEVICE_NUM}"
+                            _UEFISYSDEV_NUM="${_DEVICE_NUM}"
                         fi
                     fi
                 done
             else
-                while [[ -z "${_UEFISYS_DEVICE_SET}" ]]; do
+                while [[ -z "${_UEFISYSDEV_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
-                    _UEFISYS_DEVICE_SIZE="$(cat "${_ANSWER}")"
-                    if [[ -z "${_UEFISYS_DEVICE_SIZE}" ]]; then
+                    _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
+                    if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                     else
-                        if [[ "${_UEFISYS_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYS_DEVICE_SIZE}" -lt "260" || "${_UEFISYS_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                        if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
-                            _UEFISYS_DEVICE_SET=1
+                            _UEFISYSDEV_SET=1
                             _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                            _UEFISYS_DEVICE_NUM="${_DEVICE_NUM}"
+                            _UEFISYSDEV_NUM="${_DEVICE_NUM}"
                         fi
                     fi
                 done
             fi
-            _DISK_SIZE="$((_DISK_SIZE-_UEFISYS_DEVICE_SIZE))"
-            while [[ -z "${_BOOT_DEVICE_SET}" ]]; do
+            _DISK_SIZE="$((_DISK_SIZE-_UEFISYSDEV_SIZE))"
+            while [[ -z "${_BOOTDEV_SET}" ]]; do
                 _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
-                _BOOT_DEVICE_SIZE="$(cat "${_ANSWER}")"
-                if [[ -z "${_BOOT_DEVICE_SIZE}" ]]; then
+                _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
+                if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "100" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                    if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
-                        _BOOT_DEVICE_SET=1
-                        _DEVICE_NUM="$((_UEFISYS_DEVICE_NUM+1))"
-                        _BOOT_DEVICE_NUM="${_DEVICE_NUM}"
-                        _DISK_SIZE="$((_DISK_SIZE-_BOOT_DEVICE_SIZE))"
+                        _BOOTDEV_SET=1
+                        _DEVICE_NUM="$((_UEFISYSDEV_NUM+1))"
+                        _BOOTDEV_NUM="${_DEVICE_NUM}"
+                        _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
             done
         else
-            while [[ -z "${BOOT_DEVICE_SET}" ]]; do
+            while [[ -z "${BOOTDEV_SET}" ]]; do
                 _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
-                _BOOT_DEVICE_SIZE="$(cat "${_ANSWER}")"
-                if [[ -z "${_BOOT_DEVICE_SIZE}" ]]; then
+                _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
+                if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_BOOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOT_DEVICE_SIZE}" -lt "100" || "${_BOOT_DEVICE_SIZE}" == "${_DISK_SIZE}" ]]; then
+                    if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
-                        _BOOT_DEVICE_SET=1
+                        _BOOTDEV_SET=1
                         _DEVICE_NUM=1
-                        _BOOT_DEVICE_NUM="${_DEVICE_NUM}"
-                        _DISK_SIZE="$((_DISK_SIZE-_BOOT_DEVICE_SIZE))"
+                        _BOOTDEV_NUM="${_DEVICE_NUM}"
+                        _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
             done
         fi
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
-        while [[ -z "${_SWAP_DEVICE_SET}" ]]; do
+        while [[ -z "${_SWAPDEV_SET}" ]]; do
             _dialog --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
-            _SWAP_DEVICE_SIZE=$(cat "${_ANSWER}")
-            if [[ -z "${_SWAP_DEVICE_SIZE}" || "${_SWAP_DEVICE_SIZE}" == 0 ]]; then
+            _SWAPDEV_SIZE=$(cat "${_ANSWER}")
+            if [[ -z "${_SWAPDEV_SIZE}" || "${_SWAPDEV_SIZE}" == 0 ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
-                if [[ "${_SWAP_DEVICE_SIZE}" -ge "${_DISK_SIZE}" ]]; then
+                if [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
-                    _SWAP_DEVICE_SET=1
+                    _SWAPDEV_SET=1
                     _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                    _SWAP_DEVICE_NUM="${_DEVICE_NUM}"
+                    _SWAPDEV_NUM="${_DEVICE_NUM}"
                 fi
             fi
         done
-        while [[ -z "${_CHOSEN_FS}" ]]; do
+        while [[ -z "${_CHOSENFS}" ]]; do
             #shellcheck disable=SC2086
             _dialog --menu "Select a filesystem for / and /home:" 16 45 9 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
-            _dialog --yesno "${_FSTYPE} will be used for / and /home. Is this OK?" 0 0 && _CHOSEN_FS=1
+            _dialog --yesno "${_FSTYPE} will be used for / and /home. Is this OK?" 0 0 && _CHOSENFS=1
         done
         # / and /home are subvolumes on btrfs
         if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _DISK_SIZE="$((_DISK_SIZE-_SWAP_DEVICE_SIZE))"
+            _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
             _ROOT_SIZE="7500"
             [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="${_DISK_SIZE}"
-            while [[ -z "${_ROOT_DEVICE_SET}" ]]; do
+            while [[ -z "${_ROOTDEV_SET}" ]]; do
             _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 10 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
-            _ROOT_DEVICE_SIZE=$(cat "${_ANSWER}")
-                if [[ -z "${_ROOT_DEVICE_SIZE}" || "${_ROOT_DEVICE_SIZE}" == 0 || "${_ROOT_DEVICE_SIZE}" -lt "2000" ]]; then
+            _ROOTDEV_SIZE=$(cat "${_ANSWER}")
+                if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                     _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                 else
-                    if [[ "${_ROOT_DEVICE_SIZE}" -ge "${_DISK_SIZE}" ]]; then
+                    if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
-                        _dialog --yesno "$((_DISK_SIZE-_ROOT_DEVICE_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && _ROOT_DEVICE_SET=1
+                        _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
                     fi
                 fi
             done
         fi
         _DEVICE_NUM="$((_DEVICE_NUM+1))"
-        _ROOT_DEVICE_NUM="${_DEVICE_NUM}"
+        _ROOTDEV_NUM="${_DEVICE_NUM}"
         if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
             _DEVICE_NUM="$((_DEVICE_NUM+1))"
         fi
-        _HOME_DEVICE_NUM="${_DEVICE_NUM}"
+        _HOMEDEV_NUM="${_DEVICE_NUM}"
         _DEFAULTFS=1
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
@@ -208,18 +204,18 @@ _autoprepare() {
         sgdisk --clear "${_DISK}" >"${_NO_LOG}"
         # create actual partitions
         sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
-        sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DISK}" >"${_LOG}"
+            sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":8300 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
         fi
-        sgdisk --set-alignment="2048" --new="${_SWAP_DEVICE_NUM}":0:+"${_SWAP_DEVICE_SIZE}"M --typecode="${_SWAP_DEVICE_NUM}":8200 --change-name="${_SWAP_DEVICE_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:0 --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:+"${_ROOT_DEVICE_SIZE}"M --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
-            sgdisk --set-alignment="2048" --new="${_HOME_DEVICE_NUM}":0:0 --typecode="${_HOME_DEVICE_NUM}":8302 --change-name="${_HOME_DEVICE_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
@@ -231,15 +227,15 @@ _autoprepare() {
         wipefs -a "${_DISK}" >"${_NO_LOG}"
         # create DOS MBR with parted
         parted -a optimal -s "${_DISK}" unit MiB mktable msdos >"${_NO_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
         # $(sgdisk -E ${DEVICE}) | grep ^[0-9] as end of last partition to keep the possibilty to convert to GPT later, instead of 100%
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
         else
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE)) $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) >"${_LOG}"
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_GUID_DEVICE_SIZE+_BOOT_DEVICE_SIZE+_SWAP_DEVICE_SIZE+_ROOT_DEVICE_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
         fi
     fi
     #shellcheck disable=SC2181
@@ -257,19 +253,19 @@ _autoprepare() {
     ## <partnum>:<fstype>:<mountpoint>:<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    _FSSPEC_ROOT_DEVICE="${_ROOT_DEVICE_NUM}:${_FSTYPE}:/:ROOT_ARCH"
-    _FSSPEC_HOME_DEVICE="${_HOME_DEVICE_NUM}:${_FSTYPE}:/home:HOME_ARCH"
-    _FSSPEC_SWAP_DEVICE="${_SWAP_DEVICE_NUM}:swap:swap:SWAP_ARCH"
-    _FSSPEC_BOOT_DEVICE="${_BOOT_DEVICE_NUM}:ext2:/boot:BOOT_ARCH"
-    _FSSPEC_UEFISYS_DEVICE="${_UEFISYS_DEVICE_NUM}:vfat:${_UEFISYS_MP}:EFISYS"
+    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}:${_FSTYPE}:/:ROOT_ARCH"
+    _FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:HOME_ARCH"
+    _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:SWAP_ARCH"
+    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:BOOT_ARCH"
+    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:EFISYS"
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_UEFISYS_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
+            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         else
-            _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_BOOT_DEVICE} ${_FSSPEC_UEFISYS_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
+            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         fi
     else
-        _FSSPECS="${_FSSPEC_ROOT_DEVICE} ${_FSSPEC_BOOT_DEVICE} ${_FSSPEC_HOME_DEVICE} ${_FSSPEC_SWAP_DEVICE}"
+        _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
