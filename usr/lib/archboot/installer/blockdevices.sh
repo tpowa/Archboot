@@ -320,15 +320,15 @@ _stopmd()
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                wipefs -a --force "/dev/${i}" > "${_LOG}"  2>&1
-                mdadm --manage --stop "/dev/${i}" > "${_LOG}" 2>&1
+                wipefs -a --force "/dev/${i}" >"${_LOG}"  2>&1
+                mdadm --manage --stop "/dev/${i}" >"${_LOG}" 2>&1
             done
             _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > "${_LOG}" 2>&1
-                wipefs -a --force "${i}" > "${_LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${_LOG}" 2>&1
+                sgdisk --zap "${i}" >"${_LOG}" 2>&1
+                wipefs -a --force "${i}" >"${_LOG}" 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 >"${_LOG}" 2>&1
             done
         fi
     fi
@@ -340,9 +340,9 @@ _stopmd()
             _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
             for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
                 # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" > "${_LOG}" 2>&1
-                wipefs -a "${i}" > "${_LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 > "${_LOG}"  2>&1
+                sgdisk --zap "${i}" >"${_LOG}" 2>&1
+                wipefs -a "${i}" >"${_LOG}" 2>&1
+                dd if=/dev/zero of="${i}" bs=512 count=2048 >"${_LOG}"  2>&1
             done
         fi
     fi
@@ -365,15 +365,15 @@ _stoplvm()
         _umountall
         _dialog --infobox "Removing logical volumes ..." 0 0
         for i in ${_LV_VOLUMES}; do
-            lvremove -f "/dev/mapper/${i}" 2>/dev/null> "${_LOG}"
+            lvremove -f "/dev/mapper/${i}" 2>/dev/null>"${_LOG}"
         done
         _dialog --infobox "Removing logical groups ..." 0 0
         for i in ${_LV_GROUPS}; do
-            vgremove -f "${i}" 2>/dev/null > "${_LOG}"
+            vgremove -f "${i}" 2>/dev/null >"${_LOG}"
         done
         _dialog --infobox "Removing physical volumes ..." 0 0
         for i in ${_LV_PHYSICAL}; do
-            pvremove -f "${i}" 2>/dev/null > "${_LOG}"
+            pvremove -f "${i}" 2>/dev/null >"${_LOG}"
         done
     fi
 }
@@ -394,9 +394,9 @@ _stopluks()
         _dialog --infobox "Removing luks encrypted devices ..." 0 0
         for i in ${_LUKSDEVICE}; do
             _LUKS_REAL_DEVICE="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEVICE}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
-            cryptsetup remove "${i}" > "${_LOG}"
+            cryptsetup remove "${i}" >"${_LOG}"
             # delete header from device
-            wipefs -a "${_LUKS_REAL_DEVICE}" > "${_LOG}" 2>&1
+            wipefs -a "${_LUKS_REAL_DEVICE}" >"${_LOG}" 2>&1
         done
     fi
     _DISABLELUKS=""
@@ -410,7 +410,7 @@ _stopluks()
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a "${i}" > "${_LOG}" 2>&1
+           wipefs -a "${i}" >"${_LOG}" 2>&1
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab

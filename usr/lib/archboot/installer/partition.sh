@@ -14,9 +14,9 @@ _check_gpt() {
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
     if [[ -z "${_GUID_DETECTED}" ]]; then
         _dialog --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt "${_DISK}" > "${_LOG}" && _GUID_DETECTED=1
+        sgdisk --mbrtogpt "${_DISK}" >"${_LOG}" && _GUID_DETECTED=1
         # reread partitiontable for kernel
-        partprobe "${_DISK}" > "${_LOG}"
+        partprobe "${_DISK}" >"${_LOG}"
         if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             # clean partition table to avoid issues!
@@ -56,8 +56,8 @@ _check_efisys_part() {
         _GUID_DETECTED=""
         _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\nUEFI boot requires ${_DISK} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
         _dialog --msgbox "Setup will now try to non-destructively convert ${_DISK} to GPT using sgdisk." 0 0
-        sgdisk --mbrtogpt "${_DISK}" > "${_LOG}" && _GUID_DETECTED=1
-        partprobe "${_DISK}" > "${_LOG}"
+        sgdisk --mbrtogpt "${_DISK}" >"${_LOG}" && _GUID_DETECTED=1
+        partprobe "${_DISK}" >"${_LOG}"
         if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --msgbox "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\n You need to fix your partition table first, before setup can proceed." 0 0
             return 1

@@ -207,21 +207,21 @@ _autoprepare() {
         # create fresh GPT
         sgdisk --clear "${_DISK}" >"${_NO_LOG}"
         # create actual partitions
-        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" > "${_LOG}"
-        sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_UEFISYS_DEVICE_NUM}":0:+"${_UEFISYS_DEVICE_SIZE}"M --typecode="${_UEFISYS_DEVICE_NUM}":EF00 --change-name="${_UEFISYS_DEVICE_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DISK}" > "${_LOG}"
+            sgdisk --attributes="${_UEFISYS_DEVICE_NUM}":set:2 "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DISK}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_BOOT_DEVICE_NUM}":0:+"${_BOOT_DEVICE_SIZE}"M --typecode="${_BOOT_DEVICE_NUM}":8300 --attributes="${_BOOT_DEVICE_NUM}":set:2 --change-name="${_BOOT_DEVICE_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
         fi
-        sgdisk --set-alignment="2048" --new="${_SWAP_DEVICE_NUM}":0:+"${_SWAP_DEVICE_SIZE}"M --typecode="${_SWAP_DEVICE_NUM}":8200 --change-name="${_SWAP_DEVICE_NUM}":ARCHLINUX_SWAP "${_DISK}" > "${_LOG}"
+        sgdisk --set-alignment="2048" --new="${_SWAP_DEVICE_NUM}":0:+"${_SWAP_DEVICE_SIZE}"M --typecode="${_SWAP_DEVICE_NUM}":8200 --change-name="${_SWAP_DEVICE_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:0 --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:0 --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:+"${_ROOT_DEVICE_SIZE}"M --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" > "${_LOG}"
-            sgdisk --set-alignment="2048" --new="${_HOME_DEVICE_NUM}":0:0 --typecode="${_HOME_DEVICE_NUM}":8302 --change-name="${_HOME_DEVICE_NUM}":ARCHLINUX_HOME "${_DISK}" > "${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_ROOT_DEVICE_NUM}":0:+"${_ROOT_DEVICE_SIZE}"M --typecode="${_ROOT_DEVICE_NUM}":8300 --change-name="${_ROOT_DEVICE_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --set-alignment="2048" --new="${_HOME_DEVICE_NUM}":0:0 --typecode="${_HOME_DEVICE_NUM}":8302 --change-name="${_HOME_DEVICE_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
         fi
-        sgdisk --print "${_DISK}" > "${_LOG}"
+        sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
         _printk off

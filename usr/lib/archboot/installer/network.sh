@@ -166,15 +166,15 @@ _donetwork() {
         done
     fi
     if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then
-        echo "Disabled Archboot's bootup wired auto dhcp browsing." > "${_LOG}"
+        echo "Disabled Archboot's bootup wired auto dhcp browsing." >"${_LOG}"
         rm /etc/systemd/network/10-wired-auto-dhcp.network
     fi
-    echo "Using setup's network profile ${_NETWORK_PROFILE} now..." > "${_LOG}"
+    echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
     _dialog --infobox "Waiting for network link to come up ..." 3 60
     # add sleep here for systemd-resolve get correct values
     sleep 5
-    if ! getent hosts www.google.com > "${_LOG}" 2>&1; then
+    if ! getent hosts www.google.com >"${_LOG}" 2>&1; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
         return 1
     fi
