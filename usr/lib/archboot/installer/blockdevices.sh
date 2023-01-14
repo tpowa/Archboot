@@ -209,7 +209,7 @@ _activate_lvm2()
     fi
 }
 
-_activate_raid()
+_activate_md()
 {
     _RAID_READY=""
     if [[ -e /usr/bin/mdadm ]]; then
@@ -250,7 +250,7 @@ _activate_special_devices()
     _LUKS_READY=""
     _LVM2_READY=""
     while [[ -n "${_LVM2_READY}" && -n "${_RAID_READY}" && -n "${_LUKS_READY}" ]]; do
-        _activate_raid
+        _activate_md
         _activate_lvm2
         _activate_luks
     done
