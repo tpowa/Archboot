@@ -121,7 +121,6 @@ _abort_uboot(){
         fi
 }
 
-# check for nilfs2 bootpart and abort if detected
 _abort_nilfs_bootpart() {
         _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "nilfs2" ]]; then
@@ -130,7 +129,6 @@ _abort_nilfs_bootpart() {
         fi
 }
 
-# check for f2fs bootpart and abort if detected
 _abort_f2fs_bootpart() {
         _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
         if [[ "${_FSTYPE}" == "f2fs" ]]; then
