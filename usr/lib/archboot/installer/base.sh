@@ -85,7 +85,7 @@ _set_uefi_parameters() {
             _UEFI_SECURE_BOOT=1
         fi
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            if grep -q '_IA32_UEFI=1' /proc/cmdline 1>/dev/null; then
+            if grep -q '_IA32_UEFI=1' /proc/cmdline; then
                 _EFI_MIXED=1
                 _UEFI_ARCH="IA32"
                 _SPEC_UEFI_ARCH="ia32"
