@@ -146,7 +146,7 @@ _partition() {
                     _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
                     dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 >"${_NO_LOG}"
-                    wipefs -a "${_DEVICE}" /dev/null 2>&1
+                    wipefs -a "${_DEVICE}" >"${_LOG}"
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
