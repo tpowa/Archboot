@@ -227,18 +227,18 @@ _configure_system() {
             "Root-Password"                 "Set the root password" \
             "Return"                        "Return to Main Menu" 2>${_ANSWER} || break
         _FILE="$(cat ${_ANSWER})"
-        if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then       # exit
+        if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
             break
-        elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then       # non-file
+        elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
             _set_mkinitcpio
-        elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then            # non-file
+        elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             run_locale_gen
-        elif [[ "${_FILE}" = "Root-Password" ]]; then              # non-file
+        elif [[ "${_FILE}" = "Root-Password" ]]; then
             _set_password
-        else                                                      #regular file
+        else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi
     done
