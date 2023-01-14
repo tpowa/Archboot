@@ -55,9 +55,7 @@ _select_mirror() {
     echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
 }
 
-# dotesting()
-# enable testing repository on network install
-_dotesting() {
+_enable_testing() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
         _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING=1
         if [[ -n "${_DOTESTING}" ]]; then
@@ -68,7 +66,6 @@ _dotesting() {
     fi
 }
 
-# check for updating complete environment with packages
 _update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache ..."  >"${_LOG}"
@@ -108,9 +105,6 @@ _update_environment() {
     fi
 }
 
-# configures pacman and syncs db on destination system
-# params: none
-# returns: 1 on error
 _prepare_pacman() {
     _NEXTITEM="5"
     # Set up the necessary directories for pacman use
@@ -135,10 +129,7 @@ _prepare_pacman() {
     pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} >"${_LOG}" 2>&1 || (_dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
-# Set _PACKAGES parameter before running to install wanted packages
 _run_pacman(){
-    # create chroot environment on target system
-    # code straight from mkarchroot
     _chroot_mount
     _dialog --infobox "Pacman is running...\n\nInstalling package(s) to ${_DESTDIR}:\n${_PACKAGES} ...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress ..." 10 70
     echo "Installing Packages ..." >/tmp/pacman.log
@@ -167,8 +158,6 @@ _run_pacman(){
     _chroot_umount
 }
 
-# install_packages()
-# performs package installation to the target system
 _install_packages() {
     _destdir_mounts || return 1
     if [[ -z "${_S_SRC}" ]]; then
