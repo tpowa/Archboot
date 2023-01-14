@@ -21,10 +21,10 @@ _create_raid_menu() {
         case $(cat "${_ANSWER}") in
             "1")
                 _RAID_PARTITION=""
-                _createraid ;;
+                _createmd ;;
             "2")
                 _RAID_PARTITION=1
-                _createraid ;;
+                _createmd ;;
             "3")
                 _stopmd ;;
             "4")

@@ -471,7 +471,7 @@ disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
 }
 
-_createraid()
+_createmd()
 {
     _MDFINISH=""
     while [[ "${_MDFINISH}" != "DONE" ]]; do
@@ -549,10 +549,10 @@ _createraid()
         _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
     done
     _umountall
-    _createraid
+    _createmd
 }
 
-_createraid()
+_createmd()
 {
     _DEVS="$(echo -n "$(cat /tmp/.raid)")"
     _SPARES="$(echo -n "$(cat /tmp/.raid-spare)")"
