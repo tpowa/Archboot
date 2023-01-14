@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# menu for raid, lvm and encrypt
 _create_special() {
     _NEXTITEM=""
     _SPECIALDONE=""
@@ -20,11 +19,11 @@ _create_special() {
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1")
-                _createmd ;;
+                _createraid_menu ;;
             "2")
-                _createlvm ;;
+                _createlvm_menu ;;
             "3")
-                _createluks ;;
+                _createluks_menu ;;
             *)
                 _SPECIALDONE=1 ;;
         esac
@@ -36,8 +35,7 @@ _create_special() {
     fi
 }
 
-# menu for md creation
-_createmd() {
+_createraid_menu() {
     _NEXTITEM=""
     _MDDONE=""
     while [[ -z "${_MDDONE}" ]]; do
@@ -73,8 +71,7 @@ _createmd() {
     _NEXTITEM=1
 }
 
-# menu for lvm creation
-_createlvm() {
+_createlvm_menu() {
     _NEXTITEM=""
     _LVMDONE=""
     while [[ -z "${_LVMDONE}" ]]; do
@@ -111,8 +108,7 @@ _createlvm() {
     _NEXTITEM="2"
 }
 
-# menu for luks creation
-_createluks() {
+_createluks_menu() {
     _NEXTITEM=""
     _LUKSDONE=""
     while [[ -z "${_LUKSDONE}" ]]; do
