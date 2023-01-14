@@ -118,11 +118,11 @@ _prepare_pacman() {
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     _dialog --infobox "Waiting for Arch Linux keyring initialization ..." 3 40
     # pacman-key process itself
-    while pgrep -x pacman-key > /dev/null 2>&1; do
+    while pgrep -x pacman-key ${_NO_LOG}; do
         sleep 1
     done
     # gpg finished in background
-    while pgrep -x gpg > /dev/null 2>&1; do
+    while pgrep -x gpg ${_NO_LOG}; do
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service

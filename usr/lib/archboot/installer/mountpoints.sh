@@ -46,15 +46,15 @@ _ssd_optimization() {
 _select_filesystem() {
     # don't allow vfat as / filesystem, it will not work!
     _FSOPTS=""
-    command -v mkfs.btrfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-    command -v mkfs.ext4 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext4 Ext4"
-    command -v mkfs.ext3 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext3 Ext3"
-    command -v mkfs.ext2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} ext2 Ext2"
-    command -v mkfs.vfat > /dev/null 2>&1 && [[ -z "${_DO_ROOT}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
-    command -v mkfs.xfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} xfs XFS"
-    command -v mkfs.f2fs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} f2fs F2FS"
-    command -v mkfs.nilfs2 > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-    command -v mkfs.jfs > /dev/null 2>&1 && _FSOPTS="${_FSOPTS} jfs JFS"
+    command -v mkfs.btrfs ${_NO_LOG} && _FSOPTS="${_FSOPTS} btrfs Btrfs"
+    command -v mkfs.ext4 ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext4 Ext4"
+    command -v mkfs.ext3 ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext3 Ext3"
+    command -v mkfs.ext2 ${_NO_LOG} && _FSOPTS="${_FSOPTS} ext2 Ext2"
+    command -v mkfs.vfat ${_NO_LOG} && [[ -z "${_DO_ROOT}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
+    command -v mkfs.xfs ${_NO_LOG} && _FSOPTS="${_FSOPTS} xfs XFS"
+    command -v mkfs.f2fs ${_NO_LOG} && _FSOPTS="${_FSOPTS} f2fs F2FS"
+    command -v mkfs.nilfs2 ${_NO_LOG} && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
+    command -v mkfs.jfs ${_NO_LOG} && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
     _dialog --menu "Select a filesystem for ${_DEVICE}:" 16 50 13 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
