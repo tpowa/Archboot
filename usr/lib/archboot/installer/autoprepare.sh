@@ -24,16 +24,16 @@ _autoprepare() {
             return 1
         fi
     fi
-    _BOOTDEV_SIZE=""
-    _UEFISYSDEV_SIZE=""
     _DEFAULTFS=""
+    _CHOSENFS=""
     _UEFISYS_BOOTDEV=""
     _UEFISYS_MP=""
     _UEFISYSDEV_SET=""
     _BOOTDEV_SET=""
     _SWAPDEV_SET=""
     _ROOTDEV_SET=""
-    _CHOSENFS=""
+    _BOOTDEV_SIZE=""
+    _UEFISYSDEV_SIZE=""
     # get just the disk size in 1000*1000 MB
     _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}")/1000000))"
     if [[ -z "${_DISK_SIZE}" ]]; then
@@ -203,19 +203,19 @@ _autoprepare() {
         # create fresh GPT
         sgdisk --clear "${_DISK}" >"${_NO_LOG}"
         # create actual partitions
-        sgdisk --set-alignment="2048" --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
-        sgdisk --set-alignment="2048" --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":8300 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":8300 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
         fi
-        sgdisk --set-alignment="2048" --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --set-alignment="2048" --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
         else
-            sgdisk --set-alignment="2048" --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
-            sgdisk --set-alignment="2048" --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
