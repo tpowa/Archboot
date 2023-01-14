@@ -471,7 +471,7 @@ disk failures. The main disadvantage is cost, because 50% of your\n
 storage is duplication." 0 0
 }
 
-_raid()
+_createraid()
 {
     _MDFINISH=""
     while [[ "${_MDFINISH}" != "DONE" ]]; do
