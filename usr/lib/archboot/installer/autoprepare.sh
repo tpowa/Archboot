@@ -63,10 +63,10 @@ _autoprepare() {
         command -v mkfs.jfs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
-            _GPT_BIOS_GRUB_DEVICE_SIZE="2"
-            _DEVICE_NUM=1
-            _GPT_BIOS_GRUB_DEVICE_NUM="${_DEVICE_NUM}"
-            _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEVICE_SIZE))"
+            _GPT_BIOS_GRUB_DEV_SIZE="2"
+            _DEV_NUM=1
+            _GPT_BIOS_GRUB_DEV_NUM="${_DEV_NUM}"
+            _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
@@ -79,8 +79,8 @@ _autoprepare() {
                         else
                             _BOOTDEV_SET=1
                             _UEFISYSDEV_SET=1
-                            _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                            _UEFISYSDEV_NUM="${_DEVICE_NUM}"
+                            _DEV_NUM="$((_DEV_NUM+1))"
+                            _UEFISYSDEV_NUM="${_DEV_NUM}"
                         fi
                     fi
                 done
@@ -95,8 +95,8 @@ _autoprepare() {
                             _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
                             _UEFISYSDEV_SET=1
-                            _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                            _UEFISYSDEV_NUM="${_DEVICE_NUM}"
+                            _DEV_NUM="$((_DEV_NUM+1))"
+                            _UEFISYSDEV_NUM="${_DEV_NUM}"
                         fi
                     fi
                 done
@@ -112,8 +112,8 @@ _autoprepare() {
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOTDEV_SET=1
-                        _DEVICE_NUM="$((_UEFISYSDEV_NUM+1))"
-                        _BOOTDEV_NUM="${_DEVICE_NUM}"
+                        _DEV_NUM="$((_UEFISYSDEV_NUM+1))"
+                        _BOOTDEV_NUM="${_DEV_NUM}"
                         _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
@@ -129,8 +129,8 @@ _autoprepare() {
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOTDEV_SET=1
-                        _DEVICE_NUM=1
-                        _BOOTDEV_NUM="${_DEVICE_NUM}"
+                        _DEV_NUM=1
+                        _BOOTDEV_NUM="${_DEV_NUM}"
                         _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
@@ -148,8 +148,8 @@ _autoprepare() {
                     _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     _SWAPDEV_SET=1
-                    _DEVICE_NUM="$((_DEVICE_NUM+1))"
-                    _SWAPDEV_NUM="${_DEVICE_NUM}"
+                    _DEV_NUM="$((_DEV_NUM+1))"
+                    _SWAPDEV_NUM="${_DEV_NUM}"
                 fi
             fi
         done
@@ -178,12 +178,12 @@ _autoprepare() {
                 fi
             done
         fi
-        _DEVICE_NUM="$((_DEVICE_NUM+1))"
-        _ROOTDEV_NUM="${_DEVICE_NUM}"
+        _DEV_NUM="$((_DEV_NUM+1))"
+        _ROOTDEV_NUM="${_DEV_NUM}"
         if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _DEVICE_NUM="$((_DEVICE_NUM+1))"
+            _DEV_NUM="$((_DEV_NUM+1))"
         fi
-        _HOMEDEV_NUM="${_DEVICE_NUM}"
+        _HOMEDEV_NUM="${_DEV_NUM}"
         _DEFAULTFS=1
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
@@ -203,7 +203,7 @@ _autoprepare() {
         # create fresh GPT
         sgdisk --clear "${_DISK}" >"${_NO_LOG}"
         # create actual partitions
-        sgdisk --new="${_GPT_BIOS_GRUB_DEVICE_NUM}":0:+"${_GPT_BIOS_GRUB_DEVICE_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEVICE_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEVICE_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
         sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
@@ -269,19 +269,19 @@ _autoprepare() {
     fi
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
-        _DEVICE="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
         # MMC uses /dev/mmcblk0pX
         if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
-            _DEVICE="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
         fi
         _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
         _DOMKFS=1
         _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
         _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
         _FS_OPTIONS=""
-        _BTRFS_DEVICES="${_DEVICE}"
+        _BTRFS_DEVS="${_DEV}"
         _BTRFS_LEVEL=""
         _BTRFS_SUBVOLUME=""
         _BTRFS_COMPRESS=""
@@ -290,8 +290,8 @@ _autoprepare() {
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
             _BTRFS_COMPRESS="compress=zstd"
         fi
-        _mkfs "${_DEVICE}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVICES}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
     _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70

@@ -45,7 +45,7 @@ _check_gpt() {
         _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
         clear && cfdisk "${_DISK}"
         # reread partitiontable for kernel
-        partprobe "${_DEVICE}"
+        partprobe "${_DEV}"
     fi
 }
 
@@ -145,8 +145,8 @@ _partition() {
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     # clean partitiontable to avoid issues!
-                    dd if=/dev/zero of="${_DEVICE}" bs=512 count=2048 >"${_NO_LOG}"
-                    wipefs -a "${_DEVICE}" >"${_NO_LOG}"
+                    dd if=/dev/zero of="${_DEV}" bs=512 count=2048 >"${_NO_LOG}"
+                    wipefs -a "${_DEV}" >"${_NO_LOG}"
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc

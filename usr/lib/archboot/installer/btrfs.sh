@@ -9,7 +9,7 @@ _btrfs_scan() {
 _mount_btrfs() {
     _btrfs_scan
     _BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
-    mount "${_DEVICE}" "${_BTRFSMP}"
+    mount "${_DEV}" "${_BTRFSMP}"
 }
 
 # unmount btrfs after checks done
@@ -18,12 +18,12 @@ _umount_btrfs() {
     rm -r "${_BTRFSMP}"
 }
 
-# Set _BTRFS_DEVICES on detected btrfs devices
+# Set _BTRFS_DEVS on detected btrfs devices
 _find_btrfs_raid_devices() {
     _btrfs_scan
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
-        for i in $(btrfs filesystem show "${_DEVICE}" | cut -d " " -f 11); do
-            _BTRFS_DEVICES="${_BTRFS_DEVICES}#${i}"
+        for i in $(btrfs filesystem show "${_DEV}" | cut -d " " -f 11); do
+            _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
         done
     fi
 }
@@ -32,9 +32,9 @@ _find_btrfs_raid_bootloader_devices() {
     _btrfs_scan
     _BTRFS_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
-        _BTRFS_DEVICES=""
+        _BTRFS_DEVS=""
         for i in $(btrfs filesystem show "${_BOOTDEV}" | cut -d " " -f 11); do
-            _BTRFS_DEVICES="${_BTRFS_DEVICES}#${i}"
+            _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
             _BTRFS_COUNT=$((_BTRFS_COUNT+1))
         done
     fi
@@ -56,7 +56,7 @@ _find_btrfs_subvolume() {
 _find_btrfs_bootloader_subvolume() {
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
         _BTRFS_SUBVOLUMES=""
-        _DEVICE="${_BOOTDEV}"
+        _DEV="${_BOOTDEV}"
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 7); do
             _BTRFS_SUBVOLUMES="${_BTRFS_SUBVOLUMES}#${i}"
@@ -78,7 +78,7 @@ _check_btrfs_filesystem_creation() {
     _DETECT_CREATE_FILESYSTEM=""
     _SKIP_FILESYSTEM=""
     #shellcheck disable=SC2013
-    for i in $(grep "${_DEVICE}[:#]" /tmp/.parts); do
+    for i in $(grep "${_DEV}[:#]" /tmp/.parts); do
         if echo "${i}" | grep -q ":btrfs:"; then
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
@@ -91,14 +91,14 @@ _check_btrfs_filesystem_creation() {
 # remove devices with no subvolume from list and generate raid device list
 _btrfs_parts() {
      if [[ -s /tmp/.btrfs-devices ]]; then
-         _BTRFS_DEVICES=""
+         _BTRFS_DEVS=""
          while read -r i; do
-             _BTRFS_DEVICES="${_BTRFS_DEVICES}#${i}"
+             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
              # remove device if no subvolume is used!
-             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVICES="${_DEVICES//${i}\ _/}"
+             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${i}\ _/}"
          done < /tmp/.btrfs-devices
      else
-         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVICES="${_DEVICES//${_DEVICE}\ _/}"
+         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${_DEV}\ _/}"
      fi
 }
 
@@ -107,14 +107,14 @@ _btrfs_raid_level() {
     _BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid5 - raid6 - raid10 - single -"
     _BTRFS_RAID_FINISH=""
     _BTRFS_LEVEL=""
-    _BTRFS_DEVICE="${_DEVICE}"
+    _BTRFS_DEV="${_DEV}"
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
         _dialog --menu "Select the raid data level you want to use:" 14 50 10 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "NONE" ]]; then
-            echo "${_BTRFS_DEVICE}" >>/tmp/.btrfs-devices
+            echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
             break
         else
             if [[ "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
@@ -130,15 +130,15 @@ _btrfs_raid_level() {
 _select_btrfs_raid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
-    echo "${_BTRFS_DEVICE}" >>/tmp/.btrfs-devices
+    echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     #shellcheck disable=SC2001,SC2086
-    _BTRFS_DEVICES=$(echo ${_DEVICES} | sed -e "s#${_BTRFS_DEVICE}\ _##g")
+    _BTRFS_DEVS=$(echo ${_DEVS} | sed -e "s#${_BTRFS_DEV}\ _##g")
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
-    _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVICES} 2>"${_ANSWER}" || return 1
-    _BTRFS_DEVICE=$(cat "${_ANSWER}")
-    echo "${_BTRFS_DEVICE}" >>/tmp/.btrfs-devices
-    while [[ "${_BTRFS_DEVICE}" != "DONE" ]]; do
+    _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
+    _BTRFS_DEV=$(cat "${_ANSWER}")
+    echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
+    while [[ "${_BTRFS_DEV}" != "DONE" ]]; do
         _BTRFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # RAID5 needs 3 devices
@@ -148,13 +148,13 @@ _select_btrfs_raid_devices () {
         [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" ]] && _BTRFS_DONE="DONE _"
         # clean loop from used partition and options
         #shellcheck disable=SC2001,SC2086
-        _BTRFS_DEVICES=$(echo ${_BTRFS_DEVICES} | sed -e "s#${_BTRFS_DEVICE}\ _##g")
+        _BTRFS_DEVS=$(echo ${_BTRFS_DEVS} | sed -e "s#${_BTRFS_DEV}\ _##g")
         # add more devices
         #shellcheck disable=SC2086
-        _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVICES} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1
-        _BTRFS_DEVICE=$(cat "${_ANSWER}")
-        [[ "${_BTRFS_DEVICE}" == "DONE" ]] && break
-        echo "${_BTRFS_DEVICE}" >>/tmp/.btrfs-devices
+        _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1
+        _BTRFS_DEV=$(cat "${_ANSWER}")
+        [[ "${_BTRFS_DEV}" == "DONE" ]] && break
+        echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
@@ -171,7 +171,7 @@ _prepare_btrfs() {
 _prepare_btrfs_subvolume() {
     _BTRFS_SUBVOLUME="NONE"
     while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
-        _dialog --inputbox "Enter the SUBVOLUME name on ${_DEVICE}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the SUBVOLUME name on ${_DEV}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _check_btrfs_subvolume
     done
@@ -256,7 +256,7 @@ _btrfs_subvolume() {
 _btrfs_compress() {
     _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
     #shellcheck disable=SC2086
-    _dialog --menu "Select the compression method you want to use:\nDevice -> ${_DEVICE} subvolume=${_BTRFS_SUBVOLUME}" 12 50 10 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select the compression method you want to use:\nDevice -> ${_DEV} subvolume=${_BTRFS_SUBVOLUME}" 12 50 10 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
     if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
         _BTRFS_COMPRESS="NONE"
     else

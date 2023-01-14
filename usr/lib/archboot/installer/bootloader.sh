@@ -139,7 +139,7 @@ _abort_f2fs_bootpart() {
 
 _do_uefi_common() {
     _PACKAGES=""
-    _DEVICE=""
+    _DEV=""
     [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES="${_PACKAGES} dosfstools"
     [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES="${_PACKAGES} efivar"
     [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES="${_PACKAGES} efibootmgr"
@@ -181,9 +181,9 @@ _do_apple_efi_hfs_bless() {
 
 _do_uefi_bootmgr_setup() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
-    _DEVICE="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
+    _DEV="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
     _UEFISYSDEV_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
-    _BOOTMGRDEV="${_DEVICE}"
+    _BOOTMGRDEV="${_DEV}"
     _BOOTMGRDEV_NUM="${_UEFISYSDEV_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
@@ -798,7 +798,7 @@ _do_grub_bios() {
         _CHECK_BIOS_BOOT_GRUB=1
         _CHECK_UEFISYSDEV=""
         _RUN_CFDISK=""
-        _DEVICE="${_BOOTDEV}"
+        _DEV="${_BOOTDEV}"
         _check_gpt
     else
         if [[ -z "${_FAIL_COMPLEX}" ]]; then
