@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# list all net devices with mac adress
 _net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
 
-# check for already active profile
 _check_network() {
     [[ -z "${_S_NET}" ]] && _donetwork
 }
 
-# scan for available essids
 _essid_scan() {
     # scan the area
     iwctl station "${_INTERFACE}" scan
@@ -76,11 +73,6 @@ _do_wireless() {
     fi
 }
 
-# donetwork()
-# Hand-hold through setting up networking
-#
-# args: none
-# returns: 1 on failure
 _donetwork() {
     _S_NET=""
     _NETPARAMETERS=""

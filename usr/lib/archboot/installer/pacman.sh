@@ -197,7 +197,7 @@ _install_packages() {
     _auto_swap
     _auto_mdadm
     _auto_luks
-    _auto_pacman
+    _auto_pacman_keyring
     _auto_testing
     _auto_pacman_mirror
     _auto_vconsole

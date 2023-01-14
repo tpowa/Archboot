@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# _auto_fstab()
 # preprocess fstab file
 # comments out old fields and inserts new ones
 # according to partitioning/formatting stage
@@ -38,7 +37,6 @@ _auto_swap () {
     fi
 }
 
-# _auto_mdadm()
 # add mdadm setup to existing /etc/mdadm.conf
 _auto_mdadm()
 {
@@ -51,10 +49,7 @@ _auto_mdadm()
     fi
 }
 
-# _auto_network()
 # configures network on host system according to installer
-# settings if user wishes to do so
-#
 _auto_network()
 {
     # exit if network wasn't configured in installer
@@ -84,10 +79,7 @@ _auto_network()
     sleep 1
 }
 
-# Pacman signature check is enabled by default
-# add gnupg pacman files to installed system
-# in order to have a working pacman on installed system
-_auto_pacman()
+_auto_pacman_keyring()
 {
     if ! [[ -d ${_DESTDIR}/etc/pacman.d/gnupg ]]; then
         _dialog --infobox "Enable pacman's GPG keyring files on installed system ..." 3 70
@@ -96,8 +88,6 @@ _auto_pacman()
     fi
 }
 
-# If [testing] repository was enabled during installation,
-# enable it on installed system too!
 _auto_testing()
 {
     if [[ -n "${_DOTESTING}" ]]; then
