@@ -350,7 +350,7 @@ _stoplvm()
     [[ -n "${_LV_GROUPS}" ]] && _DETECTED_LVM=1
     [[ -n "${_LV_PHYSICAL}" ]] && _DETECTED_LVM=1
     if [[ -n "${_DETECTED_LVM}" ]]; then
-        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?" 0 0 && _DISABLELVM=1
+        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to delete ALL of them completely?" 0 0 && _DISABLELVM=1
     fi
     if [[ -n "${_DISABLELVM}" ]]; then
         _umountall
@@ -378,7 +378,7 @@ _stopluks()
     _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to delete ALL of them completely?" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
@@ -395,7 +395,7 @@ _stopluks()
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to remove them completely?" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to delete ALL of them completely?" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
@@ -799,12 +799,7 @@ _createlv()
             _LV_ALL=""
             _dialog --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${_LV}")B\n\nIf you enter no value, all free space left will be used." 10 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
-                if [[ -z "${_LV_SIZE}" ]]; then
-                    _dialog --yesno "Would you like to create Logical Volume with no free space left?" 0 0 && _LV_ALL=1
-                    if [[ -z "${_LV_ALL}" ]]; then
-                         _LV_SIZE="0"
-                    fi
-                fi
+                [[ -z "${_LV_SIZE}" ]] && _LV_ALL=1
                 if [[ "${_LV_SIZE}" == 0 ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
