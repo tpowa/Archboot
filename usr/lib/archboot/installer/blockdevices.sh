@@ -922,6 +922,7 @@ _createluks()
     _LUKSFINISH=""
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
         _activate_special_devices
+        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         # Remove all crypt devices with children
         _LUKS_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     ${_LSBLK} NAME "${i}"
