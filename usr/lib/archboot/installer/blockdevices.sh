@@ -319,7 +319,6 @@ _stopmd()
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 mdadm --manage --stop "/dev/${i}" >"${_LOG}" 2>&1
-                wipefs -a "/dev/${i}" &>"${_NO_LOG}"
             done
             _dialog --infobox "Removing all software raid devices done.\nContinuing in 3 seconds..." 0 0
             sleep 3
