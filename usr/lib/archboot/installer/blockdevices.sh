@@ -313,7 +313,7 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        _dialog --defaultno --yesno "Setup detected already running software raid devices...\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMD=1
+        _dialog --defaultno --yesno "Setup detected already running software raid devices...\n\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
@@ -326,7 +326,7 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\nDo you want to delete the superblock of ALL of them?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\n\nDo you want to delete the superblock of ALL of them?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
         fi
@@ -350,7 +350,7 @@ _stoplvm()
     [[ -n "${_LV_GROUPS}" ]] && _DETECTED_LVM=1
     [[ -n "${_LV_PHYSICAL}" ]] && _DETECTED_LVM=1
     if [[ -n "${_DETECTED_LVM}" ]]; then
-        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices, do you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELVM=1
+        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices...\n\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELVM=1
     fi
     if [[ -n "${_DISABLELVM}" ]]; then
         _umountall
@@ -378,7 +378,7 @@ _stopluks()
     _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected running luks encrypted devices, do you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected running luks encrypted devices...\n\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
@@ -395,7 +395,7 @@ _stopluks()
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices, do you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices...\n\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
