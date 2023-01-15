@@ -190,16 +190,12 @@ _autoprepare() {
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _umountall
+    _printk off
+    _dialog --infobox "Partitioning ${_DISK} ..." 0 0
+    _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
-        _printk off
-        _dialog --infobox "Partitioning ${_DISK} ..." 0 0
-        # clean partition table to avoid issues!
-        sgdisk --zap "${_DISK}" &>"${_NO_LOG}"
-        # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 &>"${_NO_LOG}"
-        wipefs -a "${_DISK}" &>"${_NO_LOG}"
         # create fresh GPT
         sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
         # create actual partitions
@@ -220,11 +216,6 @@ _autoprepare() {
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
-        _printk off
-        _dialog --infobox "Partitioning ${_DISK}" 0 0
-        # clean partitiontable to avoid issues!
-        dd if=/dev/zero of="${_DISK}" bs=512 count=2048 &>"${_NO_LOG}"
-        wipefs -a "${_DISK}" &>"${_NO_LOG}"
         # create DOS MBR with parted
         parted -a optimal -s "${_DISK}" unit MiB mktable msdos &>"${_NO_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"

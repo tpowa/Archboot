@@ -273,9 +273,13 @@ _set_device_name_scheme() {
     _NAME_SCHEME_PARAMETER_RUN=1
 }
 
-# Get a list of available disks for use in the "Available disks" dialogs.
-# This will print the mountpoints as follows, getting size info from lsblk:
-#   /dev/sda 64G
+_clean_disk() {
+    # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
+    sgdisk -Z "${1}" &>"${_NO_LOG}"
+    wipefs -a "${1}" &>"${_NO_LOG}"
+    dd if=/dev/zero of="${1}" bs=512 count=2048 &>"${_NO_LOG}"
+}
+
 _getavaildisks()
 {
     #shellcheck disable=SC2119
@@ -284,9 +288,6 @@ _getavaildisks()
     done
 }
 
-# Get a list of available partitions for use in the "Available Mountpoints" dialogs.
-# This will print the mountpoints as follows, getting size info from lsblk:
-#   /dev/sda1 640M
 _getavailpartitions()
 {
     #shellcheck disable=SC2119
@@ -313,38 +314,29 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to disable them completely?" 0 0 && _DISABLEMD=1
+        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to delete them completely?" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
-                # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                wipefs -a --force "/dev/${i}" >"${_LOG}"  2>&1
                 mdadm --manage --stop "/dev/${i}" >"${_LOG}" 2>&1
-            done
-            _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-                # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" >"${_LOG}" 2>&1
-                wipefs -a --force "${i}" >"${_LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 >"${_LOG}" 2>&1
+                wipefs -a "/dev/${i}" &>"${_NO_LOG}"
             done
         fi
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to clean the superblock of them?" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to delete the superblock of them?" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
-            _dialog --infobox "Cleaning superblocks of all software raid devices..." 0 0
-            for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-                # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-                sgdisk --zap "${i}" >"${_LOG}" 2>&1
-                wipefs -a "${i}" >"${_LOG}" 2>&1
-                dd if=/dev/zero of="${i}" bs=512 count=2048 >"${_LOG}"  2>&1
-            done
         fi
+    fi
+    if [[ -n "${_DISABLEMD}" || -n "${_DISABLEMDSB}" ]]; then
+        _dialog --infobox "Deleting superblocks of all software raid devices..." 0 0
+        for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
+            _clean_disk "${i}"
+        done
     fi
 }
 
@@ -396,7 +388,7 @@ _stopluks()
             _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
             cryptsetup remove "${i}" >"${_LOG}"
             # delete header from device
-            wipefs -a "${_LUKS_REAL_DEV}" >"${_LOG}" 2>&1
+            wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
     fi
     _DISABLELUKS=""
@@ -410,7 +402,7 @@ _stopluks()
         _dialog --infobox "Removing not running luks encrypted devices ..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a "${i}" >"${_LOG}" 2>&1
+           wipefs -a "${i}" &>"${_NO_LOG}"
         done
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab

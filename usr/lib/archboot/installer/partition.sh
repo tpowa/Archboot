@@ -19,11 +19,7 @@ _check_gpt() {
         partprobe "${_DISK}" >"${_LOG}"
         if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-            # clean partition table to avoid issues!
-            sgdisk --zap "${_DISK}" &>"${_NO_LOG}"
-            # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
-            dd if=/dev/zero of="${_DISK}" bs=512 count=2048 &>"${_NO_LOG}"
-            wipefs -a "${_DISK}" &>"${_NO_LOG}"
+            _clean_disk "${_DISK}"
             # create fresh GPT
             sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
             _GUID_DETECTED=1
@@ -140,9 +136,7 @@ _partition() {
 
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-                    # clean partitiontable to avoid issues!
-                    dd if=/dev/zero of="${_DEV}" bs=512 count=2048 &>"${_NO_LOG}"
-                    wipefs -a "${_DEV}" &>"${_NO_LOG}"
+                   _clean_disk "${_DISK}"
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
