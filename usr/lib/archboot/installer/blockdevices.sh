@@ -313,7 +313,7 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to delete them completely?" 0 0 && _DISABLEMD=1
+        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to delete ALL of them completely?" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
@@ -326,13 +326,13 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to delete the superblock of them?" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to delete the superblock of ALL of them?" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
         fi
     fi
     if [[ -n "${_DISABLEMD}" || -n "${_DISABLEMDSB}" ]]; then
-        _dialog --infobox "Deleting superblocks of all software raid devices..." 0 0
+        _dialog --infobox "Deleting superblocks of ALL software raid devices..." 0 0
         for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${i}"
         done
@@ -862,7 +862,7 @@ _enter_luks_name() {
 
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
-    while [[ -z "${LUKSPASSPHRASE}" ]]; do
+    while [[ -z "${_LUKSPASSPHRASE}" ]]; do
         _dialog --insecure --passwordbox "Enter passphrase for luks encrypted device ${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
         _LUKSPASS=$(cat "${_ANSWER}")
         _dialog --insecure --passwordbox "Retype passphrase for luks encrypted device ${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
