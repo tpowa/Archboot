@@ -336,7 +336,7 @@ _stopmd()
         for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${i}"
         done
-        _dialog --infobox "Deleting superblocks of ALL software raid devices done.\nContinuing in 3 seconds..." 0 0
+        _dialog --infobox "Removing superblocks of ALL software raid devices done.\nContinuing in 3 seconds..." 0 0
         sleep 3
     fi
 }
