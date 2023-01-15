@@ -275,8 +275,7 @@ _set_device_name_scheme() {
 
 _clean_disk() {
     # clear all magic strings/signatures - mdadm, lvm, partition tables etc
-    sgdidk -Z "${1}" &>"${_NO_LOG}"
-    wipefs -a --force "${1}" &>"${_NO_LOG}"
+    wipefs -a -f "${1}" &>"${_NO_LOG}"
     partprobe "${1}" &>"${_NO_LOG}"
 }
 
@@ -319,6 +318,7 @@ _stopmd()
             _umountall
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
+                wipefs -a -f "/dev/${i}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${i}" >"${_LOG}" 2>&1
             done
             _dialog --infobox "Removing all software raid devices done.\nContinuing in 3 seconds..." 0 0
