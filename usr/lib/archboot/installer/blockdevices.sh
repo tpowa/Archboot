@@ -311,8 +311,8 @@ _umountall()
 
 _stopmd()
 {
+    _DISABLEMD=""
     if grep -q ^md /proc/mdstat 2>/dev/null; then
-        _DISABLEMD=""
         _dialog --defaultno --yesno "Setup detected already running software raid devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
