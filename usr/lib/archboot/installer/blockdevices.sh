@@ -733,7 +733,7 @@ _createvg()
         done
         # show all devices with sizes, which are not in use
         #shellcheck disable=SC2086
-        _dialog --cr-wrap --msgbox "Physical Volumes:\n$(getavailablepv)" 0 0
+        _dialog --cr-wrap --msgbox "Physical Volumes:\n$(_getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         _PVNUMBER=1
         #shellcheck disable=SC2086
@@ -781,7 +781,7 @@ _createlv()
             return 1
         fi
         # show all devices with sizes, which are not 100% in use!
-        _dialog --cr-wrap --msgbox "Volume Groups:\n$(getavailablevg)" 0 0
+        _dialog --cr-wrap --msgbox "Volume Groups:\n$(_getavailablevg)" 0 0
         #shellcheck disable=SC2086
         _dialog --menu "Select Volume Group:" 11 50 5 ${_LVS} 2>"${_ANSWER}" || return 1
         _LV=$(cat "${_ANSWER}")
