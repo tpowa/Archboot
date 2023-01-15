@@ -102,7 +102,6 @@ _check_efisys_part() {
 }
 
 _partition() {
-    _umountall
     # stop special devices, else weird things can happen during partitioning
     _stopluks
     _stopmd

@@ -86,7 +86,7 @@ _create_luks_menu() {
         #shellcheck disable=SC2086
         dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Manage Luks Encryption" 11 60 5 \
             "1" "Create Luks" \
-            "2" "Reset Luks Encryption completely" \
+            "2" "Reset Luks Encryption" \
             "3" "Luks Help" \
             "4" "Return to Previous Menu" 2>"${_ANSWER}" || _CANCEL=1
         _NEXTITEM="$(cat "${_ANSWER}")"
