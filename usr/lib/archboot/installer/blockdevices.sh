@@ -63,7 +63,7 @@ _blockdevices_partitions() {
         # - extended partition (LBA)
         #   sfdisk -l 2>/dev/null | grep "${part}" | grep "(LBA)$"
         #- bios_grub partitions
-        #  "echo ${part} | grep "[a-z]$(parted -s $(${_LSBLK} PKNAME ${part}) print 2>/dev/null | grep bios_grub | cut -d " " -f 2)$"
+        #  sfdisk -l 2>/dev/null | grep "${part}" | grep -q "BIOS boot$"
         #- iso9660 devices
         #  "${_LSBLK} FSTYPE -s ${part} | grep "iso9660"
         if ! ${_LSBLK} FSTYPE "${part}" | grep -q "linux_raid_member" && ! ${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE -s "${part}" | grep -q "iso9660" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "Extended$" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "(LBA)$" && ! sfdisk -l 2>/dev/null | grep "${part}" | grep -q "BIOS boot$"; then
@@ -604,6 +604,7 @@ _createpv()
     while [[ "${_PVFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.pvs-create
+        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
                     echo "$(${_LSBLK} NAME "${i}")" _
