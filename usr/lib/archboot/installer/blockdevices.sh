@@ -313,7 +313,7 @@ _stopmd()
 {
     if grep -q ^md /proc/mdstat 2>/dev/null; then
         _DISABLEMD=""
-        _dialog --defaultno --yesno "Setup detected already running raid devices, do you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMD=1
+        _dialog --defaultno --yesno "Setup detected already running software raid devices...\nDo you want to delete ALL of them completely?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             _dialog --infobox "Disabling all software raid devices..." 0 0
@@ -326,7 +326,7 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of raid devices, do you want to delete the superblock of ALL of them?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\nDo you want to delete the superblock of ALL of them?\nALL DATA WILL BE LOST!" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
         fi
