@@ -565,7 +565,7 @@ _createmd()
         _dialog --msgbox "Error creating ${_RAIDDEV} (see ${_LOG} for details)." 0 0
         return 1
     fi
-    if [[ -n ${_RAID_DEVITION} ]]; then
+    if [[ -n "${_RAID_PARTITION}" ]]; then
         # switch for mbr usage
         _set_guid
         if [[ -z "${_GUIDPARAMETER}" ]]; then
