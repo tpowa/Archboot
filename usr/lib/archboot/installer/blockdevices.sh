@@ -276,7 +276,7 @@ _set_device_name_scheme() {
 _clean_disk() {
     # clear all magic strings/signatures - mdadm, lvm, partition tables etc.
     sgdisk -Z "${1}" &>"${_NO_LOG}"
-    wipefs -a "${1}" &>"${_NO_LOG}"
+    wipefs -a --force "${1}" &>"${_NO_LOG}"
     dd if=/dev/zero of="${1}" bs=512 count=2048 &>"${_NO_LOG}"
 }
 
