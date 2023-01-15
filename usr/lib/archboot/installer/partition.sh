@@ -41,7 +41,7 @@ _check_gpt() {
         _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
         clear && cfdisk "${_DISK}"
         # reread partitiontable for kernel
-        partprobe "${_DEV}"
+        partprobe "${_DISK}"
     fi
 }
 
