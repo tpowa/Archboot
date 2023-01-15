@@ -365,7 +365,7 @@ _stoplvm()
         for i in ${_LV_PHYSICAL}; do
             pvremove -f "${i}" 2>/dev/null >"${_LOG}"
         done
-        _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\n nContinuing in 3 seconds ..." 0 0
+        _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds ..." 0 0
         sleep 3
     fi
 }
