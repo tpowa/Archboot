@@ -717,7 +717,7 @@ _createvg()
         _VGDEV=""
         _PVS=$(_findpv _)
         # break if all devices are in use
-        if [[ -z "${PVS}" ]]; then
+        if [[ -z "${_PVS}" ]]; then
             _dialog --msgbox "No devices left for Volume Group creation." 0 0
             return 1
         fi
