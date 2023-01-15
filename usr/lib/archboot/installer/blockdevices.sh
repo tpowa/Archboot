@@ -820,10 +820,10 @@ _createlv()
         [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS=1
         if [[ -n "${_LV_CONTIGUOUS}" ]]; then
             _CONTIGUOUS=yes
-            _LV_EXTRA="-W -C -y"
+            _LV_EXTRA="-W y -C y -y"
         else
             _CONTIGUOUS=no
-            _LV_EXTRA="-W -y"
+            _LV_EXTRA="-W y -y"
         fi
         [[ -z "${_LV_SIZE}" ]] && _LV_SIZE="All free space left"
         # final step ask if everything is ok?
