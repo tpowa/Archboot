@@ -667,7 +667,7 @@ _findpv()
          # ! "$(${_LSBLK} TYPE ${i} | grep "lvm")"
          #- not part of volume group
          # $(pvs -o vg_name --noheading ${i} | grep " $")
-         if ! ${_LSBLK} FSTYPE "${i}" | grep -q "LVM2" && pvs -o vg_name --noheading "${i}" | grep -q " $"; then
+         if ! ${_LSBLK} FSTYPE "${i}" | grep -q "lvm" && pvs -o vg_name --noheading "${i}" | grep -q " $"; then
              echo "${i}"
              [[ "${1}" ]] && echo "${1}"
          fi
