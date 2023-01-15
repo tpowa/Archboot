@@ -701,10 +701,10 @@ _findvg()
 
 _getavailablevg()
 {
-    for i in $(vgs -o vg_name,vg_free --noheading --units m); do
-        if ! echo "${i}" | grep -q " 0m$"; then
+    for i in $(vgs -o vg_name --noheading); do
+        if ! vgs -o vg_free "${i}" | grep -q " 0m$"; then
             #shellcheck disable=SC2028
-            echo "${i}"\n
+            echo "${i}"'\\n'
         fi
     done
 }
