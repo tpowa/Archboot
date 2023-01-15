@@ -83,7 +83,7 @@ _auto_pacman_keyring()
 {
     if ! [[ -d ${_DESTDIR}/etc/pacman.d/gnupg ]]; then
         _dialog --infobox "Enable pacman's GPG keyring files on installed system ..." 3 70
-        cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d 2>&1
+        cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
         sleep 1
     fi
 }
