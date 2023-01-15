@@ -471,6 +471,7 @@ _createmd()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
+        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
         _DEVS="$(for i in $(_finddevices); do
@@ -503,6 +504,7 @@ _createmd()
             _dialog --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${_PARITYLEVELS} 2>"${_ANSWER}" || return 1
             _PARITY=$(cat "${_ANSWER}")
         fi
+        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         # show all devices with sizes
         _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
