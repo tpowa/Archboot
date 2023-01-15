@@ -71,7 +71,7 @@ _update_environment() {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 _dialog --infobox "Refreshing package database ..." 3 70
-                pacman -Sy >"${_LOG}" 2>&1
+                pacman -Sy &>"${_LOG}"
                 sleep 1
                 _dialog --infobox "Checking on new online kernel version ..." 3 70
                 #shellcheck disable=SC2086
@@ -92,7 +92,7 @@ _update_environment() {
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                         _dialog --infobox "Now setting up new archboot environment and dowloading latest packages.\n\nRunning at the moment: update-installer -latest-install\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress...\n\nGet a cup of coffee ...\nDepending on your system's setup, this needs about 5 minutes.\nPlease be patient." 0 0
-                        update-installer -latest-install >"${_LOG}" 2>&1
+                        update-installer -latest-install &>"${_LOG}"
                     fi
                 fi
             fi
@@ -116,12 +116,12 @@ _prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     _dialog --infobox "Refreshing package database ..." 3 40
-    ${_PACMAN} -Sy >"${_LOG}" 2>&1 || (_dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
+    ${_PACMAN} -Sy &>"${_LOG}" || (_dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
     _dialog --infobox "Update Arch Linux keyring ..." 3 40
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} >"${_LOG}" 2>&1 || (_dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
+    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}" || (_dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
 }
 
 _run_pacman(){

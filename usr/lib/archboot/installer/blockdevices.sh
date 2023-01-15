@@ -319,7 +319,7 @@ _stopmd()
             # shellcheck disable=SC2013
             for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
                 wipefs -a -f "/dev/${i}" &>"${_NO_LOG}"
-                mdadm --manage --stop "/dev/${i}" >"${_LOG}" 2>&1
+                mdadm --manage --stop "/dev/${i}" &>"${_LOG}"
             done
             _dialog --infobox "Removing all software raid devices done.\nContinuing in 3 seconds..." 0 0
             sleep 3
@@ -559,7 +559,7 @@ _createmd()
     [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
     _dialog --infobox "Creating ${_RAIDDEV}..." 0 0
     #shellcheck disable=SC2086
-    if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} >"${_LOG}" 2>&1; then
+    if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
         _dialog --infobox "${_RAIDDEV} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
@@ -650,7 +650,7 @@ _createpv()
     #shellcheck disable=SC2028,SC2086
     _umountall
     #shellcheck disable=SC2086
-    if pvcreate -y ${_DEV} >"${_LOG}" 2>&1; then
+    if pvcreate -y ${_DEV} &>"${_LOG}"; then
         _dialog --infobox "Creating physical volume on ${_DEV} successful.\n\nContinuing in 3 seconds..." 6 75
         sleep 3
     else
@@ -762,7 +762,7 @@ _createvg()
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
-    if vgcreate ${_VGDEV} ${_PV} >"${_LOG}" 2>&1; then
+    if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
         _dialog --infobox "Creating Volume Group ${_VGDEV} successful.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
@@ -832,7 +832,7 @@ _createlv()
     _umountall
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
-        if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} >"${_LOG}" 2>&1; then
+        if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
@@ -841,7 +841,7 @@ _createlv()
         fi
     else
         #shellcheck disable=SC2086
-        if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} >"${_LOG}" 2>&1; then
+        if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else

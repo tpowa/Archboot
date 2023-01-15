@@ -248,14 +248,14 @@ _mkfs() {
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
-            mkswap -L "${6}" "${1}" >"${_LOG}" 2>&1
+            mkswap -L "${6}" "${1}" &>"${_LOG}"
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
                 _dialog --msgbox "Error creating swap: mkswap ${1}" 0 0
                 return 1
             fi
         fi
-        swapon "${1}" >"${_LOG}" 2>&1
+        swapon "${1}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error activating swap: swapon ${1}" 0 0
@@ -276,16 +276,16 @@ _mkfs() {
             local ret
             #shellcheck disable=SC2086
             case ${2} in
-                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${7} -L "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                ext3)     mke2fs -F ${7} -L "${6}" -t ext3 ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
+                jfs)      yes | mkfs.jfs ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                ext3)     mke2fs -F ${7} -L "${6}" -t ext3 ${1} &>"${_LOG}"; ret=$? ;;
+                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
-                                    -O extra_attr,inode_checksum,sb_checksum ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} >"${_LOG}" 2>&1; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
-                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} >"${_LOG}" 2>&1; ret=$? ;;
+                                    -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;
+                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
+                nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
@@ -318,14 +318,14 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" >"${_LOG}" 2>&1
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
             return 1
         fi
 	# btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" >"${_LOG}" 2>&1
+        [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
         # change permission of base directories to correct permission
         # to avoid btrfs issues
         if [[ "${5}" == "/tmp" ]]; then

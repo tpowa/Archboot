@@ -224,7 +224,7 @@ _do_secureboot_keys() {
             _dialog --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
             _CN=$(cat "${_ANSWER}")
         done
-        secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" >"${_LOG}" 2>&1 || return 1
+        secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
          _dialog --infobox "Setup keys created:\n\nCommon name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}\n\nContinuing in 10 seconds ..." 8 60
          sleep 10
     else
@@ -262,11 +262,11 @@ _do_mok_sign () {
     _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK=1
     if [[ -n "${_SIGN_MOK}" ]]; then
         if [[ "${_DESTDIR}" == "/install" ]]; then
-            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" >"${_LOG}" 2>&1
-            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi >"${_LOG}" 2>&1
+            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
+            systemd-nspawn -q -D "${_DESTDIR}" sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
         else
-            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" >"${_LOG}" 2>&1
-            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi >"${_LOG}" 2>&1
+            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
+            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
         fi
         _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds ..." 7 60
         sleep 5
@@ -431,8 +431,8 @@ timeout 5
 default archlinux-core-main
 GUMEOF
     _chroot_mount
-    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" install >"${_LOG}" 2>&1
-    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" update >"${_LOG}" 2>&1
+    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" install &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" update &>"${_LOG}"
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"

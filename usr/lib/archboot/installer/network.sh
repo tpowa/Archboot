@@ -166,7 +166,7 @@ _donetwork() {
     _dialog --infobox "Waiting for network link to come up ..." 3 60
     # add sleep here for systemd-resolve get correct values
     sleep 5
-    if ! getent hosts www.google.com >"${_LOG}" 2>&1; then
+    if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
         return 1
     fi
