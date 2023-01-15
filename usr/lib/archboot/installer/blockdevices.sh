@@ -76,7 +76,7 @@ _blockdevices_partitions() {
 
 # list none partitionable raid md devices
 _raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" | cut -d' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
