@@ -707,7 +707,7 @@ _getavailablevg()
     for dev in $(vgs -o vg_name --noheading); do
         if ! vgs -o vg_free --noheading --units m "${dev}" | grep -q " 0m$"; then
             #shellcheck disable=SC2028
-            echo "${dev} $(vgs -o vg_free --noheading --units m "${dev}")"\n
+            echo "${dev} $(vgs -o vg_free --noheading --units m "${dev}")\n"
         fi
     done
 }
