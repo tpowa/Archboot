@@ -64,7 +64,7 @@ _enable_testing() {
 _update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache..."  >"${_LOG}"
-        _dialog --infobox "Packages are already in pacman cache. Skipping update environment.\nContinuing in 3 seconds..." 4 70
+        _dialog --infobox "Packages are already in pacman cache. Skipping update environment.\nContinuing in 3 seconds..." 4 50
         sleep 3
     else
         _UPDATE_ENVIRONMENT=""
@@ -86,7 +86,7 @@ _update_environment() {
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
                 sleep 2
                 if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
-                    _dialog --infobox "No new kernel online available. Continuing in 3 seconds..." 3 70
+                    _dialog --infobox "No new kernel online available.\nSkipping update environment.\nContinuing in 3 seconds..." 5 50
                     sleep 3
                 else
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT=1

@@ -282,7 +282,7 @@ _autoprepare() {
               "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
-    _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds..." 3 70
+    _dialog --infobox "Auto-Prepare was successful.\nContinuing in 3 seconds..." 4 70
     sleep 3
     _S_MKFSAUTO=1
 }
