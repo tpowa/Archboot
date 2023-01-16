@@ -9,7 +9,7 @@ if grep -qw archboot /etc/hostname; then
 else
     _DESTDIR="/"
 fi
-_NO_LOG=""${_NO_LOG}""
+_NO_LOG="/dev/null"
 if pgrep -x Xorg &>"${_NO_LOG}"; then
     _LOG="/dev/tty8"
 else
