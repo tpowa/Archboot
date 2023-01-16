@@ -611,11 +611,11 @@ _createpv()
         _dialog --infobox "Scanning blockdevices..." 3 40
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
-                    echo "${dev} _"
+                    echo "${dev} _ "
                     done)"
         #shellcheck disable=SC2119
         _DEVS="$(for dev in $(_finddevices); do
-                ! echo "${_LVM_BLACKLIST}" | grep -E "${dev} _" && echo "${dev}" _
+                ! echo "${_LVM_BLACKLIST}" | grep -q -E "${dev} _" && echo "${dev}" _
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
