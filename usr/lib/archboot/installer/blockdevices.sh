@@ -304,7 +304,7 @@ _umountall()
         for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
         done
-        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
+        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}...\n\nContinuing in 3 seconds..." 7 60
         sleep 3
     fi
 }
@@ -365,7 +365,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds ..." 0 0
+        _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds..." 0 0
         sleep 3
     fi
 }
@@ -389,7 +389,7 @@ _stopluks()
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing luks encrypted devices done.\nContnuing in 3 seconds ..." 0 0
+        _dialog --infobox "Removing luks encrypted devices done.\nContnuing in 3 seconds..." 0 0
         sleep 3
     fi
     _DISABLELUKS=""
@@ -404,7 +404,7 @@ _stopluks()
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing not running luks encrypted devices done.\nContinuing in 3 seconds ..." 0 0
+        _dialog --infobox "Removing not running luks encrypted devices done.\nContinuing in 3 seconds..." 0 0
         sleep 3
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
@@ -474,7 +474,7 @@ _createmd()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
         _DEVS="$(for dev in $(_finddevices); do
@@ -507,7 +507,7 @@ _createmd()
             _dialog --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${_PARITYLEVELS} 2>"${_ANSWER}" || return 1
             _PARITY=$(cat "${_ANSWER}")
         fi
-        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         # show all devices with sizes
         _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
@@ -609,7 +609,7 @@ _createpv()
     while [[ "${_PVFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.pvs-create
-        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
                     echo "$(${_LSBLK} NAME "${dev}")" _
@@ -922,7 +922,7 @@ _createluks()
     _LUKSFINISH=""
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
         _activate_special_devices
-        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
         _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     ${_LSBLK} NAME "${dev}"
