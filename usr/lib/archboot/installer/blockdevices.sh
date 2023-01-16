@@ -542,7 +542,7 @@ _createmd()
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${dev}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${dev}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r dev;do echo "${dev}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r dev;do echo "${dev}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
     done
     _umountall
     _DEVS="$(echo -n "$(cat /tmp/.raid)")"
