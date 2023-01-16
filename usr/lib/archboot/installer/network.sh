@@ -55,7 +55,7 @@ _do_wireless() {
                 _WLAN_KEY=$(cat "${_ANSWER}")
             fi
             # time to connect
-            _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE} ..." 3 70
+            _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
             _printk off
             if [[ -z "${_WLAN_KEY}" ]]; then
                 iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
@@ -63,7 +63,7 @@ _do_wireless() {
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
             fi
             if [[ -n "${_WLAN_AUTH}" ]]; then
-                _dialog --infobox "Authentification successfull. Continuing in 3 seconds ..." 3 70
+                _dialog --infobox "Authentification successfull. Continuing in 3 seconds..." 3 70
                 sleep 3
             else
                 _dialog --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
@@ -163,14 +163,14 @@ _donetwork() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
-    _dialog --infobox "Waiting for network link to come up ..." 3 60
+    _dialog --infobox "Waiting for network link to come up..." 3 60
     # add sleep here for systemd-resolve get correct values
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
         return 1
     fi
-    _dialog --infobox "Link is up. Continuing in 3 seconds ..." 3 60
+    _dialog --infobox "Link is up. Continuing in 3 seconds..." 3 60
     sleep 3
     _NEXTITEM="2"
     _S_NET=1

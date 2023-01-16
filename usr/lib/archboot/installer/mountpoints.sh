@@ -132,7 +132,7 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
-        _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_finddevices _)
         _dialog --cr-wrap --msgbox "Available devices:\n\n$(_getavailpartitions)\n" 0 0
         #
@@ -220,7 +220,7 @@ _mountpoints() {
     done < /tmp/.parts
     _printk on
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
-    _dialog --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds ..." 0 0
+    _dialog --infobox "Partitions were successfully mounted.\nContinuing in 3 seconds..." 0 0
     sleep 3
     _NEXTITEM="5"
     _S_MKFS=1
@@ -232,15 +232,15 @@ _mountpoints() {
 _mkfs() {
     if [[ -n "${4}" ]]; then
         if [[ "${2}" == "swap" ]]; then
-            _dialog --infobox "Creating and activating \nswapspace on \n${1} ..." 0 0
+            _dialog --infobox "Creating and activating \nswapspace on \n${1}..." 0 0
         else
-            _dialog --infobox "Creating ${2} on ${1},\nmounting to ${3}${5} ..." 0 0
+            _dialog --infobox "Creating ${2} on ${1},\nmounting to ${3}${5}..." 0 0
         fi
     else
         if [[ "${2}" == "swap" ]]; then
-            _dialog --infobox "Activating swapspace \non ${1} ..." 0 0
+            _dialog --infobox "Activating swapspace \non ${1}..." 0 0
         else
-            _dialog --infobox "Mounting ${2} \non ${1} \nto ${3}${5} ..." 0 0
+            _dialog --infobox "Mounting ${2} \non ${1} \nto ${3}${5}..." 0 0
         fi
     fi
     # add btrfs raid level, if needed

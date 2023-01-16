@@ -45,7 +45,7 @@ _set_locale() {
             _SET_LOCALE=$(cat "${_ANSWER}")
         fi
         sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}#g" "${_DESTDIR}"/etc/locale.conf
-        _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system ..." 3 70
+        _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system..." 3 70
         _SET_LOCALE=1
         sleep 2
         _auto_set_locale
@@ -83,9 +83,9 @@ _set_password() {
 }
 
 _run_mkinitcpio() {
-    _dialog --infobox "Rebuilding initramfs on installed system ..." 3 70
+    _dialog --infobox "Rebuilding initramfs on installed system..." 3 70
     _chroot_mount
-    echo "Initramfs progress ..." > /tmp/mkinitcpio.log
+    echo "Initramfs progress..." > /tmp/mkinitcpio.log
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log &>"${_NO_LOG}"
     else
@@ -110,7 +110,7 @@ _run_mkinitcpio() {
 }
 
 _run_locale_gen() {
-    _dialog --infobox "Rebuilding glibc locales on installed system ..." 3 70
+    _dialog --infobox "Rebuilding glibc locales on installed system..." 3 70
     _locale_gen
     sleep 1
 }

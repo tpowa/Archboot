@@ -9,7 +9,7 @@ _autoprepare() {
     # switch for mbr usage
     _set_guid
     : >/tmp/.device-names
-    _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
+    _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
     sleep 2
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
@@ -190,7 +190,7 @@ _autoprepare() {
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _printk off
-    _dialog --infobox "Partitioning ${_DISK} ..." 0 0
+    _dialog --infobox "Partitioning ${_DISK}..." 0 0
     _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
@@ -283,7 +283,7 @@ _autoprepare() {
               "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
     done
-    _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds ..." 3 70
+    _dialog --infobox "Auto-Prepare was successful. Continuing in 3 seconds..." 3 70
     sleep 3
     _S_MKFSAUTO=1
 }
