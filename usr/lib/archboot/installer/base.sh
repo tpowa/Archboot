@@ -28,7 +28,7 @@ _NEXTITEM=""
 _EDITOR=""
 # programs
 _LSBLK="lsblk -rpno"
-_BLKID="blkid -c "${_NO_LOG}""
+_BLKID="blkid -c ${_NO_LOG}"
 _DLPROG="wget -q"
 
 _set_title() {
