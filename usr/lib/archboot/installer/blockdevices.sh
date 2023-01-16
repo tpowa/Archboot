@@ -302,7 +302,7 @@ _umountall()
     if [[ "${_DESTDIR}" == "/install" ]] && mountpoint -q "${_DESTDIR}"; then
         swapoff -a &>"${_NO_LOG}"
         for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
-            umount "$i"
+            umount "${dev}"
         done
         _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}...\n\nContinuing in 3 seconds..." 7 60
         sleep 3
