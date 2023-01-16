@@ -152,7 +152,6 @@ _do_uefi_common() {
 
 _do_uefi_efibootmgr() {
     if [[ "$(/usr/bin/efivar -l)" ]]; then
-        _dialog --infobox "Creating boot entry with efibootmgr..." 7 50
         cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
 _BOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
@@ -453,7 +452,6 @@ GUMEOF
 
 _do_refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
-        _dialog --infobox "Installing refind..." 0 0
         _PACKAGES="refind"
         _run_pacman
     fi
@@ -511,7 +509,6 @@ _do_grub_common_before() {
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
-        _dialog --infobox "Installing grub..." 0 0
         _PACKAGES="grub"
         _run_pacman
     fi
