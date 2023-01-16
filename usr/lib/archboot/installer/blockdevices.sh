@@ -557,13 +557,12 @@ _createmd()
     ! [[ "${_RAID_DEVS}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --raid-devices=${_RAID_DEVS}"
     ! [[ "${_SPARE_DEVS}" == 0 ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --spare-devices=${_SPARE_DEVS}"
     [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
-    _dialog --infobox "Creating ${_RAIDDEV}..." 0 0
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
         _dialog --infobox "${_RAIDDEV} created successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        _dialog --msgbox "Error creating ${_RAIDDEV} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error while creating ${_RAIDDEV} (see ${_LOG} for details)." 0 0
         return 1
     fi
     if [[ -n "${_RAID_PARTITION}" ]]; then
@@ -650,10 +649,10 @@ _createpv()
     _umountall
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
-        _dialog --infobox "Creating physical volume on ${_DEV} successful.\n\nContinuing in 3 seconds..." 5 75
+        _dialog --infobox "Creating physical volume on ${_DEV} was successfully.\n\nContinuing in 3 seconds..." 5 75
         sleep 3
     else
-        _dialog --msgbox "Error creating physical volume on ${_DEV} (see ${_LOG} for details)." 0 0; return 1
+        _dialog --msgbox "Error while creating physical volume on ${_DEV} (see ${_LOG} for details)." 0 0; return 1
     fi
     # run udevadm to get values exported
     udevadm trigger
@@ -761,10 +760,10 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
-        _dialog --infobox "Creating Volume Group ${_VGDEV} successful.\n\nContinuing in 3 seconds..." 5 50
+        _dialog --infobox "Creating Volume Group ${_VGDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
         sleep 3
     else
-        _dialog --msgbox "Error creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
+        _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
         return 1
     fi
 }
@@ -831,19 +830,19 @@ _createlv()
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            _dialog --msgbox "Error creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
         fi
     else
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} successful.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
             sleep 3
         else
-            _dialog --msgbox "Error creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
+            _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
         fi
     fi
