@@ -106,11 +106,11 @@ _run_mkinitcpio() {
     fi
     rm /tmp/.mkinitcpio-retcode
     _chroot_umount
-    sleep 1
+    sleep 2
 }
 
 _run_locale_gen() {
     _dialog --infobox "Rebuilding glibc locales on installed system..." 3 70
     _locale_gen
-    sleep 1
+    sleep 2
 }
