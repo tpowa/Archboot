@@ -321,7 +321,7 @@ _stopmd()
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
-            _dialog --infobox "Removing all software raid devices done.\nContinuing in 3 seconds..." 0 0
+            _dialog --infobox "Removing software raid devices done.\nContinuing in 3 seconds..." 0 0
             sleep 3
         fi
     fi
@@ -336,7 +336,7 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${dev}"
         done
-        _dialog --infobox "Removing all superblocks on software raid devices done.\n\nContinuing in 3 seconds..." 5 70
+        _dialog --infobox "Removing superblocks on software raid devices done.\n\nContinuing in 3 seconds..." 5 70
         sleep 3
     fi
 }
@@ -365,7 +365,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing on ALL logical volumes, logical groups and physical volumes done.\n\nContinuing in 3 seconds..." 0 0
+        _dialog --infobox "Removing logical volumes, logical groups and physical volumes done.\n\nContinuing in 3 seconds..." 5 70
         sleep 3
     fi
 }
