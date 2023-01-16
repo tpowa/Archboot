@@ -365,7 +365,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing logical volumes, logical groups and physical volumes done.\n\nContinuing in 3 seconds..." 5 70
+        _dialog --infobox "Removing logical volumes, logical groups and physical volumes done.\n\nContinuing in 3 seconds..." 5 75
         sleep 3
     fi
 }
