@@ -327,7 +327,7 @@ _stopmd()
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\n\nDo you want to delete the superblock of ALL of them?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\n\nDo you want to delete the superblock on ALL of them?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
         fi
@@ -336,7 +336,7 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${dev}"
         done
-        _dialog --infobox "Removing superblocks of ALL software raid devices done.\nContinuing in 3 seconds..." 0 0
+        _dialog --infobox "Removing superblocks on ALL software raid devices done.\nContinuing in 3 seconds..." 0 0
         sleep 3
     fi
 }
@@ -365,7 +365,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds..." 0 0
+        _dialog --infobox "Removing on ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds..." 0 0
         sleep 3
     fi
 }
