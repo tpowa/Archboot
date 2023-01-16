@@ -249,6 +249,7 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             mkswap -L "${6}" "${1}" &>"${_LOG}"
+            sleep 2
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
                 _dialog --msgbox "Error creating swap: mkswap ${1}" 0 0
