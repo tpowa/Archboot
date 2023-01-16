@@ -760,7 +760,7 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
-        _dialog --infobox "Creating Volume Group ${_VGDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
+        _dialog --infobox "Creating Volume Group ${_VGDEV} was successfully.\n\nContinuing in 3 seconds..." 5 60
         sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
@@ -830,7 +830,7 @@ _createlv()
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 60
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -839,7 +839,7 @@ _createlv()
     else
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 50
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successfully.\n\nContinuing in 3 seconds..." 5 60
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
