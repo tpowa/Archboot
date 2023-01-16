@@ -282,16 +282,16 @@ _clean_disk() {
 _getavaildisks()
 {
     #shellcheck disable=SC2119
-    for i in $(_finddisks); do
-        ${_LSBLK} NAME,SIZE -d "${i}"
+    for dev in $(_finddisks); do
+        ${_LSBLK} NAME,SIZE -d "${dev}"
     done
 }
 
 _getavailpartitions()
 {
     #shellcheck disable=SC2119
-    for i in $(_finddevices); do
-        ${_LSBLK} NAME,SIZE -d "${i}"
+    for dev in $(_finddevices); do
+        ${_LSBLK} NAME,SIZE -d "${dev}"
     done
 }
 
@@ -301,7 +301,7 @@ _umountall()
 {
     if [[ "${_DESTDIR}" == "/install" ]] && mountpoint -q "${_DESTDIR}"; then
         swapoff -a &>"${_NO_LOG}"
-        for i in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
+        for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "$i"
         done
         _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR} ...\n\nContinuing in 3 seconds..." 7 60
@@ -317,9 +317,9 @@ _stopmd()
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             # shellcheck disable=SC2013
-            for i in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
-                wipefs -a -f "/dev/${i}" &>"${_NO_LOG}"
-                mdadm --manage --stop "/dev/${i}" &>"${_LOG}"
+            for dev in $(grep ^md /proc/mdstat | sed -e 's# :.*##g'); do
+                wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
+                mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
             _dialog --infobox "Removing all software raid devices done.\nContinuing in 3 seconds..." 0 0
             sleep 3
@@ -333,8 +333,8 @@ _stopmd()
         fi
     fi
     if [[ -n "${_DISABLEMD}" || -n "${_DISABLEMDSB}" ]]; then
-        for i in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
-            _clean_disk "${i}"
+        for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
+            _clean_disk "${dev}"
         done
         _dialog --infobox "Removing superblocks of ALL software raid devices done.\nContinuing in 3 seconds..." 0 0
         sleep 3
@@ -356,14 +356,14 @@ _stoplvm()
     fi
     if [[ -n "${_DISABLELVM}" ]]; then
         _umountall
-        for i in ${_LV_VOLUMES}; do
-            lvremove -f "/dev/mapper/${i}" 2>"${_NO_LOG}">"${_LOG}"
+        for dev in ${_LV_VOLUMES}; do
+            lvremove -f "/dev/mapper/${dev}" 2>"${_NO_LOG}">"${_LOG}"
         done
-        for i in ${_LV_GROUPS}; do
-            vgremove -f "${i}" 2>"${_NO_LOG}" >"${_LOG}"
+        for dev in ${_LV_GROUPS}; do
+            vgremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        for i in ${_LV_PHYSICAL}; do
-            pvremove -f "${i}" 2>"${_NO_LOG}" >"${_LOG}"
+        for dev in ${_LV_PHYSICAL}; do
+            pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
         _dialog --infobox "Removing of ALL logical volumes, logical groups and physical volumes done.\nContinuing in 3 seconds ..." 0 0
         sleep 3
@@ -383,9 +383,9 @@ _stopluks()
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
-        for i in ${_LUKSDEV}; do
+        for dev in ${_LUKSDEV}; do
             _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
-            cryptsetup remove "${i}" >"${_LOG}"
+            cryptsetup remove "${dev}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
@@ -400,9 +400,9 @@ _stopluks()
         _dialog --defaultno --yesno "Setup detected not running luks encrypted devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
-        for i in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
+        for dev in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
-           wipefs -a "${i}" &>"${_NO_LOG}"
+           wipefs -a "${dev}" &>"${_NO_LOG}"
         done
         _dialog --infobox "Removing not running luks encrypted devices done.\nContinuing in 3 seconds ..." 0 0
         sleep 3
@@ -477,8 +477,8 @@ _createmd()
         _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _DEVS="$(for i in $(_finddevices); do
-                echo "${_RAID_BLACKLIST}" | grep -qw "${i}" || echo "${i}" _
+        _DEVS="$(for dev in $(_finddevices); do
+                echo "${_RAID_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}" _
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
@@ -542,7 +542,7 @@ _createmd()
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${i}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${i}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r i;do echo "${dev}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r i;do echo "${dev}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
     done
     _umountall
     _DEVS="$(echo -n "$(cat /tmp/.raid)")"
@@ -611,12 +611,12 @@ _createpv()
         : >/tmp/.pvs-create
         _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         # Remove all lvm devices with children
-        _LVM_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
-                    echo "$(${_LSBLK} NAME "${i}")" _
+        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
+                    echo "$(${_LSBLK} NAME "${dev}")" _
                     done)"
         #shellcheck disable=SC2119
-        _DEVS="$(for i in $(_finddevices); do
-                ! echo "${_LVM_BLACKLIST}" | grep -E "${i} _" && echo "${i}" _
+        _DEVS="$(for dev in $(_finddevices); do
+                ! echo "${_LVM_BLACKLIST}" | grep -E "${dev} _" && echo "${dev}" _
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
@@ -924,12 +924,12 @@ _createluks()
         _activate_special_devices
         _dialog --infobox "Scanning blockdevices ... This may need some time." 3 60
         # Remove all crypt devices with children
-        _LUKS_BLACKLIST="$(for i in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
-                    ${_LSBLK} NAME "${i}"
+        _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
+                    ${_LSBLK} NAME "${dev}"
                     done)"
         #shellcheck disable=SC2119
-        _DEVS="$(for i in $(_finddevices); do
-                echo "${_LUKS_BLACKLIST}" | grep -wq "${i}" || echo "${i}" _;
+        _DEVS="$(for dev in $(_finddevices); do
+                echo "${_LUKS_BLACKLIST}" | grep -wq "${dev}" || echo "${dev}" _;
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
