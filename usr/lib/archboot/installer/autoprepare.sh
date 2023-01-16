@@ -155,7 +155,7 @@ _autoprepare() {
             #shellcheck disable=SC2086
             _dialog --menu "Select a filesystem for / and /home:" 16 45 9 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
-            _dialog --yesno "${_FSTYPE} will be used for / and /home. Is this OK?" 0 0 && _CHOSENFS=1
+            _dialog --yesno "${_FSTYPE} will be used for\n/ and /home. Is this OK?" 0 0 && _CHOSENFS=1
         done
         # / and /home are subvolumes on btrfs
         if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
