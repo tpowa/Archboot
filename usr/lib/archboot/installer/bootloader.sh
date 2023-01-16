@@ -152,6 +152,7 @@ _do_uefi_common() {
 
 _do_uefi_efibootmgr() {
     if [[ "$(/usr/bin/efivar -l)" ]]; then
+        _dialog --infobox "Creating boot entry with efibootmgr..." 7 50
         cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
 #!/usr/bin/env bash
 _BOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
