@@ -757,7 +757,6 @@ _createvg()
         # final step ask if everything is ok?
         _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
     done
-    _dialog --infobox "Creating Volume Group ${_VGDEV}..." 0 0
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
     #shellcheck disable=SC2086
