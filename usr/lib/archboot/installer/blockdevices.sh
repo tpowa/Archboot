@@ -645,13 +645,12 @@ _createpv()
         # final step ask if everything is ok?
         _dialog --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && _PVFINISH="DONE"
     done
-    _dialog --infobox "Creating physical volume on ${_DEV}..." 0 0
     _DEV="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
     _umountall
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
-        _dialog --infobox "Creating physical volume on ${_DEV} successful.\n\nContinuing in 3 seconds..." 6 75
+        _dialog --infobox "Creating physical volume on ${_DEV} successful.\n\nContinuing in 3 seconds..." 5 75
         sleep 3
     else
         _dialog --msgbox "Error creating physical volume on ${_DEV} (see ${_LOG} for details)." 0 0; return 1
