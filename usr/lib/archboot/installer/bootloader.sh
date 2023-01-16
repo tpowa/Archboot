@@ -16,7 +16,7 @@ _getrootflags() {
 _getraidarrays() {
     _RAIDARRAYS=""
     if ! grep -q ^ARRAY "${_DESTDIR}"/etc/mdadm.conf; then
-        _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>/dev/null | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
+        _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>"${_NO_LOG}" | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
     fi
 }
 
@@ -112,7 +112,7 @@ _check_bootpart() {
 
 # only allow ext2/3/4 and vfat on uboot bootloader
 _abort_uboot(){
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
         if ! [[ "${_FSTYPE}" == "ext2" || "${_FSTYPE}" == "ext3" || "${_FSTYPE}" == "ext4" || "${_FSTYPE}" == "vfat" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
@@ -120,7 +120,7 @@ _abort_uboot(){
 }
 
 _abort_nilfs_bootpart() {
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
         if [[ "${_FSTYPE}" == "nilfs2" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
@@ -128,7 +128,7 @@ _abort_nilfs_bootpart() {
 }
 
 _abort_f2fs_bootpart() {
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>/dev/null)"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
         if [[ "${_FSTYPE}" == "f2fs" ]]; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
@@ -289,7 +289,7 @@ Target = linux
 [Action]
 Description = Signing kernel with Machine Owner Key for Secure Boot
 When = PostTransaction
-Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>/dev/null | /usr/bin/grep -q "signature certificates"; then /usr/bin/sbsign --key /${_KEYDIR}/MOK/MOK.key --cert /${_KEYDIR}/MOK/MOK.crt --output {} {}; fi' ;
+Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>"${_NO_LOG}" | /usr/bin/grep -q "signature certificates"; then /usr/bin/sbsign --key /${_KEYDIR}/MOK/MOK.key --cert /${_KEYDIR}/MOK/MOK.crt --output {} {}; fi' ;
 Depends = sbsigntools
 Depends = findutils
 Depends = grep
@@ -519,20 +519,20 @@ _do_grub_common_before() {
 _do_grub_config() {
     _chroot_mount
     _GRUB_PROBE="chroot ${_DESTDIR} grub-probe"
-    _BOOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/boot" 2>/dev/null)"
-    _BOOTDEV_FS_LABEL="$(${_GRUB_PROBE} --target="fs_label" "/boot" 2>/dev/null)"
-    _BOOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/boot" 2>/dev/null)"
-    _BOOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/boot" 2>/dev/null)"
-    _BOOTDEV_DRIVE="$(${_GRUB_PROBE} --target="drive" "/boot" 2>/dev/null)"
-    _ROOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/" 2>/dev/null)"
-    _ROOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/" 2>/dev/null)"
-    _ROOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/" 2>/dev/null)"
-    _USRDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/usr" 2>/dev/null)"
-    _USRDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>/dev/null)"
-    _USRDEV_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>/dev/null)"
+    _BOOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/boot" 2>"${_NO_LOG}")"
+    _BOOTDEV_FS_LABEL="$(${_GRUB_PROBE} --target="fs_label" "/boot" 2>"${_NO_LOG}")"
+    _BOOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/boot" 2>"${_NO_LOG}")"
+    _BOOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/boot" 2>"${_NO_LOG}")"
+    _BOOTDEV_DRIVE="$(${_GRUB_PROBE} --target="drive" "/boot" 2>"${_NO_LOG}")"
+    _ROOTDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/" 2>"${_NO_LOG}")"
+    _ROOTDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/" 2>"${_NO_LOG}")"
+    _ROOTDEV_FS="$(${_GRUB_PROBE} --target="fs" "/" 2>"${_NO_LOG}")"
+    _USRDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/usr" 2>"${_NO_LOG}")"
+    _USRDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>"${_NO_LOG}")"
+    _USRDEV_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>"${_NO_LOG}")"
     if [[ -n "${_GRUB_UEFI}" ]]; then
-        _UEFISYSDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>/dev/null)"
-        _UEFISYSDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>/dev/null)"
+        _UEFISYSDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
+        _UEFISYSDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
     fi
     if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
         _SUBDIR="/boot"

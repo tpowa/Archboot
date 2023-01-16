@@ -41,7 +41,7 @@ _auto_swap () {
 _auto_mdadm()
 {
     if [[ -e ${_DESTDIR}/etc/mdadm.conf ]]; then
-        if grep -q ^md /proc/mdstat 2>/dev/null; then
+        if grep -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
             _dialog --infobox "Enable mdadm settings on installed system ..." 3 70
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
@@ -123,7 +123,7 @@ _auto_mkinitcpio() {
         # get kernel version
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_DESTDIR}/boot/${_VMLINUZ}")
-            read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+            read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>"${_NO_LOG}")
         elif [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             reader="cat"
             # try if the image is gzip compressed
@@ -168,8 +168,8 @@ _auto_luks() {
         # add to temp crypttab
         sed -i -e "/^$(basename "${_ROOTDEV}") /d" /tmp/.crypttab
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
-        chmod 700 /tmp/passphrase-* 2>/dev/null
-        cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>/dev/null
+        chmod 700 /tmp/passphrase-* 2>"${_NO_LOG}"
+        cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
         sleep 1
     fi
 }

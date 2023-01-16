@@ -9,7 +9,7 @@ if grep -qw archboot /etc/hostname; then
 else
     _DESTDIR="/"
 fi
-_NO_LOG="/dev/null"
+_NO_LOG=""${_NO_LOG}""
 if pgrep -x Xorg &>"${_NO_LOG}"; then
     _LOG="/dev/tty8"
 else
@@ -28,7 +28,7 @@ _NEXTITEM=""
 _EDITOR=""
 # programs
 _LSBLK="lsblk -rpno"
-_BLKID="blkid -c /dev/null"
+_BLKID="blkid -c "${_NO_LOG}""
 _DLPROG="wget -q"
 
 _set_title() {
@@ -79,8 +79,8 @@ _set_uefi_parameters() {
     [[ -e "/sys/firmware/efi" ]] && _UEFI_BOOT=1
     if [[ -n "${_UEFI_BOOT}" ]]; then
         _GUIDPARAMETER=1
-        _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>/dev/null | tail -n -1 | awk '{print $2}')"
-        _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>/dev/null | tail -n -1 | awk '{print $2}')"
+        _SECUREBOOT_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot 2>"${_NO_LOG}" | tail -n -1 | awk '{print $2}')"
+        _SETUPMODE_VAR_VALUE="$(efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SetupMode  2>"${_NO_LOG}" | tail -n -1 | awk '{print $2}')"
         if [[ "${_SECUREBOOT_VAR_VALUE}" == "01" ]] && [[ "${_SETUPMODE_VAR_VALUE}" == "00" ]]; then
             _UEFI_SECURE_BOOT=1
         fi
