@@ -63,8 +63,8 @@ _do_wireless() {
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
             fi
             if [[ -n "${_WLAN_AUTH}" ]]; then
-                _dialog --infobox "Authentification was successful. Continuing in 3 seconds..." 3 70
-                sleep 3
+                _dialog --infobox "Authentification was successful. Continuing in 5 seconds..." 3 70
+                sleep 5
             else
                 _dialog --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
             fi
@@ -170,8 +170,8 @@ _donetwork() {
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
         return 1
     fi
-    _dialog --infobox "Link is up. Continuing in 3 seconds..." 3 60
-    sleep 3
+    _dialog --infobox "Link is up. Continuing in 5 seconds..." 3 60
+    sleep 5
     _NEXTITEM="2"
     _S_NET=1
 }

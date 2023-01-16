@@ -220,8 +220,8 @@ _mountpoints() {
     done < /tmp/.parts
     _printk on
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
-    _dialog --infobox "Partitions were mounted successfully.\nContinuing in 3 seconds..." 0 0
-    sleep 3
+    _dialog --infobox "Partitions were mounted successfully.\nContinuing in 5 seconds..." 0 0
+    sleep 5
     _NEXTITEM="5"
     _S_MKFS=1
 }

@@ -64,8 +64,8 @@ _enable_testing() {
 _update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache..."  >"${_LOG}"
-        _dialog --infobox "Packages are already in pacman cache.\nSkipping update environment.\nContinuing in 3 seconds..." 5 50
-        sleep 3
+        _dialog --infobox "Packages are already in pacman cache.\nSkipping update environment.\nContinuing in 5 seconds..." 5 50
+        sleep 5
     else
         _UPDATE_ENVIRONMENT=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
@@ -86,8 +86,8 @@ _update_environment() {
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
                 sleep 2
                 if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
-                    _dialog --infobox "No new kernel online available.\nSkipping update environment.\nContinuing in 3 seconds..." 5 50
-                    sleep 3
+                    _dialog --infobox "No new kernel online available.\nSkipping update environment.\nContinuing in 5 seconds..." 5 50
+                    sleep 5
                 else
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 0 0 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
@@ -144,8 +144,8 @@ _run_pacman(){
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        _dialog --infobox "Package installation complete.\nContinuing in 3 seconds..." 4 40
-        sleep 3
+        _dialog --infobox "Package installation complete.\nContinuing in 5 seconds..." 4 40
+        sleep 5
     fi
     rm /tmp/.pacman-retcode
     # ensure the disk is synced
