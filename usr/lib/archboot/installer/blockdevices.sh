@@ -321,7 +321,7 @@ _stopmd()
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
-            _dialog --infobox "Removing software raid devices done.\nContinuing in 3 seconds..." 0 0
+            _dialog --infobox "Removing software raid devices done.\n\nContinuing in 3 seconds..." 0 0
             sleep 3
         fi
     fi
