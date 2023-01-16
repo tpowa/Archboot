@@ -184,7 +184,7 @@ _autoprepare() {
         _HOMEDEV_NUM="${_DEV_NUM}"
         _DEFAULTFS=1
     done
-    _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+    _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!ALL DATA ON ${_DISK} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
     # disable swap and all mounted partitions, umount / last!
     _printk off
