@@ -186,6 +186,7 @@ _autoprepare() {
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!\nALL DATA ON ${_DISK} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
     [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
+    _umountall
     # disable swap and all mounted partitions, umount / last!
     _printk off
     _dialog --infobox "Partitioning ${_DISK}..." 0 0
