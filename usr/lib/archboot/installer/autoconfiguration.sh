@@ -15,7 +15,7 @@ _auto_fstab(){
             sed -i -e '/^\#/!d' "${_DESTDIR}"/etc/fstab
             sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
         fi
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -24,7 +24,7 @@ _auto_scheduler () {
     if [[ ! -f ${_DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
         _dialog --infobox "Enable performance ioscheduler settings on installed system..." 3 70
         cp /etc/udev/rules.d/60-ioschedulers.rules "${_DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -33,7 +33,7 @@ _auto_swap () {
     if [[ ! -f ${_DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
         _dialog --infobox "Enable sysctl swap settings on installed system..." 3 70
         cp /etc/sysctl.d/99-sysctl.conf "${_DESTDIR}"/etc/sysctl.d/99-sysctl.conf
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -45,7 +45,7 @@ _auto_mdadm()
             _dialog --infobox "Enable mdadm settings on installed system..." 3 70
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -76,7 +76,7 @@ _auto_network()
             chmod a+x "${_DESTDIR}"/etc/profile.d/proxy.sh
         done
     fi
-    sleep 1
+    sleep 2
 }
 
 _auto_pacman_keyring()
@@ -84,7 +84,7 @@ _auto_pacman_keyring()
     if ! [[ -d ${_DESTDIR}/etc/pacman.d/gnupg ]]; then
         _dialog --infobox "Enable pacman's GPG keyring files on installed system..." 3 70
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -95,7 +95,7 @@ _auto_testing()
         sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
         sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
         sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${_DESTDIR}"/etc/pacman.conf
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -157,7 +157,7 @@ _auto_vconsole() {
         if [[ -s /tmp/.font ]]; then
             echo FONT="$(sed -e 's/\..*//g' /tmp/.font)" >> "${_DESTDIR}"/etc/vconsole.conf
         fi
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -170,7 +170,7 @@ _auto_luks() {
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
         chmod 700 /tmp/passphrase-* 2>"${_NO_LOG}"
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -185,7 +185,7 @@ _auto_timesetting() {
         echo 0.0 0 0.0 > "${_DESTDIR}"/etc/adjtime
         echo 0 >> "${_DESTDIR}"/etc/adjtime
         [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>"${_DESTDIR}"/etc/adjtime
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -197,7 +197,7 @@ _auto_pacman_mirror() {
         #shellcheck disable=SC2027,SC2086
         awk "BEGIN { printf(\"# Mirror used during installation\nServer == "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -205,7 +205,7 @@ _auto_hostname() {
     if [[ ! -f ${_DESTDIR}/etc/hostname ]]; then
         _dialog --infobox "Set default hostname on installed system..." 3 70
         echo "myhostname" > "${_DESTDIR}"/etc/hostname
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -214,7 +214,7 @@ _auto_locale() {
         _dialog --infobox "Set default locale on installed system..." 3 70
         echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
         echo "LC_COLLATE=C" >> "${_DESTDIR}"/etc/locale.conf
-        sleep 1
+        sleep 2
     fi
 }
 
