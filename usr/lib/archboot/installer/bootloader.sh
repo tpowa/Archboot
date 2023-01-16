@@ -255,7 +255,7 @@ _do_mok_sign () {
         done
         mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
         rm /tmp/.password
-        _dialog --infobox "MOK keys have been installed successfully.\n\nContinuing in 5 seconds..." 5 50
+        _dialog --infobox "MOK keys have been installed successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
     fi
     _SIGN_MOK=""
@@ -268,7 +268,7 @@ _do_mok_sign () {
             sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
             sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
         fi
-        _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\n\nContinuing in 5 seconds..." 7 60
+        _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\nContinuing in 5 seconds..." 6 60
         sleep 5
     fi
 }
@@ -294,7 +294,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        _dialog --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}\n\nContinuing in 5 seconds..." 7 70
+        _dialog --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}\nContinuing in 5 seconds..." 6 70
         sleep 5
     fi
 }
@@ -738,7 +738,7 @@ label linux
     initrd ${_SUBDIR}/${_INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
-    _dialog --infobox "UBOOT has been installed successfully.\n\nContinuing in 5 seconds..." 5 55
+    _dialog --infobox "UBOOT has been installed successfully.\nContinuing in 5 seconds..." 4 55
     sleep 5
     _S_BOOTLOADER=1
 }
@@ -822,7 +822,7 @@ _do_grub_bios() {
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
         _do_grub_config
-        _dialog --infobox "GRUB(2) BIOS has been installed successfully.\n\nContinuing in 5 seconds..." 5 55
+        _dialog --infobox "GRUB(2) BIOS has been installed successfully.\nContinuing in 5 seconds..." 4 55
         sleep 5
         _S_BOOTLOADER=1
     else
@@ -891,7 +891,7 @@ _do_grub_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds..." 5 60
+        _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
         _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
@@ -902,7 +902,7 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_DIR="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
-        _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\n\nContinuing in 5 seconds..." 6 50
+        _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\nContinuing in 5 seconds..." 5 50
         sleep 5
         _S_BOOTLOADER=1
     else

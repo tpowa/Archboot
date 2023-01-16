@@ -64,7 +64,7 @@ _enable_testing() {
 _update_environment() {
     if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
         echo "Packages are already in pacman cache..."  >"${_LOG}"
-        _dialog --infobox "Packages are already in pacman cache. Skipping update environment.\n\nContinuing in 3 seconds..." 5 70
+        _dialog --infobox "Packages are already in pacman cache. Skipping update environment.\nContinuing in 3 seconds..." 4 70
         sleep 3
     else
         _UPDATE_ENVIRONMENT=""
