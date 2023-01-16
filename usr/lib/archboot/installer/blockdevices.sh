@@ -313,7 +313,7 @@ _stopmd()
 {
     _DISABLEMD=""
     if grep -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
-        _dialog --defaultno --yesno "Setup detected already running software raid devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMD=1
+        _dialog --defaultno --yesno "Setup detected already running software raid device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             # shellcheck disable=SC2013
@@ -321,13 +321,13 @@ _stopmd()
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
-            _dialog --infobox "Removing software raid devices done.\nContinuing in 5 seconds..." 0 0
+            _dialog --infobox "Removing software raid device(s) done.\nContinuing in 5 seconds..." 0 0
             sleep 5
         fi
     fi
     _DISABLEMDSB=""
     if ${_LSBLK} FSTYPE | grep -q "linux_raid_member"; then
-        _dialog --defaultno --yesno "Setup detected superblock of software raid devices...\n\nDo you want to delete the superblock on ALL of them?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMDSB=1
+        _dialog --defaultno --yesno "Setup detected superblock(s) of software raid devices...\n\nDo you want to delete the superblock on ALL of them?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMDSB=1
         if [[ -n "${_DISABLEMDSB}" ]]; then
             _umountall
         fi
@@ -336,7 +336,7 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${dev}"
         done
-        _dialog --infobox "Removing superblocks on software raid devices done.\nContinuing in 5 seconds..." 4 60
+        _dialog --infobox "Removing superblock(s) on software raid devices done.\nContinuing in 5 seconds..." 4 60
         sleep 5
     fi
 }
@@ -352,7 +352,7 @@ _stoplvm()
     [[ -n "${_LV_GROUPS}" ]] && _DETECTED_LVM=1
     [[ -n "${_LV_PHYSICAL}" ]] && _DETECTED_LVM=1
     if [[ -n "${_DETECTED_LVM}" ]]; then
-        _dialog --defaultno --yesno "Setup detected lvm volumes, volume groups or physical devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELVM=1
+        _dialog --defaultno --yesno "Setup detected lvm volume(s), volume group(s) or physical device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELVM=1
     fi
     if [[ -n "${_DISABLELVM}" ]]; then
         _umountall
@@ -365,7 +365,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing logical volumes, logical groups and physical volumes done.\nContinuing in 5 seconds..." 4 75
+        _dialog --infobox "Removing logical volume(s), logical group(s) and physical volume(s) done.\nContinuing in 5 seconds..." 4 75
         sleep 5
     fi
 }
@@ -379,7 +379,7 @@ _stopluks()
     _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
     [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected running luks encrypted devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
@@ -389,7 +389,7 @@ _stopluks()
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing luks encrypted devices done.\nContnuing in 5 seconds..." 0 0
+        _dialog --infobox "Removing luks encrypted device(s) done.\nContinuing in 5 seconds..." 0 0
         sleep 5
     fi
     _DISABLELUKS=""
@@ -397,14 +397,14 @@ _stopluks()
     # detect not running luks devices
     ${_LSBLK} FSTYPE | grep -q "crypto_LUKS" && _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
-        _dialog --defaultno --yesno "Setup detected not running luks encrypted devices...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
+        _dialog --defaultno --yesno "Setup detected not running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing not running luks encrypted devices done.\nContinuing in 5 seconds..." 0 0
+        _dialog --infobox "Removing not running luks encrypted device(s) done.\nContinuing in 5 seconds..." 0 0
         sleep 5
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
