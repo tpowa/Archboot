@@ -33,13 +33,13 @@ _linux_firmware() {
 }
 
 _marvell_firmware() {
-    unset MARVELL
+    _MARVELL=""
     _PACKAGES="${_PACKAGES// linux-firmware-marvell/ }"
     for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
-        [[ -f $i ]] && MARVELL="$MARVELL $(basename "${i}" | sed -e 's#\..*$##g')"
+        [[ -f $i ]] && _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
     done
     # check marvell modules if already loaded
-    for i in ${MARVELL}; do
+    for i in ${_MARVELL}; do
         if lsmod | grep -qw "${i}"; then
             _PACKAGES="${_PACKAGES} linux-firmware-marvell"
             break
