@@ -117,7 +117,7 @@ _autoprepare() {
                 fi
             done
         else
-            while [[ -z "${BOOTDEV_SET}" ]]; do
+            while [[ -z "${_BOOTDEV_SET}" ]]; do
                 _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
