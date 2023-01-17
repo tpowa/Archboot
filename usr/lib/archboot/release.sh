@@ -4,21 +4,21 @@
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs_${_ARCH}.img"
-_INITRAMFS_LATEST="boot/initramfs_${_ARCH}-latest.img"
-_INITRAMFS_LOCAL="boot/initramfs_${_ARCH}-local.img"
+_INITRAMFS_LATEST="boot/initramfs-latest-${_ARCH}.img"
+_INITRAMFS_LOCAL="boot/initramfs-local-${_ARCH}.img"
 _KERNEL="boot/vmlinuz_${_ARCH}"
-_KERNEL_ARCHBOOT="boot/vmlinuz_archboot_${_ARCH}"
+_KERNEL_ARCHBOOT="boot/vmlinuz-archboot-${_ARCH}"
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 if [[ "${_ARCH}" == "x86_64" ]]; then
     _ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
-    _EFISTUB="x64"
+    _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
     _CMDLINE="rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0"
 fi
 if [[ "${_ARCH}" == "aarch64" ]]; then
     _ISONAME="archboot-archlinuxarm-$(date +%Y.%m.%d-%H.%M)"
-    _EFISTUB="aa64"
+    _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
     _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
 fi
 [[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinuxriscv-$(date +%Y.%m.%d-%H.%M)"
@@ -111,46 +111,46 @@ _create_iso() {
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_INTEL_UCODE} ${_AMD_UCODE} ${_INITRAMFS}) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}.efi"
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_INTEL_UCODE} ${_AMD_UCODE} ${_INITRAMFS_LATEST}) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}-latest.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-latest.efi"
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_INTEL_UCODE} ${_AMD_UCODE} ${_INITRAMFS_LOCAL}) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}-local.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-local.efi"
             chmod 644 boot/*.efi
     elif [[ "${_ARCH}" == "aarch64" ]]; then
         ${_NSPAWN} "${_W_DIR}"  /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_AMD_UCODE} boot/initramfs_${_ARCH}.img) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}.efi"
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_AMD_UCODE} ${_INITRAMFS_LATEST}) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}-latest.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-latest.efi"
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat ${_AMD_UCODE} ${_INITRAMFS_LOCAL}) \
-            --change-section-vma .initrd=0x3000000 linux${_EFISTUB}.efi.stub \
+            --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
-            --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}-local.efi"
+            --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-local.efi"
             chmod 644 boot/*.efi
     fi
     mv "${_W_DIR}"/boot ./
