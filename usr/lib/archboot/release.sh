@@ -123,21 +123,21 @@ _create_boot() {
                 --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS}") \
                 --change-section-vma .initrd=0x3000000 "/usr/lib/systemd/boot/efi/linux${efistub}.efi.stub" \
                 --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
-                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi" boot/archboot-${efistub}.efi
+                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi"
             objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
                 --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
                 --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
                 --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS_LATEST}") \
                 --change-section-vma .initrd=0x3000000 "/usr/lib/systemd/boot/efi/linux${efistub}.efi.stub" \
                 --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
-                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi" boot/archboot-${efistub}-latest.efi
+                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}-latest.efi"
             objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
                 --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
                 --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
                 --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS_LOCAL}") \
                 --change-section-vma .initrd=0x3000000 "/usr/lib/systemd/boot/efi/linux${efistub}.efi.stub" \
                 --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
-                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi" boot/archboot-${efistub}-local.efi
+                --change-section-vma .splash=0x40000 "boot/archboot-${efistub}-local.efi"
         done
     elif [[ "${_ARCH}" == "aarch64" ]]; then
         _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
@@ -155,14 +155,14 @@ _create_boot() {
             --add-section .initrd=<(cat "${_AMD_UCODE}" "${_INITRAMFS_LATEST}") \
             --change-section-vma .initrd=0x3000000 "/usr/lib/systemd/boot/efi/linux${efistub}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
-            --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi" boot/archboot-${efistub}-latest.efi
+            --change-section-vma .splash=0x40000 "boot/archboot-${efistub}-latest.efi"
         objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_AMD_UCODE}" "${_INITRAMFS_LOCAL}") \
             --change-section-vma .initrd=0x3000000 "/usr/lib/systemd/boot/efi/linux${efistub}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
-            --change-section-vma .splash=0x40000 "boot/archboot-${efistub}.efi" boot/archboot-${efistub}-local.efi
+            --change-section-vma .splash=0x40000 "boot/archboot-${efistub}-local.efi"
     fi
 }
 
