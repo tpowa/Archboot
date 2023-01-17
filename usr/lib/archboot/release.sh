@@ -145,7 +145,7 @@ _create_boot() {
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-local.efi"
             rm linux"${_EFISTUB}".efi.stub
-            chmod 644 ./*.efi
+            chmod 644 boot/*.efi
     elif [[ "${_ARCH}" == "aarch64" ]]; then
         _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
         objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
@@ -170,7 +170,7 @@ _create_boot() {
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-local.efi"
             rm linux"${_EFISTUB}".efi.stub
-            chmod 644 ./*.efi
+            chmod 644 boot/*.efi
     fi
 }
 
