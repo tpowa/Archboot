@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 17.01.2023 07:01 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 17.01.2023 16:18 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -182,7 +182,7 @@
 <ul>
 <li><a href="#download-image-files" id="toc-download-image-files"><span class="toc-section-number">2.1</span> <span dir="">Download image files</span></a></li>
 <li><a href="#features-of-the-images" id="toc-features-of-the-images"><span class="toc-section-number">2.2</span> <span dir="">Features of the images</span></a></li>
-<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> <span dir="">PXE</span> <span dir="">booting / Rescue system</span></a></li>
+<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> <span dir="">Unified Kernel Image</span> / <span dir="">PXE</span> <span dir="">booting / Rescue system</span></a></li>
 <li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.4</span> <span dir="">Supported boot modes</span></a></li>
 <li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.5</span> <span dir="">Burning release or writing to disk</span></a></li>
 <li><a href="#installation-with-a-graphical-environment-or-vnc-instead-of-plain-console" id="toc-installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="toc-section-number">2.6</span> <span dir="">Installation with a graphical environment or VNC instead of plain console</span></a></li>
@@ -362,7 +362,7 @@
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image.<br>It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
-<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3</span> <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a> <strong><span dir="">booting / Rescue system</span></strong></h3>
+<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3</span><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a>/<a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a> <strong><span dir="">booting / Rescue system</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -388,6 +388,14 @@
 <td><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/amd-ucode.img"><strong>amd-ucode.img</strong></a></td>
 <td></td>
 </tr>
+<tr class="even">
+<td>Unified Kernel Image</td>
+<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/archboot-aa64-latest.efi"><strong>archboot-aa64-latest.efi</strong></a><br>
+<a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/archboot-aa64.efi"><strong>archboot-aa64.efi</strong></a><br>
+<a href="https://pkgbuild.com/~tpowa/archboot/iso/aarch64/latest/boot/archboot-aa64-local.efi"><strong>archboot-aa64-local.efi</strong></a><br>
+</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <table>
@@ -410,11 +418,19 @@
 <td>Microcode</td>
 <td><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/intel-ucode.img"><strong>intel-ucode.img</strong></a><br><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/amd-ucode.img"><strong>amd-ucode.img</strong></a></td>
 </tr>
+<tr class="even">
+<td>Unified Kernel Image</td>
+<td><a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/archboot-x64-latest.efi"><strong>archboot-x64-latest.efi</strong></a><br>
+<a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/archboot-x64.efi"><strong>archboot-x64.efi</strong></a><br>
+<a href="https://pkgbuild.com/~tpowa/archboot/iso/x86_64/latest/boot/archboot-x64-local.efi"><strong>archboot-x64-local.efi</strong></a><br>
+</td>
+</tr>
 </tbody>
 </table>
 </ul>
 <ul>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong> setup.</a><br>
+<li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a> can be booted directly from your UEFI implementation like any other <EFI> file.<br>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>,<a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.<br>
 <li>For <strong>rescue booting</strong> add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li>In <strong>both</strong> cases, add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
 </ul>
