@@ -87,7 +87,7 @@ _prepare_kernel_initramfs_files_RISCV64() {
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_RUNNING_ARCH}"
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img" || exit 1
 }
 
@@ -201,7 +201,7 @@ timeout 100
 default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds ...)
-    kernel /boot/vmlinuz_${_RUNNING_ARCH}
+    kernel /boot/vmlinuz-${_RUNNING_ARCH}
     initrd /boot/initramfs-${_RUNNING_ARCH}.img
     append rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
 EOF
