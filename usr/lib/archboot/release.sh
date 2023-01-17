@@ -128,7 +128,7 @@ _create_iso() {
             --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
             --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-local.efi"
-            chmod 644 boot/*.efi
+            chmod 644 "${_W_DIR}"/boot/*.efi
     elif [[ "${_ARCH}" == "aarch64" ]]; then
         ${_NSPAWN} "${_W_DIR}"  /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
@@ -151,7 +151,7 @@ _create_iso() {
             --change-section-vma .initrd=0x3000000 ${_EFISTUB} \
             --add-section .splash=/usr/share/archboot/uki/archboot-background.bmp \
             --change-section-vma .splash=0x40000 boot/archboot-${_ARCH}-local.efi"
-            chmod 644 boot/*.efi
+            chmod 644 "${_W_DIR}"/boot/*.efi
     fi
     mv "${_W_DIR}"/boot ./
     # create Release.txt with included main archlinux packages
