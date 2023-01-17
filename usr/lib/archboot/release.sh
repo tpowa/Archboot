@@ -102,6 +102,8 @@ _create_iso() {
             fi
         fi
     fi
+    rm -r "${_W_DIR:?}"/boot
+    mv boot "${_W_DIR}"
     echo "Generate Unified Kernel Images ..."
     # create unified kernel image UKI
     if [[ "${_ARCH}" == "x86_64" ]]; then
@@ -151,6 +153,7 @@ _create_iso() {
             --change-section-vma .splash=0x40000 boot/archboot-${_EFISTUB}-local.efi"
             chmod 644 boot/*.efi
     fi
+    mv "${_W_DIR}"/boot ./
     # create Release.txt with included main archlinux packages
     echo "Generate Release.txt ..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
