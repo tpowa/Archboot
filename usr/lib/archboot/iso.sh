@@ -46,17 +46,17 @@ _prepare_kernel_initramfs_files() {
     mkdir -p "${_ISODIR}/boot"
 
     #shellcheck disable=SC2154
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img" || exit 1
     # delete cachedir on archboot environment
     [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
     # grub on x86_64 reports too big if near 1GB
-     split -b 950M -d --additional-suffix=.img -a 1 "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img" \
-     "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-"
-    rm "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-pre.img"
+     split -b 950M -d --additional-suffix=.img -a 1 "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img" \
+     "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-"
+    rm "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img"
     if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
-        mv "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img"
+        mv "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img"
     fi
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
+    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
     # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -88,7 +88,7 @@ _prepare_kernel_initramfs_files_RISCV64() {
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz_${_RUNNING_ARCH}"
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs_${_RUNNING_ARCH}.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img" || exit 1
 }
 
 _prepare_ucode() {
@@ -202,7 +202,7 @@ default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds ...)
     kernel /boot/vmlinuz_${_RUNNING_ARCH}
-    initrd /boot/initramfs_${_RUNNING_ARCH}.img
+    initrd /boot/initramfs-${_RUNNING_ARCH}.img
     append rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
 EOF
 }
