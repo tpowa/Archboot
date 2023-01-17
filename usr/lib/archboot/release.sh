@@ -121,7 +121,7 @@ objcopy -p \
         --add-section .cmdline=<(grep -a '^[^#]' "cmdline" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
         --add-section .linux=vmlinuz_archboot_x86_64 --change-section-vma .linux=0x2000000 \
         --add-section .initrd=<(cat intel-ucode.img amd-ucode.img initramfs_x86_64.img) --change-section-vma .initrd=0x3000000 \
-        "/usr/lib/systemd/boot/efi/linuxx64.efi.stub" --add-section .splash="/usr/share/archboot/grub/archboot-background.png" --change-section-vma .splash=0x40000 "test5.efi"
+        "/usr/lib/systemd/boot/efi/linuxx64.efi.stub" --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" --change-section-vma .splash=0x40000 "test5.efi"
 
 }
 
