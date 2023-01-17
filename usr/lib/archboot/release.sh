@@ -14,10 +14,12 @@ _W_DIR="$(mktemp -u archboot-release.XXX)"
 if [[ "${_ARCH}" == "x86_64" ]]; then
     _ISONAME="archboot-archlinux-$(date +%Y.%m.%d-%H.%M)"
     _EFISTUB="x64"
+    _CMDLINE="rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0"
 fi
 if [[ "${_ARCH}" == "aarch64" ]]; then
     _ISONAME="archboot-archlinuxarm-$(date +%Y.%m.%d-%H.%M)"
     _EFISTUB="aa64"
+    _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
 fi
 [[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinuxriscv-$(date +%Y.%m.%d-%H.%M)"
 
@@ -60,28 +62,9 @@ _create_iso() {
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
-    # create Release.txt with included main archlinux packages
-    echo "Generate Release.txt ..."
-    (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
-    echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
-    echo "Homepage: https://bit.ly/archboot";\
-    echo "Architecture: ${_ARCH}";\
-    echo "RAM requirement to boot: 1300 MB or greater";\
-    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
-    echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
-    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ > /dev/null 2>&1
     mv "${_W_DIR}"/*.img ./ > /dev/null 2>&1
-    [[ -n "${_EFISTUB}" ]] && mv "${_W_DIR}"/usr/lib/systemd/boot/efi/linux"${_EFISTUB}".efi.stub ./ > /dev/null 2>&1
-    # remove container
-    echo "Remove container ${_W_DIR} ..."
-    rm -r "${_W_DIR}"
-}
-
-_create_boot() {
     # create boot directory with ramdisks
     echo "Create boot directory ..."
     if [[ "${_ARCH}" == "riscv64" ]]; then
@@ -120,61 +103,70 @@ _create_boot() {
             fi
         fi
     fi
+    echo "Generate Unified Kernel Images ..."
     # create unified kernel image UKI
     if [[ "${_ARCH}" == "x86_64" ]]; then
-        _CMDLINE="rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS}") \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}.efi"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS_LATEST}") \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-latest.efi"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_INTEL_UCODE}" "${_AMD_UCODE}" "${_INITRAMFS_LOCAL}") \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-local.efi"
-            rm linux"${_EFISTUB}".efi.stub
             chmod 644 boot/*.efi
     elif [[ "${_ARCH}" == "aarch64" ]]; then
-        _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_AMD_UCODE}" boot/initramfs_"${_ARCH}".img) \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}.efi"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_AMD_UCODE}" "${_INITRAMFS_LATEST}") \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-latest.efi"
-        objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
+        ${_NSPAWN} "${_W_DIR}" objcopy -p --add-section .osrel="/usr/share/archboot/base/etc/os-release" --change-section-vma .osrel=0x20000 \
             --add-section .cmdline=<(echo "${_CMDLINE}" | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=0x30000 \
             --add-section .linux="${_KERNEL_ARCHBOOT}" --change-section-vma .linux=0x2000000 \
             --add-section .initrd=<(cat "${_AMD_UCODE}" "${_INITRAMFS_LOCAL}") \
             --change-section-vma .initrd=0x3000000 "linux${_EFISTUB}.efi.stub" \
             --add-section .splash="/usr/share/archboot/uki/archboot-background.bmp" \
             --change-section-vma .splash=0x40000 "boot/archboot-${_EFISTUB}-local.efi"
-            rm linux"${_EFISTUB}".efi.stub
             chmod 644 boot/*.efi
     fi
-}
-
-_create_cksum() {
+    # create Release.txt with included main archlinux packages
+    echo "Generate Release.txt ..."
+    (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
+    echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
+    echo "Homepage: https://bit.ly/archboot";\
+    echo "Architecture: ${_ARCH}";\
+    echo "RAM requirement to boot: 1300 MB or greater";\
+    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
+    echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
+    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
+    # remove container
+    echo "Remove container ${_W_DIR} ..."
+    rm -r "${_W_DIR}"
     # create sha256sums
     echo "Generating sha256sum ..."
     for i in *; do
