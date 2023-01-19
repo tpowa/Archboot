@@ -43,7 +43,7 @@ _create_iso() {
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # remove not working lvm2 from latest image
-        echo "Remove lvm2 from container ${_W_DIR}..."
+        echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         # generate latest tarball in container
         echo "Generate local ISO..."
@@ -164,7 +164,7 @@ _create_iso() {
     echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # remove container
-    echo "Remove container ${_W_DIR}..."
+    echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
     # create sha256sums
     echo "Generating sha256sum..."

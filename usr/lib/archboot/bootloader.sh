@@ -89,7 +89,7 @@ _upload_efi_files() {
 }
 
 _cleanup() {
-echo "Remove ${1} directory."
+echo "Removing ${1} directory."
 rm -r "${1}"
 echo "Finished ${1}."
 }

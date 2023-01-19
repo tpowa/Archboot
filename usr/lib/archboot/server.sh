@@ -56,13 +56,13 @@ _server_upload() {
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     # move files on server, create symlink and remove ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-echo "Remove old ${1}/${_ARCH}/${_DIR} directory..."
+echo "Removing old ${1}/${_ARCH}/${_DIR} directory..."
 rm -r "${1}"/"${_ARCH}"/"${_DIR}"
-echo "Remove old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
+echo "Removing old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r "${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
 echo "Move ${_ARCH}/${_DIR} to ${1}/${_ARCH}..."
 mv "${_ARCH}/${_DIR}" "${1}"/"${_ARCH}"
-echo "Remove ${_SERVER_HOME}/${_ARCH} directory..."
+echo "Removing ${_SERVER_HOME}/${_ARCH} directory..."
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${1}"/"${_ARCH}"
 echo "Creating new latest symlink in ${1}/${_ARCH}..."

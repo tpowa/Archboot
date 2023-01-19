@@ -29,7 +29,7 @@ _move_packages() {
 }
 
 _cleanup_repodir() {
-    echo "Remove ${1}..."
+    echo "Removing ${1}..."
     rm -r "${1}"
 }
 

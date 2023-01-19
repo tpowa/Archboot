@@ -90,7 +90,7 @@ _prepare_pacman() {
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
-    echo "Remove archboot repository sync db..."
+    echo "Removing archboot repository sync db..."
     rm -f /var/lib/pacman/sync/archboot.db
     echo "Updating Arch Linux keyring..."
     #shellcheck disable=SC2086
@@ -162,7 +162,7 @@ _install_archboot() {
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
-        echo "Remove archboot repository sync db..."
+        echo "Removing archboot repository sync db..."
         rm /var/lib/pacman/sync/archboot.db
     fi
 }
