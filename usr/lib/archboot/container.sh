@@ -77,7 +77,7 @@ _clean_mkinitcpio() {
 
 _prepare_pacman() {
     # prepare pacman dirs
-    echo "Create directories in ${1}..."
+    echo "Creating directories in ${1}..."
     mkdir -p "${1}/var/lib/pacman"
     mkdir -p "${1}/${_CACHEDIR}"
     [[ -e "${1}/proc" ]] || mkdir -m 555 "${1}/proc"
@@ -169,7 +169,7 @@ _install_archboot() {
 
 _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
-    echo "Create pacman config and mirrorlist in container..."
+    echo "Creating pacman config and mirrorlist in container..."
     cp "/etc/pacman.d/mirrorlist" "${1}/etc/pacman.d/mirrorlist"
     # only copy from archboot pacman.conf, else use default file
     grep -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf

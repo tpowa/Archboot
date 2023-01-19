@@ -65,7 +65,7 @@ mv "${_ARCH}/${_DIR}" "${1}"/"${_ARCH}"
 echo "Remove ${_SERVER_HOME}/${_ARCH} directory..."
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${1}"/"${_ARCH}"
-echo "Create new latest symlink in ${1}/${_ARCH}..."
+echo "Creating new latest symlink in ${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
