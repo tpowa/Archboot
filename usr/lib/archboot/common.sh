@@ -88,7 +88,7 @@ _generate_keyring() {
     # copy existing gpg cache on archboot usage
     if ! grep -qw archboot /etc/hostname; then
         # generate pacman keyring
-        echo "Generate pacman keyring in container ..."
+        echo "Generate pacman keyring in container..."
         ${_NSPAWN} "${1}" pacman-key --init >/dev/null 2>&1
         ${_NSPAWN} "${1}" pacman-key --populate >/dev/null 2>&1
     else
@@ -99,17 +99,17 @@ _generate_keyring() {
 _x86_64_pacman_use_default() {
     # use pacman.conf with disabled [testing] repository
     if [[ -z "${_CUSTOM_PACMAN_CONF}" ]]; then
-        echo "Use system's ${_PACMAN_CONF} ..."
+        echo "Use system's ${_PACMAN_CONF}..."
     else
-        echo "Copy ${_CUSTOM_PACMAN_CONF} to ${_PACMAN_CONF} ..."
+        echo "Copy ${_CUSTOM_PACMAN_CONF} to ${_PACMAN_CONF}..."
         cp "${_PACMAN_CONF}" "${_PACMAN_CONF}".old
         cp "${_CUSTOM_PACMAN_CONF}" "${_PACMAN_CONF}"
     fi
     # use mirrorlist with enabled rackspace mirror
     if [[ -z "${_CUSTOM_MIRRORLIST}" ]]; then
-        echo "Use system's ${_PACMAN_MIRROR} ..."    
+        echo "Use system's ${_PACMAN_MIRROR}..."    
     else
-        echo "Copy ${_CUSTOM_MIRRORLIST} to ${_PACMAN_MIRROR} ..."
+        echo "Copy ${_CUSTOM_MIRRORLIST} to ${_PACMAN_MIRROR}..."
         cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
         cp "${_CUSTOM_MIRRORLIST}" "${_PACMAN_MIRROR}"
     fi
@@ -118,21 +118,21 @@ _x86_64_pacman_use_default() {
 _x86_64_pacman_restore() {
     # restore pacman.conf and mirrorlist
     if [[ -z "${_CUSTOM_PACMAN_CONF}" ]]; then
-        echo "System's ${_PACMAN_CONF} used ..."
+        echo "System's ${_PACMAN_CONF} used..."
     else
-        echo "Restore system's ${_PACMAN_CONF} ..."
+        echo "Restore system's ${_PACMAN_CONF}..."
          cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
     fi
     if [[ -z "${_CUSTOM_MIRRORLIST}" ]]; then
-        echo "System's ${_PACMAN_MIRROR} used ..."
+        echo "System's ${_PACMAN_MIRROR} used..."
     else
-        echo "Restore system's ${_PACMAN_MIRROR} ..."
+        echo "Restore system's ${_PACMAN_MIRROR}..."
         cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
     fi    
 }
 
 _fix_network() {
-    echo "Fix network settings in ${1} ..."
+    echo "Fix network settings in ${1}..."
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
     # fix network in container
@@ -141,7 +141,7 @@ _fix_network() {
 }
 
 _create_archboot_db() {
-    echo "Creating archboot repository db ..."
+    echo "Creating archboot repository db..."
     #shellcheck disable=SC2046
     LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
 }
@@ -164,25 +164,25 @@ _pacman_parameters() {
 }
 
 _pacman_key() {
-    echo "Adding ${_GPG_KEY} to container ..."
+    echo "Adding ${_GPG_KEY} to container..."
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
-    echo "Adding ${_GPG_KEY_ID} to container trusted keys ..."
+    echo "Adding ${_GPG_KEY_ID} to container trusted keys..."
     ${_NSPAWN} "${1}" pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     ${_NSPAWN} "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
-    echo "Removing ${_GPG_KEY} from container ..."
+    echo "Removing ${_GPG_KEY} from container..."
     rm "${1}/${_GPG_KEY}"
 }
 
 _pacman_key_system() {
-    echo "Adding ${_GPG_KEY_ID} to trusted keys ..."
+    echo "Adding ${_GPG_KEY_ID} to trusted keys..."
     pacman-key --add "${_GPG_KEY}" >/dev/null 2>&1
     pacman-key --lsign-key "${_GPG_KEY_ID}" >/dev/null 2>&1
 }
 
 _cachedir_check() {
     if grep -q ^CacheDir /etc/pacman.conf; then
-        echo "Error: CacheDir is set in /etc/pacman.conf. Aborting ..."
+        echo "Error: CacheDir is set in /etc/pacman.conf. Aborting..."
         exit 1
     fi
 }

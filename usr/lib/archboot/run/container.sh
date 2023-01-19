@@ -5,8 +5,8 @@
 [[ -z "${1}" ]] && _usage
 _parameters "$@"
 _root_check
-echo "Starting container creation ..."
-[[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
+echo "Starting container creation..."
+[[ -d "${1}" ]] || (echo "Create directory ${1}..."; mkdir "${1}")
 if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     _cachedir_check
@@ -27,7 +27,7 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
         _copy_archboot_defaults "${1}"
         # enable [testing] if enabled in host
         if grep -q "^\[testing" /etc/pacman.conf; then
-            echo "Enable [testing] repository in container ..."
+            echo "Enable [testing] repository in container..."
             sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
             sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
             sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${1}/etc/pacman.conf"

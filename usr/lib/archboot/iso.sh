@@ -39,7 +39,7 @@ _config() {
 }
 
 _prepare_kernel_initramfs_files() {
-    echo "Prepare kernel and initramfs ..."
+    echo "Prepare kernel and initramfs..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
@@ -67,7 +67,7 @@ _prepare_kernel_initramfs_files() {
     fi
     # only aarch64
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        echo "Prepare dtbs ..."
+        echo "Prepare dtbs..."
         cp -r /boot/dtbs "${_ISODIR}/boot/"
     fi
 }
@@ -83,7 +83,7 @@ _prepare_kernel_initramfs_files() {
 #   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
 # - only left option is extlinux support in u-boot loader
 _prepare_kernel_initramfs_files_RISCV64() {
-    echo "Prepare RISCV64 u-boot ..."
+    echo "Prepare RISCV64 u-boot..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
@@ -94,14 +94,14 @@ _prepare_kernel_initramfs_files_RISCV64() {
 _prepare_ucode() {
     # only x86_64
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        echo "Prepare intel-ucode ..."
+        echo "Prepare intel-ucode..."
         cp /boot/intel-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/intel-ucode
         cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        echo "Prepare amd-ucode ..."
+        echo "Prepare amd-ucode..."
         cp /boot/amd-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
@@ -109,7 +109,7 @@ _prepare_ucode() {
 }
 
 _prepare_fedora_shim_bootloaders_x86_64 () {
-    echo "Prepare fedora shim ..."
+    echo "Prepare fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     cp "/usr/share/archboot/bootloader/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
@@ -119,7 +119,7 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
 }
 
 _prepare_fedora_shim_bootloaders_aarch64 () {
-    echo "Prepare fedora shim ..."
+    echo "Prepare fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
     cp "/usr/share/archboot/bootloader/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
@@ -127,13 +127,13 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
 }
 
 _prepare_efitools_uefi () {
-    echo "Prepare efitools ..."
+    echo "Prepare efitools..."
     cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/TOOLS/HASHTOOL.EFI"
     cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/TOOLS/KEYTOOL.EFI"
 }
 
 _prepare_uefi_shell_tianocore() {
-    echo "Prepare uefi shell ..."
+    echo "Prepare uefi shell..."
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
     cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
@@ -142,29 +142,29 @@ _prepare_uefi_shell_tianocore() {
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
-    echo "Prepare X64 Grub ..."
+    echo "Prepare X64 Grub..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
 _prepare_uefi_IA32() {
-    echo "Prepare IA32 Grub ..."
+    echo "Prepare IA32 Grub..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
-    echo "Prepare AA64 Grub ..."
+    echo "Prepare AA64 Grub..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
 }
 
 _prepare_memtest() {
-    echo "Prepare memtest86+ ..."
+    echo "Prepare memtest86+..."
     cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
     cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
 }
 
 _prepare_background() {
-    echo "Prepare Grub background ..."
+    echo "Prepare Grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
@@ -176,7 +176,7 @@ _reproducibility() {
 }
 
 _prepare_uefi_image() {
-    echo "Prepare UEFI image ..."
+    echo "Prepare UEFI image..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/EFI | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
@@ -194,13 +194,13 @@ _prepare_extlinux_conf() {
         _SMP="nr_cpus=1"
     fi
     [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
-    echo "Prepare extlinux.conf ..."
+    echo "Prepare extlinux.conf..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
 menu title Welcome to Archboot - ${_TITLE}
 timeout 100
 default linux
 label linux
-    menu label Boot System (automatic boot in 10 seconds ...)
+    menu label Boot System (automatic boot in 10 seconds...)
     kernel /boot/vmlinuz-${_RUNNING_ARCH}
     initrd /boot/initramfs-${_RUNNING_ARCH}.img
     append rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
@@ -214,7 +214,7 @@ EOF
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
 _uboot() {
-    echo "Generating ${_RUNNING_ARCH} U-Boot image ..."
+    echo "Generating ${_RUNNING_ARCH} U-Boot image..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024)) # image size in sectors
@@ -232,7 +232,7 @@ EOF
     ## Copy all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
-    echo "Remove extlinux config file ..."
+    echo "Remove extlinux config file..."
     rm -r "${_ISODIR}"/boot/extlinux
 }
 
@@ -241,13 +241,14 @@ _grub_mkrescue() {
     #set date for reproducibility
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
-    echo "Generating ${_RUNNING_ARCH} hybrid ISO ..."
+    # -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
+    echo "Generating ${_RUNNING_ARCH} hybrid ISO..."
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System"
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
 _reproducibility_iso() {
-    echo "Create reproducible UUIDs on ${_IMAGENAME}.iso GPT ..."
+    echo "Create reproducible UUIDs on ${_IMAGENAME}.iso GPT..."
     sgdisk -u 1:1 "${_IMAGENAME}.iso" >/dev/null 2>&1
     sgdisk -u 2:2 "${_IMAGENAME}.iso" >/dev/null 2>&1
     sgdisk -u 3:3 "${_IMAGENAME}.iso" >/dev/null 2>&1
@@ -257,7 +258,7 @@ _reproducibility_iso() {
 
 _create_cksum() {
     ## create sha256sums.txt
-    echo "Generating sha256sum ..."
+    echo "Generating sha256sum..."
     [[ -f  "sha256sums.txt" ]] && rm "sha256sums.txt"
     [[ "$(echo ./*.iso)" == "./*.iso" ]] || cksum -a sha256 ./*.iso > "sha256sums.txt"
     [[ "$(echo ./*.img)" == "./*.img" ]] || cksum -a sha256 ./*.img > "sha256sums.txt"
@@ -265,6 +266,6 @@ _create_cksum() {
 
 _cleanup_iso() {
     # cleanup
-    echo "Cleanup... remove ${_ISODIR} ..."
+    echo "Cleanup... remove ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }

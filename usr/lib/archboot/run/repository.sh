@@ -6,9 +6,9 @@
 _CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
 [[ -z "${1}" ]] && _usage
 _root_check
-[[ -d "${1}" ]] || (echo "Create directory ${1} ..."; mkdir "${1}")
+[[ -d "${1}" ]] || (echo "Create directory ${1}..."; mkdir "${1}")
 _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
-echo "Starting repository creation ..."
+echo "Starting repository creation..."
 if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && (_x86_64_pacman_use_default || exit 1)

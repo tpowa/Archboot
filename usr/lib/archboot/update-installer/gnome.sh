@@ -6,7 +6,7 @@ _install_gnome() {
 }
 
 _start_gnome() {
-    echo -e "Launching \033[1mGNOME\033[0m now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo -e "Launching \033[1mGNOME\033[0m now, logging is done on \033[1m/dev/tty8\033[0m..."
     echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
     #shellcheck disable=SC2129
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc

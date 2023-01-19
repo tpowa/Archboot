@@ -8,7 +8,7 @@ _usage () {
     echo "This will create an archboot container for an archboot image."
     echo "Usage: ${_BASENAME} <directory> <options>"
     echo " Options:"
-    echo "  -cc    Cleanup container eg. remove manpages, includes ..."
+    echo "  -cc    Cleanup container eg. remove manpages, includes..."
     echo "  -cp    Cleanup container package cache"
     echo "  -install-source=Server add package server with archboot repository"
     exit 0
@@ -27,11 +27,11 @@ _parameters() {
 
 _clean_cache() {
     if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
-        echo "Clean pacman cache in ${1} ..."
+        echo "Clean pacman cache in ${1}..."
         rm -r "${1}"/var/cache/pacman
     fi
     if grep -qw 'archboot' /etc/hostname; then
-        echo "Cleaning archboot /var/cache/pacman/pkg ..."
+        echo "Cleaning archboot /var/cache/pacman/pkg..."
         for i in "${1}"/var/cache/pacman/pkg/*; do
             [[ "${i}" == "${1}/var/cache/pacman/pkg/archboot.db" ]] || rm -f /var/cache/pacman/pkg/"$(basename "${i}")"
         done
@@ -40,16 +40,16 @@ _clean_cache() {
 
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
-        echo "Downloading ${3} ..."
+        echo "Downloading ${3}..."
         wget "${2}"/"${3}"{,.sig} >/dev/null 2>&1
     else
-        echo "Using local ${3} ..."
+        echo "Using local ${3}..."
     fi
-    echo "Verifying ${3} ..."
+    echo "Verifying ${3}..."
     gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${1}" -xf "${3}"
     if [[ -f "${3}" && -f "${3}".sig ]]; then
-        echo "Removing installation tarball ${3} ..."
+        echo "Removing installation tarball ${3}..."
         rm "${3}"{,.sig}
     fi
     echo "Update container to latest packages..."
@@ -59,7 +59,7 @@ _pacman_chroot() {
 # clean container from not needed files
 _clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
-        echo "Clean container, delete not needed files from ${1} ..."
+        echo "Clean container, delete not needed files from ${1}..."
         rm -r "${1}"/usr/include
         rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,bash-completion,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,i18n,locale,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,bash,binfmt.d,cifs-utils,cmake,coreutils,cryptsetup,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,krb5,ldscripts,libnl,pkgconfig,python[0-9]*,rsync,sasl2,siconv,tar,terminfo,xfsprogs,xtables}
@@ -68,7 +68,7 @@ _clean_container() {
 
 # remove mkinitcpio hooks to speed up process, remove not needed initramdisks
 _clean_mkinitcpio() {
-    echo "Clean mkinitcpio from ${1} ..."
+    echo "Clean mkinitcpio from ${1}..."
     [[ -e "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"
     [[ -e "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook" ]] && rm "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook"
     [[ -e "${1}/boot/initramfs-linux.img" ]] && rm "${1}/boot/initramfs-linux.img"
@@ -77,22 +77,22 @@ _clean_mkinitcpio() {
 
 _prepare_pacman() {
     # prepare pacman dirs
-    echo "Create directories in ${1} ..."
+    echo "Create directories in ${1}..."
     mkdir -p "${1}/var/lib/pacman"
     mkdir -p "${1}/${_CACHEDIR}"
     [[ -e "${1}/proc" ]] || mkdir -m 555 "${1}/proc"
     [[ -e "${1}/sys" ]] || mkdir -m 555 "${1}/sys"
     [[ -e "${1}/dev" ]] || mkdir -m 755 "${1}/dev"
     # mount special filesystems to ${1}
-    echo "Mount special filesystems in ${1} ..."
+    echo "Mount special filesystems in ${1}..."
     mount proc "${1}/proc" -t proc -o nosuid,noexec,nodev
     mount sys "${1}/sys" -t sysfs -o nosuid,noexec,nodev,ro
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
-    echo "Remove archboot repository sync db ..."
+    echo "Remove archboot repository sync db..."
     rm -f /var/lib/pacman/sync/archboot.db
-    echo "Update Arch Linux keyring ..."
+    echo "Update Arch Linux keyring..."
     #shellcheck disable=SC2086
     pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} >/dev/null 2>&1
 }
@@ -100,17 +100,17 @@ _prepare_pacman() {
 #shellcheck disable=SC2120
 _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
-        echo "Use default pacman.conf ..."
+        echo "Use default pacman.conf..."
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="${1}${_PACMAN_CONF}"
         if ! grep -qw "\[archboot\]" "${_PACMAN_CONF}"; then
-            echo "Adding archboot repository to ${_PACMAN_CONF} ..."
+            echo "Adding archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkgbuild.com/~tpowa/archboot/pkg" >> "${_PACMAN_CONF}"
         fi
         #shellcheck disable=SC2001
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sed -e "s#^${1}##g")"
     else
-        echo "Use custom pacman.conf ..."
+        echo "Use custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
         #shellcheck disable=SC2129
         echo "[options]" >> "${_PACMAN_CONF}"
@@ -133,7 +133,7 @@ _change_pacman_conf() {
 
 # umount special filesystems
 _umount_special() {
-    echo "Umount special filesystems in ${1} ..."
+    echo "Umount special filesystems in ${1}..."
     umount -R "${1}/proc"
     umount -R "${1}/sys"
     umount -R "${1}/dev"
@@ -141,11 +141,11 @@ _umount_special() {
 
 _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
-        echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1} ..."
+        echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
     fi
-    echo "Installing ${_PACKAGES} ${_KEYRING} to ${1} ..."
+    echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
 }
@@ -156,13 +156,13 @@ _install_archboot() {
     else
         _pacman_key_system
     fi
-    echo "Installing ${_ARCHBOOT} to ${1} ..."
+    echo "Installing ${_ARCHBOOT} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
-        echo "Remove archboot repository sync db ..."
+        echo "Remove archboot repository sync db..."
         rm /var/lib/pacman/sync/archboot.db
     fi
 }
@@ -176,24 +176,24 @@ _copy_mirrorlist_and_pacman_conf() {
 }
 
 _copy_archboot_defaults() {
-    echo "Copy archboot defaults to container ..."
+    echo "Copy archboot defaults to container..."
     cp /etc/archboot/defaults "${1}"/etc/archboot/defaults
 }
 
 _reproducibility() {
-    echo "Reproducibility changes ..."
+    echo "Reproducibility changes..."
     sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}"/var/lib/pacman/local/*/desc
     rm "${1}"/var/cache/ldconfig/aux-cache
     rm "${1}"/etc/ssl/certs/java/cacerts
 }
 
 _set_hostname() {
-    echo "Setting hostname to archboot ..."
+    echo "Setting hostname to archboot..."
     echo 'archboot' > "${1}/etc/hostname"
 }
 
 _fix_groups() {
-    echo "Recreate system groups ..."
+    echo "Recreate system groups..."
     rm "${1}"/etc/{group,gshadow}
     ${_NSPAWN} "${1}" systemd-sysusers >/dev/null 2>&1
     # fix missing group in iwd FS#74646

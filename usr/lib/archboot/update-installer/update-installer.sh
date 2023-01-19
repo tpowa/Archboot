@@ -97,10 +97,10 @@ _download_latest() {
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         # config
-        echo -e "\033[1mStep 1/4:\033[0m Downloading latest config ..."
+        echo -e "\033[1mStep 1/4:\033[0m Downloading latest config..."
         wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
         # helper binaries
-        echo -e "\033[1mStep 2/4:\033[0m Downloading latest scripts ..."
+        echo -e "\033[1mStep 2/4:\033[0m Downloading latest scripts..."
         # main binaries
         BINS="quickinst setup km tz update-installer copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
@@ -112,7 +112,7 @@ _download_latest() {
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
         done
         # main libs
-        echo -e "\033[1mStep 3/4:\033[0m Downloading latest script libs ..."
+        echo -e "\033[1mStep 3/4:\033[0m Downloading latest script libs..."
         LIBS="common.sh container.sh release.sh iso.sh login.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
@@ -128,7 +128,7 @@ _download_latest() {
             wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
         done
         # setup libs
-        echo -e "\033[1mStep 4/4:\033[0m Downloading latest setup libs ..."
+        echo -e "\033[1mStep 4/4:\033[0m Downloading latest setup libs..."
         LIBS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
                 configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
         for i in ${LIBS}; do
@@ -142,7 +142,7 @@ _download_latest() {
 _update_installer_check() {
     if [[ -f /.update-installer ]]; then
         echo -e "\033[91mAborting:\033[0m"
-        echo "update-installer is already running on other tty ..."
+        echo "update-installer is already running on other tty..."
         echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
     fi
@@ -165,11 +165,11 @@ _zram_initialize() {
 _zram_usr() {
     if ! mountpoint -q /usr; then
         echo "${1}" >/sys/block/zram0/disksize
-        echo "Creating btrfs filesystem with ${1} on /dev/zram0 ..." > /dev/tty7
+        echo "Creating btrfs filesystem with ${1} on /dev/zram0..." > /dev/tty7
         mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
         mkdir /usr.zram
         mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
-        echo "Moving /usr to /usr.zram ..." > /dev/tty7
+        echo "Moving /usr to /usr.zram..." > /dev/tty7
         mv /usr/* /usr.zram/
         USR_SYMLINKS="bin local lib"
         # lib64 is x86_64 only
@@ -186,27 +186,27 @@ _zram_usr() {
 
 _zram_w_dir() {
     echo "${1}" >/sys/block/zram1/disksize
-    echo "Creating btrfs filesystem with ${1} on /dev/zram1 ..." > /dev/tty7
+    echo "Creating btrfs filesystem with ${1} on /dev/zram1..." > /dev/tty7
     mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
     [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
     mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
 }
 
 _initialize_zram_usr() {
-    echo -e "\033[1mInitializing /usr.zram ...\033[0m"
-    echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mInitializing /usr.zram...\033[0m"
+    echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
     if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram ..."
+        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram..."
         _zram_usr "${_ZRAM_SIZE}"
     else
-        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done ..."
+        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done..."
     fi
 }
 
 _umount_w_dir() {
     if mountpoint -q "${_W_DIR}"; then
-        echo "Unmounting ${_W_DIR} ..." > /dev/tty7
+        echo "Unmounting ${_W_DIR}..." > /dev/tty7
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
         echo 1 > /sys/block/zram1/reset
@@ -302,10 +302,10 @@ _create_initramfs() {
 _kexec() {
     # you need approx. 3.39x size for KEXEC_FILE_LOAD
     if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mnew\033[0m KEXEC_FILE_LOAD ..."
+        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mnew\033[0m KEXEC_FILE_LOAD..."
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
-        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD ..."
+        echo -e "Running \033[1m\033[92mkexec\033[0m with \033[1mold\033[0m KEXEC_LOAD..."
         kexec -c -f --mem-max=0xA0000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
     sleep 2
@@ -346,14 +346,14 @@ _home_root_mount() {
 _prepare_graphic() {
     _GRAPHIC="${1}"
     if [[ ! -e "/.full_system" ]]; then
-        echo "Removing firmware files ..."
+        echo "Removing firmware files..."
         rm -rf /usr/lib/firmware
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
     # saving RAM by calling always cleanup hook and installing each package alone
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo "Running pacman to install packages: ${_GRAPHIC} ..."
+        echo "Running pacman to install packages: ${_GRAPHIC}..."
         _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
         #shellcheck disable=SC2119
         _create_pacman_conf
@@ -368,7 +368,7 @@ _prepare_graphic() {
             rm -f /var/log/pacman.log
         done
     else
-        echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE}) ..."
+        echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
         _IGNORE=""
         if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
             for i in ${_GRAPHIC_IGNORE}; do
@@ -378,7 +378,7 @@ _prepare_graphic() {
         #shellcheck disable=SC2086
         pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
         [[ ! -e "/.full_system" ]] && _cleanup_install
-        echo "Running pacman to install packages: ${_GRAPHIC} ..."
+        echo "Running pacman to install packages: ${_GRAPHIC}..."
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
             pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
@@ -388,9 +388,9 @@ _prepare_graphic() {
         done
     fi
     if [[ ! -e "/.full_system" ]]; then
-        echo "Removing not used icons ..."
+        echo "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
-        echo "Cleanup locale and i18n ..."
+        echo "Cleanup locale and i18n..."
         rm -rf /usr/share/{locale,i18n}
     fi
     _home_root_mount
@@ -401,42 +401,42 @@ _new_environment() {
     touch /.update-installer
     _umount_w_dir
     _zram_w_dir "${_ZRAM_SIZE}"
-    echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish ..."
+    echo -e "\033[1mStep 1/9:\033[0m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
-    echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from / ..."
+    echo -e "\033[1mStep 2/9:\033[0m Removing not necessary files from /..."
     _clean_archboot
     _zram_usr "300M"
     _clean_kernel_cache
-    echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR} ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mStep 3/9:\033[0m Generating archboot container in ${_W_DIR}..."
+    echo "          This will need some time..."
     _create_container || exit 1
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\033[1mStep 4/9:\033[0m Copy kernel ${VMLINUZ} to /${VMLINUZ} ..."
+    echo -e "\033[1mStep 4/9:\033[0m Copy kernel ${VMLINUZ} to /${VMLINUZ}..."
     cp "${_W_DIR}/boot/${VMLINUZ}" / || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR} ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR}..."
+    echo "          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR} ..."
+    echo -e "\033[1mStep 6/9:\033[0m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img..."
+    echo "          This will need some time..."
     _create_initramfs
-    echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR} ..."
+    echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR}..."
     cd /
     _umount_w_dir
     _clean_kernel_cache
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
-    echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mStep 9/9:\033[0m Loading files through kexec into kernel now..."
+    echo "          This will need some time..."
     _kexec
 }
 
@@ -464,14 +464,14 @@ _full_system() {
         _ZRAM_SIZE="4000M"
     fi
     _initialize_zram_usr
-    echo -e "\033[1mInitializing full Arch Linux system ...\033[0m"
-    echo -e "\033[1mStep 1/3:\033[0m Reinstalling packages and adding info/man-pages ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mInitializing full Arch Linux system...\033[0m"
+    echo -e "\033[1mStep 1/3:\033[0m Reinstalling packages and adding info/man-pages..."
+    echo "          This will need some time..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
-    echo -e "\033[1mStep 2/3:\033[0m Checking /home and /root are tmpfs ..."
+    echo -e "\033[1mStep 2/3:\033[0m Checking /home and /root are tmpfs..."
     _home_root_mount
-    echo -e "\033[1mStep 3/3:\033[0m Checking kernel version ..."
+    echo -e "\033[1mStep 3/3:\033[0m Checking kernel version..."
     _kernel_check
     echo -e "\033[1mFull Arch Linux system is ready now.\033[0m"
     touch /.full_system
@@ -479,12 +479,12 @@ _full_system() {
 
 _new_image() {
     _zram_w_dir "4000M"
-    echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from / ..."
+    echo -e "\033[1mStep 1/2:\033[0m Removing not necessary files from /..."
     _clean_archboot
     rm /var/cache/pacman/pkg/*
     _zram_usr "300M"
-    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now ..."
-    echo "          This will need some time ..."
+    echo -e "\033[1mStep 2/2:\033[0m Generating new iso files in ${_W_DIR} now..."
+    echo "          This will need some time..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
     echo -e "\033[1mFinished:\033[0m New isofiles are located in ${_W_DIR}"
 }
@@ -492,18 +492,18 @@ _new_image() {
 _install_graphic () {
     _initialize_zram_usr
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-    echo -e "\033[1mInitializing desktop environment ...\033[0m"
+    echo -e "\033[1mInitializing desktop environment...\033[0m"
     [[ -n "${_L_XFCE}" ]] && _install_xfce
     [[ -n "${_L_GNOME}" ]] && _install_gnome
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
     [[ -n "${_L_PLASMA}" ]] && _install_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
-    echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi ..."
+    echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi..."
     systemctl restart systemd-sysusers
     systemctl restart dbus
     systemctl restart avahi-daemon
     # only start vnc on xorg environment
-    echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser ...\033[0m"
+    echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser...\033[0m"
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
     command -v firefox > /dev/null 2>&1  && _firefox_flags
     command -v chromium > /dev/null 2>&1 && _chromium_flags
@@ -515,46 +515,46 @@ _install_graphic () {
 }
 
 _hint_graphic_installed () {
-    echo -e "\033[1m\033[91mError: Graphical environment already installed ...\033[0m"
+    echo -e "\033[1m\033[91mError: Graphical environment already installed...\033[0m"
     echo -e "You are running in \033[1mLocal mode\033[0m with less than \033[1m4500 MB RAM\033[0m, which only can launch \033[1mone\033[0m environment."
     echo -e "Please relaunch your already used graphical environment from commandline."
 }
 
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        echo -e "\033[1mStep 1/4:\033[0m Installing GNOME desktop now ..."
-        echo "          This will need some time ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing GNOME desktop now..."
+        echo "          This will need some time..."
         _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop ..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop..."
         _configure_gnome >/dev/tty7 2>&1
         systemd-sysusers >/dev/tty7 2>&1
         systemd-tmpfiles --create >/dev/tty7 2>&1
     else
-        echo -e "\033[1mStep 1/4:\033[0m Installing GNOME desktop already done ..."
-        echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop already done ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing GNOME desktop already done..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop already done..."
     fi
 }
 
 _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        echo -e "\033[1mStep 1/4:\033[0m Installing KDE/Plasma desktop now ..."
-        echo "          This will need some time ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing KDE/Plasma desktop now..."
+        echo "          This will need some time..."
         _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\033[1mStep 2/4:\033[0m Configuring KDE desktop ..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring KDE desktop..."
         _configure_plasma >/dev/tty7 2>&1
     else
-        echo -e "\033[1mStep 1/4:\033[0m Installing KDE/Plasma desktop already done ..."
-        echo -e "\033[1mStep 2/4:\033[0m Configuring KDE desktop already done ..."
+        echo -e "\033[1mStep 1/4:\033[0m Installing KDE/Plasma desktop already done..."
+        echo -e "\033[1mStep 2/4:\033[0m Configuring KDE desktop already done..."
     fi
 }
 
 _configure_gnome() {
-    echo "Configuring Gnome ..."
+    echo "Configuring Gnome..."
     [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
     [[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
-    echo "Setting wallpaper ..."
+    echo "Setting wallpaper..."
     gsettings set org.gnome.desktop.background picture-uri file:////usr/share/archboot/grub/archboot-background.png
-    echo "Autostarting setup ..."
+    echo "Autostarting setup..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -565,7 +565,7 @@ Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
     _HIDE_MENU="avahi-discover bssh bvnc org.gnome.Extensions org.gnome.FileRoller org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
-    echo "Hiding ${_HIDE_MENU} menu entries ..."
+    echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
@@ -573,13 +573,13 @@ EOF
 }
 
 _configure_plasma() {
-    echo "Configuring KDE ..."
+    echo "Configuring KDE..."
     sed -i -e "s#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,applications:${_STANDARD_BROWSER}.desktop,applications:gparted.desktop,applications:archboot.desktop</default>#g" /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
-    echo "Replacing wallpaper ..."
+    echo "Replacing wallpaper..."
     for i in /usr/share/wallpapers/Next/contents/images/*; do
         cp /usr/share/archboot/grub/archboot-background.png "${i}"
     done
-    echo "Replacing menu structure ..."
+    echo "Replacing menu structure..."
     cat << EOF >/etc/xdg/menus/applications.menu
  <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
@@ -618,7 +618,7 @@ _configure_plasma() {
 	</Include>
 </Menu>
 EOF
-    echo "Autostarting setup ..."
+    echo "Autostarting setup..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -633,24 +633,24 @@ EOF
 _custom_wayland_xorg() {
     _initialize_zram_usr
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
-        echo -e "\033[1mStep 1/3:\033[0m Installing custom wayland ..."
-        echo "          This will need some time ..."
+        echo -e "\033[1mStep 1/3:\033[0m Installing custom wayland..."
+        echo "          This will need some time..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
-        echo -e "\033[1mStep 1/3:\033[0m Installing custom xorg ..."
-        echo "          This will need some time ..."
+        echo -e "\033[1mStep 1/3:\033[0m Installing custom xorg..."
+        echo "          This will need some time..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
     fi
-    echo -e "\033[1mStep 2/3:\033[0m Starting avahi-daemon ..."
+    echo -e "\033[1mStep 2/3:\033[0m Starting avahi-daemon..."
     systemctl start avahi-daemon.service
-    echo -e "\033[1mStep 3/3:\033[0m Setting up browser ...\033[0m"
+    echo -e "\033[1mStep 3/3:\033[0m Setting up browser...\033[0m"
     which firefox > /dev/null 2>&1  && _firefox_flags
     which chromium > /dev/null 2>&1 && _chromium_flags
 }
 
 _chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf ..." >/dev/tty7
+    echo "Adding chromium flags to /etc/chromium-flags.conf..." >/dev/tty7
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
@@ -662,7 +662,7 @@ EOF
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
         if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js ..." >/dev/tty7
+            echo "Adding firefox flags vendor.js..." >/dev/tty7
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
@@ -673,10 +673,10 @@ EOF
 }
 
 _autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW} ..." >/dev/tty7
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >/dev/tty7
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc ..." >/dev/tty7
+    echo "Autostarting tigervnc..." >/dev/tty7
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application

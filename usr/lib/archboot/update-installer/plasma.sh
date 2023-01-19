@@ -6,7 +6,7 @@ _install_plasma() {
 }
 
 _start_plasma() {
-    echo -e "Launching \033[1mKDE/Plasma\033[0m now, logging is done on \033[1m/dev/tty8\033[0m ..."
+    echo -e "Launching \033[1mKDE/Plasma\033[0m now, logging is done on \033[1m/dev/tty8\033[0m..."
     echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
     echo "exec startplasma-x11" >> /root/.xinitrc
     startx >/dev/tty8 2>&1

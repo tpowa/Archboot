@@ -25,7 +25,7 @@ _update_pacman_chroot() {
     # verify download
     sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" >/dev/null 2>&1 || exit 1
     bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" >/dev/null 2>&1
-    echo "Removing installation tarball ..."
+    echo "Removing installation tarball..."
     rm "${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
     # update container to latest packages
     echo "Update container to latest packages..."
@@ -35,37 +35,37 @@ _update_pacman_chroot() {
     _fix_network "${_ARCH_DIR}"
     _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" >/dev/null 2>&1
     _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" >/dev/null 2>&1
-    echo "Generating tarball ..."
+    echo "Generating tarball..."
     tar -acf "${_PACMAN_CHROOT}" -C "${_ARCH_DIR}" .
-    echo "Removing ${_ARCH_DIR} ..."
+    echo "Removing ${_ARCH_DIR}..."
     rm -r "${_ARCH_DIR}"
     echo "Finished container tarball."
-    echo "Sign tarball ..."
+    echo "Sign tarball..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
-    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN} ..."
+    echo "Uploading files to ${_SERVER}:${_SERVER_PACMAN}..."
     sudo -u "${_USER}" scp -q "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_SERVER_PACMAN}" || exit 1
 }
 
 _server_upload() {
     # copy files to server
-    echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH} ..."
+    echo "Uploading files to ${_SERVER}:${_SERVER_HOME}/${_ARCH}..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
     # move files on server, create symlink and remove ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-echo "Remove old ${1}/${_ARCH}/${_DIR} directory ..."
+echo "Remove old ${1}/${_ARCH}/${_DIR} directory..."
 rm -r "${1}"/"${_ARCH}"/"${_DIR}"
-echo "Remove old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory ..."
+echo "Remove old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r "${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
-echo "Move ${_ARCH}/${_DIR} to ${1}/${_ARCH} ..."
+echo "Move ${_ARCH}/${_DIR} to ${1}/${_ARCH}..."
 mv "${_ARCH}/${_DIR}" "${1}"/"${_ARCH}"
-echo "Remove ${_SERVER_HOME}/${_ARCH} directory ..."
+echo "Remove ${_SERVER_HOME}/${_ARCH} directory..."
 rm -r "${_SERVER_HOME}/${_ARCH}"
 cd "${1}"/"${_ARCH}"
-echo "Create new latest symlink in ${1}/${_ARCH} ..."
+echo "Create new latest symlink in ${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
@@ -90,7 +90,7 @@ _sign_sha256sum() {
 _update_source() {
     cd "${_ISO_HOME_SOURCE}" || exit 1
     _create_archive
-    echo "Creating ${_ARCH} archboot repository ..."
+    echo "Creating ${_ARCH} archboot repository..."
     "archboot-${_ARCH}-create-repository.sh" "${_DIR}" || exit 1
     chown -R "${_USER}:${_GROUP}" "${_DIR}"
     _server_upload "${_SERVER_SOURCE_DIR}"

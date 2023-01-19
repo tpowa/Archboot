@@ -43,22 +43,22 @@ _create_iso() {
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # remove not working lvm2 from latest image
-        echo "Remove lvm2 from container ${_W_DIR} ..."
+        echo "Remove lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
         # generate latest tarball in container
-        echo "Generate local ISO ..."
+        echo "Generate local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
-        echo "Generate latest ISO ..."
+        echo "Generate latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
-        echo "Install lvm2 to container ${_W_DIR} ..."
+        echo "Install lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
     fi
-    echo "Generate normal ISO ..."
+    echo "Generate normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
@@ -66,7 +66,7 @@ _create_iso() {
     mv "${_W_DIR}"/*.iso ./ > /dev/null 2>&1
     mv "${_W_DIR}"/*.img ./ > /dev/null 2>&1
     # create boot directory with ramdisks
-    echo "Create boot directory ..."
+    echo "Create boot directory..."
     if [[ "${_ARCH}" == "riscv64" ]]; then
         mkdir -p boot/
         for i in *.img; do
@@ -105,7 +105,7 @@ _create_iso() {
     fi
     rm -r "${_W_DIR:?}"/boot
     mv boot "${_W_DIR}"
-    echo "Generate Unified Kernel Images ..."
+    echo "Generate Unified Kernel Images..."
     # create unified kernel image UKI
     if [[ "${_ARCH}" == "x86_64" ]]; then
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
@@ -152,7 +152,7 @@ _create_iso() {
     fi
     mv "${_W_DIR}"/boot ./
     # create Release.txt with included main archlinux packages
-    echo "Generate Release.txt ..."
+    echo "Generate Release.txt..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
     echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
     echo "Homepage: https://bit.ly/archboot";\
@@ -164,10 +164,10 @@ _create_iso() {
     echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
     # remove container
-    echo "Remove container ${_W_DIR} ..."
+    echo "Remove container ${_W_DIR}..."
     rm -r "${_W_DIR}"
     # create sha256sums
-    echo "Generating sha256sum ..."
+    echo "Generating sha256sum..."
     for i in *; do
         [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     done

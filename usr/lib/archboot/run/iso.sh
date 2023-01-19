@@ -10,7 +10,7 @@ _architecture_check
 _config
 if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_64; then
     # running system = aarch64 or x86_64
-    echo "Starting ISO creation ..."
+    echo "Starting ISO creation..."
     _prepare_kernel_initramfs_files || exit 1
     _prepare_ucode || exit 1
     if echo "${_BASENAME}" | grep -qw aarch64; then
@@ -33,7 +33,7 @@ if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_
     _reproducibility_iso  || exit 1
 else
     # running system = riscv64
-    echo "Starting Image creation ..."
+    echo "Starting Image creation..."
     _prepare_kernel_initramfs_files_RISCV64 || exit 1
     _prepare_extlinux_conf || exit 1
     _reproducibility

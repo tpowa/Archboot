@@ -5,7 +5,7 @@
 [[ -z "${1}" ]] && _usage
 _root_check
 _container_check
-echo "Start release creation in ${1} ..."
+echo "Start release creation in ${1}..."
 _create_iso "$@" || exit 1
 echo "Finished release creation in ${1} ."
 

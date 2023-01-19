@@ -45,13 +45,13 @@ _enter_shell() {
 }
 
 _run_latest() {
-    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwithout\033[0m package cache ..."
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwithout\033[0m package cache..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
     update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
-    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwith\033[0m package cache ..."
+    echo -e "\033[1mStarting\033[0m assembling of archboot environment \033[1mwith\033[0m package cache..."
     echo -e "\033[1mRunning now: \033[92mupdate-installer -latest-install\033[0m"
     update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
@@ -62,10 +62,10 @@ _run_update_installer() {
     cd /
     echo -e "\033[1m\033[92mMemory checks run successfully:\033[0m"
     echo -e "\033[93mGo and get a cup of coffee. Depending on your system setup,\033[0m"
-    echo -e "\033[93myou can \033[1mstart\033[0m\033[93m with your tasks in about \033[1m5\033[0m\033[93m minutes ...\033[0m"
+    echo -e "\033[93myou can \033[1mstart\033[0m\033[93m with your tasks in about \033[1m5\033[0m\033[93m minutes...\033[0m"
     echo ""
     if [[ "${TTY}" == "tty1" ]]; then
-        echo -e "\033[1m\033[91m10 seconds\033[0;25m time to hit \033[1m\033[92mCTRL-C\033[0m to \033[1m\033[91mstop\033[0m the process \033[1m\033[1mnow ...\033[0m"
+        echo -e "\033[1m\033[91m10 seconds\033[0;25m time to hit \033[1m\033[92mCTRL-C\033[0m to \033[1m\033[91mstop\033[0m the process \033[1m\033[1mnow...\033[0m"
         sleep 10
         echo ""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
@@ -75,11 +75,11 @@ _run_update_installer() {
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            echo -e "Running \033[1m\033[92mupdate-installer -latest-install\033[0m on \033[1mtty1\033[0m, please wait ...\033[0m"
+            echo -e "Running \033[1m\033[92mupdate-installer -latest-install\033[0m on \033[1mtty1\033[0m, please wait...\033[0m"
         else
             echo -e "\033[1mRunning now: \033[92mupdate-installer -latest\033[0m"
         fi
-        echo -e "\033[1mProgress is shown here ...\033[0m"
+        echo -e "\033[1mProgress is shown here...\033[0m"
     fi
 }
 
@@ -96,7 +96,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[91m- Not engough memory detected! \033[0m"
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
-    echo -e "\033[91mAborting ...\033[0m"
+    echo -e "\033[91mAborting...\033[0m"
     _enter_shell
 # local image, fail if less than 3.3GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
@@ -105,7 +105,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[1m\033[91mMemory check failed:\033[0m"
     echo -e "\033[91m- Not engough memory detected! \033[0m"
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.6GB\033[0m\033[93m RAM.\033[0m"
-    echo -e "\033[91mAborting ...\033[0m"
+    echo -e "\033[91mAborting...\033[0m"
     _enter_shell
 else
     _welcome
