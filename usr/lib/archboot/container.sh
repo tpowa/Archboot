@@ -193,7 +193,7 @@ _set_hostname() {
 }
 
 _fix_groups() {
-    echo "Recreate system groups..."
+    echo "Recreating system groups..."
     rm "${1}"/etc/{group,gshadow}
     ${_NSPAWN} "${1}" systemd-sysusers &>/dev/null
     # fix missing group in iwd FS#74646
