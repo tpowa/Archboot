@@ -84,7 +84,7 @@ _dotimeset() {
         _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
         _dohwclock
         # check internet connection
-        if ping -c1 www.google.com >/dev/null 2>&1; then
+        if ping -c1 www.google.com &>/dev/null; then
             if _dialog --yesno \
             "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
                 _dialog --infobox "Syncing clock with NTP pool..." 3 45
