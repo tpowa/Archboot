@@ -1,6 +1,7 @@
 #!/bin/bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
+_ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs-${_ARCH}.img"
