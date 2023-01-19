@@ -9,7 +9,7 @@ _usage () {
     echo "CREATE ${_RUNNING_ARCH} USB/CD IMAGES"
     echo "-----------------------------"
     echo "PARAMETERS:"
-    echo "  -g                  Start generation of image."
+    echo "  -g                  Starting generation of image."
     echo "  -p=PRESET           Which preset should be used."
     echo "                      /etc/archboot/presets locates the presets"
     echo "                      default=${_RUNNING_ARCH}"
