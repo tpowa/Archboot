@@ -32,7 +32,7 @@ while [ $# -gt 0 ]; do
 done
 _archboot_check
 _download_latest
-echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m ..."
+echo -e "\033[1mInformation:\033[0m Logging is done on \033[1m/dev/tty7\033[0m..."
 _zram_initialize
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then

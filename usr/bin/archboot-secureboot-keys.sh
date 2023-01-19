@@ -39,7 +39,7 @@ _root_check
 if [[ -n "${_DIR}" ]]; then
     [[ ! -d "${_DIR}" ]] && mkdir -p "${_DIR}"
     cd "${_DIR}" || exit 1
-    echo "Backup old keys in $_DIR/BACKUP ..."
+    echo "Backup old keys in $_DIR/BACKUP..."
     [[ ! -d "BACKUP" ]] && mkdir BACKUP
     efi-readvar -v PK -o BACKUP/old_PK.esl
     efi-readvar -v KEK -o BACKUP/old_KEK.esl

@@ -31,7 +31,7 @@ _abort_dialog() {
 }
 
 _do_vconsole() {
-    _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP} ..." 3 80
+    _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
@@ -40,7 +40,7 @@ _do_vconsole() {
 
 _set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
-        _dialog --infobox "Detected big screen size, using 32 font size now ..." 3 60
+        _dialog --infobox "Detected big screen size, using 32 font size now..." 3 60
         _FONT="latarcyrheb-sun32"
         sleep 2
     else

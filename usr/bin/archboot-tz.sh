@@ -60,7 +60,7 @@ _dotimezone () {
         _ZONE=$(cat ${_ANSWER})
         [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
         if [[ -n "${_SET_ZONE}" ]]; then
-            _dialog --infobox "Setting Timezone to ${_ZONE} ..." 0 0
+            _dialog --infobox "Setting Timezone to ${_ZONE}..." 0 0
             echo "${_ZONE}" > /tmp/.timezone
             timedatectl set-timezone "${_ZONE}"
             _S_NEXTITEM="2"
@@ -87,7 +87,7 @@ _dotimeset() {
         if ping -c1 www.google.com >/dev/null 2>&1; then
             if _dialog --yesno \
             "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-                _dialog --infobox "Syncing clock with NTP pool ..." 3 45
+                _dialog --infobox "Syncing clock with NTP pool..." 3 45
                 # sync immediatly with standard pool
                 if ! systemctl restart systemd-timesyncd; then
                     _dialog --msgbox "An error has occured, time was not changed!" 0 0
