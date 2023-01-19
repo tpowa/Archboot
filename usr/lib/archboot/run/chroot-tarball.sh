@@ -39,7 +39,7 @@ echo "Starting container creation..."
 echo "Create directory ${1}..."
 mkdir -p "${1}"/"${_PACMAN_ARCH}"
 echo "Downloading archlinux ${_ARCH}..."
-! [[ -f ${_ARCH_VERSION} ]] && wget "${_LATEST_ARCH}" >/dev/null 2>&1
+! [[ -f ${_ARCH_VERSION} ]] && wget "${_LATEST_ARCH}" &>/dev/null
 bsdtar -xf "${_ARCH_VERSION}" -C "${1}"
 echo "Removing installation tarball..."
 rm "${_ARCH_VERSION}"
@@ -49,13 +49,13 @@ _fix_network "${1}"
 echo "Installing pacman to container..."
 mkdir -p "${1}/${_PACMAN_ARCH}/var/lib/pacman"
 #shellcheck disable=SC2086
-systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_ARCH}" -Sy awk ${_KEYRING} --ignore systemd-resolvconf --noconfirm >/dev/null 2>&1
+systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_ARCH}" -Sy awk ${_KEYRING} --ignore systemd-resolvconf --noconfirm &>/dev/null
 _generate_keyring "${1}/${_PACMAN_ARCH}" || exit 1
 _fix_network "${1}/${_PACMAN_ARCH}"
 _CLEANUP_CONTAINER="1" _clean_container "${1}/${_PACMAN_ARCH}" 2>/dev/null
 _CLEANUP_CACHE="1" _clean_cache "${1}/${_PACMAN_ARCH}" 2>/dev/null
 echo "Generating tarball..."
-tar -acf "${_PACMAN_ARCH_CHROOT}" -C "${1}"/"${_PACMAN_ARCH}" . >/dev/null 2>&1 || exit 1
+tar -acf "${_PACMAN_ARCH_CHROOT}" -C "${1}"/"${_PACMAN_ARCH}" . &>/dev/null || exit 1
 echo "Removing ${1}..."
 rm -r "${1}"
 echo "Finished container tarball."
