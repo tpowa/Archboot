@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 18.01.2023 10:41 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 19.01.2023 17:36 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -856,6 +856,12 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Image <strong>fails</strong> to boot with <strong>out of memory/OOM error</strong> on GRUB menu.</li>
 Grub and UEFI firmware are not compatible. Grub developers are aware of the issue,<br>but it's not decided how to solve this issue yet.
 This mostly happens with local image due to its large initramfs size.<br>Try the normal image, latest image or to avoid grub at all, use the Unified Kernel Image.
+</ul>
+</ul>
+<ul>
+<li><strong>Latest</strong> Image <strong>fails</strong> at <strong>stage 3/9</strong>.</li>
+Check <strong>VC7</strong> for logged errors, mostly it's a <strong>network</strong> issue at this stage, which you can try to fix <strong>before</strong> build process starts.
+<br>Hit <strong>CTRL+C</strong> on the 10 second waiting break at the beginning.<br>Try to configure your network or select an other mirror in /etc/pacman.d/mirrorlist and leave the shell with <strong>exit</strong> after fixing your network.
 </ul>
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
