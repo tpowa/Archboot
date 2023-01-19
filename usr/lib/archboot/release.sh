@@ -20,6 +20,7 @@ if [[ "${_ARCH}" == "aarch64" ]]; then
     _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
     _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
 fi
+[[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinuxriscv-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
@@ -45,17 +46,20 @@ _create_iso() {
         # generate latest tarball in container
         echo "Generating local ISO..."
         # generate local iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL}" || exit 1
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         echo "Generating latest ISO..."
         # generate latest iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST}" || exit 1
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Installing lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
     echo "Generating normal ISO..."
     # generate iso in container
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g" || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    -i=${_ISONAME}-${_ARCH}"  || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
     mv "${_W_DIR}"/*.img ./ &>/dev/null
