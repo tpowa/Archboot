@@ -60,7 +60,7 @@ echo "Removing old ${1}/${_ARCH}/${_DIR} directory..."
 rm -r "${1}"/"${_ARCH}"/"${_DIR}"
 echo "Removing old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r "${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
-echo "Move ${_ARCH}/${_DIR} to ${1}/${_ARCH}..."
+echo "Moving ${_ARCH}/${_DIR} to ${1}/${_ARCH}..."
 mv "${_ARCH}/${_DIR}" "${1}"/"${_ARCH}"
 echo "Removing ${_SERVER_HOME}/${_ARCH} directory..."
 rm -r "${_SERVER_HOME}/${_ARCH}"

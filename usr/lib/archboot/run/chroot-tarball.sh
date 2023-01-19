@@ -36,7 +36,7 @@ _root_check
 echo "Starting container creation..."
 # remove old files
 [[ -f ${_PACMAN_ARCH_CHROOT} ]] && rm "${_PACMAN_ARCH_CHROOT}"{,.sig} 2>/dev/null
-echo "Create directory ${1}..."
+echo "Creating directory ${1}..."
 mkdir -p "${1}"/"${_PACMAN_ARCH}"
 echo "Downloading archlinux ${_ARCH}..."
 ! [[ -f ${_ARCH_VERSION} ]] && wget "${_LATEST_ARCH}" &>/dev/null
@@ -59,7 +59,7 @@ tar -acf "${_PACMAN_ARCH_CHROOT}" -C "${1}"/"${_PACMAN_ARCH}" . &>/dev/null || e
 echo "Removing ${1}..."
 rm -r "${1}"
 echo "Finished container tarball."
-echo "Sign tarball..."
+echo "Signing tarball..."
 #shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} ${_PACMAN_ARCH_CHROOT} || exit 1
 chown "${_USER}":"${_GROUP}" "${_PACMAN_ARCH_CHROOT}"{,.sig} || exit 1
