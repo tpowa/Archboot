@@ -39,7 +39,7 @@ _config() {
 }
 
 _prepare_kernel_initramfs_files() {
-    echo "Prepare kernel and initramfs..."
+    echo "Preparing kernel and initramfs..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
@@ -67,7 +67,7 @@ _prepare_kernel_initramfs_files() {
     fi
     # only aarch64
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        echo "Prepare dtbs..."
+        echo "Preparing dtbs..."
         cp -r /boot/dtbs "${_ISODIR}/boot/"
     fi
 }
@@ -83,7 +83,7 @@ _prepare_kernel_initramfs_files() {
 #   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
 # - only left option is extlinux support in u-boot loader
 _prepare_kernel_initramfs_files_RISCV64() {
-    echo "Prepare RISCV64 u-boot..."
+    echo "Preparing RISCV64 u-boot..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
@@ -94,14 +94,14 @@ _prepare_kernel_initramfs_files_RISCV64() {
 _prepare_ucode() {
     # only x86_64
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        echo "Prepare intel-ucode..."
+        echo "Preparing intel-ucode..."
         cp /boot/intel-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/intel-ucode
         cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        echo "Prepare amd-ucode..."
+        echo "Preparing amd-ucode..."
         cp /boot/amd-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
@@ -109,7 +109,7 @@ _prepare_ucode() {
 }
 
 _prepare_fedora_shim_bootloaders_x86_64 () {
-    echo "Prepare fedora shim..."
+    echo "Preparing fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     cp "/usr/share/archboot/bootloader/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
@@ -119,7 +119,7 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
 }
 
 _prepare_fedora_shim_bootloaders_aarch64 () {
-    echo "Prepare fedora shim..."
+    echo "Preparing fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
     cp "/usr/share/archboot/bootloader/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
@@ -127,13 +127,13 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
 }
 
 _prepare_efitools_uefi () {
-    echo "Prepare efitools..."
+    echo "Preparing efitools..."
     cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/TOOLS/HASHTOOL.EFI"
     cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/TOOLS/KEYTOOL.EFI"
 }
 
 _prepare_uefi_shell_tianocore() {
-    echo "Prepare uefi shell..."
+    echo "Preparing uefi shell..."
     ## Install Tianocore UDK/EDK2 EdkShellBinPkg UEFI X64 "Full Shell" - For UEFI Spec. <2.3 systems
     cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
     ## Install Tianocore UDK/EDK2 ShellBinPkg UEFI IA32 "Full Shell" - For UEFI Spec. >=2.3 systems
@@ -142,29 +142,29 @@ _prepare_uefi_shell_tianocore() {
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
-    echo "Prepare X64 Grub..."
+    echo "Preparing X64 Grub..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
 _prepare_uefi_IA32() {
-    echo "Prepare IA32 Grub..."
+    echo "Preparing IA32 Grub..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
-    echo "Prepare AA64 Grub..."
+    echo "Preparing AA64 Grub..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
 }
 
 _prepare_memtest() {
-    echo "Prepare memtest86+..."
+    echo "Preparing memtest86+..."
     cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
     cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
 }
 
 _prepare_background() {
-    echo "Prepare Grub background..."
+    echo "Preparing Grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
@@ -176,7 +176,7 @@ _reproducibility() {
 }
 
 _prepare_uefi_image() {
-    echo "Prepare UEFI image..."
+    echo "Preparing UEFI image..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/EFI | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
@@ -194,7 +194,7 @@ _prepare_extlinux_conf() {
         _SMP="nr_cpus=1"
     fi
     [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
-    echo "Prepare extlinux.conf..."
+    echo "Preparing extlinux.conf..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
 menu title Welcome to Archboot - ${_TITLE}
 timeout 100
