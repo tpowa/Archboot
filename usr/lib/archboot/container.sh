@@ -133,7 +133,7 @@ _change_pacman_conf() {
 
 # umount special filesystems
 _umount_special() {
-    echo "Umount special filesystems in ${1}..."
+    echo "Unmounting special filesystems in ${1}..."
     umount -R "${1}/proc"
     umount -R "${1}/sys"
     umount -R "${1}/dev"
