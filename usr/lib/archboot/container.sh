@@ -52,7 +52,7 @@ _pacman_chroot() {
         echo "Removing installation tarball ${3}..."
         rm "${3}"{,.sig}
     fi
-    echo "Update container to latest packages..."
+    echo "Updating container to latest packages..."
     ${_NSPAWN} "${1}" pacman -Syu --noconfirm &>/dev/null
 }
 
@@ -92,7 +92,7 @@ _prepare_pacman() {
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     echo "Remove archboot repository sync db..."
     rm -f /var/lib/pacman/sync/archboot.db
-    echo "Update Arch Linux keyring..."
+    echo "Updating Arch Linux keyring..."
     #shellcheck disable=SC2086
     pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>/dev/null
 }
