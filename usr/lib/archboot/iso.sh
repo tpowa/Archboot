@@ -244,7 +244,8 @@ _grub_mkrescue() {
     # -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
     echo "Generating ${_RUNNING_ARCH} hybrid ISO..."
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System"
-    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /efi .disk/ /boot/grub/{roms,locale} "${_RESCUE_REMOVE}" &> "${_IMAGENAME}.log"
+    #shellcheck disable=SC2086
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="unicode" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
 _reproducibility_iso() {
