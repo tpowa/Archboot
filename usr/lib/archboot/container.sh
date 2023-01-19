@@ -84,7 +84,7 @@ _prepare_pacman() {
     [[ -e "${1}/sys" ]] || mkdir -m 555 "${1}/sys"
     [[ -e "${1}/dev" ]] || mkdir -m 755 "${1}/dev"
     # mount special filesystems to ${1}
-    echo "Mount special filesystems in ${1}..."
+    echo "Mounting special filesystems in ${1}..."
     mount proc "${1}/proc" -t proc -o nosuid,noexec,nodev
     mount sys "${1}/sys" -t sysfs -o nosuid,noexec,nodev,ro
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
