@@ -88,7 +88,7 @@ _generate_keyring() {
     # copy existing gpg cache on archboot usage
     if ! grep -qw archboot /etc/hostname; then
         # generate pacman keyring
-        echo "Generate pacman keyring in container..."
+        echo "Generating pacman keyring in container..."
         ${_NSPAWN} "${1}" pacman-key --init &>/dev/null
         ${_NSPAWN} "${1}" pacman-key --populate &>/dev/null
     else

@@ -46,19 +46,19 @@ _create_iso() {
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         # generate latest tarball in container
-        echo "Generate local ISO..."
+        echo "Generating local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
-        echo "Generate latest ISO..."
+        echo "Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Install lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
-    echo "Generate normal ISO..."
+    echo "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
@@ -105,7 +105,7 @@ _create_iso() {
     fi
     rm -r "${_W_DIR:?}"/boot
     mv boot "${_W_DIR}"
-    echo "Generate Unified Kernel Images..."
+    echo "Generating Unified Kernel Images..."
     # create unified kernel image UKI
     if [[ "${_ARCH}" == "x86_64" ]]; then
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=/usr/share/archboot/base/etc/os-release --change-section-vma .osrel=0x20000 \
@@ -152,7 +152,7 @@ _create_iso() {
     fi
     mv "${_W_DIR}"/boot ./
     # create Release.txt with included main archlinux packages
-    echo "Generate Release.txt..."
+    echo "Generating Release.txt..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
     echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
     echo "Homepage: https://bit.ly/archboot";\

@@ -237,7 +237,7 @@ EOF
 }
 
 _grub_mkrescue() {
-    ## Generate the BIOS+ISOHYBRID+UEFI CD image
+    ## Generating the BIOS+ISOHYBRID+UEFI CD image
     #set date for reproducibility
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
