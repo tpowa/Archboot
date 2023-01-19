@@ -183,7 +183,7 @@ _prepare_uefi_image() {
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
     mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
-    ## Copy all files to UEFI vfat image
+    ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
 }
 
@@ -229,7 +229,7 @@ unit: sectors
 "${VFAT_IMAGE}"1 : start=        2048, type=83, bootable
 EOF
     mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >/dev/null
-    ## Copy all files to UEFI vfat image
+    ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
     echo "Remove extlinux config file..."

@@ -176,7 +176,7 @@ _copy_mirrorlist_and_pacman_conf() {
 }
 
 _copy_archboot_defaults() {
-    echo "Copy archboot defaults to container..."
+    echo "Copying archboot defaults to container..."
     cp /etc/archboot/defaults "${1}"/etc/archboot/defaults
 }
 

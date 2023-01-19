@@ -101,7 +101,7 @@ _x86_64_pacman_use_default() {
     if [[ -z "${_CUSTOM_PACMAN_CONF}" ]]; then
         echo "Use system's ${_PACMAN_CONF}..."
     else
-        echo "Copy ${_CUSTOM_PACMAN_CONF} to ${_PACMAN_CONF}..."
+        echo "Copying ${_CUSTOM_PACMAN_CONF} to ${_PACMAN_CONF}..."
         cp "${_PACMAN_CONF}" "${_PACMAN_CONF}".old
         cp "${_CUSTOM_PACMAN_CONF}" "${_PACMAN_CONF}"
     fi
@@ -109,7 +109,7 @@ _x86_64_pacman_use_default() {
     if [[ -z "${_CUSTOM_MIRRORLIST}" ]]; then
         echo "Use system's ${_PACMAN_MIRROR}..."    
     else
-        echo "Copy ${_CUSTOM_MIRRORLIST} to ${_PACMAN_MIRROR}..."
+        echo "Copying ${_CUSTOM_MIRRORLIST} to ${_PACMAN_MIRROR}..."
         cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
         cp "${_CUSTOM_MIRRORLIST}" "${_PACMAN_MIRROR}"
     fi

@@ -22,7 +22,7 @@ _prepare_shim_files () {
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/*.rpm
     bsdtar -C "${_SHIM32}" -xf "${_SHIM32}"/*.rpm
     bsdtar -C "${_SHIMAA64}" -xf "${_SHIMAA64}"/*.rpm 
-    echo "Copy shim files..."
+    echo "Copying shim files..."
     mkdir -m 777 shim-fedora
     cp "${_SHIM}"/boot/efi/EFI/fedora/{mmx64.efi,shimx64.efi} shim-fedora/
     cp "${_SHIM}/boot/efi/EFI/fedora/shimx64.efi" shim-fedora/BOOTX64.efi
