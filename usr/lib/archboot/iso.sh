@@ -267,6 +267,6 @@ _create_cksum() {
 
 _cleanup_iso() {
     # cleanup
-    echo "Cleanup... remove ${_ISODIR}..."
+    echo "Cleanup... removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }

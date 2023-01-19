@@ -8,7 +8,7 @@ _usage () {
     echo "This will create an archboot container for an archboot image."
     echo "Usage: ${_BASENAME} <directory> <options>"
     echo " Options:"
-    echo "  -cc    Cleanup container eg. remove manpages, includes..."
+    echo "  -cc    Cleanup container eg. removing manpages, includes..."
     echo "  -cp    Cleanup container package cache"
     echo "  -install-source=Server add package server with archboot repository"
     exit 0
@@ -66,7 +66,7 @@ _clean_container() {
     fi
 }
 
-# remove mkinitcpio hooks to speed up process, remove not needed initramdisks
+# removing mkinitcpio hooks to speed up process, removing not needed initramdisks
 _clean_mkinitcpio() {
     echo "Cleaning mkinitcpio from ${1}..."
     [[ -e "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"

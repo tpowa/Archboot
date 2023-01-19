@@ -54,7 +54,7 @@ _server_upload() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_SERVER_HOME}/${_ARCH}" ]] || mkdir -p ${_SERVER_HOME}/${_ARCH}"
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_SERVER_HOME}/${_ARCH}" || exit 1
-    # move files on server, create symlink and remove ${_PURGE_DATE} old release
+    # move files on server, create symlink and removing ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 echo "Removing old ${1}/${_ARCH}/${_DIR} directory..."
 rm -r "${1}"/"${_ARCH}"/"${_DIR}"
@@ -104,7 +104,7 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # remove sha256sum
+    # removing sha256sum
     rm sha256sum.txt
     _sign_sha256sum "*"
     _sign_sha256sum "boot/*"

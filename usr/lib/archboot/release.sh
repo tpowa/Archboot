@@ -42,7 +42,7 @@ _create_iso() {
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
-        # remove not working lvm2 from latest image
+        # removing not working lvm2 from latest image
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         # generate latest tarball in container
@@ -163,7 +163,7 @@ _create_iso() {
     echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")") >>Release.txt
-    # remove container
+    # removing container
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
     # create sha256sums
