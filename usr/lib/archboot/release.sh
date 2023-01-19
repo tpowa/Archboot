@@ -21,7 +21,6 @@ if [[ "${_ARCH}" == "aarch64" ]]; then
     _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
     _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
 fi
-[[ "${_ARCH}" == "riscv64" ]] && _ISONAME="archboot-archlinuxriscv-$(date +%Y.%m.%d-%H.%M)"
 
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
