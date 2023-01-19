@@ -36,7 +36,7 @@ _local_mode () {
 
 _enter_shell() {
     # dbus sources profiles again
-    if ! pgrep -x dbus-run-sessio > /dev/null 2>&1; then
+    if ! pgrep -x dbus-run-sessio &>/dev/null; then
         cd /
         echo -e "Hit \033[1m\033[92mENTER\033[0m for \033[1mshell\033[0m login."
         read -r

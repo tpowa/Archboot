@@ -41,19 +41,19 @@ _clean_cache() {
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3}..."
-        wget "${2}"/"${3}"{,.sig} >/dev/null 2>&1
+        wget "${2}"/"${3}"{,.sig} &>/dev/null
     else
         echo "Using local ${3}..."
     fi
     echo "Verifying ${3}..."
-    gpg --verify "${3}.sig" >/dev/null 2>&1 || exit 1
+    gpg --verify "${3}.sig" &>/dev/null || exit 1
     bsdtar -C "${1}" -xf "${3}"
     if [[ -f "${3}" && -f "${3}".sig ]]; then
         echo "Removing installation tarball ${3}..."
         rm "${3}"{,.sig}
     fi
     echo "Update container to latest packages..."
-    ${_NSPAWN} "${1}" pacman -Syu --noconfirm >/dev/null 2>&1
+    ${_NSPAWN} "${1}" pacman -Syu --noconfirm &>/dev/null
 }
 
 # clean container from not needed files
@@ -94,7 +94,7 @@ _prepare_pacman() {
     rm -f /var/lib/pacman/sync/archboot.db
     echo "Update Arch Linux keyring..."
     #shellcheck disable=SC2086
-    pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} >/dev/null 2>&1
+    pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>/dev/null
 }
 
 #shellcheck disable=SC2120
@@ -143,11 +143,11 @@ _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} >/dev/null 2>&1 || exit 1
+        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>/dev/null || exit 1
     fi
     echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
 }
 
 _install_archboot() {
@@ -158,7 +158,7 @@ _install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT} to ${1}..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} >/dev/null 2>&1 || exit 1
+    ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
@@ -195,16 +195,16 @@ _set_hostname() {
 _fix_groups() {
     echo "Recreate system groups..."
     rm "${1}"/etc/{group,gshadow}
-    ${_NSPAWN} "${1}" systemd-sysusers >/dev/null 2>&1
+    ${_NSPAWN} "${1}" systemd-sysusers &>/dev/null
     # fix missing group in iwd FS#74646
-    ${_NSPAWN} "${1}" groupadd netdev >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd netdev &>/dev/null
     # add missing groups
-    ${_NSPAWN} "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd >/dev/null 2>&1
-    ${_NSPAWN} "${1}" groupadd -r -g 26 proc >/dev/null 2>&1
-    ${_NSPAWN} "${1}" groupmems -g proc -a polkitd >/dev/null 2>&1
-    ${_NSPAWN} "${1}" groupadd -r colord >/dev/null 2>&1
-    ${_NSPAWN} "${1}" groupadd -r -g 140 usbmux >/dev/null 2>&1
+    ${_NSPAWN} "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd &>/dev/null
+    ${_NSPAWN} "${1}" groupadd -r -g 26 proc &>/dev/null
+    ${_NSPAWN} "${1}" groupmems -g proc -a polkitd &>/dev/null
+    ${_NSPAWN} "${1}" groupadd -r colord &>/dev/null
+    ${_NSPAWN} "${1}" groupadd -r -g 140 usbmux &>/dev/null
     # add missing groups on aarch64
-    ${_NSPAWN} "${1}" groupadd -r -g 90 network >/dev/null 2>&1
-    ${_NSPAWN} "${1}" groupadd -r tss >/dev/null 2>&1
+    ${_NSPAWN} "${1}" groupadd -r -g 90 network &>/dev/null
+    ${_NSPAWN} "${1}" groupadd -r tss &>/dev/null
 }

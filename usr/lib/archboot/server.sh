@@ -21,20 +21,20 @@ _update_pacman_chroot() {
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
     echo "Downloading pacman ${_ARCH} chroot..."
     [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>/dev/null
-    wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
+    wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} &>/dev/null
     # verify download
-    sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" >/dev/null 2>&1 || exit 1
-    bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" >/dev/null 2>&1
+    sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" &>/dev/null || exit 1
+    bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>/dev/null
     echo "Removing installation tarball..."
-    rm "${_PACMAN_CHROOT}"{,.sig} >/dev/null 2>&1
+    rm "${_PACMAN_CHROOT}"{,.sig} &>/dev/null
     # update container to latest packages
     echo "Update container to latest packages..."
     # fix mirrorlist
     [[ "${_ARCH}" == "riscv64" ]] && sed -i -e 's|^#Server = https://riscv|Server = https://riscv|g' "${_ARCH_DIR}"/etc/pacman.d/mirrorlist
-    ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm >/dev/null 2>&1 || exit 1
+    ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm &>/dev/null || exit 1
     _fix_network "${_ARCH_DIR}"
-    _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" >/dev/null 2>&1
-    _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" >/dev/null 2>&1
+    _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" &>/dev/null
+    _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" &>/dev/null
     echo "Generating tarball..."
     tar -acf "${_PACMAN_CHROOT}" -C "${_ARCH_DIR}" .
     echo "Removing ${_ARCH_DIR}..."

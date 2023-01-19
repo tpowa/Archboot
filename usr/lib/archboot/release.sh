@@ -44,7 +44,7 @@ _create_iso() {
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # remove not working lvm2 from latest image
         echo "Remove lvm2 from container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm >/dev/null 2>&1
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         # generate latest tarball in container
         echo "Generate local ISO..."
         # generate local iso in container
@@ -56,15 +56,15 @@ _create_iso() {
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Install lvm2 to container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm >/dev/null 2>&1
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
     echo "Generate normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_ARCH}"  || exit 1
     # move iso out of container
-    mv "${_W_DIR}"/*.iso ./ > /dev/null 2>&1
-    mv "${_W_DIR}"/*.img ./ > /dev/null 2>&1
+    mv "${_W_DIR}"/*.iso ./ &>/dev/null
+    mv "${_W_DIR}"/*.img ./ &>/dev/null
     # create boot directory with ramdisks
     echo "Create boot directory..."
     if [[ "${_ARCH}" == "riscv64" ]]; then

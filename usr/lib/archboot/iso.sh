@@ -221,7 +221,7 @@ _uboot() {
     VFAT_IMAGE="${_ISODIR}/extlinux.img"
     ## Create efi.img
     dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
-    sfdisk "${VFAT_IMAGE}" >/dev/null 2>&1 <<EOF
+    sfdisk "${VFAT_IMAGE}" &>/dev/null <<EOF
 label: dos
 label-id: 0x12345678
 device: "${VFAT_IMAGE}"
@@ -249,11 +249,11 @@ _grub_mkrescue() {
 
 _reproducibility_iso() {
     echo "Create reproducible UUIDs on ${_IMAGENAME}.iso GPT..."
-    sgdisk -u 1:1 "${_IMAGENAME}.iso" >/dev/null 2>&1
-    sgdisk -u 2:2 "${_IMAGENAME}.iso" >/dev/null 2>&1
-    sgdisk -u 3:3 "${_IMAGENAME}.iso" >/dev/null 2>&1
-    sgdisk -u 4:4 "${_IMAGENAME}.iso" >/dev/null 2>&1
-    sgdisk -U 1 "${_IMAGENAME}.iso" >/dev/null 2>&1
+    sgdisk -u 1:1 "${_IMAGENAME}.iso" &>/dev/null
+    sgdisk -u 2:2 "${_IMAGENAME}.iso" &>/dev/null
+    sgdisk -u 3:3 "${_IMAGENAME}.iso" &>/dev/null
+    sgdisk -u 4:4 "${_IMAGENAME}.iso" &>/dev/null
+    sgdisk -U 1 "${_IMAGENAME}.iso" &>/dev/null
 }
 
 _create_cksum() {
