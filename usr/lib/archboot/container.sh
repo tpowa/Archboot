@@ -145,7 +145,7 @@ _install_base_packages() {
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>/dev/null || exit 1
     fi
-    echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
+    echo "Installinging ${_PACKAGES} ${_KEYRING} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
 }
@@ -156,7 +156,7 @@ _install_archboot() {
     else
         _pacman_key_system
     fi
-    echo "Installing ${_ARCHBOOT} to ${1}..."
+    echo "Installinging ${_ARCHBOOT} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
     # cleanup

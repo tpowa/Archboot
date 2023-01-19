@@ -50,7 +50,7 @@ _prepare_uefi_IA32() {
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
-    echo "Installing grub package..."
+    echo "Installinging grub package..."
    ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
     cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Preparing AA64 Grub..."
@@ -61,7 +61,7 @@ _prepare_uefi_AA64() {
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_RISCV64() {
-    echo "Installing grub package..."
+    echo "Installinging grub package..."
    ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
     cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Preparing RISCV64 Grub..."

@@ -55,7 +55,7 @@ _create_iso() {
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
-        echo "Install lvm2 to container ${_W_DIR}..."
+        echo "Installing lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
     echo "Generating normal ISO..."
