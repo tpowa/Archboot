@@ -229,11 +229,11 @@ _clean_archboot() {
 
 _gpg_check() {
     # pacman-key process itself
-    while pgrep -x pacman-key > /dev/null 2>&1; do
+    while pgrep -x pacman-key &>/dev/null; do
         sleep 1
     done
     # gpg finished in background
-    while pgrep -x gpg > /dev/null 2>&1; do
+    while pgrep -x gpg &>/dev/null; do
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
@@ -293,7 +293,7 @@ _create_initramfs() {
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
     sleep 2
-    while pgrep -x zstd > /dev/null 2>&1; do
+    while pgrep -x zstd &>/dev/null; do
         _clean_kernel_cache
         sleep 1
     done
@@ -311,7 +311,7 @@ _kexec() {
     sleep 2
     _clean_kernel_cache
     rm /{"${VMLINUZ}",initrd.img}
-    while pgrep -x kexec > /dev/null 2>&1; do
+    while pgrep -x kexec &>/dev/null; do
         _clean_kernel_cache
         sleep 1
     done
@@ -335,10 +335,10 @@ _cleanup_cache() {
 
 # needed for programs which check disk space
 _home_root_mount() {
-    if ! mountpoint /home >/dev/null 2>&1; then
+    if ! mountpoint /home &>/dev/null; then
         /usr/bin/mount -t tmpfs tmpfs /home
     fi
-    if ! mountpoint /root >/dev/null 2>&1; then
+    if ! mountpoint /root &>/dev/null; then
         /usr/bin/mount -t tmpfs tmpfs /root
     fi
 }
@@ -358,11 +358,11 @@ _prepare_graphic() {
         #shellcheck disable=SC2119
         _create_pacman_conf
         #shellcheck disable=SC2086
-        pacman -Sy --config ${_PACMAN_CONF} >/dev/null 2>&1 || exit 1
+        pacman -Sy --config ${_PACMAN_CONF} &>/dev/null || exit 1
         # check if already full system is used
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
-            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm >/dev/null 2>&1 || exit 1
+            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm &>/dev/null || exit 1
             [[ ! -e "/.full_system" ]] && _cleanup_install
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
@@ -376,12 +376,12 @@ _prepare_graphic() {
             done
         fi
         #shellcheck disable=SC2086
-        pacman -Syu ${_IGNORE} --noconfirm >/dev/null 2>&1 || exit 1
+        pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
         [[ ! -e "/.full_system" ]] && _cleanup_install
         echo "Running pacman to install packages: ${_GRAPHIC}..."
         for i in ${_GRAPHIC}; do
             #shellcheck disable=SC2086
-            pacman -S ${i} --noconfirm >/dev/null 2>&1 || exit 1
+            pacman -S ${i} --noconfirm &>/dev/null || exit 1
             [[ ! -e "/.full_system" ]] && _cleanup_install
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
@@ -505,8 +505,8 @@ _install_graphic () {
     # only start vnc on xorg environment
     echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser...\033[0m"
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
-    command -v firefox > /dev/null 2>&1  && _firefox_flags
-    command -v chromium > /dev/null 2>&1 && _chromium_flags
+    command -v firefox &>/dev/null  && _firefox_flags
+    command -v chromium &>/dev/null && _chromium_flags
     [[ -n "${_L_XFCE}" ]] && _start_xfce
     [[ -n "${_L_GNOME}" ]] && _start_gnome
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
@@ -645,8 +645,8 @@ _custom_wayland_xorg() {
     echo -e "\033[1mStep 2/3:\033[0m Starting avahi-daemon..."
     systemctl start avahi-daemon.service
     echo -e "\033[1mStep 3/3:\033[0m Setting up browser...\033[0m"
-    which firefox > /dev/null 2>&1  && _firefox_flags
-    which chromium > /dev/null 2>&1 && _chromium_flags
+    which firefox &>/dev/null  && _firefox_flags
+    which chromium &>/dev/null && _chromium_flags
 }
 
 _chromium_flags() {
