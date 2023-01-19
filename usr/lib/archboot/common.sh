@@ -120,13 +120,13 @@ _x86_64_pacman_restore() {
     if [[ -z "${_CUSTOM_PACMAN_CONF}" ]]; then
         echo "System's ${_PACMAN_CONF} used..."
     else
-        echo "Restore system's ${_PACMAN_CONF}..."
+        echo "Restoring system's ${_PACMAN_CONF}..."
          cp "${_PACMAN_CONF}".old "${_PACMAN_CONF}"
     fi
     if [[ -z "${_CUSTOM_MIRRORLIST}" ]]; then
         echo "System's ${_PACMAN_MIRROR} used..."
     else
-        echo "Restore system's ${_PACMAN_MIRROR}..."
+        echo "Restoring system's ${_PACMAN_MIRROR}..."
         cp "${_PACMAN_MIRROR}".old "${_PACMAN_MIRROR}"
     fi    
 }
