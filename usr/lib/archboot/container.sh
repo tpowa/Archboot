@@ -100,7 +100,7 @@ _prepare_pacman() {
 #shellcheck disable=SC2120
 _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
-        echo "Use default pacman.conf..."
+        echo "Using default pacman.conf..."
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="${1}${_PACMAN_CONF}"
         if ! grep -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding archboot repository to ${_PACMAN_CONF}..."
@@ -110,7 +110,7 @@ _create_pacman_conf() {
         #shellcheck disable=SC2001
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sed -e "s#^${1}##g")"
     else
-        echo "Use custom pacman.conf..."
+        echo "Using custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
         #shellcheck disable=SC2129
         echo "[options]" >> "${_PACMAN_CONF}"

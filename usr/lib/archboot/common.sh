@@ -99,7 +99,7 @@ _generate_keyring() {
 _x86_64_pacman_use_default() {
     # use pacman.conf with disabled [testing] repository
     if [[ -z "${_CUSTOM_PACMAN_CONF}" ]]; then
-        echo "Use system's ${_PACMAN_CONF}..."
+        echo "Using system's ${_PACMAN_CONF}..."
     else
         echo "Copying ${_CUSTOM_PACMAN_CONF} to ${_PACMAN_CONF}..."
         cp "${_PACMAN_CONF}" "${_PACMAN_CONF}".old
@@ -107,7 +107,7 @@ _x86_64_pacman_use_default() {
     fi
     # use mirrorlist with enabled rackspace mirror
     if [[ -z "${_CUSTOM_MIRRORLIST}" ]]; then
-        echo "Use system's ${_PACMAN_MIRROR}..."    
+        echo "Using system's ${_PACMAN_MIRROR}..."    
     else
         echo "Copying ${_CUSTOM_MIRRORLIST} to ${_PACMAN_MIRROR}..."
         cp "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}".old
