@@ -122,10 +122,10 @@ _create_iso() {
                 --change-section-vma .initrd=${_INITRAMFS_OFFS} ${_EFISTUB} ${_UKI}" || exit 1
         done
         # fix permission and timestamp
-        rm "${_W_DIR}"/"${_CMDLINE}"
-        chmod 644 "${_W_DIR}"/boot/*.efi
-        touch "${_W_DIR}"/boot/*.efi
         mv "${_W_DIR}"/boot ./
+        rm "${_CMDLINE}"
+        chmod 644 boot/*.efi
+        touch boot/*.efi
     fi
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
