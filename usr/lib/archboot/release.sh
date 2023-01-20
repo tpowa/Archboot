@@ -56,8 +56,8 @@ _create_iso() {
     mv "${_W_DIR}"/*.img ./ &>/dev/null
     # create boot directory with ramdisks
     echo "Creating boot directory..."
+    mkdir -p boot/
     if [[ "${_ARCH}" == "riscv64" ]]; then
-        mkdir -p boot/
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
@@ -69,8 +69,6 @@ _create_iso() {
             fi
         done
     else
-        mkdir -p boot/licenses/amd-ucode
-        [[ "${_ARCH}" == "aarch64" ]] || mkdir -p boot/licenses/intel-ucode
         for i in *.iso; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
                 isoinfo -R -i "${i}" -x /"${_AMD_UCODE}" 2>/dev/null > "${_AMD_UCODE}"
@@ -83,33 +81,29 @@ _create_iso() {
                 isoinfo -R -i "${i}" -x /"${_INITRAMFS}" 2>/dev/null > "${_INITRAMFS_LOCAL}"
             fi
         done
-        if [[ -d /usr/share/licenses/amd-ucode ]]; then
-            cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-        fi
-        if ! [[ "${_ARCH}" == "aarch64" ]]; then
-            if [[ -d /usr/share/licenses/intel-ucode ]]; then
-                cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
-            fi
-        fi
-    fi
-    if ! [[ "${_ARCH}" == "riscv64" ]]; then
-        rm -r "${_W_DIR:?}"/boot
-        mv boot "${_W_DIR}"
         echo "Generating Unified Kernel Images..."
         # create unified kernel image UKI, code adapted from wiki
         # https://wiki.archlinux.org/title/Unified_kernel_image
         _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
         _OSREL="/usr/share/archboot/base/etc/os-release"
-        _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
+        # add AMD ucode license
+        mkdir -p boot/licenses/amd-ucode
+        cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
         if [[ "${_ARCH}" == "x86_64" ]]; then
+            # add INTEL ucode license
+            mkdir -p boot/licenses/intel-ucode
+            cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
             _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             _CMDLINE="rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0"
+            _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
             _UCODE="${_AMD_UCODE}"
         fi
+        rm -r "${_W_DIR:?}"/boot
+        mv boot "${_W_DIR}"
         _OSREL_OFFS=$(objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
         _CMDLINE_OFFS=$((_OSREL_OFFS + $(stat -Lc%s "${_OSREL}")))
         _SPLASH_OFFS=$((_CMDLINE_OFFS + $(stat -Lc%s "${_CMDLINE}")))
