@@ -122,7 +122,7 @@ _create_iso() {
                 --change-section-vma .initrd=${_INITRAMFS_OFFS} ${_EFISTUB} ${_UKI}"
         done
         # fix permission and timestamp
-        rm "${_CMDLINE}"
+        rm "${_W_DIR}"/"${_CMDLINE}"
         chmod 644 "${_W_DIR}"/boot/*.efi
         touch "${_W_DIR}"/boot/*.efi
         mv "${_W_DIR}"/boot ./
