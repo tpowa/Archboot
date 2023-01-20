@@ -84,31 +84,32 @@ _create_iso() {
         echo "Generating Unified Kernel Images..."
         # create unified kernel image UKI, code adapted from wiki
         # https://wiki.archlinux.org/title/Unified_kernel_image
-        _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
-        _OSREL="/usr/share/archboot/base/etc/os-release"
+        _SPLASH="usr/share/archboot/uki/archboot-background.bmp"
+        _OSREL="usr/share/archboot/base/etc/os-release"
         # add AMD ucode license
         mkdir -p boot/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
+        _CMDLINE="boot/cmdline.txt"
         if [[ "${_ARCH}" == "x86_64" ]]; then
             # add INTEL ucode license
             mkdir -p boot/licenses/intel-ucode
             cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
             _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
-            _CMDLINE="rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0"
+            echo "rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0" > ${_CMDLINE}
             _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
+            echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
-            _CMDLINE="rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0"
             _UCODE="${_AMD_UCODE}"
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
-        _OSREL_OFFS=$(objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
-        _CMDLINE_OFFS=$((_OSREL_OFFS + $(stat -Lc%s "${_OSREL}")))
-        _SPLASH_OFFS=$((_CMDLINE_OFFS + $(stat -Lc%s "${_CMDLINE}")))
-        _KERNEL_OFFS=$((_SPLASH_OFFS + $(stat -Lc%s "${_SPLASH}")))
-        _INITRAMFS_OFFS=$((_KERNEL_OFFS + $(stat -Lc%s "${_KERNEL_ARCHBOOT}")))
+        _OSREL_OFFS=$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "objdump -h ${_EFISTUB} | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}'")
+        _CMDLINE_OFFS=$((_OSREL_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_OSREL}")))
+        _SPLASH_OFFS=$((_CMDLINE_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_CMDLINE}")))
+        _KERNEL_OFFS=$((_SPLASH_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_SPLASH}")))
+        _INITRAMFS_OFFS=$((_KERNEL_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_KERNEL_ARCHBOOT}")))
         for initramfs in ${_INITRAMFS} ${_INITRAMFS_LATEST} ${_INITRAMFS_LOCAL}; do
             [[ "${initramfs}" == "${_INITRAMFS}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
@@ -121,6 +122,7 @@ _create_iso() {
                 --change-section-vma .initrd=${_INITRAMFS_OFFS} ${_EFISTUB} ${_UKI}"
         done
         # fix permission and timestamp
+        rm "${_CMDLINE}"
         chmod 644 "${_W_DIR}"/boot/*.efi
         touch "${_W_DIR}"/boot/*.efi
         mv "${_W_DIR}"/boot ./
