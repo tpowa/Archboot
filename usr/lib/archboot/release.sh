@@ -106,10 +106,10 @@ _create_iso() {
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         _OSREL_OFFS=$(${_NSPAWN} "${_W_DIR}" objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
-        _CMDLINE_OFFS=$((_OSREL_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_OSREL}")))
-        _SPLASH_OFFS=$((_CMDLINE_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_CMDLINE}")))
-        _KERNEL_OFFS=$((_SPLASH_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_SPLASH}")))
-        _INITRAMFS_OFFS=$((_KERNEL_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_KERNEL_ARCHBOOT}")))
+        _CMDLINE_OFFS=$((_OSREL_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_OSREL}")))
+        _SPLASH_OFFS=$((_CMDLINE_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_CMDLINE}")))
+        _KERNEL_OFFS=$((_SPLASH_OFFS + $(stat -Lc%s ""${_W_DIR}"/${_SPLASH}")))
+        _INITRAMFS_OFFS=$((_KERNEL_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_KERNEL_ARCHBOOT}")))
         for initramfs in ${_INITRAMFS} ${_INITRAMFS_LATEST} ${_INITRAMFS_LOCAL}; do
             [[ "${initramfs}" == "${_INITRAMFS}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
@@ -119,7 +119,7 @@ _create_iso() {
                 --add-section .splash=${_SPLASH} --change-section-vma .splash=${_SPLASH_OFFS} \
                 --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=${_KERNEL_OFFS} \
                 --add-section .initrd=<(cat ${_UCODE} ${initramfs}) \
-                --change-section-vma .initrd=${_INITRAMFS_OFFS} ${_EFISTUB} ${_UKI}"
+                --change-section-vma .initrd=${_INITRAMFS_OFFS} ${_EFISTUB} ${_UKI}" || exit 1
         done
         # fix permission and timestamp
         rm "${_W_DIR}"/"${_CMDLINE}"
