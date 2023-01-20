@@ -1,7 +1,7 @@
 On the road to 2023.02
 Highlights:
 - Unified Kernel Images / UKI files are provided now
-- grub 2:2.06.r415.g1a241e050-1
+- grub 2:2.06.r440.g4de39a2af-1 
 Environment changes:
 - added fbset and terminus-font
 ---
