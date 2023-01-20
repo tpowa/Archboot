@@ -105,7 +105,7 @@ _create_iso() {
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
-        _OSREL_OFFS=$(${_NSPAWN} "${_W_DIR}" /bin/bash -c objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
+        _OSREL_OFFS=$(${_NSPAWN} "${_W_DIR}" objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
         _CMDLINE_OFFS=$((_OSREL_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_OSREL}")))
         _SPLASH_OFFS=$((_CMDLINE_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_CMDLINE}")))
         _KERNEL_OFFS=$((_SPLASH_OFFS + $(${_NSPAWN} "${_W_DIR}" stat -Lc%s "${_SPLASH}")))
