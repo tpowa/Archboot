@@ -404,10 +404,12 @@ _do_efistub_uefi() {
     else
         _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
+            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
+            "Firmware" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
             "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
             "rEFInd") _do_refind_uefi ;;
+            "Firmware") _do_uki_uefi;;
         esac
     fi
 }
@@ -497,6 +499,18 @@ CONFEOF
     else
         _dialog --msgbox "Error setting up rEFInd." 3 40
     fi
+}
+
+_do_uki_uefi() {
+    _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
+    _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/linux.preset"
+    _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 60
+    echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
+    grep -q '^ALL_microcode=(/boot/*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
+        echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
+    grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
+        echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
+    _run_mkinitcpio
 }
 
 _do_grub_common_before() {
