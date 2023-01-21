@@ -402,7 +402,7 @@ _do_efistub_uefi() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _do_systemd_boot_uefi
     else
-        _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 10 55 2 \
+        _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
             "Firmware" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
@@ -448,7 +448,7 @@ GUMEOF
         sleep 5
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error installing SYSTEMD-BOOT..." 0 0
+        _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0
     fi
 }
 
@@ -506,12 +506,24 @@ _do_uki_uefi() {
     _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/linux.preset"
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 60
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-    grep -q '^ALL_microcode=(/boot/*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
+    grep -q '^ALL_microcode=(/boot/\*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
         echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
     [[ -d ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux ]] || mkdir -p ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux
     _run_mkinitcpio
+    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
+        _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
+        _BOOTMGR_LOADER_DIR="/EFI/Linux/archlinux-linux.efi"
+        _do_uefi_bootmgr_setup
+        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
+        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        _dialog --infobox "Firmware boot with Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 50
+        sleep 5
+    else
+        _dialog --msgbox "Error setting up Firmware boot with Unified Kernel Image." 3 40
+    fi
 }
 
 _do_grub_common_before() {
