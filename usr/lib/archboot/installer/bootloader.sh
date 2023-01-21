@@ -154,7 +154,7 @@ _do_uefi_efibootmgr() {
     for _bootnum in $(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
         efibootmgr --quiet -b "${_bootnum}" -B
     done
-    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRDEV_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
+    efibootmgr --quiet --create --disk "${_UEFISYSDEV}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --full-dev-path
 }
 
 _do_apple_efi_hfs_bless() {
@@ -164,16 +164,12 @@ _do_apple_efi_hfs_bless() {
 }
 
 _do_uefi_bootmgr_setup() {
-    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
+    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     # automounted /boot needs to be mounted first
-    if [[ "${_UEFISYSDEV}" == "systemd-1" ]]; then
+    if [[ -z "${_UEFISYSDEV}" ]]; then
         ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
         _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     fi
-    _DEV="$(${_LSBLK} KNAME "${_UEFISYSDEV}")"
-    _UEFISYSDEV_NUM="$(${_BLKID} -p -i -s PART_ENTRY_NUMBER -o value "${_UEFISYSDEV}")"
-    _BOOTMGRDEV="${_DEV}"
-    _BOOTMGRDEV_NUM="${_UEFISYSDEV_NUM}"
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
     else
