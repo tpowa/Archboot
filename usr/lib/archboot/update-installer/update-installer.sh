@@ -206,10 +206,10 @@ _initialize_zram_usr() {
     echo -e "\033[1mStep 1/2:\033[0m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
     if ! [[ -d /usr.zram ]]; then
-        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram..."
+        echo -e "\033[1mStep 2/2:\033[0m Moving /usr to /usr.zram..."
         _zram_usr "${_ZRAM_SIZE}"
     else
-        echo -e "\033[1mStep 2/2:\033[0m Move /usr to /usr.zram already done..."
+        echo -e "\033[1mStep 2/2:\033[0m Moving /usr to /usr.zram already done..."
     fi
 }
 
