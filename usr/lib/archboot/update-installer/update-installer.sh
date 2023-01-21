@@ -90,10 +90,7 @@ _clean_kernel_cache () {
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ -n "${_D_SCRIPTS}" ]]; then
-        if ! ping -c1 www.google.com >/dev/tty7 2>&1; then
-            echo -e "\033[91mError: Network not yet ready, aborting!\033[0m"
-            exit 1
-        fi
+        _update_installer_check
         echo -e "\033[1mStart:\033[0m Downloading latest km, tz, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         # config
@@ -149,8 +146,8 @@ _update_installer_check() {
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         if ! getent hosts www.google.com &>/dev/null; then
             echo -e "\033[91mAborting:\033[0m"
-            echo "Network is not working..."
-            echo "Please configure your network first."
+            echo -e "Network not yet ready."
+            echo -e "Please configure your network first."
             exit 1
         fi
     fi
