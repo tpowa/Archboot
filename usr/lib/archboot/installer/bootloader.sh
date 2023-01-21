@@ -399,7 +399,7 @@ _do_efistub_uefi() {
     _do_uefi_common
     _do_efistub_parameters
     _common_bootloader_checks
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _ADDITIONAL_BOOTLOADER="\"rEFInd\" \"rEFInd for ${_UEFI_ARCH} UEFI\""
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _ADDITIONAL_BOOTLOADER="rEFInd "rEFInd for "${_UEFI_ARCH}" UEFI""
     _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
@@ -508,7 +508,7 @@ _do_uki_uefi() {
         echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
-    [[ -d ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux ]] || mkdir -p ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux
+    [[ -d ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
     _run_mkinitcpio
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
