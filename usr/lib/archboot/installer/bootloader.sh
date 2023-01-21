@@ -429,7 +429,7 @@ GUMEOF
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
               "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _BOOTMGR_LABEL="SYSTEMD-BOOT"
-        _BOOTMGR_LOADER_PATH="/EFI/systemd/systemd.boot${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_PATH="/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
