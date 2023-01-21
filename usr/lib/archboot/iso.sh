@@ -46,16 +46,9 @@ _prepare_kernel_initramfs_files() {
     mkdir -p "${_ISODIR}/boot"
 
     #shellcheck disable=SC2154
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
-    # grub on x86_64 reports too big if near 1GB
-     split -b 950M -d --additional-suffix=.img -a 1 "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img" \
-     "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-"
-    rm "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-pre.img"
-    if [[ "$(find "${_ISODIR}/boot" -name '*.img' | wc -l)" -lt "2" ]]; then
-        mv "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}-0.img" "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img"
-    fi
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
     # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
