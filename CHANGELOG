@@ -4,6 +4,8 @@ Highlights:
 - grub 2:2.06.r440.g4de39a2af-1 
 Environment changes:
 - added fbset and terminus-font
+update-installer:
+- added network check
 ---
 2023.01 Highlights:
 - linux 6.1.x
