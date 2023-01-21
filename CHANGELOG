@@ -1,12 +1,15 @@
 On the road to 2023.02
 Highlights:
 - Unified Kernel Images / UKI files are provided now
-- grub 2:2.06.r440.g4de39a2af-1 
+- Unified Kernel Image setup is now supported in bootloader menu
+- grub 2:2.06.r440.g4de39a2af-1
 Environment changes:
 - readded the possibility to edit the initrd line in grub menu
 - added fbset and terminus-font
 update-installer:
 - added network check
+setup:
+- added Unified Kernel Image suppport in booloader menu
 ---
 2023.01 Highlights:
 - linux 6.1.x
