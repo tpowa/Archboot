@@ -421,11 +421,11 @@ _new_environment() {
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\033[1mStep 4/9:\033[0m Copy kernel ${VMLINUZ} to /${VMLINUZ}..."
+    echo -e "\033[1mStep 4/9:\033[0m Copying kernel ${VMLINUZ} to /${VMLINUZ}..."
     cp "${_W_DIR}/boot/${VMLINUZ}" / || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-    echo -e "\033[1mStep 5/9:\033[0m Collect initramfs files in ${_W_DIR}..."
+    echo -e "\033[1mStep 5/9:\033[0m Collecting initramfs files in ${_W_DIR}..."
     echo "          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
@@ -434,7 +434,7 @@ _new_environment() {
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\033[1mStep 7/9:\033[0m Create initramfs /initrd.img..."
+    echo -e "\033[1mStep 7/9:\033[0m Creating initramfs /initrd.img..."
     echo "          This will need some time..."
     _create_initramfs
     echo -e "\033[1mStep 8/9:\033[0m Cleanup ${_W_DIR}..."
