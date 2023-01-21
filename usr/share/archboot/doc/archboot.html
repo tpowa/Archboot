@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 21.01.2023 11:48 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 21.01.2023 13:21 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -230,7 +230,7 @@
 </ul>
 </nav>
 <h2 data-number="1" id="introduction"><span class="header-section-number">1.</span> Introduction</h2>
-<p><strong>Archboot</strong><span dir=""> is a most advanced, modular <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> boot/install image creation utility to generate<br>reproducible bootable media for <strong>CD/USB/PXE/UKI</strong>, designed for <strong>installation</strong> or <strong>rescue</strong> operation.<br> It is fully based on </span><a href="https://wiki.archlinux.org/title/Mkinitcpio" title="Mkinitcpio"><strong>mkinitcpio</strong></a><span dir="">, only runs in <strong>RAM</strong> and without any special filesystems like squashfs/erofs.</span><br />
+<p><strong>Archboot</strong><span dir=""> is a most advanced, modular <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> boot/install image creation utility to generate<br><strong>reproducible</strong> bootable media for <strong>CD/USB/PXE/UKI</strong>, designed for <strong>installation</strong> or <strong>rescue</strong> operation.<br> It is fully based on </span><a href="https://wiki.archlinux.org/title/Mkinitcpio" title="Mkinitcpio"><strong>mkinitcpio</strong></a><span dir="">, only runs in <strong>RAM</strong> and without any special filesystems like squashfs/erofs.</span><br />
 <span dir="">It was used as official installer from Arch Linux 0.7 till 2008.03 release and is developed by </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""> since 2006.</span></p>
 <h2 data-number="2" id="image-releases"><span class="header-section-number">2.</span> <span dir="">Image Releases</span></h2>
 <ul>
@@ -358,7 +358,7 @@
 </table>
 </ul>
 <ul>
-<li>During boot all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
+<li>During boot, all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="Dhcp"><strong>dhcp</strong></a>.</li>
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image.<br>It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
@@ -1312,7 +1312,7 @@ There are the following configuration files for ISO creation:
 </table>
 </ul>
 <h4 data-number="5.3.3" id="server-cleanup"><span class="header-section-number">5.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
-<p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>3</strong> months.</p>
+<p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>2</strong> months.</p>
 <h2 data-number="6" id="testing-image-and-files-with-qemu"><span class="header-section-number">6.</span> <span dir="">Testing image and files with QEMU</span></h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
 <h3 data-number="6.1" id="running-aarch64"><span class="header-section-number">6.1</span> <strong><span dir="">Running AARCH64:</span></strong></h3>
