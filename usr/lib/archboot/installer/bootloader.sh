@@ -403,7 +403,7 @@ _do_efistub_uefi() {
         _ADDITIONAL_BOOTLOADER="rEFInd"
         _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --menu "Select FIRMWARE or an UEFI Boot Manager to install,\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
+    _dialog --menu "Select FIRMWARE or an UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
