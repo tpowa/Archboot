@@ -520,7 +520,7 @@ _do_uki_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 70
+        _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
         _S_BOOTLOADER=1
     else
