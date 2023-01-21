@@ -399,11 +399,14 @@ _do_efistub_uefi() {
     _do_uefi_common
     _do_efistub_parameters
     _common_bootloader_checks
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _ADDITIONAL_BOOTLOADER="rEFInd $(echo rEFInd for ${_UEFI_ARCH} UEFI)"
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _ADDITIONAL_BOOTLOADER="rEFInd"
+        _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
+    fi
     _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
-        ${_ADDITIONAL_BOOTLOADER} 2>"${_ANSWER}"
+        "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
         "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
         "FIRMWARE") _do_uki_uefi;;
