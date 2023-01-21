@@ -17,7 +17,7 @@ build ()
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
           sort zstd date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
-          ldconfig nscd ln top df cut stat sln file tr
+          ldconfig nscd ln top df cut stat sln file tr getent
 
     ### add nano
     add_binary nano

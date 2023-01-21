@@ -146,6 +146,14 @@ _update_installer_check() {
         echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
         exit 1
     fi
+    if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        if ! getent hosts www.google.com &>/dev/null; then
+            echo -e "\033[91mAborting:\033[0m"
+            echo "Network is not working..."
+            echo "Please configure your network first."
+            exit 1
+        fi
+    fi
 }
 
 _zram_initialize() {
