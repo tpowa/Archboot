@@ -859,17 +859,17 @@ This mostly happens with local image, due to its large initramfs size.<br>Try th
 </ul>
 </ul>
 <ul>
-<li>The <strong>&ltdate&gt-latest</strong> image <strong>fails</strong> at stage <strong>3/9</strong>: Generating archboot container...</li>
-Check <strong>virtual console (VC7)</strong> for logged errors. Mostly it's a <strong>network</strong> issue, which you can try to fix <strong>before</strong> the building process starts.
-<br>Hit <strong>CTRL+C</strong> at the 10 second countdown, at the beginning of the build process.<br>Try to configure your network or select an other mirror in <strong>/etc/pacman.d/mirrorlist</strong>.<br>After fixing your network run <strong>exit</strong> to restart the building process.
-</ul>
-<ul>
 <li>The <strong>screen stays blank</strong> or other <strong>weird screen issues</strong> happen?</li>
 Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" title="KMS"><strong>KMS</strong></a> activation. Use <strong>one</strong> of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a>:<br><strong><code>radeon.modeset=0</code>, <code>i915.modeset=0</code>, <code>amdgpu.modeset=0</code> or <code>nouveau.modeset=0</code></strong>
 </ul>
 <ul>
 <li>Your system <strong>hangs</strong> during the <strong>boot process</strong>?</li>
 <strong>Any</strong> combinations of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a> may be useful:<br><strong><code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code></strong></p>
+</ul>
+<ul>
+<li>The <strong>&ltdate&gt-latest</strong> image <strong>fails</strong> at stage <strong>3/9</strong>: Generating archboot container...</li>
+Check <strong>virtual console (VC7)</strong> for logged errors. Mostly it's a <strong>network</strong> issue, which you can try to fix <strong>before</strong> the building process starts.
+<br>Hit <strong>CTRL+C</strong> at the 10 second countdown, at the beginning of the build process.<br>Try to configure your network or select an other mirror in <strong>/etc/pacman.d/mirrorlist</strong>.<br>After fixing your network run <strong>exit</strong> to restart the building process.
 </ul>
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
