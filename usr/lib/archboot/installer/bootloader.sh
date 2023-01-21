@@ -151,7 +151,7 @@ _do_uefi_common() {
 }
 
 _do_uefi_efibootmgr() {
-    for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
+    for _bootnum in $(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
         efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
     done
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRDEV_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
