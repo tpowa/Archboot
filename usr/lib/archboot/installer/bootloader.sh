@@ -151,24 +151,10 @@ _do_uefi_common() {
 }
 
 _do_uefi_efibootmgr() {
-    if [[ "$(/usr/bin/efivar -l)" ]]; then
-        cat << EFIBEOF > "/tmp/efibootmgr_run.sh"
-#!/usr/bin/env bash
-_BOOTMGR_LOADER_PARAMETERS="${_BOOTMGR_LOADER_PARAMETERS}"
-for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
-    efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
-done
-if [[ "\${_BOOTMGR_LOADER_PARAMETERS}" != "" ]]; then
-    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRDEV_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" --unicode "\${_BOOTMGR_LOADER_PARAMETERS}" -e "3"
-else
+    for _bootnum in \$(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
+        efibootmgr --quiet --bootnum "\${_bootnum}" --delete-bootnum
+    done
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRDEV_NUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" -e "3"
-fi
-EFIBEOF
-        chmod a+x "/tmp/efibootmgr_run.sh"
-        /tmp/efibootmgr_run.sh &>"/tmp/efibootmgr_run.log"
-    else
-        _dialog --msgbox "Boot entry could not be created. Check whether you have booted in UEFI boot mode and create a boot entry for ${_UEFISYS_MP}/${_EFIBOOTMGR_LOADER_PATH} using efibootmgr." 0 0
-    fi
 }
 
 _do_apple_efi_hfs_bless() {
@@ -197,13 +183,13 @@ _do_uefi_secure_boot_efitools() {
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
             cp "${_DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
-            _BOOTMGR_LOADER_PARAMETERS="/EFI/BOOT/HashTool.efi"
+            _BOOTMGR_LOADER_PATH="/EFI/BOOT/HashTool.efi"
             _do_uefi_bootmgr_setup
         fi
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/KeyTool.efi" ]]; then
             cp "${_DESTDIR}/usr/share/efitools/efi/KeyTool.efi" "${_UEFISYS_MP}/EFI/BOOT/KeyTool.efi"
             _BOOTMGR_LABEL="KeyTool (Secure Boot)"
-            _BOOTMGR_LOADER_PARAMETERS="/EFI/BOOT/KeyTool.efi"
+            _BOOTMGR_LOADER_PATH="/EFI/BOOT/KeyTool.efi"
             _do_uefi_bootmgr_setup
         fi
     fi
@@ -441,7 +427,7 @@ GUMEOF
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
               "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _BOOTMGR_LABEL="SYSTEMD-BOOT"
-        _BOOTMGR_LOADER_PARAMETERS="/EFI/systemd/systemd.boot${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_PATH="/EFI/systemd/systemd.boot${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
@@ -487,7 +473,7 @@ CONFEOF
 CONFEOF
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="rEFInd"
-        _BOOTMGR_LOADER_PARAMETERS="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_PATH="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -518,7 +504,7 @@ _do_uki_uefi() {
     _run_mkinitcpio
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
-        _BOOTMGR_LOADER_PARAMETERS="/EFI/Linux/archlinux-linux.efi"
+        _BOOTMGR_LOADER_PATH="/EFI/Linux/archlinux-linux.efi"
         _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -918,7 +904,7 @@ _do_grub_uefi() {
     fi
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
-        _BOOTMGR_LOADER_PARAMETERS="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
+        _BOOTMGR_LOADER_PATH="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -932,7 +918,7 @@ _do_grub_uefi() {
         _do_pacman_sign
         _do_uefi_secure_boot_efitools
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
-        _BOOTMGR_LOADER_PARAMETERS="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
         _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\nContinuing in 5 seconds..." 5 50
         sleep 5
