@@ -155,7 +155,7 @@ _do_uefi_efibootmgr() {
         efibootmgr --quiet -b "${_bootnum}" -B
     done
     _BOOTMGRDEV=/dev/"$(${_LSBLK} -no PKNAME "${_UEFISYSDEV}")"
-    _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sed -i -e "s#${_BOOTMGRDEV}##g")
+    _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sed -e "s#${_BOOTMGRDEV}##g")
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}"
 }
 
