@@ -164,12 +164,6 @@ _do_apple_efi_hfs_bless() {
 }
 
 _do_uefi_bootmgr_setup() {
-    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
-    # automounted /boot needs to be mounted first
-    if [[ -z "${_UEFISYSDEV}" ]]; then
-        ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
-        _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
-    fi
     if [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Inc.' ]] || [[ "$(cat "/sys/class/dmi/id/sys_vendor")" == 'Apple Computer, Inc.' ]]; then
         _do_apple_efi_hfs_bless
     else
@@ -292,7 +286,12 @@ _do_efistub_parameters() {
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
-    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}")"
+    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
+    # automounted /boot needs to be mounted first
+    if [[ -z "${_UEFISYSDEV}" ]]; then
+        ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
+        _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
+    fi
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
