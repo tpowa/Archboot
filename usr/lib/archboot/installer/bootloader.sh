@@ -510,6 +510,7 @@ _do_uki_uefi() {
         echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
+    [[ -d ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux ]] || mkdir -p ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux
     _run_mkinitcpio
 }
 
