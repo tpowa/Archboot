@@ -505,6 +505,7 @@ _do_uki_uefi() {
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/linux.preset"
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 60
+    sleep 5
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
     grep -q '^ALL_microcode=(/boot/\*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
         echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
@@ -519,7 +520,7 @@ _do_uki_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "Firmware boot with Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 50
+        _dialog --infobox "Firmware boot with Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
     else
         _dialog --msgbox "Error setting up Firmware boot with Unified Kernel Image." 3 40
