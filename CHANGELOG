@@ -10,6 +10,7 @@ update-installer:
 - added network check
 setup:
 - added Unified Kernel Image suppport in booloader menu
+- fixed efibootmgr entries
 ---
 2023.01 Highlights:
 - linux 6.1.x
