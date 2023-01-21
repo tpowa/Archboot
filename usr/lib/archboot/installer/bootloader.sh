@@ -405,11 +405,11 @@ _do_efistub_uefi() {
         _dialog --menu "Select which UEFI Boot Manager to install, to provide a menu for the EFISTUB kernels?" 11 55 3 \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
-            "Firmware" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
+            "UKI" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
             "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
             "rEFInd") _do_refind_uefi ;;
-            "Firmware") _do_uki_uefi;;
+            "UKI") _do_uki_uefi;;
         esac
     fi
 }
@@ -520,7 +520,7 @@ _do_uki_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 60
+        _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
     else
         _dialog --msgbox "Error setting up Unified Kernel Image." 3 40
