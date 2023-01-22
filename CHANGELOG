@@ -11,7 +11,8 @@ update-installer:
 setup:
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
-- fixed automounted ESP detection
+- fixed automounted ESP and /boot detection on already installed systems
+- don't ask for network, sources and mkfs on already installed sytems
 ---
 2023.01 Highlights:
 - linux 6.1.x
