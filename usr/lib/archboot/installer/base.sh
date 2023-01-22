@@ -133,8 +133,10 @@ _select_source() {
         if [[ -z ${_S_NET} ]]; then
             _check_network || return 1
         fi
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _enable_testing
-        _getsource || return 1
+        if [[ -z ${_S_SRC} ]]; then
+            [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _enable_testing
+            _getsource || return 1
+        fi
     fi
     _NEXTITEM="3"
 }
