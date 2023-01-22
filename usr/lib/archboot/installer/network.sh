@@ -11,7 +11,9 @@ _check_network() {
             _S_SRC=1
         fi
     fi
-    [[ -z "${_S_NET}" ]] && _donetwork
+    if [[ -z "${_S_NET}" ]]; then
+        _donetwork
+    fi
 }
 
 _essid_scan() {
