@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.setup"
-# use the first VT not dedicated to a running console
-# don't use _DESTDIR=/mnt because it's intended to mount other things there!
-# check first if bootet in archboot
-if grep -qw archboot /etc/hostname; then
-    _DESTDIR="/install"
-else
-    _DESTDIR="/"
-fi
 _NO_LOG="/dev/null"
 if pgrep -x Xorg &>"${_NO_LOG}"; then
     _LOG="/dev/tty8"
@@ -30,6 +22,18 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
 _DLPROG="wget -q"
+# use the first VT not dedicated to a running console
+# don't use _DESTDIR=/mnt because it's intended to mount other things there!
+# check first if bootet in archboot
+# don't ask for source and network on booted system
+if grep -qw '^archboot' /etc/hostname; then
+    _DESTDIR="/install"
+else
+    _DESTDIR="/"
+    _S_NET=1
+    _S_SRC=1
+    _S_MKFS=1
+fi
 
 _set_title() {
     if [[ -e "${_LOCAL_DB}" ]]; then

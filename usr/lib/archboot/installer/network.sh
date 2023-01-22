@@ -5,12 +5,6 @@ _net_interfaces() {
 }
 
 _check_network() {
-    if ! grep -qw '^archboot' /etc/hostname; then
-        if getent hosts www.google.com &>"${_LOG}"; then
-            _S_NET=1
-            _S_SRC=1
-        fi
-    fi
     if [[ -z "${_S_NET}" ]]; then
         _donetwork
     fi
