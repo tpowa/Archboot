@@ -287,7 +287,11 @@ _do_efistub_parameters() {
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
-    _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
+    _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -vw 'systemd-1')"
+    if [[ -z "${_BOOTDEV}" ]]; then
+        ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
+        _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
+    fi
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     # automounted /boot needs to be mounted first
     if [[ -z "${_UEFISYSDEV}" ]]; then

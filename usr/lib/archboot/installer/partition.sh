@@ -2,7 +2,10 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _detect_disk() {
     if [[ -z "${_DISK}" ]] || ! echo "${_DISK}" | grep -q '/dev/'; then
-        _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot")")"
+        if [[ -z "$(findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -vw systemd-1)" ]]; then
+            ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
+        fi
+        _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -vw systemd-1)")"
     fi
     if [[ -z "${_DISK}" ]]; then
         _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/")")"
