@@ -403,7 +403,6 @@ _do_efistub_uefi() {
 }
 
 _do_systemd_boot_uefi() {
-    _COPY_EFISTUB=""
     _dialog --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
     ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
@@ -436,9 +435,9 @@ GUMEOF
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
+        _do_efistub_copy_to_efisys
         _dialog --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
-        _COPY_EFISTUB=1
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0
@@ -446,7 +445,6 @@ GUMEOF
 }
 
 _do_refind_uefi() {
-    _COPY_EFISTUB=""
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _PACKAGES="refind"
         _run_pacman
@@ -487,9 +485,9 @@ CONFEOF
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+        _do_efistub_copy_to_efisys
         _dialog --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
-        _COPY_EFISTUB=1
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error setting up rEFInd." 3 40
@@ -497,7 +495,6 @@ CONFEOF
 }
 
 _do_uki_uefi() {
-    _COPY_EFISTUB=""
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}-${_RUNNING_ARCH}.preset"
@@ -537,7 +534,6 @@ _do_grub_common_before() {
     _BOOTDEV=""
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
-    _COPY_EFISTUB=""
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
@@ -939,10 +935,10 @@ _install_bootloader_uefi() {
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
-            "EFISTUB") _do_efistub_uefi
-                       [[ -z "${_COPY_EFISTUB}" ]] || _do_efistub_copy_to_efisys
-                        ;;
-            "GRUB_UEFI") _do_grub_uefi ;;
+            "EFISTUB")
+                        _do_efistub_uefi ;;
+            "GRUB_UEFI")
+                        _do_grub_uefi ;;
         esac
     fi
 }
