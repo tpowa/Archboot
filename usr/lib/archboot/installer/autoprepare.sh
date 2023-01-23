@@ -42,7 +42,7 @@ _autoprepare() {
         _set_device_name_scheme || return 1
     fi
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        _dialog --inputbox "Enter the mountpoint of your EFI SYSTEM PARTITION (Default is /boot or use /efi a for separate partition) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the mountpoint of your EFI SYSTEM PARTITION (Default is /boot or use /efi for a separate partition): " 10 60 "/boot" 2>"${_ANSWER}" || return 1
         _UEFISYS_MP="$(cat "${_ANSWER}")"
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
