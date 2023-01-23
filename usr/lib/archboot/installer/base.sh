@@ -136,6 +136,7 @@ _set_vconsole() {
 _select_source() {
     _NEXTITEM="2"
     _set_title
+    _S_SRC=""
     if [[ -e "${_LOCAL_DB}" ]]; then
         _getsource || return 1
     else

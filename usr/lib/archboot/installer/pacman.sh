@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getsource() {
-    _S_SRC=""
     _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
         _local_pacman_conf
         _dialog --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
-        _S_SRC=1
     else
         _select_mirror || return 1
-        _S_SRC=1
     fi
+    _S_SRC=1
 }
 
 _select_mirror() {
