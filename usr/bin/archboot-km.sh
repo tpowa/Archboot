@@ -34,9 +34,6 @@ _do_vconsole() {
     _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
-    if ! grep '^archboot' /etc/hostname; then
-        locale-gen &>/dev/null
-    fi
     systemctl restart systemd-vconsole-setup
     sleep 2
 }
