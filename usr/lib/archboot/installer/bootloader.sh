@@ -694,16 +694,6 @@ EOF
     _NUMBER=$((_NUMBER+1))
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 if [ "\${grub_platform}" == "efi" ]; then
-    ## UEFI Shell
-    #menuentry "UEFI Shell \${_UEFI_ARCH} v2" {
-    #    search --fs-uuid --no-floppy --set=root ${_UEFISYSDEV_HINTS_STRING} ${_UEFISYSDEV_FS_UUID}
-    #    chainloader /EFI/tools/shell\${_SPEC_UEFI_ARCH}_v2.efi
-    #}
-fi
-EOF
-    _NUMBER=$((_NUMBER+1))
-    cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
         ## Microsoft Windows 10/11 via x86_64 UEFI
         #menuentry Microsoft Windows 10/11 x86_64 UEFI-GPT {
