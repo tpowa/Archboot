@@ -198,19 +198,21 @@ _autoprepare() {
         sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
         # create actual partitions
         sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
-        sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM_PARTITION "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             # set the legacy BIOS boot 2bit attribute
             sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
         else
-            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_BOOT "${_DISK}" >"${_LOG}"
         fi
-        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
+        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8304 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":${_GUID_TYPE} --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         else
-            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8304 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
-            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":${_GUID_TYPE} --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
