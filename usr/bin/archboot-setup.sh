@@ -23,7 +23,9 @@ fi
 : >/tmp/.setup
 _set_title
 _set_uefi_parameters
-_dialog --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${_VC} console (ALT-F${_VC_NUM}). ALT-F1 will bring you back here." 14 65
+if [[ "${_DESTDIR}" == "/install" ]]; then
+    _dialog --msgbox "Welcome to the Archboot Arch Linux Installation program.\n\nThe install process is fairly straightforward, and you should run through the options in the order they are presented.\n\nIf you are unfamiliar with partitioning/making filesystems, you may want to consult some documentation before continuing.\n\nYou can view all output from commands by viewing your ${_VC} console (ALT-F${_VC_NUM}). ALT-F1 will bring you back here." 14 65
+fi
 while true; do
     _mainmenu
 done
