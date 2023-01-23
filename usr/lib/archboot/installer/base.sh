@@ -37,7 +37,7 @@ fi
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
-        _TITLE="Archboot Arch Linux (Setup System mode) --> https://bit.ly/archboot"
+        _TITLE="Archboot Arch Linux (System Setup mode) --> https://bit.ly/archboot"
     else
         if [[ -e "${_LOCAL_DB}" ]]; then
             _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
@@ -66,7 +66,7 @@ _printk()
 }
 
 _abort_running_system() {
-    _dialog --msgbox "This function is not available on Setup System mode." 5 60
+    _dialog --msgbox "This function is not available on System Setup mode." 5 60
 }
 
 _geteditor() {
