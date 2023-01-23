@@ -242,11 +242,11 @@ _autoprepare() {
     ## <partnum>:<fstype>:<mountpoint>:<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}:${_FSTYPE}:/:ARCHLINUX_ROOT"
-    _FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCHLINUX_HOME"
-    _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:ARCHLINUX_SWAP"
-    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:ARCHLINUX_BOOT"
-    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:EFI_SYSTEM_PARTITION"
+    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}:${_FSTYPE}:/:ARCH_ROOT"
+    _FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCH_HOME"
+    _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:ARCH_SWAP"
+    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:ARCH_BOOT"
+    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:ESP"
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
