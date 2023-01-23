@@ -42,11 +42,11 @@ _autoprepare() {
         _set_device_name_scheme || return 1
     fi
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        _dialog --inputbox "Enter the mountpoint of your UEFI SYSTEM PARTITION (Default is /boot) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the mountpoint of your EFI SYSTEM PARTITION (Default is /boot or use /efi a for separate partition) : " 10 60 "/boot" 2>"${_ANSWER}" || return 1
         _UEFISYS_MP="$(cat "${_ANSWER}")"
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
-        _dialog --msgbox "You have chosen to use /boot as the UEFISYS Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
+        _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
         _UEFISYS_BOOTDEV=1
     fi
     while [[ -z "${_DEFAULTFS}" ]]; do
@@ -84,7 +84,7 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --inputbox "Enter the size (MB) of your UEFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --inputbox "Enter the size (MB) of your EFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -198,17 +198,18 @@ _autoprepare() {
         sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
         # create actual partitions
         sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
-        sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":UEFI_SYSTEM "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM_PARTITION "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
+            # set the legacy BIOS boot 2bit attribute
             sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
         else
-            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":8300 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCHLINUX_BOOT "${_DISK}" >"${_LOG}"
         fi
         sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCHLINUX_SWAP "${_DISK}" >"${_LOG}"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":8304 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
         else
-            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8300 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":8304 --change-name="${_ROOTDEV_NUM}":ARCHLINUX_ROOT "${_DISK}" >"${_LOG}"
             sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCHLINUX_HOME "${_DISK}" >"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
