@@ -863,7 +863,7 @@ _do_grub_uefi() {
         chroot "${_DESTDIR}" grub-install \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
             --target="${_GRUB_ARCH}-efi" \
-            --efi-directory="${_UEFISYS_MP}" \
+            --efi-directory="/${_UEFISYS_MP}" \
             --bootloader-id="grub" \
             --boot-directory="/boot" \
             --no-nvram \
