@@ -32,7 +32,6 @@ else
     _DESTDIR="/"
     _S_NET=1
     _S_SRC=1
-    _S_MKFS=1
 fi
 
 _set_title() {
