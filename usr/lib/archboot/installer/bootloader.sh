@@ -537,6 +537,7 @@ _do_grub_common_before() {
     _BOOTDEV=""
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
+    _COPY_EFISTUB=""
     _common_bootloader_checks
     _abort_f2fs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
@@ -848,7 +849,6 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     _do_grub_common_before
-    _COPY_EFISTUB=""
     _dialog --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
