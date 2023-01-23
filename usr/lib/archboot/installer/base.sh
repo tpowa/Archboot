@@ -275,7 +275,7 @@ _mainmenu() {
     "5" "Install Packages" \
     "6" "Configure System" \
     "7" "Install Bootloader" \
-    "8" "Exit Install" 2>${_ANSWER}
+    "8" "Exit" 2>${_ANSWER}
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
         "0")
