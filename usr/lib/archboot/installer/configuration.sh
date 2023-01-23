@@ -45,7 +45,7 @@ _set_locale() {
             _SET_LOCALE=$(cat "${_ANSWER}")
         fi
         sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}.UTF-8#g" "${_DESTDIR}"/etc/locale.conf
-        _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system..." 3 70
+        _dialog --infobox "Setting locale LANG=${_SET_LOCALE}.UTF-8 on installed system..." 3 70
         _S_LOCALE=1
         sleep 2
         _auto_set_locale
