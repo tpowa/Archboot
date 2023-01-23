@@ -42,11 +42,11 @@ _set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
         _dialog --infobox "Detected big screen size, using 32 font size now..." 3 60
         _FONT="latarcyrheb-sun32"
-        sleep 2
     else
         _dialog --infobox "Normal screen size, using 16 font size now..." 3 60
         _FONT="latarcyrheb-sun16"
     fi
+    sleep 2
     echo "${_FONT}" > /tmp/.font
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
