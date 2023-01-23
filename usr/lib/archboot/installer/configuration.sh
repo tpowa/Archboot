@@ -29,7 +29,7 @@ _set_mkinitcpio() {
 }
 
 _set_locale() {
-    if [[ -z ${_SET_LOCALE} ]]; then
+    if [[ -z ${_S_LOCALE} ]]; then
         _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
         _CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
         _OTHER_LOCALES=""
@@ -46,7 +46,7 @@ _set_locale() {
         fi
         sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}#g" "${_DESTDIR}"/etc/locale.conf
         _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system..." 3 70
-        _SET_LOCALE=1
+        _S_LOCALE=1
         sleep 2
         _auto_set_locale
         _run_locale_gen
