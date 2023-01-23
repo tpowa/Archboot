@@ -3,6 +3,7 @@ Highlights:
 - Unified Kernel Images / UKI files are provided now
 - Unified Kernel Image setup is supported in EFISTUB menu now
 - grub 2:2.06.r440.g4de39a2af-1
+- archboot-setup.sh works on installed system as System Setup tool
 Environment changes:
 - show full initrd line in grub menu
 - added fbset and terminus-font
@@ -11,9 +12,15 @@ update-installer:
 setup:
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
-- fixed automounted ESP and /boot detection on already installed systems
-- don't ask for network, sources and mkfs on already installed sytems
+- disable unsafe menu entries on installed system
+- don't show install message in installed system
+- added new menu title if running on installed system
+- fixed automounted ESP and /boot detection on installed systems
+- don't ask for network, sources and mkfs on installed sytems
 - fix LANG= add .UTF-8 to parameter
+- only copy kernel and other files to ESP on systemd-boot and rEFInd
+- only add BIOS or UEFI Windows entry to grub.cfg
+- remove efi shell from grub.cfg
 ---
 2023.01 Highlights:
 - linux 6.1.x
