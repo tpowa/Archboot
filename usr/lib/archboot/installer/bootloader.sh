@@ -584,18 +584,6 @@ _do_grub_config() {
     ## Ignore if the insmod entries are repeated - there are possibilities of having /boot in one disk and root-fs in altogether different disk
     ## with totally different configuration.
     cat << EOF > "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-if [ "\${grub_platform}" == "efi" ]; then
-    set _UEFI_ARCH="\${grub_cpu}"
-    if [ "\${grub_cpu}" == "x86_64" ]; then
-        set _SPEC_UEFI_ARCH="x64"
-    fi
-    if [ "\${grub_cpu}" == "i386" ]; then
-        set _SPEC_UEFI_ARCH="ia32"
-    fi
-    if [ "\${grub_cpu}" == "aarch64" ]; then
-        set _SPEC_UEFI_ARCH="aa64"
-    fi
-fi
 # Include modules - required for boot
 insmod part_gpt
 insmod part_msdos
