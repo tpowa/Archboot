@@ -34,6 +34,9 @@ _do_vconsole() {
     _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
+    if ! grep '^archboot' /etc/hostname; then
+        locale-gen &>/dev/null
+    fi
     systemctl restart systemd-vconsole-setup
     sleep 2
 }
@@ -42,11 +45,16 @@ _set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
         _dialog --infobox "Detected big screen size, using 32 font size now..." 3 60
         _FONT="latarcyrheb-sun32"
+        sleep 2
     else
-        _dialog --infobox "Normal screen size, using 16 font size now..." 3 60
-        _FONT="latarcyrheb-sun16"
+        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
+        _CANCEL=
+        #shellcheck disable=SC2086
+        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+        _abort_dialog || return 1
+        #shellcheck disable=SC2086
+        _FONT=$(cat ${_ANSWER})
     fi
-    sleep 2
     echo "${_FONT}" > /tmp/.font
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
