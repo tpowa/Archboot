@@ -66,7 +66,7 @@ _printk()
 }
 
 _abort_running_system() {
-    _dialog --msgbox "Error:\nThis function is not available on Setup System mode." 6 60
+    _dialog --msgbox "This function is not available on Setup System mode." 5 60
 }
 
 _geteditor() {
@@ -318,7 +318,11 @@ _mainmenu() {
             fi
             exit 0 ;;
         *)
-            _dialog --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
+            if _dialog --yesno "Leave Program?" 6 40; then
+                [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
+                clear
+                exit 0
+            fi
             ;;
     esac
 }
