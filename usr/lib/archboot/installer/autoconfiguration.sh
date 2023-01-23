@@ -197,7 +197,7 @@ _auto_pacman_mirror() {
     if [[ "${_SYNC_URL}" != "" ]]; then
         _dialog --infobox "Enable pacman mirror on installed system..." 3 70
         #shellcheck disable=SC2027,SC2086
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer == "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
+        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
         sleep 2
     fi
