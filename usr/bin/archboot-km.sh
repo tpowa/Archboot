@@ -44,13 +44,8 @@ _set_vconsole() {
         _FONT="latarcyrheb-sun32"
         sleep 2
     else
-        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
-        _CANCEL=
-        #shellcheck disable=SC2086
-        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
-        _abort_dialog || return 1
-        #shellcheck disable=SC2086
-        _FONT=$(cat ${_ANSWER})
+        _dialog --infobox "Normal screen size, using 16 font size now..." 3 60
+        _FONT="latarcyrheb-sun16"
     fi
     echo "${_FONT}" > /tmp/.font
     # get list of 2 sign locale

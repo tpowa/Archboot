@@ -44,7 +44,7 @@ _set_locale() {
             _dialog --menu "Select A System-Wide Locale:" 18 40 12 ${_OTHER_LOCALES} 2>${_ANSWER} || return 1
             _SET_LOCALE=$(cat "${_ANSWER}")
         fi
-        sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}#g" "${_DESTDIR}"/etc/locale.conf
+        sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}.UTF-8#g" "${_DESTDIR}"/etc/locale.conf
         _dialog --infobox "Setting locale LANG=${_SET_LOCALE} on installed system..." 3 70
         _S_LOCALE=1
         sleep 2
