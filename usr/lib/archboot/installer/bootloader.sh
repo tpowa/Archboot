@@ -495,9 +495,9 @@ CONFEOF
 _do_uki_uefi() {
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/"${_KERNELPKG}"-"${_RUNNING_ARCH}".preset"
+        _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}-${_RUNNING_ARCH}.preset"
     else
-        _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/"${_KERNELPKG}".preset"
+        _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}.preset"
     fi
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     sleep 5
