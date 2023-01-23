@@ -106,6 +106,7 @@ _auto_mkinitcpio() {
     _HWDETECTHOOKS=""
     _HWKVER=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
+        _printk off
         _AUTO_MKINITCPIO=""
         # check on nfs
         if lsmod | grep -q ^nfs; then
@@ -144,6 +145,7 @@ _auto_mkinitcpio() {
         sleep 2
         _AUTO_MKINITCPIO=1
         _run_mkinitcpio
+        _printk on
     fi
 }
 
