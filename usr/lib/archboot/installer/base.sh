@@ -61,9 +61,10 @@ _printk()
     esac
 }
 
-# _geteditor()
-# prompts the user to choose an editor
-# sets EDITOR global variable
+_abort_running_system() {
+    _dialog --msgbox "Error:\nThis function is not available on already installed system." 0 0
+}
+
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
         _dialog --menu "Select a Text Editor to Use" 9 35 3 \
@@ -278,14 +279,26 @@ _mainmenu() {
         "1")
             _donetwork ;;
         "2")
-            _select_source || return 1
-            _update_environment ;;
+            if [[ "${_DESTDIR}" == "/" ]]; then
+                _abort_running_system
+            else
+                _select_source || return 1
+                _update_environment
+            fi ;;
         "3")
             _set_clock ;;
         "4")
-            _prepare_storagedrive ;;
+            if [[ "${_DESTDIR}" == "/" ]]; then
+                _abort_running_system
+            else
+                _prepare_storagedrive
+            fi ;;
         "5")
-            _install_packages ;;
+            if [[ "${_DESTDIR}" == "/" ]]; then
+                _abort_running_system
+            else
+                _install_packages
+            fi ;;
         "6")
             _configure_system ;;
         "7")
@@ -293,10 +306,12 @@ _mainmenu() {
         "8")
             [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear
-            echo ""
-            echo "If the install finished successfully, you can now type 'reboot'"
-            echo "to restart the system."
-            echo ""
+            if [[ "${_DESTDIR}" == "/install" ]]; then
+                echo ""
+                echo "If the install finished successfully, you can now type 'reboot'"
+                echo "to restart the system."
+                echo ""
+            fi
             exit 0 ;;
         *)
             _dialog --yesno "Abort Installation?" 6 40 && [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running && clear && exit 0
