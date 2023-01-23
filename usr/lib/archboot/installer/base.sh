@@ -318,7 +318,7 @@ _mainmenu() {
             fi
             exit 0 ;;
         *)
-            if _dialog --yesno "Leave Program?" 6 40; then
+            if _dialog --yesno "Abort Program?" 6 40; then
                 [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
                 clear
                 exit 0
