@@ -300,7 +300,7 @@ _do_efistub_parameters() {
     fi
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
-    if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
+    if [[ "${_UEFISYS_MP}" == "boot" ]]; then
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _KERNEL="${_VMLINUZ_EFISTUB}"
         else
@@ -331,7 +331,7 @@ _do_efistub_parameters() {
 }
 
 _do_efistub_copy_to_efisys() {
-    if ! [[ "${_UEFISYS_MP}" == "/boot" ]]; then
+    if ! [[ "${_UEFISYS_MP}" == "boot" ]]; then
         # clean and copy to efisys
         _dialog --infobox "Copying kernel, ucode and initramfs to EFI system partition now..." 4 50
         ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
@@ -370,14 +370,14 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} ${_UEFISYS_MP}/${_KERNEL}
-ExecStart=/usr/bin/cp -f /boot/${_INITRAMFS} ${_UEFISYS_MP}/${_INITRD}
+ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} /${_UEFISYS_MP}/${_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${_INITRAMFS} /${_UEFISYS_MP}/${_INITRD}
 CONFEOF
         [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${_AMD_UCODE} ${_UEFISYS_MP}/${_INITRD_AMD_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${_AMD_UCODE} /${_UEFISYS_MP}/${_INITRD_AMD_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${_INTEL_UCODE} ${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
+            echo "ExecStart=/usr/bin/cp -f /boot/${_INTEL_UCODE} /${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         if [[ "${_DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${_DESTDIR}" systemctl enable efistub_copy.path &>"${_NO_LOG}"
@@ -426,8 +426,8 @@ timeout 5
 default archlinux-core-main
 GUMEOF
     _chroot_mount
-    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" install &>"${_LOG}"
-    chroot "${_DESTDIR}" bootctl --path="${_UEFISYS_MP}" update &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" install &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" update &>"${_LOG}"
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
