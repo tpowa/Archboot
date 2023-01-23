@@ -289,10 +289,15 @@ _do_efistub_parameters() {
     _UEFISYS_PATH="EFI/archlinux"
     # automounted /boot and ESP needs to be mounted first
     findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -qw 'systemd-1' && \
-        ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
+        ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
-    findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -qw 'systemd-1' && \
-        ls "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
+    findmnt -vno SOURCE "${_DESTDIR}/efi" | grep -qw 'systemd-1' && \
+        ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
+    if mountpoint -q ${_DESTDIR}/efi ; then
+        _UEFISYS_MP=efi
+    else
+        _UEFISYS_MP=boot
+    fi
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
