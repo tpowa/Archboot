@@ -66,7 +66,7 @@ _printk()
 }
 
 _abort_running_system() {
-    _dialog --msgbox "Error:\nThis function is not available on Setup System mode." 0 0
+    _dialog --msgbox "Error:\nThis function is not available on Setup System mode." 6 60
 }
 
 _geteditor() {
