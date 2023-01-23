@@ -691,11 +691,12 @@ menuentry "Arch Linux" {
     initrd ${_SUBDIR}/${_INTEL_UCODE} ${_SUBDIR}/${_AMD_UCODE} ${_SUBDIR}/${_INITRAMFS}
 }
 EOF
-    _NUMBER=$((_NUMBER+1))
-    cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+    if [[ -n "${_UEFI_BOOT}" ]]; then
+        _NUMBER=$((_NUMBER+1))
+        cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 if [ "\${grub_platform}" == "efi" ]; then
     if [ "\${grub_cpu}" == "x86_64" ]; then
-        ## Microsoft Windows 10/11 via x86_64 UEFI
+        ## (${_NUMBER}) Microsoft Windows 10/11 via x86_64 UEFI
         #menuentry Microsoft Windows 10/11 x86_64 UEFI-GPT {
         #    insmod part_gpt
         #    insmod fat
@@ -707,12 +708,13 @@ if [ "\${grub_platform}" == "efi" ]; then
     fi
 fi
 EOF
-    _NUMBER=$((_NUMBER+1))
-    ## TODO: Detect actual Windows installation if any
-    ## create example file for windows
-    cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+    else
+        _NUMBER=$((_NUMBER+1))
+        ## TODO: Detect actual Windows installation if any
+        ## create example file for windows
+        cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 if [ "\${grub_platform}" == "pc" ]; then
-    ## Microsoft Windows 10/11 BIOS
+    ## (${_NUMBER}) Microsoft Windows 10/11 BIOS
     #menuentry Microsoft Windows 10/11 BIOS-MBR {
     #    insmod part_msdos
     #    insmod ntfs
@@ -723,6 +725,7 @@ if [ "\${grub_platform}" == "pc" ]; then
     #}
 fi
 EOF
+    fi
 fi
     ## copy unicode.pf2 font file
     cp -f "${_DESTDIR}/usr/share/grub/unicode.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/unicode.pf2"
