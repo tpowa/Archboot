@@ -403,6 +403,7 @@ _do_efistub_uefi() {
 }
 
 _do_systemd_boot_uefi() {
+    _COPY_EFISTUB=""
     _dialog --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
     ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
@@ -437,6 +438,7 @@ GUMEOF
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _dialog --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
+        _COPY_EFISTUB=1
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0
@@ -444,6 +446,7 @@ GUMEOF
 }
 
 _do_refind_uefi() {
+    _COPY_EFISTUB=""
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _PACKAGES="refind"
         _run_pacman
@@ -486,6 +489,7 @@ CONFEOF
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _dialog --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds..." 4 50
         sleep 5
+        _COPY_EFISTUB=1
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error setting up rEFInd." 3 40
@@ -493,6 +497,7 @@ CONFEOF
 }
 
 _do_uki_uefi() {
+    _COPY_EFISTUB=""
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}-${_RUNNING_ARCH}.preset"
@@ -520,7 +525,6 @@ _do_uki_uefi() {
         _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
         # not a bootloader, no need to copy kernel and other files to ESP
-        _S_BOOTLOADER=""
     else
         _dialog --msgbox "Error setting up Unified Kernel Image." 3 40
     fi
@@ -748,7 +752,6 @@ label linux
 EOF
     _dialog --infobox "UBOOT has been installed successfully.\nContinuing in 5 seconds..." 4 55
     sleep 5
-    _S_BOOTLOADER=1
 }
 
 _do_grub_bios() {
@@ -845,6 +848,7 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     _do_grub_common_before
+    _COPY_EFISTUB=""
     _dialog --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
@@ -902,6 +906,7 @@ _do_grub_uefi() {
         _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
         _S_BOOTLOADER=1
+
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _do_secureboot_keys || return 1
         _do_mok_sign
@@ -935,7 +940,7 @@ _install_bootloader_uefi() {
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
             "EFISTUB") _do_efistub_uefi
-                       [[ -z "${_S_BOOTLOADER}" ]] || _do_efistub_copy_to_efisys
+                       [[ -z "${_COPY_EFISTUB}" ]] || _do_efistub_copy_to_efisys
                         ;;
             "GRUB_UEFI") _do_grub_uefi ;;
         esac
