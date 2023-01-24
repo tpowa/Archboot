@@ -159,6 +159,8 @@ _mountpoints() {
         _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
         if [[ "${_DEV}" != "NONE" ]]; then
+            # always create swap
+            _DOMKFS=1
             _clear_fs_values
             if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
                 _create_filesystem || return 1
@@ -196,6 +198,7 @@ _mountpoints() {
                     _SKIP_FILESYSTEM="1"
                 fi
                 if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                    # create vfat, if not already vfat format
                     _FSTYPE="vfat"
                     _DOMKFS=1
                 fi
