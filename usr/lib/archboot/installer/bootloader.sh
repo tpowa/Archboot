@@ -146,7 +146,9 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/efi-readvar" ]] || _PACKAGES="${_PACKAGES} efitools"
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
-    [[ -n "${_PACKAGES}" ]] && _run_pacman
+    if [[ -n "${_PACKAGES}" ]]; then
+        _run_pacman
+    fi
     _check_efisys_part || return 1
 }
 
@@ -174,7 +176,7 @@ _do_uefi_bootmgr_setup() {
 }
 
 _do_uefi_secure_boot_efitools() {
-    _do_uefi_common
+    _do_uefi_common || return 1
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
@@ -389,7 +391,7 @@ CONFEOF
 }
 
 _do_efistub_uefi() {
-    _do_uefi_common
+    _do_uefi_common || return 1
     _do_efistub_parameters
     _common_bootloader_checks
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -845,7 +847,7 @@ _do_grub_bios() {
 }
 
 _do_grub_uefi() {
-    _do_uefi_common
+    _do_uefi_common || return 1
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
