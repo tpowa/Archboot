@@ -335,15 +335,6 @@ _mkfs() {
         fi
         # btrfs needs balancing on fresh created raid, else weird things could happen
         [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
-        # change permission of base directories to correct permission
-        # to avoid btrfs issues
-        if [[ "${5}" == "/tmp" ]]; then
-            chmod 1777 "${3}""${5}"
-        elif [[ "${5}" == "/root" ]]; then
-            chmod 750 "${3}""${5}"
-        else
-            chmod 755 "${3}""${5}"
-        fi
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
