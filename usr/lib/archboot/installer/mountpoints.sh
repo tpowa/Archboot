@@ -154,14 +154,14 @@ _mountpoints() {
         #
         # swap setting
         #
-        _FSTYPE="swap"
         #shellcheck disable=SC2086
-        _dialog --menu "Select the partition to use as swap:" 15 50 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the device to use as swap:" 15 50 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
         if [[ "${_DEV}" != "NONE" ]]; then
             # always create swap
             _clear_fs_values
-            if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
+            if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
                 _DOMKFS=1
                 _create_filesystem || return 1
             fi
@@ -203,7 +203,7 @@ _mountpoints() {
                     _DOMKFS=1
                 fi
                 if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
-                    [[ "${_FSTYPE}" == "vfat" || "${_FSTYPE}" == "swap" ]] && _FSTYPE=""
+                    [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
