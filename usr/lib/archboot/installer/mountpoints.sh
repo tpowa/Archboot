@@ -380,7 +380,7 @@ _mkfs() {
     # https://www.freedesktop.org/software/systemd/man/systemd-gpt-auto-generator.html
     # systemd supports detection on GPT disks:
     # GRUB and rEFInd don't support /efi automount!
-    # disabled for now "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
+    # disabled for now this  check: "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
     # /boot or /efi as ESP: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
     # /boot as Extended Boot Loader Partition: bc13c2ff-59e6-4262-a352-b275fd6f7172
     # swap:  0657fd6d-a4ab-43c4-84e5-0933c84b4f4f

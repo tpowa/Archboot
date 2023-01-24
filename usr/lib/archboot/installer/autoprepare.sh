@@ -272,10 +272,8 @@ _autoprepare() {
               "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
         # set default subvolume for systemd-gpt-autogenerator
-         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
-            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
-            btrfs subvolume set-default "${_BTRFS_SUBVOLUME}" "${_DESTDIR}"/${_MP} || return 1
+        if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            btrfs subvolume set-default "${_DESTDIR}"/${_MP} || return 1
         fi
     done
     _dialog --infobox "Auto-Prepare was successful.\nContinuing in 5 seconds..." 4 40
