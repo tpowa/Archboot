@@ -71,11 +71,7 @@ _check_efisys_part() {
     if sgdisk -p "${_DISK}" | grep -q 'EF00'; then
         # check on unique PARTTYPE c12a7328-f81f-11d2-ba4b-00a0c93ec93b for EFI System Partition type UUID
         _UEFISYSDEV="$(${_LSBLK} NAME,PARTTYPE "${_DISK}" | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" != "vfat" ]]; then
-            ## Check whether EFISYS is FAT, otherwise inform the user and offer to format the partition as FAT32.
-            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYSDEV} does not appear to be FAT formatted. UEFI Specification requires EFI System partition to be FAT32 formatted. Do you want to format ${_UEFISYSDEV} as FAT32?\nNote: Setup will proceed even if you select NO. Some systems like Apple Macs may work with Non-FAT EFI System partition. However the installed system is not in conformance with UEFI Spec., and MAY NOT boot properly." 0 0 && _FORMAT_UEFISYS_FAT32=1
-        fi
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" == "vfat" ]] && [[ "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYSDEV}")" != "FAT32" ]]; then
+        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" == "vfat" && "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYSDEV}")" != "FAT32" ]] || [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" != "vfat" ]]; then
             ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
             _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYSDEV} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYSDEV} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
         fi
