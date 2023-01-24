@@ -66,6 +66,8 @@ _enter_mountpoint() {
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /boot _ /efi _ 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
+        _FSTYPE="vfat"
+        _DO_UEFISYSDEV=""
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
@@ -206,7 +208,6 @@ _mountpoints() {
                 ! [[ "${_FSTYPE}" == "btrfs" ]] || [[ -n ${_DEV_ROOT} ]] && _DEVS="$(echo ${_DEVS} | sed -e "s#${_DEV} _##g")"
             fi
             _DO_ROOT=""
-            _DEV_ROOT=""
         done
         #shellcheck disable=SC2028
         _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
