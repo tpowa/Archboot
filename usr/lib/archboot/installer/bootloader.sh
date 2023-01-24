@@ -147,7 +147,7 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
     [[ -n "${_PACKAGES}" ]] && _run_pacman
-    _check_efisys_part
+    _check_efisys_part || return 1
 }
 
 _do_uefi_efibootmgr() {
