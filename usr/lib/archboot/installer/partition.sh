@@ -97,7 +97,7 @@ _check_efisys_part() {
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
     else
-        _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION on ${_DISK}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
+        _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION (ESP) on ${_DISK}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
     fi
 }
