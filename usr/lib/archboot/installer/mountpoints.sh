@@ -64,7 +64,7 @@ _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-        _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         _FSTYPE="vfat"
         _DO_UEFISYSDEV=""
