@@ -64,14 +64,18 @@ _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /boot _ /efi _ 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         _FSTYPE="vfat"
         _DO_UEFISYSDEV=""
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
-            _dialog --inputbox "Enter the mountpoint for ${_DEV}" 8 65 "/boot" 2>"${_ANSWER}" || return 1
+            _MP=/boot
+            grep -qw "/boot" /tmp/.parts && _MP=/home
+            grep -qw "/home" /tmp/.parts && _MP=/srv
+            grep -qw "/srv" /tmp/.parts && _MP=/var
+            _dialog --inputbox "Enter the mountpoint for ${_DEV}" 8 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
             if grep ":${_MP}:" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
