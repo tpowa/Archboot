@@ -64,7 +64,7 @@ _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         _FSTYPE="vfat"
         _DO_UEFISYSDEV=""
@@ -181,9 +181,9 @@ _mountpoints() {
             if [[ -n "${_DO_ROOT}" ]]; then
                 _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-                _dialog --menu "Select the device to mount as\nEfi System Partition (ESP):" 15 40 12 ${_DEVS} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the device to mount as\nEFI SYSTEM PARTITION (ESP):" 15 40 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             else
-                _dialog --menu "Select any additional devices to mount\nunder your new root:" 15 40 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select any additional devices to\nmount under your new root:" 15 40 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
             if [[ "${_DEV}" != "DONE" ]]; then
