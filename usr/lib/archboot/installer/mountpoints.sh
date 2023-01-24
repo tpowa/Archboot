@@ -66,7 +66,6 @@ _enter_mountpoint() {
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
-        _FSTYPE="vfat"
         _DO_UEFISYSDEV=""
     else
         _MP=""
@@ -195,6 +194,10 @@ _mountpoints() {
                 [[ "${_FSTYPE}" == "swap" ]] && _FSTYPE=""
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
                     _SKIP_FILESYSTEM="1"
+                fi
+                if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
+                    _FSTYPE="vfat"
+                    _DOMKFS=1
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
