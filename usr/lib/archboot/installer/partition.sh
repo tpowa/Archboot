@@ -64,7 +64,7 @@ _check_efisys_part() {
     fi
     if ! sgdisk -p "${_DISK}" | grep -q 'EF00'; then
         # Windows 10 recommends a minimum of 260MB Efi Systen Partition
-        _dialog --msgbox "Setup detected no EFI System partition in ${_DISK}. You will now be put into cfdisk. Please create a >= 260 MB partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260 MB FAT32 EFI System partition, check whether that partition has EFI System cfdisk type code." 0 0
+        _dialog --msgbox "Setup detected no EFI SYSTEM PARTITION (ESP) in ${_DISK}. You will now be put into cfdisk. Please create a >= 260 MB partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260 MB FAT32 EFI SYSTEM PARTITIOM (ESP), check whether that partition has EFI System cfdisk type code." 0 0
         clear && cfdisk "${_DISK}"
         _RUN_CFDISK=""
     fi
@@ -73,7 +73,7 @@ _check_efisys_part() {
         _UEFISYSDEV="$(${_LSBLK} NAME,PARTTYPE "${_DISK}" | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
         if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" == "vfat" && "$(${_BLKID} -p -i -o value -s VERSION "${_UEFISYSDEV}")" != "FAT32" ]] || [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" != "vfat" ]]; then
             ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
-            _dialog --defaultno --yesno "Detected EFI System partition ${_UEFISYSDEV} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYSDEV} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI System partition. It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
+            _dialog --defaultno --yesno "Detected EFI SYSTEM PARTITION (ESP) ${_UEFISYSDEV} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYSDEV} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI SYSTEM PARTITION (ESP). It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
         fi
         #autodetect efisys mountpoint, on fail ask for mountpoint
         _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
@@ -97,7 +97,7 @@ _check_efisys_part() {
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
     else
-        _dialog --msgbox "Setup did not find any EFI System partition in ${_DISK}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
+        _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION on ${_DISK}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
     fi
 }
