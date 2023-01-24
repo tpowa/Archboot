@@ -42,8 +42,8 @@ _autoprepare() {
         _set_device_name_scheme || return 1
     fi
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        _dialog --inputbox "Enter the mountpoint of your EFI SYSTEM PARTITION (Default is /boot or use /efi for a separate partition): " 10 60 "/boot" 2>"${_ANSWER}" || return 1
-        _UEFISYS_MP="$(cat "${_ANSWER}")"
+        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
+        _UEFISYS_MP=$(cat "${_ANSWER}")
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
         _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
