@@ -259,16 +259,14 @@ _activate_special_devices()
 _set_device_name_scheme() {
     _NAME_SCHEME_PARAMETER=""
     _NAME_SCHEME_LEVELS=""
-    _MENU_DESC_TEXT=""
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
     if [[ -n "${_UEFI_BOOT}" ]]; then
         _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
-        _MENU_DESC_TEXT="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
     fi
     _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
-    _dialog --menu "Select the device name scheme you want to use in config files. ${_MENU_DESC_TEXT} FSUUID is recommended." 15 70 9 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --menu "Select the device name scheme you want to use in config files.\nPARTUUID is recommended on GPT disks.\nFSUUID is recommended on MBR/MSDOS disks." 15 70 9 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
     _NAME_SCHEME_PARAMETER=$(cat "${_ANSWER}")
     _NAME_SCHEME_PARAMETER_RUN=1
 }
