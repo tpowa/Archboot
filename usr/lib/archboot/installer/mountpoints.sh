@@ -321,8 +321,8 @@ _mkfs() {
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
         [[ "${2}" == "f2fs" ]] && _F2FS_MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
-        [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
-        [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
+        [[ "${2}" == "btrfs" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
+        [[ "${2}" == "btrfs" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
@@ -397,6 +397,4 @@ _mkfs() {
         echo -n "${_DEV} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         _check_filesystem_fstab $@
     fi
-    # clear values
-    unset "${7}" "${8}" "${9}" "${10}" "${11}"
 }

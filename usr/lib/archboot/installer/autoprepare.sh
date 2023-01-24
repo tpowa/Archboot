@@ -259,11 +259,12 @@ _autoprepare() {
         _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
         _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
         _FS_OPTIONS=""
-        _BTRFS_DEVS="${_DEV}"
+        _BTRFS_DEVS=""
         _BTRFS_LEVEL=""
         _BTRFS_SUBVOLUME=""
         _BTRFS_COMPRESS=""
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            _BTRFS_DEVS="${_DEV}"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
             _BTRFS_COMPRESS="compress=zstd"
