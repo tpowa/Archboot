@@ -163,6 +163,7 @@ _mountpoints() {
             _clear_fs_values
             if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
                 _DOMKFS=1
+                _FSTYPE="swap"
                 _create_filesystem || return 1
             fi
         fi
