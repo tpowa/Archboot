@@ -197,7 +197,7 @@ _mountpoints() {
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
                     _SKIP_FILESYSTEM="1"
                 fi
-                if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     # create vfat, if not already vfat format
                     _FSTYPE="vfat"
                     _DOMKFS=1
@@ -215,7 +215,7 @@ _mountpoints() {
                         _btrfs_subvolume || return 1
                     fi
                 fi
-                [[ -z "${_DOMKFS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
+                [[ -z "${_DOMKFS}" || -n "${_ASK_MOUNTPOINTS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 _find_btrfsraid_devices
                 _btrfs_parts
                 _check_mkfs_values
