@@ -321,7 +321,7 @@ _mainmenu() {
             if _dialog --yesno "Abort Program?" 6 40; then
                 [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
                 clear
-                exit 0
+                exit 1
             fi
             ;;
     esac
