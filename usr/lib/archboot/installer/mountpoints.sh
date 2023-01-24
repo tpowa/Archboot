@@ -195,7 +195,7 @@ _mountpoints() {
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
                     _SKIP_FILESYSTEM="1"
                 fi
-                if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
+                if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _FSTYPE="vfat"
                     _DOMKFS=1
                 fi
