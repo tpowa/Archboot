@@ -75,7 +75,7 @@ _check_efisys_part() {
             ## Check whether EFISYS is FAT32 (specifically), otherwise warn the user about compatibility issues with UEFI Spec.
             _dialog --defaultno --yesno "Detected EFI SYSTEM PARTITION (ESP) ${_UEFISYSDEV} does not appear to be FAT32 formatted. Do you want to format ${_UEFISYSDEV} as FAT32?\nNote: Setup will proceed even if you select NO. Most systems will boot fine even with FAT16 or FAT12 EFI System partition, however some firmwares may refuse to boot with a non-FAT32 EFI SYSTEM PARTITION (ESP). It is recommended to use FAT32 for maximum compatibility with UEFI Spec." 0 0 && _FORMAT_UEFISYS_FAT32=1
         fi
-        #autodetect efisys mountpoint, on fail ask for mountpoint
+        # autodetect efisys mountpoint
         _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
         while [[ "${_UEFISYS_MP}" == "/" ]]; do
             _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
@@ -92,7 +92,7 @@ _check_efisys_part() {
         if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${_UEFISYSDEV}" "${_DESTDIR}/${_UEFISYS_MP}"
         else
-            _dialog --msgbox "${_UEFISYSDEV} is not formatted using FAT filesystem. Setup will go ahead but there might be issues using non-FAT FS for EFI System partition." 0 0
+            _dialog --msgbox "${_UEFISYSDEV} is not formatted using FAT filesystem. Setup will go ahead, but there might be issues using non-FAT FS for EFI System partition." 0 0
             mount -o rw "${_UEFISYSDEV}" "${_DESTDIR}/${_UEFISYS_MP}"
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
