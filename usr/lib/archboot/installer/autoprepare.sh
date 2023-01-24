@@ -22,6 +22,7 @@ _autoprepare() {
             return 1
         fi
     fi
+    _DEV=""
     _DEFAULTFS=""
     _CHOSENFS=""
     _UEFISYS_BOOTDEV=""
