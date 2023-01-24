@@ -63,6 +63,9 @@ _select_filesystem() {
 _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
+    elif [[ -n "${_DO_UEFISYSPART}" ]]; then
+        _dialog --menu "Select the mountpoint of your Efi System Partition (ESP) on ${_DEV}:" 15 50 12 /boot _ /efi _ 2>"${_ANSWER}" || return 1
+        _MP=$(cat "${_ANSWER}")
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
