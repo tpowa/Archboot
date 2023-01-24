@@ -187,9 +187,6 @@ _mountpoints() {
                 _check_btrfs_filesystem_creation
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
                     _SKIP_FILESYSTEM="1"
-                else
-                    _FSTYPE="vfat"
-                    _DOMKFS="1"
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
