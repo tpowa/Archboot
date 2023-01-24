@@ -81,10 +81,12 @@ _check_efisys_part() {
         fi
         #autodetect efisys mountpoint, on fail ask for mountpoint
         _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
-        if [[ "${_UEFISYS_MP}" == "/" ]]; then
-            _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /efi or /boot): " 0 0 "/efi" 2>"${_ANSWER}" || return 1
-            _UEFISYS_MP="$(cat "${_ANSWER}")"
-        fi
+        while [[ "${_UEFISYS_MP}" == "/" ]]; do
+            _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
+            if [[ "${_UEFISYS_MP}" == "/" ]]; then
+                 _dialog --yesno "Setup did not find an mounted EFI System Partition in ${_UEFISYS_MP}. Please mount the partition and confirm dialog. Retry?" 0 0 || return 1
+            fi
+        done
         umount "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
         umount "${_UEFISYSDEV}" &>"${_NO_LOG}"
         if [[ -n "${_FORMAT_UEFISYS_FAT32}" ]]; then
