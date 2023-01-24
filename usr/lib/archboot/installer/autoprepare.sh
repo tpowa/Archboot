@@ -43,7 +43,7 @@ _autoprepare() {
         _set_device_name_scheme || return 1
     fi
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP)" 10 40 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 /efi _ /boot _ 2>"${_ANSWER}" || return 1
         _UEFISYS_MP=$(cat "${_ANSWER}")
     fi
     if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
@@ -85,7 +85,7 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --inputbox "Enter the size (MB) of your EFI SYSTEM PARTITION,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --inputbox "Enter the size (MB) of your EFI SYSTEM PARTITION (ESP),\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0

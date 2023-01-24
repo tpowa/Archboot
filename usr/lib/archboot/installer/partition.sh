@@ -84,7 +84,7 @@ _check_efisys_part() {
         while [[ "${_UEFISYS_MP}" == "/" ]]; do
             _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
             if [[ "${_UEFISYS_MP}" == "/" ]]; then
-                 _dialog --yesno "Setup did not find an mounted EFI System Partition in ${_UEFISYS_MP}. Please mount the partition and confirm dialog. Retry?" 0 0 || return 1
+                 _dialog --yesno "Setup did not find an mounted EFI SYSTEM PARTITION (ESP) in ${_UEFISYS_MP}. Please mount the partition in other VC and confirm dialog. Retry?" 0 0 || return 1
             fi
         done
         umount "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
