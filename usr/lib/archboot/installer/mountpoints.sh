@@ -166,15 +166,19 @@ _mountpoints() {
         # mountpoints setting
         #
          _DO_ROOT="1"
+        [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
             if [[ -n ${_DO_ROOT} ]]; then
                 _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
+            elif [[ -n ${_DO_UEFISYSDEV} ]]; then
+                _dialog --menu "Select the device to mount as Efi System Partition (ESP):" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             else
                 _dialog --menu "Select any additional devices to mount under your new root:" 15 52 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
             [[ -n ${_DO_ROOT} ]] && _DEV_ROOT=${_DEV}
+            [[ -n ${_DO_UEFISYSDEV} ]] && _UEFISYSDEV=${_DEV}
             if [[ "${_DEV}" != "DONE" ]]; then
                 _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 # clear values first!
