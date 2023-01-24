@@ -127,7 +127,7 @@ _create_filesystem() {
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     else
-        FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
+        _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _SKIP_FILESYSTEM="1"
             _btrfs_subvolume || return 1
