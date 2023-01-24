@@ -82,7 +82,7 @@ _check_efisys_part() {
         #autodetect efisys mountpoint, on fail ask for mountpoint
         _UEFISYS_MP="/$(basename "$(mount | grep "${_UEFISYSDEV}" | cut -d " " -f 3)")"
         if [[ "${_UEFISYS_MP}" == "/" ]]; then
-            _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /boot): " 0 0 "/boot" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the mountpoint of your EFI System partition (Default is /efi or /boot): " 0 0 "/efi" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP="$(cat "${_ANSWER}")"
         fi
         umount "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
