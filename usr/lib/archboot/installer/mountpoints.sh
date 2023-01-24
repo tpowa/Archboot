@@ -253,6 +253,7 @@ _mkfs() {
     fi
     # add btrfs raid level, if needed
     # we have two main cases: "swap" and everything else.
+    _MOUNTOPTIONS=""
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
@@ -312,7 +313,6 @@ _mkfs() {
         mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
         _ssd_optimization
-        _MOUNTOPTIONS=""
         _F2FS_MOUNTOPTIONS=""
         ### f2fs mount options, taken from wiki:
         # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
@@ -321,8 +321,8 @@ _mkfs() {
         # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
         [[ "${2}" == "f2fs" ]] && _F2FS_MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
-        [[ "${2}" == "btrfs" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
-        [[ "${2}" == "btrfs" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
+        [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
+        [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
