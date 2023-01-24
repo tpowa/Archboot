@@ -61,9 +61,9 @@ _select_filesystem() {
 }
 
 _enter_mountpoint() {
-    if [[ -n "${_ROOT_DEV}" ]]; then
+    if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
-    elif [[ -n "${_UEFISYSDEV}" ]]; then
+    elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
         _dialog --menu "Select the mountpoint of your Efi System Partition (ESP) on ${_DEV}:" 15 50 12 /boot _ /efi _ 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
     else
@@ -174,14 +174,12 @@ _mountpoints() {
             #shellcheck disable=SC2086
             if [[ -n ${_DO_ROOT} ]]; then
                 _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
-                _DEV_ROOT=$(cat "${_ANSWER}")
             elif [[ -n ${_DO_UEFISYSDEV} ]]; then
                 _dialog --menu "Select the device to mount as Efi System Partition (ESP):" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
-                _UEFISYSDEV=$(cat "${_ANSWER}")
             else
                 _dialog --menu "Select any additional devices to mount under your new root:" 15 52 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
-                _DEV=$(cat "${_ANSWER}")
             fi
+            _DEV=$(cat "${_ANSWER}")
             if [[ "${_DEV}" != "DONE" ]]; then
                 _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 # clear values first!
