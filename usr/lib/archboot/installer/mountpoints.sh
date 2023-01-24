@@ -181,9 +181,9 @@ _mountpoints() {
             if [[ -n "${_DO_ROOT}" ]]; then
                 _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-                _dialog --menu "Select the device to mount as\nEfi System Partition (ESP):" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the device to mount as\nEfi System Partition (ESP):" 15 40 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             else
-                _dialog --menu "Select any additional devices to mount\nunder your new root:" 15 52 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select any additional devices to mount\nunder your new root:" 15 40 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
             if [[ "${_DEV}" != "DONE" ]]; then
