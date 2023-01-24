@@ -274,7 +274,7 @@ _autoprepare() {
         sleep 1
         # set default subvolume for systemd-gpt-autogenerator
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            btrfs subvolume set-default "${_DESTDIR}"/${_MP} || return 1
+            btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
         fi
     done
     _dialog --infobox "Auto-Prepare was successful.\nContinuing in 5 seconds..." 4 40

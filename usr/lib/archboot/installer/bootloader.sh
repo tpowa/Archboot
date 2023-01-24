@@ -293,7 +293,7 @@ _do_efistub_parameters() {
     _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
     findmnt -vno SOURCE "${_DESTDIR}/efi" | grep -qw 'systemd-1' && \
         ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
-    if mountpoint -q ${_DESTDIR}/efi ; then
+    if mountpoint -q "${_DESTDIR}/efi" ; then
         _UEFISYS_MP=efi
     else
         _UEFISYS_MP=boot
