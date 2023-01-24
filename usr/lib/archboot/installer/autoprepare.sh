@@ -157,30 +157,25 @@ _autoprepare() {
             _FSTYPE=$(cat "${_ANSWER}")
             _dialog --yesno "${_FSTYPE} will be used for\n/ and /home. Is this OK?" 0 0 && _CHOSENFS=1
         done
-        # / and /home are subvolumes on btrfs
-        if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
-            _ROOT_SIZE="7500"
-            [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="${_DISK_SIZE}"
-            while [[ -z "${_ROOTDEV_SET}" ]]; do
-            _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 10 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
-            _ROOTDEV_SIZE=$(cat "${_ANSWER}")
-                if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
-                    _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+        _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
+        _ROOT_SIZE="7500"
+        [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="${_DISK_SIZE}"
+        while [[ -z "${_ROOTDEV_SET}" ]]; do
+        _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 10 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _ROOTDEV_SIZE=$(cat "${_ANSWER}")
+            if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
+                _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+            else
+                if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
+                    _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
-                    if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
-                        _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
-                    else
-                        _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
-                    fi
+                    _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
                 fi
-            done
-        fi
+            fi
+        done
         _DEV_NUM="$((_DEV_NUM+1))"
         _ROOTDEV_NUM="${_DEV_NUM}"
-        if ! [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _DEV_NUM="$((_DEV_NUM+1))"
-        fi
+        _DEV_NUM="$((_DEV_NUM+1))"
         _HOMEDEV_NUM="${_DEV_NUM}"
         _DEFAULTFS=1
     done
@@ -208,12 +203,8 @@ _autoprepare() {
         sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
         [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
-        if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
-        else
-            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
-            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
-        fi
+        sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
+        sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -222,12 +213,8 @@ _autoprepare() {
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
-        if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
-        else
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
-        fi
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
     fi
     #shellcheck disable=SC2181
     if [[ $? -gt 0 ]]; then
@@ -278,12 +265,18 @@ _autoprepare() {
         _BTRFS_COMPRESS=""
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
-            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home" && _DOMKFS=""
+            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
             _BTRFS_COMPRESS="compress=zstd"
         fi
         _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
               "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
+        # set default subvolume for systemd-gpt-autogenerator
+         if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
+            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
+            btrfs subvolume set-default "${_BTRFS_SUBVOLUME}" "${_DESTDIR}"/${_MP} || return 1
+        fi
     done
     _dialog --infobox "Auto-Prepare was successful.\nContinuing in 5 seconds..." 4 40
     sleep 5
