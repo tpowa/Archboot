@@ -397,4 +397,6 @@ _mkfs() {
         echo -n "${_DEV} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
         _check_filesystem_fstab $@
     fi
+    # clear values
+    unset "${7}" "${8}" "${9}" "${10}" "${11}"
 }
