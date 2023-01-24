@@ -12,6 +12,9 @@ update-installer:
 setup:
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
+- new systemd compliant mounting dialogs with /efi or /boot as ESP
+- don't allow formatting of existing ESP in mountpoints
+- Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - disable unsafe menu entries on installed system
 - don't show install message in installed system
 - added new menu title if running on installed system
