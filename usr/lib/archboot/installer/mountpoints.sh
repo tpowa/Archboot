@@ -160,8 +160,8 @@ _mountpoints() {
         _DEV=$(cat "${_ANSWER}")
         if [[ "${_DEV}" != "NONE" ]]; then
             # always create swap
-            _DOMKFS=1
             _clear_fs_values
+            _DOMKFS=1
             if [[ -n "${_ASK_MOUNTPOINTS}" ]]; then
                 _create_filesystem || return 1
             fi
