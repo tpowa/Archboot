@@ -176,7 +176,7 @@ _mountpoints() {
         #
         # mountpoints setting
         #
-         _DO_ROOT="1"
+        _DO_ROOT="1"
         [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
