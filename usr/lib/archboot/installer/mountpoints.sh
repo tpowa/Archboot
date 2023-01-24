@@ -191,6 +191,8 @@ _mountpoints() {
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
+                # allow other format on old swap partition
+                [[ "${_FSTYPE}" == "swap" ]] && _FSTYPE=""
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
                     _SKIP_FILESYSTEM="1"
                 fi
