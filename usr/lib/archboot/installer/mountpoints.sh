@@ -64,7 +64,7 @@ _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
-        _dialog --menu "Select the mountpoint of your Efi System Partition (ESP) on ${_DEV}:" 15 50 12 /boot _ /efi _ 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the mountpoint of your\nEfi System Partition (ESP) on ${_DEV}:" 10 50 7 /boot _ /efi _ 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
     else
         _MP=""
@@ -104,9 +104,9 @@ _create_filesystem() {
     _BTRFS_DEVS=""
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
-    _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
+    [[ -z "${_DOMKFS}" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ -n "${_DOMKFS}" ]]; then
-        [[ "${_FSTYPE}" == "swap" ]] || _select_filesystem || return 1
+        if [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "vfat" ]] || _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
             "$(${_LSBLK} LABEL "${_DEV}")" 2>"${_ANSWER}" || return 1
@@ -172,9 +172,9 @@ _mountpoints() {
         [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            if [[ -n ${_DO_ROOT} ]]; then
+            if [[ -n "${_DO_ROOT}" ]]; then
                 _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
-            elif [[ -n ${_DO_UEFISYSDEV} ]]; then
+            elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
                 _dialog --menu "Select the device to mount as Efi System Partition (ESP):" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             else
                 _dialog --menu "Select any additional devices to mount under your new root:" 15 52 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -185,6 +185,12 @@ _mountpoints() {
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
+                if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" ]]; then
+                    _SKIP_FILESYSTEM="1"
+                else
+                    _FSTYPE="vfat"
+                    _DOMKFS="1"
+                fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                     _enter_mountpoint || return 1
