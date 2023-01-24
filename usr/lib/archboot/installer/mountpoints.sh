@@ -127,7 +127,6 @@ _create_filesystem() {
         _dialog --inputbox "Enter additional options to the filesystem creation utility.\nUse this field only, if the defaults are not matching your needs,\nelse just leave it empty." 10 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     else
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _SKIP_FILESYSTEM="1"
             _btrfs_subvolume || return 1
@@ -199,7 +198,8 @@ _mountpoints() {
                 if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _FSTYPE="vfat"
                     _DOMKFS=1
-                else
+                fi
+                if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _FSTYPE=""
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
@@ -212,6 +212,7 @@ _mountpoints() {
                         _btrfs_subvolume || return 1
                     fi
                 fi
+                [[ -z "${_DOMKFS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 _find_btrfsraid_devices
                 _btrfs_parts
                 _check_mkfs_values
