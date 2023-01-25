@@ -11,6 +11,7 @@ update-installer:
 - added network check
 setup:
 - major cleanup of blockdevice code
+- major cleanup of mountpoints code
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
 - don't format already existing ESP
 - don't format already existing swap partition
