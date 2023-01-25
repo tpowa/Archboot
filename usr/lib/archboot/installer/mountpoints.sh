@@ -205,6 +205,12 @@ _mountpoints() {
                 if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                 fi
+                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" ]]; then
+                    if [[ "${_FSTYPE}" == "vfat" ]]; then
+                        _FSTYPE=""
+                        _DOMKFS=1
+                    fi
+                fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                     _enter_mountpoint || return 1
