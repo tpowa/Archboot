@@ -11,9 +11,8 @@ _autoprepare() {
     : >/tmp/.device-names
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
-        _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
         #shellcheck disable=SC2046
-        _dialog --menu "Select the storage drive to use:" 10 40 5 $(_blockdevices _) 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the storage drive to use:" 10 40 5 $(_getavaildisks) 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
     else
         _DISK="${_DISKS}"
