@@ -226,7 +226,6 @@ _mountpoints() {
                         _btrfs_subvolume || return 1
                     fi
                 fi
-                [[ -z "${_DOMKFS}" || -n "${_ASK_MOUNTPOINTS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 _find_btrfsraid_devices
                 _btrfs_parts
                 _check_mkfs_values
@@ -236,7 +235,10 @@ _mountpoints() {
                     _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
                 else
                    # don't remove btrfs format devices on none root MP
-                   [[ ! "${_FSTYPE}" == "btrfs" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                    if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
+                        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                        #[[ -z "${_DOMKFS}" || -n "${_ASK_MOUNTPOINTS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
+                    fi
                 fi
             _DO_ROOT=""
             fi
