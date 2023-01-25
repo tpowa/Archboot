@@ -237,6 +237,8 @@ _mountpoints() {
                         fi
                         _SKIP_FILESYSTEM=1
                     fi
+                else
+                    break
                 fi
             done
             if [[ "${_DEV}" != "DONE" ]]; then
