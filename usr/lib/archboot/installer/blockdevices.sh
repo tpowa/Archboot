@@ -476,7 +476,7 @@ _createmd()
         _DEVS="$(_getavailpartitions)"
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
-                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g"
+                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
             done
         fi
         # break if all devices are in use
