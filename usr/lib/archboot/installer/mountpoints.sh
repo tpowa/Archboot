@@ -166,7 +166,7 @@ _mountpoints() {
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
             if [[ -n "${_DO_SWAP}" ]]; then
-                _dialog --menu "Select the SWAP device:" 15 45 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the SWAP PARTITION:" 15 45 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_ROOT}" ]]; then
                 _dialog --menu "Select the ROOT DEVICE /:" 15 45 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
@@ -202,9 +202,18 @@ _mountpoints() {
                         _FSTYPE="vfat"
                         _DOMKFS=1
                     fi
+                    # don't format ESP, if already vfat format
+                    if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        _SKIP_FILESYSTEM="1"
+                    fi
+                    # allow reformat. if already vfat format
+                    if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
+                    fi
                 else
-                    if [[ -n "${_DO_SWAP}" ]]; then
+                    if [[ -n "${_DO_SWAP}" && ! "${_DEV}" == "NONE" ]]; then
                         if ! [[ "${_FSTYPE}" == "swap" ]]; then
+                            _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
                             return 1
                         else
                             _DO_SWAP=""
@@ -213,20 +222,13 @@ _mountpoints() {
                             _DO_ROOT=""
                     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
                         if ! [[ "${_FSTYPE}" == "vfat" ]]; then
+                            _dialog --msgbox "Error: EFI SYSTEM PARTITION has not a vfat filesystem." 5 50
                             return 1
                         else
                             _DO_UEFISYSDEV=""
                         fi
                     fi
                     _SKIP_FILESYSTEM=1
-                fi
-                # don't format ESP, if already vfat format
-                if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
-                    _SKIP_FILESYSTEM="1"
-                fi
-                # allow reformat. if already vfat format
-                if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
-                    [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
