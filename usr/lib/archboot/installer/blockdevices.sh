@@ -474,7 +474,7 @@ _createmd()
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
         _DEVS="$(for dev in $(_getavailpartitions); do
-                echo "${_RAID_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}" _
+                echo "${_RAID_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}"
                 done)"
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
