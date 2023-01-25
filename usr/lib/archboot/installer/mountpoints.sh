@@ -158,8 +158,8 @@ _mountpoints() {
         _DEV=$(cat "${_ANSWER}")
         _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
         if [[ "${_DEV}" != "NONE" ]]; then
-            # always create swap
             _clear_fs_values
+             # create swap if not already swap formatted
             if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
                 _DOMKFS=1
                 _FSTYPE="swap"
