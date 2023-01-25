@@ -149,7 +149,7 @@ _mountpoints() {
             _set_device_name_scheme || return 1
         fi
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
-        _DEVS=$(_getavaildevices)
+        _DEVS=$(_finddevices)
         #
         # swap setting
         #

@@ -12,7 +12,7 @@ _autoprepare() {
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
-        _dialog --menu "Select the storage drive to use:" 10 40 5 $(_getavaildisks) 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the storage drive to use:" 10 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
     else
         _DISK="${_DISKS}"

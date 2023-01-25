@@ -109,7 +109,7 @@ _partition() {
     _stoplvm
     _set_guid
     # Select disk to partition
-    _DISKS=$(_getavaildisks)
+    _DISKS=$(_finddisks)
     _DISKS="${_DISKS} OTHER _ DONE +"
     _DISK=""
     while true; do
