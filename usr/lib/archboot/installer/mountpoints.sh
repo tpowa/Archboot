@@ -167,13 +167,14 @@ _mountpoints() {
             fi
             _DEV=$(cat "${_ANSWER}")
             if [[ "${_DEV}" != "DONE" ]]; then
-                _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
                 if [[ "${_DEV}" == "NONE" ]]; then
                     _DO_SWAP=""
                     _SKIP_FILESYSTEM=1
+                else
+                    _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 fi
                 if [[ -n ${_DO_SWAP} ]]; then
                     _MP="swap"
@@ -222,9 +223,11 @@ _mountpoints() {
                 _find_btrfsraid_devices
                 _btrfs_parts
                 _check_mkfs_values
-                echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                # always remove root device
-                [[ ! "${_FSTYPE}" == "btrfs" || -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                if ! [[ "${_DEV}" == "NONE" ]]; then
+                    echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    # always remove root device
+                    [[ ! "${_FSTYPE}" == "btrfs" || -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                fi
             fi
         done
         #shellcheck disable=SC2028
