@@ -740,7 +740,7 @@ _createvg()
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
             #shellcheck disable=SC2001,SC2086
-            _PVS="$(echo ${_PVS} sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_PV}")##g")"
+            _PVS="$(echo ${_PVS} | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_PV}")##g")"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
