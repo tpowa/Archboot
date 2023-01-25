@@ -610,16 +610,17 @@ _createpv()
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
-        _DEVS="$(for dev in $(_finddevices); do
-                echo "${_LVM_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}" _
-                done)"
+        _DEVS="$(_getavailpartitions)"
+        if [[ -n "${_LVM_BLACKLIST}" ]]; then
+            for dev in ${_LVM_BLACKLIST}; do
+                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
+            done
+        fi
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
             _dialog --msgbox "No devices left for physical volume creation." 0 0
             return 1
         fi
-        # show all devices with sizes
-        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         # select the first device to use
         _DEVNUMBER=1
         #shellcheck disable=SC2086
