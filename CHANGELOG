@@ -13,10 +13,11 @@ setup:
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
-- don't allow formatting of existing ESP in mountpoints
+- don't format already existing ESP
+- don't format already existing swap partition
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - disable unsafe menu entries on installed system
-- don't show install message in installed system
+- don't show install message on installed system
 - added new menu title if running on installed system
 - fixed automounted ESP and /boot detection on installed systems
 - don't ask for network, sources and mkfs on installed sytems

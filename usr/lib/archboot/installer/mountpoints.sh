@@ -155,7 +155,7 @@ _mountpoints() {
         # swap setting
         #
         #shellcheck disable=SC2086
-        _dialog --menu "Select the device to use as swap:" 15 50 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the device to use as SWAP:" 15 50 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
         _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
         if [[ "${_DEV}" != "NONE" ]]; then
@@ -181,7 +181,7 @@ _mountpoints() {
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
             if [[ -n "${_DO_ROOT}" ]]; then
-                _dialog --menu "Select the device to mount as /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
+                _dialog --menu "Select the device to mount as ROOT DEVICE /:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
                 _dialog --menu "Select the device to mount as\nEFI SYSTEM PARTITION (ESP):" 15 40 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             else
