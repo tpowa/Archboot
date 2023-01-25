@@ -637,21 +637,6 @@ _createpv()
 _findpv()
 {
     for dev in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
-         # exclude checks:
-         #-  not part of running lvm2
-         # ! "$(${_LSBLK} TYPE ${dev} | grep "lvm")"
-         #- not part of volume group
-         # $(pvs -o vg_name --noheading ${dev} | grep " $")
-         if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "lvm" && pvs -o vg_name --noheading "${dev}" | grep -q " $"; then
-             echo "${dev}"
-             [[ "${1}" ]] && echo "${1}"
-         fi
-    done
-}
-
-_getavailablepv()
-{
-    for dev in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         #-  not part of running lvm2
         # ! "$(${_LSBLK} TYPE ${dev} | grep "lvm")"
@@ -665,16 +650,6 @@ _getavailablepv()
 
 #find volume groups that are not already full in use
 _findvg()
-{
-    for dev in $(vgs -o vg_name --noheading);do
-        if ! vgs -o vg_free --noheading --units m "${dev}" | grep -q " 0m$"; then
-            echo "${dev}"
-            [[ "${1}" ]] && echo "${1}"
-        fi
-    done
-}
-
-_getavailablevg()
 {
     for dev in $(vgs -o vg_name --noheading); do
         if ! vgs -o vg_free --noheading --units m "${dev}" | grep -q " 0m$"; then
@@ -690,7 +665,7 @@ _createvg()
     while [[ "${_VGFINISH}" != "DONE" ]]; do
         : >/tmp/.pvs
         _VGDEV=""
-        _PVS=$(_getavailablepv)
+        _PVS=$(_findpv)
         # break if all devices are in use
         if [[ -z "${_PVS}" ]]; then
             _dialog --msgbox "No devices left for Volume Group creation." 0 0
@@ -746,7 +721,7 @@ _createlv()
     while [[ "${_LVFINISH}" != "DONE" ]]; do
         _LVDEV=""
         _LV_SIZE_SET=""
-        _LVS=$(_getavailablevg)
+        _LVS=$(_findvg)
         # break if all devices are in use
         if [[ -z "${_LVS}" ]]; then
             _dialog --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
