@@ -236,6 +236,8 @@ _mountpoints() {
                             else
                                 _MP_DONE=1
                             fi
+                        else
+                            _MP_DONE=1
                         fi
                         _SKIP_FILESYSTEM=1
                     fi
