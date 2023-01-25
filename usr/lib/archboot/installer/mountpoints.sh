@@ -183,26 +183,46 @@ _mountpoints() {
                 if [[ -n ${_DO_SWAP} && "${_FSTYPE}" == "swap" || "${_DEV}" == "NONE" ]]; then
                     _SKIP_FILESYSTEM=1
                 fi
-                # reformat device, if already swap partition format
-                if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
-                    _FSTYPE=""
-                    _DOMKFS=1
-                fi
-                # reformat vfat, root cannot be vfat format
-                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" && -z "${_DO_SWAP}" ]]; then
-                    if [[ "${_FSTYPE}" == "vfat" ]]; then
+                # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                if [[  -n "${_ASK_MOUNTPOINTS}" ]]; then
+                    # reformat device, if already swap partition format
+                    if [[  "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
                         _FSTYPE=""
                         _DOMKFS=1
                     fi
+                    # reformat vfat, root cannot be vfat format
+                    if [[ -n "${_DO_ROOT}" && -z "${_DO_SWAP}" ]]; then
+                        if [[ "${_FSTYPE}" == "vfat" ]]; then
+                            _FSTYPE=""
+                            _DOMKFS=1
+                        fi
+                    fi
+                    # create vfat on ESP, if not already vfat format
+                    if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        _FSTYPE="vfat"
+                        _DOMKFS=1
+                    fi
+                else
+                    if [[ -n "${_DO_SWAP}" ]]; then
+                        if ! [[ "${_FSTYPE}" == "swap" ]]; then
+                            return 1
+                        else
+                            _DO_SWAP=""
+                        fi
+                    elif [[ -n "${_DO_ROOT}" ]]; then
+                            _DO_ROOT=""
+                    elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
+                        if ! [[ "${_FSTYPE}" == "vfat" ]]; then
+                            return 1
+                        else
+                            _DO_UEFISYSDEV=""
+                        fi
+                    fi
+                    _SKIP_FILESYSTEM=1
                 fi
                 # don't format ESP, if already vfat format
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _SKIP_FILESYSTEM="1"
-                fi
-                # create vfat on ESP, if not already vfat format
-                if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
-                    _FSTYPE="vfat"
-                    _DOMKFS=1
                 fi
                 # allow reformat. if already vfat format
                 if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
