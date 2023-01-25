@@ -857,9 +857,9 @@ _enter_luks_name() {
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
     while [[ -z "${_LUKSPASSPHRASE}" ]]; do
-        _dialog --insecure --passwordbox "Enter passphrase for luks encrypted device ${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
+        _dialog --insecure --passwordbox "Enter passphrase for luks encrypted device\n${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
         _LUKSPASS=$(cat "${_ANSWER}")
-        _dialog --insecure --passwordbox "Retype passphrase for luks encrypted device ${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
+        _dialog --insecure --passwordbox "Retype passphrase for luks encrypted device\n${_DEV}:" 0 0 2>"${_ANSWER}" || return 1
         _LUKSPASS2=$(cat "${_ANSWER}")
         if [[ -n "${_LUKSPASS}" && -n "${_LUKSPASS2}" && "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
