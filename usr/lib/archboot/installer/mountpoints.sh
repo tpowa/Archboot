@@ -149,7 +149,7 @@ _mountpoints() {
             _set_device_name_scheme || return 1
         fi
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
-        _DEVS=$(_finddevices _)
+        _DEVS=$(_getavailpartitions)
         _dialog --cr-wrap --msgbox "Available devices:\n\n$(_getavailpartitions)\n" 0 0
         #
         # swap setting
