@@ -11,13 +11,13 @@ update-installer:
 - added network check
 setup:
 - major cleanup of blockdevice code
-- devices are listed with their SIZE in menus
-- added Unified Kernel Image suppport in EFISTUB menu
-- new efibootmgr routine
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
 - don't format already existing ESP
 - don't format already existing swap partition
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
+- devices are listed with their SIZE in menus
+- added Unified Kernel Image suppport in EFISTUB menu
+- new efibootmgr routine
 - disable unsafe menu entries on installed system
 - don't show install message on installed system
 - added new menu title if running on installed system
