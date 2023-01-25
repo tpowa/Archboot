@@ -150,7 +150,6 @@ _mountpoints() {
         fi
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_getavailpartitions)
-        _dialog --cr-wrap --msgbox "Available devices:\n\n$(_getavailpartitions)\n" 0 0
         #
         # swap setting
         #
@@ -170,7 +169,7 @@ _mountpoints() {
         if [[ "${_DEV}" != "NONE" ]]; then
             _check_mkfs_values
             #shellcheck disable=SC2001,SC2086
-            _DEVS="$(echo ${_DEVS} | sed -e "s#${_DEV} _##g")"
+            _DEVS="$(echo ${_DEVS} | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g")"
             echo "${_DEV}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         #
