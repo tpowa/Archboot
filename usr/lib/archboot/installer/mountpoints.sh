@@ -262,7 +262,7 @@ _mountpoints() {
                 if ! [[ "${_DEV}" == "NONE" ]]; then
                     echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                     # always remove root device
-                    [[ ! "${_FSTYPE}" == "btrfs" || -z "${_ROOT_DONE}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                    [[ ! "${_FSTYPE}" == "btrfs" || -z "${_UEFISYSDEV_DONE}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
                 fi
             fi
         done
