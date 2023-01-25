@@ -168,8 +168,7 @@ _mountpoints() {
         fi
         if [[ "${_DEV}" != "NONE" ]]; then
             _check_mkfs_values
-            #shellcheck disable=SC2001,SC2086
-            _DEVS="$(echo ${_DEVS} | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g")"
+            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
             echo "${_DEV}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
         fi
         #
@@ -192,12 +191,19 @@ _mountpoints() {
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
-                # allow other format on already swap partition format
+                # reformat device, if already swap partition format
                 if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" ]]; then
                     _FSTYPE=""
                     _DOMKFS=1
                 fi
-                # don't format ESP if already vfat format
+                # reformat vfat, root cannot be vfat format
+                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" ]]; then
+                    if [[ "${_FSTYPE}" == "vfat" ]]; then
+                        _FSTYPE=""
+                        _DOMKFS=1
+                    fi
+                fi
+                # don't format ESP, if already vfat format
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _SKIP_FILESYSTEM="1"
                 fi
@@ -206,16 +212,9 @@ _mountpoints() {
                     _FSTYPE="vfat"
                     _DOMKFS=1
                 fi
-                # allow reformat of vfat formatted device
+                # allow reformat. if already vfat format
                 if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
-                fi
-                # root cannot be vfat format
-                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" ]]; then
-                    if [[ "${_FSTYPE}" == "vfat" ]]; then
-                        _FSTYPE=""
-                        _DOMKFS=1
-                    fi
                 fi
                 # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
@@ -233,7 +232,7 @@ _mountpoints() {
                 _check_mkfs_values
                 echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                 #shellcheck disable=SC2001,SC2086
-                ! [[ "${_FSTYPE}" == "btrfs" ]] || [[ -n ${_DO_ROOT} ]] && _DEVS="$(echo ${_DEVS} | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g")"
+                ! [[ "${_FSTYPE}" == "btrfs" ]] || [[ -n ${_DO_ROOT} ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
             fi
             _DO_ROOT=""
         done
