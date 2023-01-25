@@ -167,8 +167,8 @@ _mountpoints() {
                 _create_filesystem || return 1
             fi
         fi
-        _check_mkfs_values
         if [[ "${_DEV}" != "NONE" ]]; then
+            _check_mkfs_values
             #shellcheck disable=SC2001,SC2086
             _DEVS="$(echo ${_DEVS} | sed -e "s#${_DEV} _##g")"
             echo "${_DEV}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
