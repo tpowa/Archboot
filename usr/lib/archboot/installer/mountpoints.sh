@@ -71,7 +71,7 @@ _enter_mountpoint() {
         _SWAP_DONE=1
     elif [[ -z "${_ROOT_DONE}" ]]; then
         _MP="/"
-        _ROOT_DONE="1"
+        _ROOT_DONE=1
     elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
