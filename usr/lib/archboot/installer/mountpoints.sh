@@ -157,6 +157,7 @@ _mountpoints() {
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
+        _DEV=""
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_finddevices)
         _DO_SWAP="1"
