@@ -63,6 +63,7 @@ _select_filesystem() {
 _enter_mountpoint() {
     if [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
+        _DO_ROOT=""
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
@@ -150,35 +151,14 @@ _mountpoints() {
         fi
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_finddevices)
-        #
-        # swap setting
-        #
-        #shellcheck disable=SC2086
-        _dialog --menu "Select the SWAP device:" 15 45 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
-        _DEV=$(cat "${_ANSWER}")
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-        if [[ "${_DEV}" != "NONE" ]]; then
-            _clear_fs_values
-             # create swap if not already swap formatted
-            if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
-                _DOMKFS=1
-                _FSTYPE="swap"
-                _create_filesystem || return 1
-            fi
-        fi
-        if [[ "${_DEV}" != "NONE" ]]; then
-            _check_mkfs_values
-            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
-            echo "${_DEV}:swap:swap:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-        fi
-        #
-        # mountpoints setting
-        #
+        _DO_SWAP="1"
         _DO_ROOT="1"
         [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
         while [[ "${_DEV}" != "DONE" ]]; do
             #shellcheck disable=SC2086
-            if [[ -n "${_DO_ROOT}" ]]; then
+            if [[ -n "${_DO_SWAP}" ]]; then
+                _dialog --menu "Select the SWAP device:" 15 45 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+            elif [[ -n "${_DO_ROOT}" ]]; then
                 _dialog --menu "Select the ROOT DEVICE /:" 15 45 12 ${_DEVS} 2>"${_ANSWER}" || return 1
             elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
                 _dialog --menu "Select the EFI SYSTEM PARTITION (ESP):" 15 45 12 ${_DEVS} 2>"${_ANSWER}" || return 1
@@ -186,13 +166,23 @@ _mountpoints() {
                 _dialog --menu "Select any additional devices:" 15 45 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
+            [[ "${_DEV}" == "NONE" ]] && _DO_SWAP=""
             if [[ "${_DEV}" != "DONE" ]]; then
                 _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
+                if [[ -n ${_DO_SWAP} ]]; then
+                    _MP="swap"
+                    # create swap if not already swap formatted
+                    if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
+                        _DOMKFS=1
+                        _FSTYPE="swap"
+                    fi
+                    _DO_SWAP=""
+                fi
                 # reformat device, if already swap partition format
-                if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" ]]; then
+                if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
                     _FSTYPE=""
                     _DOMKFS=1
                 fi
@@ -231,8 +221,7 @@ _mountpoints() {
                 _check_mkfs_values
                 echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                 # always remove root device
-                [[ ! "${_FSTYPE}" == "btrfs" ||  -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
-                _DO_ROOT=""
+                [[ ! "${_FSTYPE}" == "btrfs" || -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
             fi
         done
         #shellcheck disable=SC2028
