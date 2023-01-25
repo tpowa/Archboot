@@ -713,7 +713,7 @@ _createvg()
     while [[ "${_VGFINISH}" != "DONE" ]]; do
         : >/tmp/.pvs
         _VGDEV=""
-        _PVS=$(_findpv _)
+        _PVS=$(_getavailablepv)
         # break if all devices are in use
         if [[ -z "${_PVS}" ]]; then
             _dialog --msgbox "No devices left for Volume Group creation." 0 0
@@ -730,8 +730,6 @@ _createvg()
             fi
         done
         # show all devices with sizes, which are not in use
-        #shellcheck disable=SC2086
-        _dialog --cr-wrap --msgbox "Physical Volumes:\n$(_getavailablepv)" 0 0
         # select the first device to use, no missing option available!
         _PVNUMBER=1
         #shellcheck disable=SC2086
@@ -742,7 +740,7 @@ _createvg()
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
             #shellcheck disable=SC2001,SC2086
-            _PVS="$(echo ${_PVS} | sed -e "s#${_PV} _##g")"
+            _PVS="$(echo ${_PVS} sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_PV}")##g")"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -771,14 +769,13 @@ _createlv()
     while [[ "${_LVFINISH}" != "DONE" ]]; do
         _LVDEV=""
         _LV_SIZE_SET=""
-        _LVS=$(_findvg _)
+        _LVS=$(_getavailablevg)
         # break if all devices are in use
         if [[ -z "${_LVS}" ]]; then
             _dialog --msgbox "No Volume Groups with free space available for Logical Volume creation." 0 0
             return 1
         fi
         # show all devices with sizes, which are not 100% in use!
-        _dialog --cr-wrap --msgbox "Volume Groups:\n$(_getavailablevg)" 0 0
         #shellcheck disable=SC2086
         _dialog --menu "Select Volume Group:" 11 50 5 ${_LVS} 2>"${_ANSWER}" || return 1
         _LV=$(cat "${_ANSWER}")
