@@ -10,6 +10,8 @@ Environment changes:
 update-installer:
 - added network check
 setup:
+- major cleanup of blockdevice code
+- devices are listed with their SIZE in menus
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
