@@ -50,7 +50,7 @@ _select_filesystem() {
     command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
     command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
     command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
-    command -v mkfs.vfat &>"${_NO_LOG}" && [[ -z "${_DO_ROOT}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
+    command -v mkfs.vfat &>"${_NO_LOG}" && [[ -n "${_ROOT_DONE}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
     command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
     command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
     command -v mkfs.ext3 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
@@ -61,21 +61,21 @@ _select_filesystem() {
 }
 
 _enter_mountpoint() {
-    if [[ -n "${_DO_SWAP}" ]]; then
+    if [[ -z "${_SWAP_DONE}" ]]; then
         _MP="swap"
         # create swap if not already swap formatted
         if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
             _DOMKFS=1
             _FSTYPE="swap"
         fi
-        _DO_SWAP=""
-    elif [[ -n "${_DO_ROOT}" ]]; then
+        _SWAP_DONE=1
+    elif [[ -z "${_ROOT_DONE}" ]]; then
         _MP="/"
-        _DO_ROOT=""
-    elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
+        _ROOT_DONE="1"
+    elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP) on ${_DEV}:" 10 50 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
-        _DO_UEFISYSDEV=""
+        _UEFISYSDEV_DONE=""
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
@@ -151,27 +151,24 @@ _mountpoints() {
         : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
-        #
-        # Select mountpoints
-        #
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
         _DEV=""
         _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_finddevices)
-        _DO_SWAP="1"
-        _DO_ROOT="1"
-        [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
+        _SWAP_DONE=""
+        _ROOT_DONE=""
+        [[ -n ${_UEFI_BOOT} ]] && _UEFISYSDEV_DONE=""
         while [[ "${_DEV}" != "DONE" ]]; do
-            _FS_FAILED=1
-            while [[ -n "${_FS_FAILED}" ]]; do
+            _MP_DONE=""
+            while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
-                if [[ -n "${_DO_SWAP}" ]]; then
+                if [[ -z "${_SWAP_DONE}" ]]; then
                     _dialog --menu "Select the SWAP PARTITION:" 15 45 12 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
-                elif [[ -n "${_DO_ROOT}" ]]; then
+                elif [[ -z "${_ROOT_DONE}" ]]; then
                     _dialog --menu "Select the ROOT DEVICE /:" 15 45 12 ${_DEVS} 2>"${_ANSWER}" || return 1
-                elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
+                elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                     _dialog --menu "Select the EFI SYSTEM PARTITION (ESP):" 15 45 12 ${_DEVS} 2>"${_ANSWER}" || return 1
                 else
                     _dialog --menu "Select any additional devices:" 15 45 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -182,57 +179,62 @@ _mountpoints() {
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
                     [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-                    if [[ -n ${_DO_SWAP} && "${_FSTYPE}" == "swap" || "${_DEV}" == "NONE" ]]; then
+                    if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" || "${_DEV}" == "NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi
                     # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                     if [[  -n "${_ASK_MOUNTPOINTS}" ]]; then
-                        _FS_FAILED=""
+                        _MP_DONE=1
                         # reformat device, if already swap partition format
-                        if [[  "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
+                        if [[  "${_FSTYPE}" == "swap" && -n "${_SWAP_DONE}" ]]; then
                             _FSTYPE=""
                             _DOMKFS=1
                         fi
                         # reformat vfat, root cannot be vfat format
-                        if [[ -n "${_DO_ROOT}" && -z "${_DO_SWAP}" ]]; then
+                        if [[ -z "${_ROOT_DONE}" && -n "${_SWAP_DONE}" ]]; then
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _FSTYPE=""
                                 _DOMKFS=1
                             fi
                         fi
                         # create vfat on ESP, if not already vfat format
-                        if [[ ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        if [[ ! "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             _FSTYPE="vfat"
                             _DOMKFS=1
                         fi
                         # don't format ESP, if already vfat format
-                        if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        if [[ "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             _SKIP_FILESYSTEM="1"
                         fi
                         # allow reformat. if already vfat format
-                        if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                         fi
                     else
-                        if [[ -n "${_DO_SWAP}" ]]; then
+                        if [[ -z "${_SWAP_DONE}" ]]; then
                             if ! [[ "${_DEV}" == "NONE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
                                     _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
-                                    _FS_FAILED=1
+                                    _MP_DONE=""
                                 else
-                                    _FS_FAILED=""
+                                    _MP_DONE=1
                                 fi
                             else
-                                _FS_FAILED=""
+                                _MP_DONE=1
                             fi
-                        elif [[ -n "${_DO_ROOT}" ]]; then
-                            _FS_FAILED=""
-                        elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
+                        elif [[ -z "${_ROOT_DONE}" ]]; then
+                            if [[ "${_FSTYPE}" == "vfat" ]]; then
+                                _dialog --msgbox "Error: ROOT DEVICE has a vfat filesystem." 5 50
+                                _MP_DONE=""
+                            else
+                                _MP_DONE=1
+                            fi
+                        elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --msgbox "Error: EFI SYSTEM PARTITION has not a vfat filesystem." 5 50
-                                _FS_FAILED=1
+                                _MP_DONE=""
                             else
-                                _FS_FAILED=""
+                                _MP_DONE=1
                             fi
                         fi
                         _SKIP_FILESYSTEM=1
@@ -258,7 +260,7 @@ _mountpoints() {
                 if ! [[ "${_DEV}" == "NONE" ]]; then
                     echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                     # always remove root device
-                    [[ ! "${_FSTYPE}" == "btrfs" || -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                    [[ ! "${_FSTYPE}" == "btrfs" || -z "${_ROOT_DONE}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
                 fi
             fi
         done
