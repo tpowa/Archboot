@@ -111,7 +111,6 @@ _partition() {
     # Select disk to partition
     _DISKS=$(_getavaildisks)
     _DISKS="${_DISKS} OTHER _ DONE +"
-    _dialog --cr-wrap --msgbox "Available Disks:\n\n$(_getavaildisks)\n" 0 0
     _DISK=""
     while true; do
         # Prompt the user with a list of known disks
