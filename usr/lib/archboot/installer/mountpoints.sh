@@ -220,15 +220,13 @@ _mountpoints() {
                                     _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
                                     _FS_FAILED=1
                                 else
-                                    _DO_SWAP=""
                                     _FS_FAILED=""
                                 fi
                             else
-                                _DO_SWAP=""
                                 _FS_FAILED=""
                             fi
                         elif [[ -n "${_DO_ROOT}" ]]; then
-                            _DO_ROOT=""
+                            _FS_FAILED=""
                         elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --msgbox "Error: EFI SYSTEM PARTITION has not a vfat filesystem." 5 50
