@@ -919,16 +919,18 @@ _createluks()
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
-        _DEVS="$(for dev in $(_finddevices); do
-                echo "${_LUKS_BLACKLIST}" | grep -wq "${dev}" || echo "${dev}" _
-                done)"
+         _DEVS="$(_getavailpartitions)"
+        if [[ -n "${_LUKS_BLACKLIST}" ]]; then
+            for dev in ${_LUKS_BLACKLIST}; do
+                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
+            done
+        fi
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
             _dialog --msgbox "No devices left for luks encryption." 0 0
             return 1
         fi
         # show all devices with sizes
-        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)\n\n" 0 0
         #shellcheck disable=SC2086
         _dialog --menu "Select device for luks encryption:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
