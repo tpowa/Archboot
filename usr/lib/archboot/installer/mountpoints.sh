@@ -179,7 +179,7 @@ _mountpoints() {
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
                 [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-                if [[ -n ${_DO_SWAP} && "${_FSTYPE}" == "swap" ]]; then
+                if [[ -n ${_DO_SWAP} && "${_FSTYPE}" == "swap" || "${_DEV}" == "NONE" ]]; then
                     _SKIP_FILESYSTEM=1
                 fi
                 # reformat device, if already swap partition format
