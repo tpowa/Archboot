@@ -61,7 +61,15 @@ _select_filesystem() {
 }
 
 _enter_mountpoint() {
-    if [[ -n "${_DO_ROOT}" ]]; then
+    if [[ -n "${_DO_SWAP}" ]]; then
+        _MP="swap"
+        # create swap if not already swap formatted
+        if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
+            _DOMKFS=1
+            _FSTYPE="swap"
+        fi
+        _DO_SWAP=""
+    elif [[ -n "${_DO_ROOT}" ]]; then
         _MP="/"
         _DO_ROOT=""
     elif [[ -n "${_DO_UEFISYSDEV}" ]]; then
@@ -170,20 +178,9 @@ _mountpoints() {
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
-                if [[ "${_DEV}" == "NONE" ]]; then
-                    _DO_SWAP=""
+                [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
+                if [[ -n ${_DO_SWAP} && "${_FSTYPE}" == "swap" ]]; then
                     _SKIP_FILESYSTEM=1
-                else
-                    _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-                fi
-                if [[ -n ${_DO_SWAP} ]]; then
-                    _MP="swap"
-                    # create swap if not already swap formatted
-                    if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
-                        _DOMKFS=1
-                        _FSTYPE="swap"
-                    fi
-                    _DO_SWAP=""
                 fi
                 # reformat device, if already swap partition format
                 if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
@@ -191,7 +188,7 @@ _mountpoints() {
                     _DOMKFS=1
                 fi
                 # reformat vfat, root cannot be vfat format
-                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" ]]; then
+                if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" && -z "${_DO_SWAP}" ]]; then
                     if [[ "${_FSTYPE}" == "vfat" ]]; then
                         _FSTYPE=""
                         _DOMKFS=1
