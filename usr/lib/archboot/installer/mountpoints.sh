@@ -214,7 +214,7 @@ _mountpoints() {
                         if [[ -z "${_SWAP_DONE}" ]]; then
                             if ! [[ "${_DEV}" == "NONE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
-                                    _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
+                                    _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 60
                                     _MP_DONE=""
                                 else
                                     _MP_DONE=1
@@ -224,14 +224,14 @@ _mountpoints() {
                             fi
                         elif [[ -z "${_ROOT_DONE}" ]]; then
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
-                                _dialog --msgbox "Error: ROOT DEVICE has a vfat filesystem." 5 50
+                                _dialog --msgbox "Error: ROOT DEVICE has a vfat filesystem." 5 60
                                 _MP_DONE=""
                             else
                                 _MP_DONE=1
                             fi
                         elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
-                                _dialog --msgbox "Error: EFI SYSTEM PARTITION has not a vfat filesystem." 5 50
+                                _dialog --msgbox "Error: EFI SYSTEM PARTITION has not a vfat filesystem." 5 60
                                 _MP_DONE=""
                             else
                                 _MP_DONE=1
