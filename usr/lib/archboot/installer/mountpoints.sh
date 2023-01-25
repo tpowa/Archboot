@@ -214,10 +214,15 @@ _mountpoints() {
                             [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                         fi
                     else
-                        if [[ -n "${_DO_SWAP}" && ! "${_DEV}" == "NONE" ]]; then
-                            if ! [[ "${_FSTYPE}" == "swap" ]]; then
-                                _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
-                                _FS_FAILED=1
+                        if [[ -n "${_DO_SWAP}" ]]; then
+                            if ! [[ "${_DEV}" == "NONE" ]]; then
+                                if ! [[ "${_FSTYPE}" == "swap" ]]; then
+                                    _dialog --msgbox "Error: SWAP PARTITION has not a swap filesystem." 5 50
+                                    _FS_FAILED=1
+                                else
+                                    _DO_SWAP=""
+                                    _FS_FAILED=""
+                                fi
                             else
                                 _DO_SWAP=""
                                 _FS_FAILED=""
