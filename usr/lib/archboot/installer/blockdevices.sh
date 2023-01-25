@@ -87,8 +87,7 @@ _raid_devices() {
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
         if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member" && ! find "$dev"*p* -type f -exec echo {} \; 2>"${_NO_LOG}"; then
-            echo "${dev}"
-            [[ "${1}" ]] && echo "${1}"
+            ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
 }
@@ -110,8 +109,7 @@ _partitionable_raid_devices_partitions() {
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
         if ! ${_LSBLK} FSTYPE "${part}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${part}" | grep -q "crypto_LUKS" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${part}" | grep -q "Extended$" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${part}" | grep -q "(LBA)$" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"; then
-            echo "${part}"
-            [[ "${1}" ]] && echo "${1}"
+            ${_LSBLK} NAME,SIZE -d "${part}"
         fi
     done
 }
@@ -475,7 +473,7 @@ _createmd()
         _dialog --infobox "Scanning blockdevices..." 3 40
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _DEVS="$(for dev in $(_finddevices); do
+        _DEVS="$(for dev in $(_getavailpartitions); do
                 echo "${_RAID_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}" _
                 done)"
         # break if all devices are in use
