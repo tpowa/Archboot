@@ -283,7 +283,7 @@ _getavaildisks()
     done
 }
 
-_getavailpartitions()
+_getavaildevices()
 {
     #shellcheck disable=SC2119
     for dev in $(_finddevices); do
@@ -473,7 +473,7 @@ _createmd()
         _dialog --infobox "Scanning blockdevices..." 3 40
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _DEVS="$(_getavailpartitions)"
+        _DEVS="$(_getavaildevices)"
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
                 _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
@@ -610,7 +610,7 @@ _createpv()
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
-        _DEVS="$(_getavailpartitions)"
+        _DEVS="$(_getavaildevices)"
         if [[ -n "${_LVM_BLACKLIST}" ]]; then
             for dev in ${_LVM_BLACKLIST}; do
                 _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
@@ -902,7 +902,7 @@ system by inserting a bootable medium, for example. Encrypting the root\n
 partition prevents anyone from using this method to insert viruses or\n
 trojans onto your computer.\n\n
 ATTENTION:\n
-Having encrypted partitions does not protect you from all possible\n
+Having encrypted devices does not protect you from all possible\n
 attacks. The encryption is only as good as your key management, and there\n
 are other ways to break into computers, while they are running." 0 0
 }
@@ -919,7 +919,7 @@ _createluks()
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
-         _DEVS="$(_getavailpartitions)"
+         _DEVS="$(_getavaildevices)"
         if [[ -n "${_LUKS_BLACKLIST}" ]]; then
             for dev in ${_LUKS_BLACKLIST}; do
                 _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
