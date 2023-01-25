@@ -38,8 +38,11 @@ _blockdevices() {
         #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
         # - zram devices
         #  echo "${dev}" | grep -q 'zram'
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "iso9660" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "ddf_raid_member" && ! echo "${dev}" | grep -q 'zram'; then
-            ${_LSBLK} NAME,SIZE -d "${dev}"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "iso9660" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "ddf_raid_member" &&\
+            ! echo "${dev}" | grep -q 'zram'; then
+                ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
      done
 }
@@ -65,8 +68,14 @@ _blockdevices_partitions() {
         #  sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "BIOS boot$"
         #- iso9660 devices
         #  "${_LSBLK} FSTYPE -s ${dev} | grep "iso9660"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE -s "${dev}" | grep -q "iso9660" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "BIOS boot$"; then
-            ${_LSBLK} NAME,SIZE -d "${dev}"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
+            ! ${_LSBLK} FSTYPE -s "${dev}" | grep -q "iso9660" &&\
+            ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" &&\
+            ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" &&\
+            ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "BIOS boot$"; then
+                ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     _printk on
@@ -84,8 +93,12 @@ _raid_devices() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member" && ! find "$dev"*p* -type f -exec echo {} \; 2>"${_NO_LOG}"; then
-            ${_LSBLK} NAME,SIZE -d "${dev}"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member" &&\
+            ! find "$dev"*p* -type f -exec echo {} \; 2>"${_NO_LOG}"; then
+                ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
 }
@@ -106,8 +119,13 @@ _partitionable_raid_devices_partitions() {
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
         # - part of ddf fakeraid
         #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" && ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" && ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"; then
-            ${_LSBLK} NAME,SIZE -d "${dev}"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
+            ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" &&\
+            ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"; then
+                ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
 }
@@ -156,8 +174,11 @@ _dm_devices() {
         #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
         # - part of running raid on encrypted device
         #   ${_LSBLK} TYPE ${dev} | grep "raid.*$
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" && ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member$" && ! ${_LSBLK} TYPE "${dev}" | grep -q "raid.*$"; then
-            ${_LSBLK} NAME,SIZE -d "${dev}"
+        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member$" &&\
+            ! ${_LSBLK} TYPE "${dev}" | grep -q "raid.*$"; then
+                ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
 }

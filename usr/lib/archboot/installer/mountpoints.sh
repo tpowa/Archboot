@@ -408,7 +408,7 @@ _mkfs() {
     # https://www.freedesktop.org/software/systemd/man/systemd-gpt-auto-generator.html
     # systemd supports detection on GPT disks:
     # GRUB and rEFInd don't support /efi automount!
-    # disabled for now this  check: "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
+    # disabled for now this check: "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
     # /boot or /efi as ESP: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
     # /boot as Extended Boot Loader Partition: bc13c2ff-59e6-4262-a352-b275fd6f7172
     # swap:  0657fd6d-a4ab-43c4-84e5-0933c84b4f4f
@@ -417,8 +417,13 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     if [[ -z "${_MOUNTOPTIONS}" ]]; then
-        _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID | grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
-        if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" && "${5}" == "/home" || "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" || "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" || "${_GUID_VALUE}" == "bc13c2ff-59e6-4262-a352-b275fd6f7172" && "${5}" == "/boot" || "${5}" == "/" ]]; then
+        _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID |\
+                    grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
+        if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" && "${5}" == "/home" ||\
+                "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" ||\
+                "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" ||\
+                "${_GUID_VALUE}" == "bc13c2ff-59e6-4262-a352-b275fd6f7172" && "${5}" == "/boot" ||\
+                "${5}" == "/" ]]; then
             echo -n "${_DEV} ${5} ${2} defaults 0 " >>/tmp/.fstab
             _check_filesystem_fstab "$@"
         fi
