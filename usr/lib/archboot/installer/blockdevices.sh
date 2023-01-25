@@ -607,7 +607,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
+            _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${_DEV}")||"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
