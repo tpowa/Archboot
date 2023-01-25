@@ -453,7 +453,7 @@ _createmd()
         _DEVS="$(_finddevices)"
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
-                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
+                _DEVS="_DEVS/$(${_LSBLK} NAME,SIZE -d "${dev}")//"
             done
         fi
         # break if all devices are in use
@@ -590,7 +590,7 @@ _createpv()
         _DEVS="$(_finddevices)"
         if [[ -n "${_LVM_BLACKLIST}" ]]; then
             for dev in ${_LVM_BLACKLIST}; do
-                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
+                _DEVS="_DEVS/$(${_LSBLK} NAME,SIZE -d "${dev}")//"
             done
         fi
         # break if all devices are in use
@@ -607,7 +607,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${_DEV}")||"
+            _DEVS="_DEVS/$(${_LSBLK} NAME,SIZE -d "${_DEV}")//"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -874,7 +874,7 @@ _createluks()
          _DEVS="$(_finddevices)"
         if [[ -n "${_LUKS_BLACKLIST}" ]]; then
             for dev in ${_LUKS_BLACKLIST}; do
-                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
+                _DEVS="_DEVS/$(${_LSBLK} NAME,SIZE -d "${dev}")//"
             done
         fi
         # break if all devices are in use
