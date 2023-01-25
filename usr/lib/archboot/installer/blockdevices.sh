@@ -447,7 +447,7 @@ _createmd()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 50
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
         _DEVS="$(_finddevices)"
@@ -581,7 +581,7 @@ _createpv()
     while [[ "${_PVFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.pvs-create
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 50
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
                     echo "${dev}"
@@ -865,7 +865,7 @@ _createluks()
     _LUKSFINISH=""
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
         _activate_special_devices
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 50
+        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
         _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     echo "${dev}"
