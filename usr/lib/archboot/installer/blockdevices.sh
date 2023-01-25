@@ -268,22 +268,6 @@ _clean_disk() {
     partprobe "${1}" &>"${_NO_LOG}"
 }
 
-_finddisks()
-{
-    #shellcheck disable=SC2119
-    for dev in $(_finddisks); do
-        ${_LSBLK} NAME,SIZE -d "${dev}"
-    done
-}
-
-_finddevices()
-{
-    #shellcheck disable=SC2119
-    for dev in $(_finddevices); do
-        ${_LSBLK} NAME,SIZE -d "${dev}"
-    done
-}
-
 # Disable swap and all mounted partitions for the destination system. Unmount
 # the destination root partition last!
 _umountall()
@@ -469,7 +453,7 @@ _createmd()
         _DEVS="$(_finddevices)"
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
-                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
+                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
             done
         fi
         # break if all devices are in use
@@ -606,7 +590,7 @@ _createpv()
         _DEVS="$(_finddevices)"
         if [[ -n "${_LVM_BLACKLIST}" ]]; then
             for dev in ${_LVM_BLACKLIST}; do
-                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
+                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
             done
         fi
         # break if all devices are in use
@@ -623,7 +607,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g")"
+            _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -915,7 +899,7 @@ _createluks()
          _DEVS="$(_finddevices)"
         if [[ -n "${_LUKS_BLACKLIST}" ]]; then
             for dev in ${_LUKS_BLACKLIST}; do
-                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g")"
+                _DEVS="_DEVS|$(${_LSBLK} NAME,SIZE -d "${dev}")||"
             done
         fi
         # break if all devices are in use
