@@ -166,12 +166,15 @@ _mountpoints() {
                 _dialog --menu "Select any additional devices:" 15 45 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
-            [[ "${_DEV}" == "NONE" ]] && _DO_SWAP=""
             if [[ "${_DEV}" != "DONE" ]]; then
                 _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
+                if [[ "${_DEV}" == "NONE" ]]; then
+                    _DO_SWAP=""
+                    _SKIP_FILESYSTEM=1
+                fi
                 if [[ -n ${_DO_SWAP} ]]; then
                     _MP="swap"
                     # create swap if not already swap formatted
