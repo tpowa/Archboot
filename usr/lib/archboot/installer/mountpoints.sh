@@ -192,22 +192,25 @@ _mountpoints() {
                 # clear values first!
                 _clear_fs_values
                 _check_btrfs_filesystem_creation
-                # allow other format on old swap partition
+                # allow other format on already swap partition format
                 if [[  -n "${_ASK_MOUNTPOINTS}" && "${_FSTYPE}" == "swap" ]]; then
                     _FSTYPE=""
                     _DOMKFS=1
                 fi
+                # don't format ESP if already vfat format
                 if [[ "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     _SKIP_FILESYSTEM="1"
                 fi
+                # create vfat on ESP, if not already vfat format
                 if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "vfat" && -n "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
-                    # create vfat, if not already vfat format
                     _FSTYPE="vfat"
                     _DOMKFS=1
                 fi
+                # allow reformat of vfat formatted device
                 if [[ -z "${_DO_UEFISYSDEV}" && -z "${_DO_ROOT}" ]]; then
                     [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                 fi
+                # root cannot be vfat format
                 if [[  -n "${_ASK_MOUNTPOINTS}" && -n "${_DO_ROOT}" ]]; then
                     if [[ "${_FSTYPE}" == "vfat" ]]; then
                         _FSTYPE=""
