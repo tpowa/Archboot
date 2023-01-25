@@ -164,6 +164,7 @@ _mountpoints() {
         _DO_ROOT="1"
         [[ -n ${_UEFI_BOOT} ]] && _DO_UEFISYSDEV=1
         while [[ "${_DEV}" != "DONE" ]]; do
+            _FS_FAILED=1
             while [[ -n "${_FS_FAILED}" ]]; do
                 #shellcheck disable=SC2086
                 if [[ -n "${_DO_SWAP}" ]]; then
@@ -186,6 +187,7 @@ _mountpoints() {
                     fi
                     # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                     if [[  -n "${_ASK_MOUNTPOINTS}" ]]; then
+                        _FS_FAILED=""
                         # reformat device, if already swap partition format
                         if [[  "${_FSTYPE}" == "swap" && -z "${_DO_SWAP}" ]]; then
                             _FSTYPE=""
