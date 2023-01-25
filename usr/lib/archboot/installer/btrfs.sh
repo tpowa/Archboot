@@ -132,7 +132,7 @@ _select_btrfsraid_devices () {
     : >/tmp/.btrfs-devices
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     #shellcheck disable=SC2001,SC2086
-    _BTRFS_DEVS=$(echo ${_DEVS} | sed -e "s#${_BTRFS_DEV}\ _##g")
+    _BTRFS_DEVS=${_DEVS//${_BTRFS_DEV}\ _/}
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
     _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
@@ -147,8 +147,7 @@ _select_btrfsraid_devices () {
         [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] && _BTRFS_DONE="DONE _"
         [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" ]] && _BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        #shellcheck disable=SC2001,SC2086
-        _BTRFS_DEVS=$(echo ${_BTRFS_DEVS} | sed -e "s#${_BTRFS_DEV}\ _##g")
+        _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
         # add more devices
         #shellcheck disable=SC2086
         _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1
@@ -224,7 +223,7 @@ _choose_btrfs_subvolume () {
     _subvolumes_in_use
     for i in ${_SUBVOLUME_IN_USE}; do
         #shellcheck disable=SC2001,SC2086
-        _SUBVOLUMES="$(echo ${_SUBVOLUMES} | sed -e "s#${i} _##g")"
+        _SUBVOLUMES="${_SUBVOLUMES}//${i} _/}"
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086
