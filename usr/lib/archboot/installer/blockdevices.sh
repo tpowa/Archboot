@@ -473,9 +473,10 @@ _createmd()
         _dialog --infobox "Scanning blockdevices..." 3 40
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
-        _DEVS="$(for dev in $(_getavailpartitions); do
-                echo "${_RAID_BLACKLIST}" | grep -qw "${dev}" || echo "${dev}"
-                done)"
+        _DEVS="$(_getavailpartitions)"
+        for dev in ${_RAID_BLACKLIST}; do
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${dev}")##g"
+        done
         # break if all devices are in use
         if [[ -z "${_DEVS}" ]]; then
             _dialog --msgbox "All devices in use. No more devices left for new creation." 0 0
