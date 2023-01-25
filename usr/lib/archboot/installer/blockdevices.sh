@@ -512,7 +512,7 @@ _createmd()
         while [[ "${_DEV}" != "DONE" ]]; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}"##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
             # add more devices
