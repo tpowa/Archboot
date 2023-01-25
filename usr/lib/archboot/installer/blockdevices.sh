@@ -503,9 +503,6 @@ _createmd()
             _dialog --menu "Select the parity layout you want to use (default is left-symmetric):" 21 50 13 ${_PARITYLEVELS} 2>"${_ANSWER}" || return 1
             _PARITY=$(cat "${_ANSWER}")
         fi
-        _dialog --infobox "Scanning blockdevices..." 3 40
-        # show all devices with sizes
-        _dialog --cr-wrap --msgbox "DISKS:\n$(_getavaildisks)\n\nPARTITIONS:\n$(_getavailpartitions)" 0 0
         # select the first device to use, no missing option available!
         _RAIDNUMBER=1
         #shellcheck disable=SC2086
@@ -515,7 +512,7 @@ _createmd()
         while [[ "${_DEV}" != "DONE" ]]; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#${_DEV}\ _##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}"##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
             # add more devices
