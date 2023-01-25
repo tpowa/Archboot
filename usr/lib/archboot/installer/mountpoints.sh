@@ -231,16 +231,8 @@ _mountpoints() {
                 _check_mkfs_values
                 echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                 # always remove root device
-                if [[ -n "${_DO_ROOT}" ]]; then
-                    _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
-                else
-                   # don't remove btrfs format devices on none root MP
-                    if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
-                        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
-                        #[[ -z "${_DOMKFS}" || -n "${_ASK_MOUNTPOINTS}" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-                    fi
-                fi
-            _DO_ROOT=""
+                [[ ! "${_FSTYPE}" == "btrfs" ||  -n "${_DO_ROOT}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                _DO_ROOT=""
             fi
         done
         #shellcheck disable=SC2028
