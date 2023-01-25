@@ -231,10 +231,15 @@ _mountpoints() {
                 _btrfs_parts
                 _check_mkfs_values
                 echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                #shellcheck disable=SC2001,SC2086
-                [[ ! "${_FSTYPE}" == "btrfs" || -n ${_DO_ROOT} ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
-            fi
+                # always remove root device
+                if [[ -n "${_DO_ROOT}" ]]; then
+                    _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                else
+                   # don't remove btrfs format devices on none root MP
+                   [[ ! "${_FSTYPE}" == "btrfs" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                fi
             _DO_ROOT=""
+            fi
         done
         #shellcheck disable=SC2028
         _dialog --yesno "Would you like to create and mount the filesytems like this?\n\nSyntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
