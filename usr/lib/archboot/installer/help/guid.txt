@@ -1,14 +1,15 @@
+ATTENTION:\n
+----------\n
 You are running in BIOS/MBR mode.\n\n
 Do you want to use GUID Partition Table (GPT)?\n\n
-It is a standard for the layout of the partition table on a physical storage disk.
-Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard,
-it is also used on some BIOS systems because of the limitations of MBR
-aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\n
-Windows 10 and later versions include the capability to use GPT for
-non-boot aka data disks (only UEFI systems can boot Windows 10 and later from GPT disks).\n\n
+As a part of the Unified Extensible Firmware Interface (UEFI) standard,\n
+it is also be used on BIOS systems because of the limitations of MBR\n
+aka BIOS/MS-DOS partition tables, which restrict maximum disk size to 2TB.\n
+Windows 10 and later versions include the capability, to boot from a GPT\n
+disk.\n\n
 Attention:\n
 - Please check if your other operating systems have GPT support!\n
 - Use this option for a GRUB(2) setup, which should support LVM, RAID\n
   etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n
-- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n
-  bootloader used).
+- BIOS-GPT boot may not work on some old Lenovo systems (irrespective of\n
+  the bootloader used).
