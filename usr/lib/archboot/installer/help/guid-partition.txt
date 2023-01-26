@@ -5,8 +5,8 @@ You should make the following scheme:\n
     RAM Size:               Recommendation:\n
     ---------------------------------------\n
     - < 2GB         -->     2X RAM\n
-    - 2GB – 8GB     -->     = RAM\n
-    - 8GB – 64GB    -->     4G to 0.5X RAM\n
+    - 2GB - 8GB     -->     = RAM\n
+    - 8GB - 64GB    -->     4G to 0.5X RAM\n
     - >64GB         -->     Minimum 4GB\n
     ---------------------------------------\n
 - 1 EFI SYSTEM PARTITION (ESP) (Minimum >= 260MB)\n
