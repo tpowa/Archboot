@@ -2,16 +2,16 @@ LOGICAL VOLUME SUMMARY:\n
 -----------------------------\n\n
 LVM2 is a Logical Volume Manager for the Linux kernel. With LVM you can\n
 abstract your storage space and have "virtual partitions" which are easier\n
-to modify.\n\nThe basic building block of LVM2 are:\n
-- Physical volume (PV):\n
+to modify.\n\n
+- Physical volume (PV):\n\n
   Partition on storage disk (or even storage disk itself or loopback file)\n
   on which you can have virtual groups. It has a special header and is\n
   divided into physical extents. Think of physical volumes as big building\n
   blocks which can be used to build your storage drive.\n
-- Volume group (VG):\n
+- Volume group (VG):\n\n
   Group of physical volumes that are used as storage volume (as one disk).\n
   They contain logical volumes. Think of volume groups as storage drives.\n
-- Logical volume(LV):\n
+- Logical volume(LV):\n\n
   A "virtual/logical partition" that resides in a volume group and is\n
   composed of physical extents. Think of logical volumes as normal par-\n
   titions.

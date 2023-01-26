@@ -14,6 +14,8 @@ update-installer:
 setup:
 - major cleanup of blockdevice code
 - major cleanup of mountpoints code
+- outsourced help texts to files
+- added new help texts for partitioning GUID and BIOS/MBR
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
 - don't format already existing ESP
 - don't format already existing swap partition
