@@ -1,5 +1,5 @@
-Now you'll be put into cfdisk where you can partition your storage drive.\n\n
-You should consider the following scheme:\n
+Now you'll be put into cfdisk, where you can partition your storage drive.\n\n
+You should consider the following GUID partition scheme:\n
 ---------------------------------------------------------------\n
 BIOS_GRUB PARTITION            -->            exact 2MB\n
 ---------------------------------------------------------------\n
