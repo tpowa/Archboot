@@ -159,7 +159,11 @@ _mountpoints() {
         _DEVS=$(_finddevices)
         _SWAP_DONE=""
         _ROOT_DONE=""
-        [[ -n ${_UEFI_BOOT} ]] && _UEFISYSDEV_DONE=""
+        if [[ -n ${_UEFI_BOOT} ]];then
+            _UEFISYSDEV_DONE=""
+        else
+            _UEFISYSDEV_DONE=1
+        fi
         while [[ "${_DEV}" != "DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
