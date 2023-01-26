@@ -40,7 +40,7 @@ _do_vconsole() {
 
 _set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
-        _FONTS="latarcyrheb-sun32 Worldwide ter-v32n Terminus"
+        _FONTS="ter-v32n Worldwide latarcyrheb-sun32 Worldwide"
         _CANCEL=
         #shellcheck disable=SC2086
         _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
@@ -49,7 +49,7 @@ _set_vconsole() {
         _FONT=$(cat ${_ANSWER})
         sleep 2
     else
-        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe ter-v16n Terminus"
+        _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         _CANCEL=
         #shellcheck disable=SC2086
         _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
