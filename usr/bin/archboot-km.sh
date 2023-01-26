@@ -43,7 +43,7 @@ _set_vconsole() {
         _FONTS="latarcyrheb-sun32 Worldwide ter-v32n Terminus"
         _CANCEL=
         #shellcheck disable=SC2086
-        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
         _abort_dialog || return 1
         #shellcheck disable=SC2086
         _FONT=$(cat ${_ANSWER})
@@ -52,7 +52,7 @@ _set_vconsole() {
         _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe ter-v16n Terminus"
         _CANCEL=
         #shellcheck disable=SC2086
-        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
         _abort_dialog || return 1
         #shellcheck disable=SC2086
         _FONT=$(cat ${_ANSWER})
