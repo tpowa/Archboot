@@ -1,10 +1,10 @@
 LUKS ENLUKSION SUMMARY:\n
 -----------------------------\n\n
-Encryption is useful for two (related) reasons. Firstly, it prevents anyone\n
-with physical access to your computer, and your storage drive in parti-\n
-cular, from getting the data from it(unless they have your passphrase/key).\n
-Secondly, it allows you to wipe the data on your storage drive with far\n
-more confidence in the event of you selling or discarding your drive.\n
+Encryption is useful for two (related) reasons. Firstly, it prevents any-\n
+one with physical access to your computer, and your storage drive in parti-\n
+cular, from getting the data from it(unless they have your passphrase or \n
+key). Secondly, it allows you to wipe the data on your storage drive with\n
+far more confidence in the event of you selling or discarding your drive.\n
 Basically, it supplements the access control mechanisms of the operating\n
 system (like file permissions) by making it harder to bypass the operating\n
 system by inserting a bootable medium, for example. Encrypting the root\n
