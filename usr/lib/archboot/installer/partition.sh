@@ -41,7 +41,7 @@ _check_gpt() {
         fi
     fi
     if [[ -n "${_RUN_CFDISK}" ]]; then
-        _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/guid-partition.txt)" 7 60
+        _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/guid-partition.txt)" 0 0
         clear
         cfdisk "${_DISK}"
         # reread partitiontable for kernel
@@ -140,7 +140,7 @@ _partition() {
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
-                _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 18 70
+                _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 0 0
                 clear
                 cfdisk "${_DISK}"
                 # reread partitiontable for kernel
