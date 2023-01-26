@@ -1,5 +1,5 @@
-LUKS ENLUKSION SUMMARY:\n
------------------------------\n\n
+LUKS ENCRYPTION SUMMARY:\n
+------------------------\n\n
 Encryption is useful for two (related) reasons. Firstly, it prevents any-\n
 one with physical access to your computer, and your storage drive in par-\n
 ticular, from getting the data from it(unless they have your passphrase or\n
