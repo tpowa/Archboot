@@ -1,6 +1,6 @@
 Now you'll be put into cfdisk where you can partition your storage drive.\n\n
 You should consider the following scheme:\n
-- 1 BIOS GRUB PARTITION (size 1MB)
+- 1 BIOS GRUB PARTITION (size 1MB)\n
 - 1 SWAP PARTITION:\n
     RAM Size:               Recommendation:\n
     ---------------------------------------\n
