@@ -44,8 +44,7 @@ build ()
     ### fix licenses
     map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
                  "/usr/share/licenses/hdparm/LICENSE.TXT" "/usr/share/licenses/ncurses/COPYING" \
-                 "/usr/share/licenses/pcre/LICENSE" "/usr/share/licenses/sdparm/LICENSE" \
-                 "/usr/share/licenses/zlib/LICENSE"
+                 "/usr/share/licenses/sdparm/LICENSE" "/usr/share/licenses/zlib/LICENSE"
 }
 
 help ()
