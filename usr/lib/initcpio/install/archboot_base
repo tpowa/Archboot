@@ -14,7 +14,7 @@ build ()
           renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
           sysctl pkill pmap pwdx slabtop tload vmstat watch eject keyctl request-key \
-          zsh tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
+          tac sulogin resizepart lslocks wdctl zless zgrep fold od ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \
           lzless lzmore lzma modinfo reset unlzma unxz xzcat lastb \
@@ -29,9 +29,6 @@ build ()
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat
     [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64 peekfd
     [[ "$(uname -m)" == "aarch64" ]] && add_binary peekfd
-
-    ### add zsh
-    map add_full_dir "/etc/zsh" "/usr/share/zsh" "/usr/lib/zsh"
     
     ### add C.UTF-8 locale
     add_dir /usr/lib/locale

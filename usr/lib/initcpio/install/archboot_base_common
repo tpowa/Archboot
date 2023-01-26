@@ -57,8 +57,9 @@ build ()
     # delete root password
     # shellcheck disable=SC2129
     echo "passwd -S root | grep -q 'L' && passwd -d root >/dev/null" >> "$BUILDROOT/etc/bash.bashrc"
-    echo "# always try to run zsh" >> "$BUILDROOT/etc/bash.bashrc"
-    echo "command -v zsh >/dev/null && exec zsh \"\$@\"" >> "$BUILDROOT/etc/bash.bashrc"
+    # color output for bash prompt and ls
+    echo -e "PS1='[\e[1;31m\u\e[m@\e[1;32m\h\e[m \W]\$ '" >> "$BUILDROOT/etc/bash.bashrc"
+    echo -e "alias ls='ls --color=auto'" >> "$BUILDROOT/etc/bash.bashrc"
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
