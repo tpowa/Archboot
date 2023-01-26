@@ -1,13 +1,14 @@
 Now you'll be put into cfdisk where you can partition your storage drive.\n\n
-You should make the following scheme:\n
-- 1 SWAP PARTITION      --> table below\n
-    RAM SIZE:               RECOMMENDATION:\n
-    ---------------------------------------\n
-    - < 2GB         -->     2X RAM\n
-    - 2GB - 8GB     -->     = RAM\n
-    - 8GB - 64GB    -->     4G to 0.5X RAM\n
-    - > 64GB        -->     Minimum 4GB\n
-    ---------------------------------------\n
-- 1 ROOT PARTITION  -->     Minimum >= 2000MB\n
-- DATA PARTITIONS   -->     As you will need...\n
-  (eg. /home, /boot)
+You should consider the following BIOS/MBR partition scheme:\n
+---------------------------------------------------------------\n
+        RAM SIZE         SWAP PARTITION       RECOMMENDATION\n
+---------------------------------------------------------------\n
+        < 2GB                  -->            2X RAM\n
+        2GB - 8GB              -->            = RAM\n
+        8GB - 64GB             -->            4G to 0.5X RAM\n
+        > 64GB                 -->            Minimum 4GB\n
+---------------------------------------------------------------\n
+ROOT PARTITION                 -->            Minimum >= 2000MB\n
+---------------------------------------------------------------\n
+DATA PARTITION(S) (eg. /home)  -->            As you will need.\n
+---------------------------------------------------------------
