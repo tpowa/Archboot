@@ -7,7 +7,7 @@ You should consider the following scheme:\n
     - < 2GB         -->     2X RAM\n
     - 2GB - 8GB     -->     = RAM\n
     - 8GB - 64GB    -->     4G to 0.5X RAM\n
-    - >64GB         -->     Minimum 4GB\n
+    - > 64GB        -->     Minimum 4GB\n
     ---------------------------------------\n
 - 1 EFI SYSTEM PARTITION (ESP) (Minimum >= 260MB)\n
 - 1 ROOT PARTITION (Minimum >= 2000MB)\n
