@@ -1,0 +1,51 @@
+LINUX SOFTWARE RAID SUMMARY:\n
+-----------------------------\n\n
+Linear mode:\n
+You have two or more partitions which are not necessarily the same size\n
+(but of course can be), which you want to append to each other.\n
+Spare-disks are not supported here. If a disk dies, the array dies with\n
+it.\n\n
+RAID-0:\n
+You have two or more devices, of approximately the same size, and you want\n
+to combine their storage capacity and also combine their performance by\n
+accessing them in parallel. Like in Linear mode, spare disks are not\n
+supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
+array goes with it.\n\n
+RAID-1:\n
+You have two devices of approximately same size, and you want the two to\n
+be mirrors of each other. Eventually you have more devices, which you\n
+want to keep as stand-by spare-disks, that will automatically become a\n
+part of the mirror if one of the active devices break.\n\n
+RAID-4:\n
+You have three or more devices of roughly the same size and you want\n
+a way that protects data against loss of any one disk.\n
+Fault tolerance is achieved by adding an extra disk to the array, which\n
+is dedicated to storing parity information. The overall capacity of the\n
+array is reduced by one disk.\n
+The storage efficiency is 66 percent. With six drives, the storage\n
+efficiency is 87 percent. The main disadvantage is poor performance for\n
+multiple,\ simultaneous, and independent read/write operations.\n
+Thus, if any disk fails, all data stay intact. But if two disks fail,\n
+all data is lost.\n\n
+RAID-5:\n
+You have three or more devices of roughly the same size, you want to\n
+combine them into a larger device, but still to maintain a degree of\n
+redundancy fordata safety. Eventually you have a number of devices to use\n
+as spare-disks, that will not take part in the array before another device\n
+fails. If you use N devices where the smallest has size S, the size of the\n
+entire array will be (N-1)*S. This \"missing\" space is used for parity\n
+(redundancy) information. Thus, if any disk fails, all data stay intact.\n
+But if two disks fail, all data is lost.\n\n
+RAID-6:\n
+You have four or more devices of roughly the same size and you want\n
+a way that protects data against loss of any two disks.\n
+Fault tolerance is achieved by adding an two extra disk to the array,\n
+which is dedicated to storing parity information. The overall capacity\n
+of the array is reduced by 2 disks.\n
+Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
+all data is lost.\n\n
+RAID-10:\n
+Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
+two disks. It provides superior data security and can survive multiple\n
+disk failures. The main disadvantage is cost, because 50% of your\n
+storage is duplication.

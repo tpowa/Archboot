@@ -35,14 +35,15 @@ _check_gpt() {
         fi
         if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
             if ! sgdisk -p "${_DISK}" | grep -q 'EF02'; then
-                _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1 MB BIOS Boot partition for grub BIOS GPT support." 0 0
+                _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1 MB BIOS BOOT PARTITION for grub BIOS GPT support." 0 0
                 _RUN_CFDISK=1
             fi
         fi
     fi
     if [[ -n "${_RUN_CFDISK}" ]]; then
-        _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 7 60
-        clear && cfdisk "${_DISK}"
+        _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/guid-partition.txt)" 7 60
+        clear
+        cfdisk "${_DISK}"
         # reread partitiontable for kernel
         partprobe "${_DISK}"
     fi
@@ -134,12 +135,12 @@ _partition() {
                 [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" == "dos" ]] && _MSDOS_DETECTED=1
 
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
-                    _dialog --defaultno --yesno "Setup detected no MS-DOS partition table on ${_DISK}.\nDo you want to create a MS-DOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+                    _dialog --defaultno --yesno "Setup detected no MBR/BIOS partition table on ${_DISK}.\nDo you want to create a MBR/BIOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                    _clean_disk "${_DISK}"
                     parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
                 fi
                 # Partition disc
-                _dialog --msgbox "Now you'll be put into cfdisk where you can partition your storage drive. You should make a swap partition and as many data partitions as you will need." 18 70
+                _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 18 70
                 clear
                 cfdisk "${_DISK}"
                 # reread partitiontable for kernel

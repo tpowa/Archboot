@@ -406,57 +406,7 @@ _stopluks()
 
 _helpmd()
 {
-_dialog --msgbox "LINUX SOFTWARE RAID SUMMARY:\n
------------------------------\n\n
-Linear mode:\n
-You have two or more partitions which are not necessarily the same size\n
-(but of course can be), which you want to append to each other.\n
-Spare-disks are not supported here. If a disk dies, the array dies with\n
-it.\n\n
-RAID-0:\n
-You have two or more devices, of approximately the same size, and you want\n
-to combine their storage capacity and also combine their performance by\n
-accessing them in parallel. Like in Linear mode, spare disks are not\n
-supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
-array goes with it.\n\n
-RAID-1:\n
-You have two devices of approximately same size, and you want the two to\n
-be mirrors of each other. Eventually you have more devices, which you\n
-want to keep as stand-by spare-disks, that will automatically become a\n
-part of the mirror if one of the active devices break.\n\n
-RAID-4:\n
-You have three or more devices of roughly the same size and you want\n
-a way that protects data against loss of any one disk.\n
-Fault tolerance is achieved by adding an extra disk to the array, which\n
-is dedicated to storing parity information. The overall capacity of the\n
-array is reduced by one disk.\n
-The storage efficiency is 66 percent. With six drives, the storage\n
-efficiency is 87 percent. The main disadvantage is poor performance for\n
-multiple,\ simultaneous, and independent read/write operations.\n
-Thus, if any disk fails, all data stay intact. But if two disks fail,\n
-all data is lost.\n\n
-RAID-5:\n
-You have three or more devices of roughly the same size, you want to\n
-combine them into a larger device, but still to maintain a degree of\n
-redundancy fordata safety. Eventually you have a number of devices to use\n
-as spare-disks, that will not take part in the array before another device\n
-fails. If you use N devices where the smallest has size S, the size of the\n
-entire array will be (N-1)*S. This \"missing\" space is used for parity\n
-(redundancy) information. Thus, if any disk fails, all data stay intact.\n
-But if two disks fail, all data is lost.\n\n
-RAID-6:\n
-You have four or more devices of roughly the same size and you want\n
-a way that protects data against loss of any two disks.\n
-Fault tolerance is achieved by adding an two extra disk to the array,\n
-which is dedicated to storing parity information. The overall capacity\n
-of the array is reduced by 2 disks.\n
-Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
-all data is lost.\n\n
-RAID-10:\n
-Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
-two disks. It provides superior data security and can survive multiple\n
-disk failures. The main disadvantage is cost, because 50% of your\n
-storage is duplication." 0 0
+_dialog --msgbox "$(cat /usr/lib/archboot/installer/help/md.txt)" 0 0
 }
 
 _createmd()
@@ -577,23 +527,7 @@ _createmd()
 
 _helplvm()
 {
-_dialog --msgbox "LOGICAL VOLUME SUMMARY:\n
------------------------------\n\n
-LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
-abstract your storage space and have \"virtual partitions\" which are easier\n
-to modify.\n\nThe basic building block of LVM are:\n
-- Physical volume (PV):\n
-  Partition on storage disk (or even storage disk itself or loopback file) on\n
-  which you can have virtual groups. It has a special header and is\n
-  divided into physical extents. Think of physical volumes as big building\n
-  blocks which can be used to build your storage drive.\n
-- Volume group (VG):\n
-  Group of physical volumes that are used as storage volume (as one disk).\n
-  They contain logical volumes. Think of volume groups as storage drives.\n
-- Logical volume(LV):\n
-  A \"virtual/logical partition\" that resides in a volume group and is\n
-  composed of physical extents. Think of logical volumes as normal\n
-  partitions." 0 0
+_dialog --msgbox "$(cat /usr/lib/archboot/installer/help/lvm2.txt)" 0 0
 }
 
 _createpv()
@@ -860,24 +794,7 @@ _opening_luks() {
 
 _helpluks()
 {
-_dialog --msgbox "LUKS ENLUKSION SUMMARY:\n
------------------------------\n\n
-Encryption is useful for two (related) reasons.\n
-Firstly, it prevents anyone with physical access to your computer,\n
-and your storage drive in particular, from getting the data from it\n
-(unless they have your passphrase/key).\n
-Secondly, it allows you to wipe the data on your storage drive with\n
-far more confidence in the event of you selling or discarding\n
-your drive.\n
-Basically, it supplements the access control mechanisms of the operating\n
-system (like file permissions) by making it harder to bypass the operating\n
-system by inserting a bootable medium, for example. Encrypting the root\n
-partition prevents anyone from using this method to insert viruses or\n
-trojans onto your computer.\n\n
-ATTENTION:\n
-Having encrypted devices does not protect you from all possible\n
-attacks. The encryption is only as good as your key management, and there\n
-are other ways to break into computers, while they are running." 0 0
+_dialog --msgbox "$(cat /usr/lib/archboot/installer/help/luks.txt)" 0 0
 }
 
 _createluks()
