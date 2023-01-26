@@ -1,5 +1,5 @@
 LOGICAL VOLUME SUMMARY:\n
------------------------------\n\n
+-----------------------\n\n
 LVM2 is a Logical Volume Manager for the Linux kernel. With LVM you can\n
 abstract your storage space and have "virtual partitions" which are easier\n
 to modify.\n\n
