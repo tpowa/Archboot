@@ -11,6 +11,6 @@ system by inserting a bootable medium, for example. Encrypting the root\n
 partition prevents anyone from using this method to insert viruses or\n
 trojans onto your computer.\n\n
 ATTENTION:\n
-Having encrypted devices does not protect you from all possible\n
-attacks. The encryption is only as good as your key management, and there\n
-are other ways to break into computers, while they are running.
+Having encrypted devices does not protect you from all possible attacks.\n
+The encryption is only as good as your key management, and there\are other\n
+ways to break into computers, while they are running.
