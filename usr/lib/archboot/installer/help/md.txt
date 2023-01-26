@@ -7,42 +7,42 @@ disks are not supported here. If a disk dies, the array dies with it.\n\n
 RAID-0:\n
 You have two or more devices, of approximately the same size, and you want\n
 to combine their storage capacity and also combine their performance by\n
-accessing them in parallel. Like in Linear mode, spare disks are not\n
-supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
+accessing them in parallel. Like in Linear mode, spare disks are not sup-\n
+ported here either. RAID-0 has no redundancy, so when a disk dies, the\n
 array goes with it.\n\n
 RAID-1:\n
 You have two devices of approximately same size, and you want the two to\n
-be mirrors of each other. Eventually you have more devices, which you\n
-want to keep as stand-by sparedisks, that will automatically become a\n
-part of the mirror if one of the active devices break.\n\n
+be mirrors of each other. Eventually you have more devices, which you want\n
+to keep as stand-by sparedisks, that will automatically become a part of\n
+the mirror if one of the active devices break.\n\n
 RAID-4:\n
-You have three or more devices of roughly the same size and you want\n
-a way that protects data against loss of any one disk.Fault tolerance\n
-is achieved by adding an extra disk to the array, which\is dedicated \n
-to storing parity information. The overall capacity of the array is \n
-reduced by one disk.The storage efficiency is 66 percent. With six drives,\n
-the storage efficiency is 87 percent. The main disadvantage is poor per-\n
-formance for multiple, simultaneous, and independent read/write operations.\n
-Thus, if any disk fails, all data stay intact. But if two disks fail,all \
-data is lost.\n\n
+You have three or more devices of roughly the same size and you want a way\n
+that protects data against loss of any one disk.Fault tolerance is a-\n
+chieved by adding an extra disk to the array, which is dedicated to stor\n
+ing parity information. The overall capacity of the array is reduced by \n
+one disk.The storage efficiency is 66 percent. With six drives, the sto-\n
+rage efficiency is 87 percent. The main disadvantage is poor performance\n
+for multiple, simultaneous, and independent read/write operations. Thus,\n
+if any disk fails, all data stay intact. But if two disks fail,all data is\n
+lost.\n\n
 RAID-5:\n
-You have three or more devices of roughly the same size, you want to\n
-combine them into a larger device, but still to maintain a degree of\n
-redundancy fordata safety. Eventually you have a number of devices to use\n
-as spare-disks, that will not take part in the array before another device\n
+You have three or more devices of roughly the same size, you want to com-\n
+bine them into a larger device, but still to maintain a degree of redun-\n
+dancy for data safety. Eventually you have a number of devices to use as\n
+sparedisks, that will not take part in the array before another device\n
 fails. If you use N devices where the smallest has size S, the size of the\n
 entire array will be (N-1)*S. This "missing" space is used for parity\n
 (redundancy) information. Thus, if any disk fails, all data stay intact.\n
 But if two disks fail, all data is lost.\n\n
 RAID-6:\n
-You have four or more devices of roughly the same size and you want\n
-a way that protects data against loss of any two disks.Fault tolerance is\n
-achieved by adding an two extra disk to the array, which is dedicated to\n
+You have four or more devices of roughly the same size and you wanta way\n
+that protects data against loss of any two disks.Fault tolerance is a-\
+chieved by adding an two extra disk to the array, which is dedicated to\n
 storing parity information. The overall capacity of the array is reduced\n
 by 2 disks. Thus, if any two disks fail, all data stay intact. But if \n
 3 disks fail, all data is lost.\n\n
 RAID-10:\n
-Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
-two disks. It provides superior data security and can survive multiple\n
-disk failures. The main disadvantage is cost, because 50% of your\n
-storage is duplication.
+Shorthand for RAID1+0, a mirrored striped array and needs a minimum of two\n
+disks. It provides superior data security and can survive multiple disk \n
+failures. The main disadvantage is cost, because 50% of your storage is du-\n
+plication.
