@@ -11,6 +11,7 @@ _BIN="/usr/bin"
 _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
 _INST="/${_LIB}/installer"
+_HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
 _UPDATE="/${_LIB}/update-installer"
 _ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
@@ -107,6 +108,10 @@ _download_latest() {
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
+        done
+        HELP="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
+        for i in ${HELP}; do
+            wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
         done
         # main libs
         echo -e "\033[1mStep 3/4:\033[0m Downloading latest script libs..."
