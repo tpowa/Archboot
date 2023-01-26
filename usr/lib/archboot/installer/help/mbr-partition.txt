@@ -1,7 +1,7 @@
 Now you'll be put into cfdisk where you can partition your storage drive.\n\n
 You should make the following scheme:\n
 - 1 SWAP PARTITION:\n
-    RAM Size:               Recommendation:\n
+    RAM SIZE:               RECOMMENDATION:\n
     ---------------------------------------\n
     - < 2GB         -->     2X RAM\n
     - 2GB - 8GB     -->     = RAM\n
