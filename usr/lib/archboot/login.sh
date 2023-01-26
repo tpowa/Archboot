@@ -11,7 +11,7 @@ _vconsole() {
             SIZE="16"
         fi
         echo KEYMAP=us > /etc/vconsole.conf
-        echo FONT=latarcyrheb-sun${SIZE} >> /etc/vconsole.conf
+        echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
         systemctl restart systemd-vconsole-setup
     fi
 }

@@ -114,6 +114,7 @@ _auto_packages() {
     if ls /sys/class/net | grep -q wlan; then
         ! echo "${_PACKAGES}" | grep -qw iwd && _PACKAGES="${_PACKAGES} iwd"
     fi
+    grep -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES="${_PACKAGES} terminus-font"
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware
