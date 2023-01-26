@@ -24,7 +24,7 @@ is dedicated to storing parity information. The overall capacity of the\n
 array is reduced by one disk.\n
 The storage efficiency is 66 percent. With six drives, the storage\n
 efficiency is 87 percent. The main disadvantage is poor performance for\n
-multiple,\ simultaneous, and independent read/write operations.\n
+multiple, simultaneous, and independent read/write operations.\n
 Thus, if any disk fails, all data stay intact. But if two disks fail,\n
 all data is lost.\n\n
 RAID-5:\n
@@ -33,7 +33,7 @@ combine them into a larger device, but still to maintain a degree of\n
 redundancy fordata safety. Eventually you have a number of devices to use\n
 as spare-disks, that will not take part in the array before another device\n
 fails. If you use N devices where the smallest has size S, the size of the\n
-entire array will be (N-1)*S. This \"missing\" space is used for parity\n
+entire array will be (N-1)*S. This "missing" space is used for parity\n
 (redundancy) information. Thus, if any disk fails, all data stay intact.\n
 But if two disks fail, all data is lost.\n\n
 RAID-6:\n
