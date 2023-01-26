@@ -7,7 +7,7 @@ Highlights:
 Environment changes:
 - show full initrd line in grub menu
 - added fbset and terminus-font
-- removed zsh and grml-zsh-config
+- removed pcre, zsh and grml-zsh-config
 - use color for bash prompt and ls output
 update-installer:
 - added network check
@@ -15,7 +15,7 @@ setup:
 - major cleanup of blockdevice code
 - major cleanup of mountpoints code
 - outsourced help texts to files
-- added new help texts for partitioning GUID and BIOS/MBR
+- added new help texts for partitioning GUID/GPT and BIOS/MBR
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
 - don't format already existing ESP
 - don't format already existing swap partition
@@ -25,7 +25,7 @@ setup:
 - new efibootmgr routine
 - disable unsafe menu entries on installed system
 - don't show install message on installed system
-- added new menu title if running on installed system
+- added new menu title, if running on installed system
 - fixed automounted ESP and /boot detection on installed systems
 - don't ask for network, sources and mkfs on installed sytems
 - fix LANG= add .UTF-8 to parameter

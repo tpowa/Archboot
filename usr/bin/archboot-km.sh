@@ -40,11 +40,16 @@ _do_vconsole() {
 
 _set_vconsole() {
     if grep -qw 'sun32' /etc/vconsole.conf; then
-        _dialog --infobox "Detected big screen size, using 32 font size now..." 3 60
-        _FONT="latarcyrheb-sun32"
+        _FONTS="latarcyrheb-sun32 Worldwide ter-v32n Terminus"
+        _CANCEL=
+        #shellcheck disable=SC2086
+        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+        _abort_dialog || return 1
+        #shellcheck disable=SC2086
+        _FONT=$(cat ${_ANSWER})
         sleep 2
     else
-        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe"
+        _FONTS="latarcyrheb-sun16 Worldwide eurlatgr Europe ter-v16n Terminus"
         _CANCEL=
         #shellcheck disable=SC2086
         _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
