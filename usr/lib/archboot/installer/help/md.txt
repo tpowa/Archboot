@@ -36,7 +36,7 @@ entire array will be (N-1)*S. This "missing" space is used for parity\n
 But if two disks fail, all data is lost.\n\n
 RAID-6:\n
 You have four or more devices of roughly the same size and you wanta way\n
-that protects data against loss of any two disks.Fault tolerance is a-\
+that protects data against loss of any two disks.Fault tolerance is a-\n
 chieved by adding an two extra disk to the array, which is dedicated to\n
 storing parity information. The overall capacity of the array is reduced\n
 by 2 disks. Thus, if any two disks fail, all data stay intact. But if \n
@@ -44,5 +44,5 @@ by 2 disks. Thus, if any two disks fail, all data stay intact. But if \n
 RAID-10:\n
 Shorthand for RAID1+0, a mirrored striped array and needs a minimum of two\n
 disks. It provides superior data security and can survive multiple disk \n
-failures. The main disadvantage is cost, because 50% of your storage is du-\n
-plication.
+failures. The main disadvantage is cost, because 50% of your storage is\n
+duplication.
