@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _PRESET_DIR="/etc/archboot/presets"
@@ -263,3 +264,4 @@ _cleanup_iso() {
     echo "Cleanup... removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }
+# vim: set ft=sh ts=4 sw=4 et:

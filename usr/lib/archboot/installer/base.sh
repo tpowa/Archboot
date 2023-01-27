@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.setup"
 _NO_LOG="/dev/null"
@@ -330,3 +331,4 @@ _mainmenu() {
             ;;
     esac
 }
+# vim: set ft=sh ts=4 sw=4 et:

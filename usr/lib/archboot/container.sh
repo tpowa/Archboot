@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 
@@ -208,3 +209,4 @@ _fix_groups() {
     ${_NSPAWN} "${1}" groupadd -r -g 90 network &>/dev/null
     ${_NSPAWN} "${1}" groupadd -r tss &>/dev/null
 }
+# vim: set ft=sh ts=4 sw=4 et:

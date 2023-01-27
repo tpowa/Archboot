@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _detect_disk() {
     if [[ -z "${_DISK}" ]] || ! echo "${_DISK}" | grep -q '/dev/'; then
@@ -150,3 +151,4 @@ _partition() {
     done
     _NEXTITEM="3"
 }
+# vim: set ft=sh ts=4 sw=4 et:

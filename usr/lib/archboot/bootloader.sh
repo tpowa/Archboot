@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 # fedora shim setup
@@ -93,3 +94,4 @@ echo "Removing ${1} directory."
 rm -r "${1}"
 echo "Finished ${1}."
 }
+# vim: set ft=sh ts=4 sw=4 et:

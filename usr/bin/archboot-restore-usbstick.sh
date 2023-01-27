@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # 
 #    archboot-restore-usbstick.sh - restore usbstick to FAT32
 #    by Tobias Powalowski <tpowa@archlinux.org>

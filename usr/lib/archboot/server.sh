@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 . /usr/lib/archboot/container.sh
@@ -114,3 +115,4 @@ _server_release() {
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
     _server_upload "${_SERVER_IMAGE_DIR}"
 }
+# vim: set ft=sh ts=4 sw=4 et:

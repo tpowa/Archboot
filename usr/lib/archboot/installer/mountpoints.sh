@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # _destdir_mounts()
 # check if _ROOTDEV is set and if something is mounted on ${_DESTDIR}
@@ -480,3 +481,4 @@ _mkfs() {
         _check_filesystem_fstab "$@"
     fi
 }
+# vim: set ft=sh ts=4 sw=4 et:

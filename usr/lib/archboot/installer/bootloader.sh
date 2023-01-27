@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getrootfstype() {
     _ROOTFS="$(_getfstype "${_ROOTDEV}")"
@@ -975,3 +976,4 @@ _install_bootloader() {
         _NEXTITEM="8"
     fi
 }
+# vim: set ft=sh ts=4 sw=4 et:

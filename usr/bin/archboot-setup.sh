@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # source base and common first, contains basic parameters
 . /usr/lib/archboot/installer/base.sh

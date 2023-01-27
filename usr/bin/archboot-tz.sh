@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.tz"
 _TITLE="Arch Linux Time And Date Setting"

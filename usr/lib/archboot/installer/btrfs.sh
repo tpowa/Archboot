@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # scan and update btrfs devices
 _btrfs_scan() {
@@ -262,3 +263,4 @@ _btrfs_compress() {
         _BTRFS_COMPRESS="compress=$(cat "${_ANSWER}")"
     fi
 }
+# vim: set ft=sh ts=4 sw=4 et:

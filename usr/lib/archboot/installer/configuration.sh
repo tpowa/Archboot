@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _check_root_password() {
     # check if empty password is set
@@ -114,3 +115,4 @@ _run_locale_gen() {
     _locale_gen
     sleep 2
 }
+# vim: set ft=sh ts=4 sw=4 et:

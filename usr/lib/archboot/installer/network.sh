@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
@@ -177,3 +178,4 @@ _donetwork() {
     _NEXTITEM="2"
     _S_NET=1
 }
+# vim: set ft=sh ts=4 sw=4 et:

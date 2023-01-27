@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getsource() {
     _PACMAN_CONF=""
@@ -189,3 +190,4 @@ _install_packages() {
     # tear down the chroot environment
     _chroot_umount
 }
+# vim: set ft=sh ts=4 sw=4 et:

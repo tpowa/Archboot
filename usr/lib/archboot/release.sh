@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
@@ -151,3 +152,4 @@ _create_iso() {
         [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
     done
 }
+# vim: set ft=sh ts=4 sw=4 et:

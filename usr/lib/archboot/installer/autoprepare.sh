@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _autoprepare() {
     # check on special devices and stop them, else weird things can happen during partitioning!
@@ -281,3 +282,4 @@ _autoprepare() {
     sleep 5
     _S_MKFSAUTO=1
 }
+# vim: set ft=sh ts=4 sw=4 et:

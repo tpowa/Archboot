@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
@@ -33,3 +34,4 @@ _cleanup_repodir() {
     rm -r "${1}"
 }
 
+# vim: set ft=sh ts=4 sw=4 et:

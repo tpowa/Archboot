@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/server.sh
 _root_check

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 LANG="C"
@@ -187,3 +188,4 @@ _cachedir_check() {
     fi
 }
 
+# vim: set ft=sh ts=4 sw=4 et:

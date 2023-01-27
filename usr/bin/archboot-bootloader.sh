@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
+# created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/bootloader.sh
 _SHIM=$(mktemp -d shim.XXX)

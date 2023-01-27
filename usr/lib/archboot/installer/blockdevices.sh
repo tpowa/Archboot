@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getfstype()
 {
@@ -837,3 +838,4 @@ _createluks()
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     _opening_luks
 }
+# vim: set ft=sh ts=4 sw=4 et:

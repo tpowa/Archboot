@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # don't run ttyS0 as first device
 _vconsole() {
@@ -111,3 +112,4 @@ else
     _welcome
     _run_update_installer
 fi
+# vim: set ft=sh ts=4 sw=4 et:

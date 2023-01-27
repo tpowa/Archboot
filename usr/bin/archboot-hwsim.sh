@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 #
 #    archboot-hwsim.sh - setup a test SSID
 #    by Tobias Powalowski <tpowa@archlinux.org>

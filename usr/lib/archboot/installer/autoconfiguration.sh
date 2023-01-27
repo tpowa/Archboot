@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # preprocess fstab file
 # comments out old fields and inserts new ones
@@ -235,3 +236,4 @@ _auto_nano_syntax() {
     grep -q '^include' "${_DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
     sleep 2
 }
+# vim: set ft=sh ts=4 sw=4 et:
