@@ -9,9 +9,11 @@ Environment changes:
 - added fbset and terminus-font
 - removed pcre, zsh and grml-zsh-config
 - use color for bash prompt and ls output
+- switch to Terminus as default font
 update-installer:
 - added network check
 setup:
+- add Terminus font to font selection dialogs
 - major cleanup of blockdevice code
 - major cleanup of mountpoints code
 - outsourced help texts to files
