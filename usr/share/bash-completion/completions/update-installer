@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# created by Tobias Powalowski <tpowa@archlinux.org>
+_update_installer()
+{
+	local cur prev OPTS
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	case $prev in
+		-*)
+			return 0
+			;;
+	esac
+	case $cur in
+		*)
+			OPTS="$(update-installer | grep '\-[a-z]' | cut -d ' ' -f2 | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")"
+			COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+			return 0
+			;;
+	esac
+	compopt -o bashdefault -o default
+	return 0
+}
+complete -F _update_installer update-installer
