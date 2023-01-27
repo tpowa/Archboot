@@ -14,3 +14,4 @@ _start_gnome_wayland() {
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
 }
+# vim: set ft=sh ts=4 sw=4 et:

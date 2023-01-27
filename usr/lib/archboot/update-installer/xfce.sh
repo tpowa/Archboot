@@ -255,3 +255,4 @@ _start_xfce() {
     startxfce4 >/dev/tty8 2>&1
     echo -e "To relaunch \033[1mXFCE\033[0m desktop use: \033[92mstartxfce4\033[0m"
 }
+# vim: set ft=sh ts=4 sw=4 et:

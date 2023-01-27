@@ -699,3 +699,4 @@ Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
 }
+# vim: set ft=sh ts=4 sw=4 et:

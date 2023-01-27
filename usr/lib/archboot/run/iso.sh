@@ -47,3 +47,4 @@ if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_
 else
     echo "Finished Image creation."
 fi
+# vim: set ft=sh ts=4 sw=4 et:

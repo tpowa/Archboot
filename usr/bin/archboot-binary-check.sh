@@ -28,3 +28,4 @@ echo "${_PACKAGE}" >binary.txt
 for i in $(pacman -Ql ${_PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
 	command -v "${i}" &>/dev/null || echo "${i}" >>binary.txt
 done
+# vim: set ft=sh ts=4 sw=4 et: archboot-bootloader.sh archboot-copy-mountpoint.sh archboot-hwsim.sh archboot-km.sh archboot-mkkeys.sh archboot-quickinst.sh archboot-restore-usbstick.sh archboot-rsync-backup.sh archboot-secureboot-keys.sh archboot-setup.sh archboot-tz.sh archboot-update-installer.sh

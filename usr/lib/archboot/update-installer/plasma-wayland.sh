@@ -13,3 +13,4 @@ _start_plasma_wayland() {
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland
 }
+# vim: set ft=sh ts=4 sw=4 et:

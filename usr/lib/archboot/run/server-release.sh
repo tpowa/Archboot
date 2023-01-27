@@ -15,3 +15,4 @@ _server_release || exit 1
 if echo "${_BASENAME}" | grep -qw x86_64; then
     _x86_64_pacman_restore || exit 1
 fi
+# vim: set ft=sh ts=4 sw=4 et:
