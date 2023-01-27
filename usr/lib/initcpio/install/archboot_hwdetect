@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
@@ -12,3 +13,4 @@ cat <<HELPEOF
   This hook will add hwdetect on an archboot image.
 HELPEOF
 }
+# vim: set ft=sh ts=4 sw=4 et:

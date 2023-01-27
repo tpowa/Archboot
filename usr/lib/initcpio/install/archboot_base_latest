@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
@@ -8,7 +9,7 @@ build ()
     add_file "/usr/share/kbd/consolefonts/latarcyrheb-sun32.psfu.gz"
     add_file "/usr/share/kbd/keymaps/i386/qwerty/us.map.gz"
     add_full_dir "/usr/share/kbd/keymaps/i386/include"
-     add_full_dir "/usr/share/kbd/keymaps/include"
+    add_full_dir "/usr/share/kbd/keymaps/include"
 }
 
 help ()
@@ -17,3 +18,4 @@ cat <<HELPEOF
   This hook sets up stripped down base for for latest image.
 HELPEOF
 }
+# vim: set ft=sh ts=4 sw=4 et:
