@@ -55,7 +55,9 @@ build ()
 
     ### add options to bashrc
     add_file /etc/bash.bashrc
-    # delete root password
+    # add bash-completion
+    add_full_dir /usr/share/bash-completion
+    # unlock and delete root password, if not set by user!
     # shellcheck disable=SC2129
     echo "passwd -S root | grep -q 'L' && passwd -d root >/dev/null" >> "$BUILDROOT/etc/bash.bashrc"
     # color output for bash prompt and ls

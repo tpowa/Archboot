@@ -232,10 +232,10 @@ _umount_w_dir() {
 
 _clean_archboot() {
     # remove everything not necessary
-    rm -rf "/usr/lib/firmware"
-    rm -rf "/usr/lib/modules"
+    rm -rf /usr/lib/firmware
+    rm -rf /usr/lib/modules
     rm -rf /usr/lib/{libicu*,libstdc++*}
-    _SHARE_DIRS="efitools grub fonts fontconfig hwdata kbd licenses lshw nmap nano nvim pacman refind systemd tc zoneinfo"
+    _SHARE_DIRS="bash-completion efitools grub fonts fontconfig hwdata kbd licenses lshw nmap nano nvim pacman refind systemd tc zoneinfo"
     for i in ${_SHARE_DIRS}; do
         #shellcheck disable=SC2115
         rm -rf "/usr/share/${i}"
