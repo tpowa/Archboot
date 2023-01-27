@@ -1,4 +1,6 @@
 # defaults for archboot
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+# SPDX-License-Identifier: GPL-2.0-only
 # packages to install (eg. firmware, kernel packages)
 _PACKAGES="base linux linux-firmware linux-firmware-marvell"
 # grub setup

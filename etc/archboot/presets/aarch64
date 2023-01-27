@@ -1,6 +1,5 @@
-# vim:set ft=sh:
 # Created by Tobias Powalowski <tpowa@archlinux.org>
-
+# SPDX-License-Identifier: GPL-2.0-only
 # mkinitcpio config file, defaulted to stock config file
 MKINITCPIO_CONFIG="/etc/archboot/aarch64.conf"
 
