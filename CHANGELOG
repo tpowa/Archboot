@@ -13,6 +13,7 @@ Environment changes:
 - switch to Terminus as default font
 update-installer:
 - added network check
+- added bash completion
 setup:
 - add Terminus font to font selection dialogs
 - major cleanup of blockdevice code
