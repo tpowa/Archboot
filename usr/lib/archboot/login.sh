@@ -67,12 +67,12 @@ _run_update_installer() {
     echo ""
     if [[ "${TTY}" == "tty1" ]]; then
         echo -e "\033[1m\033[91m10 seconds\033[0;25m time to hit \033[1m\033[92mCTRL-C\033[0m to \033[1m\033[91mstop\033[0m the process \033[1m\033[1mnow...\033[0m"
-        sleep 10
+        sleep 10 || _enter_shell
         echo ""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
-            _run_latest
+            _run_latest || _enter_shell
         else
-            _run_latest_install
+            _run_latest_install || _enter_shell
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
@@ -99,7 +99,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     echo -e "\033[93m- Please add \033[1mmore\033[0m\033[93m than \033[1m2.0GB\033[0m\033[93m RAM.\033[0m"
     echo -e "\033[91mAborting...\033[0m"
     _enter_shell
-# local image, fail if less than 3.3GB RAM available
+# local image, fail if less than 2.6GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
 -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _welcome

@@ -10,7 +10,8 @@ build ()
     add_full_dir "/usr/lib/archboot/update-installer"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer"
     add_file "/usr/share/archboot/gpg/tpowa.gpg"
-    add_symlink "/etc/profile.d/zz-archboot-login.sh" "/usr/lib/archboot/login.sh"
+    # use /etc/profile to launch login.sh
+    echo ". /usr/lib/archboot/login.sh" >> $BUILDROOT/etc/profile
 }
 
 help ()
