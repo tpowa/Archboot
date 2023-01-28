@@ -11,6 +11,7 @@ Environment changes:
 - added bash-completion
 - use color for bash prompt and ls output
 - switch to Terminus as default font
+- new MOTD with architecture and Manage Archboot'
 update-installer:
 - added network check
 - added bash completion
