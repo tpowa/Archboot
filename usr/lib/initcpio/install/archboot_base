@@ -38,7 +38,7 @@ build ()
     [[ -e "/usr/lib/locale/locale-archive" ]] && add_file "/usr/lib/locale/locale-archive"
     
     ### add shadow
-    map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog passwd \
+    map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog \
           chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
           newusers pwck pwconv pwunconv useradd userdel usermod sg getsubids
 
