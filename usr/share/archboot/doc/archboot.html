@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 28.01.2023 12:03 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 28.01.2023 21:44 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -869,11 +869,6 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 <ul>
 <li>Your system <strong>hangs</strong> during the <strong>boot process</strong>?</li>
 <strong>Any</strong> combinations of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a> may be useful:<br><strong><code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code></strong></p>
-</ul>
-<ul>
-<li>The <strong>&lt;date&gt;-latest</strong> image <strong>fails</strong> at stage <strong>3/9</strong>: Generating archboot container...</li>
-Check <strong>virtual console (VC7)</strong> for logged errors. Mostly it's a <strong>network</strong> issue, which you can try to fix <strong>before</strong> the building process starts.
-<br>Hit <strong>CTRL+C</strong> at the 10 second countdown, at the beginning of the build process.<br>Try to configure your network or select an other mirror in <strong>/etc/pacman.d/mirrorlist</strong>.<br>After fixing your network run <strong>exit</strong> to restart the building process.
 </ul>
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.</li>
