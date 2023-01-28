@@ -637,7 +637,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> first for initial shim setup.</li>
 <li>In order to boot in <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> mode on first boot:
 <ul>
-<li>you need to add the <strong>hash</strong> of <strong>grub</strong> and <strong>kernel</strong> from disk:<br><strong>/EFI/BOOT/GRUB&ltARCH&gt.EFI</strong> and <strong>/EFI/BOOT/VMLINUZ_&ltARCH&gt</strong> </li>
+<li>you need to add the <strong>hash</strong> of <strong>grub</strong> and <strong>kernel</strong> from disk:<br><strong>/EFI/BOOT/GRUB&lt;ARCH&gt;.EFI</strong> and <strong>/EFI/BOOT/VMLINUZ_&ltARCH&gt</strong> </li>
 </ul></li>
 <li>Tools included for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></li>
 <li>setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:
@@ -707,8 +707,8 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li><strong>Online mode</strong>:
 <ul>
 <li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be synced and you have to select your favourite mirror.</li>
-<li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repository <strong>&ltdefault=no&gt</strong>.</li>
-<li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&ltdefault=no&gt</strong>.</li>
+<li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repository <strong>&lt;default=no&gt;</strong>.</li>
+<li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
 <h4 data-number="2.10.4" id="changing-timezone-and-date"><span class="header-section-number">2.10.4</span> <strong><span dir="">Changing timezone and date</span></strong></h4>
@@ -871,7 +871,7 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 <strong>Any</strong> combinations of the following <a href="https://wiki.archlinux.org/title/Kernel_parameters" title="Kernel parameters"><strong>kernel parameters</strong></a> may be useful:<br><strong><code>noapic</code>, <code>nolapic</code>, <code>acpi=off</code>, <code>pci=routeirq</code>, <code>pci=nosmp</code> or <code>pci=nomsi</code></strong></p>
 </ul>
 <ul>
-<li>The <strong>&ltdate&gt-latest</strong> image <strong>fails</strong> at stage <strong>3/9</strong>: Generating archboot container...</li>
+<li>The <strong>&lt;date&gt;-latest</strong> image <strong>fails</strong> at stage <strong>3/9</strong>: Generating archboot container...</li>
 Check <strong>virtual console (VC7)</strong> for logged errors. Mostly it's a <strong>network</strong> issue, which you can try to fix <strong>before</strong> the building process starts.
 <br>Hit <strong>CTRL+C</strong> at the 10 second countdown, at the beginning of the build process.<br>Try to configure your network or select an other mirror in <strong>/etc/pacman.d/mirrorlist</strong>.<br>After fixing your network run <strong>exit</strong> to restart the building process.
 </ul>
