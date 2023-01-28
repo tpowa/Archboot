@@ -14,7 +14,7 @@
 [[ -z "${1}" ]] && usage
 while [ $# -gt 0 ]; do
     case ${1} in
-        -u|--u) _D_SCRIPTS="1" ;;
+        -u|--u|-update|--update) _D_SCRIPTS="1" ;;
         -latest|--latest) _L_COMPLETE="1" ;;
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
         -latest-image|--latest-image) _G_RELEASE="1" ;;
@@ -25,8 +25,8 @@ while [ $# -gt 0 ]; do
         -plasma-wayland|--plasma-wayland) _L_PLASMA_WAYLAND="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
-        -full-system) _FULL_SYSTEM="1" ;;
-        -h|--h|?) usage ;;
+        -full-system|--full-system) _FULL_SYSTEM="1" ;;
+        -h|--h||-help|--help|?) usage ;;
         *) usage ;;
         esac
     shift

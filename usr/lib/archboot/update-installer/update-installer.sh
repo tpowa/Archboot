@@ -29,12 +29,12 @@ _graphic_options() {
 }
 
 usage () {
-    echo -e "\033[1mUpdate installer, launch environments or create latest image files:\033[0m"
-    echo -e "\033[1m-------------------------------------------------------------------\033[0m"
+    echo -e "\033[1mUpdate And Manage Arch Linux - Archboot Environment:\033[0m"
+    echo -e "\033[1m----------------------------------------------------\033[0m"
     echo -e "\033[1mPARAMETERS:\033[0m"
-    echo -e " \033[1m-h\033[0m               This message."
+    echo -e " \033[1m-help\033[0m            This message."
     if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
-        echo -e " \033[1m-u\033[0m               Update scripts: setup, quickinst, tz, km and helpers."
+        echo -e " \033[1m-update\033[0m          Update scripts: setup, quickinst, tz, km and helpers."
     fi
     # latest image
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
