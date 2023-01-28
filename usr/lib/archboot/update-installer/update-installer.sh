@@ -29,8 +29,8 @@ _graphic_options() {
 }
 
 usage () {
-    echo -e "\033[1mUpdate And Manage \033[36mArchboot\033[0m\033[1m - Arch Linux Environment:\033[0m"
-    echo -e "\033[1m----------------------------------------------------\033[0m"
+    echo -e "\033[1mManage \033[36mArchboot\033[0m\033[1m - Arch Linux Environment:\033[0m"
+    echo -e "\033[1m-----------------------------------------\033[0m"
     echo -e " \033[1m-help\033[0m            This message."
     if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
         echo -e " \033[1m-update\033[0m          Update scripts: setup, quickinst, tz, km and helpers."

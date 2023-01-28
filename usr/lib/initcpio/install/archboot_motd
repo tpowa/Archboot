@@ -6,11 +6,11 @@ build ()
 {
     ### generate motd
     MOTD=$(mktemp /var/tmp/motd.XXXX)
-    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux X86-64\033[0m" >> "${MOTD}"
+    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux X86_64\033[0m" >> "${MOTD}"
     [[ "$(uname -m)" == "aarch64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux AARCH64\033[0m" >> "${MOTD}"
     [[ "$(uname -m)" == "riscv64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux RISCV64\033[0m" >> "${MOTD}"
     #shellcheck disable=SC2129
-    echo -e "\033[1m--------------------------------------------\033[0m" >> "${MOTD}"
+    echo -e "\033[1m----------------------------------------\033[0m" >> "${MOTD}"
     echo -e "\033[1mConsoles:\033[0m" >> "${MOTD}"
     echo -e "  - Virtual consoles \033[1m1-6\033[0m are active." >> "${MOTD}"
     echo -e "  - To change virtual console use \033[1m\033[92mALT + F(1-6)\033[0m" >> "${MOTD}"
@@ -30,8 +30,8 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     echo -e "  - Use the \033[1m\033[92m'weechat'\033[0m IRC client." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
-    echo -e "\033[1mManage Archboot:\033[0m" >> "${MOTD}"
-    echo -e "  - Run \033[1m\033[92m'update-installer'\033[0m to manage the Archboot environment." >> "${MOTD}"
+    echo -e "\033[1mManage Archboot Environment:\033[0m" >> "${MOTD}"
+    echo -e "  - Run \033[1m\033[92m'update-installer'\033[0m to manage the Archboot Environment." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\033[1mInstallation:\033[0m" >> "${MOTD}"
     echo -e "  - On first login \033[92m'setup'\033[0m is launched automatically." >> "${MOTD}"
