@@ -29,7 +29,7 @@ _graphic_options() {
 }
 
 usage () {
-    echo -e "\033[1mUpdate And Manage Arch Linux - Archboot Environment:\033[0m"
+    echo -e "\033[1mUpdate And Manage \033[36mArchboot\033[0m\033[1m - Arch Linux Environment:\033[0m"
     echo -e "\033[1m----------------------------------------------------\033[0m"
     echo -e "\033[1mPARAMETERS:\033[0m"
     echo -e " \033[1m-help\033[0m            This message."
