@@ -7,8 +7,8 @@
 _APPNAME=$(basename "${0}")
 _usage()
 {
-    echo -e "\033[1mWelcome to \033[36mARCHBOOT\033[0m \033[1m - RSYNC BACKUP:\033[0m"
-    echo -e "\033[1m--------------------------------------\033[0m"
+    echo -e "\033[1mWelcome to \033[36mARCHBOOT\033[0m\033[1m - RSYNC BACKUP:\033[0m"
+    echo -e "\033[1m-----------------------------------\033[0m"
     echo -e "- Copy \033[1mbackupdir\033[0m to \033[1mbackupdestination\033[0m using rsync."
     echo -e "- For system backup, start with \033[1mfull\033[0m mounted system and then invoke this script"
     echo -e "  with system's root directory as \033[1mbackupdir\033[0m."
