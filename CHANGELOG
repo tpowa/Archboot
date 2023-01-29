@@ -26,7 +26,7 @@ setup:
 - don't format already existing swap partition
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - devices are listed with their SIZE in menus
-- enable colored bash prompt and ls output on installed system
+- enable archboot's bash prompt,ls and grep color output on installed system
 - always add bash-completion on installed system
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
