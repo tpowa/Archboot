@@ -63,7 +63,7 @@ build ()
     for i in archboot-bash-prompt.sh archboot-reset-root-password.sh archboot-bash-aliases.sh; do
         add_file "/usr/share/archboot/base/etc/profile.d/$i" "/etc/profile.d/$i"
     done
-    echo ". /etc/profile.d/archboot-color-bash-prompt.sh" >> "$BUILDROOT/etc/bash.bashrc"
+    echo ". /etc/profile.d/archboot-bash-prompt.sh" >> "$BUILDROOT/etc/bash.bashrc"
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
