@@ -175,13 +175,11 @@ _auto_timesetting() {
     if [[ -e /etc/localtime && ! -e "${_DESTDIR}"/etc/localtime ]]; then
         _dialog --infobox "Enable timezone setting on installed system..." 3 70
         cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
-        sleep 1
+        sleep 2
     fi
-    if [[ ! -f "${_DESTDIR}"/etc/adjtime ]]; then
+    if [[ -f /etc/adjtime && ! -f "${_DESTDIR}"/etc/adjtime ]]; then
         _dialog --infobox "Enable clock setting on installed system..." 3 70
-        echo 0.0 0 0.0 > "${_DESTDIR}"/etc/adjtime
-        echo 0 >> "${_DESTDIR}"/etc/adjtime
-        [[ -s /tmp/.hardwareclock ]] && cat /tmp/.hardwareclock >>"${_DESTDIR}"/etc/adjtime
+        cp /etc/adjtime "${_DESTDIR}"/etc/adjtime
         sleep 2
     fi
 }

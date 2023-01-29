@@ -17,8 +17,6 @@ _dialog() {
 _abort()
 {
     _dialog --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
-    [[ -e /tmp/.keymap ]] && rm -f /tmp/.keymap
-    [[ -e /tmp/.font ]] && rm -f /tmp/.font
     [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
     clear
     exit 1
@@ -58,7 +56,6 @@ _set_vconsole() {
         #shellcheck disable=SC2086
         _FONT=$(cat ${_ANSWER})
     fi
-    echo "${_FONT}" > /tmp/.font
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     _KEYMAPS="us English de German es Spanish fr French pt Portuguese ru Russian OTHER More"
@@ -83,7 +80,6 @@ _set_vconsole() {
     _abort_dialog || return 1
     #shellcheck disable=SC2086
     _KEYMAP=$(cat ${_ANSWER})
-    echo "${_KEYMAP}" > /tmp/.keymap
     _S_NEXTITEM=2
 }
 
@@ -113,8 +109,6 @@ _mainmenu() {
     esac
 }
 
-: >/tmp/.keymap
-: >/tmp/.font
 if [[ -e /tmp/.km-running ]]; then
     echo "km already runs on a different console!"
     echo "Please remove /tmp/.km-running first to launch tz!"

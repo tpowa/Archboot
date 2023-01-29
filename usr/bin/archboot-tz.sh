@@ -16,8 +16,6 @@ _dialog() {
 _abort()
 {
     _dialog --yesno "Abort Time And Date Setting?" 6 40 || return 0
-    [[ -e /tmp/.timezone ]] && rm -f /tmp/.timezone
-    [[ -e /tmp/.hardwareclock ]] && rm -f /tmp/.hardwareclock
     [[ -e /tmp/.tz ]] && rm -f /tmp/.tz
     [[ -e /etc/localtime ]] && rm -f /etc/localtime
     [[ -e /etc/adjtime ]] && rm -f /etc/adjtime
@@ -34,14 +32,10 @@ _dohwclock() {
     if [[ "${_HARDWARECLOCK}" = "UTC" ]]; then
         timedatectl set-local-rtc 0
         _DATE_PROGRAM=timedatectl
-        # for setup script
-        echo UTC > /tmp/.hardwareclock
     else
         timedatectl set-local-rtc 1
         #shellcheck disable=SC2209
         _DATE_PROGRAM=date
-        # for setup script
-        echo LOCAL > /tmp/.hardwareclock
     fi
 }
 
@@ -62,7 +56,6 @@ _dotimezone () {
         [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
         if [[ -n "${_SET_ZONE}" ]]; then
             _dialog --infobox "Setting Timezone to ${_ZONE}..." 0 0
-            echo "${_ZONE}" > /tmp/.timezone
             timedatectl set-timezone "${_ZONE}"
             _S_NEXTITEM="2"
         else
@@ -73,7 +66,7 @@ _dotimezone () {
 }
 
 _dotimeset() {
-    if [[ ! -s /tmp/.timezone ]]; then
+    if [[ -z "${_SET_ZONE}" ]]; then
         _dialog --msgbox "Error:\nYou have to select timezone first." 0 0
         _S_NEXTITEM="1"
         dotimezone || return 1
@@ -154,8 +147,6 @@ _mainmenu() {
             _abort ;;
     esac
 }
-: >/tmp/.hardwareclock
-: >/tmp/.timezone
 : >/tmp/.tz
 if [[ "${1}" = "--setup" ]]; then
     _EXIT="Return to Main Menu"
