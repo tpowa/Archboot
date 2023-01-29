@@ -58,11 +58,11 @@ build ()
     # add bash-completion
     add_full_dir /usr/share/bash-completion
     # unlock and delete root password, if not set by user!
-    # shellcheck disable=SC2129
-    echo "passwd -S root | grep -q 'L' && passwd -d root >/dev/null" >> "$BUILDROOT/etc/bash.bashrc"
-    # color output for bash prompt and ls
-    echo -e "PS1='[\e[1;31m\u\e[m@\e[1;32m\h\e[m \W]\\$ '" >> "$BUILDROOT/etc/bash.bashrc"
-    echo -e "alias ls='ls --color=auto'" >> "$BUILDROOT/etc/bash.bashrc"
+    # use color ls output
+    # use color bash prompt
+    for i in archboot-color-bash-prompt.sh archboot-reset-root-password.sh archboot-color-ls.sh; do
+        add_file "/usr/share/archboot/base/etc/profile.d/$i" "/etc/profile.d/$i"
+    done
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 

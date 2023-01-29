@@ -236,4 +236,19 @@ _auto_nano_syntax() {
     grep -q '^include' "${_DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
     sleep 2
 }
+_auto_color_bash_prompt(){
+    if [[ ! -f ${_DESTDIR}/etc/profile.d/archboot-color-bash-prompt.sh ]]; then
+        _dialog --infobox "Enable color bash prompt on installed system..." 3 70
+        cp /etc/profile.d/archboot-color-bash-prompt.sh ${_DESTDIR}/etc/profile.d/
+        sleep 2
+    fi
+}
+
+_auto_color_ls() {
+    if [[ ! -f ${_DESTDIR}/etc/profile.d/archboot-color-ls.sh ]]; then
+        _dialog --infobox "Enable ls color output on installed system..." 3 70
+        cp /etc/profile.d/archboot-color-ls.sh ${_DESTDIR}/etc/profile.d/
+        sleep 2
+    fi
+}
 # vim: set ft=sh ts=4 sw=4 et:
