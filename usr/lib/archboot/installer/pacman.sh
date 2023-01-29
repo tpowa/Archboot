@@ -187,8 +187,7 @@ _install_packages() {
     _auto_hostname
     _auto_locale
     _auto_nano_syntax
-    _auto_color_bash_prompt
-    _auto_color_ls
+    _auto_bash
     # tear down the chroot environment
     _chroot_umount
 }
