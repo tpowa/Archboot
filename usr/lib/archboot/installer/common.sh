@@ -131,19 +131,19 @@ _auto_packages() {
         _PACKAGES="${_PACKAGES} amd-ucode"
     fi
     ### HACK:
-    # always add lvm2, cryptsetup and mdadm
+    # always add lvm2, cryptsetup, mdadm, nano, neovim and bash-completion
     _PACKAGES="${_PACKAGES//\ lvm2\ / }"
     _PACKAGES="${_PACKAGES} lvm2"
     _PACKAGES="${_PACKAGES//\ cryptsetup\ / }"
     _PACKAGES="${_PACKAGES} cryptsetup"
     _PACKAGES="${_PACKAGES//\ mdadm\ / }"
     _PACKAGES="${_PACKAGES} mdadm"
-    ### HACK
-    # always add nano and neovim
     _PACKAGES="${_PACKAGES//\ nano\ / }"
     _PACKAGES="${_PACKAGES} nano"
     _PACKAGES="${_PACKAGES//\ neovim\ / }"
     _PACKAGES="${_PACKAGES} neovim"
+    _PACKAGES="${_PACKAGES//\ bash-completion\ / }"
+    _PACKAGES="${_PACKAGES} bash-completion"
 }
 
 # /etc/locale.gen
