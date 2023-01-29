@@ -153,13 +153,7 @@ _auto_mkinitcpio() {
 _auto_vconsole() {
     if [[ ! -f ${_DESTDIR}/etc/vconsole.conf ]]; then
         _dialog --infobox "Setting keymap and font on installed system..." 3 70
-        : >"${_DESTDIR}"/etc/vconsole.conf
-        if [[ -s /tmp/.keymap ]]; then
-            echo KEYMAP="$(sed -e 's/\..*//g' /tmp/.keymap)" >> "${_DESTDIR}"/etc/vconsole.conf
-        fi
-        if [[ -s /tmp/.font ]]; then
-            echo FONT="$(sed -e 's/\..*//g' /tmp/.font)" >> "${_DESTDIR}"/etc/vconsole.conf
-        fi
+        cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
         sleep 2
     fi
 }
