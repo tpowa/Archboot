@@ -40,7 +40,7 @@ _do_vconsole() {
 }
 
 _set_vconsole() {
-    if grep -qw 'sun32' /etc/vconsole.conf; then
+    if grep -qw 'FONT=*32*' /etc/vconsole.conf; then
         _FONTS="ter-v32n Worldwide latarcyrheb-sun32 Worldwide"
         _CANCEL=
         #shellcheck disable=SC2086
