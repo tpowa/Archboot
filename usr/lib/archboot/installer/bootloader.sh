@@ -7,10 +7,6 @@ _getrootfstype() {
 
 _getrootflags() {
     _ROOTFLAGS="$(findmnt -m -n -o options -T "${_DESTDIR}")"
-    # add subvolume for btrfs
-    if [[ "${_ROOTFS}" == "btrfs" ]]; then
-        findmnt -m -n -o SOURCE -T "${_DESTDIR}" | grep -q "\[" && _ROOTFLAGS="${_ROOTFLAGS},subvol=$(basename "$(findmnt -m -n -o SOURCE -T "${_DESTDIR}" | cut -d "]" -f1)")"
-    fi
     [[ -n "${_ROOTFLAGS}" ]] && _ROOTFLAGS="rootflags=${_ROOTFLAGS}"
 }
 
