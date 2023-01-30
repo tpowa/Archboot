@@ -266,8 +266,8 @@ _autoprepare() {
         _BTRFS_COMPRESS=""
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _BTRFS_DEVS="${_DEV}"
-            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
-            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
+            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="/root"
+            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="/home"
             _BTRFS_COMPRESS="compress=zstd"
         fi
         _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
