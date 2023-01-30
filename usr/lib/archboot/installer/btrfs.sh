@@ -46,7 +46,7 @@ _find_btrfs_subvolume() {
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" ]]; then
         # existing btrfs subvolumes
         _mount_btrfs
-        for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9 | grep -v '/var/lib/machines' | grep -v '/var/lib/portables'); do
+        for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9 | grep -v 'var/lib/machines' | grep -v 'var/lib/portables'); do
             echo "${i}"
             [[ "${1}" ]] && echo "${1}"
         done
