@@ -2,6 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # check on bash
 [[ -n "${BASH_VERSION:-}" ]] || return
+# Not an interactive shell?
+[[ $- == *i* ]] || return
 if  [[ "${UID}" == 0 ]]; then
     # red for root user
     PS1='[\e[1;31m\u\e[m@\e[1;32m\h\e[m \W]\$ '

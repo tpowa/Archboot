@@ -2,6 +2,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # check on bash
 [[ -n "${BASH_VERSION:-}" ]] || return
+# Not an interactive shell?
+[[ $- == *i* ]] || return
 # color output
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
