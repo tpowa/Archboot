@@ -69,8 +69,6 @@ build ()
     done
     # add custom bash options
     echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
-    # for latest and local image
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/etc/bash.bashrc"
     # add /etc/skel
     add_full_dir /etc/skel
     ### add kmod related config file(s)
