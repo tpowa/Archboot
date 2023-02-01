@@ -8,7 +8,7 @@ build ()
     add_checked_modules 'virtio|zram|btrfs|libcrc32|zstd|sg|pkcs8_key_parser'
     
     ### setting up base structure
-    map add_dir "/mnt" "/install" "/var/log" "/home" "/var/tmp"
+    map add_dir "/root /mnt" "/install" "/var/log" "/home" "/var/tmp"
 
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
@@ -50,7 +50,7 @@ build ()
     map add_file "/etc/profile" "/etc/shells"
     basic_config="os-release hostname modprobe.d/modprobe.conf"
     for i in $basic_config; do
-        add_file "/usr/share/archboot/base/etc/$i" "/etc/$i"
+        add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
     ### add bash configuration
@@ -60,14 +60,17 @@ build ()
     # use color bash prompt
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
-    for i in custom-bash-prompt.sh archboot-reset-root-password.sh \
-        custom-bash-aliases.sh custom-bash-history.sh; do
-        add_file "/usr/share/archboot/base/etc/profile.d/$i" "/etc/profile.d/$i"
+    for i in custom-bash-options.sh archboot-reset-root-password.sh; do
+        add_file "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
     done
-    echo ". /etc/profile.d/custom-bash-prompt.sh" >> "$BUILDROOT/etc/bash.bashrc"
-    echo ". /etc/profile.d/custom-bash-aliases.sh" >> "$BUILDROOT/etc/bash.bashrc"
-    echo ". /etc/profile.d/custom-bash-history.sh" >> "$BUILDROOT/etc/bash.bashrc"
-
+    # add default bash setup
+    for i in .bashrc .bash_profile .bash_logout; do
+        add_file  "/etc/skel/${i}" "$BUILDROOT/root/${i}"
+    done
+    # add custom bash options
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
+    # add /etc/skel
+    add_full_dir /etc/skel
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 
@@ -125,7 +128,7 @@ build ()
     map add_file "/usr/lib/libnss_compat.so.2" "/usr/lib/libnsl.so.1"
     ## fix for systemd >=245 set default.target
     # remove initrd-release to allow normal systemd boot without initrd.target
-    rm -f /tmp/*/root/etc/initrd-release
+    rm -f $BUILDROOT/etc/initrd-release
     add_symlink "/etc/systemd/system/default.target" "/usr/lib/systemd/system/multi-user.target"
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
