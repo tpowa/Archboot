@@ -231,7 +231,8 @@ _auto_nano_syntax() {
 
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
-        _dialog --infobox "Enable custom bash options on installed system..." 3 70
+        _dialog --infobox "Setup bash with custom options on installed system..." 3 70
+        cp "${_DESTDIR}/etc/skel/.bash*" "${_DESTDIR}/root/"
         ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
         ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc" &&\
