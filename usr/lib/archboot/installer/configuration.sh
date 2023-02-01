@@ -60,11 +60,11 @@ _set_password() {
     _PASS2=""
     while [[ -z "${_PASSWORD}" ]]; do
         while [[ -z "${_PASS}" ]]; do
-            _dialog --insecure --passwordbox "Enter new root password:" 0 0 2>"${_ANSWER}" || return 1
+            _dialog --insecure --passwordbox "Enter new root password:" 5 20 2>"${_ANSWER}" || return 1
             _PASS=$(cat "${_ANSWER}")
         done
         while [[ -z  "${_PASS2}" ]]; do
-            _dialog --insecure --passwordbox "Retype new root password:" 0 0 2>"${_ANSWER}" || return 1
+            _dialog --insecure --passwordbox "Retype new root password:" 5 20 2>"${_ANSWER}" || return 1
             _PASS2=$(cat "${_ANSWER}")
         done
         if [[ "${_PASS}" == "${_PASS2}" ]]; then
