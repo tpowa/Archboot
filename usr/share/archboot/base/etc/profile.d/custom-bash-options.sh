@@ -17,7 +17,7 @@ HISTCONTROL="erasedups:ignorespace"
 # color output
 alias grep='grep --color=auto'
 # if installed set  neovim as default editor
-if command -v nvim 2&1>/dev/null; then
+if command -v nvim >/dev/null; then
     alias vi='nvim'
     alias vim='nvim'
     alias edit='nvim'

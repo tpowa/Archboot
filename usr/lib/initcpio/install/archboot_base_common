@@ -64,7 +64,7 @@ build ()
         add_file "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
     done
     # add default bash setup
-    for i in .bashrc .bash_profile .bash_logout; do
+    for i in ./.bashrc ./.bash_profile ./.bash_logout; do
         add_file  "/etc/skel/${i}" "$BUILDROOT/root/${i}"
     done
     # add custom bash options
