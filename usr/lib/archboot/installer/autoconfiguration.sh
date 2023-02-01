@@ -232,22 +232,28 @@ _auto_nano_syntax() {
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _dialog --infobox "Enable custom bash prompt on installed system..." 3 70
-        ! grep -qw 'custom-bash-prompt.sh' "${_DESTDIR}/etc/bash.bashrc" &&\
-            echo ". /etc/profile.d/custom-bash-prompt.sh" >> "${_DESTDIR}/etc/bash.bashrc"
+        ! grep -qw 'custom-bash-prompt.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-prompt.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
+        ! grep -qw 'custom-bash-prompt.sh' "${_DESTDIR}/root/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-prompt.sh" >> "${_DESTDIR}/root/.bashrc"
         cp /etc/profile.d/custom-bash-prompt.sh "${_DESTDIR}"/etc/profile.d/
         sleep 2
     fi
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-aliases.sh ]]; then
         _dialog --infobox "Enable custom bash aliases on installed system..." 3 70
-        ! grep -qw 'custom-bash-aliases.sh' "${_DESTDIR}/etc/bash.bashrc" &&\
-            echo ". /etc/profile.d/custom-bash-aliases.sh" >> "${_DESTDIR}/etc/bash.bashrc"
+        ! grep -qw 'custom-bash-aliases.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-aliases.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
+        ! grep -qw 'custom-bash-aliases.sh' "${_DESTDIR}/root/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-aliases.sh" >> "${_DESTDIR}/root/.bashrc"
         cp /etc/profile.d/custom-bash-aliases.sh "${_DESTDIR}"/etc/profile.d/
         sleep 2
     fi
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-history.sh ]]; then
         _dialog --infobox "Enable custom bash history on installed system..." 3 70
-        ! grep -qw 'custom-bash-history.sh' "${_DESTDIR}/etc/bash.bashrc" &&\
-            echo ". /etc/profile.d/custom-bash-history.sh" >> "${_DESTDIR}/etc/bash.bashrc"
+        ! grep -qw 'custom-bash-history.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-history.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
+        ! grep -qw 'custom-bash-history.sh' "${_DESTDIR}/root/.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-history.sh" >> "${_DESTDIR}/root/.bashrc"
         cp /etc/profile.d/custom-bash-history.sh "${_DESTDIR}"/etc/profile.d/
         sleep 2
     fi
