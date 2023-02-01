@@ -60,10 +60,14 @@ build ()
     # use color bash prompt
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
-    for i in custom-bash-prompt.sh archboot-reset-root-password.sh custom-bash-aliases.sh; do
+    for i in custom-bash-prompt.sh archboot-reset-root-password.sh \
+        custom-bash-aliases.sh custom-bash-history.sh; do
         add_file "/usr/share/archboot/base/etc/profile.d/$i" "/etc/profile.d/$i"
     done
     echo ". /etc/profile.d/custom-bash-prompt.sh" >> "$BUILDROOT/etc/bash.bashrc"
+    echo ". /etc/profile.d/custom-bash-aliases.sh" >> "$BUILDROOT/etc/bash.bashrc"
+    echo ". /etc/profile.d/custom-bash-history.sh" >> "$BUILDROOT/etc/bash.bashrc"
+
     ### add kmod related config file(s)
     add_file "/usr/lib/depmod.d/search.conf"
 

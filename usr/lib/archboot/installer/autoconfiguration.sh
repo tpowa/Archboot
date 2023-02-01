@@ -239,7 +239,16 @@ _auto_bash(){
     fi
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-aliases.sh ]]; then
         _dialog --infobox "Enable custom bash aliases on installed system..." 3 70
+        ! grep -qw 'custom-bash-aliases.sh' "${_DESTDIR}/etc/bash.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-aliases.sh" >> "${_DESTDIR}/etc/bash.bashrc"
         cp /etc/profile.d/custom-bash-aliases.sh "${_DESTDIR}"/etc/profile.d/
+        sleep 2
+    fi
+        if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-history.sh ]]; then
+        _dialog --infobox "Enable custom bash history on installed system..." 3 70
+        ! grep -qw 'custom-bash-history.sh' "${_DESTDIR}/etc/bash.bashrc" &&\
+            echo ". /etc/profile.d/custom-bash-history.sh" >> "${_DESTDIR}/etc/bash.bashrc"
+        cp /etc/profile.d/custom-bash-history.sh "${_DESTDIR}"/etc/profile.d/
         sleep 2
     fi
 }
