@@ -8,7 +8,7 @@ Environment changes:
 - show full initrd line in grub menu
 - added fbset and terminus-font
 - removed pcre, zsh and grml-zsh-config
-- added a normal bash layout with /root/.bash* files
+- added normal bash layout with /root/.bash* files
 - Custom bash options are provided by /etc/profile.d/custom-bash-options.sh
 - added bash-completion
 - switch to Terminus as default font
