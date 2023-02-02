@@ -28,7 +28,8 @@ setup:
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - devices are listed with their SIZE in menus
 - enable custom bash options on installed system
-- always add bash-completion on installed system
+- move hardcoded packages mdadm lvm2 cryptsetup to defaults file
+- added bash-completion to defaults file
 - added autodetection of ucode package
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
