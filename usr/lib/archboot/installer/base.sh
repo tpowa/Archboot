@@ -192,10 +192,10 @@ _prepare_storagedrive() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Drive" 12 60 5 \
-            "1" "Auto-Prepare (erases the ENTIRE storage drive)" \
-            "2" "Partition Storage Drives" \
-            "3" "Manage Software Raid, Lvm2 and Luks encryption" \
+        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Device" 12 60 5 \
+            "1" "Auto-Prepare (erases the ENTIRE storage device)" \
+            "2" "Partition Storage Device" \
+            "3" "Manage Software Raid, LVM2 and LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
             "5" "Return to Main Menu" 2>${_ANSWER} || _CANCEL=1
         _NEXTITEM="$(cat ${_ANSWER})"
@@ -290,7 +290,7 @@ _mainmenu() {
     "1" "Set up Network" \
     "2" "Select Source" \
     "3" "Set Time And Date" \
-    "4" "Prepare Storage Drive" \
+    "4" "Prepare Storage Device" \
     "5" "Install Packages" \
     "6" "Configure System" \
     "7" "Install Bootloader" \
