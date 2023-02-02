@@ -962,7 +962,7 @@ _install_bootloader() {
     fi
     _prepare_pacman
     if [[ -n "${_UCODE}" ]]; then
-        if ! [[ -f ${_DESTDIR}/boot/${_UCODE} ]]; then
+        if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
             _PACKAGES="${_UCODE_PKG}"
             _run_pacman
         fi
