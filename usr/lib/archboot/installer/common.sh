@@ -101,12 +101,24 @@ _auto_packages() {
     if lsblk -rnpo FSTYPE | grep -q vfat; then
         ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
     fi
-    if lsmod | grep -qw wl; then
-        ! echo "${_PACKAGES}" | grep -qw broadcom-wl && _PACKAGES="${_PACKAGES} broadcom-wl"
+    # Add packages for complex blockdevices
+    if lsblk -rnpo FSTYPE | grep -qw 'linux_raid_member'; then
+        ! echo "${_PACKAGES}" | grep -qw mdadm && _PACKAGES="${_PACKAGES} mdadm"
+    fi
+    if lsblk -rnpo FSTYPE | grep -qw 'LVM2_member'; then
+        ! echo "${_PACKAGES}" | grep -qw lvm2 && _PACKAGES="${_PACKAGES} lvm2"
+    fi
+    if lsblk -rnpo FSTYPE | grep -qw 'crypto_LUKS'; then
+        ! echo "${_PACKAGES}" | grep -qw cryptsetup && _PACKAGES="${_PACKAGES} cryptsetup"
     fi
     #shellcheck disable=SC2010
+    # Add iwd, if wlan is detected
     if ls /sys/class/net | grep -q wlan; then
         ! echo "${_PACKAGES}" | grep -qw iwd && _PACKAGES="${_PACKAGES} iwd"
+    fi
+    # Add broadcom-wl, if module is detected
+    if lsmod | grep -qw wl; then
+        ! echo "${_PACKAGES}" | grep -qw broadcom-wl && _PACKAGES="${_PACKAGES} broadcom-wl"
     fi
     grep -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES="${_PACKAGES} terminus-font"
     # only add firmware if already used
