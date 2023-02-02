@@ -15,7 +15,6 @@ _check_root_password() {
 }
 
 _set_mkinitcpio() {
-    _dialog --msgbox "The mkinitcpio.conf file controls which modules will be placed into the initramfs for your system's kernel.\n\n- If you install under VMWARE add 'BusLogic' to MODULES= array\n- 2 or more disk controllers, please specify the correct module\n  loading order in MODULES= array \n\nMost of you will not need to change anything in this file." 12 70
     _HOOK_ERROR=""
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
     #shellcheck disable=SC2013
