@@ -5,7 +5,7 @@ _autoprepare() {
     # check on special devices and stop them, else weird things can happen during partitioning!
     _stopluks
     _stoplvm
-    _stop_md
+    _stopmd
     _NAME_SCHEME_PARAMETER_RUN=""
     # switch for mbr usage
     _set_guid
