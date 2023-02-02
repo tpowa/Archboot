@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-if [[ "${_RUNNING_ARCH}" == "x86_64" && "$(grep -q 'Intel' /proc/cpuinfo)" ]]; then
+if [[ "${_RUNNING_ARCH}" == "x86_64" ]] && grep -q 'Intel' /proc/cpuinfo; then
     _UCODE="intel-ucode.img"
     _UCODE_PKG="intel-ucode"
 fi
