@@ -6,11 +6,6 @@ LANG=C.UTF8
 _LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 _RUNNING_ARCH="$(uname -m)"
 _KERNELPKG="linux"
-_INTEL_UCODE="intel-ucode.img"
-# name of amd ucode initramfs image
-_AMD_UCODE="amd-ucode.img"
-# name of the initramfs filesystem
-_INITRAMFS="initramfs-${_KERNELPKG}.img"
 # name of the kernel image
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -119,17 +114,7 @@ _auto_packages() {
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware
-    ### HACK:
-    # always add intel-ucode on x86_64
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _PACKAGES="${_PACKAGES//\ intel-ucode\ / }"
-        _PACKAGES="${_PACKAGES} intel-ucode"
-    fi
-    # always add amd-ucode
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ||  "${_RUNNING_ARCH}" == "aarch64"  ]]; then
-        _PACKAGES="${_PACKAGES//\ amd-ucode\ / }"
-        _PACKAGES="${_PACKAGES} amd-ucode"
-    fi
+    # ucode package, expression needs to be fixed for bash 5.2.x:
     ### HACK:
     # always add lvm2, cryptsetup, mdadm, nano, neovim and bash-completion
     _PACKAGES="${_PACKAGES//\ lvm2\ / }"

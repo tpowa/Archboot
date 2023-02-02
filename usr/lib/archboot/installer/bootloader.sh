@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
+if [[ "${_RUNNING_ARCH}" == "x86_64" && "$(grep -q 'Intel' /proc/cpuinfo)" ]]; then
+    _UCODE="intel-ucode.img"
+    _UCODE_PKG="intel-ucode"
+fi
+if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
+    if grep -q 'AMD' /proc/cpuinfo; then
+        _UCODE="amd-ucode.img"
+        _UCODE_PKG="amd-ucode"
+    fi
+fi
+
 _getrootfstype() {
     _ROOTFS="$(_getfstype "${_ROOTDEV}")"
 }
@@ -304,12 +315,10 @@ _do_efistub_parameters() {
             _KERNEL="${_VMLINUZ_EFISTUB}"
         else
             _KERNEL="${_VMLINUZ}"
-            if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-                _INITRD_INTEL_UCODE="${_INTEL_UCODE}"
-            fi
+
         fi
-        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            _INITRD_AMD_UCODE="${_AMD_UCODE}"
+        if [[ -n "${_UCODE}" ]]; then
+            _INITRD_UCODE="${_UCODE}"
         fi
         _INITRD="${_INITRAMFS}"
     else
@@ -318,12 +327,10 @@ _do_efistub_parameters() {
             _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ_EFISTUB}"
         else
             _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
-            if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-                _INITRD_INTEL_UCODE="${_UEFISYS_PATH}/${_INTEL_UCODE}"
-            fi
+
         fi
-        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            _INITRD_AMD_UCODE="${_UEFISYS_PATH}/${_AMD_UCODE}"
+        if [[ -n "${_UCODE}" ]]; then
+            _INITRD_UCODE="${_UEFISYS_PATH}/${_UCODE}"
         fi
         _INITRD="${_UEFISYS_PATH}/${_INITRAMFS}"
     fi
@@ -338,13 +345,9 @@ _do_efistub_copy_to_efisys() {
         cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
         cp -f "${_DESTDIR}/boot/${_INITRAMFS}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
-        if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
-            cp -f "${_DESTDIR}/boot/${_INTEL_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}"
-        fi
-        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_AMD_UCODE}"
-            cp -f "${_DESTDIR}/boot/${_AMD_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_AMD_UCODE}"
+        if [[ -n "${_INITRD_UCODE}" ]]; then
+            rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
+            cp -f "${_DESTDIR}/boot/${_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
         fi
         sleep 5
         _dialog --infobox "Enable automatic copying of system files\nto EFI SYSTEM PARTITION (ESP) on installed system..." 4 50
@@ -355,10 +358,14 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 PathChanged=/boot/${_VMLINUZ}
 PathChanged=/boot/${_INITRAMFS}
 CONFEOF
-        [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "PathChanged=/boot/${_AMD_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "PathChanged=/boot/${_INTEL_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
+        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
+            if grep -q 'AMD' /proc/cpuinfo; then
+                echo "PathChanged=/boot/${_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
+            fi
+        fi
+        if [[ "${_RUNNING_ARCH}" == "x86_64" && "$(grep -q 'Intel' /proc/cpuinfo)" ]]; then
+            echo "PathChanged=/boot/${_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
+        fi
         cat << CONFEOF >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
 Unit=efistub_copy.service
 [Install]
@@ -372,12 +379,10 @@ Type=oneshot
 ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} /${_UEFISYS_MP}/${_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${_INITRAMFS} /${_UEFISYS_MP}/${_INITRD}
 CONFEOF
-        [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${_AMD_UCODE} /${_UEFISYS_MP}/${_INITRD_AMD_UCODE}" \
+        if [[ -n "${_INITRD_UCODE}" ]]; then
+            echo "ExecStart=/usr/bin/cp -f /boot/${_UCODE} /${_UEFISYS_MP}/${_INITRD_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
-            echo "ExecStart=/usr/bin/cp -f /boot/${_INTEL_UCODE} /${_UEFISYS_MP}/${_INITRD_INTEL_UCODE}" \
-            >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
+        fi
         if [[ "${_DESTDIR}" == "/install" ]]; then
             systemd-nspawn -q -D "${_DESTDIR}" systemctl enable efistub_copy.path &>"${_NO_LOG}"
         else
@@ -412,10 +417,9 @@ _do_systemd_boot_uefi() {
     ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     echo "linux    /${_KERNEL}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "initrd   /${_INITRD_INTEL_UCODE}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    [[ "${_RUNNING_ARCH}" == "x86_64"  || "${_RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "initrd   /${_INITRD_AMD_UCODE}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    if [[ -n "${_INITRD_UCODE}" ]]; then
+        echo "initrd   /${_INITRD_UCODE}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    fi
     cat << GUMEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   /${_INITRD}
 options  ${_KERNEL_PARAMS_MOD}
@@ -469,10 +473,9 @@ menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
     loader   /${_KERNEL}
 CONFEOF
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && \
-        echo "    initrd   /${_INITRD_INTEL_UCODE}" >> "${_REFIND_CONFIG}"
-    [[ "${_RUNNING_ARCH}" == "x86_64"  || "${_RUNNING_ARCH}" == "aarch64" ]] && \
-        echo "    initrd   /${_INITRD_AMD_UCODE}" >> "${_REFIND_CONFIG}"
+    if [[ -n "${_INITRD_UCODE}" ]]; then
+        echo "    initrd   /${_INITRD_UCODE}" >> "${_REFIND_CONFIG}"
+    fi
     cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
     options  "${_KERNEL_PARAMS_MOD}"
@@ -675,7 +678,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${_GRUB_ROOT_DRIVE}
     ${_LINUX_MOD_COMMAND}
-    initrd ${_SUBDIR}/${_AMD_UCODE} ${_SUBDIR}/${_INITRAMFS}
+    initrd ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_INITRAMFS}
 }
 EOF
     _NUMBER=$((_NUMBER+1))
@@ -686,7 +689,7 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${_GRUB_ROOT_DRIVE}
     ${_LINUX_MOD_COMMAND}
-    initrd ${_SUBDIR}/${_INTEL_UCODE} ${_SUBDIR}/${_AMD_UCODE} ${_SUBDIR}/${_INITRAMFS}
+    initrd ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_INITRAMFS}
 }
 EOF
     if [[ -n "${_UEFI_BOOT}" ]]; then
@@ -961,6 +964,10 @@ _install_bootloader() {
         _select_source || return 1
     fi
     _prepare_pacman
+    if [[ -n "${_UCODE_PKG}" ]]; then
+        PACKAGES="${_UCODE_PKG}"
+        _run_pacman
+    fi
     if [[ -n "${_UEFI_BOOT}" ]]; then
         _install_bootloader_uefi
     else
