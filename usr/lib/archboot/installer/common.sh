@@ -18,7 +18,6 @@ _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/ca
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
 
 _linux_firmware() {
-    _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
         if modinfo "${i}" | grep -qw 'firmware:'; then
@@ -30,7 +29,6 @@ _linux_firmware() {
 
 _marvell_firmware() {
     _MARVELL=""
-    _PACKAGES="${_PACKAGES// linux-firmware-marvell/ }"
     for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
         [[ -f $i ]] && _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
     done
@@ -114,21 +112,6 @@ _auto_packages() {
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware
-    # ucode package, expression needs to be fixed for bash 5.2.x:
-    ### HACK:
-    # always add lvm2, cryptsetup, mdadm, nano, neovim and bash-completion
-    _PACKAGES="${_PACKAGES//\ lvm2\ / }"
-    _PACKAGES="${_PACKAGES} lvm2"
-    _PACKAGES="${_PACKAGES//\ cryptsetup\ / }"
-    _PACKAGES="${_PACKAGES} cryptsetup"
-    _PACKAGES="${_PACKAGES//\ mdadm\ / }"
-    _PACKAGES="${_PACKAGES} mdadm"
-    _PACKAGES="${_PACKAGES//\ nano\ / }"
-    _PACKAGES="${_PACKAGES} nano"
-    _PACKAGES="${_PACKAGES//\ neovim\ / }"
-    _PACKAGES="${_PACKAGES} neovim"
-    _PACKAGES="${_PACKAGES//\ bash-completion\ / }"
-    _PACKAGES="${_PACKAGES} bash-completion"
 }
 
 # /etc/locale.gen
