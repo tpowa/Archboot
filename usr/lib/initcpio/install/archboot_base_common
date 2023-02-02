@@ -101,7 +101,7 @@ build ()
     map add_full_dir "/etc/dbus-1" "/usr/share/dbus-1"
 
     # tpm2-tss files
-    map add_binary secret-tool pinentry pintentry-curses gpgme-tool gpgme-json
+    map add_binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
     map add_full_dir /etc/tpm2-tss /etc/pinentry
     #systemd files
     map add_binary systemd-umount busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
