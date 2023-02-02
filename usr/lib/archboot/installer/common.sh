@@ -18,6 +18,7 @@ _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/ca
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
 
 _linux_firmware() {
+    _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
         if modinfo "${i}" | grep -qw 'firmware:'; then
@@ -29,6 +30,7 @@ _linux_firmware() {
 
 _marvell_firmware() {
     _MARVELL=""
+    _PACKAGES="${_PACKAGES//\ linux-firmware-marvell\ / }"
     for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
         [[ -f $i ]] && _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
     done
