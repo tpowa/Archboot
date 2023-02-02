@@ -961,7 +961,7 @@ _install_bootloader() {
         _select_source || return 1
     fi
     _prepare_pacman
-    if [[ -n "${_UCODE}" ]]; then
+    if [[ -n "${_UCODE_PKG}" ]]; then
         _PACKAGES="${_UCODE_PKG}"
         _run_pacman
     fi
