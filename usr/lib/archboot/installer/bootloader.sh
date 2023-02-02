@@ -25,7 +25,7 @@ _getrootflags() {
 
 _getraidarrays() {
     _RAIDARRAYS=""
-    if ! grep -q ^ARRAY "${_DESTDIR}"/etc/mdadm.conf; then
+    if [[ -f "${_DESTDIR}"/etc/mdadm.conf ]] && ! grep -q '^ARRAY' "${_DESTDIR}"/etc/mdadm.conf 2>${_NO_LOG}; then
         _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>"${_NO_LOG}" | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
     fi
 }
