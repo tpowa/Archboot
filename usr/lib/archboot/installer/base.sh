@@ -75,8 +75,22 @@ _geteditor() {
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
-            "1") _EDITOR="nano" ;;
-            "2") _EDITOR="nvim" ;;
+            "1") _EDITOR="nano"
+                if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
+                    _PACKAGES="nano"
+                    _run_pacman
+                    _dialog --infobox "Enable nano's syntax highlighting on installed system..." 3 70
+                    grep -q '^include' "${_DESTDIR}/etc/nanorc" || \
+                        echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
+                    sleep 2
+                fi
+                ;;
+            "2") _EDITOR="nvim"
+                if ! [[ -f "${_DESTDIR}/usr/bin/nvim" ]]; then
+                    _PACKAGES="nvim"
+                    _run_pacman
+                fi
+                ;;
         esac
     fi
 }

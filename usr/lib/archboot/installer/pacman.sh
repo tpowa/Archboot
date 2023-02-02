@@ -186,7 +186,6 @@ _install_packages() {
     _auto_vconsole
     _auto_hostname
     _auto_locale
-    _auto_nano_syntax
     _auto_bash
     # tear down the chroot environment
     _chroot_umount
