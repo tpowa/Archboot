@@ -163,7 +163,7 @@ _autoprepare() {
         # btrfs minimum size is around 400MB
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-450))"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --inputbox "Enter the size (MB) of your / partition:\nMinimum value is 2000,\nThe /home partition will have a minimum of 450 MB remaining space.\n\nDisk space left:  $((_DISK_SIZE-450)) MB" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the size (MB) of your / partition:\nMinimum value is 2000.\nThe /home partition minimum is 450 MB remaining space.\n\nDisk space left:  $((_DISK_SIZE-450)) MB" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
