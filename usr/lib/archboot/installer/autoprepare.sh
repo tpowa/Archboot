@@ -168,7 +168,7 @@ _autoprepare() {
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
-                if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
+                if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "$((_DISK_SIZE-_ROOTDEV_SIZE))" -lt "450" ]]; then
                     _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE)) MB will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
