@@ -223,12 +223,6 @@ _auto_set_locale() {
     sleep 2
 }
 
-_auto_nano_syntax() {
-    _dialog --infobox "Enable nano's syntax highlighting on installed system..." 3 70
-    grep -q '^include' "${_DESTDIR}/etc/nanorc" || echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
-    sleep 2
-}
-
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _dialog --infobox "Setup bash with custom options on installed system..." 3 70
