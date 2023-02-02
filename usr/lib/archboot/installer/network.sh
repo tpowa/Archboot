@@ -115,11 +115,11 @@ _donetwork() {
             _DNS=""
         else
             _IP="static"
-            _dialog --inputbox "Enter your IP address and netmask:" 7 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter your IP address and netmask:" 8 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
             _IPADDR=$(cat "${_ANSWER}")
-            _dialog --inputbox "Enter your gateway:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter your gateway:" 8 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
             _GW=$(cat "${_ANSWER}")
-            _dialog --inputbox "Enter your DNS server IP:" 7 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
             _DNS=$(cat "${_ANSWER}")
         fi
             # http/ftp proxy settings
