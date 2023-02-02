@@ -11,6 +11,8 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _UCODE_PKG="amd-ucode"
     fi
 fi
+# name of the initramfs filesystem
+_INITRAMFS="initramfs-${_KERNELPKG}.img"
 
 _getrootfstype() {
     _ROOTFS="$(_getfstype "${_ROOTDEV}")"
@@ -358,12 +360,7 @@ Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 PathChanged=/boot/${_VMLINUZ}
 PathChanged=/boot/${_INITRAMFS}
 CONFEOF
-        if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            if grep -q 'AMD' /proc/cpuinfo; then
-                echo "PathChanged=/boot/${_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
-            fi
-        fi
-        if [[ "${_RUNNING_ARCH}" == "x86_64" && "$(grep -q 'Intel' /proc/cpuinfo)" ]]; then
+        if [[ -n "${_UCODE}" ]]; then
             echo "PathChanged=/boot/${_UCODE}" >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
         fi
         cat << CONFEOF >> "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
@@ -965,7 +962,7 @@ _install_bootloader() {
     fi
     _prepare_pacman
     if [[ -n "${_UCODE_PKG}" ]]; then
-        PACKAGES="${_UCODE_PKG}"
+        _PACKAGES="${_UCODE_PKG}"
         _run_pacman
     fi
     if [[ -n "${_UEFI_BOOT}" ]]; then
