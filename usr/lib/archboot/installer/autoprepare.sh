@@ -68,7 +68,7 @@ _autoprepare() {
             _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                    _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -85,7 +85,7 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --inputbox "Enter the size (MB) of your EFI SYSTEM PARTITION (ESP),\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --inputbox "Enter the size (MB) of your EFI SYSTEM PARTITION (ESP),\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -102,7 +102,7 @@ _autoprepare() {
             fi
             _DISK_SIZE="$((_DISK_SIZE-_UEFISYSDEV_SIZE))"
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -119,7 +119,7 @@ _autoprepare() {
             done
         else
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --inputbox "Enter the size (MB) of your /boot partition,\nMinimum value is 100.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
@@ -138,7 +138,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${_DISK_SIZE} MB" 10 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the size (MB) of your swap partition,\nMinimum value is > 0.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" || "${_SWAPDEV_SIZE}" == 0 ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
@@ -162,7 +162,7 @@ _autoprepare() {
         _ROOT_SIZE="7500"
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="${_DISK_SIZE}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 10 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the size (MB) of your / partition\nMinimum value is 2000,\nthe /home partition will use the remaining space.\n\nDisk space left:  ${_DISK_SIZE} MB" 11 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
