@@ -107,8 +107,8 @@ _check_efisys_part() {
 _partition() {
     # stop special devices, else weird things can happen during partitioning
     _stopluks
-    _stopmd
     _stoplvm
+    _stopmd
     _set_guid
     # Select disk to partition
     _DISKS=$(_finddisks)
