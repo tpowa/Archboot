@@ -29,6 +29,7 @@ setup:
 - devices are listed with their SIZE in menus
 - enable custom bash options on installed system
 - always add bash-completion on installed system
+- added autodetection of ucode package
 - added Unified Kernel Image suppport in EFISTUB menu
 - new efibootmgr routine
 - disable unsafe menu entries on installed system
