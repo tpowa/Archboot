@@ -130,6 +130,7 @@ _set_uefi_parameters() {
 _set_guid() {
     # all uefi systems should use GUID layout
     if [[ -z "${_UEFI_BOOT}" ]]; then
+        _GUIDPARAMETER=""
         ## Lenovo BIOS-GPT issues - Arch Forum - https://bbs.archlinux.org/viewtopic.php?id=131149 ,
         ## https://bbs.archlinux.org/viewtopic.php?id=133330 ,
         ## https://bbs.archlinux.org/viewtopic.php?id=138958
