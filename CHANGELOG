@@ -27,6 +27,7 @@ setup:
 - don't format already existing swap partition
 - added sanity checks for ROOT DEVICE and ESP
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
+- fixed use M to calculate sizes in Auto-Prepare
 - devices are listed with their SIZE in menus
 - enable custom bash options on installed system
 - autodetect packages mdadm, lvm2 and cryptsetup
