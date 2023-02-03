@@ -231,6 +231,9 @@ _mountpoints() {
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --msgbox "Error: ROOT DEVICE has a vfat filesystem." 5 60
                                 _MP_DONE=""
+                            elif [[ "${_FSTYPE}" == "swap" ]]; then
+                                _dialog --msgbox "Error: ROOT DEVICE has a swap filesystem." 5 60
+                                _MP_DONE=""
                             else
                                 _MP_DONE=1
                             fi
