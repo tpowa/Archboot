@@ -147,6 +147,8 @@ _create_filesystem() {
 _mountpoints() {
     _NAME_SCHEME_PARAMETER_RUN=""
     _DEVFINISH=""
+    # switch for mbr usage
+    _set_guid
     while [[ "${_DEVFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.device-names
