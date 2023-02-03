@@ -52,12 +52,11 @@ _autoprepare() {
         command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
         command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
-
+        _DEV_NUM=0
         # create 1 MB bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
             _GPT_BIOS_GRUB_DEV_SIZE="2"
-            _DEV_NUM=1
-            _GPT_BIOS_GRUB_DEV_NUM="${_DEV_NUM}"
+            _GPT_BIOS_GRUB_DEV_NUM="$((_DEV_NUM+1))"
             _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
         fi
         # only create ESP on UEFI systems
@@ -68,7 +67,6 @@ _autoprepare() {
                 _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
                 _UEFISYS_BOOTDEV=1
             fi
-
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition:\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "512" 2>"${_ANSWER}" || return 1
@@ -131,8 +129,7 @@ _autoprepare() {
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOTDEV_SET=1
-                        _DEV_NUM=1
-                        _BOOTDEV_NUM="${_DEV_NUM}"
+                        _BOOTDEV_NUM=$((_DEV_NUM+1))
                         _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
