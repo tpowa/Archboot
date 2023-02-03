@@ -58,6 +58,7 @@ _autoprepare() {
             _GPT_BIOS_GRUB_DEV_SIZE="2"
             _GPT_BIOS_GRUB_DEV_NUM="$((_DEV_NUM+1))"
             _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
+            _DEV_NUM="${_GPT_BIOS_GRUB_DEV_NUM}"
         fi
         # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
@@ -79,8 +80,8 @@ _autoprepare() {
                         else
                             _BOOTDEV_SET=1
                             _UEFISYSDEV_SET=1
-                            _DEV_NUM="$((_DEV_NUM+1))"
-                            _UEFISYSDEV_NUM="${_DEV_NUM}"
+                            _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
+                            _DEV_NUM="${_UEFISYSDEV_NUM}"
                         fi
                     fi
                 done
@@ -95,8 +96,8 @@ _autoprepare() {
                             _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                         else
                             _UEFISYSDEV_SET=1
-                            _DEV_NUM="$((_DEV_NUM+1))"
-                            _UEFISYSDEV_NUM="${_DEV_NUM}"
+                            _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
+                            _DEV_NUM=${_UEFISYSDEV_NUM}
                         fi
                     fi
                 done
@@ -112,8 +113,8 @@ _autoprepare() {
                         _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
                     else
                         _BOOTDEV_SET=1
-                        _DEV_NUM="$((_UEFISYSDEV_NUM+1))"
-                        _BOOTDEV_NUM="${_DEV_NUM}"
+                        _BOOTDEV_NUM="$((_DEV_NUM+1))"
+                        _DEV_NUM="${_BOOTDEV_NUM}"
                         _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
@@ -130,6 +131,7 @@ _autoprepare() {
                     else
                         _BOOTDEV_SET=1
                         _BOOTDEV_NUM=$((_DEV_NUM+1))
+                        _DEV_NUM="${_BOOTDEV_NUM}"
                         _DISK_SIZE="$((_DISK_SIZE-_BOOTDEV_SIZE))"
                     fi
                 fi
@@ -147,8 +149,8 @@ _autoprepare() {
                     _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     _SWAPDEV_SET=1
-                    _DEV_NUM="$((_DEV_NUM+1))"
-                    _SWAPDEV_NUM="${_DEV_NUM}"
+                    _SWAPDEV_NUM="$((_DEV_NUM+1))"
+                    _DEV_NUM="${_SWAPDEV_NUM}"
                 fi
             fi
         done
@@ -175,10 +177,10 @@ _autoprepare() {
                 fi
             fi
         done
-        _DEV_NUM="$((_DEV_NUM+1))"
-        _ROOTDEV_NUM="${_DEV_NUM}"
-        _DEV_NUM="$((_DEV_NUM+1))"
-        _HOMEDEV_NUM="${_DEV_NUM}"
+         _ROOTDEV_NUM="$((_DEV_NUM+1))"
+        _DEV_NUM="${_ROOTDEV_NUM}"
+        _HOMEDEV_NUM="$((_DEV_NUM+1))"
+        _DEV_NUM="${_HOMEDEV_NUM}"
         _DEFAULTFS=1
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!\nALL DATA ON ${_DISK} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
