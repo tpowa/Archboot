@@ -36,7 +36,7 @@ _check_gpt() {
         fi
         if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
             if ! sgdisk -p "${_DISK}" | grep -q 'EF02'; then
-                _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1 MB BIOS BOOT PARTITION for grub BIOS GPT support." 0 0
+                _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1M BIOS BOOT PARTITION for grub BIOS GPT support." 0 0
                 _RUN_CFDISK=1
             fi
         fi
@@ -65,8 +65,8 @@ _check_efisys_part() {
         fi
     fi
     if ! sgdisk -p "${_DISK}" | grep -q 'EF00'; then
-        # Windows 10 recommends a minimum of 260MB Efi Systen Partition
-        _dialog --msgbox "Setup detected no EFI SYSTEM PARTITION (ESP) in ${_DISK}. You will now be put into cfdisk. Please create a >= 260 MB partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260 MB FAT32 EFI SYSTEM PARTITIOM (ESP), check whether that partition has EFI System cfdisk type code." 0 0
+        # Windows 10 recommends a minimum of 260M Efi Systen Partition
+        _dialog --msgbox "Setup detected no EFI SYSTEM PARTITION (ESP) in ${_DISK}. You will now be put into cfdisk. Please create a >= 260M partition with cfdisk type EFI System .\nWhen prompted (later) to format as FAT32, say YES.\nIf you already have a >=260M FAT32 EFI SYSTEM PARTITIOM (ESP), check whether that partition has EFI System cfdisk type code." 0 0
         clear && cfdisk "${_DISK}"
         _RUN_CFDISK=""
     fi
@@ -99,7 +99,7 @@ _check_efisys_part() {
         fi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
     else
-        _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION (ESP) on ${_DISK}. Please create >= 260 MB FAT32 partition with cfdisk type EFI System code and try again." 0 0
+        _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION (ESP) on ${_DISK}. Please create >= 260M FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
     fi
 }
