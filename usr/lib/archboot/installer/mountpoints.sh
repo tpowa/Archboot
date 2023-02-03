@@ -250,18 +250,18 @@ _mountpoints() {
                     break
                 fi
             done
-            if [[ "${_DEV}" != "DONE" ]]; then
-                # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-                if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
-                    _enter_mountpoint || return 1
-                    _create_filesystem || return 1
-                else
-                    _enter_mountpoint || return 1
-                    if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                        _btrfs_subvolume || return 1
+            if ! [[ "${_DEV}" == "NONE" ]]; then
+                if [[ "${_DEV}" != "DONE" ]]; then
+                    # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                    if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
+                        _enter_mountpoint || return 1
+                    _   create_filesystem || return 1
+                    else
+                        _enter_mountpoint || return 1
+                        if [[ "${_FSTYPE}" == "btrfs" ]]; then
+                            _btrfs_subvolume || return 1
+                        fi
                     fi
-                fi
-                if ! [[ "${_DEV}" == "NONE" ]]; then
                     _find_btrfsraid_devices
                     _btrfs_parts
                     _check_mkfs_values
