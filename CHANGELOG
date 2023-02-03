@@ -25,6 +25,7 @@ setup:
 - new systemd compliant mounting dialogs with /efi or /boot as ESP
 - don't format already existing ESP
 - don't format already existing swap partition
+- added sanity checks for ROOT DEVICE and ESP
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - devices are listed with their SIZE in menus
 - enable custom bash options on installed system
