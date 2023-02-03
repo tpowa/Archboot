@@ -184,7 +184,7 @@ _mountpoints() {
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
                     [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
-                    if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" || "${_DEV}" == "NONE" ]]; then
+                    if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi
                     # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem

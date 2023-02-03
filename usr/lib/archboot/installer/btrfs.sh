@@ -9,7 +9,7 @@ _btrfs_scan() {
 # mount btrfs for checks
 _mount_btrfs() {
     _btrfs_scan
-    _BTRFSMP="$(mktemp -d /tmp/brtfsmp.XXXX)"
+    _BTRFSMP="$(mktemp -d /tmp/btrfsmp.XXXX)"
     mount "${_DEV}" "${_BTRFSMP}"
 }
 
