@@ -1,18 +1,18 @@
 Now you'll be put into cfdisk, where you can partition your storage drive.\n\n
 You should consider the following GUID partition scheme:\n
 ---------------------------------------------------------------\n
-BIOS_GRUB PARTITION            -->            exact 2MB\n
+BIOS_GRUB PARTITION            -->            exact 2M\n
 ---------------------------------------------------------------\n
         RAM SIZE         SWAP PARTITION       RECOMMENDATION\n
 ---------------------------------------------------------------\n
-        < 2GB                  -->            2X RAM\n
-        2GB - 8GB              -->            = RAM\n
-        8GB - 64GB             -->            4G to 0.5X RAM\n
-        > 64GB                 -->            Minimum 4GB\n
+        < 2G                   -->            2X RAM\n
+        2G - 8G                -->            = RAM\n
+        8G - 64G               -->            4G to 0.5X RAM\n
+        > 64G                  -->            Minimum 4G\n
 ---------------------------------------------------------------\n
-EFI SYSTEM PARTITION (ESP)     -->            Minimum >= 260MB\n
+EFI SYSTEM PARTITION (ESP)     -->            Minimum >= 260M\n
 ---------------------------------------------------------------\n
-ROOT PARTITION                 -->            Minimum >= 2000MB\n
+ROOT PARTITION                 -->            Minimum >= 2000M\n
 ---------------------------------------------------------------\n
 DATA PARTITION(S) (eg. /home)  -->            As you will need.\n
 ---------------------------------------------------------------
