@@ -323,7 +323,7 @@ _mountpoints() {
 _mkfs() {
     if [[ -n "${4}" ]]; then
         if [[ "${2}" == "swap" ]]; then
-            _dialog --infobox "Creating and activating \nswapspace on \n${1}..." 0 0
+            _dialog --infobox "Creating and activating\nswapspace on ${1}..." 0 0
         else
             _dialog --infobox "Creating ${2} on ${1},\nmounting to ${3}${5}..." 0 0
         fi
