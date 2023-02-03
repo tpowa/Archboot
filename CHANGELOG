@@ -11,7 +11,7 @@ Environment changes:
 - removed pcre, zsh and grml-zsh-config
 - added normal bash layout with /root/.bash* files
 - Custom bash options are provided by /etc/profile.d/custom-bash-options.sh
-- added bash-completion
+- added bash-completion, tpm2-tss and pinentry
 - new MOTD with architecture and Manage Archboot
 update-installer:
 - added network check
@@ -28,6 +28,7 @@ setup:
 - added sanity checks for ROOT DEVICE and ESP
 - Auto-Prepare mode is systemd-gpt-auto-generator compliant now
 - fixed use M to calculate sizes in Auto-Prepare
+- skip ESP on BIOS mode
 - devices are listed with their SIZE in menus
 - enable custom bash options on installed system
 - autodetect packages mdadm, lvm2 and cryptsetup
