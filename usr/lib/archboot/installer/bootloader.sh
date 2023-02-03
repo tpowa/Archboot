@@ -508,7 +508,7 @@ _do_uki_uefi() {
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     sleep 5
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-    if [[ -f "${_DESTDIR}/${_UCODE}" ]]; then
+    if [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
           grep -q "^ALL_microcode=/boot/${_UCODE}" "${_MKINITCPIO_PRESET}" || \
             echo "ALL_microcode=/boot/${_UCODE}" >> "${_MKINITCPIO_PRESET}"
     fi
