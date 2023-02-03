@@ -699,7 +699,7 @@ _createlv()
         done
         while [[ -z "${_LV_SIZE_SET}" ]]; do
             _LV_ALL=""
-            _dialog --inputbox "Enter the size (MB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units m "${_LV}")B\n\nIf you enter no value, all free space left will be used." 12 65 "" 2>"${_ANSWER}" || return 1
+            _dialog --inputbox "Enter the size (M/MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units M "${_LV}")\n\nIf you enter no value, all free space left will be used." 12 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
                     _LV_ALL=1
@@ -707,7 +707,7 @@ _createlv()
                 elif [[ "${_LV_SIZE}" == 0 ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units m | sed -e 's#m##g')" ]]; then
+                    if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units M | sed -e 's#m##g')" ]]; then
                         _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         _LV_SIZE_SET=1
