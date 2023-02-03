@@ -52,7 +52,15 @@ _autoprepare() {
         command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
         command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
+
         # create 1 MB bios_grub partition for grub BIOS GPT support
+        if [[ -n "${_GUIDPARAMETER}" ]]; then
+            _GPT_BIOS_GRUB_DEV_SIZE="2"
+            _DEV_NUM=1
+            _GPT_BIOS_GRUB_DEV_NUM="${_DEV_NUM}"
+            _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
+        fi
+        # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
             _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP=$(cat "${_ANSWER}")
@@ -60,10 +68,7 @@ _autoprepare() {
                 _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
                 _UEFISYS_BOOTDEV=1
             fi
-            _GPT_BIOS_GRUB_DEV_SIZE="2"
-            _DEV_NUM=1
-            _GPT_BIOS_GRUB_DEV_NUM="${_DEV_NUM}"
-            _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
+
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
                     _dialog --inputbox "Enter the size (MB) of your /boot partition:\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE} MB" 11 65 "512" 2>"${_ANSWER}" || return 1
