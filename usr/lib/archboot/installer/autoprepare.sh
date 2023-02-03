@@ -163,14 +163,14 @@ _autoprepare() {
         _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
         _ROOT_SIZE="7500"
         # btrfs minimum size is around 400M
-        [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-450))"
+        [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-300))"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --inputbox "Enter the size (MiB/M) of your / partition:\nMinimum value is 2000.\nThe /home partition's minimum is > 450M remaining space.\n\nDisk space left:  $((_DISK_SIZE-450))M" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --inputbox "Enter the size (MiB/M) of your / partition:\nMinimum value is 2000.\nThe /home partition's minimum is > 300M remaining space.\n\nDisk space left:  $((_DISK_SIZE-300))M" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
             else
-                if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "$((_DISK_SIZE-_ROOTDEV_SIZE))" -lt "450" ]]; then
+                if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "$((_DISK_SIZE-_ROOTDEV_SIZE))" -lt "300" ]]; then
                     _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                 else
                     _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
