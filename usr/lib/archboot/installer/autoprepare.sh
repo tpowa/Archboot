@@ -162,7 +162,8 @@ _autoprepare() {
         done
         _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
         _ROOT_SIZE="7500"
-        # btrfs minimum size is around 400M
+        # xfs minimum size is around 300M
+        # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
         _dialog --inputbox "Enter the size (MiB/M) of your / partition:\nMinimum value is 2000.\nThe /home partition's minimum is > 350M remaining space.\n\nDisk space left:  $((_DISK_SIZE-350))M" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
