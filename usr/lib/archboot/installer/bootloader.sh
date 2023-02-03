@@ -501,6 +501,9 @@ CONFEOF
 _do_uki_uefi() {
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _dialog --infobox "This menu point will work with mkinitcpio v35, aborting now..." 4 65
+        sleep 5
+        return 1
         _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}-${_RUNNING_ARCH}.preset"
     else
         _MKINITCPIO_PRESET="${_DESTDIR}/etc/mkinitcpio.d/${_KERNELPKG}.preset"
