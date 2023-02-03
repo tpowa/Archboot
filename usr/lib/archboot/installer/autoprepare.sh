@@ -42,14 +42,6 @@ _autoprepare() {
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
         _set_device_name_scheme || return 1
     fi
-    if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
-        _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
-        _UEFISYS_MP=$(cat "${_ANSWER}")
-    fi
-    if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
-        _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
-        _UEFISYS_BOOTDEV=1
-    fi
     while [[ -z "${_DEFAULTFS}" ]]; do
         _FSOPTS=""
         command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
@@ -61,7 +53,13 @@ _autoprepare() {
         command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
-        if [[ -n "${_GUIDPARAMETER}" ]]; then
+        if [[ -n "${_GUIDPARAMETER}" -n "${_UEFI_BOOT}" ]]; then
+            _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
+            _UEFISYS_MP=$(cat "${_ANSWER}")
+            if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
+                _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260 MiB and only FAT32 FS is supported." 0 0
+                _UEFISYS_BOOTDEV=1
+            fi
             _GPT_BIOS_GRUB_DEV_SIZE="2"
             _DEV_NUM=1
             _GPT_BIOS_GRUB_DEV_NUM="${_DEV_NUM}"
