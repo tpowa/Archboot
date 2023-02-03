@@ -5,7 +5,7 @@
 # check if _ROOTDEV is set and if something is mounted on ${_DESTDIR}
 _destdir_mounts(){
     # Don't ask for filesystem and create new filesystems
-    _ASK_MOUNTPOINTS=""
+    _CREATE_MOUNTPOINTS=""
     _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
@@ -65,7 +65,7 @@ _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
         _MP="swap"
         # create swap if not already swap formatted
-        if [[ -n "${_ASK_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
+        if [[ -n "${_CREATE_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
             _DOMKFS=1
             _FSTYPE="swap"
         fi
@@ -187,8 +187,8 @@ _mountpoints() {
                     if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi
-                    # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-                    if [[  -n "${_ASK_MOUNTPOINTS}" ]]; then
+                    # _CREATE_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                    if [[  -n "${_CREATE_MOUNTPOINTS}" ]]; then
                         _MP_DONE=1
                         # reformat device, if already swap partition format
                         if [[  "${_FSTYPE}" == "swap" && -n "${_SWAP_DONE}" ]]; then
@@ -254,8 +254,8 @@ _mountpoints() {
                 fi
             done
             if [[ "${_DEV}" != "DONE" ]]; then
-                # _ASK_MOUNTPOINTS switch for create filesystem and only mounting filesystem
-                if [[ -n "${_ASK_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
+                # _CREATE_MOUNTPOINTS switch for create filesystem and only mounting filesystem
+                if [[ -n "${_CREATE_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                     _enter_mountpoint || return 1
                     _create_filesystem || return 1
                 else
@@ -275,7 +275,7 @@ _mountpoints() {
             fi
         done
         #shellcheck disable=SC2028
-        if [[  -n "${_ASK_MOUNTPOINTS}" ]]; then
+        if [[  -n "${_CREATE_MOUNTPOINTS}" ]]; then
             _MOUNT_TEXT="create and mount"
         else
             _MOUNT_TEXT="mount"
@@ -415,19 +415,19 @@ _mkfs() {
             return 1
         fi
         # check if /boot exists on ROOT DEVICE
-        if [[ -z "${_ASK_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
+        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
             _dialog --msgbox "Error: ROOT DEVICE ${3}${5} does not contain /boot directory." 0 0
             _umountall
             return 1
         fi
         # check on /EFI on /efi mountpoint
-        if [[ -z "${_ASK_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
+        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
             _dialog --msgbox "Error: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
             _umountall
             return 1
         fi
         # check on /EFI on /boot
-        if [[ -z "${_ASK_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint /efi > "${_NO_LOG}") && ! -d "${3}${5}/EFI" ]]; then
+        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint /efi > "${_NO_LOG}") && ! -d "${3}${5}/EFI" ]]; then
             _dialog --msgbox "Error: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
             _umountall
             return 1

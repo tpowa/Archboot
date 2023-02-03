@@ -202,7 +202,7 @@ _prepare_storagedrive() {
         [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
         case $(cat ${_ANSWER}) in
             "1")
-                _ASK_MOUNTPOINTS=1
+                _CREATE_MOUNTPOINTS=1
                 _autoprepare
                 [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
                 ;;
@@ -212,7 +212,7 @@ _prepare_storagedrive() {
                 _create_special ;;
             "4")
                 _DEVFINISH=""
-                _ASK_MOUNTPOINTS=1
+                _CREATE_MOUNTPOINTS=1
                 _mountpoints ;;
             *)
                 _DONE=1 ;;

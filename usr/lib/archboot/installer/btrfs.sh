@@ -185,7 +185,7 @@ _check_btrfs_subvolume(){
         _dialog --msgbox "ERROR: You have defined an empty name!\nPlease enter another name." 6 50
         _BTRFS_SUBVOLUME="NONE"
     fi
-    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_ASK_MOUNTPOINTS}" ]]; then
+    if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
@@ -240,7 +240,7 @@ _choose_btrfs_subvolume () {
 
 # btrfs subvolume menu
 _btrfs_subvolume() {
-    if [[ "${_FSTYPE}" == "btrfs" && -z "${_ASK_MOUNTPOINTS}" ]]; then
+    if [[ "${_FSTYPE}" == "btrfs" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _choose_btrfs_subvolume || return 1
     else
         if [[ -n "${_SKIP_FILESYSTEM}" && -z ${_DETECT_CREATE_FILESYSTEM}"" ]]; then
