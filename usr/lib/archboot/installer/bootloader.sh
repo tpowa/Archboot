@@ -954,6 +954,8 @@ _install_bootloader_uefi() {
 _install_bootloader() {
     _S_BOOTLOADER=""
     _destdir_mounts || return 1
+    # switch for mbr usage
+    _set_guid
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
         _set_device_name_scheme || return 1
     fi
