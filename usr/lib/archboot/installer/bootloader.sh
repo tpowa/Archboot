@@ -956,6 +956,7 @@ _install_bootloader() {
     _destdir_mounts || return 1
     # switch for mbr usage
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
+        _set_guid
         _set_device_name_scheme || return 1
     fi
     if [[ -z "${_S_SRC}" ]]; then
