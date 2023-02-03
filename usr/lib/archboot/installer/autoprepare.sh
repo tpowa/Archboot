@@ -53,7 +53,7 @@ _autoprepare() {
         command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
         command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         # create 1 MB bios_grub partition for grub BIOS GPT support
-        if [[ -n "${_GUIDPARAMETER}" -n "${_UEFI_BOOT}" ]]; then
+        if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
             _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP=$(cat "${_ANSWER}")
             if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
