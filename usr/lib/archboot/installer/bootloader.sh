@@ -396,10 +396,11 @@ _do_efistub_uefi() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _FIRMWARE="FIRMWARE"
         _FIRMWARE_DESC="Unified Kernel Image for ${_UEFI_ARCH} UEFI"
+        _FIRMWARE_MENU="FIRMWARE boot or"
         _REFIND="rEFInd"
         _REFIND_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --menu "Select FIRMWARE boot or an UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
+    _dialog --menu "Select ${_FIRMWARE_MENU} UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
         "${_FIRMWARE}" "${_FIRMWARE_DESC}" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "${_REFIND}" "${_REFIND_DESC}" 2>"${_ANSWER}"
