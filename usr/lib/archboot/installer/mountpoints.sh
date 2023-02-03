@@ -414,6 +414,13 @@ _mkfs() {
             _dialog --msgbox "Error mounting ${3}${5}" 0 0
             return 1
         fi
+        # create /EFI directory on ESP
+        if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
+            mkdir "${3}${5}/EFI"
+        fi
+        if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint "${3}/efi" > "${_NO_LOG}") && ! -d "${3}${5}/EFI" ]]; then
+            mkdir "${3}${5}/EFI"
+        fi
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
             _dialog --msgbox "Error: ROOT DEVICE ${3}${5} does not contain /boot directory." 0 0
@@ -427,7 +434,7 @@ _mkfs() {
             return 1
         fi
         # check on /EFI on /boot
-        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint /efi > "${_NO_LOG}") && ! -d "${3}${5}/EFI" ]]; then
+        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint "${3}/efi" > "${_NO_LOG}") && ! -d "${3}${5}/EFI" ]]; then
             _dialog --msgbox "Error: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
             _umountall
             return 1
