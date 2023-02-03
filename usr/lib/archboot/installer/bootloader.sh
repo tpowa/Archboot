@@ -960,7 +960,10 @@ _install_bootloader() {
         _set_device_name_scheme || return 1
     fi
     if [[ -z "${_S_SRC}" ]]; then
-        _select_source || return 1
+        if ! _select_source; then
+            _NEXTITEM="7"
+            return 1
+        fi
     fi
     _prepare_pacman
     if [[ -n "${_UCODE}" ]]; then
