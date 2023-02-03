@@ -394,16 +394,13 @@ _do_efistub_uefi() {
     _do_efistub_parameters
     _common_bootloader_checks
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _FIRMWARE="FIRMWARE"
-        _FIRMWARE_DESC="Unified Kernel Image for ${_UEFI_ARCH} UEFI"
-        _FIRMWARE_MENU="FIRMWARE boot or"
-        _REFIND="rEFInd"
-        _REFIND_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
+        _ADDITIONAL_BOOTLOADER="rEFInd"
+        _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --menu "Select ${_FIRMWARE_MENU} UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
-        "${_FIRMWARE}" "${_FIRMWARE_DESC}" \
+    _dialog --menu "Select FIRMWARE boot or an UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
+        "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
-        "${_REFIND}" "${_REFIND_DESC}" 2>"${_ANSWER}"
+        "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
         "FIRMWARE") _do_uki_uefi;;
         "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
@@ -511,12 +508,17 @@ _do_uki_uefi() {
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     sleep 5
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-    grep -q '^ALL_microcode=(/boot/\*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
-        echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        grep -q '^ALL_microcode=(/boot/\*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
+            echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
+    fi
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
-    grep -q "default_options=\"--splash /usr/share/systemd/bootctl/splash-arch.bmp\"" "${_MKINITCPIO_PRESET}" || \
-        echo "default_options=\"--splash /usr/share/systemd/bootctl/splash-arch.bmp\"" >> "${_MKINITCPIO_PRESET}"
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _KERNEL_IMAGE="--kernelimage /boot/Image"
+    fi
+    grep -q "default_options=\"${_KERNEL_IMAGE} --splash /usr/share/systemd/bootctl/splash-arch.bmp\"" "${_MKINITCPIO_PRESET}" || \
+        echo "default_options=\"${_KERNEL_IMAGE} --splash /usr/share/systemd/bootctl/splash-arch.bmp\"" >> "${_MKINITCPIO_PRESET}"
     [[ -d ${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
     _run_mkinitcpio
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
