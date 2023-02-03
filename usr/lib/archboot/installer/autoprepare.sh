@@ -242,7 +242,7 @@ _autoprepare() {
     _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:ARCH_BOOT"
     _FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCH_HOME"
     _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:ESP"
-    if [[ -n "${_GUIDPARAMETER}" ]]; then
+    if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         else
