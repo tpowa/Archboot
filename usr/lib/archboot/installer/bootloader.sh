@@ -508,9 +508,9 @@ _do_uki_uefi() {
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     sleep 5
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        grep -q '^ALL_microcode=(/boot/\*-ucode.img)' "${_MKINITCPIO_PRESET}" || \
-            echo "ALL_microcode=(/boot/*-ucode.img)" >> "${_MKINITCPIO_PRESET}"
+    if [[ -f "${_DESTDIR}/${_UCODE}" ]]; then
+          grep -q "^ALL_microcode=/boot/${_UCODE}" "${_MKINITCPIO_PRESET}" || \
+            echo "ALL_microcode=/boot/${_UCODE}" >> "${_MKINITCPIO_PRESET}"
     fi
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
