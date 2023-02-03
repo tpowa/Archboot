@@ -42,7 +42,7 @@ _autoprepare() {
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
         _set_device_name_scheme || return 1
     fi
-    if [[ -n "${_GUIDPARAMETER}" ]]; then
+    if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _UEFISYS_MP=$(cat "${_ANSWER}")
     fi
