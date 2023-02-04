@@ -342,7 +342,7 @@ _do_efistub_copy_to_efisys() {
         _dialog --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
         ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
-        cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
+        cp -f "${_DESTDIR}/boot/${_KERNEL}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
         cp -f "${_DESTDIR}/boot/${_INITRAMFS}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
         if [[ -n "${_INITRD_UCODE}" ]]; then
@@ -355,7 +355,7 @@ _do_efistub_copy_to_efisys() {
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Path]
-PathChanged=/boot/${_VMLINUZ}
+PathChanged=/boot/${_KERNEL}
 PathChanged=/boot/${_INITRAMFS}
 CONFEOF
         if [[ -n "${_UCODE}" ]]; then
@@ -371,7 +371,7 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} /${_UEFISYS_MP}/${_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${_KERNEL} /${_UEFISYS_MP}/${_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${_INITRAMFS} /${_UEFISYS_MP}/${_INITRD}
 CONFEOF
         if [[ -n "${_INITRD_UCODE}" ]]; then
