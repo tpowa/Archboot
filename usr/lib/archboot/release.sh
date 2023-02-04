@@ -116,7 +116,7 @@ _create_iso() {
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=${_OSREL} --change-section-vma .osrel=$(printf 0x%x ${_OSREL_OFFS}) \
-                --add-section .cmdline=<(cat ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=$(printf 0x%x ${_CMDLINE_OFFS}) \
+                --add-section .cmdline=${_CMDLINE} --change-section-vma .cmdline=$(printf 0x%x ${_CMDLINE_OFFS}) \
                 --add-section .splash=${_SPLASH} --change-section-vma .splash=$(printf 0x%x ${_SPLASH_OFFS}) \
                 --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=$(printf 0x%x ${_KERNEL_OFFS}) \
                 --add-section .initrd=<(cat ${_UCODE} ${initramfs}) \
