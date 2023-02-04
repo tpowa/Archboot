@@ -90,17 +90,17 @@ _create_iso() {
         # add AMD ucode license
         mkdir -p boot/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-        _CMDLINE="boot/cmdline.txt"
+        _CMDLINE=cmdline.txt
         if [[ "${_ARCH}" == "x86_64" ]]; then
             # add INTEL ucode license
             mkdir -p boot/licenses/intel-ucode
             cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
             _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
-            echo "rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0" > ${_CMDLINE}
+            echo "rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0" > ${_W_DIR}/${_CMDLINE}
             _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
-            echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
+            echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_W_DIR}/${_CMDLINE}
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
         fi
