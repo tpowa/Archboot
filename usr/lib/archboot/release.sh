@@ -90,17 +90,17 @@ _create_iso() {
         # add AMD ucode license
         mkdir -p boot/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
-        _CMDLINE=cmdline.txt
+        _CMDLINE="boot/cmdline.txt"
         if [[ "${_ARCH}" == "x86_64" ]]; then
             # add INTEL ucode license
             mkdir -p boot/licenses/intel-ucode
             cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
             _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
-            echo "rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0" > ${_W_DIR}/${_CMDLINE}
+            echo "rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0" > ${_CMDLINE}
             _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
-            echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_W_DIR}/${_CMDLINE}
+            echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
         fi
@@ -116,7 +116,7 @@ _create_iso() {
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=${_OSREL} --change-section-vma .osrel=${_OSREL_OFFS} \
-                --add-section .cmdline=<(echo ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=${_CMDLINE_OFFS} \
+                --add-section .cmdline=<(cat ${_CMDLINE} | tr -s '\n' ' '; printf '\n\0') --change-section-vma .cmdline=${_CMDLINE_OFFS} \
                 --add-section .splash=${_SPLASH} --change-section-vma .splash=${_SPLASH_OFFS} \
                 --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=${_KERNEL_OFFS} \
                 --add-section .initrd=<(cat ${_UCODE} ${initramfs}) \
