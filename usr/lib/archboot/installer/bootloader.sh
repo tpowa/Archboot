@@ -313,13 +313,22 @@ _do_efistub_parameters() {
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
-        _KERNEL="${_VMLINUZ}"
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+            _KERNEL="${_VMLINUZ_EFISTUB}"
+        else
+            _KERNEL="${_VMLINUZ}"
+        fi
         if [[ -n "${_UCODE}" ]]; then
             _INITRD_UCODE="${_UCODE}"
         fi
         _INITRD="${_INITRAMFS}"
     else
-        _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
+        # name .efi for uefisys partition
+        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+            _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ_EFISTUB}"
+        else
+            _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
+        fi
         if [[ -n "${_UCODE}" ]]; then
             _INITRD_UCODE="${_UEFISYS_PATH}/${_UCODE}"
         fi
