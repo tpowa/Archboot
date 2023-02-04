@@ -59,11 +59,6 @@ _prepare_kernel_initramfs_files() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
     fi
-    # only aarch64
-    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        echo "Preparing dtbs..."
-        cp -r /boot/dtbs "${_ISODIR}/boot/"
-    fi
 }
 
 ### EFI status of RISCV64:
