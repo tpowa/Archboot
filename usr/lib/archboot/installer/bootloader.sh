@@ -312,23 +312,15 @@ _do_efistub_parameters() {
     fi
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
-        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="${_VMLINUZ_EFISTUB}"
-        else
-            _KERNEL="${_VMLINUZ}"
-        fi
+        _KERNEL="${_VMLINUZ}"
         if [[ -n "${_UCODE}" ]]; then
             _INITRD_UCODE="${_UCODE}"
         fi
         _INITRD="${_INITRAMFS}"
     else
-        # name .efi for uefisys partition
-        if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ_EFISTUB}"
-        else
-            _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
-        fi
+        _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
         if [[ -n "${_UCODE}" ]]; then
             _INITRD_UCODE="${_UEFISYS_PATH}/${_UCODE}"
         fi
@@ -342,7 +334,7 @@ _do_efistub_copy_to_efisys() {
         _dialog --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
         ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
-        cp -f "${_DESTDIR}/boot/${_KERNEL}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
+        cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
         cp -f "${_DESTDIR}/boot/${_INITRAMFS}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
         if [[ -n "${_INITRD_UCODE}" ]]; then
@@ -355,7 +347,7 @@ _do_efistub_copy_to_efisys() {
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Path]
-PathChanged=/boot/${_KERNEL}
+PathChanged=/boot/${_VMLINUZ}
 PathChanged=/boot/${_INITRAMFS}
 CONFEOF
         if [[ -n "${_UCODE}" ]]; then
@@ -371,7 +363,7 @@ CONFEOF
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/cp -f /boot/${_KERNEL} /${_UEFISYS_MP}/${_KERNEL}
+ExecStart=/usr/bin/cp -f /boot/${_VMLINUZ} /${_UEFISYS_MP}/${_KERNEL}
 ExecStart=/usr/bin/cp -f /boot/${_INITRAMFS} /${_UEFISYS_MP}/${_INITRD}
 CONFEOF
         if [[ -n "${_INITRD_UCODE}" ]]; then
@@ -384,6 +376,10 @@ CONFEOF
             systemctl enable efistub_copy.path &>"${_NO_LOG}"
         fi
         sleep 5
+    fi
+    # reset _VMLINUZ on aarch64
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _VMLINUZ="Image.gz"
     fi
 }
 
