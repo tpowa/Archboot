@@ -13,6 +13,8 @@ Environment changes:
 - custom bash options are provided by /etc/profile.d/custom-bash-options.sh
 - added bash-completion, tpm2-tss and pinentry
 - new MOTD with architecture and Manage Archboot
+- shrink aarch64 iso by removing dtbs and replacing Image with Image.gz kernel
+- shrink x86_64 and aarch64 iso by removing /EFI directory
 update-installer:
 - added network check
 - added bash completion
@@ -75,8 +77,6 @@ Environment changes:
 - enabled syntax highlighting in nano editor
 - replaced vim editor with neovim editor
 - added neovim lastplace plugin
-- shrink aarch64 iso by removing dtbs and replacing Image with Image.gz kernel
-- shrink x86_64 iso by removing /EFI directory
 setup/quickinst changes:
 - check kernel to trigger menu with updating environment
 - fixed riscv64 package installation with disabling ucode packages
