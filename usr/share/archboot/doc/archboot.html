@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 05.02.2023 10:23 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 05.02.2023 15:38 (c) Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><a href=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo" /></a> </span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -182,23 +182,24 @@
 <ul>
 <li><a href="#download-image-files" id="toc-download-image-files"><span class="toc-section-number">2.1</span> <span dir="">Download image files</span></a></li>
 <li><a href="#features-of-the-images" id="toc-features-of-the-images"><span class="toc-section-number">2.2</span> <span dir="">Features of the images</span></a></li>
-<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> <span dir="">Unified Kernel Image</span> UKI / <span dir="">PXE</span> <span dir="">booting / Rescue system</span></a></li>
-<li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.4</span> <span dir="">Supported boot modes</span></a></li>
-<li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.5</span> <span dir="">Burning release or writing to disk</span></a></li>
-<li><a href="#installation-with-a-graphical-environment-or-vnc-instead-of-plain-console" id="toc-installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="toc-section-number">2.6</span> <span dir="">Installation with a graphical environment or VNC instead of plain console</span></a></li>
-<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">2.7</span> <span dir="">Remote installation with OpenSSH</span></a></li>
-<li><a href="#secure-boot-support-with-shim-package-signed-from-fedora" id="toc-secure-boot-support-with-shim-package-signed-from-fedora"><span class="toc-section-number">2.8</span> <span dir="">Secure Boot MOK support with fedora's signed shim package</span></a></li>
-<li><a href="#switch-to-full-arch-linux-system" id="toc-switch-to-full-arch-linux-system"><span class="toc-section-number">2.9</span> <span dir="">Switch to full Arch Linux system</span></a></li>
-<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">2.10</span> <span dir="">Interactive setup</span></a></li>
-<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">2.11</span> <span dir="">For experts: quickinst installation</span></a></li>
-<li><a href="#keep-your-image-up-to-date" id="toc-keep-your-image-up-to-date"><span class="toc-section-number">2.12</span> <span dir="">Keep your image up to date</span></a></li>
-<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">2.13</span> <span dir="">Tools for backup and copying of an existing system</span></a></li>
-<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">2.14</span> <span dir="">Restoring an USB device to FAT32 state</span></a></li>
-<li><a href="#quick-system-setup" id="toc-system-setup"><span class="toc-section-number">2.15</span> <span dir="">Quick System Setup on already installed system</span></a></li>
-<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">2.16</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
-<li><a href="#screenshot-gallery" id="toc-screenshot-gallery"><span class="toc-section-number">2.17</span> <span dir="">Screenshot gallery</span></a></li>
-<li><a href="#development-git-repository" id="toc-development-git-repository"><span class="toc-section-number">2.18</span> <span dir="">Development: GIT repository</span></a></li>
-<li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">2.19</span> <span dir="">Bugs</span></a></li>
+<li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.3</span> <span dir="">Unified Kernel Image</span> / UKI</li>
+<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.4</span> <span dir="">PXE</span> <span dir="">booting / Rescue system</span></a></li>
+<li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Supported boot modes</span></a></li>
+<li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.6</span> <span dir="">Burning release or writing to disk</span></a></li>
+<li><a href="#installation-with-a-graphical-environment-or-vnc-instead-of-plain-console" id="toc-installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="toc-section-number">2.7</span> <span dir="">Installation with a graphical environment or VNC instead of plain console</span></a></li>
+<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">2.8</span> <span dir="">Remote installation with OpenSSH</span></a></li>
+<li><a href="#secure-boot-support-with-shim-package-signed-from-fedora" id="toc-secure-boot-support-with-shim-package-signed-from-fedora"><span class="toc-section-number">2.9</span> <span dir="">Secure Boot MOK support with fedora's signed shim package</span></a></li>
+<li><a href="#switch-to-full-arch-linux-system" id="toc-switch-to-full-arch-linux-system"><span class="toc-section-number">2.10</span> <span dir="">Switch to full Arch Linux system</span></a></li>
+<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">2.11</span> <span dir="">Interactive setup</span></a></li>
+<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">2.12</span> <span dir="">For experts: quickinst installation</span></a></li>
+<li><a href="#keep-your-image-up-to-date" id="toc-keep-your-image-up-to-date"><span class="toc-section-number">2.13</span> <span dir="">Keep your image up to date</span></a></li>
+<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">2.14</span> <span dir="">Tools for backup and copying of an existing system</span></a></li>
+<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">2.15</span> <span dir="">Restoring an USB device to FAT32 state</span></a></li>
+<li><a href="#quick-system-setup" id="toc-system-setup"><span class="toc-section-number">2.16</span> <span dir="">Quick System Setup on already installed system</span></a></li>
+<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">2.17</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
+<li><a href="#screenshot-gallery" id="toc-screenshot-gallery"><span class="toc-section-number">2.18</span> <span dir="">Screenshot gallery</span></a></li>
+<li><a href="#development-git-repository" id="toc-development-git-repository"><span class="toc-section-number">2.19</span> <span dir="">Development: GIT repository</span></a></li>
+<li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">2.20</span> <span dir="">Bugs</span></a></li>
 </ul></li>
 <li><a href="#create-rescue-system-of-running-system" id="toc-create-rescue-system-of-running-system"><strong><span class="toc-section-number">3.</span> <span dir="">Create rescue system of running system</strong></span></a></li>
 <li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">4.</span> <span dir="">Create image files</strong></span></a>
@@ -363,7 +364,7 @@
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image.<br>It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
-<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a> UKI / <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a> <strong><span dir="">booting / Rescue system</span></strong></h3>
+<h3 data-number="2.3" id="unified-kernel-image"><span class="header-section-number">2.3 </span><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a> / UKI</h3>
 <ul>
 <table>
 <thead>
@@ -391,6 +392,9 @@
 </tbody>
 </table>
 <li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.<br></li>
+</ul>
+<h3 data-number="2.4" id="pxe-booting-rescue-system"><span class="header-section-number">2.4 </span><a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a> <strong><span dir="">booting / Rescue system</span></strong></h3>
+<ul>
 <table>
 <thead>
 <tr class="header">
@@ -458,13 +462,11 @@
 </td>
 </tbody>
 </table>
-</ul>
-<ul>
 <li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.<br>
 <li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li>In <strong>both</strong> cases, add <strong>rootfstype=ramfs</strong> to your <a href="https://wiki.archlinux.org/title/Kernel_command_line" title="Kernel command line"><strong>kernel command line</strong></a>.</li>
 </ul>
-<h3 data-number="2.4" id="supported-boot-modes"><span class="header-section-number">2.4</span> <strong><span dir="">Supported boot modes</span></strong></h3>
+<h3 data-number="2.5" id="supported-boot-modes"><span class="header-section-number">2.5</span> <strong><span dir="">Supported boot modes</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -477,7 +479,7 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>UEFI</strong> <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a></td>
+<td>UEFI <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a></td>
 <td>Yes</td>
 <td>No</td>
 <td>Yes</td>
@@ -550,7 +552,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.5" id="burning-release-or-writing-to-disk"><span class="header-section-number">2.5</span> <strong><span dir="">Burning release or writing to disk</span></strong></h3>
+<h3 data-number="2.6" id="burning-release-or-writing-to-disk"><span class="header-section-number">2.6</span> <strong><span dir="">Burning release or writing to disk</span></strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
@@ -571,8 +573,8 @@ initrd (loop)/boot/initramfs-x86_64.img
 </table>
 </ul>
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
-<h3 data-number="2.6" id="installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="header-section-number">2.6</span> <strong><span dir="">Installation with a graphical environment or VNC instead of plain console</span></strong></h3>
-<h4 data-number="2.6.1" id="preconfigured-environments"><span class="header-section-number">2.6.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
+<h3 data-number="2.7" id="installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="header-section-number">2.7</span> <strong><span dir="">Installation with a graphical environment or VNC instead of plain console</span></strong></h3>
+<h4 data-number="2.7.1" id="preconfigured-environments"><span class="header-section-number">2.7.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
 <ul>
 <table>
 <thead>
@@ -613,7 +615,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </ul></li>
 <li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
 </ul>
-<h4 data-number="2.6.2" id="custom-environment-without-vnc-support"><span class="header-section-number">2.6.2</span> <strong><span dir="">Custom environment without VNC support</span></strong></h4>
+<h4 data-number="2.7.2" id="custom-environment-without-vnc-support"><span class="header-section-number">2.7.2</span> <strong><span dir="">Custom environment without VNC support</span></strong></h4>
 <a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong><code>/etc/archboot/defaults</code></strong>
 <ul>
 <table>
@@ -635,7 +637,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.7" id="remote-installation-with-openssh"><span class="header-section-number">2.7</span> <strong><span dir="">Remote installation with OpenSSH</span></strong></h3>
+<h3 data-number="2.8" id="remote-installation-with-openssh"><span class="header-section-number">2.8</span> <strong><span dir="">Remote installation with OpenSSH</span></strong></h3>
 <ul>
 <li>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need security during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</li>
 </ul>
@@ -653,7 +655,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.8" id="secure-boot-support-with-shim-package-signed-from-fedora"><span class="header-section-number">2.8</span> <strong><span dir="">Secure Boot MOK support with fedora's signed shim package</span></strong></h3>
+<h3 data-number="2.9" id="secure-boot-support-with-shim-package-signed-from-fedora"><span class="header-section-number">2.9</span> <strong><span dir="">Secure Boot MOK support with fedora's signed shim package</span></strong></h3>
 <ul>
 <li><strong>Caveat:</strong>
 <ul>
@@ -692,7 +694,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.9" id="switch-to-full-arch-linux-system"><span class="header-section-number">2.9</span> <strong><span dir="">Switch to full Arch Linux system</span></strong></h3>
+<h3 data-number="2.10" id="switch-to-full-arch-linux-system"><span class="header-section-number">2.10</span> <strong><span dir="">Switch to full Arch Linux system</span></strong></h3>
 <ul>
 <li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
 <li>Though <strong>perl, python, man/info pages, includes, additional kernel modules (eg. sound)</strong><br>and other things are <strong>not</strong> provided by default.</li>
@@ -714,18 +716,18 @@ initrd (loop)/boot/initramfs-x86_64.img
 <ul>
 <li>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update-installer</code></strong> tasks.</li>
 </ul>
-<h3 data-number="2.10" id="interactive-setup"><span class="header-section-number">2.10</span> <strong><span dir="">Interactive setup</span></strong></h3>
+<h3 data-number="2.11" id="interactive-setup"><span class="header-section-number">2.11</span> <strong><span dir="">Interactive setup</span></strong></h3>
 <p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
-<h4 data-number="2.10.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">2.10.1</span> <strong><span dir="">Changing console fonts and keymap</span></strong></h4>
+<h4 data-number="2.11.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">2.11.1</span> <strong><span dir="">Changing console fonts and keymap</span></strong></h4>
 <ul>
 <li>Your <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> and <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> will be set by <strong>km</strong> script.</li>
 </ul>
-<h4 data-number="2.10.2" id="setup-network"><span class="header-section-number">2.10.2</span> <strong><span dir="">Setup network</span></strong></h4>
+<h4 data-number="2.11.2" id="setup-network"><span class="header-section-number">2.11.2</span> <strong><span dir="">Setup network</span></strong></h4>
 <ul>
 <li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Systemd-Networkd"><strong>systemd-networkd</strong></a>.</li>
 <li>Your <strong>wifi network</strong></a> will be authentificated by <a href="https://wiki.archlinux.org/title/iwd" title="iwd"><strong>iwd</strong></a>.</li>
 </ul>
-<h4 data-number="2.10.3" id="select-source"><span class="header-section-number">2.10.3</span> <strong><span dir="">Select Source</span></strong></h4>
+<h4 data-number="2.11.3" id="select-source"><span class="header-section-number">2.11.3</span> <strong><span dir="">Select Source</span></strong></h4>
 <ul>
 <li><strong>Local mode</strong>:
 <ul>
@@ -738,11 +740,11 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
-<h4 data-number="2.10.4" id="changing-timezone-and-date"><span class="header-section-number">2.10.4</span> <strong><span dir="">Changing timezone and date</span></strong></h4>
+<h4 data-number="2.11.4" id="changing-timezone-and-date"><span class="header-section-number">2.11.4</span> <strong><span dir="">Changing timezone and date</span></strong></h4>
 <ul>
 <li>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</li>
 </ul>
-<h4 data-number="2.10.5" id="prepare-storage-drive"><span class="header-section-number">2.10.5</span> <strong><span dir="">Prepare Storage drive</span></strong></h4>
+<h4 data-number="2.11.5" id="prepare-storage-drive"><span class="header-section-number">2.11.5</span> <strong><span dir="">Prepare Storage drive</span></strong></h4>
 <ul>
 <li>You setup your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
 <li>Auto-Prepare mode, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
@@ -751,13 +753,13 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Supports standard linux, <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>/<a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>_partitions, dmraid/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a>, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Filesystem support: EXT2/<a href="https://wiki.archlinux.org/title/Ext3" title="EXT3"><strong>3</strong></a>/<a href="https://wiki.archlinux.org/title/Ext4" title="EXT4"><strong>4</strong></a>, <a href="https://wiki.archlinux.org/title/Btrfs" title="BTRFS"><strong>BTRFS</strong></a>, <a href="https://wiki.archlinux.org/title/F2FS" title="F2FS"><strong>F2FS</strong></a>, NILFS2, <a href="https://wiki.archlinux.org/title/XFS" title="XFS"><strong>XFS</strong></a>, <a href="https://wiki.archlinux.org/title/JFS" title="JFS"><strong>JFS</strong></a>, <a href="https://wiki.archlinux.org/title/VFAT" title="VFAT"><strong>VFAT</strong></a></li>
 </ul>
-<h4 data-number="2.10.6" id="install-packages"><span class="header-section-number">2.10.6</span> <strong><span dir="">Install Packages</span></strong></h4>
+<h4 data-number="2.11.6" id="install-packages"><span class="header-section-number">2.11.6</span> <strong><span dir="">Install Packages</span></strong></h4>
 <ul>
 <li>You can modify the packages to install in <strong>/etc/archboot/defaults</strong>.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will install the packages for the first boot to your storage drive.</li>
 <li>Autoconfiguration of basic system:<br><a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Bash" title="Bash"><strong>Bash</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>Keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>Timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>Fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>Systemd</strong></a>,<br><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>Network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>Crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>Mdadm</strong></a></li>
 </ul>
-<h4 data-number="2.10.7" id="configure-system"><span class="header-section-number">2.10.7</span> <strong><span dir="">Configure System</span></strong></h4>
+<h4 data-number="2.11.7" id="configure-system"><span class="header-section-number">2.11.7</span> <strong><span dir="">Configure System</span></strong></h4>
 <ul>
 <li>You set the root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong>.</a></li>
 <li>You set the system-wide <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a></li>
@@ -765,7 +767,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Choose your editor: <a href="https://wiki.archlinux.org/title/nano" title="nano"><strong>nano</strong></a> or <a href="https://wiki.archlinux.org/title/neovim" title="neovim"><strong>neovim</strong></a></li>
 <li>Configuration of basic system files:<br><a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>,<br><a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
 </ul>
-<h4 data-number="2.10.8" id="install-bootloader"><span class="header-section-number">2.10.8</span> <strong><span dir="">Install Bootloader</span></strong></h4>
+<h4 data-number="2.11.8" id="install-bootloader"><span class="header-section-number">2.11.8</span> <strong><span dir="">Install Bootloader</span></strong></h4>
 <ul>
 <li>You setup your preferred <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li><a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and other needed programs will be installed automatically.</li>
@@ -774,7 +776,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> supports only shim signed by fedora with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></li>
 <li>The selected <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> will be installed to your system and you can modify the configuration file(s) afterwards.</li>
 </ul>
-<h3 data-number="2.11" id="for-experts-quickinst-installation"><span class="header-section-number">2.11</span> <strong><span dir="">For experts: quickinst installation</span></strong></h3>
+<h3 data-number="2.12" id="for-experts-quickinst-installation"><span class="header-section-number">2.12</span> <strong><span dir="">For experts: quickinst installation</span></strong></h3>
 <ul>
 <li>This script is for <strong>experts</strong>, who assemble the filesystems first and mount them in a directory.</li>
 <li><strong>quickinst</strong> will autodetect the packages to install for a minimal system.</li>
@@ -793,7 +795,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.12" id="keep-your-image-up-to-date"><span class="header-section-number">2.12</span> <strong><span dir="">Keep your image up to date</span></strong></h3>
+<h3 data-number="2.13" id="keep-your-image-up-to-date"><span class="header-section-number">2.13</span> <strong><span dir="">Keep your image up to date</span></strong></h3>
 <ul>
 <li>You can always bump your image to <strong>latest</strong> available possibilities.</li>
 </ul>
@@ -811,7 +813,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.13" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">2.13</span> <strong><span dir="">Tools for backup and copying of an existing system</span></strong></h3>
+<h3 data-number="2.14" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">2.14</span> <strong><span dir="">Tools for backup and copying of an existing system</span></strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
 </ul>
@@ -845,7 +847,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.14" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">2.14</span> <strong><span dir="">Restoring an USB device to FAT32 state</span></strong></h3>
+<h3 data-number="2.15" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">2.15</span> <strong><span dir="">Restoring an USB device to FAT32 state</span></strong></h3>
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
@@ -865,10 +867,10 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.15" id="quick-system-setup"><span class="header-section-number">2.15</span> <span dir="">Quick System Setup on already installed system</span></h3>
+<h3 data-number="2.16" id="quick-system-setup"><span class="header-section-number">2.16</span> <span dir="">Quick System Setup on already installed system</span></h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for a quick <strong>System Setup</strong> on an already installed system.</p>
 <p><a href="#installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
-<h3 data-number="2.16" id="faq-known-issues-and-limitations"><span class="header-section-number">2.16</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
+<h3 data-number="2.17" id="faq-known-issues-and-limitations"><span class="header-section-number">2.17</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
 <li>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
@@ -1130,11 +1132,11 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.17" id="screenshot-gallery"><span class="header-section-number">2.17</span> <strong><span dir="">Screenshot gallery</span></strong></h3>
+<h3 data-number="2.18" id="screenshot-gallery"><span class="header-section-number">2.18</span> <strong><span dir="">Screenshot gallery</span></strong></h3>
 <p>Take a look at the archboot screenshot <a href="https://pkgbuild.com/~tpowa/archboot/web"><strong>gallery</strong></a>.</p>
-<h3 data-number="2.18" id="development-git-repository"><span class="header-section-number">2.18</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
+<h3 data-number="2.19" id="development-git-repository"><span class="header-section-number">2.19</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
 <p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
-<h3 data-number="2.19" id="bugs"><span class="header-section-number">2.19</span> <strong><span dir="">Bugs</span></strong></h3>
+<h3 data-number="2.20" id="bugs"><span class="header-section-number">2.20</span> <strong><span dir="">Bugs</span></strong></h3>
 <p><a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a></p>
 <h2 data-number="3" id="create-rescue-system-of-running-system"><span class="header-section-number">3.</span> <span dir="">Create rescue system of running system</span></h2>
 <ul>
