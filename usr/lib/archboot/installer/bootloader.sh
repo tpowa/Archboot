@@ -512,7 +512,7 @@ _do_uki_uefi() {
     grep -q "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_uki=\"${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi\"" >> "${_MKINITCPIO_PRESET}"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        _KERNEL_IMAGE="--kernelimage /boot/Image.gz"
+        _KERNEL_IMAGE="--kernelimage /boot/Image"
     fi
     grep -q "default_options=\"${_KERNEL_IMAGE} --splash /usr/share/systemd/bootctl/splash-arch.bmp\"" "${_MKINITCPIO_PRESET}" || \
         echo "default_options=\"${_KERNEL_IMAGE} --splash /usr/share/systemd/bootctl/splash-arch.bmp\"" >> "${_MKINITCPIO_PRESET}"
