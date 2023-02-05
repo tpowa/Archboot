@@ -7,13 +7,13 @@ _ISODIR="$(mktemp -d ISODIR.XXX)"
 
 _usage () {
     echo "${_BASENAME}: usage"
-    echo "CREATE ${_RUNNING_ARCH} USB/CD IMAGES"
+    echo "CREATE ${_ARCH} USB/CD IMAGES"
     echo "-----------------------------"
     echo "PARAMETERS:"
     echo "  -g                  Starting generation of image."
     echo "  -p=PRESET           Which preset should be used."
     echo "                      /etc/archboot/presets locates the presets"
-    echo "                      default=${_RUNNING_ARCH}"
+    echo "                      default=${_ARCH}"
     echo "  -i=IMAGENAME        Your IMAGENAME."
     echo "  -h                  This message."
     exit 0
@@ -34,9 +34,9 @@ _parameters() {
 
 _config() {
     # set defaults, if nothing given
-    [[ -z "${_PRESET}" ]] && _PRESET="${_RUNNING_ARCH}"
+    [[ -z "${_PRESET}" ]] && _PRESET="${_ARCH}"
     _PRESET="${_PRESET_DIR}/${_PRESET}"
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_RUNNING_ARCH}"
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_ARCH}"
 }
 
 _prepare_kernel_initramfs_files() {
@@ -83,14 +83,14 @@ _prepare_kernel_initramfs_files_RISCV64() {
 
 _prepare_ucode() {
     # only x86_64
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+    if [[ "${_ARCH}" == "x86_64" ]]; then
         echo "Preparing intel-ucode..."
         cp /boot/intel-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/intel-ucode
         cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
     fi
     # both x86_64 and aarch64
-    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+    if ! [[ "${_ARCH}" == "riscv64" ]]; then
         echo "Preparing amd-ucode..."
         cp /boot/amd-ucode.img "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/amd-ucode
@@ -180,11 +180,11 @@ _prepare_uefi_image() {
 
 _prepare_extlinux_conf() {
     mkdir -p "${_ISODIR}"/boot/extlinux
-    if [[ ${_RUNNING_ARCH} == "aarch64" ]]; then
+    if [[ ${_ARCH} == "aarch64" ]]; then
         _TITLE="Arch Linux ARM 64"
         _SMP="nr_cpus=1"
     fi
-    [[ ${_RUNNING_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
+    [[ ${_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
     echo "Preparing extlinux.conf..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
 menu title Welcome to Archboot - ${_TITLE}
@@ -192,8 +192,8 @@ timeout 100
 default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds...)
-    kernel /boot/vmlinuz-${_RUNNING_ARCH}
-    initrd /boot/initramfs-${_RUNNING_ARCH}.img
+    kernel /boot/vmlinuz-${_ARCH}
+    initrd /boot/initramfs-${_ARCH}.img
     append rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
 EOF
 }
@@ -205,7 +205,7 @@ EOF
 # https://reproducible-builds.org/docs/system-images/
 # mkfs.ext4 does not allow reproducibility
 _uboot() {
-    echo "Generating ${_RUNNING_ARCH} U-Boot image..."
+    echo "Generating ${_ARCH} U-Boot image..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024)) # image size in sectors
@@ -233,8 +233,8 @@ _grub_mkrescue() {
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
     # -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
-    echo "Generating ${_RUNNING_ARCH} hybrid ISO..."
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System"
+    echo "Generating ${_ARCH} hybrid ISO..."
+    [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System"
     #shellcheck disable=SC2086
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
