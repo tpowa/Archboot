@@ -82,9 +82,13 @@ _create_archive() {
 _sign_sha256sum() {
     for i in $1; do
         #shellcheck disable=SC2086
-        [[ -f "${i}" ]] && sudo -u "${_USER}" gpg ${_GPG} "${i}"
-        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
-        [[ -f "${i}.sig" ]] && cksum -a sha256 "${i}.sig" >> sha256sum.txt
+        if [[ -f "${i}" ]]; then
+            sudo -u "${_USER}" gpg ${_GPG} "${i}"
+            cksum -a sha256 "${i}" >> sha256sum.txt
+        fi
+        if [[ -f "${i}.sig" ]]; then
+            cksum -a sha256 "${i}.sig" >> sha256sum.txt
+        fi
     done
 }
 

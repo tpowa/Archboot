@@ -109,8 +109,8 @@ _create_iso() {
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
-            cp "${_W_DIR}"/boot/Image boot/Image-archboot-${_ARCH}
-            _KERNEL_ARCHBOOT=boot/Image-archboot-${_ARCH}
+            cp "${_W_DIR}/boot/Image" "boot/Image-archboot-${_ARCH}"
+            _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}"
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
@@ -154,10 +154,14 @@ _create_iso() {
     # create sha256sums
     echo "Generating sha256sum..."
     for i in *; do
-        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+        if [[ -f "${i}" ]]; then
+            cksum -a sha256 "${i}" >> sha256sum.txt
+        fi
     done
     for i in boot/*; do
-        [[ -f "${i}" ]] && cksum -a sha256 "${i}" >> sha256sum.txt
+        if [[ -f "${i}" ]]; then
+            cksum -a sha256 "${i}" >> sha256sum.txt
+        fi
     done
 }
 # vim: set ft=sh ts=4 sw=4 et:
