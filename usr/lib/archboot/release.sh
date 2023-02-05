@@ -8,8 +8,13 @@ _INTEL_UCODE="boot/intel-ucode.img"
 _INITRAMFS="boot/initramfs-${_ARCH}.img"
 _INITRAMFS_LATEST="boot/initramfs-latest-${_ARCH}.img"
 _INITRAMFS_LOCAL="boot/initramfs-local-${_ARCH}.img"
-_KERNEL="boot/vmlinuz-${_ARCH}"
-_KERNEL_ARCHBOOT="boot/vmlinuz-archboot-${_ARCH}"
+if [[ "${_ARCH}" == "aarch64" ]]; then
+    _KERNEL="boot/Image-${_ARCH}.gz"
+    _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}.gz"
+else
+    _KERNEL="boot/vmlinuz-${_ARCH}"
+    _KERNEL_ARCHBOOT="boot/vmlinuz-archboot-${_ARCH}"
+fi
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
@@ -104,8 +109,8 @@ _create_iso() {
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
-            cp "${_W_DIR}"/boot/Image boot/
-            _KERNEL_ARCHBOOT=boot/Image
+            cp "${_W_DIR}"/boot/Image boot/Image-archboot-${_ARCH}
+            _KERNEL_ARCHBOOT=boot/Image-archboot-${_ARCH}
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
@@ -128,9 +133,6 @@ _create_iso() {
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
         rm "${_CMDLINE}"
-        if [[ "${_ARCH}" == "aarch64" ]]; then
-            rm "${_KERNEL_ARCHBOOT}"
-        fi
         chmod 644 boot/*.efi
         touch boot/*.efi
     fi

@@ -47,17 +47,18 @@ _prepare_kernel_initramfs_files() {
     mkdir -p "${_ISODIR}/boot"
 
     #shellcheck disable=SC2154
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img" || exit 1
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_RUNNING_ARCH}"
     # needed to hash the kernel for secureboot enabled systems
     # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
-    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_AA64"
+    if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
+        [[ "${_ARCH}" == "x86_64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
     fi
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
+    if [[ "${_ARCH}" == "aarch64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
+        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/IMAGE_AA64.GZ"
     fi
 }
 
@@ -76,8 +77,8 @@ _prepare_kernel_initramfs_files_RISCV64() {
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_RUNNING_ARCH}"
-    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_RUNNING_ARCH}.img" || exit 1
+    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
+    mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
 }
 
 _prepare_ucode() {
@@ -174,6 +175,7 @@ _prepare_uefi_image() {
     mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
+    rm -r "${_ISODIR}"/EFI
 }
 
 _prepare_extlinux_conf() {
