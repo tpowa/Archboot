@@ -2,7 +2,7 @@ On the road to 2023.02
 Highlights:
 - Unified Kernel Images / UKI files are provided now
 - Unified Kernel Image setup is supported in EFISTUB menu now
-- grub 2:2.06.r440.g4de39a2af-1
+- grub 2:2.06.r456.g65bc45963-1
 - archboot-setup.sh works on installed system as System Setup tool
 Environment changes:
 - show full initrd line in grub menu
