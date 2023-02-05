@@ -103,6 +103,9 @@ _create_iso() {
             echo "rootfstype=ramfs nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
             _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
+            # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
+            cp "${_W_DIR}"/boot/Image boot/
+            _KERNEL_ARCHBOOT=boot/Image
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
@@ -125,6 +128,9 @@ _create_iso() {
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
         rm "${_CMDLINE}"
+        if [[ "${_ARCH}" == "aarch64" ]]; then
+            rm "${_KERNEL_ARCHBOOT}"
+        fi
         chmod 644 boot/*.efi
         touch boot/*.efi
     fi
