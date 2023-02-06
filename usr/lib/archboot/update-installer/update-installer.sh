@@ -408,9 +408,6 @@ _prepare_graphic() {
         rm -rf /usr/share/{locale,i18n}
     fi
     _home_root_mount
-    systemd-sysusers >/dev/tty7 2>&1
-    systemd-tmpfiles --create >/dev/tty7 2>&1
-    systemctl restart dbus
 }
 
 _new_environment() {
