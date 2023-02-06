@@ -13,7 +13,7 @@ build ()
 	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel mount.smb3 mount.cifs \
 	  fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
 	  mkfs.jfs wipefs btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
-	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.upcall cifscreds getcifsacl \
+	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.idmap cifs.upcall cifscreds getcifsacl \
 	  setcifsacl umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
 	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \
 	  tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos fsck.btrfs dosfslabel \
@@ -23,7 +23,7 @@ build ()
 	  xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
     map add_file "/etc/nilfs_cleanerd.conf" "/etc/nvme/discovery.conf"
-    map add_full_dir "/etc/cifs-utils" "/etc/request-key.d"
+    map add_full_dir /etc/cifs-utils /etc/request-key.d /usr/lib/cifs-utils
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
