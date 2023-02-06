@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # don't run ttyS0 as first device
-_vconsole() {
-
-}
 
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux\033[0m"
