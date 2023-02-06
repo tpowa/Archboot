@@ -17,6 +17,7 @@ Environment changes:
 - new MOTD with architecture and Manage Archboot
 - shrink aarch64 iso by removing dtbs and replacing Image with Image.gz kernel
 - shrink x86_64 and aarch64 iso by removing /EFI directory
+- remove not installed packages from local pacman database
 update-installer:
 - added network check
 - added bash completion
