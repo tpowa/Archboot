@@ -192,21 +192,4 @@ _set_hostname() {
     echo "Setting hostname to archboot..."
     echo 'archboot' > "${1}/etc/hostname"
 }
-
-_fix_groups() {
-    echo "Recreating system groups..."
-    rm "${1}"/etc/{group,gshadow}
-    ${_NSPAWN} "${1}" systemd-sysusers &>/dev/null
-    # fix missing group in iwd FS#74646
-    ${_NSPAWN} "${1}" groupadd netdev &>/dev/null
-    # add missing groups
-    ${_NSPAWN} "${1}" useradd -r -s /usr/bin/nologin -M -c 'PolicyKit daemon' -u 102 polkitd &>/dev/null
-    ${_NSPAWN} "${1}" groupadd -r -g 26 proc &>/dev/null
-    ${_NSPAWN} "${1}" groupmems -g proc -a polkitd &>/dev/null
-    ${_NSPAWN} "${1}" groupadd -r colord &>/dev/null
-    ${_NSPAWN} "${1}" groupadd -r -g 140 usbmux &>/dev/null
-    # add missing groups on aarch64
-    ${_NSPAWN} "${1}" groupadd -r -g 90 network &>/dev/null
-    ${_NSPAWN} "${1}" groupadd -r tss &>/dev/null
-}
 # vim: set ft=sh ts=4 sw=4 et:
