@@ -54,7 +54,8 @@ build ()
     done
 
     ### add coreutils and cryptsetup libs
-    map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup /usr/lib/terminfo
+    map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup /usr/lib/terminfo \
+        /usr/share/i18n/charmaps
 
     ### add bash configuration
     add_file /etc/bash.bashrc
