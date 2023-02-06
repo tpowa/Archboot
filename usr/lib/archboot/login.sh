@@ -3,18 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # don't run ttyS0 as first device
 _vconsole() {
-    if ! [[ -e "/.vconsole-run" ]]; then
-        touch /.vconsole-run
-        FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
-        if [[ "${FB_SIZE}" -gt '1900' ]]; then
-            SIZE="32"
-        else
-            SIZE="16"
-        fi
-        echo KEYMAP=us > /etc/vconsole.conf
-        echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
-        systemctl restart systemd-vconsole-setup
-    fi
+
 }
 
 _welcome () {
@@ -84,7 +73,26 @@ _run_update_installer() {
     fi
 }
 
-_vconsole
+if ! [[ -e "/.vconsole-run" ]]; then
+    touch /.vconsole-run
+    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
+    if [[ "${FB_SIZE}" -gt '1900' ]]; then
+        SIZE="32"
+    else
+        SIZE="16"
+    fi
+    echo KEYMAP=us > /etc/vconsole.conf
+    echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
+    systemctl restart systemd-vconsole-setup
+fi
+if ! [[ -e "/.clean-pacman-db" ]]; then
+    touch /.clean-pacman-db
+    _RM_PACMAN_DB="grub libxml2 icu gettext refind"
+    for i in ${_RM_PACMAN_DB}; do
+        rm -rf /var/lib/pacman/local/{i}* &>/dev/null
+    done
+fi
+
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     _enter_shell
