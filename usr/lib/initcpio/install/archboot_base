@@ -27,7 +27,7 @@ build ()
           tsort unexpand unlink users vdir pwait fuser prtstat pslog pstree newgidmap newuidmap \
           lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
-          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat
+          setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat wipe
     [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64 peekfd
     [[ "$(uname -m)" == "aarch64" ]] && add_binary peekfd
     
