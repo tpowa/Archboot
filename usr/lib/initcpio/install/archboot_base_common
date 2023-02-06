@@ -39,6 +39,7 @@ build ()
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
+    add_file /usr/lib/terminfo
     systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nscd.conf nsswitch.conf protocols request-key.conf securetty \
                  services"
