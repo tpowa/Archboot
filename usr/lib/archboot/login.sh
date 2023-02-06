@@ -86,7 +86,7 @@ if ! [[ -e "/.clean-pacman-db" ]]; then
     touch /.clean-pacman-db
     _RM_PACMAN_DB="grub libxml2 icu gettext refind"
     for i in ${_RM_PACMAN_DB}; do
-        rm -rf /var/lib/pacman/local/{i}* &>/dev/null
+        rm -rf /var/lib/pacman/local/${i}* &>/dev/null
     done
 fi
 
