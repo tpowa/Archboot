@@ -53,6 +53,9 @@ build ()
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
+    ### add coreutils and cryptsetup libs
+    map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup
+
     ### add bash configuration
     add_file /etc/bash.bashrc
     # add bash-completion
