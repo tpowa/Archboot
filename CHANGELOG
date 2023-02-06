@@ -9,6 +9,7 @@ Environment changes:
 - added fbset and terminus-font
 - switch to Terminus as default font
 - removed pcre, zsh and grml-zsh-config
+- removed chntpw, fsarchiver and ddrescue
 - added normal bash layout with /root/.bash* files
 - custom bash options are provided by /etc/profile.d/custom-bash-options.sh
 - added bash-completion, tpm2-tss and pinentry
