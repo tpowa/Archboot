@@ -85,7 +85,8 @@ fi
 if ! [[ -e "/.clean-pacman-db" ]]; then
     touch /.clean-pacman-db
     _RM_PACMAN_DB="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell cdrtools \
-        libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient"
+        libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
+        libbsd libmd"
     for i in ${_RM_PACMAN_DB}; do
         rm -rf /var/lib/pacman/local/${i}* &>/dev/null
     done
