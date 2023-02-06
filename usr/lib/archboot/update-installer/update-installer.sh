@@ -515,8 +515,7 @@ _install_graphic () {
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
     [[ -n "${_L_PLASMA}" ]] && _install_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
-    echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi..."
-    systemctl restart dbus
+    echo -e "\033[1mStep 3/4:\033[0m Starting avahi..."
     systemctl restart avahi-daemon
     # only start vnc on xorg environment
     echo -e "\033[1mStep 4/4:\033[0m Setting up VNC and browser...\033[0m"
