@@ -23,7 +23,8 @@ build ()
 	  xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
     map add_file "/etc/nilfs_cleanerd.conf" "/etc/nvme/discovery.conf"
-    map add_full_dir "/etc/cifs-utils" "/etc/request-key.d" "/usr/lib/cifs-utils"
+    map add_full_dir "/etc/cifs-utils" "/etc/request-key.d"
+    add_file "/usr/lib/cifs-utils/idmapwb.so"
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
