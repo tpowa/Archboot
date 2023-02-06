@@ -53,7 +53,7 @@ build ()
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
-    ### add coreutils and cryptsetup libs
+    ### add coreutils,cryptsetup,terminfo libs and charmaps
     map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup /usr/lib/terminfo \
         /usr/share/i18n/charmaps
 
