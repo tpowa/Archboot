@@ -39,7 +39,8 @@ build ()
     ### adding needed files from running system
     add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
-    add_file /usr/lib/terminfo
+    add_symlink /usr/share/terminfo ../lib/terminfo
+
     systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
                  nscd.conf nsswitch.conf protocols request-key.conf securetty \
                  services"
@@ -55,8 +56,7 @@ build ()
     done
 
     ### add coreutils,cryptsetup,terminfo libs and charmaps
-    map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup /usr/lib/terminfo \
-        /usr/share/i18n/charmaps
+    map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup /usr/share/i18n/charmaps
 
     ### add bash configuration
     add_file /etc/bash.bashrc
