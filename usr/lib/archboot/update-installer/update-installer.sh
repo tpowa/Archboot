@@ -408,6 +408,9 @@ _prepare_graphic() {
         rm -rf /usr/share/{locale,i18n}
     fi
     _home_root_mount
+    systemd-sysusers >/dev/tty7 2>&1
+    systemd-tmpfiles --create >/dev/tty7 2>&1
+    systemctl restart dbus
 }
 
 _new_environment() {
@@ -513,7 +516,6 @@ _install_graphic () {
     [[ -n "${_L_PLASMA}" ]] && _install_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
     echo -e "\033[1mStep 3/4:\033[0m Starting dbus and ahavi..."
-    systemctl restart systemd-sysusers
     systemctl restart dbus
     systemctl restart avahi-daemon
     # only start vnc on xorg environment
@@ -541,8 +543,6 @@ _prepare_gnome() {
         _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
         echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop..."
         _configure_gnome >/dev/tty7 2>&1
-        systemd-sysusers >/dev/tty7 2>&1
-        systemd-tmpfiles --create >/dev/tty7 2>&1
     else
         echo -e "\033[1mStep 1/4:\033[0m Installing GNOME desktop already done..."
         echo -e "\033[1mStep 2/4:\033[0m Configuring GNOME desktop already done..."
