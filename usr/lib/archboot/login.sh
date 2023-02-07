@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # don't run ttyS0 as first device
-
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux\033[0m"
     [[ "$(uname -m)" == "aarch64" ]] && echo -e "\033[1mWelcome to \033[36mArchboot\033[0m\033[1m - Arch Linux ARM\033[0m"
@@ -82,7 +81,6 @@ if ! [[ -e "/.vconsole-run" ]]; then
     echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
 fi
-
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     _enter_shell
