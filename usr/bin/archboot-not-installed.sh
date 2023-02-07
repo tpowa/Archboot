@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
+# created by Tobias Powalowski <tpowa@archlinux.org>
 if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
     echo "This script should only be run in booted archboot environment. Aborting..."
     exit 1
