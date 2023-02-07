@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+f#!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getsource() {
@@ -123,7 +123,10 @@ _prepare_pacman() {
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}" || (_dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60; return 1)
+    if ! pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
+        _dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60
+        return 1
+    fi
 }
 
 _run_pacman(){
