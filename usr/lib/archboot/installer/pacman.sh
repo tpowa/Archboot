@@ -115,7 +115,10 @@ _prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     _dialog --infobox "Refreshing package database..." 3 40
-    ${_PACMAN} -Sy &>"${_LOG}" || (_dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60; return 1)
+    if ! ${_PACMAN} -Sy &>"${_LOG}"; then
+        _dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60
+        return 1
+    fi
     _dialog --infobox "Update Arch Linux keyring..." 3 40
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
