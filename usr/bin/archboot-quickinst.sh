@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
+_DESTDIR="${1}"
 
 _usage() {
     echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m \e[1m- QUICKINST INSTALLER:\e[m"
