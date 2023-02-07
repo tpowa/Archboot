@@ -7,10 +7,10 @@ _install_plasma() {
 }
 
 _start_plasma() {
-    echo -e "Launching \e[1mKDE/Plasma\e[0m now, logging is done on \e[1m/dev/tty8\e[0m..."
+    echo -e "Launching \e[1mKDE/Plasma\e[m now, logging is done on \e[1m/dev/tty8\e[m..."
     echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
     echo "exec startplasma-x11" >> /root/.xinitrc
     startx >/dev/tty8 2>&1
-    echo -e "To relaunch \e[1mKDE/Plasma\e[0m desktop use: \e[92mstartx\e[0m"
+    echo -e "To relaunch \e[1mKDE/Plasma\e[m desktop use: \e[92mstartx\e[m"
 }
 # vim: set ft=sh ts=4 sw=4 et:

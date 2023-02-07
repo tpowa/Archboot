@@ -4,18 +4,18 @@
 # don't run ttyS0 as first device
 
 _welcome () {
-    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[0m\e[1m - Arch Linux\e[0m"
-    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[0m\e[1m - Arch Linux ARM\e[0m"
-    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[0m\e[1m - Arch Linux RISC-V 64\e[0m"
-    echo -e "\e[1m--------------------------------------------------------------------\e[0m"
+    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux\e[m"
+    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ARM\e[m"
+    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISC-V 64\e[m"
+    echo -e "\e[1m--------------------------------------------------------------------\e[m"
     _local_mode
 }
 
 _local_mode () {
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "You are running in \e[92m\e[1mLocal mode\e[0m, with \e[1mlocal package repository\e[0m enabled.\e[0m"
+        echo -e "You are running in \e[92m\e[1mLocal mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
         if [[ -e /usr/bin/setup ]] ; then
-            echo -e "To \e[1mswitch\e[0m to \e[1mOnline mode\e[0m:\e[1m\e[91m# rm /var/cache/pacman/pkg/archboot.db\e[0m\e[1m"
+            echo -e "To \e[1mswitch\e[m to \e[1mOnline mode\e[m:\e[1m\e[91m# rm /var/cache/pacman/pkg/archboot.db\e[m\e[1m"
             echo ""
         fi
     fi
@@ -25,21 +25,21 @@ _enter_shell() {
     # dbus sources profiles again
     if ! pgrep -x dbus-run-sessio &>/dev/null; then
         cd /
-        echo -e "Hit \e[1m\e[92mENTER\e[0m for \e[1mshell\e[0m login."
+        echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
         read -r
         clear
     fi
 }
 
 _run_latest() {
-    echo -e "\e[1mStarting\e[0m assembling of archboot environment \e[1mwithout\e[0m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[0m"
+    echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwithout\e[m package cache..."
+    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[m"
     update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
-    echo -e "\e[1mStarting\e[0m assembling of archboot environment \e[1mwith\e[0m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest-install\e[0m"
+    echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
+    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest-install\e[m"
     update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
@@ -47,12 +47,12 @@ _run_update_installer() {
     [[ -z $TTY ]] && TTY=$(tty)
     TTY=${TTY#/dev/}
     cd /
-    echo -e "\e[1m\e[92mMemory checks run successfully:\e[0m"
-    echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[0m"
-    echo -e "\e[93myou can \e[1mstart\e[0m\e[93m with your tasks in about \e[1m5\e[0m\e[93m minutes...\e[0m"
+    echo -e "\e[1m\e[92mMemory checks run successfully:\e[m"
+    echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
+    echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
     echo ""
     if [[ "${TTY}" == "tty1" ]]; then
-        echo -e "\e[1m\e[91m10 seconds\e[0;25m time to hit \e[1m\e[92mCTRL-C\e[0m to \e[1m\e[91mstop\e[0m the process \e[1m\e[1mnow...\e[0m"
+        echo -e "\e[1m\e[91m10 seconds\e[0;25m time to hit \e[1m\e[92mCTRL-C\e[m to \e[1m\e[91mstop\e[m the process \e[1m\e[1mnow...\e[m"
         sleep 10
         echo ""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
@@ -62,11 +62,11 @@ _run_update_installer() {
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            echo -e "Running \e[1m\e[92mupdate-installer -latest-install\e[0m on \e[1mtty1\e[0m, please wait...\e[0m"
+            echo -e "Running \e[1m\e[92mupdate-installer -latest-install\e[m on \e[1mtty1\e[m, please wait...\e[m"
         else
-            echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[0m"
+            echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[m"
         fi
-        echo -e "\e[1mProgress is shown here...\e[0m"
+        echo -e "\e[1mProgress is shown here...\e[m"
     fi
 }
 
@@ -102,19 +102,19 @@ if [[ -e /usr/bin/setup ]]; then
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
     _welcome
-    echo -e "\e[1m\e[91mMemory check failed:\e[0m"
-    echo -e "\e[91m- Not engough memory detected! \e[0m"
-    echo -e "\e[93m- Please add \e[1mmore\e[0m\e[93m than \e[1m2.0GB\e[0m\e[93m RAM.\e[0m"
-    echo -e "\e[91mAborting...\e[0m"
+    echo -e "\e[1m\e[91mMemory check failed:\e[m"
+    echo -e "\e[91m- Not engough memory detected! \e[m"
+    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m2.0GB\e[m\e[93m RAM.\e[m"
+    echo -e "\e[91mAborting...\e[m"
     _enter_shell
 # local image, fail if less than 2.6GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
 -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _welcome
-    echo -e "\e[1m\e[91mMemory check failed:\e[0m"
-    echo -e "\e[91m- Not engough memory detected! \e[0m"
-    echo -e "\e[93m- Please add \e[1mmore\e[0m\e[93m than \e[1m2.6GB\e[0m\e[93m RAM.\e[0m"
-    echo -e "\e[91mAborting...\e[0m"
+    echo -e "\e[1m\e[91mMemory check failed:\e[m"
+    echo -e "\e[91m- Not engough memory detected! \e[m"
+    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m2.6GB\e[m\e[93m RAM.\e[m"
+    echo -e "\e[91mAborting...\e[m"
     _enter_shell
 else
     _welcome

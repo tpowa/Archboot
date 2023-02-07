@@ -3,14 +3,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        echo -e "\e[1mStep 1/4:\e[0m Installing XFCE desktop now..."
+        echo -e "\e[1mStep 1/4:\e[m Installing XFCE desktop now..."
         echo "          This will need some time..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\e[1mStep 2/4:\e[0m Configuring XFCE desktop..."
+        echo -e "\e[1mStep 2/4:\e[m Configuring XFCE desktop..."
         _configure_xfce >/dev/tty7 2>&1
     else
-        echo -e "\e[1mStep 1/4:\e[0m Installing XFCE desktop already done..."
-        echo -e "\e[1mStep 2/4:\e[0m Configuring XFCE desktop already done..."
+        echo -e "\e[1mStep 1/4:\e[m Installing XFCE desktop already done..."
+        echo -e "\e[1mStep 2/4:\e[m Configuring XFCE desktop already done..."
     fi
 }
 
@@ -251,8 +251,8 @@ EOF
 }
 
 _start_xfce() {
-    echo -e "Launching \e[1mXFCE\e[0m now, logging is done on \e[1m/dev/tty8\e[0m..."
+    echo -e "Launching \e[1mXFCE\e[m now, logging is done on \e[1m/dev/tty8\e[m..."
     startxfce4 >/dev/tty8 2>&1
-    echo -e "To relaunch \e[1mXFCE\e[0m desktop use: \e[92mstartxfce4\e[0m"
+    echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
 }
 # vim: set ft=sh ts=4 sw=4 et:
