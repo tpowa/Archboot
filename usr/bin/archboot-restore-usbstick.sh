@@ -8,7 +8,7 @@
 _APPNAME=$(basename "${0}")
 _usage()
 {
-    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1mRESTORE USB STICK:\033[0m"
+    echo -e "\033[1mWelcome to \033[36mARCHBOOT\033[0m \033[1m- RESTORE USB STICK:\033[0m"
     echo -e "\033[1m----------------------------------------\033[0m"
     echo -e "This script restores an USB device to a \033[1mFAT32\033[0m device."
     echo -e "\033[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \033[0m"
