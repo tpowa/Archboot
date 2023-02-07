@@ -15,7 +15,8 @@ Environment changes:
 - custom bash options are provided by /etc/profile.d/custom-bash-options.sh
 - added bash-completion, tpm2-tss and pinentry
 - new MOTD with architecture and Manage Archboot
-- shrink aarch64 iso ->125M less by removing dtbs and replacing Image with Image.gz kernel and remove /EFI directory
+- shrink aarch64 iso ->125M less by removing dtbs and replacing Image 
+  with Image.gz kernel and remove /EFI directory
 - shrink x86_64 iso -> 25M less by removing /EFI directory
 - remove not installed packages from local pacman database
 update-installer:
