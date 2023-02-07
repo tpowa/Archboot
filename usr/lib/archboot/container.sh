@@ -65,13 +65,17 @@ _clean_container() {
         rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,pixmaps,pkgconfig,readline,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,i18n/locales,locale,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,guile,icu,krb5,ldscripts,libnl,pkgconfig,python[0-9]*,rsync,sasl2,siconv,tar,xfsprogs,xtables}
     fi
-    # remove packages from pacman db that are not included in initramfs
-    _RM_PACMAN_DB="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell cdrtools \
-        libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
-        libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap"
-    for i in ${_RM_PACMAN_DB}; do
-        rm -rf ${1}/var/lib/pacman/local/${i}* &>/dev/null
-    done
+}
+
+_clean_packages() {
+    if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
+        # remove packages from pacman db that are not included in initramfs
+        _RM_PACKAGES="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell cdrtools \
+            libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
+            libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap"
+        echo "Uninstalling ${_RM_PACKAGES}..."
+        ${_PACMAN} -RDD ${_RM_PACKAGES} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
+    fi
 }
 
 # removing mkinitcpio hooks to speed up process, removing not needed initramdisks
