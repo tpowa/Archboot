@@ -131,10 +131,10 @@ _auto_packages() {
 # /etc/locale.gen
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 _locale_gen() {
-    if [[ "${_DESTDIR}" == "/install" ]]; then
-        systemd-nspawn -q -D "${_DESTDIR}" locale-gen &>"${_NO_LOG}"
-    else
+    if [[ "${_DESTDIR}" == "/" ]]; then
         locale-gen &>"${_NO_LOG}"
+    else
+        systemd-nspawn -q -D "${_DESTDIR}" locale-gen &>"${_NO_LOG}"
     fi
 }
 # vim: set ft=sh ts=4 sw=4 et:
