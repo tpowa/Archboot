@@ -22,14 +22,7 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
 _DLPROG="wget -q"
-# use the first VT not dedicated to a running console
-# don't use _DESTDIR=/mnt because it's intended to mount other things there!
-# check first if bootet in archboot
-# don't ask for source and network on booted system
-if grep -qw '^archboot' /etc/hostname; then
-    _DESTDIR="/install"
-else
-    _DESTDIR="/"
+if [[ ${_DESTDIR} == "/" ]]; then
     _S_NET=1
     _S_SRC=1
 fi
