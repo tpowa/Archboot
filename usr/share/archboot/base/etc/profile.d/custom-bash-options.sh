@@ -6,10 +6,10 @@
 [[ $- == *i* ]] || return
 if  [[ "${UID}" == 0 ]]; then
     # red for root user, host green, print full working dir
-    PS1='[\e[1;31m\u\e[m@\e[1;32m\h\e[m \w]\$ '
+    PS1='[\[\e[1;31m\]\u\[\e[m\]@}[\e[1;32m\]\h\[\e[m\] \w]\$ '
 else
     # blue for normal user,host green, print full working dir
-    PS1='[\e[1;34m\u\e[m@\e[1;32m\h\e[m \w]\$ '
+    PS1='[\[\e[1;34m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \w]\$ '
 fi
 # keep history clean from dups and spaces
 HISTCONTROL="erasedups:ignorespace"
