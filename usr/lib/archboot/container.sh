@@ -67,17 +67,6 @@ _clean_container() {
     fi
 }
 
-_clean_packages() {
-    if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
-        # remove packages from pacman db that are not included in initramfs
-        _RM_PACKAGES="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell cdrtools \
-            libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
-            libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap"
-        echo "Uninstalling ${_RM_PACKAGES}..."
-        ${_PACMAN} -RDD ${_RM_PACKAGES} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
-    fi
-}
-
 # removing mkinitcpio hooks to speed up process, removing not needed initramdisks
 _clean_mkinitcpio() {
     echo "Cleaning mkinitcpio from ${1}..."
