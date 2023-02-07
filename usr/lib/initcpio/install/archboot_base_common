@@ -14,7 +14,7 @@ build ()
     add_symlink /var/lock ../run/lock
 
     ### add basic apps
-    map add_binary init agetty basename mount umount clear env printf gawk tty bash partprobe cp dir du ls mv rm sed grep \
+    map add_binary init agetty basename mount umount clear env printf gawk tty bash rbash partprobe cp dir du ls mv rm sed grep \
           kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
           find wc uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd hexdump \
           sort zstd date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
@@ -187,7 +187,7 @@ build ()
     ### add secure boot MOK
     add_full_dir /usr/share/archboot/keys
 
-      ### remove conflicting mkinitcpio files
+    ### remove conflicting mkinitcpio files
     map rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf \
