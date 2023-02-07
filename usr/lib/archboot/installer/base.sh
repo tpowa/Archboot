@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.setup"
-_NO_LOG="/dev/null"
 if pgrep -x Xorg &>"${_NO_LOG}"; then
     _LOG="/dev/tty8"
 else
