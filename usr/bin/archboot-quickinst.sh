@@ -5,7 +5,7 @@ _DESTDIR="${1}"
 . /usr/lib/archboot/installer/common.sh
 
 _usage() {
-    echo -e "\033[1mWelcome to \033[34marchboot's\033[0m \033[1m QUICKINST INSTALLER:\033[0m"
+    echo -e "\033[1mWelcome to \033[36mARCHBOOT\033[0m \033[1m- QUICKINST INSTALLER:\033[0m"
     echo -e "\033[1m-------------------------------------------\033[0m"
     echo -e "Usage:"
     echo -e "\033[1mquickinst <destdir>\033[0m"
