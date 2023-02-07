@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # source base and common first, contains basic parameters
-. /usr/lib/archboot/installer/base.sh
 . /usr/lib/archboot/installer/common.sh
+. /usr/lib/archboot/installer/base.sh
 # source all other functions
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/autoprepare.sh

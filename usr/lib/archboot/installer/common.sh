@@ -6,6 +6,7 @@ LANG=C.UTF8
 _LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 _RUNNING_ARCH="$(uname -m)"
 _KERNELPKG="linux"
+_NO_LOG="/dev/null"
 # name of the kernel image
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
