@@ -7,15 +7,15 @@
 _APPNAME=$(basename "${0}")
 _usage()
 {
-    echo -e "\033[1mWelcome to \033[36mARCHBOOT\033[0m\033[1m - RSYNC BACKUP:\033[0m"
-    echo -e "\033[1m-----------------------------------\033[0m"
-    echo -e "- Copy \033[1mbackupdir\033[0m to \033[1mbackupdestination\033[0m using rsync."
-    echo -e "- For system backup, start with \033[1mfull\033[0m mounted system and then invoke this script"
-    echo -e "  with system's root directory as \033[1mbackupdir\033[0m."
-    echo -e "- \033[1mexcluded\033[0m directories are \033[1m/dev /tmp /proc /sys /run /mnt /media /lost+found\033[0m"
-    echo -e "- \033[1m--numeric-ids\033[0m option is invoked to \033[1mpreserve\033[0m users"
+    echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[0m\e[1m - RSYNC BACKUP:\e[0m"
+    echo -e "\e[1m-----------------------------------\e[0m"
+    echo -e "- Copy \e[1mbackupdir\e[0m to \e[1mbackupdestination\e[0m using rsync."
+    echo -e "- For system backup, start with \e[1mfull\e[0m mounted system and then invoke this script"
+    echo -e "  with system's root directory as \e[1mbackupdir\e[0m."
+    echo -e "- \e[1mexcluded\e[0m directories are \e[1m/dev /tmp /proc /sys /run /mnt /media /lost+found\e[0m"
+    echo -e "- \e[1m--numeric-ids\e[0m option is invoked to \e[1mpreserve\e[0m users"
     echo ""
-    echo -e "usage: \033[1m${_APPNAME} <backupdir> <backupdestination>\033[0m"
+    echo -e "usage: \e[1m${_APPNAME} <backupdir> <backupdestination>\e[0m"
     exit "$1"
 }
 ##################################################
