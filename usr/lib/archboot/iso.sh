@@ -167,7 +167,7 @@ _prepare_uefi_image() {
     echo "Preparing UEFI image..."
     ## get size of boot files
     BOOTSIZE=$(du -bc "${_ISODIR}"/EFI "${_ISODIR}"/boot | grep total | cut -f1)
-    IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
+    IMGSZ=$((BOOTSIZE/1024 + 1)) # image size in sectors
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
     mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
