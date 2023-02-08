@@ -54,11 +54,9 @@ _prepare_kernel_initramfs_files() {
     # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
     if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
         install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
-        [[ "${_ARCH}" == "x86_64" ]] && install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/VMLINUZ_X64"
     fi
     if [[ "${_ARCH}" == "aarch64" ]]; then
         install -m644 "${ALL_kver}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
-        install -m644 "${ALL_kver}" "${_ISODIR}/EFI/BOOT/IMAGE_AA64.GZ"
     fi
 }
 
@@ -168,14 +166,14 @@ _reproducibility() {
 _prepare_uefi_image() {
     echo "Preparing UEFI image..."
     ## get size of boot files
-    BOOTSIZE=$(du -bc "${_ISODIR}"/EFI | grep total | cut -f1)
+    BOOTSIZE=$(du -bc "${_ISODIR}"/EFI "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$(((BOOTSIZE*102)/100/1024 + 1)) # image size in sectors
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
     mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
     ## Copying all files to UEFI vfat image
-    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI ::/
-    rm -r "${_ISODIR}"/EFI
+    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
+    rm -r "${_ISODIR}"/EFI "${_ISODIR}"/boot
 }
 
 _prepare_extlinux_conf() {
@@ -236,7 +234,7 @@ _grub_mkrescue() {
     echo "Generating ${_ARCH} hybrid ISO..."
     [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System"
     #shellcheck disable=SC2086
-    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /boot/grub/{roms,i386-efi,locale,x86_64-efi} /efi .disk/ ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
 _reproducibility_iso() {
