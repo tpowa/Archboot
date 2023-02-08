@@ -59,6 +59,9 @@ build ()
     map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup \
         /usr/lib/gconv /usr/share/readline
 
+    ### make archinstall happy, add /etc/locale.gen
+    add_file /etc/locale.gen
+
     ### add bash configuration
     add_file /etc/bash.bashrc
     # add bash-completion
