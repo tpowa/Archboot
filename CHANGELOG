@@ -16,7 +16,7 @@ Environment changes:
 - new MOTD with listed architecture and Manage Archboot section
 - shrink aarch64 iso ->125M less by removing dtbs, replacing Image 
   with Image.gz kernel and remove /EFI directory
-- shrink x86_64 iso -> 25M less by removing /EFI directory
+- shrink x86_64 iso with new grub layout -> 35M saved 
 - remove not installed packages from local pacman database
 update-installer:
 - added network check
