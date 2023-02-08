@@ -57,7 +57,7 @@ build ()
 
     ### add coreutils,cryptsetup,terminfo libs and charmaps
     map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup \
-        /usr/share/i18n/charmaps /usr/share/readline
+        /usr/lib/gconv /usr/share/readline
 
     ### add bash configuration
     add_file /etc/bash.bashrc
