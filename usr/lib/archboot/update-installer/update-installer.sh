@@ -229,8 +229,8 @@ _kill_w_dir() {
     else
         if [[ -d "${_W_DIR}" ]]; then
             rm -r "${_W_DIR}"
-            # wait 15 seconds to get RAM cleared and set free
-            sleep 15
+            # wait 20 seconds to get RAM cleared and set free
+            sleep 20
         fi
     fi
 
