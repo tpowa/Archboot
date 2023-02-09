@@ -224,9 +224,11 @@ _umount_w_dir() {
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
         echo 1 > /sys/block/zram1/reset
+    else
+        [[ -d"${_W_DIR}" ]] && rm -r "${_W_DIR}"
     fi
-    # wait 10 seconds to get RAM cleared and set free
-    sleep 10
+    # wait 5 seconds to get RAM cleared and set free
+    sleep 5
 }
 
 _clean_archboot() {
@@ -314,7 +316,6 @@ _create_initramfs() {
 }
 
 _kexec() {
-    sleep 10
     # you need approx. 3.39x size for KEXEC_FILE_LOAD
     if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
