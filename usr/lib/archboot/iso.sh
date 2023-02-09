@@ -45,7 +45,7 @@ _prepare_kernel_initramfs_files() {
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
-    mkinitcpio -c "/etc/archboot/init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs.img" || exit 1
+    mkinitcpio -c "/etc/archboot/init-${_ARCH}.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
     #shellcheck disable=SC2154
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment

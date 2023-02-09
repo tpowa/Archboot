@@ -1,0 +1,9 @@
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+# SPDX-License-Identifier: GPL-2.0-only
+# mkinitcpio config file, defaulted to stock config file
+MKINITCPIO_CONFIG="/etc/archboot/aarch64-init.conf"
+
+# kernel version, defaulted to build for runtime kernel
+ALL_kver="/boot/Image.gz"
+
+# vim: set ft=sh ts=4 sw=4 et:
