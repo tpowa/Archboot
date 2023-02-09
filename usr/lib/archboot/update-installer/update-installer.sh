@@ -417,12 +417,12 @@ _new_environment() {
     _update_installer_check
     touch /.update-installer
     _umount_w_dir
-    _zram_w_dir "${_ZRAM_SIZE}"
+    mount | grep -q zram0 || _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\e[1mStep 1/9:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
     echo -e "\e[1mStep 2/9:\e[m Removing not necessary files from /..."
     _clean_archboot
-    _zram_usr "300M"
+    mount | grep -q zram0 || _zram_usr "300M"
     _clean_kernel_cache
     echo -e "\e[1mStep 3/9:\e[m Generating archboot container in ${_W_DIR}..."
     echo "          This will need some time..."
@@ -480,7 +480,7 @@ _full_system() {
     if [[ "${_ZRAM_VALUE}" -lt "4000" ]]; then
         _ZRAM_SIZE="4000M"
     fi
-    _initialize_zram_usr
+    mount | grep -q zram0 || _initialize_zram_usr
     echo -e "\e[1mInitializing full Arch Linux system...\e[m"
     echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
     echo "          This will need some time..."
@@ -495,11 +495,11 @@ _full_system() {
 }
 
 _new_image() {
-    _zram_w_dir "4000M"
+    mount | grep -q zram0 || _zram_w_dir "4000M"
     echo -e "\e[1mStep 1/2:\e[m Removing not necessary files from /..."
     _clean_archboot
     rm /var/cache/pacman/pkg/*
-    _zram_usr "300M"
+    mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
     "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
@@ -507,7 +507,7 @@ _new_image() {
 }
 
 _install_graphic () {
-    _initialize_zram_usr
+    mount | grep -q zram0 || _initialize_zram_usr
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
     echo -e "\e[1mInitializing desktop environment...\e[m"
     [[ -n "${_L_XFCE}" ]] && _install_xfce
@@ -644,7 +644,7 @@ EOF
 }
 
 _custom_wayland_xorg() {
-    _initialize_zram_usr
+    mount | grep -q zram0 || _initialize_zram_usr
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom wayland..."
         echo "          This will need some time..."
