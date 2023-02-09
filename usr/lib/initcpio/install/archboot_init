@@ -27,9 +27,9 @@ build() {
     for applet in {dep,ins,rm,ls}mod mod{probe,info}; do
         add_symlink "/usr/bin/$applet" kmod
     done
-    map add_binary blkid mount switch_root bsdcpio mkfs.btrfs \
+    map add_binary blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles
-
+    add_file "ter-v16n.psf.gz"
     map add_udev_rule '50-udev-default.rules' '60-persistent-storage.rules' \
         '64-btrfs.rules' '80-drivers.rules'
 

@@ -1,8 +1,0 @@
-#!/usr/bin/ash
-# SPDX-License-Identifier: GPL-2.0-only
-
-run_hook() {
-    setfont -C /dev/console ter-v16n
-}
-
-# vim: set ft=sh ts=4 sw=4 et:
