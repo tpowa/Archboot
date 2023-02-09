@@ -224,11 +224,16 @@ _kill_w_dir() {
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
         echo 1 > /sys/block/zram1/reset
+        # wait 5 seconds to get RAM cleared and set free
+        sleep 5
     else
-        [[ -d"${_W_DIR}" ]] && rm -r "${_W_DIR}"
+        if [[ -d "${_W_DIR}" ]]; then
+            rm -r "${_W_DIR}"
+            # wait 15 seconds to get RAM cleared and set free
+            sleep 15
+        fi
     fi
-    # wait 5 seconds to get RAM cleared and set free
-    sleep 5
+
 }
 
 _clean_archboot() {
