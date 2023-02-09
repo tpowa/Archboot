@@ -29,7 +29,7 @@ build() {
     done
     map add_binary blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles
-    add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz"
+    add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont.psf.gz"
     map add_udev_rule '50-udev-default.rules' '60-persistent-storage.rules' \
         '64-btrfs.rules' '80-drivers.rules'
 
