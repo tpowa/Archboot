@@ -2,6 +2,8 @@ On the road to 2023.02
 Highlights:
 - Use zram for rootfs on ISO/IMAGE boot. This enables finally booting the normal image
   with 800M RAM. !500M less RAM \o/! The requirement to boot is now equal to archiso.
+  This also fixes the grub boot issues, with failing on using a big initramdisks
+  and firmware incompatibility.
 - Unified Kernel Images / UKI files are provided now
 - Unified Kernel Image setup is supported in EFISTUB menu now
 - grub 2:2.06.r456.g65bc45963-1
