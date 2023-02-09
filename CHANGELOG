@@ -1,10 +1,10 @@
 On the road to 2023.02
 Highlights:
+- Use zram for rootfs on ISO/IMAGE boot. This enables finally booting the image
+  with 800M RAM. 500M less RAM \o/, requirement to boot now equal to archiso :)
 - Unified Kernel Images / UKI files are provided now
 - Unified Kernel Image setup is supported in EFISTUB menu now
 - grub 2:2.06.r456.g65bc45963-1
-- Use zram for rootfs on ISO/IMAGE boot. This enables booting the image 
-  with 800M RAM. 500M less RAM \o/
 - archboot-setup.sh works on installed system as System Setup tool
 Environment changes:
 - switch to Terminus as default font
@@ -16,7 +16,7 @@ Environment changes:
 - added normal bash layout with /root/.bash* files
 - custom bash options are provided by /etc/profile.d/custom-bash-options.sh
 - new MOTD with listed architecture and Manage Archboot section
-- new grub boot layout 
+- new grub boot layout, no redundancy anymore
 - remove not installed packages from local pacman database
 update-installer:
 - added network check
