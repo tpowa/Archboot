@@ -32,8 +32,8 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 mount -o discard /dev/zram0 /new_root &>/dev/null
 if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
     mkdir /cdrom
-    mount /dev/sr0 /cdrom
-    mount /cdrom/efi.img /mnt || /bin/sh
+    mount /dev/sr0 /cdrom &>/dev/null
+    mount /cdrom/efi.img /mnt &>/dev/null || /bin/sh
 fi
 cd new_root
 echo -e "\e[1mStep 3/3:\e[m Initializing /new_root..."
