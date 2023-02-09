@@ -218,7 +218,7 @@ _initialize_zram_usr() {
     fi
 }
 
-_umount_w_dir() {
+_kill_w_dir() {
     if mountpoint -q "${_W_DIR}"; then
         echo "Unmounting ${_W_DIR}..." > /dev/tty7
         # umount all possible mountpoints
@@ -418,7 +418,7 @@ _prepare_graphic() {
 _new_environment() {
     _update_installer_check
     touch /.update-installer
-    _umount_w_dir
+    _kill_w_dir
     mount | grep -q zram0 || _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\e[1mStep 1/9:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
@@ -450,7 +450,7 @@ _new_environment() {
     _create_initramfs
     echo -e "\e[1mStep 8/9:\e[m Cleanup ${_W_DIR}..."
     cd /
-    _umount_w_dir
+    _kill_w_dir
     _clean_kernel_cache
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
