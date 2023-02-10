@@ -209,10 +209,17 @@ _uboot() {
     BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/extlinux.img"
-    ## Creating extlinux.img
-    mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
+    dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
+    sfdisk "${VFAT_IMAGE}" &>/dev/null <<EOF
+label: dos
+label-id: 0x12345678
+device: "${VFAT_IMAGE}"
+unit: sectors
+"${VFAT_IMAGE}"1 : start=        2048, type=83, bootable
+EOF
+    mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >/dev/null
     ## Copying all files to UEFI vfat image
-    mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/boot ::/
+    mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
     echo "Removing extlinux config file..."
     rm -r "${_ISODIR}"/boot/extlinux
