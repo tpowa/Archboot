@@ -8,8 +8,8 @@ build() {
     # pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
     map add_checked_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
-            '/usb/host' '/drivers/usb/storage/' '/drivers/usb/roles/' \
-            '/(drivers/mmc|tifm_)' '/drivers/spi/' 'virtio'
+            '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
+            '/drivers/spi/' 'virtio'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod \
         insmod modprobe mkdir gzip sleep uname
