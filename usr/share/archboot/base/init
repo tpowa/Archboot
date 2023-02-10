@@ -49,7 +49,7 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
         /bin/sh
     fi
 fi
-cd new_root
+cd /new_root || /bin/sh
 echo -e "\e[1mStep 4/4:\e[m Initializing /new_root..."
 bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img"  &>/dev/null
 exec switch_root /new_root /init "$@"
