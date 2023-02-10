@@ -229,8 +229,10 @@ _kill_w_dir() {
     else
         if [[ -d "${_W_DIR}" ]]; then
             rm -r "${_W_DIR}"
-            # wait 20 seconds to get RAM cleared and set free
-            sleep 20
+            while true; do
+                [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+                sleep 1
+            done
         fi
     fi
 
