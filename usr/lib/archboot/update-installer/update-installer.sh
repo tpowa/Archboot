@@ -447,7 +447,7 @@ _new_environment() {
     sleep 10
     echo -e "\e[1mStep 4/9:\e[m Copying kernel ${VMLINUZ} to /${VMLINUZ}..."
     mkdir /ramfs
-    mount -o ramfs none /ramfs
+    mount -t ramfs none /ramfs
     cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
