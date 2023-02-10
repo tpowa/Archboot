@@ -1,5 +1,6 @@
-On the road to 2023.02
-Highlights:
+On the road to 2023.03
+---
+2023.02 Highlights:
 - Use zram for rootfs on ISO/IMAGE boot. This enables finally booting the normal image
   with 800M RAM. !500M less RAM \o/! The requirement to boot is now equal to archiso.
   This also fixes the grub boot issues, with failing on using a big initramdisks
@@ -11,7 +12,7 @@ Highlights:
 Environment changes:
 - switch to Terminus as default font
 - show full initrd line in grub menu
-- added fbset, terminus-font bash-completion, tpm2-tss and pinentry
+- added fbset, terminus-font, bash-completion, tpm2-tss and pinentry
 - removed refind, grub, pcre, zsh, grml-zsh-config, chntpw, fsarchiver 
   and ddrescue
 - switch to bash as default shell
