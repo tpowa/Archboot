@@ -223,16 +223,11 @@ _kill_w_dir() {
         echo "Unmounting ${_W_DIR}..." > /dev/tty7
         # umount all possible mountpoints
         umount -R "${_W_DIR}"
+        rm -r "${_W_DIR}"
         echo 1 > /sys/block/zram1/reset
-        # wait 5 seconds to get RAM cleared and set free
-        sleep 5
     else
         if [[ -d "${_W_DIR}" ]]; then
             rm -r "${_W_DIR}"
-            while true; do
-                [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
-                sleep 1
-            done
         fi
     fi
 
@@ -323,8 +318,17 @@ _create_initramfs() {
 }
 
 _kexec() {
+    # wait until enough memory is available!
+    while true; do
+        if [[ "$(($(stat -c %s /initrd.img)*339/1000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+            [[ "$(($(stat -c %s /initrd.img)*339/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        else
+            [[ "$(($(stat -c %s /initrd.img)/10))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        fi
+        sleep 1
+    done
     # you need approx. 3.39x size for KEXEC_FILE_LOAD
-    if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+    if [[ "$(($(stat -c %s /initrd.img)*339/1000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     else
