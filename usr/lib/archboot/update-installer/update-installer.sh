@@ -309,7 +309,7 @@ _create_initramfs() {
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /initrd.img &
+    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /ramfs/initrd.img &
     sleep 2
     while pgrep -x zstd &>/dev/null; do
         _clean_kernel_cache
@@ -335,13 +335,11 @@ _kexec() {
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
         kexec -c -f --mem-max=0xA0000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
-    if ! [[ "$(mount | grep '/dev/zram0' | cut -d ' ' -f 3)" == "/" ]]; then
-        sleep 2
-    else
-        sleep 0.1
-    fi
+    sleep 2
     _clean_kernel_cache
-    rm /{"${VMLINUZ}",initrd.img}
+    rm /ramfs/{"${VMLINUZ}",initrd.img}
+    umount /ramfs
+    rm -r ramfs/
     while pgrep -x kexec &>/dev/null; do
         _clean_kernel_cache
         sleep 1
@@ -448,7 +446,9 @@ _new_environment() {
     _clean_kernel_cache
     sleep 10
     echo -e "\e[1mStep 4/9:\e[m Copying kernel ${VMLINUZ} to /${VMLINUZ}..."
-    cp "${_W_DIR}/boot/${VMLINUZ}" / || exit 1
+    mkdir /ramfs
+    mount -o ramfs none /ramfs
+    cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     echo -e "\e[1mStep 5/9:\e[m Collecting initramfs files in ${_W_DIR}..."
