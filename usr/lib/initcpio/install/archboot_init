@@ -18,7 +18,9 @@ build() {
         '64-btrfs.rules' '80-drivers.rules'
     map add_file '/usr/lib/udev/ata_id' '/usr/lib/udev/scsi_id'
     add_file "/usr/share/archboot/base/init" "/init"
-    add_dir /mnt
+    map add_dir /mnt /etc/modprobe.d
+    echo "blacklist floppy" >> "${BUILDROOT}/etc/modprobe.d/modprobe.conf"
+
 }
 
 help() {
