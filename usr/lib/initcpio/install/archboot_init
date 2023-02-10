@@ -3,8 +3,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 build() {
-    map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat \
-        btrfs zram iso9660 loop zstd
+    map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat? \
+        btrfs? zram? iso9660? loop? zstd?
     # pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
     map add_checked_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
@@ -24,10 +24,9 @@ build() {
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont.psf.gz"
     map add_udev_rule '50-udev-default.rules' '60-persistent-storage.rules' \
         '64-btrfs.rules' '80-drivers.rules'
-
     map add_file '/usr/lib/udev/ata_id' '/usr/lib/udev/scsi_id'
-    add_dir /mnt
     add_file "/usr/share/archboot/base/init" "/init"
+    add_dir /mnt
 }
 
 help() {
