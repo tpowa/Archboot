@@ -35,7 +35,7 @@ echo -e "\e[1mStep 3/4:\e[mearching usb device..."
 _COUNT=0
 while ! mount UUID=1234-ABCD; do
     sleep 1
-    _COUNT=((_COUNT+1))
+    _COUNT=$((_COUNT+1))
     [[ "${_COUNT}" == 10 ]] && break
 done
 if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
