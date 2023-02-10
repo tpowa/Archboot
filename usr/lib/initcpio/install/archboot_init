@@ -10,17 +10,9 @@ build() {
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
             '/usb/host' '/drivers/usb/storage/' '/drivers/usb/roles/' \
             '/(drivers/mmc|tifm_)' '/drivers/spi/' 'virtio'
-    add_binary /usr/lib/initcpio/busybox /bin/busybox
-    for applet in $(/usr/lib/initcpio/busybox --list); do
-        add_symlink "/usr/bin/$applet" busybox
-    done
-    # add kmod with applet symlinks
-    add_binary kmod
-    for applet in {dep,ins,rm,ls}mod mod{probe,info}; do
-        add_symlink "/usr/bin/$applet" kmod
-    done
-    map add_binary blkid mount switch_root bsdcpio mkfs.btrfs setfont \
-        /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles
+    map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
+        /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod \
+        insmod modprobe
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont.psf.gz"
     map add_udev_rule '50-udev-default.rules' '60-persistent-storage.rules' \
         '64-btrfs.rules' '80-drivers.rules'
