@@ -329,10 +329,10 @@ _kexec() {
         sleep 1
     done
     if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-        echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
         kexec -s -f /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
     else
-        echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
         kexec -c -f --mem-max=0xA0000000 /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
     fi
     sleep 2
@@ -433,43 +433,44 @@ _new_environment() {
     touch /.update-installer
     _kill_w_dir
     mount | grep -q zram0 || _zram_w_dir "${_ZRAM_SIZE}"
-    echo -e "\e[1mStep 1/9:\e[m Waiting for gpg pacman keyring import to finish..."
+    echo -e "\e[1mStep 1/10:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
-    echo -e "\e[1mStep 2/9:\e[m Removing not necessary files from /..."
+    echo -e "\e[1mStep 2/10:\e[m Removing not necessary files from /..."
     _clean_archboot
     mount | grep -q zram0 || _zram_usr "300M"
     _clean_kernel_cache
-    echo -e "\e[1mStep 3/9:\e[m Generating archboot container in ${_W_DIR}..."
+    echo -e "\e[1mStep 3/10:\e[m Generating archboot container in ${_W_DIR}..."
     echo "          This will need some time..."
     _create_container || exit 1
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\e[1mStep 4/9:\e[m Copying kernel ${VMLINUZ} to /ramfs/${VMLINUZ}..."
+    echo -e "\e[1mStep 4/10:\e[m Copying kernel ${VMLINUZ} to /ramfs/${VMLINUZ}..."
+    # use ramfs to get immediate free space on file deletion
     mkdir /ramfs
     mount -t ramfs none /ramfs
     cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-    echo -e "\e[1mStep 5/9:\e[m Collecting initramfs files in ${_W_DIR}..."
+    echo -e "\e[1mStep 5/10:\e[m Collecting initramfs files in ${_W_DIR}..."
     echo "          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    echo -e "\e[1mStep 6/9:\e[m Cleanup ${_W_DIR}..."
+    echo -e "\e[1mStep 6/10:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\e[1mStep 7/9:\e[m Creating initramfs /initrd.img..."
+    echo -e "\e[1mStep 7/10:\e[m Creating initramfs /ramfs/initrd.img..."
     echo "          This will need some time..."
     _create_initramfs
-    echo -e "\e[1mStep 8/9:\e[m Cleanup ${_W_DIR}..."
+    echo -e "\e[1mStep 8/10:\e[m Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
     _clean_kernel_cache
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
-    echo -e "\e[1mStep 9/9:\e[m Loading files through kexec into kernel now..."
+    echo -e "\e[1mStep 9/10:\e[m Waiting for kernel to free RAM..."
     echo "          This will need some time..."
     _kexec
 }
