@@ -12,15 +12,13 @@ build() {
     done
     # usb
     add_checked_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
-    add_checked_modules '/drivers/usb/storage/'
+    add_checked_modules '/drivers/usb/storage/'  '/drivers/usb/roles/'
     # mmc
     add_checked_modules '/(drivers/mmc|tifm_)'
     # spi (mmc in spi mode)
     add_checked_modules '/drivers/spi/'
     # virtio
     add_checked_modules 'virtio'
-    # add platform
-    add_checked_modules '/platform/'
     add_binary /usr/lib/initcpio/busybox /bin/busybox
     for applet in $(/usr/lib/initcpio/busybox --list); do
         add_symlink "/usr/bin/$applet" busybox
