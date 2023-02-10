@@ -440,7 +440,7 @@ _new_environment() {
     mount | grep -q zram0 || _zram_usr "300M"
     _clean_kernel_cache
     echo -e "\e[1mStep 03/10:\e[m Generating archboot container in ${_W_DIR}..."
-    echo "           This will need some time..."
+    echo "            This will need some time..."
     _create_container || exit 1
     # 10 seconds for getting free RAM
     _clean_kernel_cache
@@ -453,7 +453,7 @@ _new_environment() {
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     echo -e "\e[1mStep 05/10:\e[m Collecting initramfs files in ${_W_DIR}..."
-    echo "           This will need some time..."
+    echo "            This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep 06/10:\e[m Cleanup ${_W_DIR}..."
@@ -462,7 +462,7 @@ _new_environment() {
     _clean_kernel_cache
     sleep 10
     echo -e "\e[1mStep 07/10:\e[m Creating initramfs /ramfs/initrd.img..."
-    echo "           This will need some time..."
+    echo "            This will need some time..."
     _create_initramfs
     echo -e "\e[1mStep 08/10:\e[m Cleanup ${_W_DIR}..."
     cd /
@@ -471,7 +471,7 @@ _new_environment() {
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
     echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
-    echo "           This will need some time..."
+    echo "            This will need some time..."
     _kexec
 }
 
