@@ -21,21 +21,36 @@ udevadm info --cleanup-db
 echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont.psf.gz -C /dev/console
-echo -e "\e[1mStep 1/3:\e[m Initializing /dev/zram0..."
+echo -e "\e[1mStep 1/4:\e[m Initializing /dev/zram0..."
 modprobe zram
 echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
-echo -e "\e[1mStep 2/3:\e[m Initializing btrfs on /dev/zram0..."
+echo -e "\e[1mStep 2/4:\e[m Initializing btrfs on /dev/zram0..."
 mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /new_root &>/dev/null
+# not all devices trigger autoload!
+modprobe usb-storage
+echo -e "\e[1mStep 3/4:\e[mearching usb device..."
+_COUNT=0
+while ! mount UUID=1234-ABCD; do
+    sleep 1
+    _COUNT=((_COUNT+1))
+    [[ "${_COUNT}" == 10 ]] && break
+done
 if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
+    echo -e "\e[1mStep 3/4:\e[mSearching cdrom device..."
     mkdir /cdrom
     mount /dev/sr0 /cdrom &>/dev/null
-    mount /cdrom/efi.img /mnt &>/dev/null || /bin/sh
+    if ! mount /cdrom/efi.img /mnt &>/dev/null; then
+        echo "ERROR: Didn't find device with efi.img!"
+        echo "This needs debugging, please contact the archboot author."
+        echo "Tobias Powalowski: tpowa@archlinux.org"
+        /bin/sh
+    fi
 fi
 cd new_root
-echo -e "\e[1mStep 3/3:\e[m Initializing /new_root..."
+echo -e "\e[1mStep 4/4:\e[m Initializing /new_root..."
 bsdcpio -i </mnt/boot/initramfs-$(uname -m).img  &>/dev/null
 exec switch_root /new_root /init "$@"
 
