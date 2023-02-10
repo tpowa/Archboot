@@ -337,6 +337,8 @@ _kexec() {
     fi
     if ! [[ "$(mount | grep '/dev/zram0' | cut -d ' ' -f 3)" == "/" ]]; then
         sleep 2
+    else
+        sleep 1
     fi
     _clean_kernel_cache
     rm /{"${VMLINUZ}",initrd.img}
