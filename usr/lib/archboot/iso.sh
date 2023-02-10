@@ -76,7 +76,7 @@ _prepare_kernel_initramfs_files_RISCV64() {
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/boot
     install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
-    mkinitcpio -c "/etc/archboot/init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs.img" || exit 1
+    mkinitcpio -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs.img" || exit 1
     mkinitcpio -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
 }
 
