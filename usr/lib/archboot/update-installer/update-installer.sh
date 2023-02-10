@@ -320,10 +320,10 @@ _create_initramfs() {
 _kexec() {
     # wait until enough memory is available!
     while true; do
-        if [[ "$(($(stat -c %s /initrd.img)*339/1000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-            [[ "$(($(stat -c %s /initrd.img)*339/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+            [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         else
-            [[ "$(($(stat -c %s /initrd.img)/10))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+            [[ "$(($(stat -c %s /initrd.img)/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         fi
         sleep 1
     done
