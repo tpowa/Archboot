@@ -111,7 +111,7 @@ _download_latest() {
         done
         HELP="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
         for i in ${HELP}; do
-            wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
+            [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
         done
         # main libs
         echo -e "\e[1mStep 3/4:\e[m Downloading latest script libs..."
