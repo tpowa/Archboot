@@ -31,15 +31,15 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 mount -o discard /dev/zram0 /new_root &>/dev/null
 # not all devices trigger autoload!
 modprobe usb-storage
-echo -e "\e[1mStep 3/4:\e[mearching usb device..."
+echo -e "\e[1mStep 3/4:\e[m Searching usb device..."
 _COUNT=0
-while ! mount UUID=1234-ABCD; do
+while ! mount UUID=1234-ABCD  &>/dev/null; do
     sleep 1
     _COUNT=$((_COUNT+1))
-    [[ "${_COUNT}" == 10 ]] && break
+    [[ "${_COUNT}" == 20 ]] && break
 done
 if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
-    echo -e "\e[1mStep 3/4:\e[mSearching cdrom device..."
+    echo -e "\e[1mStep 3/4:\e[m Searching cdrom device..."
     mkdir /cdrom
     mount /dev/sr0 /cdrom &>/dev/null
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
