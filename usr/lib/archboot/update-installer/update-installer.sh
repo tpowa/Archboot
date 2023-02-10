@@ -318,6 +318,7 @@ _create_initramfs() {
 }
 
 _kexec() {
+    # you need approx. 3.39x size for KEXEC_FILE_LOAD
     # wait until enough memory is available!
     while true; do
         if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
@@ -327,7 +328,6 @@ _kexec() {
         fi
         sleep 1
     done
-    # you need approx. 3.39x size for KEXEC_FILE_LOAD
     if [[ "$(($(stat -c %s /initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
         kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
@@ -335,7 +335,9 @@ _kexec() {
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
         kexec -c -f --mem-max=0xA0000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
     fi
-    sleep 2
+    if ! [[ "$(mount | grep '/dev/zram0' | cut -d ' ' -f 3)" == "/" ]]; then
+        sleep 2
+    fi
     _clean_kernel_cache
     rm /{"${VMLINUZ}",initrd.img}
     while pgrep -x kexec &>/dev/null; do
