@@ -33,12 +33,12 @@ mount -o discard /dev/zram0 /new_root &>/dev/null
 modprobe usb-storage
 echo -e "\e[1mStep 3/4:\e[m Searching usb device..."
 _COUNT=0
-while ! mount UUID=1234-ABCD  &>/dev/null; do
+while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
     sleep 1
     _COUNT=$((_COUNT+1))
-    [[ "${_COUNT}" == 20 ]] && break
+    [[ "${_COUNT}" == 10 ]] && break
 done
-if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
+if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
     echo -e "\e[1mStep 3/4:\e[m Searching cdrom device..."
     mkdir /cdrom
     mount /dev/sr0 /cdrom &>/dev/null
@@ -51,7 +51,7 @@ if ! mount UUID=1234-ABCD /mnt &>/dev/null; then
 fi
 cd new_root
 echo -e "\e[1mStep 4/4:\e[m Initializing /new_root..."
-bsdcpio -i </mnt/boot/initramfs-$(uname -m).img  &>/dev/null
+bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img"  &>/dev/null
 exec switch_root /new_root /init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
