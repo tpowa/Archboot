@@ -5,20 +5,11 @@
 build() {
     map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat \
         btrfs zram iso9660 loop zstd
-    # pata, sata, scsi, nvme
-    for filter in 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
-            'ata/(ahci|pdc_adma|ata_piix|ata_generic)'; do
-        add_checked_modules "$filter"
-    done
-    # usb
-    add_checked_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
-    add_checked_modules '/drivers/usb/storage/'  '/drivers/usb/roles/'
-    # mmc
-    add_checked_modules '/(drivers/mmc|tifm_)'
-    # spi (mmc in spi mode)
-    add_checked_modules '/drivers/spi/'
-    # virtio
-    add_checked_modules 'virtio'
+    # pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
+    map add_checked_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
+            '/usb/host' '/drivers/usb/storage/' '/drivers/usb/roles/' \
+            '/(drivers/mmc|tifm_)' '/drivers/spi/' 'virtio'
     add_binary /usr/lib/initcpio/busybox /bin/busybox
     for applet in $(/usr/lib/initcpio/busybox --list); do
         add_symlink "/usr/bin/$applet" busybox
