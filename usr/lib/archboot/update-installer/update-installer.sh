@@ -330,10 +330,10 @@ _kexec() {
     done
     if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
-        kexec -s -f /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -s -f /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
     else
         echo -e "Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
-        kexec -c -f --mem-max=0xA0000000 /"${VMLINUZ}" --initrd="/initrd.img" --reuse-cmdline &
+        kexec -c -f --mem-max=0xA0000000 /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
     fi
     sleep 2
     _clean_kernel_cache
@@ -445,7 +445,7 @@ _new_environment() {
     # 10 seconds for getting free RAM
     _clean_kernel_cache
     sleep 10
-    echo -e "\e[1mStep 4/9:\e[m Copying kernel ${VMLINUZ} to /${VMLINUZ}..."
+    echo -e "\e[1mStep 4/9:\e[m Copying kernel ${VMLINUZ} to /ramfs/${VMLINUZ}..."
     mkdir /ramfs
     mount -t ramfs none /ramfs
     cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
