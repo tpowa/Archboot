@@ -1,6 +1,13 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_emergency_shell() {
+    echo "Welcome to Archboot Emergeny Shell:"
+    echo "Seems something went wrong..."
+    echo "Reboot will happen in 10 seconds. Hit CTRL-C to enter shell."
+    reboot
+}
+
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
 mount -t sysfs sys /sys -o nosuid,noexec,nodev
