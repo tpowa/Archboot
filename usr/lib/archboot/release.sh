@@ -78,14 +78,14 @@ _create_iso() {
         for i in *.iso; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
                 isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
-                mcopy -m -i "${i}" ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
+                mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i "${i}" ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
-                mcopy -m -i "${i}" ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
-                mcopy -m -i "${i}" ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
+                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
+                mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
-                mcopy -m -i "${i}" ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
+                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
-                mcopy -m -i "${i}" ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
+                mcopy -m -i efi,img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
             fi
         done
         echo "Generating Unified Kernel Images..."
