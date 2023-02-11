@@ -324,39 +324,6 @@ _free_ram_loop() {
     done
 }
 
-_kexec() {
-    echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
-    echo "            This will need some time..."
-    # you need approx. 3.39x size for KEXEC_FILE_LOAD
-    # wait until enough memory is available!
-    while true; do
-        if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-            [[ "$(($(stat -c %s /ramfs/initrd.img)*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
-        else
-            [[ "$(($(stat -c %s /ramfs/initrd.img)/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
-        fi
-        sleep 1
-    done
-    if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
-        kexec -s -f /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
-    else
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
-        kexec -c -f --mem-max=0xA0000000 /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
-    fi
-    sleep 2
-    _clean_kernel_cache
-    rm /ramfs/{"${VMLINUZ}",initrd.img}
-    umount /ramfs
-    rm -r ramfs/
-    while pgrep -x kexec &>/dev/null; do
-        _clean_kernel_cache
-        sleep 1
-    done
-    #shellcheck disable=SC2115
-    rm -rf /usr/*
-}
-
 _cleanup_install() {
     rm -rf /usr/share/{man,help,gir-[0-9]*,info,doc,gtk-doc,ibus,perl[0-9]*}
     rm -rf /usr/include
@@ -477,7 +444,36 @@ _new_environment() {
     _clean_kernel_cache
     # unload virtio-net to avoid none functional network device on aarch64
     grep -qw virtio_net /proc/modules && rmmod virtio_net
-    _kexec
+    echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
+    echo "            This will need some time..."
+    # you need approx. 3.39x size for KEXEC_FILE_LOAD
+    # wait until enough memory is available!
+    while true; do
+        if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+            [[ "$(($(stat -c %s /ramfs/initrd.img)*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        else
+            [[ "$(($(stat -c %s /ramfs/initrd.img)/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        fi
+        sleep 1
+    done
+    if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
+        kexec -s -f /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
+    else
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
+        kexec -c -f --mem-max=0xA0000000 /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
+    fi
+    sleep 2
+    _clean_kernel_cache
+    rm /ramfs/{"${VMLINUZ}",initrd.img}
+    umount /ramfs
+    rm -r ramfs/
+    while pgrep -x kexec &>/dev/null; do
+        _clean_kernel_cache
+        sleep 1
+    done
+    #shellcheck disable=SC2115
+    rm -rf /usr/*
 }
 
 _kernel_check() {
