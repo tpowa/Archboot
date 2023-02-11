@@ -85,7 +85,7 @@ _create_iso() {
             elif echo "${i}" | grep -q latest; then
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
-                mcopy -m -i efi,img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
+                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
             fi
         done
         echo "Generating Unified Kernel Images..."
