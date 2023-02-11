@@ -13,7 +13,7 @@ build() {
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod \
         insmod modprobe mkdir gzip sleep uname cat cp cut dmesg grep ln ls mv \
-        poweroff reboot rm umount lsblk rmmod
+        rm umount lsblk rmmod
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont.psf.gz"
     map add_udev_rule '50-udev-default.rules' '60-persistent-storage.rules' \
         '64-btrfs.rules' '80-drivers.rules'

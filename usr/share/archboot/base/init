@@ -4,7 +4,8 @@
 _emergency_shell() {
     echo "Welcome to Archboot Emergeny Shell:"
     echo "Seems something went wrong..."
-    echo "Type 'poweroff' for shutdown or 'reboot' to restart."
+    echo "Type 'echo b >/proc/sysrq-trigger' for reboot."
+    echo "Type 'echo o >/proc/sysrq-trigger' for poweroff."
     /bin/sh
 }
 
@@ -25,6 +26,7 @@ udevadm trigger --action=add --type=devices
 udevadm settle
 udevadm control --exit
 udevadm info --cleanup-db
+echo 1 > /proc/sys/kernel/sysrq
 echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont.psf.gz -C /dev/console
@@ -61,6 +63,7 @@ cd /new_root || _emergency_shell
 echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /new_root..."
 echo -e "          This may need some time..."
 bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+echo 0 > /proc/sys/kernel/sysrq
 exec switch_root /new_root /init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
