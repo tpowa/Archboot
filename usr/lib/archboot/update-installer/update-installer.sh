@@ -317,6 +317,13 @@ _create_initramfs() {
     done
 }
 
+_free_ram_loop() {
+    while true; do
+        # continue when 1 GB RAM is free
+        [[ "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "1000000" ]] && break
+    done
+}
+
 _kexec() {
     # you need approx. 3.39x size for KEXEC_FILE_LOAD
     # wait until enough memory is available!
@@ -442,9 +449,8 @@ _new_environment() {
     echo -e "\e[1mStep 03/10:\e[m Generating archboot container in ${_W_DIR}..."
     echo "            This will need some time..."
     _create_container || exit 1
-    # 10 seconds for getting free RAM
     _clean_kernel_cache
-    sleep 10
+    _free_ram_loop
     echo -e "\e[1mStep 04/10:\e[m Copying kernel ${VMLINUZ} to /ramfs/${VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mkdir /ramfs
@@ -458,9 +464,8 @@ _new_environment() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep 06/10:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
-    # 10 seconds for getting free RAM
     _clean_kernel_cache
-    sleep 10
+    _free_ram_loop
     echo -e "\e[1mStep 07/10:\e[m Creating initramfs /ramfs/initrd.img..."
     echo "            This will need some time..."
     _create_initramfs
