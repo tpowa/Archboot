@@ -4,8 +4,7 @@
 _emergency_shell() {
     echo "Welcome to Archboot Emergeny Shell:"
     echo "Seems something went wrong..."
-    echo "Reboot will happen in 10 seconds. Hit CTRL-C to enter shell."
-    reboot
+    echo "Type 'poweroff' for shutdown or 'reboot' to restart."
 }
 
 # mount kernel filesystems
@@ -54,13 +53,13 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
         echo "ERROR: Didn't find a device with archboot rootfs!"
         echo "This needs further debugging. Please contact the archboot author."
         echo "Tobias Powalowski: tpowa@archlinux.org"
-        /bin/sh
+        _emergency_shell
     fi
 fi
-cd /new_root || /bin/sh
+cd /new_root || _emergency_shell
 echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /new_root..."
 echo -e "          This may need some time..."
-bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || /bin/sh
+bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 exec switch_root /new_root /init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
