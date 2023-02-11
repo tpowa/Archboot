@@ -83,8 +83,10 @@ _create_iso() {
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
                 mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
+                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
+                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
             fi
         done
