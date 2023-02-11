@@ -53,7 +53,7 @@ fi
 cd /new_root || /bin/sh
 echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /new_root..."
 echo -e "          This may need some time..."
-bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img"  &>/dev/null || /bin/sh
+bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || /bin/sh
 exec switch_root /new_root /init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
