@@ -5,6 +5,7 @@ _emergency_shell() {
     echo "Welcome to Archboot Emergeny Shell:"
     echo "Seems something went wrong..."
     echo "Type 'poweroff' for shutdown or 'reboot' to restart."
+    /bin/sh
 }
 
 # mount kernel filesystems
