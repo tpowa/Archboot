@@ -77,18 +77,19 @@ _create_iso() {
     else
         for i in *.iso; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
+                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
                 mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
+                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
             elif echo "${i}" | grep -q local; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
+                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
             fi
+            rm efi.img
         done
         echo "Generating Unified Kernel Images..."
         # create unified kernel image UKI, code adapted from wiki
