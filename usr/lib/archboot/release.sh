@@ -79,7 +79,7 @@ _create_iso() {
             if  echo "${i}" | grep -v local | grep -vq latest; then
                 isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > "efi.img"
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
-                [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i "${i}" ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
+                [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
                 mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
