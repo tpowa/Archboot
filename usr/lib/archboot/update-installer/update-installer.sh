@@ -11,6 +11,8 @@ _SOURCE="https://gitlab.archlinux.org/tpowa/archboot/-/raw/master"
 _BIN="/usr/bin"
 _ETC="/etc/archboot"
 _LIB="/usr/lib/archboot"
+_RAM="/ramfs"
+_INITRD="initrd.img"
 _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
@@ -282,19 +284,19 @@ _create_container() {
 
 _kver_x86() {
     # get kernel version from installed kernel
-    if [[ -f "/ramfs/${VMLINUZ}" ]]; then
-        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/ramfs/${VMLINUZ}")
-        read -r _HWKVER _ < <(dd if="/ramfs/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+    if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
+        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_RAM}/${VMLINUZ}")
+        read -r _HWKVER _ < <(dd if="${_RAM}/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
     fi
 }
 
 _kver_generic() {
     # get kernel version from installed kernel
-    if [[ -f "/ramfs/${VMLINUZ}" ]]; then
+    if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
         reader="cat"
         # try if the image is gzip compressed
-        [[ $(file -b --mime-type "/ramfs/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-        read -r _ _ _HWKVER _ < <($reader "/ramfs/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        [[ $(file -b --mime-type "${_RAM}/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+        read -r _ _ _HWKVER _ < <($reader "${_RAM}/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 }
 
@@ -304,7 +306,7 @@ _create_initramfs() {
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
     bsdtar --uid 0 --gid 0 --null -cnf - -T - |
-    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> /ramfs/initrd.img &
+    bsdtar --null -cf - --format=newc @- | zstd --rm -T0> ${_RAM}/${_INITRD} &
     sleep 2
     while pgrep -x zstd &>/dev/null; do
         _clean_kernel_cache
@@ -312,7 +314,7 @@ _create_initramfs() {
     done
 }
 
-_free_ram_loop() {
+_ram_check() {
     while true; do
         # continue when 1 GB RAM is free
         [[ "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "1000000" ]] && break
@@ -414,12 +416,12 @@ _new_environment() {
     echo "            This will need some time..."
     _create_container || exit 1
     _clean_kernel_cache
-    _free_ram_loop
-    echo -e "\e[1mStep 04/10:\e[m Copying kernel ${VMLINUZ} to /ramfs/${VMLINUZ}..."
+    _ram_check
+    echo -e "\e[1mStep 04/10:\e[m Copying kernel ${VMLINUZ} to ${_RAM}/${VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
-    mkdir /ramfs
-    mount -t ramfs none /ramfs
-    cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
+    mkdir ${_RAM}
+    mount -t ramfs none ${_RAM}
+    cp "${_W_DIR}/boot/${VMLINUZ}" ${_RAM}/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     # fallback if no detectable kernel is installed
@@ -431,8 +433,8 @@ _new_environment() {
     echo -e "\e[1mStep 06/10:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
     _clean_kernel_cache
-    _free_ram_loop
-    echo -e "\e[1mStep 07/10:\e[m Creating initramfs /ramfs/initrd.img..."
+    _ram_check
+    echo -e "\e[1mStep 07/10:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
     _create_initramfs
     echo -e "\e[1mStep 08/10:\e[m Cleanup ${_W_DIR}..."
@@ -446,31 +448,31 @@ _new_environment() {
     # you need approx. 3.39x size for KEXEC_FILE_LOAD
     # wait until enough memory is available!
     while true; do
-        if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-            [[ "$(($(stat -c %s /ramfs/initrd.img)*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+            [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         else
-            [[ "$(($(stat -c %s /ramfs/initrd.img)/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+            [[ "$(($(stat -c %s ${_RAM}/${_INITRD})/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         fi
         sleep 1
     done
-    if [[ "$(($(stat -c %s /ramfs/initrd.img)*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
+    if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
-        kexec -s -f /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
+        kexec -s -f ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     else
         echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
-        kexec -c -f --mem-max=0xA0000000 /ramfs/"${VMLINUZ}" --initrd="/ramfs/initrd.img" --reuse-cmdline &
+        kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     fi
     sleep 2
     _clean_kernel_cache
-    rm /ramfs/{"${VMLINUZ}",initrd.img}
-    umount /ramfs
-    rm -r ramfs/
-    while pgrep -x kexec &>/dev/null; do
-        _clean_kernel_cache
-        sleep 1
-    done
+    rm ${_RAM}/{"${VMLINUZ}",${_INITRD}}
+    umount ${_RAM} &>/dev/null
+    rm -r ramfs/ &>/dev/null
     #shellcheck disable=SC2115
-    rm -rf /usr/*
+    rm -rf /usr/* &>/dev/null
+    while true; do
+        _clean_kernel_cache
+        read -t 1
+    done
 }
 
 _kernel_check() {
