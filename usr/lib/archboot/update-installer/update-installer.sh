@@ -285,8 +285,8 @@ _create_container() {
 _kver_x86() {
     # get kernel version from installed kernel
     if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
-        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_RAM}/${VMLINUZ}")
-        read -r _HWKVER _ < <(dd if="${_RAM}/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+        offset="$(od -An -j0x20E -dN2 "${_RAM}/${VMLINUZ}")"
+        read -r _HWKVER _ < <(dd if="${_RAM}/${VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>/dev/null)
     fi
 }
 
@@ -295,7 +295,8 @@ _kver_generic() {
     if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
         reader="cat"
         # try if the image is gzip compressed
-        [[ $(file -b --mime-type "${_RAM}/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+        bytes="$(od -An -t x2 -N2 "${_RAM}/${VMLINUZ}" | tr -dc '[:alnum:]')"
+        [[ $bytes == '8b1f' ]] && reader="zcat"
         read -r _ _ _HWKVER _ < <($reader "${_RAM}/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 }
