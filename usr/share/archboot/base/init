@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _emergency_shell() {
-    echo "Welcome to Archboot Emergeny Shell:"
-    echo "Seems something went wrong..."
-    echo "Type 'echo b >/proc/sysrq-trigger' for reboot."
-    echo "Type 'echo o >/proc/sysrq-trigger' for poweroff."
+    echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
+    echo -e "\e[1mSeems something went wrong...\e[m"
+    echo -e "\e[1;93mType 'echo b >/proc/sysrq-trigger' for reboot.\e[m"
+    echo -e "\e[1;93mType 'echo o >/proc/sysrq-trigger' for poweroff.\e[m"
     /bin/sh
 }
 
@@ -53,9 +53,10 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
     mkdir /cdrom
     mount /dev/sr0 /cdrom &>/dev/null
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
-        echo "ERROR: Didn't find a device with archboot rootfs!"
-        echo "This needs further debugging. Please contact the archboot author."
-        echo "Tobias Powalowski: tpowa@archlinux.org"
+        echo -e "\e[1;91mError: Didn't find a device with archboot rootfs\!\e[m"
+        echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
+        echo -e "\e[1mTobias Powalowski: tpowa@archlinux.org\e[m"
+        echo ""
         _emergency_shell
     fi
 fi

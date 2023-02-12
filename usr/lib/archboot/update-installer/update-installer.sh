@@ -282,9 +282,9 @@ _create_container() {
 
 _kver_x86() {
     # get kernel version from installed kernel
-    if [[ -f "/${VMLINUZ}" ]]; then
-        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/${VMLINUZ}")
-        read -r _HWKVER _ < <(dd if="/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
+    if [[ -f "/ramfs/${VMLINUZ}" ]]; then
+        offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/ramfs/${VMLINUZ}")
+        read -r _HWKVER _ < <(dd if="/ramfs/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
     fi
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
@@ -292,13 +292,12 @@ _kver_x86() {
 
 _kver_generic() {
     # get kernel version from installed kernel
-    if [[ -f "/${VMLINUZ}" ]]; then
+    if [[ -f "/ramfs/${VMLINUZ}" ]]; then
         reader="cat"
         # try if the image is gzip compressed
-        [[ $(file -b --mime-type "/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
-        read -r _ _ _HWKVER _ < <($reader "/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        [[ $(file -b --mime-type "/ramfs/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+        read -r _ _ _HWKVER _ < <($reader "/ramfs/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
-
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
 }
