@@ -124,12 +124,13 @@ _auto_mkinitcpio() {
         ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && _HWPARAMETER="${_HWPARAMETER} --keymap"
         # get kernel version
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            offset=$(hexdump -s 526 -n 2 -e '"%0d"' "${_DESTDIR}/boot/${_VMLINUZ}")
-            read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>"${_NO_LOG}")
+            offset="$(od -An -j0x20E -dN2 "${_DESTDIR}/boot/${_VMLINUZ}")"
+            read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_NO_LOG}")
         elif [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             reader="cat"
             # try if the image is gzip compressed
-            [[ $(file -b --mime-type "${_DESTDIR}/boot/${_VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
+            bytes="$(od -An -t x2 -N2 "${_DESTDIR}/boot/${_VMLINUZ}" | tr -dc '[:alnum:]')"
+            [[ $bytes == '8b1f' ]] && reader="zcat"
             read -r _ _ _HWKVER _ < <($reader "${_DESTDIR}/boot/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
         fi
         # arrange MODULES for mkinitcpio.conf
