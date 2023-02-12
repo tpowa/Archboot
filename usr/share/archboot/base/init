@@ -44,7 +44,7 @@ echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd device..."
 echo -e "          Trying for 10 seconds..."
 _COUNT=0
 while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
-    sleep 1
+    read -t 1
     _COUNT=$((_COUNT+1))
     [[ "${_COUNT}" == 10 ]] && break
 done
