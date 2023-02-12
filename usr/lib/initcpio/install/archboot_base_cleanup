@@ -16,7 +16,7 @@ build ()
           linux32 linux64 setarch setsid setterm taskset ul unshare uuidgen whereis write \
           addpart delpart ldattach partx readprofile rtcwake uuidd sysctl pkill pmap \
           pwdx slabtop tload vmstat watch eject keyctl request-key tac \
-          sulogin resizepart lslocks wdctl zless zgrep fold od shred blockdev blkdiscard \
+          sulogin resizepart lslocks wdctl zless zgrep fold hexdump shred blockdev blkdiscard \
           newgrp nsenter runuser vigr vipw diff lsmod lzcmp lzdiff lzegrep \
           lzgrep lzfgrep xzegrep xzfgrep xzgrep lzless lzmore reset blkzone \
           chmem choom fincore hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs scriptlive \
