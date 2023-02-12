@@ -50,7 +50,6 @@ while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
 done
 if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
     echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on cdrom device..."
-    mkdir /cdrom
     mount /dev/sr0 /cdrom &>/dev/null
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs\!\e[m"
