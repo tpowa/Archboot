@@ -286,8 +286,6 @@ _kver_x86() {
         offset=$(hexdump -s 526 -n 2 -e '"%0d"' "/ramfs/${VMLINUZ}")
         read -r _HWKVER _ < <(dd if="/ramfs/${VMLINUZ}" bs=1 count=127 skip=$(( offset + 0x200 )) 2>/dev/null)
     fi
-    # fallback if no detectable kernel is installed
-    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
 }
 
 _kver_generic() {
@@ -298,8 +296,6 @@ _kver_generic() {
         [[ $(file -b --mime-type "/ramfs/${VMLINUZ}") == 'application/gzip' ]] && reader="zcat"
         read -r _ _ _HWKVER _ < <($reader "/ramfs/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
-    # fallback if no detectable kernel is installed
-    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
 }
 
 _create_initramfs() {
@@ -426,6 +422,8 @@ _new_environment() {
     cp "${_W_DIR}/boot/${VMLINUZ}" /ramfs/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
+    # fallback if no detectable kernel is installed
+    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
     echo -e "\e[1mStep 05/10:\e[m Collecting initramfs files in ${_W_DIR}..."
     echo "            This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
