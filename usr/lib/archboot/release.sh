@@ -146,7 +146,7 @@ _create_iso() {
     echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
     echo "Homepage: https://bit.ly/archboot";\
     echo "Architecture: ${_ARCH}";\
-    echo "RAM requirement to boot: 1300 MB or greater";\
+    echo "RAM requirement to boot: 800M or greater";\
     echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g")";\
     echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g")";\
