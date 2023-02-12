@@ -193,7 +193,7 @@ label linux
     menu label Boot System (automatic boot in 10 seconds...)
     kernel /boot/vmlinuz-${_ARCH}
     initrd /boot/initramfs.img
-    append rootfstype=ramfs console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
+    append console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
 EOF
 }
 
