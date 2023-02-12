@@ -13,31 +13,31 @@ build ()
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mConsoles:\e[m" >> "${MOTD}"
     echo -e "  - Virtual consoles \e[1m1-6\e[m are active." >> "${MOTD}"
-    echo -e "  - To change virtual console use \e[1m\e[92mALT + F(1-6)\e[m" >> "${MOTD}"
+    echo -e "  - To change virtual console use \e[1;92mALT + F(1-6)\e[m" >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
     echo -e "\e[1mChange keymap and console font:\e[m" >> "${MOTD}"
-    echo -e "  - To change to a non-US keymap, type \e[1m\e[92m'km'\e[m at the console." >> "${MOTD}"
+    echo -e "  - To change to a non-US keymap, type \e[1;92m'km'\e[m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\e[1mChange time and date:\e[m" >> "${MOTD}"
-    echo -e "  - To change your time and date, type \e[1m\e[92m'tz'\e[m at the console." >> "${MOTD}"
+    echo -e "  - To change your time and date, type \e[1;92m'tz'\e[m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor wifi authentification to internet access or further online help:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1m\e[92m'elinks'\e[m text mode browser." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
     echo -e "\e[1mFor getting support on IRC channels:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1m\e[92m'weechat'\e[m IRC client." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
-    echo -e "  - Run \e[1m\e[92m'update-installer'\e[m to manage the Archboot Environment." >> "${MOTD}"
+    echo -e "  - Run \e[1;92m'update-installer'\e[m to manage the Archboot Environment." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
     echo -e "  - On first login \e[92m'setup'\e[m is launched automatically." >> "${MOTD}"
-    echo -e "  - Rerun \e[1m\e[92m'setup'\e[m to continue installation." >> "${MOTD}"
+    echo -e "  - Rerun \e[1;92m'setup'\e[m to continue installation." >> "${MOTD}"
     echo -e "\e[1mFor Experts:\e[m" >> "${MOTD}"
-    echo -e "  - Use \e[1m\e[92m'quickinst'\e[m to install and bypass the setup routine." >> "${MOTD}"
+    echo -e "  - Use \e[1;92m'quickinst'\e[m to install and bypass the setup routine." >> "${MOTD}"
 fi
     chmod 644 "${MOTD}"
     add_file "${MOTD}" "/etc/motd"

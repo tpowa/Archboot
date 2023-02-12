@@ -457,10 +457,10 @@ _new_environment() {
         sleep 1
     done
     if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
         kexec -s -f ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     else
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1m\e[92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
+        echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
         kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     fi
     sleep 2
@@ -490,7 +490,7 @@ _kernel_check() {
 
 _full_system() {
     if [[ -e "/.full_system" ]]; then
-        echo -e "\e[1m\e[1mFull Arch Linux system already setup.\e[m"
+        echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
     # higher _ZRAM_SIZE is needed for plasma environment 200MB safety buffer
@@ -549,7 +549,7 @@ _install_graphic () {
 }
 
 _hint_graphic_installed () {
-    echo -e "\e[1m\e[91mError: Graphical environment already installed...\e[m"
+    echo -e "\e[1;91mError: Graphical environment already installed...\e[m"
     echo -e "You are running in \e[1mLocal mode\e[m with less than \e[1m4500 MB RAM\e[m, which only can launch \e[1mone\e[m environment."
     echo -e "Please relaunch your already used graphical environment from commandline."
 }
