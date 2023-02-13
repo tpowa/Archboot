@@ -13,8 +13,6 @@ else
 fi
 # keep history clean from dups and spaces
 HISTCONTROL="erasedups:ignorespace"
-# color grep output
-alias grep='grep --color=auto'
 # if installed set  neovim as default editor
 if command -v nvim >/dev/null; then
     alias vi='nvim'
