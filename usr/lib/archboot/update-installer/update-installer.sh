@@ -72,8 +72,7 @@ usage () {
             fi
         fi
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3216000 &&\
-    -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3216000 ]]; then
         echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
     fi
     exit 0
