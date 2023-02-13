@@ -13,6 +13,7 @@ _usage()
     echo -e "- For system backup, start with \e[1mfull\e[m mounted system and then invoke this script"
     echo -e "  with system's root directory as \e[1mbackupdir\e[m."
     echo -e "- \e[1mexcluded\e[m directories are \e[1m/dev /tmp /proc /sys /run /mnt /media /lost+found\e[m"
+    echo -e "  \e[1mexcluded\e[m \e[1m/sysroot /var/run /var/lib/systemd\e[m"
     echo -e "- \e[1m--numeric-ids\e[m option is invoked to \e[1mpreserve\e[m users"
     echo ""
     echo -e "usage: \e[1m${_APPNAME} <backupdir> <backupdestination>\e[m"
@@ -25,6 +26,6 @@ fi
 _BACKUPDESTINATION="${2}"
 _BACKUPDIR="${1}"
 rsync -aAXv --numeric-ids \
---exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} \
+--exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*","/var/lib/systemd/*","/var/run/*"} \
 "${_BACKUPDIR}" "${_BACKUPDESTINATION}"
 
