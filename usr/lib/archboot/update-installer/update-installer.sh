@@ -523,36 +523,37 @@ _new_image() {
     echo "          This will need some time..."
     _PRESET_LATEST="${_RUNNING_ARCH}-latest"
     _PRESET_LOCAL="${_RUNNING_ARCH}-local"
+    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
     mkdir /archboot
     cd archboot
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc || exit 1
-    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
+    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > /dev/tty7 || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > /dev/tty7
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # removing not working lvm2 from latest image
-        echo "Removing lvm2 from container ${_W_DIR}..."
+        echo "Removing lvm2 from container ${_W_DIR}..." > /dev/tty7
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         # generate latest tarball in container
-        echo "Generating local ISO..."
+        echo "Generating local ISO..." > /dev/tty7
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_RUNNING_ARCH}" || exit 1
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         _ram_check
-        echo "Generating latest ISO..."
+        echo "Generating latest ISO..." > /dev/tty7
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" || exit 1
-        echo "Installing lvm2 to container ${_W_DIR}..."
+        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
+        echo "Installing lvm2 to container ${_W_DIR}..." > /dev/tty7
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
-    echo "Generating normal ISO..."
+    echo "Generating normal ISO..." > /dev/tty7
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
-    -i=${_ISONAME}-${_RUNNING_ARCH}"  || exit 1
+    -i=${_ISONAME}-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
     mv "${_W_DIR}"/*.img ./ &>/dev/null
