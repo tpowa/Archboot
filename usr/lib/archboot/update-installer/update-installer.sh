@@ -472,7 +472,7 @@ _new_environment() {
     rm -rf /usr/* &>/dev/null
     while true; do
         _clean_kernel_cache
-        read -t 1
+        read -r -t 1
     done
 }
 
@@ -514,6 +514,9 @@ _full_system() {
 }
 
 _new_image() {
+    _PRESET_LATEST="${_RUNNING_ARCH}-latest"
+    _PRESET_LOCAL="${_RUNNING_ARCH}-local"
+    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
     mount | grep -q zram0 || _zram_w_dir "4000M"
     echo -e "\e[1mStep 1/2:\e[m Removing not necessary files from /..."
     _clean_archboot
@@ -521,11 +524,8 @@ _new_image() {
     mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
-    _PRESET_LATEST="${_RUNNING_ARCH}-latest"
-    _PRESET_LOCAL="${_RUNNING_ARCH}-local"
-    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
     mkdir /archboot
-    cd archboot
+    cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
     archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > /dev/tty7 || exit 1
@@ -558,7 +558,7 @@ _new_image() {
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
     mv "${_W_DIR}"/*.img ./ &>/dev/null
     rm -r "${_W_DIR}"
-    echo -e "\e[1mFinished:\e[m New isofiles are located in /"
+    echo -e "\e[1mFinished:\e[m New isofiles are located in /archboot"
 }
 
 _install_graphic () {
