@@ -6,7 +6,7 @@ _emergency_shell() {
     echo -e "\e[1mSeems something went wrong...\e[m"
     echo -e "\e[1;93mType 'echo b >/proc/sysrq-trigger' for reboot.\e[m"
     echo -e "\e[1;93mType 'echo o >/proc/sysrq-trigger' for poweroff.\e[m"
-    /bin/sh
+    /bin/bash &>/dev/null . /etc/bash.bashrc
 }
 
 # mount kernel filesystems

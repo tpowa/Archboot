@@ -19,9 +19,13 @@ build() {
     map add_file '/usr/lib/udev/ata_id' '/usr/lib/udev/scsi_id'
     add_file "/usr/share/archboot/base/init" "/init"
     map add_dir /mnt /cdrom
-    map add_file /etc/bash.bash_logout /etc/bash.bashrc
+    map add_file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
+    # add default bash setup
+    for i in .bashrc .bash_profile .bash_logout; do
+        add_file  "/etc/skel/${i}" "/root/${i}"
+    done
     # add custom bash options
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/etc/bash.bashrc"
+    echo ". /root/.bashrc" >> "$BUILDROOT/etc/bash.bashrc"
     echo "root:x:0:root" > "$BUILDROOT/etc/group"
     echo "root:x:0:0:/root:/bin/bash" > "$BUILDROOT/etc/passwd"
     add_file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
