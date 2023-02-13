@@ -28,7 +28,7 @@ echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
 mkfs.btrfs /dev/zram0 &>/dev/null
 mount -o discard /dev/zram0 /sysroot &>/dev/null
-rsync-backup,sh / /sysroot &>/dev/null
+rsync-backup.sh / /sysroot &>/dev/null
 touch /etc/initrd-release
 systemctl --no-block switch-root /sysroot
 }
