@@ -26,6 +26,7 @@ build() {
     done
     # add custom bash options
     echo ". /root/.bashrc" >> "$BUILDROOT/etc/bash.bashrc"
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
     echo "root:x:0:root" > "$BUILDROOT/etc/group"
     echo "root:x:0:0:/root:/bin/bash" > "$BUILDROOT/etc/passwd"
     add_file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
