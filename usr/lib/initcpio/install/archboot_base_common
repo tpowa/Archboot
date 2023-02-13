@@ -41,9 +41,9 @@ build ()
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
     add_symlink /usr/lib/terminfo ../share/terminfo
 
-    systemfiles="bash.bash_logout crypttab fstab host.conf hosts inputrc mke2fs.conf \
-                 nscd.conf nsswitch.conf protocols request-key.conf securetty \
-                 services"
+    systemfiles="bash.bash_logout bash.bashrc crypttab fstab host.conf hosts \
+                 inputrc mke2fs.conf nscd.conf nsswitch.conf protocols \
+                 request-key.conf securetty services"
     for i in $systemfiles; do
         add_file "/etc/$i"
     done
@@ -63,7 +63,6 @@ build ()
     add_file /etc/locale.gen
 
     ### add bash configuration
-    add_file /etc/bash.bashrc
     # add bash-completion
     add_full_dir /usr/share/bash-completion
     # use color bash prompt
