@@ -554,8 +554,8 @@ _new_image() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}"  || exit 1
     # move iso out of container
-    mv "${_W_DIR}"/*.iso /archboot &>/dev/null
-    mv "${_W_DIR}"/*.img /archboot &>/dev/null
+    mv "${_W_DIR}"/*.iso ./ &>/dev/null
+    mv "${_W_DIR}"/*.img ./ &>/dev/null
     rm -r "${_W_DIR}"
     echo -e "\e[1mFinished:\e[m New isofiles are located in /"
 }
