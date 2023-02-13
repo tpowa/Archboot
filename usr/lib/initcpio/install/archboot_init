@@ -10,7 +10,7 @@ build() {
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
             '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
             '/drivers/spi/' 'virtio'
-    map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
+    map add_binary bash blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont.psf.gz"
@@ -27,11 +27,13 @@ build() {
     # add custom bash options
     echo ". /root/.bashrc" >> "$BUILDROOT/etc/bash.bashrc"
     echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
+    echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "$BUILDROOT/root/.bashrc"
+    echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "$BUILDROOT/root/.bashrc"
     echo "root:x:0:root" > "$BUILDROOT/etc/group"
     echo "root:x:0:0:/root:/bin/bash" > "$BUILDROOT/etc/passwd"
     add_file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
-    basic_config="os-release hostname modprobe.d/modprobe.conf"
+    basic_config="os-release modprobe.d/modprobe.conf"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
