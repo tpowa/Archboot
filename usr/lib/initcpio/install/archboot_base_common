@@ -190,7 +190,7 @@ build ()
     add_full_dir /usr/share/archboot/keys
 
     ### remove conflicting mkinitcpio files and grub
-    map rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
+    rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf \
         ${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio \
