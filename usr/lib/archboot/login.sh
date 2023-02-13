@@ -21,6 +21,18 @@ _local_mode () {
     fi
 }
 
+_switch_root_zram() {
+[[ -d /sysroot ]] || mkdir /sysroot
+modprobe zram &>/dev/null
+echo "zstd" >/sys/block/zram0/comp_algorithm
+echo "4G" >/sys/block/zram0/disksize
+mkfs.btrfs /dev/zram0 &>/dev/null
+mount -o discard /dev/zram0 /sysroot &>/dev/null
+rsync-backup,sh / /sysroot &>/dev/null
+touch /etc/initrd-release
+systemctl start initrd-switch-root.service
+}
+
 _enter_shell() {
     # dbus sources profiles again
     if ! pgrep -x dbus-run-sessio &>/dev/null; then
@@ -69,6 +81,10 @@ _run_update_installer() {
         echo -e "\e[1mProgress is shown here...\e[m"
     fi
 }
+
+if ! mount | grep -q zram0; then
+    _switch_root_zram
+fi
 
 if ! [[ -e "/.vconsole-run" ]]; then
     touch /.vconsole-run
