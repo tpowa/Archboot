@@ -1,4 +1,8 @@
 On the road to 2023.03
+Environment changes:
+- emergency shell with messages
+update-installer.sh:
+- implemented free RAM detection
 ---
 2023.02 Highlights:
 - Use zram for rootfs on ISO/IMAGE boot. This enables finally booting the normal image
