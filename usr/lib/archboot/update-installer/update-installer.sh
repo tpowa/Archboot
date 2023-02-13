@@ -521,6 +521,11 @@ _new_image() {
     mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
+    _PRESET_LATEST="${_RUNNING_ARCH}-latest"
+    _PRESET_LOCAL="${_RUNNING_ARCH}-local"
+    mkdir /archboot
+    cd archboot
+    _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
     archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
@@ -549,8 +554,8 @@ _new_image() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}"  || exit 1
     # move iso out of container
-    mv "${_W_DIR}"/*.iso ./ &>/dev/null
-    mv "${_W_DIR}"/*.img ./ &>/dev/null
+    mv "${_W_DIR}"/*.iso /archboot &>/dev/null
+    mv "${_W_DIR}"/*.img /archboot &>/dev/null
     rm -r "${_W_DIR}"
     echo -e "\e[1mFinished:\e[m New isofiles are located in /"
 }
