@@ -11,7 +11,7 @@ build ()
           losetup mkfifo mknod  lzmadec lzop lzma lzcat unlzma unxz xzcat \
           lastb last wall mesg utmpdump xzdec switch_root pivot_root chcpu ctrlaltdel \
           gdisk sgdisk cgdisk fixparts findmnt lsblk swaplabel cal chrt col colcrt \
-          colrm column fallocate flock getopt ionice ipcmk ipcrm ipcs isosize swapoff \
+          colrm column fallocate flock getopt ionice ipcmk ipcrm ipcs swapoff \
           look lsfd lscpu mcookie namei prlimit rename renice rev script scriptreplay uname26 \
           linux32 linux64 setarch setsid setterm taskset ul unshare uuidgen whereis write \
           addpart delpart ldattach partx readprofile rtcwake uuidd sysctl pkill pmap \

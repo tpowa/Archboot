@@ -72,7 +72,7 @@ usage () {
             fi
         fi
     fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4616000 &&\
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3216000 &&\
     -e /usr/bin/archboot-"${_RUNNING_ARCH}"-release.sh ]]; then
         echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
     fi
@@ -517,11 +517,43 @@ _new_image() {
     mount | grep -q zram0 || _zram_w_dir "4000M"
     echo -e "\e[1mStep 1/2:\e[m Removing not necessary files from /..."
     _clean_archboot
-    rm /var/cache/pacman/pkg/*
+    [[ -d var/cache/pacman/pkg ]] && rm /var/cache/pacman/pkg/*
     mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
-    "archboot-${_RUNNING_ARCH}-release.sh" "${_W_DIR}" >/dev/tty7 2>&1 || exit 1
+    mkdir -p "${_W_DIR}"
+    cd "${_W_DIR}" || exit 1
+    # create container
+    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
+    # riscv64 does not support kexec at the moment
+    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+        # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
+        # removing not working lvm2 from latest image
+        echo "Removing lvm2 from container ${_W_DIR}..."
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
+        # generate latest tarball in container
+        echo "Generating local ISO..."
+        # generate local iso in container
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" || exit 1
+        rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
+        _ram_check
+        echo "Generating latest ISO..."
+        # generate latest iso in container
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" || exit 1
+        echo "Installing lvm2 to container ${_W_DIR}..."
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
+    fi
+    echo "Generating normal ISO..."
+    # generate iso in container
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
+    -i=${_ISONAME}-${_RUNNING_ARCH}"  || exit 1
+    # move iso out of container
+    mv "${_W_DIR}"/*.iso ./ &>/dev/null
+    mv "${_W_DIR}"/*.img ./ &>/dev/null
+    rm -r "${_W_DIR}"
     echo -e "\e[1mFinished:\e[m New isofiles are located in ${_W_DIR}"
 }
 
