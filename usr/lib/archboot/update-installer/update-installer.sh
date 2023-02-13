@@ -517,12 +517,10 @@ _new_image() {
     mount | grep -q zram0 || _zram_w_dir "4000M"
     echo -e "\e[1mStep 1/2:\e[m Removing not necessary files from /..."
     _clean_archboot
-    [[ -d var/cache/pacman/pkg ]] && rm /var/cache/pacman/pkg/*
+    [[ -d var/cache/pacman/pkg ]] && rm -f /var/cache/pacman/pkg/*
     mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
-    mkdir -p "${_W_DIR}"
-    cd "${_W_DIR}" || exit 1
     # create container
     archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
@@ -554,7 +552,7 @@ _new_image() {
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
     mv "${_W_DIR}"/*.img ./ &>/dev/null
     rm -r "${_W_DIR}"
-    echo -e "\e[1mFinished:\e[m New isofiles are located in ${_W_DIR}"
+    echo -e "\e[1mFinished:\e[m New isofiles are located in /"
 }
 
 _install_graphic () {
