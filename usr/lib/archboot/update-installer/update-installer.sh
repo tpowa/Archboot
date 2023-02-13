@@ -522,7 +522,7 @@ _new_image() {
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
     # create container
-    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
+    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
