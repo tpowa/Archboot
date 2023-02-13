@@ -19,7 +19,7 @@ build() {
     map add_file '/usr/lib/udev/ata_id' '/usr/lib/udev/scsi_id'
     add_file "/usr/share/archboot/base/init" "/init"
     map add_dir /mnt /cdrom
-    map add_file /etc/bash.bash_logout /etc/bash.bashrc
+    map add_file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do
         add_file  "/etc/skel/${i}" "/root/${i}"
@@ -28,8 +28,6 @@ build() {
     echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
     add_file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
-    ### adding config files of installation system
-    map add_file "/etc/profile" "/etc/shells"
     basic_config="os-release hostname modprobe.d/modprobe.conf"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
