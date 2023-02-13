@@ -30,7 +30,7 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 mount -o discard /dev/zram0 /sysroot &>/dev/null
 rsync-backup,sh / /sysroot &>/dev/null
 touch /etc/initrd-release
-systemctl start initrd-switch-root.service
+systemctl --no-block switch-root /sysroot
 }
 
 _enter_shell() {
