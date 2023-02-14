@@ -1,6 +1,7 @@
 On the road to 2023.03
 Environment changes:
 - emergency shell with messages
+- new zram routine for all boot types
 update-installer.sh:
 - implemented free RAM detection
 ---
