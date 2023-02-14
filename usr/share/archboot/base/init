@@ -31,7 +31,13 @@ udevadm info --cleanup-db
 echo 1 > /proc/sys/kernel/sysrq
 echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
 # it needs one echo before, in order to reset the consolefont!
-setfont consolefont.psf.gz -C /dev/console
+FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
+if [[ "${FB_SIZE}" -gt '1900' ]]; then
+    SIZE="32"
+else
+    SIZE="16"
+fi
+setfont consolefont-${SIZE}.psf.gz -C /dev/console
 echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
 modprobe zram &>/dev/null
 modprobe zstd &>/dev/null
