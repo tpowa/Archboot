@@ -26,7 +26,9 @@ _local_mode () {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
-if ! [[ -e "/.switch_root" ]]; then
+[[ -z $TTY ]] && TTY=$(tty)
+TTY=${TTY#/dev/}
+if ! [[ -e "/.switch_root" && "${TTY}" = "tty1" ]]; then
     touch /.switch_root
     clear
     echo -e "Moving \e[1mrootfs\e[m to btrfs on 4G \e[1m/dev/zram0\e[m. This needs some time..."
