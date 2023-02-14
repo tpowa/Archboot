@@ -37,7 +37,6 @@ build() {
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
-
 }
 
 help() {
