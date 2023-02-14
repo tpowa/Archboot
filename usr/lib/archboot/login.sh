@@ -30,6 +30,7 @@ _switch_root_zram() {
 TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
+    echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
     echo -e "\e[1mStep 1/3:\e[m Creating /dev/zram0 with zstd compression..."
     [[ -d /sysroot ]] || mkdir /sysroot
     modprobe zram &>/dev/null
