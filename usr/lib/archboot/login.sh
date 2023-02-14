@@ -41,8 +41,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     mount -o discard /dev/zram0 /sysroot &>/dev/null
     echo -e "\e[1mStep 3/3:\e[m Copying archboot rootfs to /sysroot..."
     rsync -aAXv --numeric-ids \
-        --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*"} \
-        "/" "/sysroot" / /sysroot &>/dev/null
+        --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/sysroot/*"} \
+        "/" "/sysroot" &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
     systemctl start initrd-switch-root
