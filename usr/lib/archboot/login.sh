@@ -43,6 +43,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     rsync -aAXv --numeric-ids \
         --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*"} \
         "/" "/sysroot" / /sysroot &>/dev/null
+    # systemd needs this for root_switch
     touch /etc/initrd-release
     systemctl start initrd-switch-root
 fi
@@ -102,8 +103,9 @@ if ! mount | grep -q zram0; then
 else
     # restart network, if zram move killed network
     if ! getent hosts www.google.com &>/dev/null; then
-        systemctl restart systemd-network
+        systemctl restart systemd-networkd
     fi
+    # initialize pacman keyring
     if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
         systemctl start pacman-init
     fi
