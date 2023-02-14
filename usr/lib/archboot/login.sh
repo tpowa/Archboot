@@ -31,7 +31,6 @@ echo -e "Moving \e[1mrootfs\e[m to \e[1mzram\e[m. This needs some time..."
 [[ -d /sysroot ]] || mkdir /sysroot
 modprobe zram &>/dev/null
 modprobe zstd &>/dev/null
-sleep 3
 echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
 mkfs.btrfs /dev/zram0 &>/dev/null
