@@ -2,7 +2,7 @@
 Description=Initializes Pacman keyring
 
 [Service]
-Type=oneshot
+Type=simple
 RemainAfterExit=yes
 ExecStart=/usr/bin/pacman-key --init
 ExecStart=/usr/bin/bash -c "/usr/bin/pacman-key --populate"
