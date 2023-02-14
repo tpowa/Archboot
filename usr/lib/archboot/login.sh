@@ -44,6 +44,9 @@ if [[ "${TTY}" = "tty1" ]]; then
     rsync -aAXv --numeric-ids \
         --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/sysroot/*"} \
         "/" "/sysroot" &>/dev/null
+    # cleanup mkinitcpio directories and files
+    rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
+    rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
     systemctl start initrd-switch-root
