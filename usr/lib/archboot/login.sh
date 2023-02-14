@@ -92,6 +92,8 @@ _run_update_installer() {
 
 if ! mount | grep -q zram0; then
     _switch_root_zram
+else
+    systemctl start pacman-init
 fi
 
 if ! [[ -e "/.vconsole-run" ]]; then

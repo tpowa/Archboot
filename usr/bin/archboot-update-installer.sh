@@ -34,7 +34,6 @@ done
 _archboot_check
 _download_latest
 echo -e "\e[1mInformation:\e[m Logging is done on \e[1m/dev/tty7\e[m..."
-_zram_initialize
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _new_environment
