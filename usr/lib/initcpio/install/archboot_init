@@ -18,7 +18,7 @@ build() {
         '64-btrfs.rules' '80-drivers.rules'
     map add_file '/usr/lib/udev/ata_id' '/usr/lib/udev/scsi_id'
     add_file "/usr/share/archboot/base/init" "/init"
-    map add_dir /mnt /cdrom
+    map add_dir /mnt /cdrom /sysroot
     map add_file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do

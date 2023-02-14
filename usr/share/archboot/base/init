@@ -40,7 +40,7 @@ echo "4G" >/sys/block/zram0/disksize
 echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
 mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
-mount -o discard /dev/zram0 /new_root &>/dev/null
+mount -o discard /dev/zram0 /sysroot &>/dev/null
 # not all devices trigger autoload!
 modprobe usb-storage &>/dev/null
 echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd device..."
@@ -62,11 +62,11 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
         _emergency_shell
     fi
 fi
-cd /new_root || _emergency_shell
-echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /new_root..."
+cd /sysroot || _emergency_shell
+echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
 echo -e "          This may need some time..."
 bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
-exec switch_root /new_root /init "$@"
+exec switch_root /sysroot /init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
