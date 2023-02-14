@@ -26,21 +26,23 @@ _local_mode () {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
-clear
-echo -e "Moving \e[1mrootfs\e[m to btrfs on 4G \e[1m/dev/zram0\e[m. This needs some time..."
-[[ -d /sysroot ]] || mkdir /sysroot
-modprobe zram &>/dev/null
-modprobe zstd &>/dev/null
-sleep 3
-echo "zstd" >/sys/block/zram0/comp_algorithm
-echo "4G" >/sys/block/zram0/disksize
-mkfs.btrfs /dev/zram0 &>/dev/null
-mount -o discard /dev/zram0 /sysroot &>/dev/null
-rsync -aAXv --numeric-ids \
---exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*"} \
-"/" "/sysroot" / /sysroot &>/dev/null
-touch /etc/initrd-release
-systemctl start initrd-switch-root
+if ! [[ -e "/.switch_root" ]]; then
+    touch /.switch_root
+    clear
+    echo -e "Moving \e[1mrootfs\e[m to btrfs on 4G \e[1m/dev/zram0\e[m. This needs some time..."
+    [[ -d /sysroot ]] || mkdir /sysroot
+    modprobe zram &>/dev/null
+    modprobe zstd &>/dev/null
+    echo "zstd" >/sys/block/zram0/comp_algorithm
+    echo "4G" >/sys/block/zram0/disksize
+    mkfs.btrfs /dev/zram0 &>/dev/null
+    mount -o discard /dev/zram0 /sysroot &>/dev/null
+    rsync -aAXv --numeric-ids \
+        --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*"} \
+        "/" "/sysroot" / /sysroot &>/dev/null
+    touch /etc/initrd-release
+    systemctl start initrd-switch-root
+fi
 }
 
 _enter_shell() {

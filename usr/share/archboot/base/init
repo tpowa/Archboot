@@ -35,7 +35,6 @@ setfont consolefont.psf.gz -C /dev/console
 echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
 modprobe zram &>/dev/null
 modprobe zstd &>/dev/null
-read -r -t 3
 echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
 echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
