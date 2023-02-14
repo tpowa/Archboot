@@ -106,10 +106,8 @@ _run_update_installer() {
 if ! mount | grep -q zram0; then
     _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
-    # restart network if zram move killed initialization
-    if ! getent hosts www.google.com &>/dev/null; then
-        systemctl restart systemd-networkd
-    fi
+    systemctl start systemd-networkd
+    systemctl start systemd-resolved
     # initialize pacman keyring
     if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
         systemctl start pacman-init
