@@ -22,6 +22,8 @@ _local_mode () {
 }
 
 _switch_root_zram() {
+clear
+echo -e "Moving \e[1mrootfs\e[m to zram. This needs some time..."
 [[ -d /sysroot ]] || mkdir /sysroot
 modprobe zram &>/dev/null
 echo "zstd" >/sys/block/zram0/comp_algorithm
