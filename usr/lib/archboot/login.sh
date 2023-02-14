@@ -47,8 +47,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     touch /etc/initrd-release
     systemctl start initrd-switch-root
 else
-    while true;
-        read -t 1
+    while true; do
+        read -r -t 1
     done
 fi
 }
