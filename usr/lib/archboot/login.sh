@@ -98,7 +98,7 @@ _run_update_installer() {
 }
 
 if ! mount | grep -q zram0; then
-    _switch_root_zram
+    _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
     if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
         systemctl start pacman-init
