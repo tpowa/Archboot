@@ -269,16 +269,6 @@ _cleanup_cache() {
     done
 }
 
-# needed for programs which check disk space
-_home_root_mount() {
-    if ! mountpoint /home &>/dev/null; then
-        /usr/bin/mount -t tmpfs tmpfs /home
-    fi
-    if ! mountpoint /root &>/dev/null; then
-        /usr/bin/mount -t tmpfs tmpfs /root
-    fi
-}
-
 _prepare_graphic() {
     _GRAPHIC="${1}"
     if [[ ! -e "/.full_system" ]]; then
@@ -329,7 +319,6 @@ _prepare_graphic() {
         echo "Cleanup locale and i18n..."
         rm -rf /usr/share/{locale,i18n}
     fi
-    _home_root_mount
     systemd-sysusers >/dev/tty7 2>&1
     systemd-tmpfiles --create >/dev/tty7 2>&1
     systemctl restart dbus
@@ -430,7 +419,6 @@ _full_system() {
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep 2/3:\e[m Checking /home and /root are tmpfs..."
-    _home_root_mount
     echo -e "\e[1mStep 3/3:\e[m Checking kernel version..."
     _kernel_check
     echo -e "\e[1mFull Arch Linux system is ready now.\e[m"
