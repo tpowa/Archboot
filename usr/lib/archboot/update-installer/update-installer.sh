@@ -17,7 +17,6 @@ _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
 _UPDATE="/${_LIB}/update-installer"
-_ZRAM_SIZE=${_ZRAM_SIZE:-"3G"}
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
 
@@ -163,75 +162,10 @@ _update_installer_check() {
     fi
 }
 
-_zram_initialize() {
-    # add defaults
-    _ZRAM_ALGORITHM=${_ZRAM_ALGORITHM:-"zstd"}
-    if ! grep -qw zram /proc/modules; then
-        modprobe zram num_devices=2> /dev/tty7 2>&1
-        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram0/comp_algorithm
-        echo "${_ZRAM_ALGORITHM}" >/sys/block/zram1/comp_algorithm
-    fi
-}
-
-# use -o discard for RAM cleaning on delete
-# (online fstrimming the block device!)
-# fstrim <mountpoint> for manual action
-# it needs some seconds to get RAM free on delete!
-_zram_usr() {
-    if ! mountpoint -q /usr; then
-        echo "${1}" >/sys/block/zram0/disksize
-        echo "Creating btrfs filesystem with ${1} on /dev/zram0..." > /dev/tty7
-        mkfs.btrfs -q --mixed /dev/zram0 > /dev/tty7 2>&1
-        mkdir /usr.zram
-        mount -o discard /dev/zram0 "/usr.zram" > /dev/tty7 2>&1
-        echo "Moving /usr to /usr.zram..." > /dev/tty7
-        mv /usr/* /usr.zram/
-        USR_SYMLINKS="bin local lib"
-        # lib64 is x86_64 only
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && USR_SYMLINKS="${USR_SYMLINKS} lib64"
-        for i in ${USR_SYMLINKS}; do
-            /usr.zram/bin/sln /usr.zram/"${i}" /usr/"${i}"
-        done
-        # pacman kills symlinks in below /usr
-        # mount --bind is the only way to solve this.
-        mount --bind /usr.zram /usr
-        systemctl restart dbus > /dev/tty7 2>&1
-    fi
-}
-
-_zram_w_dir() {
-    echo "${1}" >/sys/block/zram1/disksize
-    echo "Creating btrfs filesystem with ${1} on /dev/zram1..." > /dev/tty7
-    mkfs.btrfs -q --mixed /dev/zram1 > /dev/tty7 2>&1
-    [[ -d "${_W_DIR}" ]] || mkdir "${_W_DIR}"
-    mount -o discard /dev/zram1 "${_W_DIR}" > /dev/tty7 2>&1
-}
-
-_initialize_zram_usr() {
-    echo -e "\e[1mInitializing /usr.zram...\e[m"
-    echo -e "\e[1mStep 1/2:\e[m Waiting for gpg pacman keyring import to finish..."
-    _gpg_check
-    if ! [[ -d /usr.zram ]]; then
-        echo -e "\e[1mStep 2/2:\e[m Moving /usr to /usr.zram..."
-        _zram_usr "${_ZRAM_SIZE}"
-    else
-        echo -e "\e[1mStep 2/2:\e[m Moving /usr to /usr.zram already done..."
-    fi
-}
-
 _kill_w_dir() {
-    if mountpoint -q "${_W_DIR}"; then
-        echo "Unmounting ${_W_DIR}..." > /dev/tty7
-        # umount all possible mountpoints
-        umount -R "${_W_DIR}"
+    if [[ -d "${_W_DIR}" ]]; then
         rm -r "${_W_DIR}"
-        echo 1 > /sys/block/zram1/reset
-    else
-        if [[ -d "${_W_DIR}" ]]; then
-            rm -r "${_W_DIR}"
-        fi
     fi
-
 }
 
 _clean_archboot() {
@@ -405,12 +339,10 @@ _new_environment() {
     _update_installer_check
     touch /.update-installer
     _kill_w_dir
-    mount | grep -q zram0 || _zram_w_dir "${_ZRAM_SIZE}"
     echo -e "\e[1mStep 01/10:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
     echo -e "\e[1mStep 02/10:\e[m Removing not necessary files from /..."
     _clean_archboot
-    mount | grep -q zram0 || _zram_usr "300M"
     _clean_kernel_cache
     echo -e "\e[1mStep 03/10:\e[m Generating archboot container in ${_W_DIR}..."
     echo "            This will need some time..."
@@ -492,13 +424,6 @@ _full_system() {
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
-    # higher _ZRAM_SIZE is needed for plasma environment 200MB safety buffer
-    #shellcheck disable=SC2001,SC2086
-    _ZRAM_VALUE="$(echo ${_ZRAM_SIZE} | sed -e 's#[A-Z]##g')"
-    if [[ "${_ZRAM_VALUE}" -lt "4000" ]]; then
-        _ZRAM_SIZE="4000M"
-    fi
-    mount | grep -q zram0 || _initialize_zram_usr
     echo -e "\e[1mInitializing full Arch Linux system...\e[m"
     echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
     echo "          This will need some time..."
@@ -516,11 +441,9 @@ _new_image() {
     _PRESET_LATEST="${_RUNNING_ARCH}-latest"
     _PRESET_LOCAL="${_RUNNING_ARCH}-local"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
-    mount | grep -q zram0 || _zram_w_dir "4000M"
     echo -e "\e[1mStep 1/2:\e[m Removing not necessary files from /..."
     _clean_archboot
     [[ -d var/cache/pacman/pkg ]] && rm -f /var/cache/pacman/pkg/*
-    mount | grep -q zram0 || _zram_usr "300M"
     echo -e "\e[1mStep 2/2:\e[m Generating new iso files in ${_W_DIR} now..."
     echo "          This will need some time..."
     mkdir /archboot
@@ -561,7 +484,6 @@ _new_image() {
 }
 
 _install_graphic () {
-    mount | grep -q zram0 || _initialize_zram_usr
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
     echo -e "\e[1mInitializing desktop environment...\e[m"
     [[ -n "${_L_XFCE}" ]] && _install_xfce
@@ -698,7 +620,6 @@ EOF
 }
 
 _custom_wayland_xorg() {
-    mount | grep -q zram0 || _initialize_zram_usr
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom wayland..."
         echo "          This will need some time..."

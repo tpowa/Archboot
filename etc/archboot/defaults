@@ -26,10 +26,6 @@ _PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dol
 # Custom packages
 _CUSTOM_XORG=""
 _CUSTOM_WAYLAND=""
-### zram setup
-_ZRAM_ALGORITHM="zstd"
-# default size for all operations
-_ZRAM_SIZE="3500M"
 ### server setup
 # release directory
 _DIR="$(date +%Y.%m)"

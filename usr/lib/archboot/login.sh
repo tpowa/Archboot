@@ -21,9 +21,13 @@ _local_mode () {
     fi
 }
 
+# use -o discard for RAM cleaning on delete
+# (online fstrimming the block device!)
+# fstrim <mountpoint> for manual action
+# it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
 clear
-echo -e "Moving \e[1mrootfs\e[m to zram. This needs some time..."
+echo -e "Moving \e[1mrootfs\e[m to \e[1mzram\e[m. This needs some time..."
 [[ -d /sysroot ]] || mkdir /sysroot
 modprobe zram &>/dev/null
 echo "zstd" >/sys/block/zram0/comp_algorithm
