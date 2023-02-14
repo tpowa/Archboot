@@ -28,8 +28,7 @@ _local_mode () {
 _switch_root_zram() {
 [[ -z $TTY ]] && TTY=$(tty)
 TTY=${TTY#/dev/}
-if ! [[ -e "/.switch_root" && "${TTY}" = "tty1" ]]; then
-    touch /.switch_root
+if [[ "${TTY}" = "tty1" ]]; then
     clear
     echo -e "Moving \e[1mrootfs\e[m to btrfs on 4G \e[1m/dev/zram0\e[m. This needs some time..."
     [[ -d /sysroot ]] || mkdir /sysroot
