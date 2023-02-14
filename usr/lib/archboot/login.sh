@@ -30,14 +30,16 @@ _switch_root_zram() {
 TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
-    echo -e "Moving \e[1mrootfs\e[m to btrfs on 4G \e[1m/dev/zram0\e[m. This needs some time..."
+    echo -e "\e[1mStep 1/3:\e[m Creating /dev/zram0 with zstd compression..."
     [[ -d /sysroot ]] || mkdir /sysroot
     modprobe zram &>/dev/null
     modprobe zstd &>/dev/null
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "4G" >/sys/block/zram0/disksize
+    echo -e "\e[1mStep 2/3:\e[m Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>/dev/null
     mount -o discard /dev/zram0 /sysroot &>/dev/null
+    echo -e "\e[1mStep 3/3:\e[m Copying archboot rootfs to /sysroot..."
     rsync -aAXv --numeric-ids \
         --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/sysroot/*"} \
         "/" "/sysroot" / /sysroot &>/dev/null
