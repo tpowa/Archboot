@@ -128,8 +128,6 @@ _create_pacman_conf() {
 _change_pacman_conf() {
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
-    # disable checkspace option in pacman.conf, to allow to install packages in environment
-    sed -i -e 's:^CheckSpace:#CheckSpace:g' "${1}"/etc/pacman.conf
 }
 
 # umount special filesystems
