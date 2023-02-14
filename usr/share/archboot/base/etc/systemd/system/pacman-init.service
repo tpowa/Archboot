@@ -4,8 +4,7 @@ Description=Initializes Pacman keyring
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/pacman-key --init
-ExecStart=/usr/bin/bash -c "/usr/bin/pacman-key --populate"
+ExecStart=/usr/bin/bash -c "/usr/bin/pacman-key --init; /usr/bin/pacman-key --populate"
 
 [Install]
 WantedBy=multi-user.target
