@@ -46,6 +46,10 @@ if [[ "${TTY}" = "tty1" ]]; then
     # systemd needs this for root_switch
     touch /etc/initrd-release
     systemctl start initrd-switch-root
+else
+    while true;
+        read -t 1
+    done
 fi
 }
 
@@ -101,10 +105,6 @@ _run_update_installer() {
 if ! mount | grep -q zram0; then
     _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
-    # restart network, if zram move killed network
-    if ! getent hosts www.google.com &>/dev/null; then
-        systemctl restart systemd-networkd
-    fi
     # initialize pacman keyring
     if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
         systemctl start pacman-init
