@@ -67,6 +67,9 @@ echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
 echo -e "          This may need some time..."
 bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
-exec switch_root /sysroot /init "$@"
+# remove mkinitcpio files and directories
+rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
+rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+exec switch_root /sysroot /usr/bin/init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
