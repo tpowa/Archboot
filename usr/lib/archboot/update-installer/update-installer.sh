@@ -517,11 +517,11 @@ _prepare_plasma() {
         echo -e "\e[1mStep 1/4:\e[m Installing KDE/Plasma desktop now..."
         echo "          This will need some time..."
         _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\e[1mStep 2/4:\e[m Configuring KDE desktop..."
+        echo -e "\e[1mStep 2/4:\e[m Configuring KDE/Plasma desktop..."
         _configure_plasma >/dev/tty7 2>&1
     else
         echo -e "\e[1mStep 1/4:\e[m Installing KDE/Plasma desktop already done..."
-        echo -e "\e[1mStep 2/4:\e[m Configuring KDE desktop already done..."
+        echo -e "\e[1mStep 2/4:\e[m Configuring KDE/Plasma desktop already done..."
     fi
 }
 
