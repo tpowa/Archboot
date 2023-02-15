@@ -41,9 +41,9 @@ if [[ "${TTY}" = "tty1" ]]; then
     mkfs.btrfs /dev/zram0 &>/dev/null
     mount -o discard /dev/zram0 /sysroot &>/dev/null
     echo -e "\e[1mStep 3/3:\e[m Copying archboot rootfs to /sysroot..."
-    rsync -aAXv --numeric-ids \
-        --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/sysroot/*"} \
-        "/" "/sysroot" &>/dev/null
+    tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
+        --exclude="./run/*" --exclude="./mnt/*" --exclude="./sysroot/*" \
+        -clpf - . | tar -C /sysroot -xlspf - &>/dev/null
     # cleanup mkinitcpio directories and files
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
