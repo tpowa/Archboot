@@ -14,11 +14,12 @@ build ()
     add_symlink /var/lock ../run/lock
 
     ### add basic apps
-    map add_binary init agetty basename mount umount clear env printf gawk tty bash rbash partprobe cp dir du ls mv rm sed grep \
-          kill killall more ps pwd rmdir true cat mkdir echo false sleep kmod pidof touch chmod \
-          find wc uname bsdtar yes awk halt shutdown reboot poweroff insmod modprobe sh dd \
-          sort zstd date tee mktemp install pgrep mkfs.btrfs rmmod mountpoint gzip \
-          ldconfig nscd ln top df cut stat sln file tr passwd od tar
+    map add_binary init agetty basename mount umount clear env printf gawk tty bash rbash \
+            partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \
+            mkdir echo false sleep kmod pidof touch chmod find wc uname bsdtar yes awk halt \
+            shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
+            install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig nscd ln top df cut \
+            stat tr passwd od tar
 
     ### add nano
     add_binary nano
