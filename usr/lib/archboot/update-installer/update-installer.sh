@@ -189,7 +189,9 @@ _gpg_check() {
     while pgrep -x gpg &>/dev/null; do
         sleep 1
     done
-    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
+    if [[ -e /etc/systemd/system/pacman-init.service ]]; then
+        systemctl stop pacman-init.service
+    fi
 }
 
 _create_container() {
@@ -385,9 +387,9 @@ _new_environment() {
     fi
     sleep 2
     _clean_kernel_cache
-    rm ${_RAM}/{"${VMLINUZ}",${_INITRD}}
+    rm ${_RAM}/{${VMLINUZ},${_INITRD}}
     umount ${_RAM} &>/dev/null
-    rm -r ramfs/ &>/dev/null
+    rm -r ${_RAM} &>/dev/null
     #shellcheck disable=SC2115
     rm -rf /usr/* &>/dev/null
     while true; do
