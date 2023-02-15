@@ -49,17 +49,17 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 mount -o discard /dev/zram0 /sysroot &>/dev/null
 # not all devices trigger autoload!
 modprobe usb-storage &>/dev/null
-echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd device..."
-echo -e "          Trying for 10 seconds..."
-_COUNT=0
-while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
-    read -r -t 1
-    _COUNT=$((_COUNT+1))
-    [[ "${_COUNT}" == 10 ]] && break
-done
+echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+if ! mount /dev/sr0 /cdrom &>/dev/null; then
+    echo -e "          Trying for 10 seconds..."
+    _COUNT=0
+    while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
+        read -r -t 1
+        _COUNT=$((_COUNT+1))
+        [[ "${_COUNT}" == 10 ]] && break
+    done
+fi
 if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
-    echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on cdrom device..."
-    mount /dev/sr0 /cdrom &>/dev/null
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
         echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
