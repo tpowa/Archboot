@@ -17,8 +17,8 @@ _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
 _UPDATE="/${_LIB}/update-installer"
-[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && VMLINUZ="vmlinuz-linux"
-[[ "${_RUNNING_ARCH}" == "aarch64" ]] && VMLINUZ="Image"
+[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-linux"
+[[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="Image"
 
 _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
@@ -219,20 +219,20 @@ _create_container() {
 
 _kver_x86() {
     # get kernel version from installed kernel
-    if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
-        offset="$(od -An -j0x20E -dN2 "${_RAM}/${VMLINUZ}")"
-        read -r _HWKVER _ < <(dd if="${_RAM}/${VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>/dev/null)
+    if [[ -f "${_RAM}/${_VMLINUZ}" ]]; then
+        offset="$(od -An -j0x20E -dN2 "${_RAM}/${_VMLINUZ}")"
+        read -r _HWKVER _ < <(dd if="${_RAM}/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>/dev/null)
     fi
 }
 
 _kver_generic() {
     # get kernel version from installed kernel
-    if [[ -f "${_RAM}/${VMLINUZ}" ]]; then
+    if [[ -f "${_RAM}/${_VMLINUZ}" ]]; then
         reader="cat"
         # try if the image is gzip compressed
-        bytes="$(od -An -t x2 -N2 "${_RAM}/${VMLINUZ}" | tr -dc '[:alnum:]')"
+        bytes="$(od -An -t x2 -N2 "${_RAM}/${_VMLINUZ}" | tr -dc '[:alnum:]')"
         [[ $bytes == '8b1f' ]] && reader="zcat"
-        read -r _ _ _HWKVER _ < <($reader "${_RAM}/${VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
+        read -r _ _ _HWKVER _ < <($reader "${_RAM}/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 }
 
@@ -340,11 +340,11 @@ _new_environment() {
     _create_container || exit 1
     _clean_kernel_cache
     _ram_check
-    echo -e "\e[1mStep 04/10:\e[m Copying kernel ${VMLINUZ} to ${_RAM}/${VMLINUZ}..."
+    echo -e "\e[1mStep 04/10:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mkdir ${_RAM}
     mount -t ramfs none ${_RAM}
-    cp "${_W_DIR}/boot/${VMLINUZ}" ${_RAM}/ || exit 1
+    cp "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     # fallback if no detectable kernel is installed
@@ -354,7 +354,7 @@ _new_environment() {
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep 06/10:\e[m Cleanup ${_W_DIR}..."
-    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${VMLINUZ}" -exec rm -rf {} \;
+    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' ! -name "${_VMLINUZ}" -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
     echo -e "\e[1mStep 07/10:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
@@ -380,14 +380,14 @@ _new_environment() {
     done
     if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
-        kexec -s -f ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+        kexec -s -f ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     else
         echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
-        kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+        kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     fi
     sleep 2
     _clean_kernel_cache
-    rm ${_RAM}/{"${VMLINUZ}","${_INITRD}"}
+    rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
     umount ${_RAM} &>/dev/null
     rm -r ${_RAM} &>/dev/null
     #shellcheck disable=SC2115
