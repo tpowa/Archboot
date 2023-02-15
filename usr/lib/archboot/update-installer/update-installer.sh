@@ -387,7 +387,7 @@ _new_environment() {
     fi
     sleep 2
     _clean_kernel_cache
-    rm ${_RAM}/{${VMLINUZ},${_INITRD}}
+    rm ${_RAM}/{"${VMLINUZ}","${_INITRD}"}
     umount ${_RAM} &>/dev/null
     rm -r ${_RAM} &>/dev/null
     #shellcheck disable=SC2115
