@@ -2,6 +2,8 @@ On the road to 2023.03
 Environment changes:
 - implemented emergency shell with messages and with big font detection support
 - implemented new zram routine for all boot types
+- added kms to archboot_init, to avoid font flickering introduced 
+  in kernel 6.0.x series 
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
 ---
