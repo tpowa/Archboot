@@ -536,27 +536,8 @@ add_full_dir() {
     # Add a directory and all its contents, recursively, to the initcpio image.
     # No parsing is performed and the contents of the directory is added as is.
     #   $1: path to directory
-    #   $2: glob pattern to filter file additions (optional)
-    #   $3: path prefix that will be stripped off from the image path (optional)
-
-    local f= filter=${2:-*} strip_prefix=$3
-
     if [[ -n $1 && -d $1 ]]; then
-        add_dir "$1"
-
-        for f in "$1"/*; do
-            if [[ -L $f ]]; then
-                if [[ $f = $filter ]]; then
-                    add_symlink "${f#$strip_prefix}" "$(readlink "$f")"
-                fi
-            elif [[ -d $f ]]; then
-                add_full_dir "$f" "$filter" "$strip_prefix"
-            elif [[ -f $f ]]; then
-                if [[ $f = $filter ]]; then
-                    add_file "$f" "${f#$strip_prefix}"
-                fi
-            fi
-        done
+        command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
     fi
 }
 
