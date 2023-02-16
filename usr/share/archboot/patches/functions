@@ -428,7 +428,7 @@ add_firmware() {
     # add a firmware file to the image.
     #   $1: firmware path fragment
 
-    local fw fwpath r=1
+    local fw fwpath r=0
 
     for fw; do
         for fwpath in "${_d_firmware[@]}"; do
@@ -726,10 +726,6 @@ add_binary() {
             # strip parameters
             interpreter="${interpreter%%[[:space:]]*}"
             # lookup the interpreter in PATH on BUILDROOT
-            if [[ "$interpreter" != '/'* ]] && PATH="${BUILDROOT}/usr/local/sbin:${BUILDROOT}/usr/local/bin:${BUILDROOT}/usr/bin" type -P "$interpreter" &>/dev/null; then
-                interpreter="$(PATH="${BUILDROOT}/usr/local/sbin:${BUILDROOT}/usr/local/bin:${BUILDROOT}/usr/bin" type -P "$interpreter")"
-            fi
-
             if [[ "$interpreter" != '/'* ]] && PATH="${BUILDROOT}/usr/local/sbin:${BUILDROOT}/usr/local/bin:${BUILDROOT}/usr/bin" type -P "$interpreter" &>/dev/null; then
                 :
             elif [[ -e "${BUILDROOT}/${interpreter}" ]]; then
