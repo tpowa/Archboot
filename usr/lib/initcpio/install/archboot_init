@@ -4,7 +4,7 @@
 
 build() {
     map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat? \
-        btrfs? zram? iso9660? loop? zstd?
+        btrfs? zram? iso9660? loop? zstd? libcrc32? sg? pkcs8_key_parse?
     # pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
     map add_checked_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \

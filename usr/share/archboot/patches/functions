@@ -454,13 +454,13 @@ add_firmware() {
         # shellcheck disable=SC2154
         for fwpath in "${_d_firmware[@]}"; do
             if [[ -f $fwpath/$fw.xz ]]; then
-                add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz" && r=0
+                add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz"
                 break
             elif [[ -f "$fwpath/$fw.zst" ]]; then
-                add_file "$fwpath/$fw.zst" "$fwpath/$fw.zst" && r=0
+                add_file "$fwpath/$fw.zst" "$fwpath/$fw.zst"
                 break
             elif [[ -f $fwpath/$fw ]]; then
-                add_file "$fwpath/$fw" "$fwpath/$fw" && r=0
+                add_file "$fwpath/$fw" "$fwpath/$fw"
                 break
             fi
         done
@@ -612,12 +612,6 @@ add_symlink() {
     fi
 
     add_dir "${name%/*}"
-
-    if [[ -L "${BUILDROOT}${1}" ]]; then
-        quiet "overwriting symlink %s -> %s" "$name" "$target"
-    else
-        quiet "adding symlink: %s -> %s" "$name" "$target"
-    fi
     ln -sfn "$target" "${BUILDROOT}${name}"
 }
 
@@ -638,7 +632,6 @@ add_file() {
         return 1
     fi
     if [[ ! -e "${BUILDROOT}${dest}" ]]; then
-        quiet 'adding file: %s' "$dest"
         if [[ "$src" != "$dest" ]]; then
             command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
         else
@@ -717,26 +710,6 @@ add_binary() {
 
     # non-binaries
     if ! lddout="$(ldd "$binary" 2>/dev/null)"; then
-        # detect if the file has a shebang
-        if IFS='' LC_ALL=C read -rn2 -d '' shebang < "$binary" && [[ "$shebang" == '#!' ]]; then
-            read -r shebang < "$binary"
-            interpreter="${shebang##\#\!*([[:space:]])}"
-            # strip /usr/bin/env and warn if it is missing
-            if [[ "$interpreter" == '/usr/bin/env'* ]]; then
-                [[ -e "${BUILDROOT}/usr/bin/env" ]] || warning "Possibly missing '/usr/bin/env' for script: %s" "$binary"
-                interpreter="${interpreter##'/usr/bin/env'+([[:space:]])}"
-            fi
-            # strip parameters
-            interpreter="${interpreter%%[[:space:]]*}"
-            # check if the interpreter exists in BUILDROOT
-            if [[ "$interpreter" != '/'* ]] && PATH="${BUILDROOT}/usr/local/sbin:${BUILDROOT}/usr/local/bin:${BUILDROOT}/usr/bin" type -P "$interpreter" &>/dev/null; then
-                :
-            elif [[ -e "${BUILDROOT}/${interpreter}" ]]; then
-                :
-            else
-                warning "Possibly missing '%s' for script: %s" "$interpreter" "$binary"
-            fi
-        fi
         return 0
     fi
 

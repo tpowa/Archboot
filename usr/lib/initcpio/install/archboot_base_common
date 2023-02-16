@@ -5,7 +5,7 @@
 build ()
 {
     ### add virtio modules
-    add_checked_modules 'virtio|zram|btrfs|libcrc32|zstd|sg|pkcs8_key_parser'
+    add_checked_modules 'virtio|zram|btrfs||zstd|sg|pkcs8_key_parser'
     
     ### setting up base structure
     map add_dir "/root" "/mnt" "/sysroot" "/install" "/var/log" "/home" "/var/tmp"
@@ -38,7 +38,6 @@ build ()
     add_symlink "/init" "/usr/lib/systemd/systemd"
     
     ### adding needed files from running system
-    add_symlink "/etc/mtab" "/proc/self/mounts"
     map add_full_dir "/etc/profile.d" "/usr/share/terminfo"
     add_symlink /usr/lib/terminfo ../share/terminfo
 
