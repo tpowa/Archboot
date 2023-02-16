@@ -106,17 +106,6 @@ _run_update_installer() {
     fi
 }
 
-if ! mount | grep -q zram0; then
-    _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
-else
-    systemctl start systemd-networkd
-    systemctl start systemd-resolved
-    # initialize pacman keyring
-    if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
-        systemctl start pacman-init
-    fi
-fi
-
 if ! [[ -e "/.vconsole-run" ]]; then
     touch /.vconsole-run
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
@@ -138,6 +127,17 @@ if ! [[ -e "/.clean-pacman-db" ]]; then
     for i in ${_RM_PACMAN_DB}; do
         rm -rf /var/lib/pacman/local/${i}-[0-9]* &>/dev/null
     done
+fi
+
+if ! mount | grep -q zram0; then
+    _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+else
+    systemctl start systemd-networkd
+    systemctl start systemd-resolved
+    # initialize pacman keyring
+    if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
+        systemctl start pacman-init
+    fi
 fi
 
 if [[ -e /usr/bin/setup ]]; then
