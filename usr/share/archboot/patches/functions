@@ -641,7 +641,7 @@ add_file() {
             add_file  "$srcrealpath" "$srcrealpath" "$mode"
         else
             if [[ -n $mode ]]; then
-                chmod "$mode" ${BUILDROOT}${dest}
+                command chmod "$mode" ${BUILDROOT}${dest}
             fi
         fi
 	fi
