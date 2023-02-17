@@ -447,7 +447,7 @@ add_firmware() {
     # add a firmware file to the image.
     #   $1: firmware path fragment
 
-    local fw fwpath r=0
+    local fw fwpath
 
     for fw; do
         # _d_firmware is assigned in mkinitcpio
@@ -465,8 +465,7 @@ add_firmware() {
             fi
         done
     done
-
-    return "$r"
+    return 0
 }
 
 add_module() {
@@ -642,7 +641,7 @@ add_file() {
             add_file  "$srcrealpath" "$srcrealpath" "$mode"
         else
             if [[ -n $mode ]]; then
-                chmod "$3" ${BUILDROOT}${dest}
+                chmod "$mode" ${BUILDROOT}${dest}
             fi
         fi
 	fi

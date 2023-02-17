@@ -1,0 +1,164 @@
+--- mkinitcpio-functions-202317021053 	2023-02-17 10:48:03.804097093 +0100
++++ functions	2023-02-17 09:38:03.229742449 +0100
+@@ -447,26 +447,25 @@
+     # add a firmware file to the image.
+     #   $1: firmware path fragment
+ 
+-    local fw fwpath r=1
++    local fw fwpath
+ 
+     for fw; do
+         # _d_firmware is assigned in mkinitcpio
+         # shellcheck disable=SC2154
+         for fwpath in "${_d_firmware[@]}"; do
+             if [[ -f $fwpath/$fw.xz ]]; then
+-                add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz" 644 && r=0
++                add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz"
+                 break
+             elif [[ -f "$fwpath/$fw.zst" ]]; then
+-                add_file "$fwpath/$fw.zst" "$fwpath/$fw.zst" 644 && r=0
++                add_file "$fwpath/$fw.zst" "$fwpath/$fw.zst"
+                 break
+             elif [[ -f $fwpath/$fw ]]; then
+-                add_file "$fwpath/$fw" "$fwpath/$fw" 644 && r=0
++                add_file "$fwpath/$fw" "$fwpath/$fw"
+                 break
+             fi
+         done
+     done
+-
+-    return "$r"
++    return 0
+ }
+ 
+ add_module() {
+@@ -557,31 +556,8 @@
+     # Add a directory and all its contents, recursively, to the initcpio image.
+     # No parsing is performed and the contents of the directory is added as is.
+     #   $1: path to directory
+-    #   $2: glob pattern to filter file additions (optional)
+-    #   $3: path prefix that will be stripped off from the image path (optional)
+-
+-    local f='' filter="${2:-*}" strip_prefix="$3"
+-
+-    if [[ -n "$1" && -d "$1" ]]; then
+-        add_dir "$1"
+-
+-        for f in "$1"/*; do
+-            if [[ -L "$f" ]]; then
+-                # Explicit glob matching
+-                # shellcheck disable=SC2053
+-                if [[ "$f" == $filter ]]; then
+-                    add_symlink "${f#"${strip_prefix}"}" "$(readlink "$f")"
+-                fi
+-            elif [[ -d "$f" ]]; then
+-                add_full_dir "$f" "$filter" "$strip_prefix"
+-            elif [[ -f "$f" ]]; then
+-                # Explicit glob matching
+-                # shellcheck disable=SC2053
+-                if [[ "$f" == $filter ]]; then
+-                    add_file "$f" "${f#"${strip_prefix}"}"
+-                fi
+-            fi
+-        done
++    if [[ -n $1 && -d $1 ]]; then
++        command tar -C / -cpf - ."$1" | tar -C "${BUILDROOT}" -xspf -
+     fi
+ }
+ 
+@@ -635,12 +611,6 @@
+     fi
+ 
+     add_dir "${name%/*}"
+-
+-    if [[ -L "${BUILDROOT}${1}" ]]; then
+-        quiet "overwriting symlink %s -> %s" "$name" "$target"
+-    else
+-        quiet "adding symlink: %s -> %s" "$name" "$target"
+-    fi
+     ln -sfn "$target" "${BUILDROOT}${name}"
+ }
+ 
+@@ -660,32 +630,21 @@
+         error "file not found: '%s'" "$src"
+         return 1
+     fi
+-
+-    # check if $src is a symlink
+-    if [[ -L "$src" ]]; then
+-        srcrealpath="$(realpath -- "$src")"
+-        if [[ "$srcrealpath" != "$dest" ]]; then
+-            # add the target file
+-            add_file "$srcrealpath" "$srcrealpath" "$mode"
+-            # create the symlink
+-            add_symlink "$dest" "$src"
+-            return
++    if [[ ! -e "${BUILDROOT}${dest}" ]]; then
++        if [[ "$src" != "$dest" ]]; then
++            command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
++        else
++            command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
+         fi
+-    fi
+-
+-    # unlike install, cp does not create directories leading to the destination
+-    [[ -z "$mode" ]] && add_dir "${dest%/*}"
+-
+-    if [[ -e "${BUILDROOT}${dest}" ]]; then
+-        quiet 'overwriting file: %s' "$dest"
+-    else
+-        quiet 'adding file: %s' "$dest"
+-    fi
+-    if [[ -z "$mode" ]]; then
+-        command cp --remove-destination --preserve=mode,ownership "$src" "${BUILDROOT}${dest}"
+-    else
+-        command install -Dm"$mode" "$src" "${BUILDROOT}${dest}"
+-    fi
++        if [[ -L "$src" ]]; then
++            srcrealpath="$(realpath -- "$src")"
++            add_file  "$srcrealpath" "$srcrealpath" "$mode"
++        else
++            if [[ -n $mode ]]; then
++                chmod "$mode" ${BUILDROOT}${dest}
++            fi
++        fi
++	fi
+ }
+ 
+ add_runscript() {
+@@ -750,26 +709,6 @@
+ 
+     # non-binaries
+     if ! lddout="$(ldd "$binary" 2>/dev/null)"; then
+-        # detect if the file has a shebang
+-        if IFS='' LC_ALL=C read -rn2 -d '' shebang < "$binary" && [[ "$shebang" == '#!' ]]; then
+-            read -r shebang < "$binary"
+-            interpreter="${shebang##\#\!*([[:space:]])}"
+-            # strip /usr/bin/env and warn if it is missing
+-            if [[ "$interpreter" == '/usr/bin/env'* ]]; then
+-                [[ -e "${BUILDROOT}/usr/bin/env" ]] || warning "Possibly missing '/usr/bin/env' for script: %s" "$binary"
+-                interpreter="${interpreter##'/usr/bin/env'+([[:space:]])}"
+-            fi
+-            # strip parameters
+-            interpreter="${interpreter%%[[:space:]]*}"
+-            # check if the interpreter exists in BUILDROOT
+-            if [[ "$interpreter" != '/'* ]] && PATH="${BUILDROOT}/usr/local/sbin:${BUILDROOT}/usr/local/bin:${BUILDROOT}/usr/bin" type -P "$interpreter" &>/dev/null; then
+-                :
+-            elif [[ -e "${BUILDROOT}/${interpreter}" ]]; then
+-                :
+-            else
+-                warning "Possibly missing '%s' for script: %s" "$interpreter" "$binary"
+-            fi
+-        fi
+         return 0
+     fi
+ 
+@@ -1008,7 +947,7 @@
+     fi
+ 
+     for m in "$@"; do
+-        add_file "$m" "$m" 644
++        add_file "$m" "$m"
+         # unzip modules prior to recompression
+         if [[ "$MODULES_DECOMPRESS" == 'yes' ]]; then
+             case "$m" in
