@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_checked_modules '/hv/hv_*'
+    add_all_modules '/hv/hv_*'
 }
 
 help ()

@@ -5,7 +5,7 @@
 build ()
 {
     ### add virtio modules
-    add_checked_modules 'virtio|zram|btrfs|zstd|sg|pkcs8_key_parser'
+    map add_module virtio? zram? btrfs? zstd? libcrc32c?
     
     ### setting up base structure
     map add_dir "/root" "/mnt" "/sysroot" "/install" "/var/log" "/home" "/var/tmp"
@@ -99,7 +99,7 @@ build ()
     
     ### add systemd
     # add systemd kernel modules
-    add_checked_modules 'nfs|autofs4|loop'
+    add_all_modules 'nfs|autofs4|loop'
     map add_binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys
     
     #dbus files

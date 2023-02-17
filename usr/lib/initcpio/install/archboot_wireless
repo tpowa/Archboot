@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_checked_modules '/drivers/net/wireless/|/net/wireless/|/net/ieee80211/|/net/mac80211/'
+    add_all_modules '/drivers/net/wireless/|/net/wireless/|/net/ieee80211/|/net/mac80211/'
     
     if [[ "$(uname -m)" == "x86_64" ]]; then
         # add broadcom wl support

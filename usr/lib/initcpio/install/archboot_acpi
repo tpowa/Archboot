@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_checked_modules '/acpi/'
+    add_all_modules '/acpi/'
 }
 
 help ()
