@@ -376,11 +376,11 @@ _new_environment() {
     _MEM_MAX=""
     # only needed on aarch64
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _MEM_MAX="--mem-max=0xA0000000"
+            _MEM_MIN="--mem-min=0xA0000000"
     fi
     echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
     echo "            This will need some time..."
-    kexec -c -f ${_MEM_MAX} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+    kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 2
     _clean_kernel_cache
     rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
