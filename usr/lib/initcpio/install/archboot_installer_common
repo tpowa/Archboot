@@ -10,7 +10,6 @@ build ()
     add_full_dir "/usr/lib/archboot/update-installer"
     add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer"
     add_file "/usr/share/archboot/gpg/tpowa.gpg"
-    add_file "/usr/share/archboot/patches/functions"
     # use /etc/profile to launch login.sh
     echo ". /usr/lib/archboot/login.sh" >> $BUILDROOT/root/.bashrc
 }

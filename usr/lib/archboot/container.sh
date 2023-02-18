@@ -191,7 +191,4 @@ _set_hostname() {
     echo 'archboot' > "${1}/etc/hostname"
 }
 
-_speed_patch() {
-    cp /usr/share/archboot/patches/functions "${1}"/usr/lib/initcpio/
-}
 # vim: set ft=sh ts=4 sw=4 et:
