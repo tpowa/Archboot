@@ -368,25 +368,19 @@ _new_environment() {
     grep -qw virtio_net /proc/modules && rmmod virtio_net
     echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
     echo "            This will need some time..."
-    # you need approx. 3.39x size for KEXEC_FILE_LOAD
     # wait until enough memory is available!
     while true; do
-        if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-            [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
-        else
-            [[ "$(($(stat -c %s ${_RAM}/${_INITRD})/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
-        fi
+        [[ "$(($(stat -c %s ${_RAM}/${_INITRD})/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         sleep 1
     done
-    if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
-        echo "            This will need some time..."
-        kexec -s -f ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
-    else
-        echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
-        echo "            This will need some time..."
-        kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+    _MEM_MAX=""
+    # only needed on aarch64
+    if [[ ${_RUNNING_ARCH} == aarch64 ]]; then
+            _MEM_MAX="--mem-max=0xA0000000"
     fi
+    echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
+    echo "            This will need some time..."
+    kexec -c -f ${_MEM_MAX} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 2
     _clean_kernel_cache
     rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
