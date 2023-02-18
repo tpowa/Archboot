@@ -380,9 +380,11 @@ _new_environment() {
     done
     if [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*339/100000))" -lt "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]]; then
         echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mnew\e[m KEXEC_FILE_LOAD..."
+        echo "            This will need some time..."
         kexec -s -f ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     else
         echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mold\e[m KEXEC_LOAD..."
+        echo "            This will need some time..."
         kexec -c -f --mem-max=0xA0000000 ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     fi
     sleep 2
