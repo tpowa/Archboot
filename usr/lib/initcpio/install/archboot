@@ -249,6 +249,7 @@ install_modules() {
     # remove all non-binary module.* files (except devname for on-demand module loading)
     rm "${BUILDROOT}${_d_kmoduledir}"/modules.!(*.bin|devname|softdep)
 }
+}
 
 help ()
 {
