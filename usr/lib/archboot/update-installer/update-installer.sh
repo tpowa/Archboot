@@ -375,7 +375,7 @@ _new_environment() {
     done
     _MEM_MAX=""
     # only needed on aarch64
-    if [[ ${_RUNNING_ARCH} == aarch64 ]]; then
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _MEM_MAX="--mem-max=0xA0000000"
     fi
     echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
