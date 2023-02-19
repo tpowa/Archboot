@@ -4,7 +4,8 @@ Environment changes:
 - implemented new zram routine for all boot types
 - added kms to archboot_init, to avoid font flickering introduced 
   in kernel 6.0.x series
-- added archboot specific speed patches to mkinitcpio functions 
+- added archboot specific speed patches to mkinitcpio functions
+- only use KEXEC_LOAD it's way faster than KEXEC_FILE_LOAD
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
 ---
