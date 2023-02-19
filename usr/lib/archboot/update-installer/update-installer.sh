@@ -364,8 +364,6 @@ _new_environment() {
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    # unload virtio-net to avoid none functional network device on aarch64
-    grep -qw virtio_net /proc/modules && rmmod virtio_net
     echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
     echo "            This will need some time..."
     # wait until enough memory is available!
