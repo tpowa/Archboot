@@ -95,7 +95,17 @@ _run_update_installer() {
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
             _run_latest
         else
-            _run_latest_install
+            # local image
+            if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+                _run_latest_install
+            else
+                # latest image
+                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 3271000 ]]; then
+                    _run_latest
+                else
+                    _run_latest_install
+                fi
+            fi
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
