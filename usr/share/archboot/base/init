@@ -48,6 +48,7 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /sysroot &>/dev/null
 # not all devices trigger autoload!
+modprobe cdrom &>/dev/null
 modprobe usb-storage &>/dev/null
 echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 if ! mount /dev/sr0 /cdrom &>/dev/null; then
