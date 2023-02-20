@@ -51,15 +51,20 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /sysroot &>/dev/null
 echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
-if ! mount /dev/sr0 /cdrom &>/dev/null; then
-    echo -e "          Trying for 10 seconds..."
-    _COUNT=0
-    while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
+COUNT=0
+echo -e "          Trying for 10 seconds /dev/sr0..."
+while ! mount /dev/sr0 /cdrom &>/dev/null; do
         read -r -t 1
         _COUNT=$((_COUNT+1))
         [[ "${_COUNT}" == 10 ]] && break
-    done
-fi
+done
+echo -e "          Trying for 10 seconds UUID=1234-ABCD..."
+_COUNT=0
+while ! mount UUID=1234-ABCD /mnt &>/dev/null; do
+    read -r -t 1
+    _COUNT=$((_COUNT+1))
+    [[ "${_COUNT}" == 10 ]] && break
+done
 if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
