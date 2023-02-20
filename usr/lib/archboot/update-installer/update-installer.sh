@@ -379,7 +379,7 @@ _new_environment() {
     echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
     echo "            This will need some time..."
     kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
-    sleep 2
+    sleep 0.01
     _clean_kernel_cache
     rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
     umount ${_RAM} &>/dev/null
