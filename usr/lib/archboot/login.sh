@@ -161,7 +161,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _welcome
     echo -e "\e[1m\e[91mMemory check failed:\e[m"
     echo -e "\e[91m- Not engough memory detected! \e[m"
-    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m3.3GB\e[m\e[93m RAM.\e[m"
+    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m2.6GB\e[m\e[93m RAM.\e[m"
     echo -e "\e[91mAborting...\e[m"
     _enter_shell
 else
