@@ -51,8 +51,7 @@ mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /sysroot &>/dev/null
 echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
-echo -e "          Trying for 10 seconds /dev/sr0..."
-echo -e "          Trying for 10 seconds UUID=1234-ABCD..."
+echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
     mount UUID=1234-ABCD /mnt &>/dev/null && break
