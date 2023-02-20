@@ -368,7 +368,7 @@ _new_environment() {
     echo "            This will need some time..."
     # wait until enough memory is available!
     while true; do
-        [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/1000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         sleep 1
     done
     _MEM_MIN=""
