@@ -332,13 +332,13 @@ _new_environment() {
     _kill_w_dir
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\e[1mStep 01/07:\e[m Waiting for gpg pacman keyring import to finish..."
+        echo -e "\e[1mStep 1/6:\e[m Waiting for gpg pacman keyring import to finish..."
         _gpg_check
-        echo -e "\e[1mStep 02/07:\e[m Removing not necessary files from /..."
+        echo -e "\e[1mStep 2/6:\e[m Removing not necessary files from /..."
         _clean_archboot
         _clean_kernel_cache
-        echo -e "\e[1mStep 03/07:\e[m Generating archboot container in ${_W_DIR}..."
-        echo "            This will need some time..."
+        echo -e "\e[1mStep 3/6:\e[m Generating archboot container in ${_W_DIR}..."
+        echo "          This will need some time..."
         _create_container || exit 1
         _clean_kernel_cache
         _ram_check
@@ -348,16 +348,16 @@ _new_environment() {
         [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
         # fallback if no detectable kernel is installed
         [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
-        echo -e "\e[1mStep 05/07:\e[m Collecting rootfs files in ${_W_DIR}..."
-        echo "            This will need some time..."
+        echo -e "\e[1mStep 4/6:\e[m Collecting rootfs files in ${_W_DIR}..."
+        echo "          This will need some time..."
         # write initramfs to "${_W_DIR}"/tmp
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-        echo -e "\e[1mStep 06/07:\e[m Cleanup ${_W_DIR}..."
+        echo -e "\e[1mStep 5/6:\e[m Cleanup ${_W_DIR}..."
         find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
         _clean_kernel_cache
         _ram_check
-        echo -e "\e[1mStep 07/07:\e[m Switch root to ${_RAM}..."
-        mv ${_W_DIR}/tmp/* /ramfs/
+        echo -e "\e[1mStep 6/6:\e[m Switch root to ${_RAM}..."
+        mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
