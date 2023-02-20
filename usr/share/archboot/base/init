@@ -28,6 +28,11 @@ udevadm trigger --action=add --type=devices
 udevadm settle
 udevadm control --exit
 udevadm info --cleanup-db
+# not all devices trigger autoload!
+modprobe -q cdrom
+modprobe -q usb-storage
+modprobe -q zram
+modprobe -q zstd
 echo 1 > /proc/sys/kernel/sysrq
 echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
 # it needs one echo before, in order to reset the consolefont!
@@ -39,17 +44,12 @@ else
 fi
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
 echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
-modprobe zram &>/dev/null
-modprobe zstd &>/dev/null
 echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
 echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
 mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /sysroot &>/dev/null
-# not all devices trigger autoload!
-modprobe cdrom &>/dev/null
-modprobe usb-storage &>/dev/null
 echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 if ! mount /dev/sr0 /cdrom &>/dev/null; then
     echo -e "          Trying for 10 seconds..."
