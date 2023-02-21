@@ -358,16 +358,19 @@ _new_environment() {
     echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-    # use ramfs to get immediate free space on file deletion
-    mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Skipping copying of kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    else
+        echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+        # use ramfs to get immediate free space on file deletion
+        mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    fi
     echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        rm ${_RAM}/"${_VMLINUZ}"
         echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Switch root to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
