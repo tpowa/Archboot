@@ -330,33 +330,43 @@ _new_environment() {
     _update_installer_check
     touch /.update-installer
     _kill_w_dir
+    _STEPS="10"
+    _S_APPEND="0"
+    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        _STEPS="7"
+        _S_APPEND=""
+    fi
+    echo -e "\e[1mStep ${_S_APPEND}1/${_STEPS}:\e[m Waiting for gpg pacman keyring import to finish..."
+    _gpg_check
+    echo -e "\e[1mStep ${_S_APPEND}2/${_STEPS}:\e[m Removing not necessary files from /..."
+    _clean_archboot
+    _clean_kernel_cache
+    echo -e "\e[1mStep ${_S_APPEND}3/${_STEPS}:\e[m Generating archboot container in ${_W_DIR}..."
+    echo "          This will need some time..."
+    _create_container || exit 1
+    _clean_kernel_cache
+    _ram_check
+    mkdir ${_RAM}
+    mount -t ramfs none ${_RAM}
+    [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
+    [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
+    # fallback if no detectable kernel is installed
+    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
+    echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
+    echo "          This will need some time..."
+    # write initramfs to "${_W_DIR}"/tmp
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
+    echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    # use ramfs to get immediate free space on file deletion
+    mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
+    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
+    _clean_kernel_cache
+    _ram_check
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\e[1mStep 1/6:\e[m Waiting for gpg pacman keyring import to finish..."
-        _gpg_check
-        echo -e "\e[1mStep 2/6:\e[m Removing not necessary files from /..."
-        _clean_archboot
-        _clean_kernel_cache
-        echo -e "\e[1mStep 3/6:\e[m Generating archboot container in ${_W_DIR}..."
-        echo "          This will need some time..."
-        _create_container || exit 1
-        _clean_kernel_cache
-        _ram_check
-        mkdir ${_RAM}
-        mount -t ramfs none ${_RAM}
-        [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
-        [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-        # fallback if no detectable kernel is installed
-        [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
-        echo -e "\e[1mStep 4/6:\e[m Collecting rootfs files in ${_W_DIR}..."
-        echo "          This will need some time..."
-        # write initramfs to "${_W_DIR}"/tmp
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-        echo -e "\e[1mStep 5/6:\e[m Cleanup ${_W_DIR}..."
-        find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
-        _clean_kernel_cache
-        _ram_check
-        echo -e "\e[1mStep 6/6:\e[m Switch root to ${_RAM}..."
+        rm ${_RAM}/"${_VMLINUZ}"
+        echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Switch root to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
@@ -365,41 +375,14 @@ _new_environment() {
         touch /etc/initrd-release
         systemctl start initrd-switch-root
     fi
-    echo -e "\e[1mStep 01/10:\e[m Waiting for gpg pacman keyring import to finish..."
-    _gpg_check
-    echo -e "\e[1mStep 02/10:\e[m Removing not necessary files from /..."
-    _clean_archboot
-    _clean_kernel_cache
-    echo -e "\e[1mStep 03/10:\e[m Generating archboot container in ${_W_DIR}..."
-    echo "            This will need some time..."
-    _create_container || exit 1
-    _clean_kernel_cache
-    _ram_check
-    echo -e "\e[1mStep 04/10:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-    # use ramfs to get immediate free space on file deletion
-    mkdir ${_RAM}
-    mount -t ramfs none ${_RAM}
-    cp "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
-    [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
-    [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-    # fallback if no detectable kernel is installed
-    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
-    echo -e "\e[1mStep 05/10:\e[m Collecting initramfs files in ${_W_DIR}..."
-    echo "            This will need some time..."
-    # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    echo -e "\e[1mStep 06/10:\e[m Cleanup ${_W_DIR}..."
-    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
-    _clean_kernel_cache
-    _ram_check
-    echo -e "\e[1mStep 07/10:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
+    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
     _create_initramfs
-    echo -e "\e[1mStep 08/10:\e[m Cleanup ${_W_DIR}..."
+    echo -e "\e[1mStep ${_S_APPEND}8/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    echo -e "\e[1mStep 09/10:\e[m Waiting for kernel to free RAM..."
+    echo -e "\e[1mStep ${_S_APPEND}9/${_STEPS}:\e[m Waiting for kernel to free RAM..."
     echo "            This will need some time..."
     # wait until enough memory is available!
     while true; do
@@ -411,7 +394,7 @@ _new_environment() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _MEM_MIN="--mem-min=0xA0000000"
     fi
-    echo -e "\e[1mStep 10/10:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
+    echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
     echo "            This will need some time..."
     kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 0.1
