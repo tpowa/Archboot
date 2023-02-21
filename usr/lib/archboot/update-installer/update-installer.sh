@@ -332,9 +332,11 @@ _new_environment() {
     _kill_w_dir
     _STEPS="10"
     _S_APPEND="0"
+    _S_EMPTY="  "
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _STEPS="7"
         _S_APPEND=""
+        _S_EMPTY=""
     fi
     echo -e "\e[1mStep ${_S_APPEND}1/${_STEPS}:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
@@ -342,7 +344,7 @@ _new_environment() {
     _clean_archboot
     _clean_kernel_cache
     echo -e "\e[1mStep ${_S_APPEND}3/${_STEPS}:\e[m Generating archboot container in ${_W_DIR}..."
-    echo "          This will need some time..."
+    echo "${_S_EMPTY}          This will need some time..."
     _create_container || exit 1
     _clean_kernel_cache
     _ram_check
@@ -353,7 +355,7 @@ _new_environment() {
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
     echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
-    echo "          This will need some time..."
+    echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
