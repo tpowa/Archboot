@@ -241,7 +241,7 @@ install_modules() {
 }
 
 add_checked_modules() {
-    add_all_modules
+    add_all_modules "$@"
 }
 
 }
