@@ -31,8 +31,6 @@ add_module() {
     local target='' module='' softdeps=() deps=() field='' value='' firmware=()
     local ign_errors=0 found=0
 
-    [[ "$KERNELVERSION" == 'none' ]] && return 0
-
     if [[ "$1" == *\? ]]; then
         ign_errors=1
         set -- "${1%?}"
@@ -84,6 +82,20 @@ add_module() {
     if (( ${#firmware[*]} )); then
         add_firmware "${firmware[@]}"
     fi
+}
+
+add_checked_modules() {
+    # Add modules to the initcpio, filtered by the list of autodetected
+    # modules.
+    #   $@: arguments to all_modules
+
+    local mod mods
+
+    mapfile -t mods < <(all_modules "$@")
+
+    map add_module "${mods[@]}"
+
+    return $(( !${#mods[*]} ))
 }
 
 add_full_dir() {
@@ -229,14 +241,6 @@ add_binary() {
 
 install_modules() {
     local m
-    local -a xz_comp gz_comp zst_comp
-
-    [[ "$KERNELVERSION" == 'none' ]] && return 0
-
-    if (( $# == 0 )); then
-        warning "No modules were added to the image. This is probably not what you want."
-        return 0
-    fi
 
     for m in "$@"; do
         add_file "$m" "$m"
