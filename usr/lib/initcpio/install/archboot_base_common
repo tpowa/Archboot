@@ -196,7 +196,8 @@ build ()
         ${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf \
         ${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio \
         ${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio \
-        ${BUILDROOT}/usr/share/bash-completion/completions/grub
+        ${BUILDROOT}/usr/share/bash-completion/completions/grub \
+        ${BUILDROOT}/usr/lib/modules-load.d/cdrecord.conf
 
     ### fix licenses
     map add_file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \
