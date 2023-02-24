@@ -194,7 +194,7 @@ _set_hostname() {
 _enable_common_locales() {
     echo "Enable common UTF-8 locales..."
     _LOCALES="C en_US de_DE es_ES fr_FR pt_PT ru_RU"
-    for i in "${_LOCALES}"; do
+    for i in ${_LOCALES}; do
         echo "${i}.UTF-8 UTF-8"  >> "${1}"/etc/locale.gen
     done
     ${_NSPAWN} "${1}" locale-gen &>/dev/null
