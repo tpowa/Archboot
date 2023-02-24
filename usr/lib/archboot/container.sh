@@ -191,4 +191,13 @@ _set_hostname() {
     echo 'archboot' > "${1}/etc/hostname"
 }
 
+_enable_common_locales() {
+    exho "Enable common UTF-8 locales..."
+    _LOCALES="C en_US de_DE es_ES fr_FR pt_PT ru_RU"
+    for i in "${_LOCALES}"; do
+        echo "${i}.UTF-8"  >> "${1}"/etc/locale.gen
+    done
+    ${_NSPAWN} "${1}" locale-gen &>/dev/null
+}
+
 # vim: set ft=sh ts=4 sw=4 et:

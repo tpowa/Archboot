@@ -2,7 +2,7 @@ On the road to 2023.03
 Environment changes:
 - implemented emergency shell with messages and with big font detection support
 - implemented new zram routine for all boot types
-- added kms to archboot_init, to avoid font flickering introduced 
+- added kms to archboot_init, to avoid font flickering, introduced 
   in kernel 6.0.x series
 - added archboot specific speed patches to mkinitcpio functions
 - only use KEXEC_LOAD it's way faster than KEXEC_FILE_LOAD
