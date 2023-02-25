@@ -62,6 +62,7 @@ build ()
     ### make archinstall happy, add /etc/locale.gen
     add_file /etc/locale.gen
     add_file /usr/lib/locale/locale-archive
+    add_full_dir /usr/share/locale
 
     ### add bash configuration
     # add bash-completion
