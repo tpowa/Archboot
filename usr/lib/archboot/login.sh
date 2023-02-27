@@ -152,6 +152,9 @@ else
 fi
 
 if [[ -e /usr/bin/setup ]]; then
+    if ! [[ -e /tmp/.locale ]]; then
+        archboot-locale.sh
+    fi
     _local_mode
     _enter_shell
     if ! [[ -e /tmp/.setup ]]; then

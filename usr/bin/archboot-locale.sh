@@ -24,6 +24,7 @@ _abort()
 _do_locale() {
     _dialog --infobox "Setting System Wide Locale ${_LOCALE}..." 3 80
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
+    echo "LANG=${_LOCALE}.UTF-8" > /tmp/.locale
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8"
     sleep 2
@@ -40,7 +41,7 @@ _set_locale() {
 
 if [[ -e /tmp/.locale-running ]]; then
     echo "System Wide Locale Setting already runs on a different console!"
-    echo "Please remove /tmp/.locale-running first to launch tz!"
+    echo "Please remove /tmp/.locale-running first!"
     exit 1
 fi 
 : >/tmp/.locale-running
