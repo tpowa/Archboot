@@ -22,7 +22,7 @@ _abort()
 }
 
 _do_locale() {
-    _dialog --infobox "Setting System Wide Locale ${_LOCALE}..." 3 80
+    _dialog --infobox "Setting System Wide Locale ${_LOCALE}..." 3 50
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /tmp/.locale
     echo LC_COLLATE=C >> /etc/locale.conf
@@ -39,6 +39,7 @@ _set_locale() {
     #shellcheck disable=SC2086
     _dialog --menu "Select A System Wide Locale:" 13 35 8 ${_LOCALES} 2>${_ANSWER} || _abort
     _LOCALE=$(cat ${_ANSWER})
+    _dialog --yesno "Do you want to use ${_LOCALE} as System Wide Locale" 6 70 || _LOCALE=""
 }
 
 if [[ -e /tmp/.locale-running ]]; then
