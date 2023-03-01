@@ -323,7 +323,11 @@ _prepare_graphic() {
     fi
     systemd-sysusers >/dev/tty7 2>&1
     systemd-tmpfiles --create >/dev/tty7 2>&1
-    systemctl restart dbus
+    # fixing dbus requirements
+    systemctl reload dbus
+    systemctl reload dbus-org.freedesktop.login1.service
+    # fixing permission on /usr/share/polkit/rules.d
+    chgrp 102 /usr/share/polkit/rules.d &>/dev/null
 }
 
 _new_environment() {
@@ -498,10 +502,8 @@ _install_graphic () {
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
     [[ -n "${_L_PLASMA}" ]] && _install_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
-    echo -e "\e[1mStep 3/4:\e[m Starting avahi..."
-    systemctl restart avahi-daemon
     # only start vnc on xorg environment
-    echo -e "\e[1mStep 4/4:\e[m Setting up VNC and browser...\e[m"
+    echo -e "\e[1mStep 3/3:\e[m Setting up VNC and browser...\e[m"
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
     command -v firefox &>/dev/null  && _firefox_flags
     command -v chromium &>/dev/null && _chromium_flags

@@ -65,6 +65,7 @@ _clean_container() {
         rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,mkinitcpio,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,zoneinfo-leaps,man,doc,info,i18n,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,engines-[0-9]*,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,python[0-9]*,rsync,sasl2,siconv,tar,xfsprogs,xtables}
         find ${1}/usr/share/locale/ ! -path '*/de/*' ! -path '*/en_US/*' ! -path '*/fr/*' ! -path '*/es/*' ! -path '*/pt/*' ! -path '*/ru/*' -delete &>/dev/null
+        find ${1}/usr/share/locale/ -name 'gdbm*' -delete &>/dev/null
     fi
 }
 
