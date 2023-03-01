@@ -59,10 +59,23 @@ build ()
     map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup \
         /usr/lib/gconv /usr/share/readline
 
-    ### make archinstall happy, add /etc/locale.gen
+    ### add locale support
+    add_binary locale-gen
     add_file /etc/locale.gen
     add_file /usr/lib/locale/locale-archive
-    add_full_dir /usr/share/locale
+    _LANG="en de es fr pt ru"
+    for i in ${_LANG}; do
+        add_full_dir /usr/share/locale/${i}
+    done
+    _LANG="en_US de_DE es_ES fr_FR pt_PT ru_RU"
+    for i in ${_LANG}; do
+        add_file /usr/share/i18n/locales/${i}
+    done
+    add_file /usr/share/i18n/charmaps/UTF-8.gz
+    for i in $(find ${1}/usr/share/locale/ -type -f ! -name 'gdbm*' ! -name 'bfd*' \
+        ! -name 'gettext*' ! -name 'gas*' ! -name 'gold' ! -name 'gprof*' -name 'ld*' ! -name 'opcodes*'; do
+            add_file ${i}
+    done
 
     ### add bash configuration
     # add bash-completion
