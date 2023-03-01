@@ -279,42 +279,27 @@ _prepare_graphic() {
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
-    # saving RAM by calling always cleanup hook and installing each package alone
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo "Running pacman to install packages: ${_GRAPHIC}..."
-        _INSTALL_SOURCE="file:///var/cache/pacman/pkg"
-        #shellcheck disable=SC2119
-        _create_pacman_conf
-        #shellcheck disable=SC2086
-        pacman -Sy --config ${_PACMAN_CONF} &>/dev/null || exit 1
-        # check if already full system is used
-        for i in ${_GRAPHIC}; do
-            #shellcheck disable=SC2086
-            pacman -S ${i} --config ${_PACMAN_CONF} --noconfirm &>/dev/null || exit 1
-            [[ ! -e "/.full_system" ]] && _cleanup_install
-            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-            rm -f /var/log/pacman.log
+    echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
+    _IGNORE=""
+    if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
+        for i in ${_GRAPHIC_IGNORE}; do
+            _IGNORE="${_IGNORE} --ignore ${i}"
         done
-    else
-        echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
-        _IGNORE=""
-        if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
-            for i in ${_GRAPHIC_IGNORE}; do
-                _IGNORE="${_IGNORE} --ignore ${i}"
-            done
-        fi
+    fi
+    #shellcheck disable=SC2086
+    pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
+    [[ ! -e "/.full_system" ]] && _cleanup_install
+    echo "Running pacman to install packages: ${_GRAPHIC}..."
+    for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
-        pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
+        pacman -S ${i} --noconfirm &>/dev/null || exit 1
         [[ ! -e "/.full_system" ]] && _cleanup_install
-        echo "Running pacman to install packages: ${_GRAPHIC}..."
-        for i in ${_GRAPHIC}; do
-            #shellcheck disable=SC2086
-            pacman -S ${i} --noconfirm &>/dev/null || exit 1
-            [[ ! -e "/.full_system" ]] && _cleanup_install
-            [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-            rm -f /var/log/pacman.log
-        done
-        [[ "${_STANDARD_BROWSER}" == "firefox" ]] && pacman -S firefox-i18n-{de,en-us,fr,es-es,pt-pt,ru} --noconfirm &>/dev/null || exit 1
+        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
+        rm -f /var/log/pacman.log
+    done
+    # install firefox langpacks
+    if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
+        pacman -S firefox-i18n-{de,en-us,fr,es-es,pt-pt,ru} --noconfirm &>/dev/null || exit 1
     fi
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."
