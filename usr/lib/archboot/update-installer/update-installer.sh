@@ -142,7 +142,7 @@ _download_latest() {
 }
 
 _network_check() {
-    if ! getent hosts www.googlfe.com &>/dev/null; then
+    if ! getent hosts www.google.com &>/dev/null; then
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
