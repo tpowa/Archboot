@@ -3,14 +3,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        echo -e "\e[1mStep 1/4:\e[m Installing XFCE desktop now..."
+        echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop now..."
         echo "          This will need some time..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\e[1mStep 2/4:\e[m Configuring XFCE desktop..."
+        echo -e "\e[1mStep 2/3:\e[m Configuring XFCE desktop..."
         _configure_xfce >/dev/tty7 2>&1
     else
-        echo -e "\e[1mStep 1/4:\e[m Installing XFCE desktop already done..."
-        echo -e "\e[1mStep 2/4:\e[m Configuring XFCE desktop already done..."
+        echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop already done..."
+        echo -e "\e[1mStep 2/3:\e[m Configuring XFCE desktop already done..."
     fi
 }
 
