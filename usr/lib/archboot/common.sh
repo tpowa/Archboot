@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-LANG="C"
 _BASENAME="$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
 _KEYRING="archlinux-keyring"

@@ -10,7 +10,7 @@ _start_gnome_wayland() {
     echo -e "Launching \e[1mGNOME Wayland\e[m now, logging is done on \e[1m/dev/tty7\e[m..."
     echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
 
-    echo "LANG=C.UTF-8 MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/gnome-wayland
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
 }
