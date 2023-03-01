@@ -154,6 +154,7 @@ fi
 
 if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.locale ]]; then
+        clear
         _welcome
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m."
         read -r
