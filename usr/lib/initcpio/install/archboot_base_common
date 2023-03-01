@@ -73,7 +73,7 @@ build ()
     done
     add_file /usr/share/i18n/charmaps/UTF-8.gz
     for i in $(find ${1}/usr/share/locale/ -type -f ! -name 'gdbm*' ! -name 'bfd*' \
-        ! -name 'gettext*' ! -name 'gas*' ! -name 'gold' ! -name 'gprof*' -name 'ld*' ! -name 'opcodes*'; do
+        ! -name 'gettext*' ! -name 'gas*' ! -name 'gold' ! -name 'gprof*' -name 'ld*' ! -name 'opcodes*'); do
             add_file ${i}
     done
 
