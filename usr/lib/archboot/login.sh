@@ -159,7 +159,7 @@ if [[ -e /usr/bin/setup ]]; then
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mfirst\e[m login setup."
         read -r
         clear
-        archboot-locale.sh && exit
+        ! [[ -e /tmp/.locale ]] && archboot-locale.sh && exit
     fi
     _local_mode
     _enter_shell
