@@ -27,7 +27,7 @@ _do_locale() {
     echo "LANG=${_LOCALE}.UTF-8" > /tmp/.locale
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
-    echo "${_LOCALE}.UTF-8" >> /etc/locale.gen
+    echo "${_LOCALE}.UTF-8 UTF-8" >> /etc/locale.gen
     locale-gen &>/dev/null
     sleep 2
 }
