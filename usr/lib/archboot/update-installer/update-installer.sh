@@ -319,9 +319,9 @@ _prepare_graphic() {
         echo "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
         echo "Cleanup locale and i18n..."
-        find ${1}/usr/share/locale/ ! -path '*/de/*' ! -path '*/en/*' ! -path '*/fr/*' \
+        find /usr/share/locale/ -mindepth 2 ! -path '*/de/*' ! -path '*/en/*' ! -path '*/fr/*' \
             ! -path '*/es/*' ! -path '*/pt/*' ! -path '*/ru/*' -delete &>/dev/null
-        find ${1}/usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
+        find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
     fi
     systemd-sysusers >/dev/tty7 2>&1
     systemd-tmpfiles --create >/dev/tty7 2>&1
