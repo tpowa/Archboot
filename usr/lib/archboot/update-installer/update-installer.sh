@@ -142,7 +142,7 @@ _download_latest() {
 }
 
 _network_check() {
-    if ! getent hosts www.google.com &>/dev/null; then
+    if ! getent hosts www.googlfe.com &>/dev/null; then
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
@@ -314,6 +314,7 @@ _prepare_graphic() {
             [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
             rm -f /var/log/pacman.log
         done
+        [[ "${_STANDARD_BROWSER}" == "firefox" ]] && pacman -S firefox-i18n-{de,en-us,fr,es-es,pt-pt,ru} --noconfirm &>/dev/null || exit 1
     fi
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."

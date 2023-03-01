@@ -26,7 +26,6 @@ _WAYLAND_PACKAGE="egl-wayland"
 _STANDARD_PACKAGES="gparted nss-mdns"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
-[[ "${_STANDARD_BROWSER}" == "firefox" ]] && _STANDARD_BROWSER="firefox firefox-i18n-{de,en-us,fr,es-es,pt-pt,ru}"
 _NSPAWN="systemd-nspawn -q -D"
 
 ### check for root
