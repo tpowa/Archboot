@@ -59,8 +59,9 @@ fi
 }
 
 _enter_shell() {
+    [[ -z $TTY ]] && TTY=$(tty)
     # dbus sources profiles again
-    if ! pgrep -x dbus-run-sessio &>/dev/null; then
+    if ! echo "${TTY}" | grep -q pts; then
         cd /
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
         read -r
@@ -152,11 +153,15 @@ else
 fi
 
 if [[ -e /usr/bin/setup ]]; then
-    _local_mode
-    _enter_shell
     if ! [[ -e /tmp/.locale ]]; then
+        _welcome
+        echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m."
+        read -r
+        clear
         archboot-locale.sh && exit
     fi
+    _local_mode
+    _enter_shell
     if ! [[ -e /tmp/.setup ]]; then
         setup
     fi
