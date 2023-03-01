@@ -326,8 +326,8 @@ _prepare_graphic() {
     # fixing dbus requirements
     systemctl reload dbus
     systemctl reload dbus-org.freedesktop.login1.service
-    # fixing permission on /usr/share/polkit/rules.d
-    chgrp 102 /usr/share/polkit/rules.d &>/dev/null
+    # fixing permission on /usr/share/polkit-1/rules.d
+    chgrp 102 /usr/share/polkit-1/rules.d &>/dev/null
 }
 
 _new_environment() {
