@@ -67,15 +67,11 @@ build ()
     for i in ${_LANG}; do
         add_full_dir /usr/share/locale/${i}
     done
-    _LANG="en_US de_DE es_ES fr_FR pt_PT ru_RU"
-    for i in ${_LANG}; do
-        add_file /usr/share/i18n/locales/${i}
-    done
+    add_full_dir /usr/share/i18n/locales
     add_file /usr/share/i18n/charmaps/UTF-8.gz
-    for i in $(find ${1}/usr/share/locale/ -type f ! -name 'gdbm*' ! -name 'bfd*' \
-        ! -name 'gettext*' ! -name 'gas*' ! -name 'gold' ! -name 'gprof*' -name 'ld*' ! -name 'opcodes*'); do
-            add_file ${i}
-    done
+    find $BUILDROOT/usr/share/locale/ -type f -name 'gdbm*' -name 'bfd*' \
+        -name 'gettext*' -name 'gas*' -name 'gold' -name 'gprof*' -name 'ld*' \
+        -name 'opcodes*' -delete
 
     ### add bash configuration
     # add bash-completion
