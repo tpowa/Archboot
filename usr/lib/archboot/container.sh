@@ -197,7 +197,7 @@ _set_hostname() {
 
 # patch mkinitcpio to preserve permissions
 _fix_initramfs_permissions() {
-    echo "Fixing preserving permissions in mkinitcpio..."
+    echo "Preserving permissions in mkinitcpio run..."
     sed -i -e 's#--uid 0 --gid 0 ##g' "${1}"/usr/bin/mkinitcpio
 }
 # vim: set ft=sh ts=4 sw=4 et:
