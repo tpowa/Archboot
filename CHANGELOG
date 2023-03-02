@@ -6,6 +6,8 @@ Environment changes:
   in kernel 6.0.x series
 - added archboot specific speed patches to mkinitcpio functions
 - only use KEXEC_LOAD it's way faster than KEXEC_FILE_LOAD
+- fixed file permissions, especially uids and gids are now respected
+- added system wide locales: en_US,de,fr,es-es,pt-pt,ru
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
 ---
