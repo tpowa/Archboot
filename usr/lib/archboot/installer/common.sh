@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# we rely on some output which is parsed in english!
-LANG=C.UTF8
 _LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 _RUNNING_ARCH="$(uname -m)"
 _KERNELPKG="linux"
