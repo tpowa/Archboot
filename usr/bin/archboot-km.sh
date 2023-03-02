@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.km"
-_TITLE="Arch Linux Console Font And Keymap Setting"
+_TITLE="Archboot Arch Linux --> Console Font And Keymap Setting"
 _LIST_MAPS="localectl list-keymaps --no-pager"
 # _dialog()
 # an el-cheapo dialog wrapper

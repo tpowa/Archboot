@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.tz"
-_TITLE="Arch Linux Time And Date Setting"
+_TITLE="Archboot Arch Linux --> Time And Date Setting"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
