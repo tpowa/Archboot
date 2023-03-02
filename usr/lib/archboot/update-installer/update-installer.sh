@@ -241,7 +241,7 @@ _create_initramfs() {
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
     find . -mindepth 1 -printf '%P\0' | sort -z |
-    bsdtar --uid 0 --gid 0 --null -cnf - -T - |
+    bsdtar --null -cnf - -T - |
     bsdtar --null -cf - --format=newc @- | zstd --rm -T0> ${_RAM}/${_INITRD} &
     sleep 2
     while pgrep -x zstd &>/dev/null; do
