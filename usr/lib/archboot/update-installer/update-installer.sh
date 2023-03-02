@@ -495,8 +495,6 @@ _install_graphic () {
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
     command -v firefox &>/dev/null  && _firefox_flags
     command -v chromium &>/dev/null && _chromium_flags
-    # generate locales
-    locale-gen &>/dev/null
     [[ -n "${_L_XFCE}" ]] && _start_xfce
     [[ -n "${_L_GNOME}" ]] && _start_gnome
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
