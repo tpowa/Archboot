@@ -104,7 +104,7 @@ _download_latest() {
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
-        BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh"
+        BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh locale.sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
