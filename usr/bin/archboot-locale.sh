@@ -17,7 +17,6 @@ _abort()
 {
     _dialog --yesno "Abort Arch Linux System Wide Locale Setting?" 5 60 || return 0
     [[ -e /tmp/.locale-running ]] && rm /tmp/.locale-running
-    clear
     exit 1
 }
 
@@ -29,6 +28,7 @@ _do_locale() {
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     echo "${_LOCALE}.UTF-8 UTF-8" >> /etc/locale.gen
     locale-gen &>/dev/null
+    export "LANG=${_LOCALE}.UTF-8"
     sleep 2
 }
 
@@ -55,6 +55,5 @@ while [[ -z ${_LOCALE} ]]; do
 done
 _do_locale
 [[ -e /tmp/.locale-running ]] && rm /tmp/.locale-running
-clear
 exit 0
 # vim: set ts=4 sw=4 et:
