@@ -158,6 +158,7 @@ if [[ -e /usr/bin/setup ]]; then
         read -r
         ! [[ -e /tmp/.locale ]] && archboot-locale.sh
     fi
+    cat /etc/motd
     _local_mode
     _enter_shell
     if ! [[ -e /tmp/.setup ]]; then
