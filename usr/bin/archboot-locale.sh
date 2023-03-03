@@ -23,7 +23,7 @@ _abort()
 }
 
 _do_locale() {
-    _dialog --infobox "Setting System Wide Locale ${_LOCALE}..." 3 50
+    _dialog --infobox "Setting System Wide Locale ${_LOCALE}.UTF-8..." 3 50
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /tmp/.locale
     echo LC_COLLATE=C >> /etc/locale.conf
