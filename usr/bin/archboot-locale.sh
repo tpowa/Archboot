@@ -30,7 +30,6 @@ _do_locale() {
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     echo "${_LOCALE}.UTF-8 UTF-8" >> /etc/locale.gen
     locale-gen &>/dev/null
-    export "LANG=${_LOCALE}.UTF-8"
     sleep 2
 }
 
