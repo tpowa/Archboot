@@ -17,6 +17,7 @@ _abort()
 {
     _dialog --yesno "Abort Arch Linux System Wide Locale Setting?" 5 60 || return 0
     [[ -e /tmp/.locale-running ]] && rm /tmp/.locale-running
+    [[ -e /tmp/.locale ]] && rm /tmp/.locale
     clear
     exit 1
 }
