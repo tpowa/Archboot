@@ -2,6 +2,7 @@ On the road to 2023.03
 Highlights:
 - linux 6.2.x
 - added system wide locales: en_US, de_DE, fr_FR, es_ES, pt_PT, ru_RU
+  ar_IN,hi_IN,ja_JP,zh_CN
 Environment changes:
 - implemented emergency shell with messages and with big font detection support
 - implemented new zram routine for all boot types
