@@ -156,10 +156,8 @@ if [[ -e /usr/bin/setup ]]; then
     _local_mode
     _enter_shell
     if ! [[ -e /tmp/.locale ]]; then
-        if ! [[ -e /tmp/.locale ]]; then
-            archboot-locale.sh
-            source /etc/locale.conf
-        fi
+        archboot-locale.sh
+        source /etc/locale.conf
     fi
     if ! [[ -e /tmp/.setup ]]; then
         setup
