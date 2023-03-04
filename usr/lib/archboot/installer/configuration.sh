@@ -30,7 +30,7 @@ _set_mkinitcpio() {
 
 _set_locale() {
     if [[ -z ${_S_LOCALE} ]]; then
-        _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian OTHER More"
+        _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER More"
         _CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
         _OTHER_LOCALES=""
         for i in ${_CHECK_LOCALES}; do
