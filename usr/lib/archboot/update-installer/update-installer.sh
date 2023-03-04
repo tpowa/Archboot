@@ -306,7 +306,7 @@ _prepare_graphic() {
         rm -rf /usr/share/icons/breeze-dark
         echo "Cleanup locale and i18n..."
         find /usr/share/locale/ -mindepth 2 ! -path '*/de/*' ! -path '*/en/*' \
-        ! -path '*/fr/*' ! -path '*/es/*' ! -path '*/pt/*' ! -path '*/ru/*' -delete &>/dev/null
+        ! -path '*/fr/*' ! -path '*/es/*' ! -path '*/pt/*' -delete &>/dev/null
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
     fi
     systemd-sysusers >/dev/tty7 2>&1
