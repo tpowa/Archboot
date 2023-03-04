@@ -299,7 +299,7 @@ _prepare_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        pacman -S firefox-i18n-{ar,de,en-us,fr,es-es,hi,ja,pt-pt,ru,zh_CN} --noconfirm &>/dev/null || exit 1
+        pacman -S firefox-i18n-{de,en-us,fr,es-es,pt-pt} --noconfirm &>/dev/null || exit 1
     fi
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."
