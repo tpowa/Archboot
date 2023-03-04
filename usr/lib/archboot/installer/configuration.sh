@@ -37,7 +37,7 @@ _set_locale() {
             _OTHER_LOCALES="${_OTHER_LOCALES} ${i} -"
         done
         #shellcheck disable=SC2086
-        _dialog --menu "Select A System Wide Locale:" 14 40 8 ${_LOCALES} 2>${_ANSWER} || return 1
+        _dialog --menu "Select A System Wide Locale:" 13 40 7 ${_LOCALES} 2>${_ANSWER} || return 1
         _SET_LOCALE=$(cat "${_ANSWER}")
         if [[ "${_SET_LOCALE}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
