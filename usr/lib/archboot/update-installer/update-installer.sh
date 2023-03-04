@@ -305,9 +305,8 @@ _prepare_graphic() {
         echo "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
         echo "Cleanup locale and i18n..."
-        find /usr/share/locale/ -mindepth 2 ! -path '*/ar/*' ! -path '*/de/*' ! -path '*/en/*' \
-        ! -path '*/fr/*' ! -path '*/es/*' ! -path '*/hi/*' ! -path '*/ja/*' ! -path '*/pt/*' \
-        ! -path '*/ru/*' ! -path '*/zh_CN/*' -delete &>/dev/null
+        find /usr/share/locale/ -mindepth 2 ! -path '*/de/*' ! -path '*/en/*' \
+        ! -path '*/fr/*' ! -path '*/es/*' ! -path '*/pt/*' ! -path '*/ru/*' -delete &>/dev/null
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
     fi
     systemd-sysusers >/dev/tty7 2>&1
