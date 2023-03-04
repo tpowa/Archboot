@@ -62,11 +62,7 @@ _enter_shell() {
     [[ -z $TTY ]] && TTY=$(tty)
     # dbus sources profiles again
     if ! echo "${TTY}" | grep -q pts; then
-        if ! [[ -e /tmp/.locale ]]; then
-            echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mfirst\e[m login setup."
-        else
-            echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
-        fi
+        echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
         cd /
         read -r
         clear
