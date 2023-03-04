@@ -35,7 +35,7 @@ _do_locale() {
 
 _set_locale() {
     _LOCALE=""
-    _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ar_IN Arabic ru_RU Russian"
+    _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese ru_RU Russian"
     _CANCEL=""
     #shellcheck disable=SC2086
     _dialog --menu "Select A System Wide Locale:" 17 35 12 ${_LOCALES} 2>${_ANSWER} || _abort
