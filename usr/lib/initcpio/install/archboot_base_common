@@ -62,7 +62,7 @@ build ()
     ### add locale support
     map add_binary locale-gen localedef
     add_file /etc/locale.gen
-    _LANG="en de es fr pt ru"
+    _LANG="en de es fr pt"
     for i in ${_LANG}; do
         add_full_dir /usr/share/locale/${i}
     done
