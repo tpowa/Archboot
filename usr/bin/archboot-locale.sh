@@ -38,7 +38,7 @@ _set_locale() {
     _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese"
     _CANCEL=""
     #shellcheck disable=SC2086
-    _dialog --menu "Select A System Wide Locale:" 17 35 12 ${_LOCALES} 2>${_ANSWER} || _abort
+    _dialog --menu "Select A System Wide Locale:" 7 35 5 ${_LOCALES} 2>${_ANSWER} || _abort
     _LOCALE=$(cat ${_ANSWER})
     if [[ -n ${_LOCALE} ]]; then
         _dialog --yesno "Do you want to use ${_LOCALE}.UTF-8 as System Wide Locale?" 5 60 || _LOCALE=""
