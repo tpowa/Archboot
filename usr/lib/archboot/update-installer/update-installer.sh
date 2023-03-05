@@ -303,10 +303,10 @@ _prepare_graphic() {
         for i in ${_LANG}; do
             grep -q "${i}" /etc/locale.conf && pacman -S firefox-i18n-"${i}" --noconfirm &>/dev/null || exit 1
         done
-        grep -q en_US && pacman -S firefox-i18n-en-us --noconfirm &>/dev/null || exit 1
-        grep -q es_ES && pacman -S firefox-i18n-es-es --noconfirm &>/dev/null || exit 1
-        grep -q pt_PT && pacman -S firefox-i18n-pt-pt --noconfirm &>/dev/null || exit 1
-        grep -q sv_SE && pacman -S firefox-i18n-sv-se --noconfirm &>/dev/null || exit 1
+        grep -q en_US /etc/locale.conf && pacman -S firefox-i18n-en-us --noconfirm &>/dev/null || exit 1
+        grep -q es_ES /etc/locale.conf && pacman -S firefox-i18n-es-es --noconfirm &>/dev/null || exit 1
+        grep -q pt_PT /etc/locale.conf && pacman -S firefox-i18n-pt-pt --noconfirm &>/dev/null || exit 1
+        grep -q sv_SE /etc/locale.conf && pacman -S firefox-i18n-sv-se --noconfirm &>/dev/null || exit 1
     fi
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."
