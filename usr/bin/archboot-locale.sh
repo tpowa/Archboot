@@ -39,11 +39,11 @@ _set_locale() {
     _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Danish fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian  ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish uk_UA Ukrainian"
     _CANCEL=""
     #shellcheck disable=SC2086
-    _dialog --menu "Select A System Wide Locale:" 12 35 5 ${_LOCALES} 2>${_ANSWER} || _abort
+    _dialog --menu "Select A System Wide Locale:" 13 35 6 ${_LOCALES} 2>${_ANSWER} || _abort
     _LOCALE=$(cat ${_ANSWER})
     if [[ "${_LOCALE}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        _dialog --menu "Select A System Wide Locale:" 18 30 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || abort
+        _dialog --menu "Select A System Wide Locale:" 18 30 12 ${_OTHER_LOCALES} 2>${_ANSWER} || abort
         _LOCALE=$(cat ${_ANSWER})
     fi
     if [[ -n ${_LOCALE} ]]; then
