@@ -36,7 +36,7 @@ _do_locale() {
 _set_locale() {
     _LOCALE=""
     _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER Other"
-    _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Danish fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian  ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish uk_UA Ukrainian"
+    _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Dansk fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian  ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish uk_UA Ukrainian"
     _CANCEL=""
     #shellcheck disable=SC2086
     _dialog --menu "Select A System Wide Locale:" 13 35 6 ${_LOCALES} 2>${_ANSWER} || _abort
