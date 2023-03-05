@@ -1,7 +1,7 @@
 On the road to 2023.03
 Highlights:
 - linux 6.2.x
-- added system wide locales:  be, bg, cs, da, de, en, el, es, fi, fr, hu, it,
+- added system wide locales: be, bg, cs, da, de, en, el, es, fi, fr, hu, it,
   lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, uk
 Environment changes:
 - implemented emergency shell with messages and with big font detection support
