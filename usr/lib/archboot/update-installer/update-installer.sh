@@ -299,8 +299,9 @@ _prepare_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        for i in be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk; do
-            grep -q ${i} /etc/locale.conf && pacman -S firefox-i18n-${i} --noconfirm &>/dev/null || exit 1
+        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
+        for i in ${_LANG}; do
+            grep -q "${i}" /etc/locale.conf && pacman -S firefox-i18n-"${i}" --noconfirm &>/dev/null || exit 1
         done
         grep -q en_US && pacman -S firefox-i18n-en-us --noconfirm &>/dev/null || exit 1
         grep -q es_ES && pacman -S firefox-i18n-es-es --noconfirm &>/dev/null || exit 1
@@ -311,7 +312,7 @@ _prepare_graphic() {
         echo "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
         echo "Cleanup locale and i18n..."
-        find ${1}/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
+        find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
         ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
         ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
