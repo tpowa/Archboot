@@ -175,26 +175,21 @@ add_file() {
         error "file not found: '%s'" "$src"
         return 1
     fi
-  # check if $src is a symlink
-    if [[ -L "$src" ]]; then
-        srcrealpath="$(realpath -- "$src")"
-        if [[ "$srcrealpath" != "$dest" ]]; then
-            # add the target file
-            add_file "$srcrealpath" "$srcrealpath" "$mode"
-            # create the symlink
-            add_symlink "$dest" "$src"
-            return
+    if [[ ! -e "${BUILDROOT}${dest}" ]]; then
+        if [[ "$src" != "$dest" ]]; then
+            command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
+        else
+            command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
         fi
-    fi
-
-    # unlike install, cp does not create directories leading to the destination
-    [[ -z "$mode" ]] && add_dir "${dest%/*}"
-
-    if [[ -z "$mode" ]]; then
-        command cp --remove-destination --preserve=mode,ownership "$src" "${BUILDROOT}${dest}"
-    else
-        command install -Dm"$mode" "$src" "${BUILDROOT}${dest}"
-    fi
+        if [[ -L "$src" ]]; then
+            srcrealpath="$(realpath -- "$src")"
+            add_file  "$srcrealpath" "$srcrealpath" "$mode"
+        else
+            if [[ -n $mode ]]; then
+                command chmod "$mode" ${BUILDROOT}${dest}
+            fi
+        fi
+	fi
 }
 
 add_binary() {
