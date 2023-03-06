@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    # add firmware files and licenses
+    map add_full_dir "/lib/firmware/amdgpu" "/lib/firmware/i915" "/lib/firmware/nvidia" \
+        "/lib/firmware/radeon" "/usr/share/licenses/linux-firmware"
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes kms linux-firmware on an archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:
