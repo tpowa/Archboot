@@ -241,7 +241,7 @@ add_binary() {
 
 install_modules() {
 
-    tar -C / -cpf - $@ | tar -C "${BUILDROOT}" -xpf -
+    command tar -C / -cpf - $@ | tar -C "${BUILDROOT}" -xpf -
 
     msg "Generating module dependencies"
     map add_file "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
