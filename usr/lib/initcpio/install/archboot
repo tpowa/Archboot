@@ -52,7 +52,7 @@ add_module() {
                     found=1
                     module="${value##*/}" module="${module%.ko*}"
                     quiet "adding module: %s (%s)" "$module" "$value"
-                    _modpaths["$value"]=1
+                    _modpaths[".$value"]=1
                     _addedmodules["${module//-/_}"]=1
                 fi
                 ;;
@@ -183,9 +183,7 @@ add_file() {
         fi
         if [[ -L "$src" ]]; then
             srcrealpath="$(realpath -- "$src")"
-            if [[ ! -e "${BUILDROOT}${srcrealpath}" ]]; then
-                add_file  "$srcrealpath" "$srcrealpath" "$mode"
-            fi
+            add_file  "$srcrealpath" "$srcrealpath" "$mode"
         else
             if [[ -n $mode ]]; then
                 command chmod "$mode" ${BUILDROOT}${dest}
@@ -242,11 +240,8 @@ add_binary() {
 }
 
 install_modules() {
-    local m
 
-    for m in "$@"; do
-        add_file "$m" "$m"
-    done
+    tar -C / -cpf - $@ | tar -C "${BUILDROOT}" -xpf -
 
     msg "Generating module dependencies"
     map add_file "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
