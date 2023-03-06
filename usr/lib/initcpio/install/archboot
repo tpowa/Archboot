@@ -124,7 +124,7 @@ add_dir() {
         return 0
     fi
 
-    command install -dm"${mode}" "${BUILDROOT}${path}"
+    command mkdir -p -m "${mode}" "${BUILDROOT}${path}"
 }
 
 add_symlink() {
