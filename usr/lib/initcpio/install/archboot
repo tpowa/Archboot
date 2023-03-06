@@ -183,13 +183,15 @@ add_file() {
         fi
         if [[ -L "$src" ]]; then
             srcrealpath="$(realpath -- "$src")"
-            add_file  "$srcrealpath" "$srcrealpath" "$mode"
+            if [[ ! -e "${BUILDROOT}${srcrealpath}" ]]; then
+                add_file  "$srcrealpath" "$srcrealpath" "$mode"
+            fi
         else
             if [[ -n $mode ]]; then
                 command chmod "$mode" ${BUILDROOT}${dest}
             fi
         fi
-	fi
+    fi
 }
 
 add_binary() {
