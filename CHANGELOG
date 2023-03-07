@@ -6,11 +6,10 @@ Highlights:
 Environment changes:
 - implemented emergency shell with messages and with big font detection support
 - implemented new zram routine for all boot types
-- added kms to archboot_init, to avoid font flickering, introduced 
+- added kms to archboot_init, to avoid font flickering, which was introduced 
   in kernel 6.0.x series
-- added archboot specific speed patches to mkinitcpio functions
+- added speed and permissions patches for uid/gid to mkinitcpio functions
 - only use KEXEC_LOAD it's way faster than KEXEC_FILE_LOAD
-- fixed file permissions, especially uids and gids are now respected
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
 ---
