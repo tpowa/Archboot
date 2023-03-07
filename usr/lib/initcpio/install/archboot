@@ -14,9 +14,9 @@ add_firmware() {
     for fw; do
         # _d_firmware is assigned in mkinitcpio
         # shellcheck disable=SC2154
-        if [[ -f $fwpath/$fw.xz && ! -e "${BUILDROOT}$fwpath/$fw.xz" ]]; then
+        if [[ ! -e "${BUILDROOT}$fwpath/$fw.xz" ]]; then
             add_file "$fwpath/$fw.xz" "$fwpath/$fw.xz"
-        elif [[ -f $fwpath/$fw && ! -e "${BUILDROOT}$fwpath/$fw" ]]; then
+        elif [[ ! -e "${BUILDROOT}$fwpath/$fw" ]]; then
             add_file "$fwpath/$fw" "$fwpath/$fw"
         fi
     done
@@ -231,7 +231,7 @@ add_binary() {
             continue
         fi
 
-        if [[ -f "$sodep" && ! -e "${BUILDROOT}${sodep}" ]]; then
+        if [[ ! -e "${BUILDROOT}${sodep}" ]]; then
             add_file "$sodep" "$sodep"
         fi
     done <<< "$lddout"
