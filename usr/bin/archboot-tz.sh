@@ -147,15 +147,21 @@ _mainmenu() {
             _abort ;;
     esac
 }
-: >/tmp/.tz
+
+if [[ -e /tmp/.tz-running ]]; then
+    echo "tz already runs on a different console!"
+    echo "Please remove /tmp/.tz-running first to launch tz!"
+    exit 1
+fi
+: >/tmp/.tz-running
 if [[ "${1}" = "--setup" ]]; then
     if ! _dotimezone; then
-        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
         clear
         exit 1
     fi
     if ! _dotimeset; then
-        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
         clear
         exit 1
     fi
@@ -163,17 +169,9 @@ if [[ "${1}" = "--setup" ]]; then
 else
     _EXIT="Exit"
 fi
-if [[ -e /tmp/.tz-running ]]; then
-    echo "tz already runs on a different console!"
-    echo "Please remove /tmp/.tz-running first to launch tz!"
-    exit 1
-fi 
-: >/tmp/.tz-running
-
 while true; do
     _mainmenu
 done
-
 clear
 exit 0
 # vim: set ts=4 sw=4 et:
