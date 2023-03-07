@@ -278,8 +278,8 @@ _mainmenu() {
         _DEFAULT=""
     fi
     #shellcheck disable=SC2086
-    dialog ${_DEFAULT} --backtitle "${_TITLE}" \
-    --menu "MAIN MENU:\nUse the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 19 58 16 \
+    dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
+    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Set Console Font And Keymap" \
     "1" "Set up Network" \
     "2" "Select Source" \
