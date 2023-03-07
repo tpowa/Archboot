@@ -149,7 +149,17 @@ _mainmenu() {
 }
 : >/tmp/.tz
 if [[ "${1}" = "--setup" ]]; then
-    _EXIT="Return to Main Menu"
+    if ! _dotimezone; then
+        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+        clear
+        exit 1
+    fi
+    if ! _dotimeset; then
+        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+        clear
+        exit 1
+    fi
+    exit 0
 else
     _EXIT="Exit"
 fi
