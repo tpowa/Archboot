@@ -55,11 +55,11 @@ _set_vconsole() {
     _OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Dansk et Estonian fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian"
     _CANCEL=""
     #shellcheck disable=SC2086
-    _dialog --menu "Select A Keymap Region:" 13 30 7 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+    _dialog --menu "Select A Keymap Region:" 13 40 7 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     _KEYMAP=$(cat ${_ANSWER})
     if [[ "${_KEYMAP}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        _dialog --menu "Select A Keymap Region:" 18 30 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+        _dialog --menu "Select A Keymap Region:" 18 40 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
         _KEYMAP=$(cat ${_ANSWER})
     fi
     _abort_dialog || return 1
@@ -69,7 +69,7 @@ _set_vconsole() {
     done
     _CANCEL=""
     #shellcheck disable=SC2086
-    _dialog --menu "Select A Keymap Layout:" 14 30 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
+    _dialog --menu "Select A Keymap Layout:" 14 40 8 ${_KEYMAPS} 2>${_ANSWER} || _CANCEL="1"
     _abort_dialog || return 1
     #shellcheck disable=SC2086
     _KEYMAP=$(cat ${_ANSWER})
