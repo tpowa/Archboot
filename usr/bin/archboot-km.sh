@@ -49,7 +49,6 @@ _set_vconsole() {
     _abort_dialog || return 1
     #shellcheck disable=SC2086
     _FONT=$(cat ${_ANSWER})
-    sleep 2
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     _KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
