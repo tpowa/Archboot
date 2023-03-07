@@ -45,7 +45,7 @@ _set_vconsole() {
     fi
     _CANCEL=
     #shellcheck disable=SC2086
-    _dialog --title "Select Console Font" --menu "\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+    _dialog --title "Select Console Font" --menu "\n     Font Name          Region" 11 40 13 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
     _abort_dialog || return 1
     #shellcheck disable=SC2086
     _FONT=$(cat ${_ANSWER})
