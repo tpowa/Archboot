@@ -40,22 +40,16 @@ _do_vconsole() {
 _set_vconsole() {
     if grep -q '^FONT=.*32' /etc/vconsole.conf; then
         _FONTS="ter-v32n Worldwide latarcyrheb-sun32 Worldwide"
-        _CANCEL=
-        #shellcheck disable=SC2086
-        _dialog --title " Select Console Font" --menu "     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
-        _abort_dialog || return 1
-        #shellcheck disable=SC2086
-        _FONT=$(cat ${_ANSWER})
-        sleep 2
     else
         _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
-        _CANCEL=
-        #shellcheck disable=SC2086
-        _dialog --menu "\n        Select Console Font:\n\n     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
-        _abort_dialog || return 1
-        #shellcheck disable=SC2086
-        _FONT=$(cat ${_ANSWER})
     fi
+    _CANCEL=
+    #shellcheck disable=SC2086
+    _dialog --title " Select Console Font" --menu "     Font Name          Region" 13 40 15 ${_FONTS} 2>${_ANSWER} || _CANCEL=1
+    _abort_dialog || return 1
+    #shellcheck disable=SC2086
+    _FONT=$(cat ${_ANSWER})
+    sleep 2
     # get list of 2 sign locale
     #  ${KEYMAP} | grep -v '...' | grep "^[a-z]"
     _KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
