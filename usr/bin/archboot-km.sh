@@ -17,6 +17,7 @@ _dialog() {
 _abort()
 {
     _dialog --yesno "Abort Console Font And Keymap Setting?" 6 42 || return 0
+    [[ -e /tmp/.km ]] && rm -f /tmp/.km
     [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
     clear
     exit 1
