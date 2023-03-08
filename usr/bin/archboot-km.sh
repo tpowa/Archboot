@@ -66,6 +66,7 @@ if ! _set_vconsole; then
     clear
     exit 1
 fi
+[[ -e /tmp/.km ]] && rm /tmp/.km
 [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
 _do_vconsole
 clear

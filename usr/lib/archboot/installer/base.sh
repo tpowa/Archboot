@@ -136,9 +136,9 @@ _set_guid() {
 
 _set_vconsole() {
     if [[ -e /usr/bin/km ]]; then
-        km --setup && _NEXTITEM=1
+        km && _NEXTITEM=1
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
-        archboot-km.sh --setup && _NEXTITEM=1
+        archboot-km.sh && _NEXTITEM=1
     else
         _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
     fi
@@ -164,9 +164,9 @@ _select_source() {
 
 _set_clock() {
     if [[ -e /usr/bin/tz ]]; then
-        tz --setup && _NEXTITEM="4"
+        tz && _NEXTITEM="4"
     elif [[ -e /usr/bin/archboot-tz.sh ]]; then
-        archboot-tz.sh --setup && _NEXTITEM="4"
+        archboot-tz.sh && _NEXTITEM="4"
     else
         _dialog --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi

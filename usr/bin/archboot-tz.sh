@@ -13,17 +13,6 @@ _dialog() {
     return $?
 }
 
-_abort()
-{
-    _dialog --yesno "Abort Time And Date Setting?" 6 40 || return 0
-    [[ -e /tmp/.tz ]] && rm -f /tmp/.tz
-    [[ -e /etc/localtime ]] && rm -f /etc/localtime
-    [[ -e /etc/adjtime ]] && rm -f /etc/adjtime
-    [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
-    clear
-    exit 1
-}
-
 _dohwclock() {
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
@@ -57,9 +46,7 @@ _dotimezone () {
         if [[ -n "${_SET_ZONE}" ]]; then
             _dialog --infobox "Setting Timezone to ${_ZONE}..." 0 0
             timedatectl set-timezone "${_ZONE}"
-            _S_NEXTITEM="2"
         else
-            _S_NEXTITEM="1"
             return 1
         fi
     done
@@ -68,7 +55,6 @@ _dotimezone () {
 _dotimeset() {
     if [[ -z "${_SET_ZONE}" ]]; then
         _dialog --msgbox "Error:\nYou have to select timezone first." 0 0
-        _S_NEXTITEM="1"
         dotimezone || return 1
     fi
     _SET_TIME=""
@@ -85,7 +71,6 @@ _dotimeset() {
                 # sync immediatly with standard pool
                 if ! systemctl restart systemd-timesyncd; then
                     _dialog --msgbox "An error has occured, time was not changed!" 0 0
-                    _S_NEXTITEM="2"
                     return 1
                 fi
                 # enable background syncing
@@ -96,18 +81,9 @@ _dotimeset() {
         if [[ -z "${_SET_TIME}" ]]; then
             timedatectl set-ntp 0
             # display and ask to set date/time
-            _CANCEL=""
-            dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER} || _CANCEL="1"
-            if [[ -n "${_CANCEL}" ]]; then
-                _S_NEXTITEM="2"
-                return 1
-            fi
+            dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER} || return 1
             _DATE="$(cat ${_ANSWER})"
-            dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER} || _CANCEL="1"
-            if [[ -n "${_CANCEL}" ]]; then
-                _S_NEXTITEM="2"
-                return 1
-            fi
+            dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER} || return 1
             _TIME="$(cat ${_ANSWER})"
             # save the time
             # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
@@ -117,35 +93,6 @@ _dotimeset() {
         fi
         _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && _SET_TIME=""
     done
-    _S_NEXTITEM="3"
-}
-
-_mainmenu() {
-    if [[ -n "${_S_NEXTITEM}" ]]; then
-        _DEFAULT="--default-item ${_S_NEXTITEM}"
-    else
-        _DEFAULT=""
-    fi
-    #shellcheck disable=SC2086
-    _dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
-                --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 11 58 13 \
-        "1" "Select Timezone" \
-        "2" "Set Time and Date" \
-        "3" "${_EXIT}" 2>${_ANSWER}
-    case $(cat ${_ANSWER}) in
-        "1")
-            _dotimezone
-            ;;
-        "2")
-            _dotimeset
-            ;;
-        "3")
-            [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
-            clear
-            exit 0 ;;
-        *)
-            _abort ;;
-    esac
 }
 
 if [[ -e /tmp/.tz-running ]]; then
@@ -154,24 +101,20 @@ if [[ -e /tmp/.tz-running ]]; then
     exit 1
 fi
 : >/tmp/.tz-running
-if [[ "${1}" = "--setup" ]]; then
-    if ! _dotimezone; then
-        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
-        clear
-        exit 1
-    fi
-    if ! _dotimeset; then
-        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
-        clear
-        exit 1
-    fi
-    exit 0
-else
-    _EXIT="Exit"
+if ! _dotimezone; then
+    [[ -e /tmp/.tz ]] && rm /tmp/.tz
+    [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+    clear
+    exit 1
 fi
-while true; do
-    _mainmenu
-done
+if ! _dotimeset; then
+    [[ -e /tmp/.tz ]] && rm /tmp/.tz
+    [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+    clear
+    exit 1
+fi
+[[ -e /tmp/.tz ]] && rm /tmp/.tz
+[[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
 clear
 exit 0
 # vim: set ts=4 sw=4 et:
