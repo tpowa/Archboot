@@ -67,7 +67,7 @@ if ! _set_vconsole; then
     exit 1
 fi
 [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
-clear
 _do_vconsole
+clear
 exit 0
 # vim: set ts=4 sw=4 et:
