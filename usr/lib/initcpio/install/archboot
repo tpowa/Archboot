@@ -51,7 +51,6 @@ add_module() {
                 if [[ "$value" == /* ]]; then
                     found=1
                     module="${value##*/}" module="${module%.ko*}"
-                    quiet "adding module: %s (%s)" "$module" "$value"
                     _modpaths[".$value"]=1
                     _addedmodules["${module//-/_}"]=1
                 fi
@@ -72,12 +71,6 @@ add_module() {
                 ;;
         esac
     done < <(modinfo -b "$_optmoduleroot" -k "$KERNELVERSION" -0 "$target" 2>/dev/null)
-
-    if (( !found )); then
-        (( ign_errors || _addedmodules["$target"] )) && return 0
-        error "module not found: '%s'" "$target"
-        return 1
-    fi
 
     if (( ${#firmware[*]} )); then
         add_firmware "${firmware[@]}"
@@ -111,11 +104,6 @@ add_dir() {
     # add a directory (with parents) to $BUILDROOT
     #   $1: pathname on initcpio
     #   $2: mode (optional)
-
-    if [[ -z "$1" || "$1" != /?* ]]; then
-        return 1
-    fi
-
     local path="$1" mode="${2:-755}"
 
     # shellcheck disable=SC2153
@@ -124,7 +112,7 @@ add_dir() {
         return 0
     fi
 
-    command mkdir -p -m "${mode}" "${BUILDROOT}${path}"
+    command mkdir -p -m "${mode}" "${BUILDROOT}${path}" || return 1
 }
 
 add_symlink() {
@@ -134,8 +122,6 @@ add_symlink() {
     #   $2: absolute path to target of symlink (optional, can be read from $1)
 
     local name="$1" target="${2:-$1}" linkobject
-
-    (( $# == 1 || $# == 2 )) || return 1
 
     # find out the link target
     if [[ "$name" == "$target" ]]; then
@@ -150,10 +136,6 @@ add_symlink() {
     elif [[ -L "$target" ]]; then
         target="$(realpath -eq -- "$target")"
     fi
-    if [[ -z "$target" ]]; then
-        error "invalid symlink: '%s'" "$name"
-        return 1
-    fi
 
     add_dir "${name%/*}"
     ln -sfn "$target" "${BUILDROOT}${name}"
@@ -166,20 +148,14 @@ add_file() {
     #   $2: destination on initcpio (optional, defaults to same as source)
     #   $3: mode
 
-    (( $# )) || return 1
-
     # determine source and destination
     local src="$1" dest="${2:-$1}" mode="$3" srcrealpath
 
-    if [[ ! -f "$src" ]]; then
-        error "file not found: '%s'" "$src"
-        return 1
-    fi
     if [[ ! -e "${BUILDROOT}${dest}" ]]; then
         if [[ "$src" != "$dest" ]]; then
-            command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
+            command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
         else
-            command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf -
+            command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
         fi
         if [[ -L "$src" ]]; then
             srcrealpath="$(realpath -- "$src")"
@@ -204,11 +180,6 @@ add_binary() {
         binary="$(type -P "$1")"
     else
         binary="$1"
-    fi
-
-    if [[ ! -f "$binary" ]]; then
-        error "file not found: '%s'" "$1"
-        return 1
     fi
 
     dest="${2:-$binary}"
