@@ -46,6 +46,7 @@ _dotimezone () {
         if [[ -n "${_SET_ZONE}" ]]; then
             _dialog --infobox "Setting Timezone to ${_ZONE}..." 0 0
             timedatectl set-timezone "${_ZONE}"
+            sleep 2
         else
             return 1
         fi
