@@ -20,6 +20,9 @@ _do_vconsole() {
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
+    _dialog --infobox "Console Font and Keymap setting completed successfully.\nContinuing in 5 seconds..." 4 60
+    sleep 5
+    return 0
 }
 
 _set_vconsole() {
