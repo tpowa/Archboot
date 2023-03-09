@@ -175,7 +175,12 @@ _prepare_uefi_image() {
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
     # leave EFI/ and /boot/kernel for virtualbox and other restricted VM emulators :(
-    find "${_ISODIR}"/boot/* ! -name "${_ISODIR}"/boot/vmlinuz-${_ARCH} -delete
+    if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
+        find "${_ISODIR}"/boot/* ! -name "vmlinuz-${_ARCH}" -delete
+    fi
+    if [[ "${_ARCH}" == "aarch64" ]]; then
+        find "${_ISODIR}"/boot/* ! -name "Image-${_ARCH}.gz" -delete
+    fi
 }
 
 _prepare_extlinux_conf() {
