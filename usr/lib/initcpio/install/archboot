@@ -96,7 +96,7 @@ add_full_dir() {
     # No parsing is performed and the contents of the directory is added as is.
     #   $1: path to directory
     if [[ -n $1 && -d $1 ]]; then
-        command tar -C / -cpf - ."$1" | tar -C "${BUILDROOT}" -xpf -
+        command tar -C /  --hard-dereference -cpf - ."$1" | tar -C "${BUILDROOT}" -xpf -
     fi
 }
 
@@ -153,9 +153,9 @@ add_file() {
 
     if [[ ! -e "${BUILDROOT}${dest}" ]]; then
         if [[ "$src" != "$dest" ]]; then
-            command tar --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
+            command tar --hard-dereference --transform="s|"$src"|"$dest"|" -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
         else
-            command tar -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
+            command tar --hard-dereference -C / -cpf - ."$src" | tar -C "${BUILDROOT}" -xpf - || return 1
         fi
         if [[ -L "$src" ]]; then
             srcrealpath="$(realpath -- "$src")"
@@ -212,7 +212,7 @@ add_binary() {
 
 install_modules() {
 
-    command tar -C / -cpf - $@ | tar -C "${BUILDROOT}" -xpf -
+    [[ -n "$@" ]] && command tar --hard-dereference -C / -cpf - "$@" | tar -C "${BUILDROOT}" -xpf -
 
     msg "Generating module dependencies"
     map add_file "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
