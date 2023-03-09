@@ -13,6 +13,10 @@ Environment changes:
 - don't run kexec on local image, use systemd switch root instead
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
+km:
+- removed main menu
+tz:
+- removed main menu
 ---
 2023.02 Highlights:
 - Use zram for rootfs on ISO/IMAGE boot. This enables finally booting the normal image
