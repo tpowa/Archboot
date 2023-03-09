@@ -44,7 +44,7 @@ _dotimezone () {
         _ZONE=$(cat ${_ANSWER})
         [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
         if [[ -n "${_SET_ZONE}" ]]; then
-            _dialog --infobox "Setting Timezone to ${_ZONE}..." 5 60
+            _dialog --infobox "Setting Timezone to ${_ZONE}..." 4 60
             timedatectl set-timezone "${_ZONE}"
             sleep 2
         else
@@ -95,7 +95,7 @@ _dotimeset() {
         if _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0; then
             _SET_TIME=""
         else
-            _dialog --infobox "Time and Date setting completed successfully. Continuing in 5 seconds..." 5 60
+            _dialog --infobox "Time and Date setting completed successfully. Continuing in 5 seconds..." 4 75
             sleep 5
             return 0
         fi
