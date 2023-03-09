@@ -96,7 +96,7 @@ add_full_dir() {
     # No parsing is performed and the contents of the directory is added as is.
     #   $1: path to directory
     if [[ -n $1 && -d $1 ]]; then
-        command tar -C / -cpf - ."$1" | tar -C "${BUILDROOT}" -xspf -
+        command tar -C / -cpf - ."$1" | tar -C "${BUILDROOT}" -xpf -
     fi
 }
 
