@@ -174,8 +174,8 @@ _prepare_uefi_image() {
     mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
-    # leave EFI/ for virtualbox and other restricted VM emulators
-    find "${_ISODIR} "/boot ! -name "${_ISODIR}"/boot/vmlinuz-${_ARCH} -delete
+    # leave EFI/ and /boot/kernel for virtualbox and other restricted VM emulators :(
+    find "${_ISODIR}"/boot/* ! -name "${_ISODIR}"/boot/vmlinuz-${_ARCH} -delete
 }
 
 _prepare_extlinux_conf() {
