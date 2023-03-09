@@ -95,6 +95,8 @@ _dotimeset() {
         if _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0; then
             _SET_TIME=""
         else
+            _dialog --infobox "Time and Date setting completed successfully. Continuing in 5 seconds..." 0 0
+            sleep 5
             return 0
         fi
     done
