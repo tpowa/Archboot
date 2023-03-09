@@ -175,7 +175,7 @@ _prepare_uefi_image() {
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
     # leave EFI/ for virtualbox and other restricted VM emulators
-    rm -r "${_ISODIR:?}"/boot
+    find "${_ISODIR} "/boot ! -name "${_ISODIR}"/boot/vmlinuz-${_ARCH} -delete
 }
 
 _prepare_extlinux_conf() {
