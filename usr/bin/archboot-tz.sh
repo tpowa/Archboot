@@ -96,6 +96,7 @@ _dotimeset() {
             _SET_TIME=""
         else
             return 0
+        fi
     done
 }
 
