@@ -92,7 +92,10 @@ _dotimeset() {
             timedatectl set-time "${_DATETIME}"
             _SET_TIME="1"
         fi
-        _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0 && _SET_TIME=""
+        if _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0; then
+            _SET_TIME=""
+        else
+            return 0
     done
 }
 
