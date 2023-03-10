@@ -4,7 +4,7 @@
 
 build ()
 {
-    map add_binary hwclock tzselect
+    map add_binary hwclock tzselect zic zdump
     map add_full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps
     add_file "/usr/bin/archboot-tz.sh" "/usr/bin/tz"
 }
