@@ -47,9 +47,6 @@ _set_locale() {
         _dialog --menu "Select A System Wide Locale:" 18 35 12 ${_OTHER_LOCALES} 2>${_ANSWER} || abort
         _LOCALE=$(cat ${_ANSWER})
     fi
-    if [[ -n ${_LOCALE} ]]; then
-        _dialog --yesno "Do you want to use ${_LOCALE}.UTF-8 as System Wide Locale?" 5 60 || _LOCALE=""
-    fi
 }
 
 if [[ -e /tmp/.locale-running ]]; then
