@@ -80,7 +80,11 @@ _update_environment() {
                     _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     #shellcheck disable=SC2086
-                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    if [[ -z ${_DOTESTING} ]]; then
+                        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    else
+                        _ONLINE_KERNEL="$(pacman -Si testing/${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    fi
                 fi
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
                 sleep 2
