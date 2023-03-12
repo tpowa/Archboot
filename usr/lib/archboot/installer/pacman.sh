@@ -96,6 +96,10 @@ _update_environment() {
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 11 60 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                         clear
+                        echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
+                        echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
+                        echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
+                        echo -e "\e[1mRunning now: \e[92mupdate-installer -latest-install\e[m"
                         update-installer -latest-install
                     fi
                 fi
