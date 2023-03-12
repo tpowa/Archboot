@@ -88,7 +88,7 @@ _update_environment() {
                     _dialog --infobox "No new kernel online available.\nSkipping update environment.\nContinuing in 5 seconds..." 5 50
                     sleep 5
                 else
-                    _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 6 60 && _UPDATE_ENVIRONMENT=1
+                    _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 11 60 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                         clear
                         update-installer -latest-install
