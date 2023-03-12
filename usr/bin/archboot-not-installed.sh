@@ -9,10 +9,13 @@ rm -r /usr/share/licenses
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
 for i in $(cat packages.txt); do
-	rm -r /var/lib/pacman/local/$i*
-	if pacman -S $i --noconfirm &>>log.txt; then
-		echo $i >> uninstalled.txt
-	else
-	   pacman -S $i --noconfirm --overwrite '*'
-	fi
+    rm -r /var/lib/pacman/local/${i}*
+	#shellcheck disable=SC2086
+    if pacman -S ${i} --noconfirm &>>log.txt; then
+        echo "${i}" >> uninstalled.txt
+    else
+		#shellcheck disable=SC2086
+        pacman -S ${i} --noconfirm --overwrite '*'
+    fi
 done
+# vim: set ft=sh ts=4 sw=4 et:
