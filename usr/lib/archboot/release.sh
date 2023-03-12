@@ -127,6 +127,7 @@ _create_iso() {
             [[ "${initramfs}" == "${_INITRAMFS}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
+            #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=${_OSREL} --change-section-vma .osrel=$(printf 0x%x ${_OSREL_OFFS}) \
                 --add-section .cmdline=${_CMDLINE} --change-section-vma .cmdline=$(printf 0x%x ${_CMDLINE_OFFS}) \
                 --add-section .splash=${_SPLASH} --change-section-vma .splash=$(printf 0x%x ${_SPLASH_OFFS}) \
