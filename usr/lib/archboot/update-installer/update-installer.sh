@@ -358,21 +358,21 @@ _new_environment() {
     _ram_check
     mkdir ${_RAM}
     mount -t ramfs none ${_RAM}
+    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Skipping copying of kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    else
+        echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+        # use ramfs to get immediate free space on file deletion
+        mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    fi
     [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
-    echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
+    echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
     echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Skipping copying of kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-    else
-        echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-        # use ramfs to get immediate free space on file deletion
-        mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
-    fi
     echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
