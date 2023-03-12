@@ -68,6 +68,8 @@ _update_environment() {
         sleep 5
     else
         _UPDATE_ENVIRONMENT=""
+        _LOCAL_KERNEL=""
+        _ONLINE_KERNEL=""
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 _dialog --infobox "Refreshing package database..." 3 70
@@ -80,11 +82,13 @@ _update_environment() {
                     #shellcheck disable=SC2086
                     _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
-                    #shellcheck disable=SC2086
-                    if [[ -z ${_DOTESTING} ]]; then
-                        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-                    else
+                    if [[ -n "${_DOTESTING}" ]]; then
+                        #shellcheck disable=SC2086
                         _ONLINE_KERNEL="$(pacman -Si testing/${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    fi
+                    if [[ -z "${_ONLINE_KERNEL}" ]]; then
+                        #shellcheck disable=SC2086
+                        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                     fi
                 fi
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
