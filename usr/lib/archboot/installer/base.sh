@@ -328,6 +328,8 @@ _mainmenu() {
                 echo "If the installation finished successfully, you can now type 'reboot'"
                 echo "to restart the system."
                 echo ""
+            else
+                cat /etc/motd
             fi
             exit 0 ;;
         *)
