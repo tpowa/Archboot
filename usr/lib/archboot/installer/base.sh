@@ -323,7 +323,7 @@ _mainmenu() {
         "8")
             [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
             clear
-            if [[ "${_DESTDIR}" == "/install" ]]; then
+            if mountpoint -q /install; then
                 echo ""
                 echo "If the install finished successfully, you can now type 'reboot'"
                 echo "to restart the system."
