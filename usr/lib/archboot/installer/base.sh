@@ -325,7 +325,7 @@ _mainmenu() {
             clear
             if mountpoint -q /install; then
                 echo ""
-                echo "If the install finished successfully, you can now type 'reboot'"
+                echo "If the installation finished successfully, you can now type 'reboot'"
                 echo "to restart the system."
                 echo ""
             fi
