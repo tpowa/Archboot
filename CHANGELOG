@@ -12,7 +12,7 @@ Environment changes:
 - only use KEXEC_LOAD it's way faster, than KEXEC_FILE_LOAD
 - don't run kexec on local image, use systemd's switch_root instead
 - added archboot-locale script for system wide locale switching
-- readd kernel and /EFI to iso filesystem for virtualbox UEFI booting
+- readd kernel and /EFI to iso filesystem for virtualbox UEFI support
 update-installer.sh:
 - implemented free RAM detection for kexec tasks
 km:
