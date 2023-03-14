@@ -24,4 +24,4 @@ if [ $# -ne 2 ]; then
 fi
 _NEWMOUNTPOINT="${2}"
 _OLDMOUNTPOINT="${1}"
-tar -C "${_OLDMOUNTPOINT}" -clpf - . | tar -C "${_NEWMOUNTPOINT}" -vxlspf -
+tar -C "${_OLDMOUNTPOINT}" --hard-dereference -clpf - . | tar -C "${_NEWMOUNTPOINT}" -vxlspf -
