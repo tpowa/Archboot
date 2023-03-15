@@ -240,7 +240,7 @@ _create_initramfs() {
     # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
-    find . | LANG=C bsdcpio --quiet -o -H newc | zstd --rm -T0> ${_RAM}/${_INITRD} &
+    find . -mindepth 1 | cpio --reproducible --quiet -o -H newc | zstd --rm -T0> ${_RAM}/${_INITRD} &
     sleep 2
     while pgrep -x zstd &>/dev/null; do
         _clean_kernel_cache

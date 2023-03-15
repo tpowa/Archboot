@@ -199,14 +199,14 @@ _set_hostname() {
 
 # patch mkinitcpio to preserve permissions and use bsdcpio
 # Result is this code:
-#     find . | bsdcpio --quiet -o -H newc |
+#     find . | cpio --reproducible --quiet -o -H newc |
 #            $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout")
 #    pipeprogs=("find" "bsdcpio" "$compress")
 _fix_initramfs_permissions() {
     echo "Preserving permissions and bsdcpio usage in mkinitcpio run..."
-    sed -i -e 's#find . -mindepth 1 -printf .*#find . | LANG=C bsdcpio --quiet -o -H newc |#g' "${1}"/usr/bin/mkinitcpio
+    sed -i -e 's#find . -mindepth 1 -printf .*#find . -mindepth 1 | cpio --reproducible --quiet -o -H newc |#g' "${1}"/usr/bin/mkinitcpio
     sed -i -e '/sort -z |/d' "${1}"/usr/bin/mkinitcpio
     sed -i -e '/LANG=C bsdtar .*/d' "${1}"/usr/bin/mkinitcpio
-    sed -i -e 's#pipeprogs=.*#pipeprogs=\("find" "bsdcpio" "$compress"\)#g' "${1}"/usr/bin/mkinitcpio
+    sed -i -e 's#pipeprogs=.*#pipeprogs=\("find" "cpio" "$compress"\)#g' "${1}"/usr/bin/mkinitcpio
 }
 # vim: set ft=sh ts=4 sw=4 et:
