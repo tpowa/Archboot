@@ -204,7 +204,7 @@ _set_hostname() {
 #    pipeprogs=("find" "bsdcpio" "$compress")
 _fix_initramfs_permissions() {
     echo "Preserving permissions and bsdcpio usage in mkinitcpio run..."
-    sed -i -e 's#find . -mindepth 1 -printf .*#find . | bsdcpio --quiet -o -H newc |#g' "${1}"/usr/bin/mkinitcpio
+    sed -i -e 's#find . -mindepth 1 -printf .*#find . | LANG=C bsdcpio --quiet -o -H newc |#g' "${1}"/usr/bin/mkinitcpio
     sed -i -e '/sort -z |/d' "${1}"/usr/bin/mkinitcpio
     sed -i -e '/LANG=C bsdtar .*/d' "${1}"/usr/bin/mkinitcpio
     sed -i -e 's#pipeprogs=.*#pipeprogs=\("find" "bsdcpio" "$compress"\)#g' "${1}"/usr/bin/mkinitcpio
