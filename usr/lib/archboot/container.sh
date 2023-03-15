@@ -197,9 +197,16 @@ _set_hostname() {
     echo 'archboot' > "${1}/etc/hostname"
 }
 
-# patch mkinitcpio to preserve permissions
+# patch mkinitcpio to preserve permissions and use bsdcpio
+# Result is this code:
+#     find . | bsdcpio --quiet -o -H newc |
+#            $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout")
+#    pipeprogs=("find" "bsdcpio" "$compress")
 _fix_initramfs_permissions() {
-    echo "Preserving permissions in mkinitcpio run..."
-    sed -i -e 's#--uid 0 --gid 0 ##g' "${1}"/usr/bin/mkinitcpio
+    echo "Preserving permissions and bsdcpio usage in mkinitcpio run..."
+    sed -i -e 's#find . -mindepth 1 -printf .*#find . | bsdcpio --quiet -o -H newc |#g' "${1}"/usr/bin/mkinitcpio
+    sed -i -e '/sort -z |/d' "${1}"/usr/bin/mkinitcpio
+    sed -i -e '/LANG=C bsdtar .*/d' "${1}"/usr/bin/mkinitcpio
+    sed -i -e 's#pipeprogs=.*#pipeprogs=\("find" "bsdcpio" "$compress"\)#g' "${1}"/usr/bin/mkinitcpio
 }
 # vim: set ft=sh ts=4 sw=4 et:

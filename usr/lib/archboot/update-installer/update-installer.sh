@@ -237,12 +237,10 @@ _kver_generic() {
 }
 
 _create_initramfs() {
-    #from /usr/bin/mkinitcpio.conf
+    # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
-    find . -mindepth 1 -printf '%P\0' | sort -z |
-    LANG=C bsdtar --null -cnf - -T - |
-    LANG=C bsdtar --null -cf - --format=newc @- | zstd --rm -T0> ${_RAM}/${_INITRD} &
+    find . | bsdcpio --quiet -o -H newc | zstd --rm -T0> ${_RAM}/${_INITRD} &
     sleep 2
     while pgrep -x zstd &>/dev/null; do
         _clean_kernel_cache
