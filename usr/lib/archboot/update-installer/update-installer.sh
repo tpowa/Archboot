@@ -104,7 +104,7 @@ _download_latest() {
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
-        BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh locale.sh"
+        BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh locale.sh cpio,sh"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
             [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
@@ -370,7 +370,7 @@ _new_environment() {
     echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
     echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;mkinitcpio -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
     echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
