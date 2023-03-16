@@ -4,6 +4,7 @@
 # archbootcpio simplified and stripped down
 # Arch Linux mkinitcpio - modular tool for building an initramfs images
 # optimized for size and speed
+# by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
 
@@ -447,7 +448,7 @@ parseopts "$_opt_short" "${_opt_long[@]}" -- "$@" || exit 1
 set -- "${OPTRET[@]}"
 unset _opt_short _opt_long OPTRET
 
-if [[ -z "$@" ]]; then
+if [[ -z "$1" ]]; then
     usage
     cleanup 0
 fi
