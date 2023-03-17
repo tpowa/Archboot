@@ -191,10 +191,6 @@ add_binary() {
     while read -r line; do
         if [[ "$line" =~ $regex ]]; then
             sodep="${BASH_REMATCH[2]}"
-        elif [[ "$line" = *'not found' ]]; then
-            error "binary dependency '%s' not found for '%s'" "${line%% *}" "$1"
-            (( ++_builderrors ))
-            continue
         fi
 
         if [[ -f "$sodep" && ! -e "${BUILDROOT}${sodep}" ]]; then
