@@ -152,12 +152,14 @@ build_image() {
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
 
     # If this pipeline changes, |pipeprogs| below needs to be updated as well.
-    find . -mindepth 1 |
-        cpio --reproducible --quiet -o -H newc |
+    find . -mindepth 1 -printf '%P\0' |
+            sort -z |
+            LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
+            LANG=C bsdtar --null -cf - --format=newc @- |
             $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout"
 
     pipestatus=("${PIPESTATUS[@]}")
-    pipeprogs=('find' 'cpio' "$compress")
+    pipeprogs=('find' 'sort' 'bsdtar (step 1)' 'bsdtar (step 2)' "$compress")
 
     popd >/dev/null || return
 

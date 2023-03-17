@@ -15,6 +15,7 @@ add_firmware() {
         if ! compgen -G "${BUILDROOT}${fwpath}/${fw}"?(.*) &>/dev/null; then
             if fwfile="$(compgen -G "${fwpath}/${fw}"?(.*))"; then
                 add_file "$fwfile"
+                break
             fi
         fi
     done
