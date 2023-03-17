@@ -154,7 +154,7 @@ build_image() {
     # If this pipeline changes, |pipeprogs| below needs to be updated as well.
     find . -mindepth 1 -printf '%P\0' |
             sort -z |
-            LANG=C bsdtar --uid 0 --gid 0 --null -cnf - -T - |
+            LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
             $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout"
 
