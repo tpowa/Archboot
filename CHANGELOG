@@ -1,4 +1,6 @@
 On the road to 2023.04
+Environment changes:
+- switch to archboot-cpio.sh for image building
 ---
 2023.03 Highlights:
 - linux 6.2.x
