@@ -124,7 +124,7 @@ _create_iso() {
             [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /bin/bash -c "/usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
-                ${_UCODE} ${initramfs} --cmdline= ${_CMDLINE} --splash ${_SPLASH} \
+                ${_UCODE} ${initramfs} --cmdline= @${_CMDLINE} --splash ${_SPLASH} \
                 --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI}" || exit 1
         done
         # fix permission and timestamp
