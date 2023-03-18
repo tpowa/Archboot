@@ -205,6 +205,7 @@ build ()
     ### remove conflicting mkinitcpio files and grub
     rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
+        ${BUILDROOT}/usr/lib/systemd/ukify \
         ${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf \
         ${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio \
         ${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio \

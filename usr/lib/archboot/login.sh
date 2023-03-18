@@ -135,7 +135,7 @@ if ! [[ -e "/.clean-pacman-db" ]]; then
     _RM_PACMAN_DB="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
         libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
         libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap mtools \
-        libsysprof-capture libnsl libksba gdbm binutils cdrtools"
+        libsysprof-capture libnsl libksba gdbm binutils cdrtools systemd-ukify"
     for i in ${_RM_PACMAN_DB}; do
         rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
     done
