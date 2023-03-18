@@ -118,22 +118,14 @@ _create_iso() {
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
-        _OSREL_OFFS=$(${_NSPAWN} "${_W_DIR}" objdump -h "${_EFISTUB}" | awk 'NF==7 {size=strtonum("0x"$3); offset=strtonum("0x"$4)} END {print size + offset}')
-        _CMDLINE_OFFS=$((_OSREL_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_OSREL}")))
-        _SPLASH_OFFS=$((_CMDLINE_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_CMDLINE}")))
-        _KERNEL_OFFS=$((_SPLASH_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_SPLASH}")))
-        _INITRAMFS_OFFS=$((_KERNEL_OFFS + $(stat -Lc%s "${_W_DIR}"/"${_KERNEL_ARCHBOOT}")))
         for initramfs in ${_INITRAMFS} ${_INITRAMFS_LATEST} ${_INITRAMFS_LOCAL}; do
             [[ "${initramfs}" == "${_INITRAMFS}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
             [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" /bin/bash -c "objcopy -p --add-section .osrel=${_OSREL} --change-section-vma .osrel=$(printf 0x%x ${_OSREL_OFFS}) \
-                --add-section .cmdline=${_CMDLINE} --change-section-vma .cmdline=$(printf 0x%x ${_CMDLINE_OFFS}) \
-                --add-section .splash=${_SPLASH} --change-section-vma .splash=$(printf 0x%x ${_SPLASH_OFFS}) \
-                --add-section .linux=${_KERNEL_ARCHBOOT} --change-section-vma .linux=$(printf 0x%x ${_KERNEL_OFFS}) \
-                --add-section .initrd=<(cat ${_UCODE} ${initramfs}) \
-                --change-section-vma .initrd=$(printf 0x%x ${_INITRAMFS_OFFS}) ${_EFISTUB} ${_UKI}" || exit 1
+            ${_NSPAWN} "${_W_DIR}" /bin/bash -c "/usr/lib/systemd/ukify --linux ${_KERNEL_ARCHBOOT} \
+                --initrd ${_UCODE} ${initramfs} --cmdline ${_CMDLINE} --splash ${_SPLASH} --osrel ${_OSREL} \
+                --stub ${_EFISTUB} --output ${_UKI}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
