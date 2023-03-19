@@ -519,6 +519,7 @@ Type=oneshot
 ExecStart=/usr/bin/bash -c ". /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
 CONFEOF
     ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
+    ${_NSPAWN} /usr/bin/bash -c ". /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
     sleep 5
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
@@ -531,7 +532,7 @@ CONFEOF
         sleep 5
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error setting up Unified Kernel Image." 3 40
+        _dialog --msgbox "Error setting up Unified Kernel Image." 5 60
     fi
 }
 
@@ -906,7 +907,6 @@ _do_grub_uefi() {
         _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\nContinuing in 5 seconds..." 4 60
         sleep 5
         _S_BOOTLOADER=1
-
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _do_secureboot_keys || return 1
         _do_mok_sign
