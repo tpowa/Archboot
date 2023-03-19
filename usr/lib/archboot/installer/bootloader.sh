@@ -493,11 +493,10 @@ _do_uki_uefi() {
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
 echo "KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
 if [[ -n ${_UCODE} ]]; then
-    echo "INITRD=\"/boot/${_UCODE} /boot/${_INITRAMFS}\"" >> "${_DESTDIR}/etc/ukify.conf"
-else
-    echo "INITRD=/boot/${_INITRAMFS}" >> "${_DESTDIR}/etc/ukify.conf"
+    echo "UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
 fi
 cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
+INITRD=/boot/${_INITRAMFS}
 CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
@@ -519,7 +518,7 @@ Type=oneshot
 ExecStart=/usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
 CONFEOF
     ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
-    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
+    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${UCODE} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
     sleep 5
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
