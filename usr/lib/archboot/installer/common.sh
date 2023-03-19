@@ -5,7 +5,6 @@ _LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
 _RUNNING_ARCH="$(uname -m)"
 _KERNELPKG="linux"
 _NO_LOG="/dev/null"
-_NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 # use the first VT not dedicated to a running console
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
@@ -15,6 +14,7 @@ if grep -qw '^archboot' /etc/hostname; then
 else
     _DESTDIR="/"
 fi
+_NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 # name of the kernel image
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
