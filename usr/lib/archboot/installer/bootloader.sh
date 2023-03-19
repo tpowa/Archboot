@@ -516,10 +516,10 @@ CONFEOF
 Description=Run systemd ukify
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash -c ". /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
+ExecStart=/usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
 CONFEOF
     ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
-    ${_NSPAWN} /usr/bin/bash -c ". /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
+    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
     sleep 5
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
