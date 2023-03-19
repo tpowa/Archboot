@@ -500,7 +500,7 @@ fi
 cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
 CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
-EFI=${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
+EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 CONFEOF
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.path"
 [Unit]
