@@ -94,8 +94,8 @@ _create_iso() {
         echo "Generating Unified Kernel Images..."
         # create unified kernel image UKI, code adapted from wiki
         # https://wiki.archlinux.org/title/Unified_kernel_image
-        _SPLASH="usr/share/archboot/uki/archboot-background.bmp"
-        _OSREL="usr/share/archboot/base/etc/os-release"
+        _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
+        _OSREL="/usr/share/archboot/base/etc/os-release"
         # add AMD ucode license
         mkdir -p boot/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
@@ -104,17 +104,14 @@ _create_iso() {
             # add INTEL ucode license
             mkdir -p boot/licenses/intel-ucode
             cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
-            _EFISTUB="usr/lib/systemd/boot/efi/linuxx64.efi.stub"
+            _EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             echo "console=ttyS0,115200 console=tty0 audit=0" > ${_CMDLINE}
             _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
             echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
-            _EFISTUB="usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
+            _EFISTUB="/usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _UCODE="${_AMD_UCODE}"
-            # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
-            cp "${_W_DIR}/boot/Image" "boot/Image-archboot-${_ARCH}"
-            _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}"
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
