@@ -491,15 +491,15 @@ _do_uki_uefi() {
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-echo "KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
+echo "export KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
 if [[ -n ${_UCODE} ]]; then
-    echo "UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
+    echo "export UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
 fi
 cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
-INITRD=/boot/${_INITRAMFS}
-CMDLINE=/etc/kernel/cmdline
-SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
-EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
+export INITRD=/boot/${_INITRAMFS}
+export CMDLINE=/etc/kernel/cmdline
+export SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
+export EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 CONFEOF
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.path"
 [Unit]
