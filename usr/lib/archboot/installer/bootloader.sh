@@ -491,15 +491,16 @@ _do_uki_uefi() {
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-echo "export KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
+echo "KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
 if [[ -n ${_UCODE} ]]; then
-    echo "export UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
+    echo "UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
 fi
 cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
-export INITRD=/boot/${_INITRAMFS}
-export CMDLINE=/etc/kernel/cmdline
-export SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
-export EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
+INITRD=/boot/${_INITRAMFS}
+CMDLINE=/etc/kernel/cmdline
+SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
+EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
+/usr/lib/systemd/ukify ${KERNEL} ${UCODE} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}
 CONFEOF
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.path"
 [Unit]
@@ -515,10 +516,10 @@ CONFEOF
 Description=Run systemd ukify
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
+ExecStart="/usr/bin/bash -c source /etc/ukify.conf"
 CONFEOF
     ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
-    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${UCODE} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}" >${_LOG}
+    ${_NSPAWN} /usr/bin/bash -c source /etc/ukify.conf >${_LOG}
     sleep 5
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
