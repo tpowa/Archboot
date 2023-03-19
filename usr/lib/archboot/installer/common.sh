@@ -11,10 +11,11 @@ _NO_LOG="/dev/null"
 # don't ask for source and network on booted system
 if grep -qw '^archboot' /etc/hostname; then
     _DESTDIR="/install"
+    _NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 else
     _DESTDIR="/"
+    _NSPAWN=""
 fi
-_NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 # name of the kernel image
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -140,10 +141,6 @@ _auto_packages() {
 # /etc/locale.gen
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 _locale_gen() {
-    if [[ "${_DESTDIR}" == "/" ]]; then
-        locale-gen &>"${_NO_LOG}"
-    else
-        ${_NSPAWN} locale-gen &>"${_NO_LOG}"
-    fi
+    ${_NSPAWN} locale-gen &>"${_NO_LOG}"
 }
 # vim: set ft=sh ts=4 sw=4 et:

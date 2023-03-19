@@ -256,13 +256,8 @@ _do_mok_sign () {
     _SIGN_MOK=""
     _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK=1
     if [[ -n "${_SIGN_MOK}" ]]; then
-        if [[ "${_DESTDIR}" == "/install" ]]; then
-            ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
-            ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-        else
-            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
-            sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-        fi
+        ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
+        ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
         _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nbeen signed successfully.\nContinuing in 5 seconds..." 6 60
         sleep 5
     fi
@@ -370,11 +365,7 @@ CONFEOF
             echo "ExecStart=/usr/bin/cp -f /boot/${_UCODE} /${_UEFISYS_MP}/${_INITRD_UCODE}" \
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         fi
-        if [[ "${_DESTDIR}" == "/install" ]]; then
-            ${_NSPAWN} systemctl enable efistub_copy.path &>"${_NO_LOG}"
-        else
-            systemctl enable efistub_copy.path &>"${_NO_LOG}"
-        fi
+        ${_NSPAWN} systemctl enable efistub_copy.path &>"${_NO_LOG}"
         sleep 5
     fi
     # reset _VMLINUZ on aarch64
@@ -527,11 +518,7 @@ Description=Run systemd ukify
 Type=oneshot
 ExecStart=/usr/bin/bash -c ". /etc/ukify.conf;/usr/lib/systemd/ukify ${KERNEL} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}"
 CONFEOF
-    if [[ "${_DESTDIR}" == "/install" ]]; then
-        ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
-    else
-        systemctl enable ukify.path &>"${_NO_LOG}"
-    fi
+    ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
     sleep 5
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
@@ -903,17 +890,10 @@ _do_grub_uefi() {
         ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
         # add -v for verbose
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-                if [[ "${_DESTDIR}" == "/install" ]]; then
-                    ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-                else
-                    grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-                fi
+            ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-                if [[ "${_DESTDIR}" == "/install" ]]; then
-                    ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+            ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
                 else
-                    grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-                fi
         fi
         cp /"${_GRUB_PREFIX_DIR}"/"${_GRUB_CFG}" "${_UEFISYS_MP}"/EFI/BOOT/grub"${_SPEC_UEFI_ARCH}".cfg
     fi
