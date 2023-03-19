@@ -489,6 +489,7 @@ _do_uki_uefi() {
         _run_pacman
     fi
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
+    _SPLASH="/usr/share/systemd/bootctl/splash-arch.bmp"
     _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
 echo "KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
