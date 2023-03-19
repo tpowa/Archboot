@@ -498,7 +498,7 @@ else
     echo "INITRD=/boot/${_INITRAMFS}" >> "${_DESTDIR}/etc/ukify.conf"
 fi
 cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
-CMDLINE=${_CMDLINE}
+CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 CONFEOF
