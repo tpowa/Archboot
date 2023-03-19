@@ -500,7 +500,7 @@ INITRD=/boot/${_INITRAMFS}
 CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
-/usr/lib/systemd/ukify ${KERNEL} ${UCODE} ${INITRD} --cmdline @${CMDLINE} --splash ${SPLASH} --output ${EFI}
+/usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}
 CONFEOF
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.path"
 [Unit]
