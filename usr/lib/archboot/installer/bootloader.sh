@@ -507,6 +507,7 @@ CONFEOF
 Description=Run systemd ukify
 [Path]
 PathChanged=/boot/${_INITRAMFS}
+PathChanged=/boot/${_UCODE}
 Unit=run_ukify.service
 [Install]
 WantedBy=multi-user.target
