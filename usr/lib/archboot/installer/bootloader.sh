@@ -502,21 +502,21 @@ SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 /usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}
 CONFEOF
-    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.path"
+    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
 [Path]
 PathChanged=/boot/${_INITRAMFS}
-Unit=ukify.service
+Unit=run_ukify.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/ukify.service"
+    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
 [Unit]
 Description=Run systemd ukify
 [Service]
 Type=oneshot
-ExecStart='/usr/bin/bash -c "source /etc/ukify.conf"'
+ExecStart=/usr/bin/bash -c "source /etc/ukify.conf"
 CONFEOF
     ${_NSPAWN} systemctl enable ukify.path &>"${_NO_LOG}"
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
