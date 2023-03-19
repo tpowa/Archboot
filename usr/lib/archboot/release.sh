@@ -125,7 +125,7 @@ _create_iso() {
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
                 ${_UCODE} ${initramfs} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
-                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} || exit 1
+                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>/dev/null || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
