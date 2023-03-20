@@ -5,7 +5,8 @@ Environment changes:
 setup:
 - enable FIRMARE bootloader option for aarch64 architecture
 - use ukify script for FIRMWARE bootloader support
-- enable automatic UKI building as systemd service on installed system
+- edit /etc/kernel/cmdline and /etc/ukify.conf before UKI creation
+- enable automatic UKI building as run_ukify.service on installed system
 ---
 2023.03 Highlights:
 - linux 6.2.x
