@@ -366,7 +366,7 @@ CONFEOF
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         fi
         ${_NSPAWN} systemctl enable efistub_copy.path &>"${_NO_LOG}"
-        sleep 5
+        sleep 2
     fi
     # reset _VMLINUZ on aarch64
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -488,21 +488,31 @@ _do_uki_uefi() {
         _PACKAGES="systemd-ukify"
         _run_pacman
     fi
+    _UKIFY_CONFIG="${_DESTDIR}/etc/ukify.conf"
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
-    _dialog --infobox "Setting up Unified Kernel Image now. This needs some time..." 3 70
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-echo "KERNEL=/boot/${_VMLINUZ}" > "${_DESTDIR}/etc/ukify.conf"
-if [[ -n ${_UCODE} ]]; then
-    echo "UCODE=/boot/${_UCODE}" >> "${_DESTDIR}/etc/ukify.conf"
-fi
-cat << CONFEOF >> "${_DESTDIR}/etc/ukify.conf"
+    echo "KERNEL=/boot/${_VMLINUZ}" > "${_UKIFY_CONFIG}"
+    if [[ -n ${_UCODE} ]]; then
+        echo "UCODE=/boot/${_UCODE}" >> "${_UKIFY_CONFIG}"
+    fi
+    cat << CONFEOF >> "${_UKIFY_CONFIG}"
 INITRD=/boot/${_INITRAMFS}
 CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 /usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}
 CONFEOF
-    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
+    mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
+    _geteditor || return 1
+    "${_EDITOR}" "${_CMDLINE}"
+    "${_EDITOR}" "${_UKIFY_CONFIG}"
+
+    _dialog --infobox "Setting up Unified Kernel Image now.." 3 70
+    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >${_LOG}
+    sleep 2
+    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
+        _dialog --infobox "Enable automatic UKI creation \non EFI SYSTEM PARTITION (ESP) on installed system..." 3 70
+        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
 [Path]
@@ -512,18 +522,15 @@ Unit=run_ukify.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
+        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
 [Unit]
 Description=Run systemd ukify
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/bash -c "source /etc/ukify.conf"
 CONFEOF
-    ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
-    mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
-    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >${_LOG}
-    sleep 5
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
+        ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
+        sleep 2
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
         _BOOTMGR_LOADER_PATH="/EFI/Linux/archlinux-linux.efi"
         _do_uefi_bootmgr_setup
@@ -534,7 +541,7 @@ CONFEOF
         sleep 5
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error setting up Unified Kernel Image." 5 60
+        _dialog --msgbox "Error: Setting up Unified Kernel Image failed!" 5 60
     fi
 }
 
