@@ -1,10 +1,11 @@
 On the road to 2023.04
 Environment changes:
 - switch to archboot-cpio.sh for image building
-- switch to systemd ukify for UKI creation
+- switch to ukify script for UKI creation
 setup:
-- use systemd ukify for FIRMWARE bootloader support
 - enable FIRMARE bootloader option for aarch64 architecture
+- use ukify script for FIRMWARE bootloader support
+- enable automatic UKI building as systemd service on installed system
 ---
 2023.03 Highlights:
 - linux 6.2.x
