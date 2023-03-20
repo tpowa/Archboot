@@ -530,7 +530,7 @@ Type=oneshot
 ExecStart=/usr/bin/bash -c "source /etc/ukify.conf"
 CONFEOF
         ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
-        sleep 2
+        sleep 3
         _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
         _BOOTMGR_LOADER_PATH="/EFI/Linux/archlinux-linux.efi"
         _do_uefi_bootmgr_setup
