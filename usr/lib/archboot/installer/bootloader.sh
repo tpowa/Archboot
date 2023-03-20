@@ -507,11 +507,11 @@ CONFEOF
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
 
-    _dialog --infobox "Setting up Unified Kernel Image now.." 3 70
+    _dialog --infobox "Setting up Unified Kernel Image ..." 3 60
     ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >${_LOG}
     sleep 2
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
-        _dialog --infobox "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..." 4 70
+        _dialog --infobox "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..." 4 60
         cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
