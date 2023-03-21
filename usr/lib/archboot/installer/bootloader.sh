@@ -307,6 +307,7 @@ _do_efistub_parameters() {
     fi
     _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
         _KERNEL="${_VMLINUZ}"
         if [[ -n "${_UCODE}" ]]; then
