@@ -20,8 +20,6 @@ fi
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _VMLINUZ="Image.gz"
-    #shellcheck disable=SC2034
-    _VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
 _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
