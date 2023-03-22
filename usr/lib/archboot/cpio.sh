@@ -7,14 +7,17 @@ add_firmware() {
     # add a firmware file to the image.
     #   $1: firmware path fragment
 
-    local fw fwpath fwfile
+    local fw fwpath
+    local -a fwfile
+    local -i r=1
+
     fwpath=/lib/firmware
 
     for fw; do
         # shellcheck disable=SC2154
-        if ! compgen -G "${BUILDROOT}${fwpath}/${fw}"?(.*) &>/dev/null; then
-            if fwfile="$(compgen -G "${fwpath}/${fw}"?(.*))"; then
-                add_file "$fwfile"
+        if ! compgen -G "${BUILDROOT}${fwpath}/${fw}?(.*)" &>/dev/null; then
+            if read -r fwfile < <(compgen -G "${fwpath}/${fw}?(.*)"); then
+                map add_file "${fwfile[@]}"
                 break
             fi
         fi
