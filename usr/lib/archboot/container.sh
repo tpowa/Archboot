@@ -125,6 +125,7 @@ _create_pacman_conf() {
         echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
         echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
+        echo "Color" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename "${_PACMAN_CONF}")"
@@ -134,6 +135,7 @@ _create_pacman_conf() {
 _change_pacman_conf() {
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
+    sed -i -e 's:^#Color:Color:g' "${1}"/etc/pacman.conf
 }
 
 # umount special filesystems
