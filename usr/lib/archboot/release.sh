@@ -107,7 +107,6 @@ _create_iso() {
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             echo "console=ttyS0,115200 console=tty0 audit=0" > ${_CMDLINE}
             _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
-            _UNAME=""
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
             echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0" > ${_CMDLINE}
@@ -116,7 +115,6 @@ _create_iso() {
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
             cp "${_W_DIR}/boot/Image" "boot/Image-archboot-${_ARCH}"
             _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}"
-            _UNAME="--uname=''"
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
@@ -127,7 +125,7 @@ _create_iso() {
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
                 ${_UCODE} ${initramfs} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
-                --os-release @${_OSREL} --stub ${_EFISTUB} ${_UNAME} --output ${_UKI} &>/dev/null || exit 1
+                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>/dev/null || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./

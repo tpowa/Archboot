@@ -501,12 +501,7 @@ CMDLINE=/etc/kernel/cmdline
 SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
 EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 CONFEOF
-# UNAME detection fails on aarch64, keep it empty until fixed upstream
-if [[ ${_RUNNING_ARCH} == aarch64 ]]; then
-    echo "/usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --uname='' --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}" >> "${_UKIFY_CONFIG}"
-else
     echo "/usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}" >> "${_UKIFY_CONFIG}"
-fi
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
