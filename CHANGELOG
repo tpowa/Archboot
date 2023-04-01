@@ -2,8 +2,9 @@ On the road to 2023.04
 Environment changes:
 - switch to archboot-cpio.sh for image building
 - switch to ukify script for UKI creation
+- enable colors in pacman
 setup:
-- enable FIRMARE bootloader option for aarch64 architecture
+- enable FIRMWARE bootloader option for aarch64 architecture
 - use ukify script for FIRMWARE bootloader support
 - edit /etc/kernel/cmdline and /etc/ukify.conf before UKI creation
 - enable automatic UKI building as run_ukify.service on installed system
