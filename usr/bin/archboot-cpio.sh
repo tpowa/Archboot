@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# archbootcpio simplified and stripped down
+# archboot-cpio.sh:
+# simplified, stripped down, optimized for size and speed
 # Arch Linux mkinitcpio - modular tool for building an initramfs images
-# optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
@@ -393,7 +393,7 @@ ldconfig -r "$BUILDROOT" &>/dev/null
 # remove /var/cache/ldconfig/aux-cache for reproducability
 rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
 
-# Set umask to create initramfs images and unified kernel images as 600
+# Set umask to create initramfs images as 600
 umask 077
 
 if [[ -n "$_optgenimg" ]]; then
