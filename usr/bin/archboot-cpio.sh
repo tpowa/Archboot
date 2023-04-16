@@ -22,7 +22,6 @@ _optgenimg=''
 _opttargetdir=''
 _optosrelease=''
 _optquiet=1 _optcolor=1
-_hooks=("${HOOKS[@]}")
 declare -A  _addedmodules _modpaths
 
 # Sanitize environment further
@@ -250,6 +249,8 @@ BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
 ! . "$_f_config" 2>/dev/null && die "Failed to read configuration '%s'" "$_f_config"
 
 arrayize_config
+
+_hooks=("${HOOKS[@]}")
 
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
