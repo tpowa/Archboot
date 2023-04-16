@@ -288,16 +288,6 @@ map() {
     return "$r"
 }
 
-arrayize_config() {
-    set -f
-    [[ ${MODULES@a} != *a* ]] && IFS=' ' read -r -a MODULES <<< "$MODULES"
-    [[ ${BINARIES@a} != *a* ]] && IFS=' ' read -r -a BINARIES <<< "$BINARIES"
-    [[ ${FILES@a} != *a* ]] && IFS=' ' read -r -a FILES <<< "$FILES"
-    [[ ${HOOKS@a} != *a* ]] && IFS=' ' read -r -a HOOKS <<< "$HOOKS"
-    [[ ${COMPRESSION_OPTIONS@a} != *a* ]] && IFS=' ' read -r -a COMPRESSION_OPTIONS <<< "$COMPRESSION_OPTIONS"
-    set +f
-}
-
 modprobe() {
     # _optmoduleroot is assigned in mkinitcpio
     # shellcheck disable=SC2154
@@ -503,41 +493,6 @@ add_binary() {
     done <<< "$lddout"
 
     return 0
-}
-
-parse_config() {
-    # parse key global variables set by the config file.
-
-    map add_module "${MODULES[@]}"
-    map add_binary "${BINARIES[@]}"
-    map add_file "${FILES[@]}"
-
-    tee "$BUILDROOT/buildconfig" < "$1" | {
-        # When MODULES is not an array (but instead implicitly converted at
-        # startup), sourcing the config causes the string value of MODULES
-        # to be assigned as MODULES[0]. Avoid this by explicitly unsetting
-        # MODULES before re-sourcing the config.
-        unset MODULES
-
-        # shellcheck disable=SC1091
-        . /dev/stdin
-
-        # arrayize MODULES if necessary.
-        [[ ${MODULES@a} != *a* ]] && read -ra MODULES <<<"${MODULES//-/_}"
-
-        for mod in "${MODULES[@]%\?}"; do
-            mod="${mod//-/_}"
-            # only add real modules (2 == builtin)
-            (( _addedmodules["$mod"] == 1 )) && add+=("$mod")
-        done
-        (( ${#add[*]} )) && printf 'MODULES="%s"\n' "${add[*]}"
-
-        printf '%s="%s"\n' \
-            'EARLYHOOKS' "${_runhooks['early']# }" \
-            'HOOKS' "${_runhooks['hooks']# }" \
-            'LATEHOOKS' "${_runhooks['late']# }" \
-            'CLEANUPHOOKS' "${_runhooks['cleanup']% }"
-    } >"$BUILDROOT/config"
 }
 
 initialize_buildroot() {
