@@ -246,8 +246,6 @@ BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
 # shellcheck source=mkinitcpio.conf
 ! . "$_f_config" 2>/dev/null && die "Failed to read configuration '%s'" "$_f_config"
 
-arrayize_config
-
 _hooks=("${HOOKS[@]}")
 
 if (( ${#_hooks[*]} == 0 )); then
