@@ -16,17 +16,14 @@ _f_functions_overwrite=/usr/lib/archboot/cpio.sh
 _f_config=
 _d_hooks=/lib/initcpio/hooks
 _d_install=/lib/initcpio/install
-_d_flag_hooks=
-_d_flag_install=
 
 # options and runtime data
-_optmoduleroot='' _optgenimg=''
-_optcompress='' _opttargetdir=''
+_optgenimg=''
+_opttargetdir=''
 _optosrelease=''
-_optsavetree=0
 _optquiet=1 _optcolor=1
-_optaddhooks=() _hooks=()  _tmpfiles=()
-declare -A _runhooks _addedmodules _modpaths _autodetect_cache
+_hooks=("${HOOKS[@]}")
+declare -A  _addedmodules _modpaths
 
 # Sanitize environment further
 # GREP_OPTIONS="--color=always" will break everything
@@ -39,17 +36,11 @@ usage() {
 usage: ${0##*/} [options]
 
   Options:
-   -A, --addhooks <hooks>       Add specified hooks, comma separated, to image
    -c, --config <config>        Use config file
    -g, --generate <path>        Generate cpio image and write to specified path
    -h, --help                   Display this message and exit
-   -k, --kernel <kernelver>     Use specified kernel version (default: $(uname -r))
-   -r, --moduleroot <dir>       Root directory for modules (default: /)
-   -s, --save                   Save build directory. (default: no)
+   -k, --kernel <kernel>        Use specified kernel
    -d, --generatedir <dir>      Write generated image into <dir>
-   -t, --builddir <dir>         Use DIR as the temporary build directory
-   -D, --hookdir <dir>          Specify where to look for hooks
-   -z, --compress <program>     Use an alternate compressor on the image (cat, xz, lz4, zstd)
 EOF
 }
 
@@ -57,30 +48,14 @@ EOF
 # shellcheck disable=SC2317
 cleanup() {
     local err="${1:-$?}"
-
-    if (( ${#_tmpfiles[@]} )); then
-        rm -f -- "${_tmpfiles[@]}"
-    fi
     if [[ -n "$_d_workdir" ]]; then
-        # when _optpreset is set, we're in the main loop, not a worker process
-        if (( _optsavetree )) && [[ -z ${_optpreset[*]} ]]; then
-            printf '%s\n' "${!_autodetect_cache[@]}" > "$_d_workdir/autodetect_modules"
-            msg "build directory saved in '%s'" "$_d_workdir"
-        else
-            rm -rf -- "$_d_workdir"
-        fi
+        rm -rf -- "$_d_workdir"
     fi
-
     exit "$err"
 }
 
 resolve_kernver() {
-    local kernel="$1" arch=''
-
-    if [[ -z "$kernel" ]]; then
-        uname -r
-        return 0
-    fi
+    local kernel="$1"
 
     if [[ "${kernel:0:1}" != / ]]; then
         echo "$kernel"
@@ -96,21 +71,7 @@ resolve_kernver() {
 
     error "invalid kernel specified: '%s'" "$1"
 
-    arch="$(uname -m)"
-    if [[ "$arch" != @(i?86|x86_64) ]]; then
-        error "kernel version extraction from image not supported for '%s' architecture" "$arch"
-        error "there's a chance the generic version extractor may work with a valid uncompressed kernel image"
-    fi
-
     return 1
-}
-
-compute_hookset() {
-    local h
-
-    for h in "${HOOKS[@]}" "${_optaddhooks[@]}"; do
-        _hooks+=("$h")
-    done
 }
 
 build_image() {
@@ -188,11 +149,6 @@ build_image() {
     fi
 }
 
-process_preset() (
-    . "$1" || die "Failed to load preset: \`%s'" "$1"
-    exit 0
-)
-
 preload_builtin_modules() {
     local modname field value
     local -a path
@@ -223,12 +179,10 @@ preload_builtin_modules() {
 . "$_f_functions"
 . "$_f_functions_overwrite"
 
-trap 'cleanup' EXIT
-
-_opt_short='A:c:D:g:H:hk:nLMPp:Rr:S:sd:t:U:Vvz:'
-_opt_long=('add:' 'addhooks:' 'config:' 'generate:' 'hookdir': 'help'
-          'kernel:' 'listhooks' 'moduleroot:' 'nocolor'
-          'save' 'generatedir:' 'builddir:' 'compress:'
+_opt_short='c:d:g:hk:'
+_opt_long=('config:' 'generate:' 'help'
+          'kernel:'
+          'generatedir:'
           'osrelease:')
 
 parseopts "$_opt_short" "${_opt_long[@]}" -- "$@" || exit 1
@@ -242,13 +196,6 @@ fi
 
 while :; do
     case "$1" in
-        # --add remains for backwards compat
-        -A|--add|--addhooks)
-            shift
-            IFS=, read -r -a add <<< "$1"
-            _optaddhooks+=("${add[@]}")
-            unset add
-            ;;
         -c|--config)
             shift
             _f_config="$1"
@@ -256,9 +203,6 @@ while :; do
         -k|--kernel)
             shift
             KERNELVERSION="$1"
-            ;;
-        -s|--save)
-            _optsavetree=1
             ;;
         -d|--generatedir)
             shift
@@ -275,23 +219,6 @@ while :; do
             usage
             cleanup 0
             ;;
-        -t|--builddir)
-            shift
-            export TMPDIR="$1"
-            ;;
-        -z|--compress)
-            shift
-            _optcompress="$1"
-            ;;
-        -r|--moduleroot)
-            shift
-            _optmoduleroot="$1"
-            ;;
-        -D|--hookdir)
-            shift
-            _d_flag_hooks+="$1/hooks:"
-            _d_flag_install+="$1/install:"
-            ;;
         --)
             shift
             break 2
@@ -304,26 +231,15 @@ if [[ -t 1 ]] && (( _optcolor )); then
     try_enable_color
 fi
 
-if [[ -n "$_d_flag_hooks" && -n "$_d_flag_install" ]]; then
-    _d_hooks="${_d_flag_hooks%:}"
-    _d_install="${_d_flag_install%:}"
-fi
-
 # insist that /proc and /dev be mounted (important for chroots)
 # NOTE: avoid using mountpoint for this -- look for the paths that we actually
 # use in mkinitcpio. Avoids issues like FS#26344.
 [[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
 
-# use preset $_optpreset (exits after processing)
-if (( ${#_optpreset[*]} )); then
-    map process_preset "${_optpreset[@]}"
-    exit
-fi
-
 if [[ "$KERNELVERSION" != 'none' ]]; then
     KERNELVERSION="$(resolve_kernver "$KERNELVERSION")" || exit 1
-    _d_kmoduledir="$_optmoduleroot/lib/modules/$KERNELVERSION"
+    _d_kmoduledir="/lib/modules/$KERNELVERSION"
     [[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
 fi
 
@@ -334,10 +250,6 @@ BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
 ! . "$_f_config" 2>/dev/null && die "Failed to read configuration '%s'" "$_f_config"
 
 arrayize_config
-
-# after returning, hooks are populated into the array '_hooks'
-# HOOKS should not be referenced from here on
-compute_hookset
 
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
@@ -351,12 +263,6 @@ if [[ -n "$_optgenimg" ]]; then
         die "Unable to write to '%s'" "$_optgenimg"
     fi
 
-    _optcompress="${_optcompress:-"${COMPRESSION:-zstd}"}"
-    if ! type -P "$_optcompress" >/dev/null; then
-        warning "Unable to locate compression method: '%s'" "$_optcompress"
-        _optcompress='cat'
-    fi
-
     msg "Starting build: '%s'" "$KERNELVERSION"
 elif [[ -n "$_opttargetdir" ]]; then
     msg "Starting build: '%s'" "$KERNELVERSION"
@@ -366,8 +272,6 @@ fi
 
 # set functrace and trap to catch errors in add_* functions
 declare -i _builderrors=0
-set -o functrace
-trap '(( $? )) && [[ "$FUNCNAME" == add_* ]] && (( ++_builderrors ))' RETURN
 
 preload_builtin_modules
 
@@ -376,17 +280,7 @@ map run_build_hook "${_hooks[@]}" || (( ++_builderrors ))
 # process config file
 parse_config "$_f_config"
 
-# switch out the error handler to catch all errors
-trap -- RETURN
-trap '(( ++_builderrors ))' ERR
-set -o errtrace
-
 install_modules "${!_modpaths[@]}"
-
-# unset errtrace and trap
-set +o functrace
-set +o errtrace
-trap -- ERR
 
 # this is simply a nice-to-have -- it doesn't matter if it fails.
 ldconfig -r "$BUILDROOT" &>/dev/null
@@ -397,7 +291,7 @@ rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
 umask 077
 
 if [[ -n "$_optgenimg" ]]; then
-    build_image "$_optgenimg" "$_optcompress" || exit 1
+    build_image "$_optgenimg" || exit 1
 elif [[ -n "$_opttargetdir" ]]; then
     msg "Build complete."
 else
