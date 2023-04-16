@@ -11,8 +11,7 @@ shopt -s extglob
 ### globals within mkinitcpio, but not intended to be used by hooks
 
 # needed files/directories
-_f_functions=/usr/lib/initcpio/functions
-_f_functions_overwrite=/usr/lib/archboot/cpio.sh
+_f_functions=/usr/lib/archboot/cpio.sh
 _f_config=
 _d_hooks=/lib/initcpio/hooks
 _d_install=/lib/initcpio/install
@@ -176,7 +175,6 @@ preload_builtin_modules() {
 
 # shellcheck source=functions
 . "$_f_functions"
-. "$_f_functions_overwrite"
 
 _opt_short='c:d:g:hk:'
 _opt_long=('config:' 'generate:' 'help'
@@ -277,9 +275,6 @@ declare -i _builderrors=0
 preload_builtin_modules
 
 map run_build_hook "${_hooks[@]}" || (( ++_builderrors ))
-
-# process config file
-parse_config "$_f_config"
 
 install_modules "${!_modpaths[@]}"
 
