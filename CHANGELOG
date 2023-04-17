@@ -1,6 +1,6 @@
 On the road to 2023.04
 Environment changes:
-- switch to archboot-cpio.sh for image building
+- switch to archboot-cpio.sh for image/initramfs building
 - switch to ukify script for UKI creation
 - enable colors in pacman
 setup:
