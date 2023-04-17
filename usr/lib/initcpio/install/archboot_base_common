@@ -26,10 +26,10 @@ build ()
     add_full_dir /usr/share/nano
     add_file /etc/nanorc
     # add syntax highlighting
-    echo "include \"/usr/share/nano/*.nanorc\"" >> "$BUILDROOT/etc/nanorc"
+    echo "include \"/usr/share/nano/*.nanorc\"" >> "${BUILDROOT}/etc/nanorc"
 
     ### add machine-id
-    touch "$BUILDROOT/etc/machine-id"
+    touch "${BUILDROOT}/etc/machine-id"
 
     ### add file magic file
     add_file /usr/share/file/misc/magic.mgc
@@ -71,7 +71,7 @@ build ()
     # only support UTF-8
     add_file /usr/share/i18n/charmaps/UTF-8.gz
     # remove conflicting files from not installed packages: binutils, grub and gdbm
-    find $BUILDROOT/usr/share/locale/ -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
+    find ${BUILDROOT}/usr/share/locale/ -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
         -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
         -o -name 'opcodes*' \) -delete
 
@@ -89,7 +89,7 @@ build ()
         add_file  "/etc/skel/${i}" "/root/${i}"
     done
     # add custom bash options
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "$BUILDROOT/root/.bashrc"
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${BUILDROOT}/root/.bashrc"
     # add /etc/skel
     add_full_dir /etc/skel
     ### add kmod related config file(s)
@@ -152,7 +152,7 @@ build ()
     map add_file "/usr/lib/libnss_compat.so.2" "/usr/lib/libnsl.so.1"
     ## fix for systemd >=245 set default.target
     # remove initrd-release to allow normal systemd boot without initrd.target
-    rm -f $BUILDROOT/etc/initrd-release
+    rm -f ${BUILDROOT}/etc/initrd-release
     add_symlink "/etc/systemd/system/default.target" "/usr/lib/systemd/system/multi-user.target"
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
