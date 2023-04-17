@@ -29,7 +29,7 @@ build ()
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${BUILDROOT}/etc/nanorc"
 
     ### add machine-id
-    touch "${BUILDROOT}/etc/machine-id"
+    : > "${BUILDROOT}/etc/machine-id"
 
     ### add file magic file
     add_file /usr/share/file/misc/magic.mgc
