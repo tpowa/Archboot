@@ -386,19 +386,15 @@ initialize_buildroot() {
     # mount tables
     ln -s ../proc/self/mounts "$buildroot/etc/mtab"
     : >"$buildroot/etc/fstab"
-    # add os-release and initrd-release for systemd
+    # add os-release for systemd
     if [[ -e /etc/os-release ]]; then
         if [[ -L /etc/os-release ]]; then
             osreleasefile="$(realpath -- /etc/os-release)"
             install -Dm0644 "$osreleasefile" "${buildroot}${osreleasefile}"
             cp -adT /etc/os-release "${buildroot}/etc/os-release"
-            cp -adT /etc/os-release "${buildroot}/etc/initrd-release"
         else
             install -Dm0644 /etc/os-release "${buildroot}/etc/os-release"
-            ln -sT os-release "${buildroot}/etc/initrd-release"
         fi
-    else
-        : >"$buildroot/etc/initrd-release"
     fi
     # add a blank ld.so.conf to keep ldconfig happy
     : >"$buildroot/etc/ld.so.conf"
