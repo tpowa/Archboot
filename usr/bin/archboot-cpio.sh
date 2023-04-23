@@ -26,8 +26,9 @@ unset GREP_OPTIONS CDPATH "${!LIBMOUNT_@}"
 
 usage() {
     cat <<EOF
-Simplified, stripped down, optimized for size and speed
-Arch Linux mkinitcpio - modular tool for building initramfs images
+ARCHBOOT CPIO
+-------------
+Tool for creating archboot initramfs images.
 
 -c <config>      Use config file
 -g <path>        Generate cpio image and write to specified path
