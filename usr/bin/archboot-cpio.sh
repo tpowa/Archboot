@@ -147,16 +147,21 @@ preload_builtin_modules() {
     fi
 }
 
+if [[ -z "$1" ]]; then
+    usage
+    cleanup 0
+fi
+### check for root
+if ! [[ ${UID} -eq 0 ]]; then
+    echo "ERROR: Please run as root user!"
+    exit 1
+fi
 # shellcheck source=functions
 . "$_f_functions"
 _opt_short='c:d:g:hk:'
 parseopts "$_opt_short" -- "$@" || exit 1
 set -- "${OPTRET[@]}"
 unset _opt_short OPTRET
-if [[ -z "$1" ]]; then
-    usage
-    cleanup 0
-fi
 while :; do
     case "$1" in
         -c|--config)
