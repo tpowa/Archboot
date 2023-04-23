@@ -8,7 +8,7 @@ _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"
     echo "-----------------------------"
     echo "This will create an archboot repository for an archboot image."
-    echo "Usage: ${_BASENAME} <directory>"
+    echo "usage: ${_BASENAME} <directory>"
     exit 0
 }
 

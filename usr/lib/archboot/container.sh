@@ -7,7 +7,7 @@ _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
     echo "-----------------------------"
     echo "This will create an archboot container for an archboot image."
-    echo "Usage: ${_BASENAME} <directory> <options>"
+    echo "usage: ${_BASENAME} <directory> <options>"
     echo " Options:"
     echo "  -cc    Cleanup container eg. removing manpages, includes..."
     echo "  -cp    Cleanup container package cache"
