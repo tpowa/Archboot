@@ -1,4 +1,7 @@
-On the road to 2023.04
+On the road to 2023.05
+---
+2023.04 Highllights:
+- grub 2.06.r499.ge67a551a4-1
 Environment changes:
 - switch to archboot-cpio.sh for image/initramfs building
 - switch to ukify script for UKI creation

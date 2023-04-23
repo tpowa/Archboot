@@ -4,7 +4,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
-_APPNAME=$(basename "${0}")
+_APPNAME=${0##*/}
 _usage()
 {
     echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m\e[1m - RSYNC BACKUP:\e[m"

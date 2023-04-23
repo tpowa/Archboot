@@ -5,7 +5,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
-_APPNAME=$(basename "${0}")
+_APPNAME=${0##*/}
 _usage()
 {
     echo -e "\e[1mWelcome to \e[34marchboot's\e[m \e[1mHWSIM:\e[m"

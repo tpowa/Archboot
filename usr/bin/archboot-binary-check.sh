@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_APPNAME="$(basename "${0}")"
+_APPNAME=${0##*/}
 _usage () {
     echo "${_BASENAME}: usage"
     echo "Check on missing binaries in archboot environment"
