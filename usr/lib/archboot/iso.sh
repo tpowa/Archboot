@@ -6,10 +6,10 @@ _PRESET_DIR="/etc/archboot/presets"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 
 _usage () {
-    echo "${_BASENAME}: usage"
     echo "CREATE ${_ARCH} USB/CD IMAGES"
     echo "-----------------------------"
-    echo "PARAMETERS:"
+    echo "This will create an archboot iso image."
+    echo "Usage: ${_BASENAME} <options>"
     echo "  -g                  Starting generation of image."
     echo "  -p=PRESET           Which preset should be used."
     echo "                      /etc/archboot/presets locates the presets"

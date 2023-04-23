@@ -22,9 +22,9 @@ _W_DIR="$(mktemp -u archboot-release.XXX)"
 _usage () {
     echo "CREATE ARCHBOOT RELEASE IMAGE"
     echo "-----------------------------"
-    echo "Usage: ${_BASENAME} <directory> <server>"
     echo "This will create an archboot release image in <directory>."
     echo "You can specify a certain <server> with an archboot repository."
+    echo "Usage: ${_BASENAME} <directory> <server>"
     exit 0
 }
 
