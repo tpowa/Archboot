@@ -3,10 +3,9 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _APPNAME=${0##*/}
 _usage () {
-    echo "${_BASENAME}: usage"
     echo "Check on missing binaries in archboot environment"
     echo "-------------------------------------------------"
-    echo "Usage: ${_APPNAME} <package>"
+    echo "usage: ${_APPNAME} <package>"
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.txt"
     exit 0

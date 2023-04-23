@@ -3,7 +3,7 @@
 #
 # archboot-cpio.sh:
 # simplified, stripped down, optimized for size and speed
-# Arch Linux mkinitcpio - modular tool for building an initramfs images
+# Arch Linux mkinitcpio - modular tool for building initramfs images
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
@@ -26,14 +26,16 @@ unset GREP_OPTIONS CDPATH "${!LIBMOUNT_@}"
 
 usage() {
     cat <<EOF
-usage: ${0##*/} [options]
+Simplified, stripped down, optimized for size and speed
+Arch Linux mkinitcpio - modular tool for building initramfs images
 
-  Options:
-   -c <config>      Use config file
-   -g <path>        Generate cpio image and write to specified path
-   -h               Display this message and exit
-   -k <kernel>      Use specified kernel
-   -d <dir>         Write generated image into <dir>
+-c <config>      Use config file
+-g <path>        Generate cpio image and write to specified path
+-h               Display this message and exit
+-k <kernel>      Use specified kernel
+-d <dir>         Write generated image into <dir>
+
+usage: ${0##*/} <options>
 EOF
 }
 

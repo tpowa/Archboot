@@ -9,11 +9,7 @@ usage () {
     echo "to avoid soft bricking of devices."
     echo -e "Backup of your existing keys are put to \e[1mBACKUP\e[m directory."
     echo ""
-    echo -e "\e[1m-Usage: -name= <directory>\e[m"
-    echo ""
-    echo -e "\e[1m-PARAMETERS:\e[m"
-    echo " -name=         your name to embed in the keys"
-    echo " -h             This message."
+    echo -e "\e[1musage: ${_BASENAME} -name=<your name> <directory>\e[m"
     exit 0
 }
 [[ -z "${1}" || -z "${2}" ]] && usage
