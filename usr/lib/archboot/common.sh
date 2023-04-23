@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_BASENAME="$(basename "${0}")"
+_BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
 _KEYRING="archlinux-keyring"
 if echo "${_BASENAME}" | grep -qw aarch64; then
