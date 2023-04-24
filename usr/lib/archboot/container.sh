@@ -5,13 +5,14 @@
 
 _usage () {
     echo "CREATE ARCHBOOT CONTAINER"
-    echo "-----------------------------"
+    echo "-------------------------"
     echo "This will create an archboot container for an archboot image."
+    echo ""
+    echo " -cc    Cleanup container eg. removing manpages, includes..."
+    echo " -cp    Cleanup container package cache"
+    echo " -install-source=<server>    add package server with archboot repository"
+    echo ""
     echo "usage: ${_BASENAME} <directory> <options>"
-    echo " Options:"
-    echo "  -cc    Cleanup container eg. removing manpages, includes..."
-    echo "  -cp    Cleanup container package cache"
-    echo "  -install-source=Server add package server with archboot repository"
     exit 0
 }
 

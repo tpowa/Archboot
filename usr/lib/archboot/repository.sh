@@ -6,8 +6,9 @@ _GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 
 _usage () {
     echo "CREATE ARCHBOOT REPOSITORY"
-    echo "-----------------------------"
+    echo "--------------------------"
     echo "This will create an archboot repository for an archboot image."
+    echo ""
     echo "usage: ${_BASENAME} <directory>"
     exit 0
 }

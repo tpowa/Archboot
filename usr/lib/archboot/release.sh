@@ -24,6 +24,7 @@ _usage () {
     echo "-----------------------------"
     echo "This will create an archboot release image in <directory>."
     echo "You can specify a certain <server> with an archboot repository."
+    echo ""
     echo "usage: ${_BASENAME} <directory> <server>"
     exit 0
 }

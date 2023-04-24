@@ -9,13 +9,15 @@ _usage () {
     echo "CREATE ${_ARCH} USB/CD IMAGES"
     echo "-----------------------------"
     echo "This will create an archboot iso image."
+    echo ""
+    echo " -g                  Starting generation of image."
+    echo " -p=PRESET           Which preset should be used."
+    echo "                     /etc/archboot/presets locates the presets"
+    echo "                     default=${_ARCH}"
+    echo " -i=IMAGENAME        Your IMAGENAME."
+    echo " -h                  This message."
+    echo ""
     echo "usage: ${_BASENAME} <options>"
-    echo "  -g                  Starting generation of image."
-    echo "  -p=PRESET           Which preset should be used."
-    echo "                      /etc/archboot/presets locates the presets"
-    echo "                      default=${_ARCH}"
-    echo "  -i=IMAGENAME        Your IMAGENAME."
-    echo "  -h                  This message."
     exit 0
 }
 
