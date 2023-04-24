@@ -30,11 +30,11 @@ ARCHBOOT CPIO
 -------------
 Tool for creating archboot initramfs images.
 
--c <config>      Use config file
--g <path>        Generate cpio image and write to specified path
--h               Display this message and exit
--k <kernel>      Use specified kernel
--d <dir>         Write generated image into <dir>
+ -c <config>      Use config file
+ -g <path>        Generate cpio image and write to specified path
+ -h               Display this message and exit
+ -k <kernel>      Use specified kernel
+ -d <dir>         Write generated image into <dir>
 
 usage: ${0##*/} <options>
 EOF

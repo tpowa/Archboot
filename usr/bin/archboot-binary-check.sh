@@ -5,9 +5,10 @@ _APPNAME=${0##*/}
 _usage () {
     echo "Check on missing binaries in archboot environment"
     echo "-------------------------------------------------"
-    echo "usage: ${_APPNAME} <package>"
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.txt"
+    echo ""
+    echo "usage: ${_APPNAME} <package>"
     exit 0
 }
 [[ -z "${1}" ]] && _usage

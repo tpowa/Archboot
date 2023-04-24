@@ -14,6 +14,7 @@ _usage()
     echo "with mac80211_hwsim module."
 	echo "- wlan0 will be setup as the AP. Don't use for scanning!"
 	echo "- wlan1 will be setup for STATION mode. Use this for scanning for your AP."
+	echo ""
     echo -e "usage: \e[1m${_APPNAME} <SSID>\e[m"
     exit 0
 }

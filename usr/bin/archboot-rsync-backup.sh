@@ -17,11 +17,11 @@ _usage()
     echo -e "- \e[1m--numeric-ids\e[m option is invoked to \e[1mpreserve\e[m users"
     echo ""
     echo -e "usage: \e[1m${_APPNAME} <backupdir> <backupdestination>\e[m"
-    exit "$1"
+    exit 0
 }
 ##################################################
 if [ $# -ne 2 ]; then
-    _usage 1
+    _usage
 fi
 _BACKUPDESTINATION="${2}"
 _BACKUPDIR="${1}"

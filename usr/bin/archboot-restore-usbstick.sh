@@ -14,7 +14,7 @@ _usage()
     echo -e "\e[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \e[m"
     echo ""
     echo -e "usage: \e[1m${_APPNAME} <device>\e[m"
-    exit "1"
+    exit 0
 }
 ##################################################
 [[ -z "${1}" ]] && _usage "$@"

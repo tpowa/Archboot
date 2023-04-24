@@ -16,11 +16,11 @@ _usage()
     echo -e "  for each additional mountpoint eg. \e[1m/boot\e[m or \e[1m/home\e[m."
     echo ""
     echo -e "usage: \e[1m${_APPNAME} <oldmountpoint> <newmountpoint>\e[m"
-    exit "$1"
+    exit 0
 }
 ##################################################
 if [ $# -ne 2 ]; then
-    _usage 1
+    _usage
 fi
 _NEWMOUNTPOINT="${2}"
 _OLDMOUNTPOINT="${1}"
