@@ -4,17 +4,16 @@
 
 build ()
 {
-    add_binary "mdmon"
+    add_all_modules -f 'dm-' 'drivers/md/*'
+    map add_binary mdmon mdadm
     add_file /etc/mdadm.conf
-    add_file "/usr/share/mdadm/mdcheck"
-
+    add_file /usr/share/mdadm/mdcheck
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook adds complete mdadm to archboot image
-  which is not covered by mdadm_udev hook.
+  This hook adds complete mdadm to archboot image.
 HELPEOF
 }
 # vim: set ft=sh ts=4 sw=4 et:

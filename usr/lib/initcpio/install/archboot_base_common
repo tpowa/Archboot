@@ -4,7 +4,21 @@
 
 build ()
 {
-    ### add virtio modules
+    ### kmx modules
+    # AGP and DRM modules for GPUs
+    map add_all_modules '/drivers/char/agp/' '/drivers/gpu/drm/'
+    # modules that implement the privacy screen interface
+    # TODO: Replace with dynamic lookup of modules that depend on the drm_privacy_screen_register symbol
+    # See https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/issues/132
+    map add_all_modules 'chromeos_privacy_screen?' 'thinkpad_acpi?'
+
+    ### keyboard modules
+    add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
+    add_all_modules '/hid/hid'
+    add_module 'usbhid'
+    add_all_modules '/input/(serio|keyboard)'
+
+    ### add init modules
     map add_module virtio? zram? btrfs? zstd? libcrc32c?
     
     ### setting up base structure
@@ -156,8 +170,8 @@ build ()
     add_symlink "/etc/systemd/system/default.target" "/usr/lib/systemd/system/multi-user.target"
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
-    ### add udev, which is not covered by udev hook
-    add_binary "logger"
+    ### add udev
+    map add_binary /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles logger
     # add rule files
     add_full_dir "/usr/lib/udev"
     # add schedule rules file

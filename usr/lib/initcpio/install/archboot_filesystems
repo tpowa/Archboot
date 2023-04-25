@@ -4,16 +4,14 @@
 
 build ()
 {
-	### https://github.com/archlinux/mkinitcpio/pull/113/commits/0e5bc5b41f73b7d6d4e346be957a32258f07e7a7
-	# remove when merged to block hook
-    add_all_modules '/kernel/fs|/drivers/spi/'
+    map add_all_modules '/kernel/fs' '/crypto/'
     map add_module crypto-crc32c? crypto-crc32? libcrc32c? configfs? nls_cp437? nls_ascii?
     map add_binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
 	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \
 	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel mount.smb3 mount.cifs \
 	  fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
-	  mkfs.jfs wipefs btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
+	  mkfs.jfs wipefs btrfs btrfsck btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
 	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.idmap cifs.upcall cifscreds getcifsacl \
 	  setcifsacl umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
 	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \

@@ -4,6 +4,29 @@
 
 build ()
 {
+    ### add block device support
+    map add_module sd_mod? sr_mod? usb_storage? mmc_block? firewire-sbp2? virtio_blk?
+    # pata, sata, scsi, nvme
+    for filter in 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)'; do
+        add_all_modules "$filter"
+    done
+    # usb
+    add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
+    add_all_modules '/drivers/usb/storage/'
+    # firewire
+    add_all_modules '/drivers/firewire/'
+    # mmc
+    add_all_modules '/(drivers/mmc|tifm_)'
+    # spi (mmc in spi mode)
+    add_all_modules '/drivers/spi/'
+    # virtio
+    add_all_modules 'virtio'
+    # nvdimm
+    add_all_modules '/drivers/nvdimm/'
+	# Intel Volume Management Device
+    add_all_modules 'vmd'
+
     map add_binary head id cksum tail test uptime w who whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
           chgrp chown dialog dmesg egrep fgrep stty sync hdparm \

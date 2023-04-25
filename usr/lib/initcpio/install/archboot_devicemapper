@@ -4,19 +4,25 @@
 
 build ()
 {
+
     add_all_modules 'md/dm-*'
-    map add_binary dmsetup dmeventd blkdeactivate dmstats
+    map add_binary dmsetup dmeventd blkdeactivate dmstats cryptsetup
     add_dir "/dev/mapper"
     add_full_dir "/usr/lib/device-mapper"
     for i in /usr/lib/libdevmapper*; do
         add_file "$i"
     done
+    # cryptsetup calls pthread_create(), which dlopen()s libgcc_s.so.1
+    add_file '/usr/lib/libgcc_s.so.1'
+
+    # cryptsetup loads the legacy provider which is required for whirlpool
+    add_file '/usr/lib/ossl-modules/legacy.so'
 }
 
 help ()
 {
 cat<<HELPEOF
-  This hook includes devicemapper on an archboot image.
+  This hook includes devicemapper and encryption on an archboot image.
 HELPEOF
 } 
 # vim: set ft=sh ts=4 sw=4 et:

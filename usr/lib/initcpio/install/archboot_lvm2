@@ -4,6 +4,12 @@
 
 build ()
 {
+    local symlink
+    ### from thin-provisioning-tools
+    add_binary 'pdata_tools'
+    for symlink in cache_{check,dump,metadata_size,repair,restore} thin_{check,delta,dump,ls,metadata_size,repair,restore,rmap,trim}; do
+        add_symlink "/usr/bin/${symlink}" 'pdata_tools'
+    done
     map add_binary lvmdump lvmconfig vgimportclone fsadm vgcfgbackup vgcfgrestore vgchange \
           vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes \
           vgreduce vgremove vgrename vgs vgscan vgsplit pvchange pvck pvcreate pvdisplay \
@@ -14,13 +20,13 @@ build ()
     for i in /usr/lib/liblvm*; do
         add_file "$i"
     done
+    add_file /etc/lvm/lvm.conf
 }
 
 help ()
 {
 cat<<HELPEOF
   This hook adds complete lvm2 to archboot image, 
-  which is not covered by lvm2 hook.
 HELPEOF
 }
 # vim: set ft=sh ts=4 sw=4 et:
