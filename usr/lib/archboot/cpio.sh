@@ -223,16 +223,6 @@ add_module() {
     fi
 }
 
-add_checked_modules() {
-    # Add modules to the initcpio, filtered by the list of autodetected
-    # modules.
-    #   $@: arguments to all_modules
-    local mods
-    mapfile -t mods < <(all_modules "$@")
-    map add_module "${mods[@]}"
-    return $(( !${#mods[*]} ))
-}
-
 add_full_dir() {
     # Add a directory and all its contents, recursively, to the initcpio image.
     # No parsing is performed and the contents of the directory is added as is.
@@ -276,11 +266,6 @@ add_symlink() {
     fi
     add_dir "${name%/*}"
     ln -sfn "$target" "${BUILDROOT}${name}"
-}
-
-# no runscript support in archboot
-add_runscript() {
-   :
 }
 
 add_file() {
@@ -336,22 +321,6 @@ add_binary() {
         fi
     done <<< "$lddout"
     return 0
-}
-
-# no detection of helpers in archboot
-add_udev_rule() {
-    # Add an udev rules file to the initcpio image. Dependencies on binaries
-    # will be discovered and added.
-    #   $1: path to rules file (or name of rules file)
-    local rules="$1"
-    if [[ "${rules:0:1}" != '/' ]]; then
-        rules="$(PATH='/usr/lib/udev/rules.d' type -P "$rules")"
-    fi
-    if [[ -z "$rules" ]]; then
-        # complain about not found rules
-        return 1
-    fi
-    add_file "$rules" /usr/lib/udev/rules.d/"${rules##*/}"
 }
 
 initialize_buildroot() {
