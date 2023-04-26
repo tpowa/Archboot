@@ -4,6 +4,8 @@
 
 build ()
 {
+    ### add pcspkr
+    add_module "pcspkr"
     ### add init modules
     map add_module virtio? zram? btrfs? zstd? libcrc32c?
     ### keyboard modules
