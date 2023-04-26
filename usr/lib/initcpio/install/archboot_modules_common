@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+build ()
+{
+    ### init modules
+    map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat? \
+        btrfs? zram? iso9660? loop? zstd? nls_cp437? nls_ascii? libcrc32c? cdrom?
+    ### pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
+    map add_all_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
+            '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
+            '/drivers/spi/' 'virtio'
+    ### keyboard modules
+    add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
+    add_all_modules '/hid/hid'
+    add_module 'usbhid'
+    add_all_modules '/input/(serio|keyboard)'
+    ### kmx modules
+    # AGP and DRM modules for GPUs
+    map add_all_modules '/drivers/char/agp/' '/drivers/gpu/drm/'
+    # modules that implement the privacy screen interface
+    # TODO: Replace with dynamic lookup of modules that depend on the drm_privacy_screen_register symbol
+    # See https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/issues/132
+    map add_all_modules 'chromeos_privacy_screen?' 'thinkpad_acpi?'
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook includes init, kms and keyboard support
+  for an archboot image.
+  DO NOT remove this one unless you know what you're doing.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:
