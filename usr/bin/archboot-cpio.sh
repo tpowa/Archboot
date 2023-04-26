@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # archboot-cpio.sh:
-# simplified, stripped down, optimized for size and speed
 # Arch Linux mkinitcpio - modular tool for building initramfs images
+# simplified, stripped down, optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
@@ -28,7 +28,7 @@ usage() {
     cat <<EOF
 ARCHBOOT CPIO
 -------------
-Tool for creating archboot initramfs images.
+Tool for creating an archboot initramfs image.
 
  -c <config>      Use config file
  -g <path>        Generate cpio image and write to specified path
