@@ -6,6 +6,7 @@ Environment changes:
 - switch to archboot-cpio.sh for image/initramfs building
 - switch to ukify script for UKI creation
 - enable colors in pacman
+- remove firewire modules
 setup:
 - enable FIRMWARE bootloader option for aarch64 architecture
 - use ukify script for FIRMWARE bootloader support
