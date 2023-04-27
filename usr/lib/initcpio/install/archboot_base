@@ -5,7 +5,7 @@
 build ()
 {
     ### add block device support
-    map add_module sd_mod? sr_mod? usb_storage? mmc_block? firewire-sbp2? virtio_blk?
+    map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk?
     # pata, sata, scsi, nvme
     for filter in 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'; do
@@ -14,8 +14,6 @@ build ()
     # usb
     add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
     add_all_modules '/drivers/usb/storage/'
-    # firewire
-    add_all_modules '/drivers/firewire/'
     # mmc
     add_all_modules '/(drivers/mmc|tifm_)'
     # spi (mmc in spi mode)
