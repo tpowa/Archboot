@@ -57,9 +57,11 @@ _prepare_kernel_initramfs_files() {
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
-    if [[ -f "/./init-${_ARCH}.img" ]]; then
-        cp /./init-${_ARCH}.img ${_ISODIR}/boot/
+    if [[ -f "./init-${_ARCH}.img" ]]; then
+        echo "Using existing ./init-${_ARCH}.img ..."
+        cp ./init-${_ARCH}.img ${_ISODIR}/boot/
     else
+        echo "Creating init-${_ARCH}.img ..."
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         cp ${_ISODIR}/boot/init-${_ARCH}.img ./
@@ -258,8 +260,5 @@ _cleanup_iso() {
     # cleanup
     echo "Cleanup... removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
-    if ! [[ "${0}" == "archboot-${ARCH}-release.sh" ]]; then
-        rm ./init-${_ARCH}.img
-    fi
 }
 # vim: set ft=sh ts=4 sw=4 et:
