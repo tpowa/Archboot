@@ -35,7 +35,7 @@ if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_
 else
     # running system = riscv64
     echo "Starting Image creation..."
-    _prepare_kernel_initramfs_files_RISCV64 || exit 1
+    _prepare_kernel_initramfs_files || exit 1
     _prepare_extlinux_conf || exit 1
     _reproducibility
     _uboot || exit 1

@@ -41,27 +41,6 @@ _config() {
     [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_ARCH}"
 }
 
-_prepare_kernel_initramfs_files() {
-    echo "Preparing kernel and initramfs..."
-    #shellcheck disable=SC1090
-    source "${_PRESET}"
-    mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
-    mkdir -p "${_ISODIR}/boot"
-    archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
-    #shellcheck disable=SC2154
-    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
-    # delete cachedir on archboot environment
-    [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
-    # needed to hash the kernel for secureboot enabled systems
-    # all uppercase to avoid issues with firmware and hashing eg. DELL firmware is case sensitive!
-    if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
-    fi
-    if [[ "${_ARCH}" == "aarch64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
-    fi
-}
-
 ### EFI status of RISCV64:
 #----------------------------------------------------
 # EFI is not yet working for RISCV64!
@@ -72,14 +51,26 @@ _prepare_kernel_initramfs_files() {
 # - unified EFI is not possible because of this:
 #   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
 # - only left option is extlinux support in u-boot loader
-_prepare_kernel_initramfs_files_RISCV64() {
-    echo "Preparing RISCV64 u-boot..."
+_prepare_kernel_initramfs_files() {
+    echo "Preparing kernel and initramfs..."
     #shellcheck disable=SC1090
     source "${_PRESET}"
-    mkdir -p "${_ISODIR}"/boot
-    install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
-    archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs.img" || exit 1
+    mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
+    mkdir -p "${_ISODIR}/boot"
+    archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
+    # save init ramdisk for further images
+    cp ${_ISODIR}/boot/init-${_ARCH}.img ./
+    #shellcheck disable=SC2154
     archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
+    # delete cachedir on archboot environment
+    [[ "$(cat /etc/hostname)" == "archboot" ]] && rm -rf /var/cache/pacman/pkg
+    # needed to hash the kernel for secureboot enabled systems
+    if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
+    fi
+    if [[ "${_ARCH}" == "aarch64" ]]; then
+        install -m644 "${ALL_kver}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
+    fi
 }
 
 _prepare_ucode() {
@@ -200,7 +191,7 @@ default linux
 label linux
     menu label Boot System (automatic boot in 10 seconds...)
     kernel /boot/vmlinuz-${_ARCH}
-    initrd /boot/initramfs.img
+    initrd /boot/init-${_ARCH}.img
     append console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
 EOF
 }
@@ -267,5 +258,8 @@ _cleanup_iso() {
     # cleanup
     echo "Cleanup... removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
+    if ! [[ "$0" == "archboot-$ARCH-release.sh" ]]; then
+    rm ./init-${_ARCH}.img
+
 }
 # vim: set ft=sh ts=4 sw=4 et:
