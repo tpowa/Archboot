@@ -58,10 +58,10 @@ _prepare_kernel_initramfs_files() {
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
     if [[ -f "./init-${_ARCH}.img" ]]; then
-        echo "Using existing ./init-${_ARCH}.img ..."
+        echo "Using existing ./init-${_ARCH}.img initramfs..."
         cp ./init-${_ARCH}.img ${_ISODIR}/boot/
     else
-        echo "Creating init-${_ARCH}.img ..."
+        echo "Creating init-${_ARCH}.img initramfs..."
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         cp ${_ISODIR}/boot/init-${_ARCH}.img ./
