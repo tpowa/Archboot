@@ -1255,7 +1255,7 @@ There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
 </ul>
 <h4 data-number="4.4.3" id="archboot-cpio.sh"><span class="header-section-number">4.4.3</span> <strong><span dir="">archboot-cpio.sh initramfs generator:</span></strong></h4>
-<p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible in the following options:</p>
+<p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
 <strong>HOOKS, COMPRESSION, COMPRESSION_OPTIONS, MODULES_DECOMPRESS</strong></li>
