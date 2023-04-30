@@ -78,8 +78,10 @@ _prepare_kernel_initramfs_files() {
     archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
-        echo "Removing /var/cache/pacman/pkg..."
-        rm -rf /var/cache/pacman/pkg
+        if [[ -d "${_CACHEDIR}" ]]; then
+            echo "Removing ${_CACHEDIR}..."
+            rm -rf ${_CACHEDIR}
+        fi
     fi
 }
 
