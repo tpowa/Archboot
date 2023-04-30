@@ -66,12 +66,12 @@ _prepare_kernel_initramfs_files() {
     fi
     if [[ -f "./init-${_ARCH}.img" ]]; then
         echo "Using existing init-${_ARCH}.img..."
-        cp ./init-${_ARCH}.img ${_ISODIR}/boot/
+        cp "./init-${_ARCH}.img" "${_ISODIR}/boot/"
     else
         echo "Preparing init-${_ARCH}.img..."
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
-        cp ${_ISODIR}/boot/init-${_ARCH}.img ./
+        cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
     fi
     echo "Preparing initramfs-${_ARCH}.img..."
     #shellcheck disable=SC2154
@@ -80,7 +80,7 @@ _prepare_kernel_initramfs_files() {
     if grep -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
             echo "Removing ${_CACHEDIR}..."
-            rm -rf ${_CACHEDIR}
+            rm -rf "${_CACHEDIR}"
         fi
     fi
 }

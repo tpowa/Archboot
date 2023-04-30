@@ -6,7 +6,7 @@
 
 # no long options support in archboot
 parseopts() {
-    local opt='' optarg='' i='' shortopts="$1"
+    local opt='' i='' shortopts="$1"
     local -a unused_argv=()
     shift
     shift
@@ -287,7 +287,7 @@ add_file() {
             add_file  "$srcrealpath" "$srcrealpath" "$mode"
         else
             if [[ -n $mode ]]; then
-                command chmod "$mode" ${BUILDROOT}${dest}
+                command chmod "$mode" "${BUILDROOT}${dest}"
             fi
         fi
     fi
@@ -371,7 +371,7 @@ initialize_buildroot() {
 }
 
 run_build_hook() {
-    local hook="$1" script='' resolved=''
+    local hook="$1" script=''
     # shellcheck disable=SC2034
     local MODULES=() BINARIES=() FILES=() SCRIPT=''
     # find script in install dirs
