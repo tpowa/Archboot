@@ -125,7 +125,7 @@ _prepare_efitools_uefi () {
 }
 
 _prepare_uefi_shell_tianocore() {
-    echo "Preparing uefi shell..."
+    echo "Preparing UEFI shell..."
     ## Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
     cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
     ## Installing Tianocore UDK/EDK2 UEFI IA32 "Full Shell"
@@ -134,18 +134,18 @@ _prepare_uefi_shell_tianocore() {
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
-    echo "Preparing X64 Grub..."
+    echo "Preparing X64 grub..."
     cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
 _prepare_uefi_IA32() {
-    echo "Preparing IA32 Grub..."
+    echo "Preparing IA32 grub..."
     cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
-    echo "Preparing AA64 Grub..."
+    echo "Preparing AA64 grub..."
     cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
 }
 
@@ -156,7 +156,7 @@ _prepare_memtest() {
 }
 
 _prepare_background() {
-    echo "Preparing Grub background..."
+    echo "Preparing grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
 }
