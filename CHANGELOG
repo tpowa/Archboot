@@ -9,7 +9,7 @@ Environment changes:
 - remove firewire modules
 setup:
 - enable FIRMWARE bootloader option for aarch64 architecture
-- use ukify script for FIRMWARE bootloader support
+- switch to ukify script for FIRMWARE bootloader support
 - edit /etc/kernel/cmdline and /etc/ukify.conf before UKI creation
 - enable automatic UKI building as run_ukify.service on installed system
 ---
