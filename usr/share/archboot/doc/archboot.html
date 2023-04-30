@@ -1254,7 +1254,14 @@ There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
 </ul>
-<h4 data-number="4.4.3" id="archboot-x86_64-iso.sh"><span class="header-section-number">4.4.3</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
+<h4 data-number="4.4.3" id="archboot-cpio.sh"><span class="header-section-number">4.4.3</span> <strong><span dir="">archboot-cpio.sh does only support the following mkinitcpio syntax:</span></strong></h4>
+<ul>
+<li>Options supported in <strong>config files</strong>:<br>
+<strong>HOOKS, COMPRESSION, COMPRESSION_OPTIONS, MODULES_DECOMPRESS</strong></li>
+<li>Functions supported in <strong>HOOKS</strong>:<br>
+<strong>add_dir, add_full_dir, add_binary, add_file, add_symlink, add_module, all_modules,<br>add_all_modules, add_firmware</strong></li>
+</ul>
+<h4 data-number="4.4.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">4.4.4</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
 <p>Script for image creation from running system or for use in archboot container.</p>
 <ul>
 <table>
