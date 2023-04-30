@@ -40,7 +40,7 @@ _create_iso() {
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
         echo "Generating local ISO..."
         # generate local iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_ARCH}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         echo "Generating latest ISO..."

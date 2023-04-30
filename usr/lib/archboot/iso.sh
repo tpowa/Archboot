@@ -57,8 +57,8 @@ _prepare_kernel_initramfs_files() {
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
-    if [[ -f "./init-${_ARCH}.img" ]]; then
-        cp ./init-${_ARCH}.img ${_ISODIR}/boot/
+    if [[ -f "/./init-${_ARCH}.img" ]]; then
+        cp /./init-${_ARCH}.img ${_ISODIR}/boot/
     else
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
@@ -182,11 +182,7 @@ _prepare_uefi_image() {
 
 _prepare_extlinux_conf() {
     mkdir -p "${_ISODIR}"/boot/extlinux
-    if [[ ${_ARCH} == "aarch64" ]]; then
-        _TITLE="Arch Linux ARM 64"
-        _SMP="nr_cpus=1"
-    fi
-    [[ ${_ARCH} == "riscv64" ]] && _TITLE="Arch Linux RISC-V 64"
+    _TITLE="Arch Linux RISC-V 64"
     echo "Preparing extlinux.conf..."
     cat << EOF >> "${_ISODIR}/boot/extlinux/extlinux.conf"
 menu title Welcome to Archboot - ${_TITLE}
