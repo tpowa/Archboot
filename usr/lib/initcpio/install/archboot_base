@@ -15,7 +15,7 @@ build ()
     add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
     add_all_modules '/drivers/usb/storage/'
     # mmc
-    add_all_modules '/(drivers/mmc|tifm_)'
+    add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
     # spi (mmc in spi mode)
     add_all_modules '/drivers/spi/'
     # virtio
