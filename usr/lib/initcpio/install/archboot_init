@@ -7,11 +7,12 @@ build() {
     map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat? \
         iso9660? loop? nls_cp437? nls_ascii? cdrom?
     ### pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
-    map add_all_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
+    map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
             '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
             '/drivers/spi/'
-    add_all_modules -f 'pata_parport' 'ata/[ps]ata_'
+    add_all_modules -f 'pcmcia' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'pata_parport|pata_pcmcia' 'ata/[ps]ata_'
     add_all_modules -f 'virtio/sound' 'virtio'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \

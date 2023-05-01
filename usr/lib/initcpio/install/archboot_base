@@ -7,9 +7,10 @@ build ()
     ### add block device support
     map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk?
     # pata, sata, scsi, nvme
-    map add_all_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' \
+    map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
-    add_all_modules -f 'pata_parport' 'ata/[ps]ata_'
+    add_all_modules -f 'pcmcia' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'pata_parport|pata_pcmcia' 'ata/[ps]ata_'
     # usb
     add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
     add_all_modules '/drivers/usb/storage/'
