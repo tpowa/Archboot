@@ -4,7 +4,7 @@
 
 build ()
 {
-    map add_all_modules '/fs/(btrfs|cifs|ntfs3|exfat|ext4|fat|hfs|hfsplus||isofs||nfs||nfsd|f2fs|nilfs2|nls|smbfs_common|udf|xfs|vboxsf)' '/crypto/'
+    map add_all_modules '/fs/(btrfs|cifs|ntfs3|exfat|ext4|fat|hfs|hfsplus|isofs||nfs||nfsd|f2fs|nilfs2|nls|smbfs_common|udf|xfs|vboxsf)' '/crypto/'
     map add_module crypto-crc32c? crypto-crc32? libcrc32c? configfs? nls_cp437? nls_ascii?
     map add_binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
