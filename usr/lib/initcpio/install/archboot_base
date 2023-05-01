@@ -17,7 +17,7 @@ build ()
     # mmc
     add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
     # spi (mmc in spi mode)
-    add_all_modules '/drivers/spi/'
+    add_all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
     # virtio
     add_all_modules -f 'virtio/sound' 'virtio'
     # nvdimm
