@@ -30,11 +30,11 @@ _parameters() {
 _clean_cache() {
     if [[ "${_CLEANUP_CACHE}" ==  "1" ]]; then
         echo "Cleaning pacman cache in ${1}..."
-        rm -r "${1}""${_CACHEDIR}"
+        rm -r "${1}${_CACHEDIR}"
     fi
     if grep -qw 'archboot' /etc/hostname; then
         echo "Cleaning archboot ${_CACHEDIR}..."
-        for i in "${1}""${_CACHEDIR}"/*; do
+        for i in "${1}${_CACHEDIR}"/*; do
             [[ "${i}" == "${1}${_CACHEDIR}/archboot.db" ]] || rm -f "${_CACHEDIR}"/"$(basename "${i}")"
         done
     fi

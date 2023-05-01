@@ -34,7 +34,7 @@ _create_iso() {
     cd "${1}" || exit 1
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
-    _create_archboot_db "${_W_DIR}""${_CACHEDIR}"
+    _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen

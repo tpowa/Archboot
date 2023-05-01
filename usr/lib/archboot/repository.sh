@@ -27,7 +27,7 @@ _download_packages() {
 
 _move_packages() {
     echo "Moving packages to ${2}..."
-    mv "${1}""${_CACHEDIR}"/./* "${2}"
+    mv "${1}${_CACHEDIR}"/./* "${2}"
 }
 
 _cleanup_repodir() {
