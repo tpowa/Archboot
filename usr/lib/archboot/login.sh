@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_CACHEDIR="/var/cache/pacman/pkg"
+. /usr/lib/archboot/common.sh
 
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
