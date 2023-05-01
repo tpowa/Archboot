@@ -19,7 +19,7 @@ build ()
     # spi (mmc in spi mode)
     add_all_modules '/drivers/spi/'
     # virtio
-    add_all_modules 'virtio'
+    add_all_modules -f 'virtio/sound' 'virtio'
     # nvdimm
     add_all_modules '/drivers/nvdimm/'
 	# Intel Volume Management Device
