@@ -11,7 +11,8 @@ build() {
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
             '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
             '/drivers/spi/'
-    add_all_modules -f 'pata_parport|virtio/sound' 'ata/[ps]ata_' 'virtio'
+    add_all_modules -f 'pata_parport' 'ata/[ps]ata_'
+    add_all_modules -f 'virtio/sound' 'virtio'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find
