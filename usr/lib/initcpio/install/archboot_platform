@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_all_modules '/platform/'
+    add_all_modules -f 'media' '/platform/'
 }
 
 help ()

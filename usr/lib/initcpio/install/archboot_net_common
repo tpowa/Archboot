@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_all_modules -f 'nfp' -f 'liquidio' -f 'mellanox' -f 'wireless' -f 'bnx2x' -f 'bna' -f 'softing_cs' -f 'qed' '/drivers/net/'
+    add_all_modules '/drivers/net/ethernet'
     map add_binary ip getent ping wget
     # start dhcpcd on startup
     add_file "/usr/share/archboot/net/etc/systemd/network/10-wired-auto-dhcp.network" "/etc/systemd/network/10-wired-auto-dhcp.network"
