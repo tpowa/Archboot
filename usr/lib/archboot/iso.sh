@@ -68,12 +68,12 @@ _prepare_kernel_initramfs_files() {
         echo "Using existing init-${_ARCH}.img..."
         cp "./init-${_ARCH}.img" "${_ISODIR}/boot/"
     else
-        echo "Preparing init-${_ARCH}.img..."
+        echo "Running archboot-cpio.sh for init-${_ARCH}.img..."
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
     fi
-    echo "Preparing initramfs-${_ARCH}.img..."
+    echo "Running archboot-cpio.sh for initramfs-${_ARCH}.img..."
     #shellcheck disable=SC2154
     archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
@@ -264,7 +264,7 @@ _create_cksum() {
 
 _cleanup_iso() {
     # cleanup
-    echo "Cleanup... removing ${_ISODIR}..."
+    echo "Removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }
 # vim: set ft=sh ts=4 sw=4 et:
