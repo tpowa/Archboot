@@ -38,6 +38,9 @@ _create_iso() {
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
+        # removing not working lvm2 from latest and local image first
+        echo "Removing lvm2 from container ${_W_DIR}..."
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         echo "Generating local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
@@ -46,6 +49,8 @@ _create_iso() {
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_ARCH}" || exit 1
+        echo "Installing lvm2 to container ${_W_DIR}..."
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
     echo "Generating normal ISO..."
     # generate iso in container
