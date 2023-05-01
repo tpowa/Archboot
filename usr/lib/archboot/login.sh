@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-# don't run ttyS0 as first device
+_CACHEDIR="/var/cache/pacman/pkg"
 
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
@@ -12,10 +12,10 @@ _welcome () {
 }
 
 _local_mode () {
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+    if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
         echo -e "You are running in \e[92m\e[1mLocal mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
         if [[ -e /usr/bin/setup ]] ; then
-            echo -e "To \e[1mswitch\e[m to \e[1mOnline mode\e[m:\e[1m\e[91m# rm /var/cache/pacman/pkg/archboot.db\e[m\e[1m"
+            echo -e "To \e[1mswitch\e[m to \e[1mOnline mode\e[m:\e[1m\e[91m# rm ${_CACHEDIR}/archboot.db\e[m\e[1m"
             echo ""
         fi
     fi
@@ -97,7 +97,7 @@ _run_update_installer() {
             _run_latest
         else
             # local image
-            if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+            if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
                 _run_latest_install
             else
                 # latest image
@@ -172,7 +172,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _enter_shell
 # local image, fail if less than 3.3GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
--e "/var/cache/pacman/pkg/archboot.db" ]]; then
+-e "${_CACHEDIR}/archboot.db" ]]; then
     _welcome
     echo -e "\e[1m\e[91mMemory check failed:\e[m"
     echo -e "\e[91m- Not engough memory detected! \e[m"
