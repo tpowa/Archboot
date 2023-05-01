@@ -7,10 +7,11 @@ build() {
     map add_module sd_mod? sr_mod? usb_storage? mmc_block? virtio_blk? vfat? \
         iso9660? loop? nls_cp437? nls_ascii? cdrom?
     ### pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode), virtio
-    add_all_modules -f 'pata_parport' -f 'virtio/sound' 'scsi/.*ata' '/block/|scsi/|fusion/|/nvme/' 'ata/[ps]ata_' \
-            'ata/ahci|ata/pdc_adma|ata/ata_piix|ata/ata_generic' '_cs|sl811_hcd|isp116x_hcd' \
-            '/usb/host' '/drivers/usb/storage/' '/drivers/mmc|/tifm_' \
-            '/drivers/spi/' 'virtio'
+    map add_all_modules 'scsi/.*ata' '/(block|scsi|fusion|nvme)/' 'ata/[ps]ata_' \
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
+            '/usb/host' '/drivers/usb/storage/' '/(drivers/mmc|tifm_)' \
+            '/drivers/spi/'
+    add_all_modules -f 'pata_parport|virtio/sound' 'ata/[ps]ata_' 'virtio'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find
