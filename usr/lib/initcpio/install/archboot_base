@@ -8,7 +8,7 @@ build ()
     # sata, scsi, nvme
     map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
-    add_all_modules -f 'pcmcia|scsi/(imm|ppa|st|ch)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'pcmcia|scsi/(imm|ppa|st|ch)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
     add_all_modules -f 'parport' 'ata/sata_'
     # usb
     add_all_modules '/drivers/usb/storage/'
