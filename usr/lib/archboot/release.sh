@@ -130,7 +130,9 @@ _create_iso() {
         mv "${_W_DIR}"/boot ./
         rm "${_CMDLINE}"
         chmod 644 boot/*.efi
-        touch boot/*.efi
+        mv init-* boot/
+        touch boot/*
+
     fi
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
