@@ -7,8 +7,7 @@ build() {
     map add_module vfat? iso9660? nls_cp437? nls_ascii? cdrom?
     ### pata, sata, scsi, nvme, usb, mmc, spi (for mmc mode)
     map add_all_modules 'scsi/.*ata' \
-            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '(_cs|sl811_hcd|isp116x_hcd)' \
-            '/usb/host' '/drivers/usb/storage/'
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '/drivers/usb/storage/'
     add_all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
     add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|fabrics|rnbd' '/(block|scsi|fusion|nvme)/'
     add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
