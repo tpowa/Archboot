@@ -1,6 +1,6 @@
 On the road to 2023.05
 Environment changes:
-- remove pcmcia and parport modules
+- remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
 ---
 2023.04 Highlights:
