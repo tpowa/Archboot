@@ -9,7 +9,7 @@ build ()
     map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
     add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|fabrics|rnbd' '/(block|scsi|fusion|nvme)/'
-    add_all_modules -f 'parport|pata_pcmcia' 'ata/[ps]ata_'
+    add_all_modules -f 'parport' 'ata/sata_'
     # usb
     add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
     add_all_modules '/drivers/usb/storage/'
