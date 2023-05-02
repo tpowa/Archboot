@@ -1,6 +1,9 @@
 On the road to 2023.05
+Environment changes:
+- remove pcmcia and parport modules
+- cleanup init ramdisk modules
 ---
-2023.04 Highllights:
+2023.04 Highlights:
 - grub 2.06.r499.ge67a551a4-1
 Environment changes:
 - switch to archboot-cpio.sh for image/initramfs building
