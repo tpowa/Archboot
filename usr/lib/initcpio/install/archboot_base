@@ -8,7 +8,7 @@ build ()
     # pata, sata, scsi, nvme
     map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
-    add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|fabrics|rnbd|rbd|nbd|qed|cxgb|bnx2|csiotor' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|fabrics|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor' '/(block|scsi|fusion|nvme)/'
     add_all_modules -f 'parport' 'ata/sata_'
     # usb
     add_all_modules -f '(_cs|sl811_hcd|isp116x_hcd)' '/usb/host'
