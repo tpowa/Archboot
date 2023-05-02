@@ -62,6 +62,7 @@ _create_iso() {
     # create boot directory with ramdisks
     echo "Creating boot directory..."
     mkdir -p boot/
+    mv init-* boot/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
@@ -130,10 +131,8 @@ _create_iso() {
         mv "${_W_DIR}"/boot ./
         rm "${_CMDLINE}"
         chmod 644 boot/*.efi
-        mv init-* boot/
-        touch boot/*
-
     fi
+    touch boot/*
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
     (echo "Welcome to ARCHBOOT INSTALLATION / RESCUEBOOT SYSTEM";\
