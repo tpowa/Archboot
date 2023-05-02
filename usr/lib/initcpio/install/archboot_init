@@ -9,7 +9,7 @@ build() {
     map add_all_modules 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '/drivers/usb/storage/'
     add_all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
-    add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|fabrics|rnbd|rbd|nbd|qed|cxgb' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'pcmcia|scsi/imm|scsi/ppa|rdma|rnbd|rbd|nbd|qed|cxgb' '/(block|scsi|fusion|nvme)/'
     add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
     add_all_modules -f 'parport' 'ata/sata_'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
