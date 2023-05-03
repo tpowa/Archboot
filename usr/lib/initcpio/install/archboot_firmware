@@ -7,7 +7,7 @@ build ()
     # add firmware files and licenses
     map add_full_dir "/lib/firmware" "/usr/share/licenses/linux-firmware"
     # remove not used firmware
-    rm -rf ${BUILDROOT}/lib/firmware/{v4l*,dvb*,bnx2,cxgb*,sb16,yamaha}
+    rm -rf ${BUILDROOT}/lib/firmware/{bnx2,cxgb*,dvb*,sb16,sms1*,ueagle-atm,v4l*,yamaha}
     find ${BUILDROOT}/lib/firmware -type f -name "*txt*" -exec rm {} \;
     find ${BUILDROOT}/lib/firmware -type f -name "*README*" -exec rm {} \;
 }
