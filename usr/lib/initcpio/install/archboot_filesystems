@@ -5,7 +5,7 @@
 build ()
 {
 	add_all_modules '/fs/(btrfs|cifs|exfat|ext4|f2fs|fat|hfs|hfsplus|isofs|jfs|nfs|nfsd|nilfs2|nls|ntfs3|udf|xfs|vboxsf)'
-    add_all_modules -f 'chelsio|cavium|inside-secure|qat' '/crypto/'
+    add_all_modules -f 'chelsio|cavium|inside-secure|qat' 'lib/crypto/|kernel/crypto|arch/*/crypto'
     map add_module crypto-crc32c? crypto-crc32? libcrc32c? configfs? nls_cp437? nls_ascii?
     map add_binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
