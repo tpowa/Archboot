@@ -3,6 +3,7 @@ Environment changes:
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
 - cleanup scsi and network modules
+- cleanup firmware files
 ---
 2023.04 Highlights:
 - grub 2.06.r499.ge67a551a4-1
