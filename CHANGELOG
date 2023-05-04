@@ -2,7 +2,7 @@ On the road to 2023.05:
 Environment changes:
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
-- cleanup scsi and network modules
+- cleanup crypto, scsi and network modules
 - cleanup firmware files
 ---
 2023.04 Highlights:
