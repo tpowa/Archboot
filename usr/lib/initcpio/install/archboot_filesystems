@@ -5,7 +5,7 @@
 build ()
 {
 	add_all_modules '/fs/(btrfs|cifs|exfat|ext4|f2fs|fat|hfs|hfsplus|isofs|jfs|nfs|nfsd|nilfs2|nls|ntfs3|udf|xfs|vboxsf)'
-    add_all_modules -f 'chelsio|cavium|inside-secure|qat' 'lib/crypto/|kernel/crypto|arch/*/crypto'
+    add_all_modules 'lib/crypto/|kernel/crypto|arch/*/crypto'
     map add_module crypto-crc32c? crypto-crc32? libcrc32c? configfs? nls_cp437? nls_ascii?
     map add_binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
 	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
@@ -16,7 +16,7 @@ build ()
 	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.idmap cifs.upcall cifscreds getcifsacl \
 	  setcifsacl umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
 	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \
-	  tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos fsck.btrfs dosfslabel \
+	  tune.exfat exfatlabel dump.exfat fatresize nvme fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos fsck.btrfs dosfslabel \
 	  e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io f2fscrypt f2fstat fibmap.f2fs fsck.f2fs \
 	  parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld nfsidmap nfsv4.exportd nilfs-clean \
 	  nilfs-resize nilfs-tune xfs_growfs xfs_quota \
