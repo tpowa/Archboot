@@ -1,4 +1,6 @@
 On the road to 2023.05:
+- linux 6.3.x
+- systemd 253.4
 Environment changes:
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
