@@ -2,13 +2,13 @@ On the road to 2023.05:
 - linux 6.3.x
 - systemd 253.4
 - removed modules and firmware files, which are not needed:
-  normal image: 517M -> 458M
-  local image: 833M -> 795M
-  latest image: 252M -> 224M
+  normal image: 517M -> 457M
+  local image: 833M -> 793M
+  latest image: 252M -> 222M
 Environment changes:
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
-- cleanup crypto, scsi and network modules
+- cleanup crypto, input, hid, network and scsi modules
 - cleanup firmware files
 ---
 2023.04 Highlights:
