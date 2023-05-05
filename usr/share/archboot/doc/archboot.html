@@ -172,7 +172,7 @@
 </head>
 <body>
 <h1>Archboot Homepage</h1>
-<p>Last update 05.05.2023 06:58<br>&copy; Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p>Last update 05.05.2023 07:36<br>&copy; Tobias Powalowski </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <p><span dir=""><img src="https://pkgbuild.com/~tpowa/archboot/web/logo.png" alt="Logo"></span></p>
 <p><span dir=""><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate" /></a> You like the project? I like coffee :-)</span></p>
 <nav id="TOC" role="doc-toc">
@@ -199,6 +199,7 @@
 <li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">2.17</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
 <li><a href="#development-git-repository" id="toc-development-git-repository"><span class="toc-section-number">2.18</span> <span dir="">Development: GIT repository</span></a></li>
 <li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">2.19</span> <span dir="">Bugs</span></a></li>
+<li><a href="#archiso" id="toc-archiso"><span class="toc-section-number">2.20</span> <span dir="">Comparison to archiso image</span></a></li>
 </ul></li>
 <li><a href="#create-rescue-system-of-running-system" id="toc-create-rescue-system-of-running-system"><strong><span class="toc-section-number">3.</span> <span dir="">Create rescue system of running system</strong></span></a></li>
 <li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">4.</span> <span dir="">Create image files</strong></span></a>
@@ -927,8 +928,12 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:
 <br><strong>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot</strong>
 </ul>
+<h3 data-number="2.18" id="development-git-repository"><span class="header-section-number">2.18</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
+<p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
+<h3 data-number="2.19" id="bugs"><span class="header-section-number">2.19</span> <strong><span dir="">Bugs</span></strong></h3>
+<p><a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a></p>
+<h3 data-number="2.20" id="archiso"><span class="header-section-number">2.20 Comparison to <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> image</h3>
 <ul>
-<li>What are the <strong>differences</strong> to the <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> install image?</li>
 <table>
 <thead>
 <tr class="header">
@@ -1134,12 +1139,8 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </tr>
 </tbody>
 </table>
-<p>* Qemu (4GB RAM, kvm and virtio backend), normal image | ** Only local image</p>
+<p>* QEMU (4GB RAM, kvm and virtio backend), normal image | ** Only local image</p>
 </ul>
-<h3 data-number="2.18" id="development-git-repository"><span class="header-section-number">2.18</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
-<p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
-<h3 data-number="2.19" id="bugs"><span class="header-section-number">2.19</span> <strong><span dir="">Bugs</span></strong></h3>
-<p><a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a></p>
 <h2 data-number="3" id="create-rescue-system-of-running-system"><span class="header-section-number">3.</span> <span dir="">Create rescue system of running system</span></h2>
 <ul>
 </ul>
