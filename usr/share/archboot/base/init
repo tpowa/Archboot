@@ -9,6 +9,11 @@ _emergency_shell() {
     /bin/bash
     echo b >/proc/sysrq-trigger
 }
+_udev_trigger() {
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    udevadm settle
+}
 
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
@@ -23,11 +28,7 @@ echo archboot >/proc/sys/kernel/hostname
 kmod static-nodes --format=tmpfiles --output=/run/tmpfiles.d/kmod.conf
 systemd-tmpfiles --prefix=/dev --create --boot
 /usr/lib/systemd/systemd-udevd --daemon --resolve-names=never &>/dev/null
-udevadm trigger --action=add --type=subsystems
-udevadm trigger --action=add --type=devices
-udevadm settle
-udevadm control --exit
-udevadm info --cleanup-db
+_udev_trigger
 # not all devices trigger autoload!
 modprobe -q cdrom
 modprobe -q usb-storage
@@ -35,22 +36,7 @@ modprobe -q zram
 modprobe -q zstd
 echo 1 > /proc/sys/kernel/sysrq
 echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
-# it needs one echo before, in order to reset the consolefont!
-FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
-if [[ "${FB_SIZE}" -gt '1900' ]]; then
-    SIZE="32"
-else
-    SIZE="16"
-fi
-setfont consolefont-${SIZE}.psf.gz -C /dev/console
-echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
-echo "zstd" >/sys/block/zram0/comp_algorithm
-echo "4G" >/sys/block/zram0/disksize
-echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
-mkfs.btrfs /dev/zram0 &>/dev/null
-# use discard to get free RAM on delete!
-mount -o discard /dev/zram0 /sysroot &>/dev/null
-echo -e "\e[1mStep 3/4:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+echo -e "\e[1mStep 1/5:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
@@ -69,10 +55,37 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
         _emergency_shell
     fi
 fi
-cd /sysroot || _emergency_shell
-echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
+cd /
+# move in modules from main initramfs
+echo -e "\e[1mStep 2/5:\e[m Copying and loading modules from main initramfs..."
+bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+# reinitialize available modules
+udevadm control -R
+_udev_trigger
+# shutdown udevd
+udevadm control --exit
+udevadm info --cleanup-db
+# it needs one echo before, in order to reset the consolefont!
+FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
+if [[ "${FB_SIZE}" -gt '1900' ]]; then
+    SIZE="32"
+else
+    SIZE="16"
+fi
+setfont consolefont-${SIZE}.psf.gz -C /dev/console
+echo -e "\e[1mStep 3/5:\e[m Creating /dev/zram0 with zstd compression..."
+echo "zstd" >/sys/block/zram0/comp_algorithm
+echo "4G" >/sys/block/zram0/disksize
+echo -e "\e[1mStep 4/5:\e[m Creating btrfs on /dev/zram0..."
+mkfs.btrfs /dev/zram0 &>/dev/null
+# use discard to get free RAM on delete!
+mount -o discard /dev/zram0 /sysroot &>/dev/null
+echo -e "\e[1mStep 5/5:\e[m Copying archboot rootfs files to /sysroot..."
 echo -e "          This may need some time..."
-bsdcpio -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+mkdir -p /sysroot/usr/lib
+mv /lib/{modules,firmware} /sysroot/usr/lib
+cd /sysroot || _emergency_shell
+bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null

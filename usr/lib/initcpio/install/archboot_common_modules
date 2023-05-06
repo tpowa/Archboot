@@ -26,7 +26,7 @@ build ()
 help ()
 {
 cat <<HELPEOF
-  This hook includes init, keyboard, kms and pcspkr support
+  This hook includes keyboard, kms and pcspkr support
   for an archboot image.
   DO NOT remove this one unless you know what you're doing.
 HELPEOF
