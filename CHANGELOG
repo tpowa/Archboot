@@ -1,6 +1,7 @@
 On the road to 2023.05:
 - linux 6.3.x
 - systemd 253.4
+- amazing reduction of 100MB RAM to boot on image files
 - amazing shrinking of the image files:
   - Cleaned up modules and firmware files
   - Use modules and firmware files from main initramdisk
