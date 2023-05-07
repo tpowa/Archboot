@@ -1,22 +1,22 @@
 On the road to 2023.05:
 - linux 6.3.x
 - systemd 253.4
-- amazing reduction of 100MB RAM to boot on image files
-- amazing shrinking of the image files:
-  - Cleaned up modules and firmware files
-  - Use modules and firmware files from main initramdisk
-  Results in comparison to 2023.04 iso files:
-  - aarch64:
-    normal image: 356M -> 312M
-    local image:  559M -> 532M
-    latest image: 157M -> 128M
-  - riscv64:
-    normal image: 502M -> 417M
-  - x86_64:
-    normal image: 517M -> 417M
-    local image:  833M -> 753M
-    latest image: 252M -> 182M
+- Amazing reduction of 100MB! RAM to boot the normal image
+  => The new requirement dropped to 700M RAM for x86_64
+- Amazing shrinking of the image files:
+  => The results in comparison to 2023.04 iso files:
+     - aarch64:
+       normal image: 356M -> 312M
+       local image:  559M -> 532M
+       latest image: 157M -> 128M
+     - riscv64:
+       normal image: 502M -> 417M
+     - x86_64:
+       normal image: 517M -> 417M
+       local image:  833M -> 753M
+       latest image: 252M -> 182M
 Environment changes:
+- use modules and firmware files from the main initramdisk on ISO boot
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
 - cleanup crypto, input, hid, network and scsi modules
