@@ -1,17 +1,20 @@
 On the road to 2023.05:
 - linux 6.3.x
 - systemd 253.4
-- removed modules and firmware files, which are not needed:
-  aarch64:
-  normal image: 356M -> 336M
-  local image: 559M -> 556M
-  latest image: 157M -> 152M
-  riscv64:
-  normal image: 502M -> 461M
-  x86_64:
-  normal image: 517M -> 457M
-  local image: 833M -> 793M
-  latest image: 252M -> 222M
+- amazing shrinking of the image files:
+  - Cleaned up modules and firmware files
+  - Use modules and firmware files from main initramdisk
+  Results in comparison to 2023.04 iso files:
+  - aarch64:
+    normal image: 356M -> 312M
+    local image:  559M -> 532M
+    latest image: 157M -> 128M
+  - riscv64:
+    normal image: 502M -> 417M
+  - x86_64:
+    normal image: 517M -> 417M
+    local image:  833M -> 753M
+    latest image: 252M -> 182M
 Environment changes:
 - remove parport, pata, pcmcia and staging modules
 - cleanup init ramdisk modules
