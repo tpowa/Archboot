@@ -15,6 +15,7 @@ _usage () {
     echo "                     /etc/archboot/presets locates the presets"
     echo "                     default=${_ARCH}"
     echo " -i=IMAGENAME        Your IMAGENAME."
+    echo " -s                  Save init ramdisk to $(pwd)"
     echo " -h                  This message."
     echo ""
     echo "usage: ${_BASENAME} <options>"
@@ -25,6 +26,7 @@ _parameters() {
     while [ $# -gt 0 ]; do
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
+            -s|--s) _SAVE_INIT="1" ;;
             -p=*|--p=*) _PRESET="$(echo "${1}" | awk -F= '{print $2;}')" ;;
             -i=*|--i=*) _IMAGENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
             -h|--h|?) _usage ;;
@@ -71,7 +73,9 @@ _prepare_kernel_initramfs_files() {
         echo "Running archboot-cpio.sh for init-${_ARCH}.img..."
         archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
-        cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
+        if [[ -n "${_SAVE_INIT}" ]]; then
+            cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
+        fi
     fi
     echo "Running archboot-cpio.sh for initramfs-${_ARCH}.img..."
     #shellcheck disable=SC2154

@@ -43,19 +43,19 @@ _create_iso() {
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         echo "Generating local ISO..."
         # generate local iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_ARCH}" || exit 1
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
+            -p=${_PRESET_LOCAL}  -i=${_ISONAME}-local-${_ARCH}" || exit 1
         echo "Generating latest ISO..."
         # generate latest iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-        -i=${_ISONAME}-latest-${_ARCH}" || exit 1
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
+            -p=${_PRESET_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Installing lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
     fi
     echo "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
-    -i=${_ISONAME}-${_ARCH}"  || exit 1
+        -i=${_ISONAME}-${_ARCH}"  || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
     mv "${_W_DIR}"/*.img ./ &>/dev/null
