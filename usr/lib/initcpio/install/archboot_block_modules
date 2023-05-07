@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
+# created by Tobias Powalowski <tpowa@archlinux.org>
+
+build()
+{
+    ### add block device support
+    # sata, scsi, nvme
+    map add_all_modules 'scsi/.*ata' \
+            'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
+    add_all_modules -f 'pcmcia|scsi/(ch|imm|ppa|sg|st)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
+    add_all_modules -f 'parport' 'ata/sata_'
+    # usb
+    add_all_modules '/drivers/usb/storage/'
+    # mmc
+    add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
+    # spi (mmc in spi mode)
+    add_all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
+    # nvdimm
+    add_all_modules '/drivers/nvdimm/'
+	# Intel Volume Management Device
+    add_all_modules 'vmd'
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook includes block support for an archboot image.
+  DO NOT remove this one unless you know what you're doing.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

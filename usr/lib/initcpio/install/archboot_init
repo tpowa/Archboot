@@ -3,27 +3,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 build() {
-    ### block and filesystem modules
+    ### init modules
     map add_module vfat? iso9660? nls_cp437? nls_ascii? cdrom?
-    ### add pcspkr
-    add_module "pcspkr"
-    ### add init modules
-    map add_module zram? btrfs? zstd? libcrc32c?
-    ### usb modules
-    add_all_modules -f '_cs|ssb-hcd' '/usb/host'
-    ### keyboard modules
-    add_all_modules '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
-    add_module 'usbhid'
-    add_all_modules -f 'parkbd' '/input/serio|keyboard/(applespi|atkbd)'
-    ### virtio modules
-    add_all_modules -f '9pnet|bluetooth|fs' 'virtio'
-    ### sata, scsi, nvme, usb, mmc, spi (for mmc mode)
-    map add_all_modules 'scsi/.*ata' \
-            'ata/(ahci|pdc_adma|ata_piix|ata_generic)' '/drivers/usb/storage/'
-    add_all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
-    add_all_modules -f 'pcmcia|scsi/(ch|imm|ppa|sg|st)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|ublk_drv|lpfc|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
-    add_all_modules -f '_cs' '/(drivers/mmc|tifm_)'
-    add_all_modules -f 'parport' 'ata/sata_'
     map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir
