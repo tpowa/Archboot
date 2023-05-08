@@ -12,7 +12,6 @@ _emergency_shell() {
 _udev_trigger() {
     udevadm trigger --action=add --type=subsystems
     udevadm trigger --action=add --type=devices
-    setfont consolefont-16.psf.gz -C /dev/console
     udevadm settle
 }
 
