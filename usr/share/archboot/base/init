@@ -103,6 +103,7 @@ echo 0 > /proc/sys/kernel/sysrq
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
 rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+# clear screen
 printf "\ec"
 exec switch_root /sysroot /usr/bin/init "$@"
 
