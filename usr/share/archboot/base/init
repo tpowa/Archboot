@@ -1,6 +1,9 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_title() {
+    echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+}
 _emergency_shell() {
     echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
     echo -e "\e[1mSeems something went wrong...\e[m"
@@ -35,7 +38,7 @@ modprobe -q usb-storage
 modprobe -q zram
 modprobe -q zstd
 echo 1 > /proc/sys/kernel/sysrq
-echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+_title
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
 echo -e "\e[1mStep 1/6:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
@@ -64,6 +67,7 @@ echo -e "          This may need some time..."
 bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 # reinitialize available modules
 udevadm control -R
+# clear screen
 printf "\ec"
 _udev_trigger
 # shutdown udevd
@@ -76,7 +80,7 @@ else
     SIZE="16"
 fi
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
-echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+_title
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
 # cleanup firmware and modules
 rm -rf /lib/firmware
