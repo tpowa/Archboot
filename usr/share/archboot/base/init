@@ -82,7 +82,9 @@ setfont consolefont-${SIZE}.psf.gz -C /dev/console
 _title
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
 # cleanup firmware and modules
-rm -rf /lib/firmware
+mv /lib/firmware/regulatory* /tmp/
+rm -rf /lib/firmware/*
+mv /tmp/regulatory* /lib/firmware/
 rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
 rm -rf /lib/modules/*/extramodules
 echo -e "\e[1mStep 4/6:\e[m Creating /dev/zram0 with zstd compression..."
@@ -96,6 +98,7 @@ echo -e "\e[1mStep 6/6:\e[m Copying rootfs files to /sysroot..."
 echo -e "          This may need some time..."
 mkdir -p /sysroot/usr/lib
 mv /lib/modules /sysroot/usr/lib
+mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
