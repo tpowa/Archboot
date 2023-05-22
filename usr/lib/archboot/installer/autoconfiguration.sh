@@ -93,9 +93,9 @@ _auto_testing()
 {
     if [[ -n "${_DOTESTING}" ]]; then
         _dialog --infobox "Enable [testing] repository on installed system..." 3 70
-        sed -i -e '/^#\[testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
-        sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
-        sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' "${_DESTDIR}"/etc/pacman.conf
+        sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
+        sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
+        sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${_DESTDIR}"/etc/pacman.conf
         sleep 2
     fi
 }

@@ -52,11 +52,11 @@ _select_mirror() {
 _enable_testing() {
     if ! grep -q "^\[testing\]" /etc/pacman.conf; then
         _DOTESTING=""
-        _dialog --defaultno --yesno "Do you want to enable [testing]\nand [community-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING=1
+        _dialog --defaultno --yesno "Do you want to enable [core-testing]\nand [extra-testing] repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 9 50 && _DOTESTING=1
         if [[ -n "${_DOTESTING}" ]]; then
-            sed -i -e '/^#\[testing\]/ { n ; s/^#// }' /etc/pacman.conf
-            sed -i -e '/^#\[community-testing\]/ { n ; s/^#// }' /etc/pacman.conf
-            sed -i -e 's:^#\[testing\]:\[testing\]:g' -e  's:^#\[community-testing\]:\[community-testing\]:g' /etc/pacman.conf
+            sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' /etc/pacman.conf
+            sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' /etc/pacman.conf
+            sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' /etc/pacman.conf
         fi
     fi
 }
