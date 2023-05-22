@@ -15,6 +15,7 @@ On the road to 2023.05:
        normal image: 517M => 417M
        local image:  833M => 753M
        latest image: 252M => 182M
+- updated to new Arch Linux repository layout
 Environment changes:
 - load modules and firmware files from the main initramdisk on ISO boot
 - removed parport, pata, pcmcia and staging modules
