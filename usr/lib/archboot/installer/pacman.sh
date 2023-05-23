@@ -84,7 +84,7 @@ _update_environment() {
                 else
                     if [[ -n "${_DOTESTING}" ]]; then
                         #shellcheck disable=SC2086
-                        _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##' 2>${_NO_LOG})"
+                        _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                     fi
                     if [[ -z "${_ONLINE_KERNEL}" ]]; then
                         #shellcheck disable=SC2086
