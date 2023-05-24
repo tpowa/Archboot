@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _title() {
-    echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+    echo -e "\e[1mInitializing\e[m \e[1;94mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+    echo -e "\e[1;93mPlease keep the medium inserted, until the following steps have fully finished\!\e[m"
 }
 _emergency_shell() {
     echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
@@ -80,6 +81,10 @@ else
 fi
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
 _title
+echo -e "\e[1mStep 1/6:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
+echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
+echo -e "          This may need some time..."
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
 # cleanup firmware and modules
 mv /lib/firmware/regulatory* /tmp/
@@ -102,6 +107,10 @@ mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
+echo -e "\e[1;94mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
+echo -e "\e[1;92mThe medium can be safely removed now\!\e[m"
+echo -e "\e[1mSystemd will take over in a second...\e[m"
+sleep 1
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
 rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null

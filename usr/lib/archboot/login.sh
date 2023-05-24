@@ -30,7 +30,7 @@ _switch_root_zram() {
 TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
-    echo -e "\e[1mInitializing\e[m \e[36mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
+    echo -e "\e[1mInitializing\e[m \e[94mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
     echo -e "\e[1mStep 1/3:\e[m Creating /dev/zram0 with zstd compression..."
     [[ -d /sysroot ]] || mkdir /sysroot
     modprobe zram &>/dev/null
@@ -50,6 +50,9 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
+    echo -e "\e[1;94mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
+    echo -e "\e[1mSystemd will take over in a second...\e[m"
+    sleep 1
     systemctl start initrd-switch-root
 else
     while true; do
