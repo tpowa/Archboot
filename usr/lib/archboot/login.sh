@@ -31,17 +31,24 @@ TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
     echo -e "\e[1mInitializing\e[m \e[94mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
-    echo -e "\e[1mStep 1/3:\e[m Creating /dev/zram0 with zstd compression..."
+    echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
     [[ -d /sysroot ]] || mkdir /sysroot
     modprobe zram &>/dev/null
     modprobe zstd &>/dev/null
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "4G" >/sys/block/zram0/disksize
-    echo -e "\e[1mStep 2/3:\e[m Creating btrfs on /dev/zram0..."
+    echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>/dev/null
     mount -o discard /dev/zram0 /sysroot &>/dev/null
-    echo -e "\e[1mStep 3/3:\e[m Copying archboot rootfs to /sysroot..."
+    echo -e "\e[1mStep 3/4:\e[m Removing firmware and modules..."
+    # cleanup firmware and modules
+    mv /lib/firmware/regulatory* /tmp/
+    rm -rf /lib/firmware/*
+    mv /tmp/regulatory* /lib/firmware/
+    rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
+    rm -rf /lib/modules/*/extramodules
+    echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
     tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./sysroot/*" \
         -clpf - . | tar -C /sysroot -xlspf - &>/dev/null
