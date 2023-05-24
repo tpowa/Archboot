@@ -110,7 +110,7 @@ echo 0 > /proc/sys/kernel/sysrq
 echo -e "\e[1;94mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
 echo -e "\e[1;92mThe medium can be safely removed now! \e[m"
 echo -e "\e[1mSystemd will take over in a second...\e[m"
-read -r -t 1
+read -r -t 2
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
 rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
