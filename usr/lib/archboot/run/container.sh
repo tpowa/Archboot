@@ -25,9 +25,9 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     _copy_mirrorlist_and_pacman_conf "${1}"
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _copy_archboot_defaults "${1}"
-        # enable [testing] if enabled in host
+        # enable [*-testing] if enabled in host
         if grep -q "^\[core-testing" /etc/pacman.conf; then
-            echo "Enable [testing] repository in container..."
+            echo "Enable [core-testing] and [extra-testing] repository in container..."
             sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
             sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
             sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${1}/etc/pacman.conf"
