@@ -1,4 +1,6 @@
-On the road to 2023.05:
+On the road to 2023.06:
+---
+2023.05 Highlights:
 - linux 6.3.x
 - systemd 253.4
 - Amazing reduction of !100M RAM to boot the normal image
