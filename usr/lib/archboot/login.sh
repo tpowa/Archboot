@@ -52,7 +52,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     touch /etc/initrd-release
     echo -e "\e[1;94mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd will take over in a second...\e[m"
-    read -r -t 1
+    read -r -t 2
     systemctl start initrd-switch-root
 else
     while true; do
