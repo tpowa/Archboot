@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _title() {
     echo -e "\e[1mInitializing\e[m \e[1;96mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
-    echo -e "\e[1;93mPlease keep the medium inserted, until the following steps have fully finished! \e[m"
+    echo -e "\e[1;93mPlease keep the boot medium inserted, until the process has finished! \e[m"
 }
 _emergency_shell() {
     echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
@@ -108,8 +108,8 @@ cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
 echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
-echo -e "\e[1;92mThe medium can be safely removed now! \e[m"
 echo -e "\e[1mSystemd will take over in a second...\e[m"
+echo -e "\e[1;92mThe boot medium can be safely removed now! \e[m"
 read -r -t 3
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
