@@ -107,6 +107,8 @@ mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 echo 0 > /proc/sys/kernel/sysrq
+# set font size in vconsole.conf
+echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
 echo -e "\e[1mSystemd will be launched in a second...\e[m"
 echo -e "\e[1;92mThe boot medium can be safely removed now! \e[m"
