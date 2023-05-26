@@ -24,6 +24,8 @@ Environment changes:
 - cleanup init ramdisk modules
 - cleanup crypto, input, hid, network and scsi modules
 - cleanup firmware files
+- fix font flickering during boot process
+- added more messages during boot process
 ---
 2023.04 Highlights:
 - grub 2.06.r499.ge67a551a4-1
