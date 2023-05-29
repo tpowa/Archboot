@@ -29,12 +29,12 @@ fi
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
-        _TITLE="Archboot Arch Linux (System Setup mode) --> https://bit.ly/archboot"
+        _TITLE="Archboot Arch Linux (System Setup mode) --> https://archboot.com"
     else
         if [[ -e "${_LOCAL_DB}" ]]; then
-            _TITLE="Archboot Arch Linux Installation (Local mode) --> https://bit.ly/archboot"
+            _TITLE="Archboot Arch Linux Installation (Local mode) --> https://archboot.com"
         else
-            _TITLE="Archboot Arch Linux Installation (Online mode) --> https://bit.ly/archboot"
+            _TITLE="Archboot Arch Linux Installation (Online mode) --> https://archboot.com"
         fi
     fi
 }
