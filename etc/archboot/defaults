@@ -30,7 +30,7 @@ _CUSTOM_WAYLAND=""
 # release directory
 _DIR="$(date +%Y.%m)"
 # delete old version from server
-_PURGE_DATE="2 month"
+_PURGE_DATE="1 month"
 # custom pacman.conf on x86_64
 _CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
 # custom mirrorlist on x86_64
