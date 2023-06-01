@@ -19,25 +19,25 @@ body {
 }
 @media (max-width: 600px) {
     body {
-font-size: 0.9em;
-padding: 1em;
+        font-size: 0.9em;
+        padding: 1em;
     }
     h1 {
-font-size: 1.8em;
+        font-size: 1.8em;
     }
 }
 @media print {
     body {
-background-color: transparent;
-color: black;
-font-size: 12pt;
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
     }
     p, h2, h3 {
-orphans: 3;
-widows: 3;
+        orphans: 3;
+        widows: 3;
     }
     h2, h3, h4 {
-page-break-after: avoid;
+        page-break-after: avoid;
     }
 }
 p {
@@ -132,6 +132,9 @@ td {
 }
 header {
     margin-bottom: 4em;
+}
+address {
+    font-size: 12pt;
 }
 #TOC li {
     list-style: none;

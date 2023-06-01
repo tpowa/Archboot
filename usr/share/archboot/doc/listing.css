@@ -1,0 +1,32 @@
+html {
+    line-height: 1.5;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: #1a1a1a;
+    background-color: #fdfdfd;
+}
+body {
+    margin: 0 auto;
+    max-width: 75em;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    text-rendering: optimizeLegibility;
+    font-kerning: normal;
+}
+a {
+    text-decoration: none;
+    color: #0049FF;
+}
+a:visited {
+    color: #0049FF;
+}
+img {
+    max-width: 100%;
+}
+h1 {
+    margin-top: 1.4em;
+}
