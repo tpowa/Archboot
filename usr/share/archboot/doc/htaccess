@@ -1,0 +1,19 @@
+# STRONG HTACCESS PROTECTION
+<Files ~ "^.*\.([Hh][Tt][Aa])">
+ order allow,deny
+ deny from all
+</Files>
+Options +Indexes
+IndexOptions FancyIndexing HTMLTable XHTML SuppressRules IconsAreLinks NameWidth=* FoldersFirst SuppressDescription
+IndexHeadInsert "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+ServerSignature Off
+AddIcon (IMG,/web/package.png) .zst .xz
+AddIcon (IMG,/web/signature.png) .sig
+AddIcon (IMG,/web/db.png) .db .files .gz
+AddIcon (IMG,/web/boot.png) .efi .img -x86_64 -aarch64 -riscv64
+AddIcon (IMG,/web/iso.png) .iso
+AddIcon (IMG,/web/text.png) .txt
+AddIcon (DIR,/web/directory.png)    ^^DIRECTORY^^
+AddIcon /web/up.png ..
+IndexStyleSheet "/web/styles.css"
+
