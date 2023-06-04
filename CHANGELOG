@@ -1,5 +1,7 @@
 On the road to 2023.06:
-- update to new archboot.com domain
+- update to new archboot.com domain, with new layout
+Environment Changes:
+- don't try to mount none existent /dev/sr0
 ---
 2023.05 Highlights:
 - linux 6.3.x
