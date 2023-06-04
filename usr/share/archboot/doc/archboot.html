@@ -13,7 +13,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project Homepage | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>Last update:</strong> 04.06.2023 19:56 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
+<p><strong>Last update:</strong> 04.06.2023 20:32 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -104,7 +104,7 @@
 </table>
 </ul>
 <ul>
-<li>The ISO supports Apple Mac M1 and higher for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a></li>
+<li>The ISO supports <strong>Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a></li>
 </ul>
 <a href="https://archriscv.felixc.at/"><strong>Arch Linux RISC-V riscv64</strong></a>
 <ul>
@@ -125,7 +125,7 @@
 </table>
 </ul>
 <ul>
-<li>The ISO supports riscv64 and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a VM.</li>
+<li>The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a VM.</li>
 </ul>
 <a href="https://archlinux.org/"><strong>Arch Linux X64 x86_64</strong></a>
 <ul>
@@ -148,7 +148,7 @@
 </table>
 </ul>
 <ul>
-<li>The ISO for Arch Linux. Use it for <strong>real</strong> machines and/or virtual machines.</li>
+<li>The ISO for <strong>Arch Linux</strong>. Use it for <strong>real</strong> machines and/or virtual machines.</li>
 </ul>
 <h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Images</span></strong></a> / UKIs</h3>
 <ul>
@@ -517,8 +517,8 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>adding pacman hook for automatic signing with personal keys</li>
 <li>On <strong>first</strong> boot you need to <strong>enroll</strong> the used personal key as <strong>MOK</strong>.</li>
 <li>Then your installed system is dual boot ready.</li>
-</ul></li>
 </ul>
+</ul></li>
 <ul>
 <table>
 <thead>
@@ -533,6 +533,27 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
+<ul>
+<li>In order to <strong>reset</strong> the Secure Boot setup:
+<ul>
+<li>Turn <strong>off</strong> Secure Boot in firmware</li>
+<li>Boot the system and use <strong>mokutil</strong> to reset the setup.</li>
+<table>
+<thead>
+<tr class="header">
+<th>Reset MOK:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code># mokutil --reset</code></td>
+</tr>
+</tbody>
+</table>
+<li>Reboot and turn <strong>on</strong> Secure Boot again in firmware.</li>
+<li>Start again with adding the hashes of kernel and grub.</li>
+</ul>
+</ul></li>
 <h3 data-number="2.10" id="switch-to-full-arch-linux-system"><span class="header-section-number">2.10</span> <strong><span dir="">Switch to full Arch Linux system</span></strong></h3>
 <ul>
 <li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
