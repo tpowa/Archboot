@@ -46,7 +46,9 @@ echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
     mount UUID=1234-ABCD /mnt &>/dev/null && break
-    mount /dev/sr0 /cdrom &>/dev/null && break
+    if [[ -b /dev/sr0 ]]; then
+        mount /dev/sr0 /cdrom &>/dev/null && break
+    fi
     read -r -t 1
     _COUNT=$((_COUNT+1))
     [[ "${_COUNT}" == 10 ]] && break
