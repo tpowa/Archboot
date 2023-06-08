@@ -13,20 +13,21 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project Homepage | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>Last update:</strong> 08.06.2023 17:31 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
+<p><strong>Last update:</strong> 08.06.2023 21:54 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
-<li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> <span dir="">Releases</strong></span></a>
-<ul>
+<li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> <span dir="">Releases</strong></span></a></li>
+<li><ul>
 <li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> <span dir="">ISOs - USB / CD / Virtual Machine</span></a></li>
 <li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> <span dir="">UKIs - Unified Kernel Images</span></li>
 <li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramdisk / Microcode / Rescue System / <span dir="">PXE</span> </a></li>
 <li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">Image / Initramdisk Types</span></a></li>
 <li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Supported boot modes</span></a></li>
-<li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.6</span> <span dir="">Burning release or writing to disk</span></a></li></ul>
-<li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a>
-<ul>
+<li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.6</span> <span dir="">Burning release or writing to disk</span></a></li>
+</li></ul>
+<li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a></li>
+<li><ul>
 <li><a href="#installation-with-a-graphical-environment-or-vnc-instead-of-plain-console" id="toc-installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="toc-section-number">3.1</span> <span dir="">Installation with a graphical environment or VNC instead of plain console</span></a></li>
 <li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote installation with OpenSSH</span></a></li>
 <li><a href="#secure-boot-support-with-shim-package-signed-from-fedora" id="toc-secure-boot-support-with-shim-package-signed-from-fedora"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot MOK support with fedora's signed shim package</span></a></li>
@@ -37,39 +38,41 @@
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> <span dir="">Tools for backup and copying of an existing system</span></a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> <span dir="">Restoring an USB device to FAT32 state</span></a></li>
 <li><a href="#quick-system-setup" id="toc-system-setup"><span class="toc-section-number">3.10</span> <span dir="">Quick System Setup on already installed system</span></a></li>
-<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">3.11</span> <span dir="">FAQ, Known Issues and limitations</span></a></li>
-<li><a href="#development-git-repository" id="toc-development-git-repository"><span class="toc-section-number">3.12</span> <span dir="">Development: GIT repository</span></a></li>
-<li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">3.13</span> <span dir="">Bugs</span></a></li>
-<li><a href="#archiso" id="toc-archiso"><span class="toc-section-number">3.14</span> <span dir="">Comparison to archiso image</span></a></li>
-</ul></li>
-<li><a href="#create-rescue-system-of-running-system" id="toc-create-rescue-system-of-running-system"><strong><span class="toc-section-number">4.</span> <span dir="">Create rescue system of running system</strong></span></a></li>
-<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">5.</span> <span dir="">Create image files</strong></span></a>
-<ul>
-<li><a href="#installation" id="toc-installation"><span class="toc-section-number">5.1</span> <span dir="">Installation</span></a></li>
-<li><a href="#requirements" id="toc-requirements"><span class="toc-section-number">5.2</span> <span dir="">Requirements</span></a></li>
-<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">5.3</span> <span dir="">Create image files without modifications</span></a></li>
-<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">5.4</span> <span dir="">Create image files with modifications:</span></a></li>
-</ul></li>
-<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">6.</span> <span dir="">Setting up an archboot image server</strong></span></a>
-<ul>
-<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">5.1</span> <span dir="">Configuration file</span></a></li>
-<li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">5.2</span> <span dir="">Requirements</span></a></li>
-<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">5.3</span> <span dir="">Running commands</span></a></li>
-</ul></li>
-<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">7.</span> <span dir="">Testing image and files with QEMU</strong></span></a>
-<ul>
-
-<li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">7.1</span> <span dir="">Running AARCH64</span></a></li>
-<li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">7.2</span> <span dir="">Running RISCV64</span></a></li>
-<li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">7.3</span> <span dir="">Running X86_64</span></a></li>
-<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">7.4</span> <span dir="">Additional qemu parameters</span></a></li>
-<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">7.5</span> <span dir="">Setting up a hwsim SSID</span></a></li>
-</ul></li>
-
-<li><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><strong><span class="toc-section-number">8.</span> <span dir="">Arch Linux Wiki</strong></span></a></li>
-<li><a href="#quick-links-archboot" id="toc-quick-links-archboot"><strong><span class="toc-section-number">9.</span> <span dir="">Quick links Archboot</strong></span></a></li>
-<li><a href="#quick-links-videos" id="toc-quick-links-videos"><strong><span class="toc-section-number">10.</span> <span dir="">Quick links videos</strong></span></a></li>
-<li><a href="#references" id="toc-references"><strong><span class="toc-section-number">11.</span> <span dir="">References</span></strong></a></li>
+</li></ul>
+<li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><strong><span class="toc-section-number">4.</span> <span dir="">FAQ, Known Issues and limitations</span></a></li></strong>
+<li><a href="#archiso" id="toc-archiso"><strong><span class="toc-section-number">5.</span> <span dir="">Comparison to archiso image</span></a></li></strong>
+</li>
+<li><a href="#development" id="toc-development"><strong><span class="toc-section-number">6.</span> <span dir="">Development</span></a></li></strong>
+<li><ul>
+<li><a href="#git" id="toc-git"><span class="toc-section-number">6.1</span> GIT repository<span dir=""></span></a></li>
+<li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">6.2</span> <span dir="">Bugs</span></a></li>
+</li></ul>
+<li><a href="#create-rescue-system-of-running-system" id="toc-create-rescue-system-of-running-system"><strong><span class="toc-section-number">7.</span> <span dir="">Create rescue system of running system</strong></span></a></li>
+<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">8.</span> <span dir="">Create image files</strong></span></a>
+<li><ul>
+<li><a href="#installation" id="toc-installation"><span class="toc-section-number">8.1</span> <span dir="">Installation</span></a></li>
+<li><a href="#requirements" id="toc-requirements"><span class="toc-section-number">8.2</span> <span dir="">Requirements</span></a></li>
+<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">8.3</span> <span dir="">Create image files without modifications</span></a></li>
+<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">8.4</span> <span dir="">Create image files with modifications:</span></a></li>
+</li></ul>
+<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">9.</span> <span dir="">Setting up an archboot image server</strong></span></a>
+<li><ul>
+<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">9.1</span> <span dir="">Configuration file</span></a></li>
+<li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">9.2</span> <span dir="">Requirements</span></a></li>
+<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">9.3</span> <span dir="">Running commands</span></a></li>
+</li></ul>
+<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">10.</span> <span dir="">Testing image and files with QEMU</strong></span></a>
+<li><ul>
+<li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">10.1</span> <span dir="">Running AARCH64</span></a></li>
+<li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">10.2</span> <span dir="">Running RISCV64</span></a></li>
+<li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">10.3</span> <span dir="">Running X86_64</span></a></li>
+<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">10.4</span> <span dir="">Additional qemu parameters</span></a></li>
+<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">10.5</span> <span dir="">Setting up a hwsim SSID</span></a></li>
+</li></ul>
+<li><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><strong><span class="toc-section-number">11.</span> <span dir="">Arch Linux Wiki</strong></span></a></li>
+<li><a href="#quick-links-archboot" id="toc-quick-links-archboot"><strong><span class="toc-section-number">12.</span> <span dir="">Quick links Archboot</strong></span></a></li>
+<li><a href="#quick-links-videos" id="toc-quick-links-videos"><strong><span class="toc-section-number">13.</span> <span dir="">Quick links videos</strong></span></a></li>
+<li><a href="#references" id="toc-references"><strong><span class="toc-section-number">14.</span> <span dir="">References</span></strong></a></li>
 </ul>
 </nav>
 <h2 data-number="1" id="introduction"><span class="header-section-number">1.</span> Introduction</h2>
@@ -733,7 +736,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <h3 data-number="3.10" id="quick-system-setup"><span class="header-section-number">3.10</span> <span dir="">Quick System Setup on already installed system</span></h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for a quick <strong>System Setup</strong> on an already installed system.</p>
 <p><a href="#installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
-<h3 data-number="3.11" id="faq-known-issues-and-limitations"><span class="header-section-number">3.11</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
+<h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong><span dir="">FAQ, Known Issues and limitations</span></strong></h3>
 <ul>
 <li>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
@@ -789,11 +792,7 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:
 <br><strong>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot</strong>
 </ul>
-<h3 data-number="3.12" id="development-git-repository"><span class="header-section-number">3.12</span> <strong><span dir="">Development: GIT repository</span></strong></h3>
-<p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
-<h3 data-number="3.13" id="bugs"><span class="header-section-number">3.13</span> <strong><span dir="">Bugs</span></strong></h3>
-<p><a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a></p>
-<h3 data-number="3.14" id="archiso"><span class="header-section-number">3.14 Comparison to <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> image</h3>
+<h2 data-number="5." id="archiso"><span class="header-section-number">5. Comparison to <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> image</h3>
 <ul>
 <table>
 <thead>
@@ -1012,7 +1011,12 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </table>
 <p> &#9733; Optional | * Only local image | ** QEMU (4GB RAM, kvm and virtio backend), normal image</p>
 </ul>
-<h2 data-number="4" id="create-rescue-system-of-running-system"><span class="header-section-number">4.</span> <span dir="">Create rescue system of running system</span></h2>
+<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong><span dir="">Development</span></strong></h3>
+<h3 data-number="6.1" id="git"><span class="header-section-number">6.1</span> <strong><span dir="">Git</span></strong></h3>
+<p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
+<h3 data-number="6.2" id="bugs"><span class="header-section-number">6.2</span> <strong><span dir="">Bugs</span></strong></h3>
+<p>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</p>
+<h2 data-number="7" id="create-rescue-system-of-running-system"><span class="header-section-number">7.</span> <span dir="">Create rescue system of running system</span></h2>
 <ul>
 </ul>
 <ul>
@@ -1032,8 +1036,8 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 <ul>
 <li>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</li>
 </ul>
-<h2 data-number="5" id="create-image-files"><span class="header-section-number">5.</span> <span dir="">Create image files</span></h2>
-<h3 data-number="5.1" id="installation"><span class="header-section-number">5.1</span> <strong><span dir="">Installation</span></strong></h3>
+<h2 data-number="8" id="create-image-files"><span class="header-section-number">8.</span> <span dir="">Create image files</span></h2>
+<h3 data-number="8.1" id="installation"><span class="header-section-number">8.1</span> <strong><span dir="">Installation</span></strong></h3>
 <ul>
 </ul>
 <ul>
@@ -1059,9 +1063,9 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 <ul>
 <li>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</li>
 </ul>
-<h3 data-number="5.2" id="requirements"><span class="header-section-number">5.2</span> <strong><span dir="">Requirements</span></strong></h3>
+<h3 data-number="8.2" id="requirements"><span class="header-section-number">8.2</span> <strong><span dir="">Requirements</span></strong></h3>
 <p>Around <strong>3GB</strong> free space on disk.</p>
-<h3 data-number="5.3" id="create-image-files-without-modifications"><span class="header-section-number">5.3</span> <strong><span dir="">Create image files without modifications</span></strong></h3>
+<h3 data-number="8.3" id="create-image-files-without-modifications"><span class="header-section-number">8.3</span> <strong><span dir="">Create image files without modifications</span></strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
 <ul>
 <table>
@@ -1091,9 +1095,9 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </tbody>
 </table>
 </ul>
-<h3 data-number="5.4" id="create-image-files-with-modifications"><span class="header-section-number">5.4</span> <strong><span dir="">Create image files with modifications:</span></strong></h3>
+<h3 data-number="8.4" id="create-image-files-with-modifications"><span class="header-section-number">8.4</span> <strong><span dir="">Create image files with modifications:</span></strong></h3>
 <p>Explanation of the archboot image tools.</p>
-<h4 data-number="5.4.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">5.4.1</span> <strong><span dir="">archboot-x86_64-create-container.sh</span></strong></h4>
+<h4 data-number="8.4.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">8.4.1</span> <strong><span dir="">archboot-x86_64-create-container.sh</span></strong></h4>
 <ul>
 <table>
 <thead>
@@ -1123,14 +1127,14 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </table>
 </ul>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
-<h4 data-number="5.4.2" id="configuration-files-for-image-creation"><span class="header-section-number">5.4.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
+<h4 data-number="8.4.2" id="configuration-files-for-image-creation"><span class="header-section-number">8.4.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
 <ul>
 There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
 </ul>
-<h4 data-number="5.4.3" id="archboot-cpio.sh"><span class="header-section-number">5.4.3</span> <strong><span dir="">archboot-cpio.sh initramfs generator:</span></strong></h4>
+<h4 data-number="8.4.3" id="archboot-cpio.sh"><span class="header-section-number">8.4.3</span> <strong><span dir="">archboot-cpio.sh initramfs generator:</span></strong></h4>
 <p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
@@ -1138,7 +1142,7 @@ There are the following configuration files for ISO creation:
 <li>Functions supported in <strong>HOOK</strong> files:<br>
 <strong>add_dir, add_full_dir, add_binary, add_file, add_symlink, add_module, add_all_modules</strong></li>
 </ul>
-<h4 data-number="5.4.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">5.4.4</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
+<h4 data-number="8.4.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">8.4.4</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
 <p>Script for image creation from running system or for use in archboot container.</p>
 <ul>
 <table>
@@ -1163,17 +1167,17 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h2 data-number="6" id="setting-up-an-archboot-image-server"><span class="header-section-number">6.</span> <span dir="">Setting up an archboot image server</span></h2>
-<h3 data-number="6.1" id="configuration-file"><span class="header-section-number">6.1</span> <strong><span dir="">Configuration file</span></strong></h3>
+<h2 data-number="9" id="setting-up-an-archboot-image-server"><span class="header-section-number">9.</span> <span dir="">Setting up an archboot image server</span></h2>
+<h3 data-number="9.1" id="configuration-file"><span class="header-section-number">9.1</span> <strong><span dir="">Configuration file</span></strong></h3>
 <p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
-<h3 data-number="6.2" id="requirements-1"><span class="header-section-number">6.2</span> <strong><span dir="">Requirements</span></strong></h3>
+<h3 data-number="9.2" id="requirements-1"><span class="header-section-number">9.2</span> <strong><span dir="">Requirements</span></strong></h3>
 <ul>
 <li>You have a normal user, which has access to a working gpg setup with own signature.</li>
 <li>You have a normal user with ssh access to the server, on which the images should upload.</li>
 <li>Add the directories on the remote server, you want to upload to.</li>
 </ul>
-<h3 data-number="6.3" id="running-commands"><span class="header-section-number">6.3</span> <strong><span dir="">Running commands</span></strong></h3>
-<h4 data-number="6.3.1" id="x86_64-architecture"><span class="header-section-number">6.3.1</span> <strong><span dir="">x86_64 architecture</span></strong></h4>
+<h3 data-number="9.3" id="running-commands"><span class="header-section-number">9.3</span> <strong><span dir="">Running commands</span></strong></h3>
+<h4 data-number="9.3.1" id="x86_64-architecture"><span class="header-section-number">9.3.1</span> <strong><span dir="">x86_64 architecture</span></strong></h4>
 <ul>
 <table>
 <thead>
@@ -1188,7 +1192,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h4 data-number="6.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">6.3.2</span> <strong><span dir="">aarch64/riscv64 architecture</span></strong></h4>
+<h4 data-number="9.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">9.3.2</span> <strong><span dir="">aarch64/riscv64 architecture</span></strong></h4>
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong><span dir="">qemu-user-static</span></strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
@@ -1231,11 +1235,11 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h4 data-number="6.3.3" id="server-cleanup"><span class="header-section-number">6.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
+<h4 data-number="9.3.3" id="server-cleanup"><span class="header-section-number">9.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
 <p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>2</strong> months.</p>
-<h2 data-number="7" id="testing-image-and-files-with-qemu"><span class="header-section-number">7.</span> <span dir="">Testing image and files with QEMU</span></h2>
+<h2 data-number="10" id="testing-image-and-files-with-qemu"><span class="header-section-number">10.</span> <span dir="">Testing image and files with QEMU</span></h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
-<h3 data-number="7.1" id="running-aarch64"><span class="header-section-number">7.1</span> <strong><span dir="">Running AARCH64:</span></strong></h3>
+<h3 data-number="10.1" id="running-aarch64"><span class="header-section-number">10.1</span> <strong><span dir="">Running AARCH64:</span></strong></h3>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong><span dir="">edk2-armvirt</span></strong></a> package.</li>
 </ul>
@@ -1253,7 +1257,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h3 data-number="7.2" id="running-riscv64"><span class="header-section-number">7.2</span> <strong><span dir="">Running RISCV64:</span></strong></h3>
+<h3 data-number="10.2" id="running-riscv64"><span class="header-section-number">10.2</span> <strong><span dir="">Running RISCV64:</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -1271,9 +1275,9 @@ There are the following configuration files for ISO creation:
 <ul>
 <li>Use <strong>ssh root@localhost -p 2222</strong> to connect to machine from your running host.</li>
 </ul>
-<h3 data-number="7.3" id="running-x86_64"><span class="header-section-number">7.3</span> <strong><span dir="">Running X86_64:</span></strong></h3>
+<h3 data-number="10.3" id="running-x86_64"><span class="header-section-number">10.3</span> <strong><span dir="">Running X86_64:</span></strong></h3>
 <ul>
-<h4 data-number="7.3.1" id="uefi-gpt-secure-boot"><span class="header-section-number">7.3.1</span> <strong><span dir="">Running kernel, BIOS MBR, UEFI GPT without Secure Boot:</span></strong></h3>
+<h4 data-number="10.3.1" id="uefi-gpt-secure-boot"><span class="header-section-number">10.3.1</span> <strong><span dir="">Running kernel, BIOS MBR, UEFI GPT without Secure Boot:</span></strong></h3>
 </ul>
 <ul>
 <table>
@@ -1332,7 +1336,7 @@ There are the following configuration files for ISO creation:
 </table>
 </ul>
 <ul>
-<h4 data-number="7.3.2" id="uefi-gpt-secure-boot"><span class="header-section-number">7.3.2</span> <strong><span dir="">UEFI GPT Secure Boot</span></strong></h3>
+<h4 data-number="10.3.2" id="uefi-gpt-secure-boot"><span class="header-section-number">10.3.2</span> <strong><span dir="">UEFI GPT Secure Boot</span></strong></h3>
 </ul>
 <ul>
 <table>
@@ -1379,7 +1383,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h3 data-number="7.4" id="additional-qemu-parameters"><span class="header-section-number">7.4</span> <strong><span dir="">Additional qemu parameters</span></strong></h3>
+<h3 data-number="10.4" id="additional-qemu-parameters"><span class="header-section-number">10.4</span> <strong><span dir="">Additional qemu parameters</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -1408,7 +1412,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h3 data-number="7.5" id="hwsim"><span class="header-section-number">7.5</span> <strong><span dir="">Setting up a hwsim SSID</span></strong></h3>
+<h3 data-number="10.5" id="hwsim"><span class="header-section-number">10.5</span> <strong><span dir="">Setting up a hwsim SSID</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -1423,7 +1427,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h2 data-number="8" id="arch-linux-wiki"><span class="header-section-number">8.</span> <span dir="">Arch Linux Wiki</span></h2>
+<h2 data-number="11" id="arch-linux-wiki"><span class="header-section-number">11.</span> <span dir="">Arch Linux Wiki</span></h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_Guide" title="Installation Guide"><strong>Installation Guide</strong></a></li>
 <li><a href="https://wiki.archlinux.org/title/Improving_performance" title="Improving performance"><strong>Improving performance</strong></a></li>
@@ -1441,7 +1445,7 @@ There are the following configuration files for ISO creation:
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a></li>
 <li><a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></li>
 </ul>
-<h2 data-number="9" id="quick-links-archboot"><span class="header-section-number">9.</span> <span dir="">Quick links Archboot</span></h2>
+<h2 data-number="12" id="quick-links-archboot"><span class="header-section-number">12.</span> <span dir="">Quick links Archboot</span></h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot"><strong>Blog</strong></a></li>
 <li><a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Project page</strong></a></li>
@@ -1450,13 +1454,13 @@ There are the following configuration files for ISO creation:
 <li><a href="/src"><strong>Build sources</strong></a></li>
 <li><a href="https://gitlab.archlinux.org/tpowa/archboot-repository"><strong>Repository</strong></a></li>
 </ul>
-<h2 data-number="10" id="quick-links-videos"><span class="header-section-number">10.</span> <span dir="">Quick links videos</span></h2>
+<h2 data-number="13" id="quick-links-videos"><span class="header-section-number">13.</span> <span dir="">Quick links videos</span></h2>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=xo_PlJHloqk"><strong>Parallels installation on Macbook M1</strong></a></li>
 <li><a href="https://www.youtube.com/watch?v=cOobSmI-XgA"><strong>UTM installation on Macbook M1</strong></a></li>
 <li><a href="https://www.youtube.com/watch?v=mb3ykTklnWU"><strong>Running local image</strong></a></li>
 </ul>
-<h2 data-number="11" id="references"><span class="header-section-number">11.</span> <span dir="">References</span></h2>
+<h2 data-number="14" id="references"><span class="header-section-number">14.</span> <span dir="">References</span></h2>
 <ul>
 <li><a href="https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/"><strong>Qemu display devices</strong></a></li>
 <li><a href="https://colatkinson.site/linux/riscv/2021/01/27/riscv-qemu/"><strong>Qemu on RISC-V</strong></a></li>
