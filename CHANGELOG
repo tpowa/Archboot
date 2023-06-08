@@ -1,9 +1,10 @@
 On the road to 2023.06:
-- update to new archboot.com domain, with new layout
+- New domain https://archboot.com with new layout
+- systemd 253.5
 Environment Changes:
 - don't try to mount none existent /dev/sr0
 update-installer.sh:
-- remove leftover message on -full-system call
+- remove leftover message on --full-system call
 ---
 2023.05 Highlights:
 - linux 6.3.x
