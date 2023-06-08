@@ -13,15 +13,15 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project Homepage | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>Last update:</strong> 04.06.2023 21:38 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
+<p><strong>Last update:</strong> 08.06.2023 10:14 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
 <li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> <span dir="">Releases</strong></span></a>
 <ul>
-<li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> <span dir="">ISOs</span></a></li>
-<li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> <span dir="">Unified Kernel Images</span> / UKIs</li>
-<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Rescue system / <span dir="">PXE</span> <span dir="">booting</span></a></li>
+<li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> <span dir="">ISOs - USB/CD/Virtual Machine</span></a></li>
+<li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span><span dir="">UKIs - Unified Kernel Images</span></li>
+<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramdisk / Microcode / Rescue System / <span dir="">PXE</span> </a></li>
 <li><a href="#features-of-the-images" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">Features of the images</span></a></li>
 <li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Supported boot modes</span></a></li>
 <li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.6</span> <span dir="">Burning release or writing to disk</span></a></li>
@@ -78,11 +78,11 @@
 <ul>
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a>, <a href="/web/gallery.html"><strong>Screenshot Gallery</strong></a>, <a href="https://bit.ly/archboot-sources"><strong>Sources</strong></a>.</li>
 <li><strong>Release schedule</strong>: on 10th, 20th and 30th of a month new images are released.</li>
-<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Images</span></strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>initrds</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong><span dir="">microcodes</span></strong></a> are provided.</li>
+<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Images</span></strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramdisks</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong><span dir="">Microcodes</span></strong></a> are provided.</li>
 <li><strong>PGP KEY</strong>: <a href="https://keyserver.ubuntu.com/pks/lookup?op=vindex&amp;fingerprint=on&amp;exact=on&amp;search=0x5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"><strong>5B7E 3FB7 1B7F 1032 9A1C 03AB 771D F662 7EDF 681F</strong></a> for file verification is provided.</li>
 <li><strong>Supported Glibc Locales</strong>: be, bg, cs, da, de, en, el, es, fi, fr, hu, it, lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, uk</li>
 </ul>
-<h3 data-number="2.1" id="iso"><span class="header-section-number">2.1</span> <strong><span dir="">ISOs</span></strong></h3>
+<h3 data-number="2.1" id="iso"><span class="header-section-number">2.1</span> <strong><span dir="">ISOs - USB/CD/Virtual Machine</span></strong></h3>
 <a href="https://archlinuxarm.org/"><strong>Arch Linux ARM aarch64</strong></a>
 <ul>
 <table>
@@ -125,7 +125,7 @@
 </table>
 </ul>
 <ul>
-<li>The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a VM.</li>
+<li>The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.</li>
 </ul>
 <a href="https://archlinux.org/"><strong>Arch Linux X64 x86_64</strong></a>
 <ul>
@@ -148,9 +148,9 @@
 </table>
 </ul>
 <ul>
-<li>The ISO for <strong>x86_64</strong>. Use it for <strong>real</strong> machines and/or virtual machines.</li>
+<li>The ISO for <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</li>
 </ul>
-<h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Images</span></strong></a> / UKIs</h3>
+<h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span> UKIs - <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Images</strong></a></span></h3>
 <ul>
 <table>
 <thead>
@@ -177,7 +177,7 @@
 </table>
 <li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong><span dir="">Unified Kernel Image</span></strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.<br></li>
 </ul>
-<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span>Rescue system / <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a> <strong><span dir="">booting</span></strong></h3>
+<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span> Kernel / Initramdisk / Microcode / Rescue System / <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong><span dir="">PXE</span></strong></a></h3>
 <ul>
 <table>
 <thead>
