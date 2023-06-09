@@ -14,7 +14,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project Homepage | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>Last update:</strong> 09.06.2023 18:01 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
+<p><strong>Last update:</strong> 09.06.2023 20:23 | Tobias Powalowski | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a> | &copy; 2006 - 2023<span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -43,26 +43,21 @@
 <li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><strong><span class="toc-section-number">4.</span> <span dir="">FAQ, Known Issues and limitations</span></a></li></strong>
 <li><a href="#archiso" id="toc-archiso"><strong><span class="toc-section-number">5.</span> <span dir="">Comparison to archiso image</span></a></li></strong>
 </li>
-<li><a href="#development" id="toc-development"><strong><span class="toc-section-number">6.</span> <span dir="">Development</span></a></li></strong>
+<li><a href="#development" id="toc-development"><strong><span class="toc-section-number">6.</span> <span dir="">Development: GIT and Bugtracker</span></a></li></strong>
+<li><a href="#package-installation" id="toc-usage"><strong><span class="toc-section-number">7.</span> <span dir="">Package Repository / Installation</strong></span></a>
 <li><ul>
-<li><a href="#git" id="toc-git"><span class="toc-section-number">6.1</span> GIT repository<span dir=""></span></a></li>
-<li><a href="#bugs" id="toc-bugs"><span class="toc-section-number">6.2</span> <span dir="">Bugs</span></a></li>
+<li><a href="#create-rescue-system" id="toc-create-rescue-system"><strong><span class="toc-section-number">7.1</span> <span dir="">Create rescue system out of the running system</strong></span></a></li>
+<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">7.2</span> <span dir="">Create image files</strong></span></a>
+<li><ul>
+<li><a href="#requirements" id="toc-requirements"><span class="toc-section-number">7.2.1</span> <span dir="">Requirement</span></a></li>
+<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">7.2.2</span> <span dir="">Create image files without modifications</span></a></li>
+<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">7.2.3</span> <span dir="">Create image files with modifications</span></a></li>
 </li></ul>
-<li><a href="#usage" id="toc-usage"><strong><span class="toc-section-number">7.</span> <span dir="">Usage on running Arch Linux system</strong></span></a>
+<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.3</span> <span dir="">Setting up an archboot image server</strong></span></a>
 <li><ul>
-<li><a href="#installation" id="toc-installation"><strong><span class="toc-section-number">7.1</span> <span dir="">Installation</span></strong></a></li>
-<li><a href="#create-rescue-system" id="toc-create-rescue-system"><strong><span class="toc-section-number">7.2</span> <span dir="">Create rescue system of running system</strong></span></a></li>
-<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">7.3</span> <span dir="">Create image files</strong></span></a>
-<li><ul>
-<li><a href="#requirements" id="toc-requirements"><span class="toc-section-number">7.3.1</span> <span dir="">Requirements</span></a></li>
-<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">7.3.2</span> <span dir="">Create image files without modifications</span></a></li>
-<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">7.3.3</span> <span dir="">Create image files with modifications</span></a></li>
-</li></ul>
-<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.4</span> <span dir="">Setting up an archboot image server</strong></span></a>
-<li><ul>
-<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">7.4.1</span> <span dir="">Configuration file</span></a></li>
-<li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">7.4.2</span> <span dir="">Requirements</span></a></li>
-<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">7.4.3</span> <span dir="">Running commands</span></a></li>
+<li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">7.3.1</span> <span dir="">Requirements</span></a></li>
+<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">7.3.2</span> <span dir="">Configuration file</span></a></li>
+<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">7.3.3</span> <span dir="">Running commands</span></a></li>
 </li></ul>
 </li></ul>
 <li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">8.</span> <span dir="">Testing image and files with QEMU</strong></span></a>
@@ -793,8 +788,8 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 </ul>
 <ul>
 <li>How much <strong>RAM</strong> is needed to boot?</li>
-It’s an initramdisk which includes everything. The calculated size to boot the image follows the formula:
-<br><strong>initramdisk + kernelimage + unpackedinitramdisk = minimum RAM to boot</strong>
+It’s an initramfs which includes everything. The calculated size to boot the image follows the formula:
+<br><strong>Initramfs + Kernel + Unpackedkernel + Unpackedinitramfs = minimum RAM to boot</strong>
 </ul>
 <h2 data-number="5." id="archiso"><span class="header-section-number">5. Comparison to <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>archiso</strong></a> image</h3>
 <ul>
@@ -1015,13 +1010,10 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </table>
 <p> &#9733; Optional | * Only local image | ** QEMU (4GB RAM, kvm and virtio backend), normal image</p>
 </ul>
-<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong><span dir="">Development</span></strong></h3>
-<h3 data-number="6.1" id="git"><span class="header-section-number">6.1</span> <strong><span dir="">Git</span></strong></h3>
-<p>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</p>
-<h3 data-number="6.2" id="bugs"><span class="header-section-number">6.2</span> <strong><span dir="">Bugs</span></strong></h3>
-<p>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</p>
-<h2 data-number="7" id="running-system"><span class="header-section-number">7.</span> <span dir="">Usage on running Arch Linux system</span></h2>
-<h2 data-number="7.1" id="installation"><span class="header-section-number">7.1</span> <strong><span dir="">Installation</span></strong></h2>
+<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong><span dir="">Development: GIT and Bugtracker</span></strong></h3>
+<li>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</li>
+<li>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</li>
+<h2 data-number="7." id="package-installation"><span class="header-section-number">7.</span> <strong><span dir="">Package Repository / Installation</span></strong></h2>
 <ul>
 </ul>
 <ul>
@@ -1047,28 +1039,28 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 <ul>
 <li>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</li>
 </ul>
-<h2 data-number="7.2" id="create-rescue-system"><span class="header-section-number">7.2</span> <strong><span dir="">Create rescue sytem of running system</span></strong></h2>
+<h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong><span dir="">Create rescue sytem out of the running system</span></strong></h2>
 <ul>
 <table>
 <thead>
 <tr class="header">
-<th>Create the initrd with your chosen profile:</th>
+<th>Create the initramfs with your chosen profile:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># mkinitcpio -c /etc/archboot/&lt;profile&gt;.conf -g initrd.img</code></td>
+<td><code># archboot-cpio.sh -c /etc/archboot/&lt;profile&gt;.conf -g initramfs.img</code></td>
 </tr>
 </tbody>
 </table>
 </ul>
 <ul>
-<li>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</li>
+<li>Add your used <strong>kernel</strong> and <strong>initramfs</strong> to your bootloader.</li>
 </ul>
-<h2 data-number="7.3" id="create-image-files"><span class="header-section-number">7.3</span> <span dir="">Create image files</span></h2>
-<h3 data-number="7.3.1" id="requirements"><span class="header-section-number">7.3.1</span> <strong><span dir="">Requirements</span></strong></h3>
-<p>Around <strong>3GB</strong> free space on disk.</p>
-<h3 data-number="7.3.2" id="create-image-files-without-modifications"><span class="header-section-number">7.3.2</span> <strong><span dir="">Create image files without modifications</span></strong></h3>
+<h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> <span dir="">Create image files</span></h2>
+<h3 data-number="7.2.1" id="requirements"><span class="header-section-number">7.2.1</span> <strong><span dir="">Requirement</span></strong></h3>
+<p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
+<h3 data-number="7.2.2" id="create-image-files-without-modifications"><span class="header-section-number">7.2.2</span> <strong><span dir="">Create image files without modifications</span></strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
 <ul>
 <table>
@@ -1098,9 +1090,9 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </tbody>
 </table>
 </ul>
-<h3 data-number="7.3.3" id="create-image-files-with-modifications"><span class="header-section-number">7.3.3</span> <strong><span dir="">Create image files with modifications:</span></strong></h3>
-<p>Explanation of the archboot image tools.</p>
-<h4 data-number="7.3.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.3.3.1</span> <strong><span dir="">archboot-x86_64-create-container.sh</span></strong></h4>
+<h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong><span dir="">Create image files with modifications:</span></strong></h3>
+<p>Explanation of the archboot image tools / toolchain.</p>
+<h4 data-number="7.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.2.3.1</span> <strong><span dir="">archboot-x86_64-create-container.sh</span></strong></h4>
 <ul>
 <table>
 <thead>
@@ -1130,14 +1122,14 @@ It’s an initramdisk which includes everything. The calculated size to boot the
 </table>
 </ul>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
-<h4 data-number="7.3.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.3.3.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
+<h4 data-number="7.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.2.3.2</span> <strong><span dir="">Configuration files for image creation:</span></strong></h4>
 <ul>
 There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
-<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramdisks.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramfs.</li>
 </ul>
-<h4 data-number="7.3.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.3.3.3</span> <strong><span dir="">archboot-cpio.sh initramfs generator:</span></strong></h4>
+<h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong><span dir="">archboot-cpio.sh initramfs generator:</span></strong></h4>
 <p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
@@ -1145,7 +1137,7 @@ There are the following configuration files for ISO creation:
 <li>Functions supported in <strong>HOOK</strong> files:<br>
 <strong>add_dir, add_full_dir, add_binary, add_file, add_symlink, add_module, add_all_modules</strong></li>
 </ul>
-<h4 data-number="7.3.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.3.3.4</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
+<h4 data-number="7.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.2.3.4</span> <strong><span dir="">archboot-x86_64-iso.sh</span></strong></h4>
 <p>Script for image creation from running system or for use in archboot container.</p>
 <ul>
 <table>
@@ -1170,17 +1162,17 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h2 data-number="7.4" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.4.</span> <span dir="">Setting up an archboot image server</span></h2>
-<h3 data-number="7.4.1" id="configuration-file"><span class="header-section-number">7.4.1</span> <strong><span dir="">Configuration file</span></strong></h3>
-<p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
-<h3 data-number="7.4.2" id="requirements-1"><span class="header-section-number">7.4.2</span> <strong><span dir="">Requirements</span></strong></h3>
+<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> <span dir="">Setting up an archboot image server</span></h2>
+<h3 data-number="7.3.1" id="requirements-1"><span class="header-section-number">7.3.1</span> <strong><span dir="">Requirements</span></strong></h3>
 <ul>
 <li>You have a normal user, which has access to a working gpg setup with own signature.</li>
 <li>You have a normal user with ssh access to the server, on which the images should upload.</li>
 <li>Add the directories on the remote server, you want to upload to.</li>
 </ul>
-<h3 data-number="7.4.3" id="running-commands"><span class="header-section-number">7.4.3</span> <strong><span dir="">Running commands</span></strong></h3>
-<h4 data-number="7.4.3.1" id="x86_64-architecture"><span class="header-section-number">7.4.3.1</span> <strong><span dir="">x86_64 architecture</span></strong></h4>
+<h3 data-number="7.3.2" id="configuration-file"><span class="header-section-number">7.3.2</span> <strong><span dir="">Configuration file</span></strong></h3>
+<p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
+<h3 data-number="7.3.3" id="running-commands"><span class="header-section-number">7.3.3</span> <strong><span dir="">Running commands</span></strong></h3>
+<h4 data-number="7.3.3.1" id="x86_64-architecture"><span class="header-section-number">7.3.3.1</span> <strong><span dir="">x86_64 architecture</span></strong></h4>
 <ul>
 <table>
 <thead>
@@ -1195,7 +1187,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h4 data-number="7.4.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">7.4.3.2</span> <strong><span dir="">aarch64/riscv64 architecture</span></strong></h4>
+<h4 data-number="7.3.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.2</span> <strong><span dir="">aarch64/riscv64 architecture</span></strong></h4>
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong><span dir="">qemu-user-static</span></strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
@@ -1238,7 +1230,7 @@ There are the following configuration files for ISO creation:
 </tbody>
 </table>
 </ul>
-<h4 data-number="7.4.3.3" id="server-cleanup"><span class="header-section-number">7.4.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
+<h4 data-number="7.3.3.3" id="server-cleanup"><span class="header-section-number">7.3.3.3</span> <strong><span dir="">Server cleanup</span></strong></h4>
 <p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>1</strong> month.</p>
 <h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> <span dir="">Testing image and files with QEMU</span></h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
@@ -1286,12 +1278,12 @@ There are the following configuration files for ISO creation:
 <table>
 <thead>
 <tr class="header">
-<th>kernel and initramdisk testing:</th>
+<th>kernel and initramfs testing:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initramdisk&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>--enable-kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
+<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initramfs&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>--enable-kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
