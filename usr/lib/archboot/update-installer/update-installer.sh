@@ -657,7 +657,7 @@ _chromium_flags() {
 --no-sandbox
 --test-type
 --incognito
-bit.ly/archboot
+archboot.com
 EOF
 }
 
@@ -668,7 +668,7 @@ _firefox_flags() {
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
-pref("datareporting.policy.firstRunURL", "https://bit.ly/archboot", locked);
+pref("datareporting.policy.firstRunURL", "https://archboot.com", locked);
 EOF
         fi
     fi
