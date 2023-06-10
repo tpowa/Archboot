@@ -14,7 +14,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>09.06.2023 21:04</strong> | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
+<p><strong>10.06.2023 11:47</strong> | Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -24,14 +24,14 @@
 <li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> <span dir="">UKIs - Unified Kernel Images</span></li>
 <li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramfs / Microcode / Rescue System / <span dir="">PXE</span> </a></li>
 <li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">Image / Initramfs Types</span></a></li>
-<li><a href="#supported-boot-modes" id="toc-supported-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Supported boot modes</span></a></li>
-<li><a href="#burning-release-or-writing-to-disk" id="toc-burning-release-or-writing-to-disk"><span class="toc-section-number">2.6</span> <span dir="">Burning release or writing to disk</span></a></li>
+<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Boot Modes</span></a></li>
+<li><a href="#writing-to-cd-usb" id="toc-writing-to-cd-usb"><span class="toc-section-number">2.6</span> <span dir="">Writing ISO to CD/USB</span></a></li>
 </li></ul>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a></li>
 <li><ul>
-<li><a href="#installation-with-a-graphical-environment-or-vnc-instead-of-plain-console" id="toc-installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="toc-section-number">3.1</span> <span dir="">Installation with a graphical environment or VNC instead of plain console</span></a></li>
+<li><a href="#installation-with-a-graphical-environment-or-vnc" id="toc-installation-with-a-graphical-environment-or-vnc"><span class="toc-section-number">3.1</span> <span dir="">Installation with a graphical environment or VNC</span></a></li>
 <li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote installation with OpenSSH</span></a></li>
-<li><a href="#secure-boot-support-with-shim-package-signed-from-fedora" id="toc-secure-boot-support-with-shim-package-signed-from-fedora"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot MOK support with fedora's signed shim package</span></a></li>
+<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot MOK support</span></a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> <span dir="">Switch to complete Arch Linux system</span></a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> <span dir="">Interactive setup</span></a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> <span dir="">For experts: quickinst installation</span></a></li>
@@ -309,7 +309,7 @@
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image.<br>It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
-<h3 data-number="2.5" id="supported-boot-modes"><span class="header-section-number">2.5</span> <strong><span dir="">Supported boot modes</span></strong></h3>
+<h3 data-number="2.5" id="boot-modes"><span class="header-section-number">2.5</span> <strong><span dir="">Boot Modes</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -395,7 +395,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.6" id="burning-release-or-writing-to-disk"><span class="header-section-number">2.6</span> <strong><span dir="">Burning release or writing to disk</span></strong></h3>
+<h3 data-number="2.6" id="writing-to-cd-usb"><span class="header-section-number">2.6</span> <strong><span dir="">Writing ISO to CD/USB</span></strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
@@ -417,7 +417,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </ul>
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
 <h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> <span dir="">Features in a nutshell</span></h2>
-<h3 data-number="3.1" id="installation-with-a-graphical-environment-or-vnc-instead-of-plain-console"><span class="header-section-number">3.1</span> <strong><span dir="">Installation with a graphical environment or VNC instead of plain console</span></strong></h3>
+<h3 data-number="3.1" id="installation-with-a-graphical-environment-or-vnc"><span class="header-section-number">3.1</span> <strong><span dir="">Installation with a graphical environment or VNC</span></strong></h3>
 <h4 data-number="3.1.1" id="preconfigured-environments"><span class="header-section-number">3.1.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
 <ul>
 <table>
@@ -499,7 +499,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.3" id="secure-boot-support-with-shim-package-signed-from-fedora"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot MOK support with fedora's signed shim package</span></strong></h3>
+<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot MOK support</span></strong></h3>
 <ul>
 <li><strong>Caveat:</strong>
 <ul>
@@ -1443,7 +1443,7 @@ There are the following configuration files for ISO creation:
 <h2 data-number="10" id="quick-links-archboot"><span class="header-section-number">10.</span> <span dir="">Quick links Archboot</span></h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot"><strong>Blog</strong></a></li>
-<li><a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Project page</strong></a></li>
+<li><a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Development</strong></a></li>
 <li><a href="/iso"><strong>Download</strong></a></li>
 <li><a href="/web/gallery.html" target="_blank"><strong>Screenshots</strong></a></li>
 <li><a href="/src"><strong>Build sources</strong></a></li>
