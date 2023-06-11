@@ -14,7 +14,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update 10.06.2023 13:40</strong><span dir=""></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update: 11.06.2023 9:23</strong><span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -29,16 +29,16 @@
 </li></ul>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a></li>
 <li><ul>
-<li><a href="#installation-with-a-graphical-environment-or-vnc" id="toc-installation-with-a-graphical-environment-or-vnc"><span class="toc-section-number">3.1</span> <span dir="">Installation with a graphical environment or VNC</span></a></li>
-<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote installation with OpenSSH</span></a></li>
-<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot MOK support</span></a></li>
+<li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> <span dir="">Graphical Environments / VNC</span></a></li>
+<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote access with OpenSSH</span></a></li>
+<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot - Machine Owner Key MOK Setup</span></a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> <span dir="">Switch to complete Arch Linux system</span></a></li>
-<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> <span dir="">Interactive setup</span></a></li>
+<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> <span dir="">Interactive Arch Linux Setup</span></a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> <span dir="">For experts: quickinst installation</span></a></li>
-<li><a href="#keep-your-image-up-to-date" id="toc-keep-your-image-up-to-date"><span class="toc-section-number">3.7</span> <span dir="">Keep your image up to date</span></a></li>
+<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> <span dir="">Manage Archboot Environment</span></a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> <span dir="">Tools for backup and copying of an existing system</span></a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> <span dir="">Restoring an USB device to FAT32 state</span></a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> <span dir="">Quick system configuration on installed system</span></a></li>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> <span dir="">System configuration on installed system</span></a></li>
 </li></ul>
 <li><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><strong><span class="toc-section-number">4.</span> <span dir="">FAQ / Known Issues / Limitations</span></a></li></strong>
 <li><a href="#archiso" id="toc-archiso"><strong><span class="toc-section-number">5.</span> <span dir="">Comparison to Archiso image</span></a></li></strong>
@@ -417,7 +417,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </ul>
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
 <h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> <span dir="">Features in a nutshell</span></h2>
-<h3 data-number="3.1" id="installation-with-a-graphical-environment-or-vnc"><span class="header-section-number">3.1</span> <strong><span dir="">Installation with a graphical environment or VNC</span></strong></h3>
+<h3 data-number="3.1" id="graphical-environment-vnc"><span class="header-section-number">3.1</span> <strong><span dir="">Graphical Environments / VNC</span></strong></h3>
 <h4 data-number="3.1.1" id="preconfigured-environments"><span class="header-section-number">3.1.1</span> <strong><span dir="">Preconfigured environments</span></strong></h4>
 <ul>
 <table>
@@ -457,7 +457,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Connect with your vnc client and use password:<strong>archboot</strong></li>
 <li><a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong>/etc/archboot/defaults</strong> to change default vnc password.</li>
 </ul></li>
-<li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
+<li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
 </ul>
 <h4 data-number="3.1.2" id="custom-environment-without-vnc-support"><span class="header-section-number">3.1.2</span> <strong><span dir="">Custom environment without VNC support</span></strong></h4>
 <a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong><code>/etc/archboot/defaults</code></strong>
@@ -481,7 +481,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.2" id="remote-installation-with-openssh"><span class="header-section-number">3.2</span> <strong><span dir="">Remote installation with OpenSSH</span></strong></h3>
+<h3 data-number="3.2" id="remote-installation-with-openssh"><span class="header-section-number">3.2</span> <strong><span dir="">Remote access with OpenSSH</span></strong></h3>
 <ul>
 <li>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need security during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</li>
 </ul>
@@ -499,7 +499,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot MOK support</span></strong></h3>
+<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot - Machine Owner Key MOK Setup</span></strong></h3>
 <ul>
 <li><strong>Caveat:</strong>
 <ul>
@@ -581,7 +581,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <ul>
 <li>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update-installer</code></strong> tasks.</li>
 </ul>
-<h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong><span dir="">Interactive setup</span></strong></h3>
+<h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong><span dir="">Interactive Arch Linux Setup</span></strong></h3>
 <p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
 <h4 data-number="3.5.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.5.1</span> <strong><span dir="">Changing console fonts and keymap</span></strong></h4>
 <ul>
@@ -660,7 +660,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.7" id="keep-your-image-up-to-date"><span class="header-section-number">3.7</span> <strong><span dir="">Keep your image up to date</span></strong></h3>
+<h3 data-number="3.7" id="manage-archboot"><span class="header-section-number">3.7</span> <strong><span dir="">Manage Archboot Environment</span></strong></h3>
 <ul>
 <li>You can always bump your image to <strong>latest</strong> available possibilities.</li>
 </ul>
@@ -732,10 +732,10 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.10" id="quick-configurtation"><span class="header-section-number">3.10</span> <span dir="">Quick system configuration on installed system</span></h3>
-<p>You can also run <strong>archboot-setup.sh</strong> for a quick <strong>system configuration</strong> on an installed system.</p>
-<p><a href="#installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
-<h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong><span dir="">FAQ / Known Issues Limitations</span></strong></h3>
+<h3 data-number="3.10" id="system-configuration"><span class="header-section-number">3.10</span> <span dir="">System configuration on installed system</span></h3>
+<p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
+<p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
+<h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong><span dir="">FAQ / Known Issues / Limitations</span></strong></h3>
 <ul>
 <li>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</li>
 <table>
