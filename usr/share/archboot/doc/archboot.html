@@ -260,49 +260,48 @@
 <thead>
 <tr class="header">
 <th>Type</th>
-<th>RAM<br>to boot*</th>
+<th>RAM<br>to boot</th>
 <th>WiFi<br>support</th>
 <th>LAN<br>support</th>
 <th>Package cache<br>for installation</th>
-<th>Size<br>AARCH64*</th>
-<th>Size<br>RISCV64*</th>
-<th>Size<br>X86_64*</th>
+<th>Size<br>AARCH64</th>
+<th>Size<br>RISCV64</th>
+<th>Size<br>X86_64</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong><em>date</em></strong></td>
-<td>700</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
-<td>312</td>
-<td>417</td>
-<td>417</td>
+<td>700M</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td>312M</td>
+<td>417M</td>
+<td>417M</td>
 </tr>
 <tr class="even">
 <td><strong><em>date</em>-latest</strong></td>
-<td>2000</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:yellow;">local DHCP<br>server needed</td>
-<td style="background-color:lime;">&#10004;</td>
-<td>128</td>
+<td>2000M</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="yellow">local DHCP<br>server needed</td>
+<td bgcolor="lime">&#10004;</td>
+<td>128M</td>
 <td></td>
-<td>182</td>
+<td>182M</td>
 </tr>
 <tr class="odd">
 <td><strong><em>date</em>-local</strong></td>
-<td>2700</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:lime;">&#10004;</td>
-<td>532</td>
+<td>2700M</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="lime">&#10004;</td>
+<td>532M</td>
 <td></td>
-<td>753</td>
+<td>753M</td>
 </tr>
 </tbody>
 </table>
-<p>* in MiB</p>
 </ul>
 <ul>
 <li>During boot, all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="DHCP"><strong>DHCP</strong></a>.</li>
@@ -321,44 +320,39 @@
 </tr>
 </thead>
 <tbody>
+<tr class="even">
+<td><a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a>/UEFI_CD<br>booting with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+</tr>
 <tr class="odd">
-<td>UEFI <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td><strong>UEFI_MIX*</strong><br>booting with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="even">
-<td><a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a>/UEFI_CD booting with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a><br>with the included<br><strong>fedora</strong> signed <a href="https://wiki.archlinux.org/title/Secure_Boot#shim" title="Secure Boot"><strong>shim</strong></a></td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
-<td>UEFI_MIX_MODE booting with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
-</tr>
-<tr class="even">
-<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> with the<br>included <strong>fedora</strong> signed <a href="https://wiki.archlinux.org/title/Secure_Boot#shim" title="Secure Boot"><strong>shim</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td><a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> BIOS<br>with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
-<td><a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> BIOS with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
-</tr>
-<tr class="odd">
-<td><a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> with <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a></td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td><a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a><br>with <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a></td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 </tbody>
 </table>
+<p>* Firmware 32bit / OS 64bit</p>
 </ul>
 <p>It supports <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a>’s iso loopback support:</p>
 <ul>
@@ -819,92 +813,92 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Arch_Install_Scripts" title="Arch Install Scripts"><strong>Arch Install Scripts</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
 <td>Archboot installer</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>Archinstall</strong></a></td>
-<td style="background-color:yellow;">&#9733;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="yellow">&#9733;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a><br>UKI provided and bootloader support</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot MOK support</strong></a><br>with Microsoft certificates<br>supported by fedora signed shim</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td>Offline installation support*</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Internal update feature</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Glibc Localization Switch</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:yellow;">&#9733;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="yellow">&#9733;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Accessibility" title="Accessibility"><strong>Accessibility</strong></a> support</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
 <td>Mobile broadband modem<br>management service (modemmanager)</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr class="odd">
 <td>Man/Info Pages</td>
-<td style="background-color:yellow;">&#9733;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="yellow">&#9733;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 <tr>
 <td>Bootup speed to prompt**</td>
-<td style="background-color:lime;">19 seconds</td>
-<td style="background-color:red;">23 seconds</td>
+<td bgcolor="lime">19 seconds</td>
+<td bgcolor="red">23 seconds</td>
 </tr>
 <tr class="odd">
 <td>Bootup speed systemd-analyze**</td>
-<td style="background-color:lime;">18 seconds</td>
-<td style="background-color:red;">60 seconds</td>
+<td bgcolor="lime">18 seconds</td>
+<td bgcolor="red">60 seconds</td>
 </tr>
 <tr class="odd">
 <td>Minimum RAM to boot in MiB**</td>
-<td style="background-color:lime;">700</td>
-<td style="background-color:red;">750</td>
+<td bgcolor="lime">700</td>
+<td bgcolor="red">750</td>
 </tr>
 <tr>
 <td>Free RAM on system in MiB**</td>
-<td style="background-color:lime;">3320</td>
-<td style="background-color:red;">2820</td>
+<td bgcolor="lime">3320</td>
+<td bgcolor="red">2820</td>
 </tr>
 <tr class="odd">
 <td>Imagesize in MiB</td>
-<td style="background-color:lime;">182 - 753</td>
-<td style="background-color:red;">828 </td>
+<td bgcolor="lime">182 - 753</td>
+<td bgcolor="red">828 </td>
 </tr>
 <tr class="even">
 <td>ROOTFS size in MiB**</td>
-<td style="background-color:lime;">383</td>
-<td style="background-color:red;">1700</td>
+<td bgcolor="lime">383</td>
+<td bgcolor="red">1700</td>
 </tr>
 <tr class="odd">
 <td>ROOTFS packages</td>
-<td style="background-color:lime;">198</td>
-<td style="background-color:red;">391</td>
+<td bgcolor="lime">198</td>
+<td bgcolor="red">391</td>
 </tr>
 <tr class="even">
 <td>ROOTFS Type</td>
@@ -918,18 +912,18 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/nano" title="nano"><strong>Nano</strong></a> editor with syntax highlighting</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/neovim" title="neovim"><strong>Neovim</strong></a> editor with <a href="https://github.com/neovim/neovim/issues/16339" title="lastplace"><strong>lastplace</strong></a> plugin</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Detect high resolution screen size</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Text browser</td>
@@ -943,58 +937,58 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 <tr class="even">
 <td>IRC and text browser preconfigured</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Chromium" title="Chromium"><strong>Chromium</strong></a> browser</td>
-<td style="background-color:yellow;">&#9733;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="yellow">&#9733;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Firefox" title="Firefox"><strong>Firefox</strong></a> browser</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a> desktop</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/KDE" title="KDE/Plasma"><strong>KDE/Plasma</strong></a> desktop</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/KDE" title="KDE/Plasma"><strong>KDE/Plasma</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Xfce" title="Xfce"><strong>Xfce</strong></a> desktop</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> installation support</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Default Font <a href="https://terminus-font.sourceforge.net" title="Terminus"><strong> Terminus</strong></a></td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Build speed</td>
-<td style="background-color:lime;">faster</td>
-<td style="background-color:red;">slower</td>
+<td bgcolor="lime">faster</td>
+<td bgcolor="red">slower</td>
 </tr>
 <tr class="odd">
 <td>Image assembling</td>
@@ -1008,13 +1002,13 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 <tr class="odd">
 <td>Reproducibility</td>
-<td style="background-color:lime;">&#10004;</td>
-<td style="background-color:red;">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
 </tr>
 <tr class="even">
 <td>Easy custom live CD creation</td>
-<td style="background-color:red;">&#10006;</td>
-<td style="background-color:lime;">&#10004;</td>
+<td bgcolor="red">&#10006;</td>
+<td bgcolor="lime">&#10004;</td>
 </tr>
 </tbody>
 </table>
