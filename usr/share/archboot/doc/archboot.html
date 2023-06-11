@@ -23,9 +23,9 @@
 <li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> <span dir="">ISOs - USB / CD / Virtual Machine</span></a></li>
 <li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> <span dir="">UKIs - Unified Kernel Images</span></li>
 <li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramfs / Microcode / Rescue System / <span dir="">PXE</span> </a></li>
-<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">Image / Initramfs Types</span></a></li>
-<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">Boot Modes</span></a></li>
-<li><a href="#writing-to-cd-usb" id="toc-writing-to-cd-usb"><span class="toc-section-number">2.6</span> <span dir="">Writing ISO to CD/USB</span></a></li>
+<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">ISO / Initramfs / UKI Types</span></a></li>
+<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">ISO Boot Modes</span></a></li>
+<li><a href="#writing-to-cd-usb" id="toc-writing-to-cd-usb"><span class="toc-section-number">2.6</span> <span dir="">ISO writing to CD/USB</span></a></li>
 </li></ul>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a></li>
 <li><ul>
@@ -254,7 +254,7 @@
 <li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramfs</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramfs</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.<br>
 </ul>
-<h3 data-number="2.4" id="image-types"><span class="header-section-number">2.4</span> <strong><span dir="">Image / Initramfs Types</span></strong></h3>
+<h3 data-number="2.4" id="image-types"><span class="header-section-number">2.4</span> <strong><span dir="">ISO / Initramfs / UKI Types</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -309,7 +309,7 @@
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.</li>
 <li><strong>Without</strong> an internet connection for installation, you should use the <strong>local</strong> image.<br>It includes a <strong>local package repository</strong> for installation.</li>
 </ul>
-<h3 data-number="2.5" id="boot-modes"><span class="header-section-number">2.5</span> <strong><span dir="">Boot Modes</span></strong></h3>
+<h3 data-number="2.5" id="boot-modes"><span class="header-section-number">2.5</span> <strong><span dir="">ISO Boot Modes</span></strong></h3>
 <ul>
 <table>
 <thead>
@@ -395,7 +395,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.6" id="writing-to-cd-usb"><span class="header-section-number">2.6</span> <strong><span dir="">Writing ISO to CD/USB</span></strong></h3>
+<h3 data-number="2.6" id="writing-to-cd-usb"><span class="header-section-number">2.6</span> <strong><span dir="">ISO writing to CD/USB</span></strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
