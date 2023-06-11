@@ -14,7 +14,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update: 11.06.2023 11:23</strong><span dir=""></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update: 11.06.2023 13:38</strong><span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -25,13 +25,13 @@
 <li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramfs / Microcode / Rescue System / <span dir="">PXE</span> </a></li>
 <li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> <span dir="">ISO / Initramfs / UKI Types</span></a></li>
 <li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> <span dir="">ISO Boot Modes</span></a></li>
-<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> <span dir="">ISO writing to USB/CD</span></a></li>
+<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> <span dir="">ISO writing to USB / CD</span></a></li>
 </li></ul>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> <span dir="">Features in a nutshell</strong></span></a></li>
 <li><ul>
 <li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> <span dir="">Graphical Environments / VNC</span></a></li>
 <li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote access with OpenSSH</span></a></li>
-<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot - MOK - Machine Owner Key Setup</span></a></li>
+<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot - MOK / Machine Owner Key</span></a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> <span dir="">Switch to complete Arch Linux system</span></a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> <span dir="">Interactive Arch Linux Setup</span></a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> <span dir="">For experts: quickinst installation</span></a></li>
@@ -389,7 +389,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="2.6" id="writing-to-usb-cd"><span class="header-section-number">2.6</span> <strong><span dir="">ISO writing to USB/CD</span></strong></h3>
+<h3 data-number="2.6" id="writing-to-usb-cd"><span class="header-section-number">2.6</span> <strong><span dir="">ISO writing to USB / CD</span></strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
@@ -493,7 +493,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot - MOK - Machine Owner Key Setup</span></strong></h3>
+<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot - MOK / Machine Owner Key</span></strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -504,7 +504,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <tr class="odd">
 <td bgcolor="yellow"><ul><li>This method is intended to use for <a href="https://wiki.archlinux.org/title/Dual_boot" title="Dual boot"><strong>dual booting</strong></a> with Windows, without losing the Secure Boot benefits for Windows.</li>
 <li>This method will <strong>not</strong> make your system <strong>more</strong> secure.</li>
-<li>It installs a bootloader which is <strong>not</strong> controlled by Arch Linux and <strong>breaks</strong> the concept of <strong>Secure Boot</strong> as is.</li>
+<li>It installs the <strong><a href="https://kojipkgs.fedoraproject.org/packages/shim/" title="Fedora Shim">fedora signed shim</a></strong>, which is <strong>not</strong> controlled by Arch Linux and <strong>breaks</strong> the concept of <strong>Secure Boot</strong> as is.</li>
 </ul>
 </td>
 </tr>
@@ -831,7 +831,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 <td bgcolor="lime">&#10004;</td>
 <td bgcolor="red">&#10006;</td>
 <tr class="odd">
-<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot MOK support</strong></a><br>with Microsoft certificates<br>supported by fedora signed shim</td>
+<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot MOK support</strong></a><br>with Microsoft certificates<br>supported by <strong><a href="https://kojipkgs.fedoraproject.org/packages/shim/" title="Fedora Shim">fedora signed shim</a></strong></td>
 <td bgcolor="lime">&#10004;</td>
 <td bgcolor="red">&#10006;</td>
 </tr>
@@ -1012,14 +1012,12 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 </tbody>
 </table>
-<p> &#9733; Optional | * Only local image | ** QEMU (4GB RAM, kvm and virtio backend), normal image</p>
 </ul>
+<p> &#9733; Optional | * Only local image | ** QEMU (4GB RAM, kvm and virtio backend), normal image</p>
 <h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong><span dir="">Development: GIT and Bugtracker</span></strong></h3>
 <li>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</li>
 <li>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</li>
 <h2 data-number="7." id="package-installation"><span class="header-section-number">7.</span> <strong><span dir="">Package - Repository / Installation / Usage</span></strong></h2>
-<ul>
-</ul>
 <ul>
 <table>
 <thead>
