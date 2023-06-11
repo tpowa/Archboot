@@ -14,7 +14,7 @@
 <body>
 <p><span dir=""><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"/></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update: 11.06.2023 9:49</strong><span dir=""></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</strong></a><br>Arch Linux Developer </span><a href="https://archlinux.org/people/developers/#tpowa"><strong>tpowa</strong></a><br><strong>Last update: 11.06.2023 10:29</strong><span dir=""></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -31,7 +31,7 @@
 <li><ul>
 <li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> <span dir="">Graphical Environments / VNC</span></a></li>
 <li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> <span dir="">Remote access with OpenSSH</span></a></li>
-<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot - Machine Owner Key MOK Setup</span></a></li>
+<li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> <span dir="">Secure Boot - MOK - Machine Owner Key Setup</span></a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> <span dir="">Switch to complete Arch Linux system</span></a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> <span dir="">Interactive Arch Linux Setup</span></a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> <span dir="">For experts: quickinst installation</span></a></li>
@@ -499,14 +499,24 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 </ul>
-<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot - Machine Owner Key MOK Setup</span></strong></h3>
-<ul>
-<li><strong>Caveat:</strong>
-<ul>
-<li>This method is intended to use for <a href="https://wiki.archlinux.org/title/Dual_boot" title="Dual boot"><strong>dual booting</strong></a> with Windows, without losing the Secure Boot benefits for Windows.</li>
+<h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong><span dir="">Secure Boot - MOK - Machine Owner Key Setup</span></strong></h3>
+<table>
+<thead>
+<tr class="header">
+<th bgcolor="red">Caveat:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td bgcolor="yellow"><ul><li>This method is intended to use for <a href="https://wiki.archlinux.org/title/Dual_boot" title="Dual boot"><strong>dual booting</strong></a> with Windows, without losing the Secure Boot benefits for Windows.</li>
 <li>This method will <strong>not</strong> make your system <strong>more</strong> secure.</li>
 <li>It installs a bootloader which is <strong>not</strong> controlled by Arch Linux and <strong>breaks</strong> the concept of <strong>Secure Boot</strong> as is.</li>
-</ul></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
 <li>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> first for initial shim setup.</li>
 <li>In order to boot in <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> mode on first boot:
 <ul>
