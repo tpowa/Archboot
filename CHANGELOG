@@ -1,5 +1,5 @@
 On the road to 2023.06:
-- New domain https://archboot.com with new layout
+- New domain https://archboot.com with new w3c conform html layout
 - systemd 253.5
 Environment Changes:
 - don't try to mount none existent /dev/sr0
