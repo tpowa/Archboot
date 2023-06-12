@@ -130,6 +130,15 @@ td {
     border-right: 1px solid #1a1a1a;
     padding: 0.125em 0.5em 0.25em 0.5em;
 }
+.MyYes {
+    background-color: lime;
+}
+.MyNo {
+    background-color: red;
+}
+.MyOpt {
+    background-color: yellow;
+}
 header {
     margin-bottom: 4em;
 }
