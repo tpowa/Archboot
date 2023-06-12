@@ -35,7 +35,7 @@
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch to complete Arch Linux system</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Arch Linux Setup</a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For experts: quickinst installation</a></li>
-<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> Manage Archboot Environment</a></li>
+<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> Manage Environment</a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools for backup and copying of an existing system</a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring an USB device to FAT32 state</a></li>
 <li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> System configuration on installed system</a></li>
@@ -52,7 +52,7 @@
 <li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">7.2.2</span> Create image files without modifications</a></li>
 <li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">7.2.3</span> Create image files with modifications</a></li>
 </ul></li>
-<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.3</span> Setting up an archboot image server</strong></a></li>
+<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.3</span> Setting up an image server</strong></a></li>
 <li><ul>
 <li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">7.3.1</span> Requirements</a></li>
 <li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">7.3.2</span> Configuration file</a></li>
@@ -631,7 +631,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.7" id="manage-archboot"><span class="header-section-number">3.7</span> <strong>Manage Archboot Environment</strong></h3>
+<h3 data-number="3.7" id="manage-archboot"><span class="header-section-number">3.7</span> <strong>Manage Environment</strong></h3>
 <p>You can always bump your image to <strong>latest</strong> available possibilities.</p>
 <table>
 <thead>
@@ -1043,7 +1043,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tbody>
 </table>
 <h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong>Create image files with modifications:</strong></h3>
-<p>Explanation of the archboot image tools / toolchain.</p>
+<p>Explanation of the image tools / toolchain.</p>
 <h4 data-number="7.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.2.3.1</span> <strong>archboot-x86_64-create-container.sh</strong></h4>
 <table>
 <thead>
@@ -1108,7 +1108,7 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting up an archboot image server</h2>
+<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting up an image server</h2>
 <h3 data-number="7.3.1" id="requirements-1"><span class="header-section-number">7.3.1</span> <strong>Requirements</strong></h3>
 <ul>
 <li>You have a normal user, which has access to a working gpg setup with own signature.</li>
