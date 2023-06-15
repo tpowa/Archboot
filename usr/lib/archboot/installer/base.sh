@@ -321,7 +321,7 @@ _mainmenu() {
         "7")
             _install_bootloader ;;
         "8")
-            dialog ${_DEFAULT} --menu " EXIT PROGRAM " 10 40 6 \
+            dialog ${_DEFAULT} --menu " EXIT MENU " 10 40 6 \
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
@@ -338,8 +338,10 @@ _mainmenu() {
                 fi
                     exit 0
             elif [[ "${_ANSWER}" == "2" ]]; then
+                _dialog --msgbox "Reboot:\nHit 'Enter' for rebooting the system.\nDon't forget to remove the boot medium!" 10 40 6
                 reboot
             elif [[ "${_ANSWER}" == "3" ]]; then
+                _dialog --msgbox "Poweroff:\n\nHit 'Enter' for powering off the system." 8 40 4
                 poweroff
             fi
             ;;
