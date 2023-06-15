@@ -339,7 +339,7 @@ _mainmenu() {
                     exit 0
             elif [[ "${_ANSWER}" == "2" ]]; then
                 reboot
-            elif "[[ ${_ANSWER}" == "3" ]]; then
+            elif [[ "${_ANSWER}" == "3" ]]; then
                 poweroff
             fi
             ;;
