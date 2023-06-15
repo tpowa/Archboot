@@ -321,15 +321,28 @@ _mainmenu() {
         "7")
             _install_bootloader ;;
         "8")
-            [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
-            clear
-            if mountpoint -q /install; then
-                echo ""
-                echo "If the installation finished successfully, you can now type 'reboot'"
-                echo "to restart the system."
-                echo ""
+            dialog ${_DEFAULT} --title " EXIT PROGRAM " --menu 11 58 8 \
+            "1" "Exit Program" \
+            "2" "Reboot System" \
+            "3" "Poweroff System" 2>${_ANSWER}
+            _ANSWER="$(cat ${_ANSWER})"
+            if [[ "${_ANSWER}" == "1" ]]; then
+                [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
+                clear
+                if mountpoint -q /install; then
+                    echo ""
+                    echo "If the installation finished successfully:"
+                    echo "Remove the boot medium and type 'reboot'"
+                    echo "to restart the system."
+                    echo ""
+                fi
+                    exit 0
+            elif [[ "${_ANSWER}" == "2" ]]; then
+                reboot
+            elif "[[ ${_ANSWER}" == "3" ]]; then
+                poweroff
             fi
-            exit 0 ;;
+            ;;
         *)
             if _dialog --yesno "Abort Program?" 6 40; then
                 [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
