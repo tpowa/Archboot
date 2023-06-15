@@ -321,7 +321,7 @@ _mainmenu() {
         "7")
             _install_bootloader ;;
         "8")
-            dialog ${_DEFAULT} --menu " EXIT PROGRAM " --menu 11 58 8 \
+            dialog ${_DEFAULT} --menu " EXIT PROGRAM " 11 58 8 \
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
