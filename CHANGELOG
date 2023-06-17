@@ -7,7 +7,7 @@ update-installer.sh:
 - update messages on -full-system call
 - update elinks, chromium and firefox starting page to archboot.com
 setup:
-- add EXIT menu
+- add EXIT menu with options
 ---
 2023.05 Highlights:
 - linux 6.3.x
