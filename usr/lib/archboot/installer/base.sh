@@ -281,7 +281,7 @@ _mainmenu() {
     dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Set Console Font And Keymap" \
-    "1" "Set up Network" \
+    "1" "Configure Network" \
     "2" "Select Source" \
     "3" "Set Time And Date" \
     "4" "Prepare Storage Device" \
