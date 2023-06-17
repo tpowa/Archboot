@@ -325,8 +325,8 @@ _mainmenu() {
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
-            _ANSWER="$(cat ${_ANSWER})"
-            if [[ "${_ANSWER}" == "1" ]]; then
+            _EXIT="$(cat ${_ANSWER})"
+            if [[ "${_EXIT}" == "1" ]]; then
                 [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
                 clear
                 if mountpoint -q /install; then
@@ -337,10 +337,10 @@ _mainmenu() {
                     echo ""
                 fi
                     exit 0
-            elif [[ "${_ANSWER}" == "2" ]]; then
+            elif [[ "${_EXIT}" == "2" ]]; then
                 _dialog --msgbox "Reboot:\nHit 'Enter' for rebooting the system.\nDon't forget to remove the boot medium!" 7 50
                 reboot
-            elif [[ "${_ANSWER}" == "3" ]]; then
+            elif [[ "${_EXIT}" == "3" ]]; then
                 _dialog --msgbox "Poweroff:\nHit 'Enter' for powering off the system." 6 50
                 poweroff
             fi
