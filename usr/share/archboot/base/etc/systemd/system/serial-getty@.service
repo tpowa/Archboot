@@ -1,3 +1,5 @@
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#
 #  This file is part of systemd.
 #
 #  systemd is free software; you can redistribute it and/or modify it
@@ -7,10 +9,10 @@
 
 [Unit]
 Description=Serial Getty on %I
-Documentation=man:agetty(8)
-BindTo=dev-%i.device
-After=dev-%i.device systemd-user-sessions.service plymouth-quit-wait.service
-After=rc-local.service
+Documentation=man:agetty(8) man:systemd-getty-generator(8)
+Documentation=http://0pointer.de/blog/projects/serial-console.html
+BindsTo=dev-%i.device
+After=dev-%i.device systemd-user-sessions.service plymouth-quit-wait.service getty-pre.target
 
 # If additional gettys are spawned during boot then we should make
 # sure that this is synchronized before getty.target, even though
@@ -18,19 +20,27 @@ After=rc-local.service
 Before=getty.target
 IgnoreOnIsolate=yes
 
+# IgnoreOnIsolate causes issues with sulogin, if someone isolates
+# rescue.target or starts rescue.service from multi-user.target or
+# graphical.target.
+Conflicts=rescue.service
+Before=rescue.service
+
 [Service]
-Environment=TERM=vt102
-ExecStart=-/sbin/agetty -a root -s %I 115200,38400,9600
+# The '-o' option value tells agetty to replace 'login' arguments with an
+# option to preserve environment (-p), followed by '--' for safety, and then
+# the entered username.
+ExecStart=-/sbin/agetty --skip-login --o "-f root -p -- \\u" --keep-baud 115200,57600,38400,9600 - $TERM
 Type=idle
 Restart=always
-RestartSec=0
 UtmpIdentifier=%I
+StandardInput=tty
+StandardOutput=tty
 TTYPath=/dev/%I
 TTYReset=yes
 TTYVHangup=yes
-KillMode=process
 IgnoreSIGPIPE=no
+SendSIGHUP=yes
 
-# Some login implementations ignore SIGTERM, so we send SIGHUP
-# instead, to ensure that login terminates cleanly.
-KillSignal=SIGHUP
+[Install]
+WantedBy=getty.target
