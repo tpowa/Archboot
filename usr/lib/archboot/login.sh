@@ -65,7 +65,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     touch /etc/initrd-release
     # fix /run/nouser issues
     systemctl stop systemd-user-sessions.service
-    # avoid issues by bringing down services in ordered way
+    # avoid issues by taking down services in ordered way
     systemctl stop dbus-org.freedesktop.login1.service
     systemctl stop dbus.socket
     # prepare for initrd-switch-root
