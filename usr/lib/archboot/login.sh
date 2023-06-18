@@ -63,6 +63,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     systemctl stop systemd-user-sessions.service
     systemctl stop dbus-org.freedesktop.login1.service
     systemctl stop dbus.socket
+    systemctl start initrd-cleanup.service
     systemctl start initrd-switch-root.target
 else
     while true; do
