@@ -57,6 +57,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
+    touch /run/nologin
     echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
     read -r -t 3
@@ -127,6 +128,11 @@ _run_update_installer() {
         echo -e "\e[1mProgress is shown here...\e[m"
     fi
 }
+
+# systemd root switching can cause issues with pam nologin
+if [[ -e "/run/nologin" ]]; then
+    systemctl restart systemd-user-sessions.service
+fi
 
 if ! [[ -e "/.vconsole-run" ]]; then
     touch /.vconsole-run

@@ -388,6 +388,7 @@ _new_environment() {
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
         # systemd needs this for root_switch
         touch /etc/initrd-release
+        touch /run/nologin
         systemctl start initrd-switch-root.target
     fi
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
