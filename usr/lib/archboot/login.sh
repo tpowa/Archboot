@@ -60,7 +60,6 @@ if [[ "${TTY}" = "tty1" ]]; then
     echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
     read -r -t 3
-    systemctl stop systemd-user-sessions.service
     systemctl start initrd-switch-root.target
 else
     while true; do

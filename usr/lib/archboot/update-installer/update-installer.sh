@@ -388,7 +388,6 @@ _new_environment() {
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
         # systemd needs this for root_switch
         touch /etc/initrd-release
-        systemctl stop systemd-user-sessions.service
         systemctl start initrd-switch-root.target
     fi
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
