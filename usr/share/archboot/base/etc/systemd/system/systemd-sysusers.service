@@ -13,7 +13,7 @@ Documentation=man:sysusers.d(5) man:systemd-sysusers.service(8)
 
 DefaultDependencies=no
 After=systemd-remount-fs.service
-Before=dbus.socket dbus.service sysinit.target systemd-update-done.service
+Before=dbus.socket sysinit.target systemd-update-done.service
 Conflicts=shutdown.target initrd-switch-root.target
 Before=shutdown.target initrd-switch-root.target
 
