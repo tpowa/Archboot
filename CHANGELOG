@@ -3,11 +3,13 @@ On the road to 2023.06:
 - systemd 253.5
 Environment Changes:
 - don't try to mount none existent /dev/sr0
+- synced getty and serial-getty with latest systemd
+- disabled root autologin message
 update-installer.sh:
-- update messages on -full-system call
-- update elinks, chromium and firefox starting page to archboot.com
+- updated messages on -full-system call
+- updated elinks, chromium and firefox starting page to archboot.com
 setup:
-- add EXIT menu with options
+- added EXIT menu with options
 ---
 2023.05 Highlights:
 - linux 6.3.x
