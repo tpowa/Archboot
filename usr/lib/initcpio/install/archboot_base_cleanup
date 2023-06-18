@@ -6,7 +6,7 @@ build ()
 {
     apps="head id cksum tail test uptime w who whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
-          chgrp dialog dmesg egrep fgrep stty hdparm bsdcpio\
+          chgrp dialog dmesg egrep fgrep stty hdparm sync bsdcpio\
           dirname chroot expr bunzip2 bzcat bzip2 su sdparm tput \
           losetup mkfifo mknod  lzmadec lzop lzma lzcat unlzma unxz xzcat \
           lastb last wall mesg utmpdump xzdec switch_root pivot_root chcpu ctrlaltdel \

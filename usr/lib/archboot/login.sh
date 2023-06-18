@@ -50,18 +50,17 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -rf /lib/modules/*/extramodules
     echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
     tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
-        --exclude="./run/*" --exclude="./mnt/*" --exclude="./sysroot/*" \
+        --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
         -clpf - . | tar -C /sysroot -xlspf - &>/dev/null
     # cleanup mkinitcpio directories and files
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
-    sync
     echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
     read -r -t 3
-    systemctl start initrd-switch-root
+    systemctl start initrd-switch-root.target
 else
     while true; do
         read -r -t 1

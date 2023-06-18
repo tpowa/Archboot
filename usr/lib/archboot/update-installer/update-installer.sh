@@ -383,14 +383,12 @@ _new_environment() {
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Switch root to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
-        rm -r /${_RAM}/mkinitcpio.*
         # cleanup mkinitcpio directories and files
-        rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
+        rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>/dev/null
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
         # systemd needs this for root_switch
         touch /etc/initrd-release
-        sync
-        systemctl start initrd-switch-root
+        systemctl start initrd-switch-root.target
     fi
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
