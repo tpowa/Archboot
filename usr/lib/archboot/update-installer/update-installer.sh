@@ -386,11 +386,15 @@ _new_environment() {
         # cleanup mkinitcpio directories and files
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>/dev/null
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
-        # systemd needs this for root_switch
+        # https://www.freedesktop.org/software/systemd/man/bootup.html
+        # enable systemd  initrd functionality
         touch /etc/initrd-release
+        # fix /run/nouser issues
         systemctl stop systemd-user-sessions.service
+        # avoid issues by bringing down services in ordered way
         systemctl stop dbus-org.freedesktop.login1.service
         systemctl stop dbus.socket
+        # prepare for initrd-switch-root
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi

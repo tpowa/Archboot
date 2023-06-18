@@ -4,7 +4,10 @@ On the road to 2023.06:
 Environment Changes:
 - don't try to mount none existent /dev/sr0
 - synced getty and serial-getty with latest systemd
+- added systemd-sysusers.service which runs before dbus.socket launches
 - disabled root autologin message
+- made systemd initrd-switch-root routine bullet proof
+- fixed /run/nouser leftovers
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com

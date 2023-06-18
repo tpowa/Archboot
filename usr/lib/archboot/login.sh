@@ -60,9 +60,15 @@ if [[ "${TTY}" = "tty1" ]]; then
     echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
     read -r -t 3
+    # https://www.freedesktop.org/software/systemd/man/bootup.html
+    # enable systemd  initrd functionality
+    touch /etc/initrd-release
+    # fix /run/nouser issues
     systemctl stop systemd-user-sessions.service
+    # avoid issues by bringing down services in ordered way
     systemctl stop dbus-org.freedesktop.login1.service
     systemctl stop dbus.socket
+    # prepare for initrd-switch-root
     systemctl start initrd-cleanup.service
     systemctl start initrd-switch-root.target
 else
