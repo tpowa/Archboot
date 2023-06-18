@@ -129,11 +129,6 @@ _run_update_installer() {
     fi
 }
 
-# systemd root switching can cause issues with pam nologin
-if [[ -e "/run/nologin" ]]; then
-    systemctl restart systemd-user-sessions.service
-fi
-
 if ! [[ -e "/.vconsole-run" ]]; then
     touch /.vconsole-run
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
