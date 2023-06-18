@@ -391,6 +391,7 @@ _new_environment() {
         systemctl stop systemd-user-sessions.service
         systemctl stop dbus-org.freedesktop.login1.service
         systemctl stop dbus.socket
+        systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
