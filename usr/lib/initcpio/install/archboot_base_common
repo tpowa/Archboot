@@ -137,6 +137,7 @@ build ()
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
+    add_file "/usr/share/archboot/base/etc/systemd/system/systemd-sysusers.service" "/etc/systemd/system/systemd-sysusers.service"
 
     ### add missing libsystemd files
     map add_file "/usr/lib/libnss_myhostname.so.2" "/usr/lib/libnss_mymachines.so.2" \
