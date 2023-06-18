@@ -6,7 +6,7 @@ build ()
 {
     map add_binary head id cksum tail test uptime w who whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
-          chgrp chown dialog dmesg egrep fgrep stty sync hdparm \
+          chgrp chown dialog dmesg egrep fgrep stty hdparm \
           dirname chroot expr bzip2 su sdparm tput bsdcpio \
           losetup mkfifo mknod readlink lzmadec lzop xz last wall mesg utmpdump \
           xzdec switch_root pivot_root chcpu ctrlaltdel gdisk sgdisk cgdisk fixparts findmnt \

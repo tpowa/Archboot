@@ -16,7 +16,7 @@ build ()
             mkdir echo false sleep kmod pidof touch chmod find wc uname yes awk halt \
             shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
             install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig nscd ln top df cut \
-            stat tr passwd od tar bsdtar
+            stat tr passwd od tar bsdtar sync
 
     ### add nano
     add_binary nano

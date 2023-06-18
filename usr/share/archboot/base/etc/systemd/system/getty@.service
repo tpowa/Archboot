@@ -35,7 +35,7 @@ ConditionPathExists=/dev/tty0
 # The '-o' option value tells agetty to replace 'login' arguments with an
 # option to preserve environment (-p), followed by '--' for safety, and then
 # the entered username.
-ExecStart=-/sbin/agetty --skip-login --login-options "-f root -p -- \\u" - $TERM
+ExecStart=-/sbin/agetty --skip-login -o "-f root -p -- \\u" - $TERM
 Type=idle
 Restart=always
 RestartSec=0

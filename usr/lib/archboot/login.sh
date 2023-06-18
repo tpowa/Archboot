@@ -57,6 +57,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
+    sync
     echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
     echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
     read -r -t 3
