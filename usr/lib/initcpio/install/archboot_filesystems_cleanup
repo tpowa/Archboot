@@ -17,7 +17,7 @@ build ()
 	  mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \
 	  tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos  \
           fsck.btrfs e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io \
-          f2fscrypt f2fstat fibmap.f2fs resize.f2fs sload.f2fs fsck.f2fs parse.f2fs blkmapd nfsconf \
+          f2fscrypt fibmap.f2fs resize.f2fs sload.f2fs fsck.f2fs parse.f2fs blkmapd nfsconf \
           nfsdcld nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
           xfs_growfs xfs_quota \
       xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
