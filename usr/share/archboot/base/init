@@ -89,6 +89,7 @@ echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -
 echo -e "          This may need some time..."
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
 # cleanup firmware and modules
+read -r -t 3
 mv /lib/firmware/regulatory* /tmp/ &>/dev/null
 rm -rf /lib/firmware/*
 mv /tmp/regulatory* /lib/firmware/ &>/dev/null
