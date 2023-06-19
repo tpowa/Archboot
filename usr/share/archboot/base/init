@@ -88,11 +88,8 @@ echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
 echo -e "          This may need some time..."
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
-# cleanup firmware and modules
-read -r -t 3
-mv /lib/firmware/regulatory* /tmp/ &>/dev/null
-rm -rf /lib/firmware/*
-mv /tmp/regulatory* /lib/firmware/ &>/dev/null
+# keep ethernet NIC firmware
+rm -rf /lib/firmware/{advansys,amd*,ath*,dvb*,i915,intel,iwlwifi*,libertas,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rtlwifi,rtl_bt,ti-connectivity}
 rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
 rm -rf /lib/modules/*/extramodules
 echo -e "\e[1mStep 4/6:\e[m Creating /dev/zram0 with zstd compression..."
