@@ -13,6 +13,7 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - turn off sys-fs-fuse-connections.mount by default
+- turn off tmp.mount by default
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
