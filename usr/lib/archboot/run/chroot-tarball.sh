@@ -45,7 +45,7 @@ bsdtar -xf "${_ARCH_VERSION}" -C "${1}"
 echo "Removing installation tarball..."
 rm "${_ARCH_VERSION}"
 sed -i -e '/^\[community\]/ { n ; s/^/#/ }' "${1}"/etc/pacman.conf
-sed -i -e 's:^\[community\]:#\[community\]:g'"${1}"/etc/pacman.conf
+sed -i -e 's:^\[community\]:#\[community\]:g' "${1}"/etc/pacman.conf
 _generate_keyring "${1}" || exit 1
 _fix_network "${1}"
 # update container to latest packages
