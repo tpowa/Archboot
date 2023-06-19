@@ -140,7 +140,7 @@ _run_update_installer() {
 
 # don't spam lastlog to login prompt
 if [[ -e "/var/log/lastlog" ]]; then
-    rm /var/log/lastlog
+    rm -f /var/log/lastlog
 fi
 
 if ! [[ -e "/.vconsole-run" ]]; then
