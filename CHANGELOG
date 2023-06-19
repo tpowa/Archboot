@@ -14,6 +14,7 @@ Environment Changes:
 - fixed /run/nouser leftovers
 - turn off sys-fs-fuse-connections.mount by default
 - turn off tmp.mount by default
+- umount /dev/sr0 and UUID 1234-ABCD after copying
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
