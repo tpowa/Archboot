@@ -143,7 +143,7 @@ build ()
     # mask fuse, it's not included by default
     # no tmpfs needed on /tmp!
     # disable debugfs, configfs and tracefs
-    for i in sys-kernel-debug,sys-kernel-tracing,sys-kernel-config sys-fs-fuse-connections tmp; do
+    for i in sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
         add_symlink "/etc/systemd/system/${i}.mount" "/dev/null"
     done
     ### add missing libsystemd files
