@@ -67,6 +67,8 @@ cd /
 echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
 echo -e "          This may need some time..."
 bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+# unmount everything after copying
+umount -a
 # reinitialize available modules
 udevadm control -R
 # clear screen
