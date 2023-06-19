@@ -89,7 +89,7 @@ echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -
 echo -e "          This may need some time..."
 echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
 # keep ethernet NIC firmware
-rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ath*,brcm,cavium,cirrus,cxgb*,cypress,dvb*,i915,intel,iwlwifi*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rtlwifi,rtl_bt,ti-connectivity,yam,yamaha}
+rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,i915,intel,iwlwifi*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,ti-connectivity,yam,yamaha}
 rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
 rm -rf /lib/modules/*/extramodules
 echo -e "\e[1mStep 4/6:\e[m Creating /dev/zram0 with zstd compression..."
