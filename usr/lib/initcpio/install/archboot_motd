@@ -24,7 +24,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
-    echo -e "\e[1mFor wifi authentification to internet access or further online help:\e[m" >> "${MOTD}"
+    echo -e "\e[1mFor Wi-Fi authentification to internet access or further online help:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
     echo -e "\e[1mFor getting support on IRC channels:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
