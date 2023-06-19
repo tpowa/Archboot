@@ -6,7 +6,8 @@ Environment Changes:
 - synced custom getty and serial-getty with latest systemd
 - added custom systemd-sysusers.service, which runs before dbus.socket launches
 - removed old custom autovt.service and old tty1 configuration
-- disabled root autologin message
+- disabled root autologin login message
+- disabled lastlog login message
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 update-installer.sh:
