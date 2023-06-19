@@ -138,11 +138,6 @@ _run_update_installer() {
     fi
 }
 
-# don't spam lastlog to login prompt
-if [[ -e "/var/log/lastlog" ]]; then
-    rm -f /var/log/lastlog
-fi
-
 if ! [[ -e "/.vconsole-run" ]]; then
     touch /.vconsole-run
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"

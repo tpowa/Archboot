@@ -9,6 +9,7 @@ build ()
 
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
+    add_symlink /var/log/lastlog /dev/null
 
     ### add basic apps
     map add_binary init agetty basename mount umount clear env printf gawk tty bash rbash \
