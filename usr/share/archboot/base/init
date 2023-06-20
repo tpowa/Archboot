@@ -41,7 +41,7 @@ echo 1 > /proc/sys/kernel/sysrq
 _title
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
-echo -e "\e[1mStep 1/6:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
@@ -64,7 +64,7 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
 fi
 cd /
 # move in modules from main initramfs
-echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
+echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
 echo -e "          This may need some time..."
 bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 # reinitialize available modules
@@ -83,23 +83,23 @@ else
 fi
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
 _title
-echo -e "\e[1mStep 1/6:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
-echo -e "\e[1mStep 2/6:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
+echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
 echo -e "          This may need some time..."
-echo -e "\e[1mStep 3/6:\e[m Removing firmware and modules..."
+echo -e "\e[1mStep 3/7:\e[m Removing firmware and modules..."
 # keep ethernet NIC firmware
 rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,ti-connectivity,tehuti,wfx,yam,yamaha}
 rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
 rm -rf /lib/modules/*/extramodules
-echo -e "\e[1mStep 4/6:\e[m Creating /dev/zram0 with zstd compression..."
+echo -e "\e[1mStep 4/7:\e[m Creating /dev/zram0 with zstd compression..."
 echo "zstd" >/sys/block/zram0/comp_algorithm
 echo "4G" >/sys/block/zram0/disksize
-echo -e "\e[1mStep 5/6:\e[m Creating btrfs on /dev/zram0..."
+echo -e "\e[1mStep 5/7:\e[m Creating btrfs on /dev/zram0..."
 mkfs.btrfs /dev/zram0 &>/dev/null
 # use discard to get free RAM on delete!
 mount -o discard /dev/zram0 /sysroot &>/dev/null
-echo -e "\e[1mStep 6/6:\e[m Copying rootfs files to /sysroot..."
+echo -e "\e[1mStep 6/7:\e[m Copying rootfs files to /sysroot..."
 echo -e "          This may need some time..."
 mkdir -p /sysroot/usr/lib
 mv /lib/modules /sysroot/usr/lib
@@ -107,6 +107,7 @@ mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 # unmount everything after copying
+echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs on usb/hd/cdrom device..."
 umount -q -A /dev/sr0
 umount -q -A UUID=1234-ABCD
 echo 0 > /proc/sys/kernel/sysrq
