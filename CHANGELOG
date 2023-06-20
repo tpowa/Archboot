@@ -4,8 +4,7 @@ On the road to 2023.06:
 - grub-2.06.r566.g857af0e17
 - aarch64 switched to new Arch Linux GIT layout, removed community repositoy
 Environment Changes:
-- only mount /dev/sr0 on detection
-- synced custom getty and serial-getty with latest systemd
+- synced custom getty and serial-getty with latest systemd version
 - added custom systemd-sysusers.service, which runs before dbus.socket launches
 - removed old custom autovt.service and old tty1 configuration
 - disabled root autologin login message
@@ -13,6 +12,7 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - disabled/masked fuse, debugfs, configfs, tmp, tracefs by default
+- only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
 update-installer.sh:
