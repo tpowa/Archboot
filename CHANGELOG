@@ -16,7 +16,7 @@ Environment Changes:
   local-fs-pre, local-fs, swap, cryptsetup, remote-fs, remote-fs-pre,
   integritysetup and veritysetup
 - disabled/masked nfs3 support:
-  rpcbind.service rpcbind.socket rpcbind.target nfs-server.service
+  rpcbind.service, rpcbind.socket, rpcbind.target and nfs-server.service
 - only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
