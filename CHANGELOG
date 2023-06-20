@@ -13,8 +13,7 @@ Environment Changes:
 - fixed /run/nouser leftovers
 - disabled/masked systemd mounts: fuse, debugfs, configfs, tmp and tracefs
 - disabled/masked systemd targets:
-  local-fs-pre, local-fs, swap, cryptsetup, remote-fs, remote-fs-pre,
-  integritysetup and veritysetup
+  swap, cryptsetup, remote-fs, remote-fs-pre, integritysetup and veritysetup
 - disabled/masked nfs3 support:
   rpcbind.service, rpcbind.socket, rpcbind.target and nfs-server.service
 - only mount /dev/sr0 on detection
