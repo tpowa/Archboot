@@ -147,7 +147,6 @@ build ()
         add_symlink "/etc/systemd/system/${i}.mount" "/dev/null"
     done
     ### disable systemd targets:
-    # disable local filesystems
     # disable swap
     # disable cryptsetup integritysetup veritysetup
     for i in cryptsetup integritysetup swap veritysetup; do
