@@ -150,7 +150,7 @@ build ()
     # disable local filesystems
     # disable swap
     # disable cryptsetup integritysetup veritysetup
-    for i in cryptsetup integritysetup remote-fs remote-fs-pre swap veritysetup; do
+    for i in cryptsetup integritysetup swap veritysetup; do
         add_symlink "/etc/systemd/system/${i}.target" "/dev/null"
     done
     # remove .wants directories
