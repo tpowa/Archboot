@@ -2,7 +2,7 @@ On the road to 2023.06:
 - New domain https://archboot.com with new w3c conform html layout
 - systemd 253.5
 - grub-2.06.r566.g857af0e17
-- aarch64 switched to new Arch Linux GIT layout, removed community repositoy
+- aarch64 switched to new Arch Linux GIT layout, removed community repository
 Environment Changes:
 - synced custom getty and serial-getty with latest systemd version
 - added custom systemd-sysusers.service, which runs before dbus.socket launches
@@ -12,7 +12,7 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - disabled/masked systemd mounts: fuse, debugfs, configfs, tmp and tracefs
-- disabled/masked systemd targets: local-fs, local-fs-pre, swap, cryptsetup,
+- disabled/masked systemd targets: local-fs-pre, local-fs, swap, cryptsetup,
                                    integritysetup and veritysetup
 - only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
