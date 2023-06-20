@@ -149,6 +149,7 @@ build ()
     ### disable systemd targets:
     # disable local filesystems
     # disable swap
+    # disable cryptsetup integritysetup veritysetup
     for i in cryptsetup integritysetup local-fs-pre local-fs swap veritysetup; do
         add_symlink "/etc/systemd/system/${i}.target" "/dev/null"
     done
