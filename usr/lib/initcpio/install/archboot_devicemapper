@@ -6,7 +6,8 @@ build ()
 {
 
     add_all_modules 'md/dm-*'
-    map add_binary dmsetup dmeventd blkdeactivate dmstats cryptsetup
+    map add_binary dmsetup dmeventd blkdeactivate dmstats cryptsetup \
+        integritysetup veritysetup
     add_dir "/dev/mapper"
     add_full_dir "/usr/lib/device-mapper"
     for i in /usr/lib/libdevmapper*; do
