@@ -12,8 +12,11 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - disabled/masked systemd mounts: fuse, debugfs, configfs, tmp and tracefs
-- disabled/masked systemd targets: local-fs-pre, local-fs, swap, cryptsetup,
-                                   integritysetup and veritysetup
+- disabled/masked systemd targets:
+  local-fs-pre, local-fs, swap, cryptsetup, remote-fs, remote-fs-pre,
+  integritysetup and veritysetup
+- disabled/masked nfs3 support:
+  rpcbind.service rpcbind.socket rpcbind.target nfs-server.service
 - only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
