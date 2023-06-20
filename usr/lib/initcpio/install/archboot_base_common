@@ -153,8 +153,8 @@ build ()
     for i in cryptsetup integritysetup swap veritysetup; do
         add_symlink "/etc/systemd/system/${i}.target" "/dev/null"
     done
-    # remove .wants directories
-    rm -rf ${BUILDROOT}/etc/systemd/system/*.wants
+    # remove multi-user.target.wants
+    rm -rf ${BUILDROOT}/etc/systemd/system/multi-user.target.wants
     ### add missing libsystemd files
     map add_file "/usr/lib/libnss_myhostname.so.2" "/usr/lib/libnss_mymachines.so.2" \
                  "/usr/lib/libnss_resolve.so.2" "/usr/lib/libnss_systemd.so.2"
