@@ -24,6 +24,7 @@ Environment Changes:
 - only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
+- included /drivers/net/usb modules
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
