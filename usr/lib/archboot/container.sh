@@ -200,4 +200,7 @@ _set_hostname() {
     echo 'archboot' > "${1}/etc/hostname"
 }
 
+_create_sysusers() {
+    systemd-sysusers --root="${1}
+}
 # vim: set ft=sh ts=4 sw=4 et:

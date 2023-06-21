@@ -8,6 +8,7 @@ _parameters "$@"
 _root_check
 echo "Starting container creation..."
 [[ -d "${1}" ]] || (echo "Creating directory ${1}..."; mkdir "${1}")
+_create_sysusers
 if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     _cachedir_check
