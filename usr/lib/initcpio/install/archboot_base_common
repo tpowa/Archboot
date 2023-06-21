@@ -9,7 +9,6 @@ build ()
 
     add_symlink /var/run ../run
     add_symlink /var/lock ../run/lock
-    add_symlink /var/log/lastlog /dev/null
 
     ### add basic apps
     map add_binary init agetty basename mount umount clear env printf gawk tty bash rbash \
@@ -140,20 +139,23 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/systemd-sysusers.service" "/etc/systemd/system/systemd-sysusers.service"
     ### disable systemd mounts:
-    # mask fuse, it's not included by default
-    # no tmpfs needed on /tmp!
-    # disable debugfs, configfs and tracefs
+    # disable configfs, debugfs, fuse and tracefs
     for i in sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
         add_symlink "/etc/systemd/system/${i}.mount" "/dev/null"
     done
     ### disable systemd targets:
-    # disable swap
-    # disable cryptsetup integritysetup veritysetup
+    # swap cryptsetup integritysetup veritysetup
     for i in cryptsetup integritysetup swap veritysetup; do
         add_symlink "/etc/systemd/system/${i}.target" "/dev/null"
     done
+    ### disable systemd services:
+    for i in firstboot machine-id-commit pcrmachine binfmt boot-random-seed repart
+        add_symlink "/etc/systemd/system/sytem-${i}.service" "/dev/null"
+    done
     # remove multi-user.target.wants
     rm -rf ${BUILDROOT}/etc/systemd/system/multi-user.target.wants
+    # disable lastlog
+    add_symlink "/var/log/lastlog" "/dev/null"
     ### add missing libsystemd files
     map add_file "/usr/lib/libnss_myhostname.so.2" "/usr/lib/libnss_mymachines.so.2" \
                  "/usr/lib/libnss_resolve.so.2" "/usr/lib/libnss_systemd.so.2"
