@@ -4,7 +4,7 @@
 
 build ()
 {
-    add_all_modules -f '_cs|b44|broadcom/bnx2x|brocade|cavium|chelsio|cisco|netronome|mellanox|myricom|qlogic|qualcomm' '/drivers/net/ethernet|/net/ipv4|/net/ipv6'
+    add_all_modules -f '_cs|b44|broadcom/bnx2x|brocade|cavium|chelsio|cisco|netronome|mellanox|myricom|qlogic|qualcomm' '/drivers/net/ethernet|/net/ipv4|/net/ipv6|/drivers/net/usb'
     map add_binary ip getent ping wget
     # start dhcpcd on startup
     add_file "/usr/share/archboot/net/etc/systemd/network/10-wired-auto-dhcp.network" "/etc/systemd/network/10-wired-auto-dhcp.network"
