@@ -156,6 +156,7 @@ build ()
     rm -rf ${BUILDROOT}/etc/systemd/system/multi-user.target.wants
     # disable lastlog
     add_symlink "/var/log/lastlog" "/dev/null"
+    add_file "/usr/share/archboot/base/etc/tmpfiles.d/var.conf" "/etc/tmpfiles.d/var.conf"
     ### add missing libsystemd files
     map add_file "/usr/lib/libnss_myhostname.so.2" "/usr/lib/libnss_mymachines.so.2" \
                  "/usr/lib/libnss_resolve.so.2" "/usr/lib/libnss_systemd.so.2"
