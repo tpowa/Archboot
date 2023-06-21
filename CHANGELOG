@@ -11,9 +11,13 @@ Environment Changes:
 - disabled lastlog login message
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
-- disabled/masked systemd mounts: fuse, debugfs, configfs, tmp and tracefs
+- disabled/masked systemd mounts:
+  fuse, debugfs, configfs, tmp and tracefs
 - disabled/masked systemd targets:
-  swap, cryptsetup, integritysetup and veritysetup
+  cryptsetup first-boot-complete integritysetup swap veritysetup
+- disabled/masked systemd services:
+  hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed
+  repart pcrphase pcrphase-sysinit
 - disabled/masked nfs3 support:
   rpcbind.service, rpcbind.socket, rpcbind.target and nfs-server.service
 - switch to default.target -> graphical.target
