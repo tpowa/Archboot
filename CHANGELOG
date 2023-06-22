@@ -1,7 +1,7 @@
 On the road to 2023.06:
 - New domain https://archboot.com with new w3c conform html layout
 - systemd 253.5
-- grub-2.06.r566.g857af0e17
+- grub 2.06.r533.g78bc9a9b2
 - aarch64 switched to new Arch Linux GIT layout, removed community repository
 Environment Changes:
 - synced custom getty and serial-getty with latest systemd version
