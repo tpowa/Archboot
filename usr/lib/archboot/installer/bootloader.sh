@@ -851,7 +851,7 @@ _do_grub_bios() {
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
-        _do_grub_config
+        _do_grub_config || return 1
         _dialog --infobox "GRUB(2) BIOS has been installed successfully.\nContinuing in 5 seconds..." 4 55
         sleep 5
         _S_BOOTLOADER=1
@@ -891,7 +891,7 @@ _do_grub_uefi() {
     fi
     _chroot_umount
     _GRUB_UEFI=1
-    _do_grub_config
+    _do_grub_config || return 1
     _GRUB_UEFI=""
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         # generate GRUB with config embeded
