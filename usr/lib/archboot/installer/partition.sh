@@ -40,7 +40,6 @@ _check_gpt() {
 
 ## check and mount EFISYS partition at ${_UEFISYS_MP}
 _check_efisys_part() {
-    _DISK=""
     # automounted /boot needs to be mounted first, trigger mount with ls
     ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
     if ${_FINDMNT} "${_DESTDIR}/boot"; then
