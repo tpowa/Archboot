@@ -5,6 +5,8 @@ _detect_disk() {
     if [[ -z "${_DISK}" ]] || ! echo "${_DISK}" | grep -q '/dev/'; then
         if findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -qw systemd-1; then
             _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -vw systemd-1)")"
+        else
+            _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot")"
         fi
     fi
     if [[ -z "${_DISK}" ]]; then

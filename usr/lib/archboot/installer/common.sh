@@ -92,35 +92,35 @@ _local_pacman_conf() {
 
 _auto_packages() {
     # Add filesystem packages
-    if lsblk -rnpo FSTYPE | grep -q btrfs; then
+    if ${_LSBLK} FSTYPE | grep -q btrfs; then
         ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
     fi
-    if lsblk -rnpo FSTYPE | grep -q nilfs2; then
+    if ${_LSBLK} FSTYPE | grep -q nilfs2; then
         ! echo "${_PACKAGES}" | grep -qw nilfs-utils && _PACKAGES="${_PACKAGES} nilfs-utils"
     fi
-    if lsblk -rnpo FSTYPE | grep -q ext; then
+    if ${_LSBLK} FSTYPE | grep -q ext; then
         ! echo "${_PACKAGES}" | grep -qw e2fsprogs && _PACKAGES="${_PACKAGES} e2fsprogs"
     fi
-    if lsblk -rnpo FSTYPE | grep -q xfs; then
+    if ${_LSBLK} FSTYPE | grep -q xfs; then
         ! echo "${_PACKAGES}" | grep -qw xfsprogs && _PACKAGES="${_PACKAGES} xfsprogs"
     fi
-    if lsblk -rnpo FSTYPE | grep -q jfs; then
+    if ${_LSBLK} FSTYPE | grep -q jfs; then
         ! echo "${_PACKAGES}" | grep -qw jfsutils && _PACKAGES="${_PACKAGES} jfsutils"
     fi
-    if lsblk -rnpo FSTYPE | grep -q f2fs; then
+    if ${_LSBLK} FSTYPE | grep -q f2fs; then
         ! echo "${_PACKAGES}" | grep -qw f2fs-tools && _PACKAGES="${_PACKAGES} f2fs-tools"
     fi
-    if lsblk -rnpo FSTYPE | grep -q vfat; then
+    if ${_LSBLK} FSTYPE | grep -q vfat; then
         ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
     fi
     # Add packages for complex blockdevices
-    if lsblk -rnpo FSTYPE | grep -qw 'linux_raid_member'; then
+    if ${_LSBLK} FSTYPE | grep -qw 'linux_raid_member'; then
         ! echo "${_PACKAGES}" | grep -qw mdadm && _PACKAGES="${_PACKAGES} mdadm"
     fi
-    if lsblk -rnpo FSTYPE | grep -qw 'LVM2_member'; then
+    if ${_LSBLK} FSTYPE | grep -qw 'LVM2_member'; then
         ! echo "${_PACKAGES}" | grep -qw lvm2 && _PACKAGES="${_PACKAGES} lvm2"
     fi
-    if lsblk -rnpo FSTYPE | grep -qw 'crypto_LUKS'; then
+    if ${_LSBLK} FSTYPE | grep -qw 'crypto_LUKS'; then
         ! echo "${_PACKAGES}" | grep -qw cryptsetup && _PACKAGES="${_PACKAGES} cryptsetup"
     fi
     #shellcheck disable=SC2010
