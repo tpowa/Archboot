@@ -25,10 +25,17 @@ Environment Changes:
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
 - included /drivers/net/usb modules
+- renamed grub entries
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
 setup:
+- replaced findmnt -vno SOURCE with _FINDMNT
+- replaced lsblk -rnpo with _LSBLK
+- fixed create missing directories in bootloader routine
+- added custom grub package for Secure Boot workaround
+- fixed detect_disk function
+- log efibootmgr messages to VC
 - added EXIT menu with options
 ---
 2023.05 Highlights:
