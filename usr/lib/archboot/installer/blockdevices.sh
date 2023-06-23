@@ -84,7 +84,7 @@ _blockdevices_partitions() {
 
 # list none partitionable raid md devices
 _raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" 2>"${_NO_LOG}" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" | cut -d' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
@@ -237,7 +237,7 @@ _activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         _dialog --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
-            for part in $(${_LSBLK} NAME,FSTYPE 2>"{_NO_LOG}" | grep " crypto_LUKS$" | cut -d' ' -f 1); do
+            for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
                     _RUN_LUKS=""

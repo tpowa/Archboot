@@ -53,7 +53,7 @@ _check_gpt() {
 ## check and mount EFISYS partition at ${_UEFISYS_MP}
 _check_efisys_part() {
     _detect_disk
-    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" != "gpt" ]]; then
+    if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}" 2>${_NO_LOG})" != "gpt" ]]; then
         _GUID_DETECTED=""
         _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\nUEFI boot requires ${_DISK} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
         _dialog --msgbox "Setup will now try to non-destructively convert ${_DISK} to GPT using sgdisk." 0 0
