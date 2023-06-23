@@ -740,6 +740,7 @@ EOF
     fi
 fi
     ## copy ter-u16n.pf2 font file
+    [[ ! -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] && mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
     _chroot_umount
     ## Edit grub.cfg config file
