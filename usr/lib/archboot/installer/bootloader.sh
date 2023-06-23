@@ -146,6 +146,7 @@ _abort_f2fs_bootpart() {
 _do_uefi_common() {
     _PACKAGES=""
     _DEV=""
+    _BOOTDEV=""
     [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES="${_PACKAGES} dosfstools"
     [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES="${_PACKAGES} efivar"
     [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES="${_PACKAGES} efibootmgr"
@@ -154,12 +155,20 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/efi-readvar" ]] || _PACKAGES="${_PACKAGES} efitools"
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
-    _PACKAGES="${_PACKAGES/^\ //}"
     if [[ -n "${_PACKAGES}" ]]; then
         _run_pacman
     fi
-    # /dev/<device> of ESP
-    _UEFISYSDEV="$(${_LSBLK} NAME,PARTTYPE | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
+    # automounted /boot and ESP needs to be mounted first, trigger mount with ls
+    ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
+    ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
+    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
+    if mountpoint -q "${_DESTDIR}/efi" ; then
+        _UEFISYS_MP=efi
+    else
+        _UEFISYS_MP=boot
+    fi
+    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
+    _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
 }
 
 _do_uefi_efibootmgr() {
@@ -291,21 +300,9 @@ EOF
 }
 
 _do_efistub_parameters() {
-    _BOOTDEV=""
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
-    # automounted /boot and ESP needs to be mounted first, trigger mount with ls
-    ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
-    ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
-    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
-    if mountpoint -q "${_DESTDIR}/efi" ; then
-        _UEFISYS_MP=efi
-    else
-        _UEFISYS_MP=boot
-    fi
-    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
-    _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
         _KERNEL="${_VMLINUZ}"
