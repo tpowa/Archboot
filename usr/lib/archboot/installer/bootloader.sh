@@ -130,16 +130,14 @@ _abort_uboot(){
 }
 
 _abort_nilfs_bootpart() {
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
-        if [[ "${_FSTYPE}" == "nilfs2" ]]; then
+        if ${_LSBLK} FSTYPE "${_BOOTDEV}" | grep -q "nilfs2"; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_f2fs_bootpart() {
-        _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
-        if [[ "${_FSTYPE}" == "f2fs" ]]; then
+        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" | grep -q "f2fs"; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
