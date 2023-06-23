@@ -904,7 +904,7 @@ _do_grub_uefi() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            _dialog --infobox "Installing grub-2:2.06.r533.g78bc9a9b2-1 ..." 5 50
+            _dialog --infobox "Pacman is running...\n\nInstalling grub-2:2.06.r533.g78bc9a9b2-1  to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 10 70
             # fix broken grub with last working version:
             # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
             wget --quiet https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR}
@@ -912,6 +912,8 @@ _do_grub_uefi() {
             ${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig
+            _dialog --infobox "grub-2:2.06.r533.g78bc9a9b2-1 has been installed successfully.\nContinuing in 5 seconds..." 4 60
+            sleep 5
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         fi
         [[ -d "${_UEFISYS_MP}"/EFI/BOOT ]] || mkdir -p "${_UEFISYS_MP}"/EFI/BOOT
