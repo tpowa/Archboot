@@ -902,6 +902,7 @@ _do_grub_uefi() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+            _dialog --infobox "Installing grub-2:2.06.r533.g78bc9a9b2-1 ..." 5 50
             # fix broken grub with last working version:
             # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
             wget --quiet https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR}
