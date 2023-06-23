@@ -157,7 +157,6 @@ _do_uefi_common() {
     if [[ -n "${_PACKAGES}" ]]; then
         _run_pacman
     fi
-    _check_efisys_part || return 1
 }
 
 _do_uefi_efibootmgr() {
