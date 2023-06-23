@@ -40,13 +40,19 @@ _check_gpt() {
 
 ## check and mount EFISYS partition at ${_UEFISYS_MP}
 _check_efisys_part() {
-    # automounted /boot needs to be mounted first, trigger mount with ls
+    # automounted /boot and ESP needs to be mounted first, trigger mount with ls
     ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
-    if ${_FINDMNT} "${_DESTDIR}/boot"; then
+    ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
+    if mountpoint -q "${_DESTDIR}/efi" ; then
+        _UEFISYS_MP=efi
+    else
+        _UEFISYS_MP=boot
+    fi
+    if ${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}"; then
         if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
-            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw systemd-1)")"
+            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw systemd-1)")"
         else
-            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot")")"
+            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}")")"
         fi
     else
         _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
