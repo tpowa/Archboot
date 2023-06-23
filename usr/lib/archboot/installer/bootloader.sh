@@ -189,6 +189,7 @@ _do_uefi_secure_boot_efitools() {
     _do_uefi_common || return 1
     # install helper tools and create entries in UEFI boot manager, if not present
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
+        [[ -d "${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_UEFISYS_MP}/EFI/BOOT"
         if [[ ! -f "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi" ]]; then
             cp "${_DESTDIR}/usr/share/efitools/efi/HashTool.efi" "${_UEFISYS_MP}/EFI/BOOT/HashTool.efi"
             _BOOTMGR_LABEL="HashTool (Secure Boot)"
@@ -267,7 +268,7 @@ _do_pacman_sign() {
     _SIGN_KERNEL=""
     _dialog --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && _SIGN_KERNEL=1
     if [[ -n "${_SIGN_KERNEL}" ]]; then
-        [[ ! -d "${_DESTDIR}/etc/pacman.d/hooks" ]] &&  mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks/
+        [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
         _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
         cat << EOF > "${_HOOKNAME}"
 [Trigger]
@@ -327,7 +328,7 @@ _do_efistub_copy_to_efisys() {
     if ! [[ "${_UEFISYS_MP}" == "boot" ]]; then
         # clean and copy to efisys
         _dialog --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
-        ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
+        [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD}"
@@ -396,7 +397,7 @@ _do_efistub_uefi() {
 _do_systemd_boot_uefi() {
     _dialog --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
-    ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     echo "linux    /${_KERNEL}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     if [[ -n "${_INITRD_UCODE}" ]]; then
@@ -440,7 +441,7 @@ _do_refind_uefi() {
         _run_pacman
     fi
     _dialog --infobox "Setting up rEFInd now. This needs some time..." 3 60
-    ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] && mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -f "${_DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -r "${_DESTDIR}/usr/share/refind/icons" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -r "${_DESTDIR}/usr/share/refind/fonts" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
@@ -740,7 +741,7 @@ EOF
     fi
 fi
     ## copy ter-u16n.pf2 font file
-    [[ ! -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] && mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
+    [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
     _chroot_umount
     ## Edit grub.cfg config file
@@ -872,7 +873,7 @@ _do_grub_uefi() {
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         # install fedora shim
-        [[ ! -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] && mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
+        [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
