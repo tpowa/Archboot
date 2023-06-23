@@ -49,7 +49,7 @@ _check_efisys_part() {
         _UEFISYS_MP=boot
     fi
     if ${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}"; then
-        if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
+        if ${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -qw systemd-1; then
             _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw systemd-1)")"
         else
             _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}")")"
