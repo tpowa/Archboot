@@ -164,11 +164,11 @@ _do_uefi_common() {
 
 _do_uefi_efibootmgr() {
     for _bootnum in $(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
-        efibootmgr --quiet -b "${_bootnum}" -B >> "${LOG}"
+        efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}")
     _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sed -e "s#${_BOOTMGRDEV}##g" | sed -e 's#p##g')
-    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${LOG}"
+    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
 }
 
 _do_apple_efi_hfs_bless() {
