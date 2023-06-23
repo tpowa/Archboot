@@ -1,22 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_detect_disk() {
-    if [[ -z "${_DISK}" ]]; then
-        # automounted /boot needs to be mounted first, trigger mount with ls
-        ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
-        if ${_FINDMNT} "${_DESTDIR}/boot"; then
-            if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
-                _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw systemd-1)")"
-            else
-                _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot")")"
-            fi
-        else
-            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
-        fi
-    fi
-}
-
 _check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
@@ -56,7 +40,18 @@ _check_gpt() {
 
 ## check and mount EFISYS partition at ${_UEFISYS_MP}
 _check_efisys_part() {
-    _detect_disk
+    _DISK=""
+    # automounted /boot needs to be mounted first, trigger mount with ls
+    ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
+    if ${_FINDMNT} "${_DESTDIR}/boot"; then
+        if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
+            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw systemd-1)")"
+        else
+            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot")")"
+        fi
+    else
+        _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
+    fi
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" != "gpt" ]]; then
         _GUID_DETECTED=""
         _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\nUEFI boot requires ${_DISK} to be partitioned as GPT.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
