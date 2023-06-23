@@ -3,14 +3,17 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _detect_disk() {
     if [[ -z "${_DISK}" ]]; then
+        # automounted /boot needs to be mounted first, trigger mount with ls
+        ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
         if ${_FINDMNT} "${_DESTDIR}/boot"; then
             if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
                 _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw systemd-1)")"
             else
                 _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot")")"
             fi
+        else
+            _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
         fi
-        _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
     fi
 }
 

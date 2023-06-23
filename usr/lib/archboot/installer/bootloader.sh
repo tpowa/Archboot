@@ -293,12 +293,10 @@ _do_efistub_parameters() {
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
-    # automounted /boot and ESP needs to be mounted first
-    ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw 'systemd-1' && \
-        ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
+    # automounted /boot and ESP needs to be mounted first, trigger mount with ls
+    ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
+    ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
     _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
-    ${_FINDMNT} "${_DESTDIR}/efi" | grep -qw 'systemd-1' && \
-        ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
     if mountpoint -q "${_DESTDIR}/efi" ; then
         _UEFISYS_MP=efi
     else
