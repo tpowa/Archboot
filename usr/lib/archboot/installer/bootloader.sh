@@ -154,6 +154,7 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/efi-readvar" ]] || _PACKAGES="${_PACKAGES} efitools"
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
+    _PACKAGES="${_PACKAGES/^ //}"
     if [[ -n "${_PACKAGES}" ]]; then
         _run_pacman
     fi
