@@ -3,14 +3,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _detect_disk() {
     if [[ -z "${_DISK}" ]]; then
-        if findmnt -vno SOURCE "${_DESTDIR}/boot"; then
-            if findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -qw systemd-1; then
-                _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -vw systemd-1)")"
+        if ${_FINDMNT} "${_DESTDIR}/boot"; then
+            if ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw systemd-1; then
+                _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw systemd-1)")"
             else
-                _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/boot")")"
+                _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/boot")")"
             fi
         fi
-        _DISK="$(${_LSBLK} PKNAME "$(findmnt -vno SOURCE "${_DESTDIR}/")")"
+        _DISK="$(${_LSBLK} PKNAME "$(${_FINDMNT} "${_DESTDIR}/")")"
     fi
 }
 

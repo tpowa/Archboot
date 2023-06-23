@@ -21,6 +21,7 @@ _EDITOR=""
 # programs
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
+_FINDMNT="findmnt -vno SOURCE"
 _DLPROG="wget -q"
 if [[ ${_DESTDIR} == "/" ]]; then
     _S_NET=1

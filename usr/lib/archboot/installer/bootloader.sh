@@ -294,17 +294,17 @@ _do_efistub_parameters() {
     _RAID_ON_LVM=""
     _UEFISYS_PATH="EFI/archlinux"
     # automounted /boot and ESP needs to be mounted first
-    findmnt -vno SOURCE "${_DESTDIR}/boot" | grep -qw 'systemd-1' && \
+    ${_FINDMNT} "${_DESTDIR}/boot" | grep -qw 'systemd-1' && \
         ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
-    _BOOTDEV="$(findmnt -vno SOURCE "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
-    findmnt -vno SOURCE "${_DESTDIR}/efi" | grep -qw 'systemd-1' && \
+    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
+    ${_FINDMNT} "${_DESTDIR}/efi" | grep -qw 'systemd-1' && \
         ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
     if mountpoint -q "${_DESTDIR}/efi" ; then
         _UEFISYS_MP=efi
     else
         _UEFISYS_MP=boot
     fi
-    _UEFISYSDEV="$(findmnt -vno SOURCE "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
+    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
