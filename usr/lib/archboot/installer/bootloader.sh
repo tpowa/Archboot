@@ -168,7 +168,7 @@ _do_uefi_efibootmgr() {
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}")
     _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sed -e "s#${_BOOTMGRDEV}##g" | sed -e 's#p##g')
-    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}"
+    efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${LOG}"
 }
 
 _do_apple_efi_hfs_bless() {
@@ -904,9 +904,9 @@ _do_grub_uefi() {
         elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             # fix broken grub with last working version:
             # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
-            wget https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR}
-            wget https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig -P ${_DESTDIR}
-            ${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
+            wget https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR} >>"${_LOG}"
+            wget https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig -P ${_DESTDIR} >>"${_LOG}"
+            ${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
