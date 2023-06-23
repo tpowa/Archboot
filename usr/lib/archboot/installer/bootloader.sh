@@ -158,6 +158,8 @@ _do_uefi_common() {
     if [[ -n "${_PACKAGES}" ]]; then
         _run_pacman
     fi
+    # /dev/<device> of ESP
+    _UEFISYSDEV="$(${_LSBLK} NAME,PARTTYPE | grep 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b' | cut -d " " -f1)"
 }
 
 _do_uefi_efibootmgr() {
