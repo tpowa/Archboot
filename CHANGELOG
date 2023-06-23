@@ -36,6 +36,7 @@ setup:
 - added custom grub package for Secure Boot workaround
 - fixed detect_disk function
 - log efibootmgr messages to VC
+- allow cancel on grub configuration step
 - added EXIT menu with options
 ---
 2023.05 Highlights:
