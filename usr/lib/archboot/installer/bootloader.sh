@@ -576,9 +576,10 @@ _do_grub_config() {
     _USRDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>"${_NO_LOG}")"
     _USRDEV_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>"${_NO_LOG}")"
     if [[ -n "${_GRUB_UEFI}" ]]; then
-        _UEFISYSDEV_FS_UUID="$(chroot "${_DESTDIR}" grub-probe --target="fs_uuid" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
-        _UEFISYSDEV_HINTS_STRING="$(chroot "${_DESTDIR}" grub-probe --target="hints_string" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
+        _UEFISYSDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
+        _UEFISYSDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
     fi
+    _chroot_umount
     if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
         _SUBDIR="/boot"
         # on btrfs we need to check on subvol
@@ -739,7 +740,6 @@ fi
     ## copy ter-u16n.pf2 font file
     [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
-    _chroot_umount
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1

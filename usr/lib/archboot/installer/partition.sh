@@ -38,7 +38,7 @@ _check_gpt() {
     fi
 }
 
-## check and mount EFISYS partition at ${_UEFISYS_MP}
+## check EFISYS partition
 _check_efisys_part() {
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
     ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
@@ -89,19 +89,13 @@ _check_efisys_part() {
                  _dialog --yesno "Setup did not find an mounted EFI SYSTEM PARTITION (ESP) in ${_UEFISYS_MP}. Please mount the partition in other VC and confirm dialog. Retry?" 0 0 || return 1
             fi
         done
-        umount "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
-        umount "${_UEFISYSDEV}" &>"${_NO_LOG}"
         if [[ -n "${_FORMAT_UEFISYS_FAT32}" ]]; then
+            umount "${_DESTDIR}/${_UEFISYS_MP}" &>"${_NO_LOG}"
+            umount "${_UEFISYSDEV}" &>"${_NO_LOG}"
             mkfs.vfat -F32 -n "EFISYS" "${_UEFISYSDEV}"
-        fi
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}"
-        if [[ "$(${_LSBLK} FSTYPE "${_UEFISYSDEV}")" == "vfat" ]]; then
             mount -o rw,flush -t vfat "${_UEFISYSDEV}" "${_DESTDIR}/${_UEFISYS_MP}"
-        else
-            _dialog --msgbox "${_UEFISYSDEV} is not formatted using FAT filesystem. Setup will go ahead, but there might be issues using non-FAT FS for EFI System partition." 0 0
-            mount -o rw "${_UEFISYSDEV}" "${_DESTDIR}/${_UEFISYS_MP}"
         fi
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI" || true
+        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI"
     else
         _dialog --msgbox "Setup did not find any EFI SYSTEM PARTITION (ESP) on ${_DISK}. Please create >= 260M FAT32 partition with cfdisk type EFI System code and try again." 0 0
         return 1
