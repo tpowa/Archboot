@@ -5,7 +5,7 @@ _check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
     if [[ -z "${_GUID_DETECTED}" ]]; then
-        _dialog --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
+        _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt "${_DISK}" >"${_LOG}" && _GUID_DETECTED=1
         # reread partitiontable for kernel
         partprobe "${_DISK}" >"${_LOG}"
