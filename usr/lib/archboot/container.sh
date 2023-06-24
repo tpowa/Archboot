@@ -177,11 +177,11 @@ _install_archboot() {
 
 _install_custom_grub() {
         [[ -e /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst ]] && \
-         cp /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst \
-         ${1}/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
+         cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" \
+         "${1}/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
         [[ -e /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig ]] && \
-         cp /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig \
-         ${1}/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig
+         cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" \
+         "${1}/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
 }
 
 _copy_mirrorlist_and_pacman_conf() {
