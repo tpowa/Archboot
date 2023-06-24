@@ -85,7 +85,7 @@ _donetwork() {
         _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            _dialog --ok-label "Select" --menu "Select a network interface:" 14 55 7 ${_INTERFACES} 2>"${_ANSWER}"
+            _dialog --ok-label "Select" --menu "Select a network interface:" 12 40 6 ${_INTERFACES} 2>"${_ANSWER}"
             case $? in
                 1) return 1 ;;
                 0) _INTERFACE=$(cat "${_ANSWER}") ;;
