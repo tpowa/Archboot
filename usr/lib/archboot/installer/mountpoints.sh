@@ -420,8 +420,8 @@ _mkfs() {
         if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
             mkdir "${3}${5}/EFI"
         fi
-        if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint "${3}/efi" 2>${_NO_LOG}) && ! -d "${3}${5}/EFI" ]]; then
-            mkdir "${3}${5}/EFI"
+        if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
+            mountpoint -q "${3}/efi" || mkdir "${3}${5}/EFI"
         fi
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
@@ -436,10 +436,12 @@ _mkfs() {
             return 1
         fi
         # check on /EFI on /boot
-        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! $(mountpoint "${3}/efi" 2>${_NO_LOG}) && ! -d "${3}${5}/EFI" ]]; then
-            _dialog --msgbox "Error: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
-            _umountall
-            return 1
+        if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
+            if ! mountpoint -q "${3}/efi"; then
+                _dialog --msgbox "Error: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
+                _umountall
+                return 1
+            fi
         fi
         # btrfs needs balancing on fresh created raid, else weird things could happen
         [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
