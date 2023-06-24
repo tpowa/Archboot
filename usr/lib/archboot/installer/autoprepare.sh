@@ -46,7 +46,7 @@ _autoprepare() {
         _FSOPTS=""
         command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
         command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
-         command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
+        command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
         command -v mkfs.ext3 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
         command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
         command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
@@ -247,7 +247,7 @@ _autoprepare() {
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         else
-            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         fi
     else
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
