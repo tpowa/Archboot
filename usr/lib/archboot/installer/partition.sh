@@ -59,7 +59,6 @@ _partition() {
         if [[ -n "${_DISK}" ]]; then
             if [[ -n "${_GUIDPARAMETER}" ]]; then
                 _CHECK_BIOS_BOOT_GRUB=""
-                _CHECK_UEFISYSDEV=""
                 _RUN_CFDISK=1
                 _check_gpt
             else

@@ -819,7 +819,6 @@ _do_grub_bios() {
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
-        _CHECK_UEFISYSDEV=""
         _RUN_CFDISK=""
         _DEV="${_BOOTDEV}"
         _check_gpt

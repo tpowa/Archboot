@@ -520,7 +520,6 @@ _createmd()
             _DISK="${_RAIDDEV}"
             _RUN_CFDISK=1
             _CHECK_BIOS_BOOT_GRUB=""
-            _CHECK_UEFISYSDEV=""
             _check_gpt
         fi
     fi
