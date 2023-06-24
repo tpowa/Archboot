@@ -322,6 +322,7 @@ _mainmenu() {
         "7")
             _install_bootloader ;;
         "8")
+            #shellcheck disable=SC2086
             dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " EXIT MENU " --menu "" 9 30 5 \
             "1" "Exit Program" \
             "2" "Reboot System" \
