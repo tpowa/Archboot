@@ -901,8 +901,13 @@ _do_grub_uefi() {
             _dialog --infobox "Pacman is running...\n\nInstalling grub-2:2.06.r533.g78bc9a9b2-1 to ${_DESTDIR}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
             # fix broken grub with last working version:
             # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
-            ${_DLPROG} https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR}
-            ${_DLPROG} https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig -P ${_DESTDIR}
+            if [[ -e "${_LOCAL_DB}" ]]; then
+                cp /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst ${_DESTDIR}
+                cp /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig ${_DESTDIR}
+            else
+                ${_DLPROG} https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst -P ${_DESTDIR}
+                ${_DLPROG} https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig -P ${_DESTDIR}
+            fi
             ${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
             rm ${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig
