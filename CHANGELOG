@@ -33,13 +33,13 @@ setup:
 - replaced findmnt -vno SOURCE with _FINDMNT
 - replaced lsblk -rnpo with _LSBLK
 - fixed create missing directories in bootloader routine
-- added custom grub package for Secure Boot workaround
+- added custom grub package for Secure Boot until upstream is fixed
 - fixed detect_disk function
 - log efibootmgr messages to VC
 - allow cancel on grub configuration step
 - added EXIT menu with options
 - cleanup partition functions
-- fix mountpoint checks on /EFI
+- fix mountpoint checks on EFI directory
 ---
 2023.05 Highlights:
 - linux 6.3.x
