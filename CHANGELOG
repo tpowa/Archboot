@@ -38,6 +38,8 @@ setup:
 - log efibootmgr messages to VC
 - allow cancel on grub configuration step
 - added EXIT menu with options
+- cleanup partition functions
+- fix mountpoint checks on /EFI
 ---
 2023.05 Highlights:
 - linux 6.3.x
