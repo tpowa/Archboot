@@ -14,6 +14,7 @@ _check_gpt() {
             _clean_disk "${_DISK}"
             # create fresh GPT
             sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
+            _RUN_CFDISK=1
             _GUID_DETECTED=1
         fi
     fi
@@ -29,6 +30,7 @@ _check_gpt() {
         _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/guid-partition.txt)" 0 0
         clear
         cfdisk "${_DISK}"
+        _RUN_CFDISK=""
         # reread partitiontable for kernel
         partprobe "${_DISK}"
     fi
