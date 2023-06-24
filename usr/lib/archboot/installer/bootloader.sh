@@ -161,7 +161,7 @@ _do_uefi_common() {
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
     ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
     ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
-    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot}" | grep -vw 'systemd-1')"
+    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw 'systemd-1')"
     if mountpoint -q "${_DESTDIR}/efi" ; then
         _UEFISYS_MP=efi
     else
@@ -867,7 +867,7 @@ _do_grub_uefi() {
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         # install fedora shim
-        [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
+        [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
