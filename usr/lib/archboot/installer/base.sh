@@ -187,7 +187,7 @@ _prepare_storagedrive() {
         _CANCEL=""
         #shellcheck disable=SC2086
         dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Device" 12 60 5 \
-            "1" "Auto-Prepare (erases the ENTIRE storage device)" \
+            "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 and LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
