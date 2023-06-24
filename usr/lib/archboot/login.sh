@@ -13,9 +13,9 @@ _welcome () {
 
 _local_mode () {
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
-        echo -e "You are running in \e[92m\e[1mLocal mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
+        echo -e "You are running in \e[92m\e[1mLocal Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
         if [[ -e /usr/bin/setup ]] ; then
-            echo -e "To \e[1mswitch\e[m to \e[1mOnline mode\e[m:\e[1m\e[91m# rm ${_CACHEDIR}/archboot.db\e[m\e[1m"
+            echo -e "To \e[1mswitch\e[m to \e[1mOnline Mode\e[m:\e[1m\e[91m# rm ${_CACHEDIR}/archboot.db\e[m\e[1m"
             echo ""
         fi
     fi
