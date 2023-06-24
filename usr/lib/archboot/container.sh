@@ -175,7 +175,7 @@ _install_archboot() {
     fi
 }
 
-_add_custom_grub() {
+_install_custom_grub() {
         [[ -e /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst ]] && \
          cp /var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst \
          ${1}/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst
