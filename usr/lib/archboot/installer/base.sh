@@ -30,12 +30,12 @@ fi
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
-        _TITLE="Archboot - Arch Linux (System Setup Mode) --> https://archboot.com"
+        _TITLE="Archboot | Arch Linux Setup (System Mode) | https://archboot.com"
     else
         if [[ -e "${_LOCAL_DB}" ]]; then
-            _TITLE="Archboot - Arch Linux Installation (Local Mode) --> https://archboot.com"
+            _TITLE="Archboot | Arch Linux Setup (Local Mode) | https://archboot.com"
         else
-            _TITLE="Archboot - Arch Linux Installation (Online Mode) --> https://archboot.com"
+            _TITLE="Archboot | Arch Linux Setup (Online Mode) | https://archboot.com"
         fi
     fi
 }
@@ -59,12 +59,12 @@ _printk()
 }
 
 _abort_running_system() {
-    _dialog --msgbox "This function is not available on System Setup mode." 5 60
+    _dialog --msgbox "This function is not available on System Setup Mode." 5 60
 }
 
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
-        _dialog --menu "Select a Text Editor to Use" 9 35 3 \
+        _dialog --menu "Select A Text Editor" 9 35 3 \
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
@@ -189,9 +189,9 @@ _prepare_storagedrive() {
         dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Device" 12 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
-            "3" "Manage Software Raid, LVM2 and LUKS Encryption" \
+            "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "5" "Return to Main Menu" 2>${_ANSWER} || _CANCEL=1
+            "5" "Return To Main Menu" 2>${_ANSWER} || _CANCEL=1
         _NEXTITEM="$(cat ${_ANSWER})"
         [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
         case $(cat ${_ANSWER}) in
@@ -247,10 +247,10 @@ _configure_system() {
             "/etc/resolv.conf"              "DNS Servers" \
             "/etc/hosts"                    "Network Hosts" \
             "/etc/locale.gen"               "Glibc Locales" \
-            "/etc/pacman.d/mirrorlist"      "Pacman Mirror List" \
-            "/etc/pacman.conf"              "Pacman Config File" \
-            "Root-Password"                 "Set the root password" \
-            "Return"                        "Return to Main Menu" 2>${_ANSWER} || break
+            "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
+            "/etc/pacman.conf"              "Pacman Config" \
+            "Root-Password"                 "Set Root Password" \
+            "Return"                        "Return To Main Menu" 2>${_ANSWER} || break
         _FILE="$(cat ${_ANSWER})"
         if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
@@ -281,10 +281,10 @@ _mainmenu() {
     #shellcheck disable=SC2086
     dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
-    "0" "Set Console Font And Keymap" \
+    "0" "Configure Console" \
     "1" "Configure Network" \
     "2" "Select Source" \
-    "3" "Set Time And Date" \
+    "3" "Configure Clock" \
     "4" "Prepare Storage Device" \
     "5" "Install Packages" \
     "6" "Configure System" \
