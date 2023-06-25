@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.locale"
-_TITLE="Archboot Arch Linux --> System Wide Locale Setting"
+_TITLE="Archboot | Arch Linux Setup | System Wide Locale Setting"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
