@@ -12,7 +12,7 @@ build ()
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mConsole Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Virtual consoles \e[1m1-6\e[m are active." >> "${MOTD}"
+    echo -e "  - Virtual consoles \e[1m1 - 6\e[m are active." >> "${MOTD}"
     echo -e "  - To change virtual console use \e[1;92mALT + F(1-6)\e[m" >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
     echo -e "  - To change to a non-US keymap, type \e[1;92m'km'\e[m at the console." >> "${MOTD}"
