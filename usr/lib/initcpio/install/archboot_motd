@@ -13,13 +13,13 @@ build ()
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mConsole Configuration:\e[m" >> "${MOTD}"
     echo -e "  - Virtual consoles \e[1m1 - 6\e[m are active." >> "${MOTD}"
-    echo -e "  - Use \e[1;92mALT + F1 - F6\e[m to change virtual console" >> "${MOTD}"
+    echo -e "  - Use the \e[1;92mALT + F1 - F6\e[m keys to change the virtual console." >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
-    echo -e "  - Use the \e[1;92m'km'\e[m tool to change to a non-US keymap." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'km'\e[m script to change to a non-US keymap." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\e[1mClock Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'tz'\e[m tool to change your time and date." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'tz'\e[m script to change your time and date." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
@@ -30,13 +30,12 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'update-installer'\e[m tool." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'update-installer'\e[m script." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
-    echo -e "  - The \e[92m'setup'\e[m tool is run automatically." >> "${MOTD}"
-    echo -e "  - Rerun \e[1;92m'setup'\e[m to continue installation." >> "${MOTD}"
-    echo -e "\e[1mFor Experts:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'quickinst'\e[m tool." >> "${MOTD}"
+    echo -e "  - Use the \e[92m'setup'\e[m script." >> "${MOTD}"
+    echo -e "\e[1mInstallation For Experts:\e[m" >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'quickinst'\e[m script." >> "${MOTD}"
 fi
     chmod 644 "${MOTD}"
     add_file "${MOTD}" "/etc/motd"
