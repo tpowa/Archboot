@@ -11,22 +11,21 @@ build ()
     [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
-    echo -e "\e[1mConsoles:\e[m" >> "${MOTD}"
+    echo -e "\e[1mConsole Configuration:\e[m" >> "${MOTD}"
     echo -e "  - Virtual consoles \e[1m1-6\e[m are active." >> "${MOTD}"
     echo -e "  - To change virtual console use \e[1;92mALT + F(1-6)\e[m" >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
-    echo -e "\e[1mChange keymap and console font:\e[m" >> "${MOTD}"
     echo -e "  - To change to a non-US keymap, type \e[1;92m'km'\e[m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
-    echo -e "\e[1mChange time and date:\e[m" >> "${MOTD}"
+    echo -e "\e[1mClock Configuration:\e[m" >> "${MOTD}"
     echo -e "  - To change your time and date, type \e[1;92m'tz'\e[m at the console." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
-    echo -e "\e[1mFor Wi-Fi authentification to internet access or further online help:\e[m" >> "${MOTD}"
+    echo -e "\e[1mFor Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
-    echo -e "\e[1mFor getting support on IRC channels:\e[m" >> "${MOTD}"
+    echo -e "\e[1mIRC Channel Support:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
