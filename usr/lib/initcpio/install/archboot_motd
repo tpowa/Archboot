@@ -33,7 +33,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "  - Use the \e[1;92m'update-installer'\e[m tool." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
-    echo -e "  - On first login the \e[92m'setup'\e[m tool is launched automatically." >> "${MOTD}"
+    echo -e "  - The \e[92m'setup'\e[m tool is run automatically." >> "${MOTD}"
     echo -e "  - Rerun \e[1;92m'setup'\e[m to continue installation." >> "${MOTD}"
     echo -e "\e[1mFor Experts:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'quickinst'\e[m tool." >> "${MOTD}"
