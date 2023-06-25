@@ -43,7 +43,8 @@ setup:
 - added EXIT menu with options
 - cleaned up partition functions
 - fixed mountpoint checks on EFI directory
-- fixed /efi /boot mounting order in autoprepare mode
+- renamed Auto-Prepare to Quick Setup
+- fixed /efi /boot mounting order in quick setup mode
 ---
 2023.05 Highlights:
 - linux 6.3.x
