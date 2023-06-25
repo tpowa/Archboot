@@ -15,11 +15,11 @@ build ()
     echo -e "  - Virtual consoles \e[1m1 - 6\e[m are active." >> "${MOTD}"
     echo -e "  - Use \e[1;92mALT + F1 - F6\e[m to change virtual console" >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
-    echo -e "  - Use \e[1;92m'km'\e[m to change to a non-US keymap." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'km'\e[m tool to change to a non-US keymap." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\e[1mClock Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Use \e[1;92m'tz'\e[m to change your time and date." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'tz'\e[m tool to change your time and date." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
