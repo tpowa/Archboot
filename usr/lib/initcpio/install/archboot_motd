@@ -30,7 +30,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
-    echo -e "  - Run \e[1;92m'update-installer'\e[m to manage the Archboot Environment." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'update-installer'\e[m tool." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
     echo -e "  - On first login \e[92m'setup'\e[m is launched automatically." >> "${MOTD}"
