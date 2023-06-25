@@ -26,6 +26,9 @@ Environment Changes:
 - fixed ethernet firmware loading
 - included /drivers/net/usb modules
 - renamed grub entries
+- updated MOTD
+- updated /etc/issue
+- fixed /etc/os-release
 update-installer.sh:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
