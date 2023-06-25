@@ -12,7 +12,6 @@ build ()
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mConsole Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Virtual consoles \e[1m1 - 6\e[m are active." >> "${MOTD}"
     echo -e "  - Use the \e[1;92mALT + F1 - F6\e[m keys to change the virtual console." >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
     echo -e "  - Use the \e[1;92m'km'\e[m script to change to a non-US keymap." >> "${MOTD}"
@@ -23,7 +22,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
-    echo -e "\e[1mFor Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"
+    echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
     echo -e "\e[1mIRC Support Channel:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
