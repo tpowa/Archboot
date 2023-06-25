@@ -19,7 +19,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
     echo -e "\e[1mClock Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Use e[1;92m'tz'\e[m to change your time and date." >> "${MOTD}"
+    echo -e "  - Use \e[1;92m'tz'\e[m to change your time and date." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
