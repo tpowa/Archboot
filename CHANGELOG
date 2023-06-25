@@ -25,8 +25,8 @@ Environment Changes:
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
 - included /drivers/net/usb modules
-- renamed grub entries
-- updated MOTD
+- renamed grub menu entries
+- updated /etc/motd
 - updated /etc/issue
 - fixed /etc/os-release
 update-installer.sh:
