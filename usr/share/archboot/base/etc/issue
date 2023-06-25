@@ -1,1 +1,1 @@
-\l | \r | \t | \d
+\e[1mLogin on \l | \r | \t | \d\e[m
