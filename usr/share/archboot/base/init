@@ -107,7 +107,7 @@ mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 # unmount everything after copying
-echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs on usb/hd/cdrom device..."
+echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs..."
 umount -q -A /dev/sr0
 umount -q -A UUID=1234-ABCD
 echo 0 > /proc/sys/kernel/sysrq

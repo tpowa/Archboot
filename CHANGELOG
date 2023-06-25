@@ -16,11 +16,11 @@ Environment Changes:
 - disabled/masked systemd targets:
   cryptsetup first-boot-complete integritysetup swap veritysetup
 - disabled/masked systemd services:
-  hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed
-  repart pcrphase pcrphase-sysinit
+  binfmt boot-random-seed firstboot hwdb-update machine-id-commit
+  pcrmachine pcrphase pcrphase-sysinit repart
 - disabled/masked nfs3 support:
   rpcbind.service, rpcbind.socket, rpcbind.target and nfs-server.service
-- switch to default.target -> graphical.target
+- switch to default graphical.target
 - only mount /dev/sr0 on detection
 - unmount /dev/sr0 and UUID 1234-ABCD after copying initramfs files
 - fixed ethernet firmware loading
