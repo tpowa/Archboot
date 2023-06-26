@@ -154,6 +154,9 @@ build ()
     for i in hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
         add_symlink "/etc/systemd/system/systemd-${i}.service" "/dev/null"
     done
+    ### disable autonount:
+    # proc-sys-fs-binfmt_misc.automount
+    add_symlink "/etc/systemd/system/proc-sys-fs-binfmt_misc.automount" "/dev/null"
     # remove multi-user.target.wants
     rm -rf ${BUILDROOT}/etc/systemd/system/multi-user.target.wants
     # disable lastlog
