@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 24.06.2023 22:37</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 26.06.2023 10:43</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -25,50 +25,50 @@
 <li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramfs / Microcode / Rescue System / PXE</a></li>
 <li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> ISO / Initramfs / UKI Types</a></li>
 <li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> ISO Boot Modes</a></li>
-<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> ISO writing to USB / CD</a></li>
+<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> ISO Writing To USB / CD</a></li>
 </ul></li>
-<li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features in a nutshell</strong></a></li>
+<li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
 <li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> Graphical Environments / VNC</a></li>
-<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> Remote access with OpenSSH</a></li>
+<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> Remote Access With OpenSSH</a></li>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> Secure Boot - MOK / Machine Owner Key</a></li>
-<li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch to complete Arch Linux system</a></li>
+<li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch To Complete Arch Linux System</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
-<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For experts: quickinst installation</a></li>
+<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For Experts: Quickinst Installation</a></li>
 <li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> Manage Environment</a></li>
-<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools for backup and copying of an existing system</a></li>
-<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring an USB device to FAT32 state</a></li>
+<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools For Backup And Copying Of An Existing System</a></li>
+<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring An USB Device To FAT32 State</a></li>
 <li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> System configuration on installed system</a></li>
 </ul></li>
 <li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
-<li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison to Archiso image</a></strong></li>
-<li><strong><a href="#development" id="toc-development"><span class="toc-section-number">6.</span> Development: GIT and Bugtracker</a></strong></li>
+<li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
+<li><strong><a href="#development" id="toc-development"><span class="toc-section-number">6.</span> Development: GIT And Bugtracker</a></strong></li>
 <li><a href="#package-installation" id="toc-usage"><strong><span class="toc-section-number">7.</span> Package - Repository / Installation / Usage</strong></a>
 <li><ul>
-<li><a href="#create-rescue-system" id="toc-create-rescue-system"><strong><span class="toc-section-number">7.1</span> Create rescue system out of the running system</strong></a></li>
-<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">7.2</span> Create image files</strong></a>
+<li><a href="#create-rescue-system" id="toc-create-rescue-system"><strong><span class="toc-section-number">7.1</span> Create Rescue System Out Of The Running System</strong></a></li>
+<li><a href="#create-image-files" id="toc-create-image-files"><strong><span class="toc-section-number">7.2</span> Create Image Files</strong></a>
 <li><ul>
 <li><a href="#requirements" id="toc-requirements"><span class="toc-section-number">7.2.1</span> Requirement</a></li>
-<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">7.2.2</span> Create image files without modifications</a></li>
-<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">7.2.3</span> Create image files with modifications</a></li>
+<li><a href="#create-image-files-without-modifications" id="toc-create-image-files-without-modifications"><span class="toc-section-number">7.2.2</span> Create Image Files Without Modifications</a></li>
+<li><a href="#create-image-files-with-modifications" id="toc-create-image-files-with-modifications"><span class="toc-section-number">7.2.3</span> Create Image Files With Modifications</a></li>
 </ul></li>
-<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.3</span> Setting up an image server</strong></a></li>
+<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><strong><span class="toc-section-number">7.3</span> Setting Up An Image Server</strong></a></li>
 <li><ul>
 <li><a href="#requirements-1" id="toc-requirements-1"><span class="toc-section-number">7.3.1</span> Requirements</a></li>
-<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">7.3.2</span> Configuration file</a></li>
-<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">7.3.3</span> Running commands</a></li>
+<li><a href="#configuration-file" id="toc-configuration-file"><span class="toc-section-number">7.3.2</span> Configuration File</a></li>
+<li><a href="#running-commands" id="toc-running-commands"><span class="toc-section-number">7.3.3</span> Running Commands</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">8.</span> Testing image and files with QEMU</strong></a></li>
+<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">8.</span> Testing Image And Files With QEMU</strong></a></li>
 <li><ul>
 <li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">8.1</span> Running AARCH64</a></li>
 <li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">8.2</span> Running RISCV64</a></li>
 <li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">8.3</span> Running X86_64</a></li>
-<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">8.4</span> Additional qemu parameters</a></li>
-<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">8.5</span> Setting up a hwsim SSID</a></li>
+<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">8.4</span> Additional Qemu Parameters</a></li>
+<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">8.5</span> Setting Up A Hwsim SSID</a></li>
 </ul></li>
 <li><strong><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><span class="toc-section-number">9.</span> Arch Linux Wiki</a></strong></li>
-<li><strong><a href="#project-links" id="toc-project-links"><span class="toc-section-number">10.</span> Project links</a></strong></li>
+<li><strong><a href="#project-links" id="toc-project-links"><span class="toc-section-number">10.</span> Project Links</a></strong></li>
 <li><strong><a href="#videos" id="toc-videos"><span class="toc-section-number">11.</span> Videos</a></strong></li>
 <li><strong><a href="#references" id="toc-references"><span class="toc-section-number">12.</span> References</a></strong></li>
 </ul>
@@ -367,7 +367,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="2.6" id="writing-to-usb-cd"><span class="header-section-number">2.6</span> <strong>ISO writing to USB / CD</strong></h3>
+<h3 data-number="2.6" id="writing-to-usb-cd"><span class="header-section-number">2.6</span> <strong>ISO Writing To USB / CD</strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning">CD Burning</a> utilities.</li>
@@ -386,9 +386,9 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tbody>
 </table>
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
-<h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> Features in a nutshell</h2>
+<h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> Features In A Nutshell</h2>
 <h3 data-number="3.1" id="graphical-environment-vnc"><span class="header-section-number">3.1</span> <strong>Graphical Environments / VNC</strong></h3>
-<h4 data-number="3.1.1" id="preconfigured-environments"><span class="header-section-number">3.1.1</span> <strong>Preconfigured environments</strong></h4>
+<h4 data-number="3.1.1" id="preconfigured-environments"><span class="header-section-number">3.1.1</span> <strong>Preconfigured Environments</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -427,7 +427,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </ul></li>
 <li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
 </ul>
-<h4 data-number="3.1.2" id="custom-environment-without-vnc-support"><span class="header-section-number">3.1.2</span> <strong>Custom environment without VNC support</strong></h4>
+<h4 data-number="3.1.2" id="custom-environment-without-vnc-support"><span class="header-section-number">3.1.2</span> <strong>Custom Environment Without VNC Support</strong></h4>
 <a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong><code>/etc/archboot/defaults</code></strong>
 <table>
 <thead>
@@ -447,7 +447,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.2" id="remote-installation-with-openssh"><span class="header-section-number">3.2</span> <strong>Remote access with OpenSSH</strong></h3>
+<h3 data-number="3.2" id="remote-installation-with-openssh"><span class="header-section-number">3.2</span> <strong>Remote Access With OpenSSH</strong></h3>
 <p>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need security during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</p>
 <table>
 <thead>
@@ -494,7 +494,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h4 data-number="3.3.2" id="secure-boot-setup"><span class="header-section-number">3.3.2</span> <strong>Setup routine</strong></h4>
+<h4 data-number="3.3.2" id="secure-boot-setup"><span class="header-section-number">3.3.2</span> <strong>Setup Routine</strong></h4>
 <p>The setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:</p>
 <ul>
 <li>The <strong><a href="https://kojipkgs.fedoraproject.org/packages/shim/" title="Fedora Shim">fedora's signed shim</a></strong> is copied to the installed system</li>
@@ -540,7 +540,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li>Reboot and turn <strong>on</strong> Secure Boot again in firmware.</li>
 <li>Start again at <a href="#secure-boot-iso">3.3.1 Boot ISO</a>.</li>
 </ul>
-<h3 data-number="3.4" id="switch-to-complete-arch-linux-system"><span class="header-section-number">3.4</span> <strong>Switch to complete Arch Linux system</strong></h3>
+<h3 data-number="3.4" id="switch-to-complete-arch-linux-system"><span class="header-section-number">3.4</span> <strong>Switch To Complete Arch Linux System</strong></h3>
 <ul>
 <li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
 <li>Though <strong>perl, python, man/info pages, includes, additional kernel modules (eg. sound)</strong><br>and other things are <strong>not</strong> provided by default.</li>
@@ -562,7 +562,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
 <h4 data-number="3.5.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.5.1</span> <strong>Configure Console</strong></h4>
 <p>Your <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> and <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> will be set by <strong>km</strong> script.</p>
-<h4 data-number="3.5.2" id="setup-network"><span class="header-section-number">3.5.2</span> <strong>Configure network</strong></h4>
+<h4 data-number="3.5.2" id="setup-network"><span class="header-section-number">3.5.2</span> <strong>Configure Network</strong></h4>
 <ul>
 <li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <strong><a href="https://wiki.archlinux.org/title/systemd-networkd" title="Systemd-Networkd">systemd-networkd</a></strong>.</li>
 <li>Your <strong>wifi network</strong> will be authentificated by <strong><a href="https://wiki.archlinux.org/title/iwd" title="iwd">iwd</a></strong>.</li>
@@ -582,7 +582,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </ul>
 <h4 data-number="3.5.4" id="changing-timezone-and-date"><span class="header-section-number">3.5.4</span> <strong>Configure Clock</strong></h4>
 <p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</p>
-<h4 data-number="3.5.5" id="prepare-storage-drive"><span class="header-section-number">3.5.5</span> <strong>Prepare Storage drive</strong></h4>
+<h4 data-number="3.5.5" id="prepare-storage-drive"><span class="header-section-number">3.5.5</span> <strong>Prepare Storage Drive</strong></h4>
 <ul>
 <li>You setup your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
 <li>Quick Setup, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
@@ -614,7 +614,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 <li><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> supports only shim signed by fedora with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></li>
 <li>The selected <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> will be installed to your system and you can modify the configuration file(s) afterwards.</li>
 </ul>
-<h3 data-number="3.6" id="for-experts-quickinst-installation"><span class="header-section-number">3.6</span> <strong>For experts: quickinst installation</strong></h3>
+<h3 data-number="3.6" id="for-experts-quickinst-installation"><span class="header-section-number">3.6</span> <strong>For Experts: Quickinst Installation</strong></h3>
 <ul>
 <li>This script is for <strong>experts</strong>, who assemble the filesystems first and mount them in a directory.</li>
 <li><strong>quickinst</strong> will autodetect the packages to install for a minimal system.</li>
@@ -645,7 +645,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.8" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.8</span> <strong>Tools for backup and copying of an existing system</strong></h3>
+<h3 data-number="3.8" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.8</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
 </ul>
@@ -673,7 +673,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.9" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.9</span> <strong>Restoring an USB device to FAT32 state</strong></h3>
+<h3 data-number="3.9" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.9</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
@@ -691,7 +691,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.10" id="system-configuration"><span class="header-section-number">3.10</span> System configuration on installed system</h3>
+<h3 data-number="3.10" id="system-configuration"><span class="header-section-number">3.10</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
 <p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
@@ -757,7 +757,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 <strong>Initramfs + Kernel + Unpackedkernel + Unpackedinitramfs = minimum RAM to boot</strong>
 </li>
 </ul>
-<h2 data-number="5." id="archiso"><span class="header-section-number">5. </span>Comparison to <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>Archiso</strong></a> image</h2>
+<h2 data-number="5." id="archiso"><span class="header-section-number">5. </span>Comparison To <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>Archiso</strong></a> Image</h2>
 <table>
 <thead>
 <tr class="header">
@@ -980,7 +980,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </table>
 <p> &#9733; Optional | <sup>1</sup> Only local image |  <sup>2</sup> Acer R11 Chromebook 4GB RAM</p>
 <p> <sup>3</sup> QEMU (4GB RAM, kvm and virtio backend), normal image</p>
-<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong>Development: GIT and Bugtracker</strong></h2>
+<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong>Development: GIT And Bugtracker</strong></h2>
 <ul>
 <li>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</li>
 <li>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</li>
@@ -1005,7 +1005,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>qemu-user-static</strong> package for building <strong>aarch64</strong> or <strong>riscv64</strong> images on <strong>x86_64</strong> hardware.</li>
 </ul>
 <p>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</p>
-<h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong>Create rescue sytem out of the running system</strong></h2>
+<h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong>Create Rescue System Out Of The Running System</strong></h2>
 <table>
 <thead>
 <tr class="header">
@@ -1019,10 +1019,10 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tbody>
 </table>
 <p>Add your used <strong>kernel</strong> and <strong>initramfs</strong> to your bootloader.</p>
-<h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> Create image files</h2>
+<h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> Create Image Files</h2>
 <h3 data-number="7.2.1" id="requirements"><span class="header-section-number">7.2.1</span> <strong>Requirement</strong></h3>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
-<h3 data-number="7.2.2" id="create-image-files-without-modifications"><span class="header-section-number">7.2.2</span> <strong>Create image files without modifications</strong></h3>
+<h3 data-number="7.2.2" id="create-image-files-without-modifications"><span class="header-section-number">7.2.2</span> <strong>Create Image Files Without Modifications</strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
 <table>
 <thead>
@@ -1048,7 +1048,7 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tr>
 </tbody>
 </table>
-<h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong>Create image files with modifications:</strong></h3>
+<h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong>Create Image Files With Modifications:</strong></h3>
 <p>Explanation of the image tools / toolchain.</p>
 <h4 data-number="7.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.2.3.1</span> <strong>archboot-x86_64-create-container.sh</strong></h4>
 <table>
@@ -1076,14 +1076,14 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 </tbody>
 </table>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
-<h4 data-number="7.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.2.3.2</span> <strong>Configuration files for image creation:</strong></h4>
+<h4 data-number="7.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.2.3.2</span> <strong>Configuration Files For Image Creation:</strong></h4>
 There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramfs.</li>
 </ul>
-<h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh initramfs generator:</strong></h4>
+<h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
 <p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
@@ -1114,17 +1114,17 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting up an image server</h2>
+<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting Up An Image server</h2>
 <h3 data-number="7.3.1" id="requirements-1"><span class="header-section-number">7.3.1</span> <strong>Requirements</strong></h3>
 <ul>
 <li>You have a normal user, which has access to a working gpg setup with own signature.</li>
 <li>You have a normal user with ssh access to the server, on which the images should upload.</li>
 <li>Add the directories on the remote server, you want to upload to.</li>
 </ul>
-<h3 data-number="7.3.2" id="configuration-file"><span class="header-section-number">7.3.2</span> <strong>Configuration file</strong></h3>
+<h3 data-number="7.3.2" id="configuration-file"><span class="header-section-number">7.3.2</span> <strong>Configuration File</strong></h3>
 <p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
-<h3 data-number="7.3.3" id="running-commands"><span class="header-section-number">7.3.3</span> <strong>Running commands</strong></h3>
-<h4 data-number="7.3.3.1" id="x86_64-architecture"><span class="header-section-number">7.3.3.1</span> <strong>x86_64 architecture</strong></h4>
+<h3 data-number="7.3.3" id="running-commands"><span class="header-section-number">7.3.3</span> <strong>Running Commands</strong></h3>
+<h4 data-number="7.3.3.1" id="x86_64-architecture"><span class="header-section-number">7.3.3.1</span> <strong>X86_64 Architecture</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1137,7 +1137,7 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.3.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.2</span> <strong>aarch64/riscv64 architecture</strong></h4>
+<h4 data-number="7.3.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.2</span> <strong>Aarch64/Riscv64 Architecture</strong></h4>
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong>qemu-user-static</strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
@@ -1174,9 +1174,9 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.3.3.3" id="server-cleanup"><span class="header-section-number">7.3.3.3</span> <strong>Server cleanup</strong></h4>
+<h4 data-number="7.3.3.3" id="server-cleanup"><span class="header-section-number">7.3.3.3</span> <strong>Server Cleanup</strong></h4>
 <p>The <strong>/etc/archboot/defaults</strong> file defines old images purging after <strong>1</strong> month.</p>
-<h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> Testing image and files with QEMU</h2>
+<h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> Testing Image And Files With QEMU</h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
 <h3 data-number="8.1" id="running-aarch64"><span class="header-section-number">8.1</span> <strong>Running AARCH64:</strong></h3>
 <p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong>edk2-armvirt</strong></a> package.</p>
@@ -1207,7 +1207,7 @@ There are the following configuration files for ISO creation:
 </table>
 <p>Use <strong>ssh root@localhost -p 2222</strong> to connect to machine from your running host.</p>
 <h3 data-number="8.3" id="running-x86_64"><span class="header-section-number">8.3</span> <strong>Running X86_64:</strong></h3>
-<h4 data-number="8.3.1" id="uefi-gpt"><span class="header-section-number">8.3.1</span> <strong>Running kernel, BIOS MBR, UEFI GPT without Secure Boot:</strong></h4>
+<h4 data-number="8.3.1" id="uefi-gpt"><span class="header-section-number">8.3.1</span> <strong>Running Kernel, BIOS MBR, UEFI GPT Without Secure Boot:</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1294,7 +1294,7 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h3 data-number="8.4" id="additional-qemu-parameters"><span class="header-section-number">8.4</span> <strong>Additional qemu parameters</strong></h3>
+<h3 data-number="8.4" id="additional-qemu-parameters"><span class="header-section-number">8.4</span> <strong>Additional Qemu Parameters</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -1319,7 +1319,7 @@ There are the following configuration files for ISO creation:
 </tr>
 </tbody>
 </table>
-<h3 data-number="8.5" id="hwsim"><span class="header-section-number">8.5</span> <strong>Setting up a hwsim SSID</strong></h3>
+<h3 data-number="8.5" id="hwsim"><span class="header-section-number">8.5</span> <strong>Setting Up A Hwsim SSID</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -1350,7 +1350,7 @@ There are the following configuration files for ISO creation:
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a></li>
 <li><a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></li>
 </ul>
-<h2 data-number="10" id="project-links"><span class="header-section-number">10.</span> Project links</h2>
+<h2 data-number="10" id="project-links"><span class="header-section-number">10.</span> Project Links</h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot"><strong>Blog</strong></a></li>
 <li><a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Development</strong></a></li>
