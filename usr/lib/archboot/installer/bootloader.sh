@@ -944,7 +944,10 @@ _install_bootloader_uefi() {
         _EFISTUB_MENU_LABEL="EFISTUB"
         _EFISTUB_MENU_TEXT="EFISTUB for ${_UEFI_ARCH} UEFI"
     fi
-    if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
+    # aarch64 is broken for UKI and systemd-boot
+    # https://github.com/systemd/systemd/issues/27837
+    # https://sourceforge.net/p/gnu-efi/bugs/37/
+    if [[ -n "${_UEFI_SECURE_BOOT}" || "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _do_grub_uefi
     else
         _dialog --menu "Which ${_UEFI_ARCH} UEFI bootloader would you like to use?" 9 55 3 \
