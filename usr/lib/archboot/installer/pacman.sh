@@ -128,7 +128,7 @@ _prepare_pacman() {
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     _dialog --infobox "Refreshing package database..." 3 40
-    if ! ${_PACMAN} -Sy &>"${_LOG}"; then
+    if ! ${_PACMAN} -Sy ${_PACMAN_CONF} &>"${_LOG}"; then
         _dialog --msgbox "Pacman preparation failed! Check ${_LOG} for errors." 6 60
         return 1
     fi
