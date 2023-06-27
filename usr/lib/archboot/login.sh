@@ -15,6 +15,9 @@ _local_mode () {
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
         echo -e "You are running in \e[92m\e[1mLocal Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
         if [[ -e /usr/bin/setup ]] ; then
+            # bring down network
+            systemctl stop systemd-networkd 2>/dev/null
+            systemctl stop systemd-resolved 2>/dev/null
             echo -e "To \e[1mswitch\e[m to \e[1mOnline Mode\e[m:\e[1m\e[91m# rm ${_CACHEDIR}/archboot.db\e[m\e[1m"
             echo ""
         fi
