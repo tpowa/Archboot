@@ -595,6 +595,9 @@ _do_grub_config() {
             _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
         fi
     fi
+    if [[ -n "${_UCODE}" ]]; then
+        _INITRD_UCODE="${_SUBDIR}/${UC_UCODE}"
+    fi
     ## Move old config file, if any
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _GRUB_CFG="grub${_SPEC_UEFI_ARCH}.cfg"
@@ -679,27 +682,17 @@ EOF
     _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
     ## create default kernel entry
     _NUMBER=0
-if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 # (${_NUMBER}) Arch Linux
 menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${_GRUB_ROOT_DRIVE}
     ${_LINUX_MOD_COMMAND}
-    initrd ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_INITRAMFS}
+    initrd ${_INITRD_UCODE} ${_SUBDIR}/${_INITRAMFS}
 }
 EOF
     _NUMBER=$((_NUMBER+1))
-else
-    cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-# (${_NUMBER}) Arch Linux
-menuentry "Arch Linux" {
-    set gfxpayload="keep"
-    ${_GRUB_ROOT_DRIVE}
-    ${_LINUX_MOD_COMMAND}
-    initrd ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_UCODE} ${_SUBDIR}/${_INITRAMFS}
-}
-EOF
+if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
     if [[ -n "${_UEFI_BOOT}" ]]; then
         _NUMBER=$((_NUMBER+1))
         cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
