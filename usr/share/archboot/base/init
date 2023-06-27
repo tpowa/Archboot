@@ -108,8 +108,11 @@ cd /sysroot || _emergency_shell
 bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
 # unmount everything after copying
 echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs..."
-umount -q -A /dev/sr0
-umount -q -A UUID=1234-ABCD
+while true; do
+    umount -q -A /dev/sr0 2>/dev/null && break
+    umount -q -A UUID=1234-ABCD 2>/dev/null && break
+    read -r -t 1
+done
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
