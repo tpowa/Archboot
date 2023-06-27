@@ -596,7 +596,7 @@ _do_grub_config() {
         fi
     fi
     if [[ -n "${_UCODE}" ]]; then
-        _INITRD_UCODE="${_SUBDIR}/${UC_UCODE}"
+        _INITRD_UCODE="${_SUBDIR}/${_UCODE}"
     fi
     ## Move old config file, if any
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
