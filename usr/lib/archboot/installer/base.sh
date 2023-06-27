@@ -62,6 +62,10 @@ _abort_running_system() {
     _dialog --msgbox "This function is not available on System Setup Mode." 5 60
 }
 
+_abort_offline_mode() {
+    _dialog --msgbox "This function is not available on Offline Mode." 5 60
+}
+
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
         _dialog --menu "Select A Text Editor" 9 35 3 \
@@ -295,10 +299,16 @@ _mainmenu() {
         "0")
             _set_vconsole ;;
         "1")
-            _donetwork ;;
+            if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+                _abort_offline_mode
+            else
+                _donetwork
+            fi ;;
         "2")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
+            elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+                _abort_offline_mode
             else
                 _select_source || return 1
                 _update_environment
