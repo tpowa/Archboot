@@ -284,7 +284,7 @@ _autoprepare() {
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
         fi
     done
-    _dialog --infobox "Auto-Prepare was successful.\nContinuing in 5 seconds..." 4 40
+    _dialog --infobox "Quick Setup was successful.\nContinuing in 5 seconds..." 4 40
     sleep 5
     _S_MKFSAUTO=1
 }
