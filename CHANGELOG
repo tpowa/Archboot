@@ -14,7 +14,7 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - disabled/masked systemd mounts:
-  mqueue, hugetablefs, fuse, debugfs, configfs, tmp and tracefs
+  configfs, debugfs, fuse, hugetablefs ,mqueue, tmp and tracefs
 - disabled/masked systemd targets:
   cryptsetup first-boot-complete integritysetup swap veritysetup
 - disabled/masked systemd services:
