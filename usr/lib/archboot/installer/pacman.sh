@@ -6,7 +6,6 @@ _getsource() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _NEXTITEM="4"
         _local_pacman_conf
-        _dialog --msgbox "Setup is running in <Local mode>.\nOnly Local package database is used for package installation.\n\nIf you want to switch to <Online mode>, you have to delete /var/cache/pacman/pkg/archboot.db and rerun this step." 10 70
     else
         _select_mirror || return 1
     fi

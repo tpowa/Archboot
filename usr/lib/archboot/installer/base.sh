@@ -307,8 +307,6 @@ _mainmenu() {
         "2")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
-            elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-                _abort_offline_mode
             else
                 _select_source || return 1
                 _update_environment
