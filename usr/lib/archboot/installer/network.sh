@@ -166,6 +166,7 @@ _donetwork() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
+    systemctl restart systemd-resolved
     _dialog --infobox "Waiting for network link to come up..." 3 60
     # add sleep here for systemd-resolve get correct values
     sleep 5
