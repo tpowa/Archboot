@@ -53,6 +53,7 @@ setup:
 - fixed /efi /boot mounting order in Quick Setup mode
 - disable broken systemd-boot and UKI bootloaders on aarch64
 - fixed empty UCODE in grub config
+- fixed /efi /boot mounting order in quick setup mode
 ---
 2023.05 Highlights:
 - linux 6.3.x
