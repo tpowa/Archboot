@@ -14,12 +14,13 @@ Environment Changes:
 - made systemd initrd-switch-root routine bullet proof
 - fixed /run/nouser leftovers
 - disabled/masked systemd mounts:
-  fuse, debugfs, configfs, tmp and tracefs
+  mqueue, hugetablefs, fuse, debugfs, configfs, tmp and tracefs
 - disabled/masked systemd targets:
   cryptsetup first-boot-complete integritysetup swap veritysetup
 - disabled/masked systemd services:
   binfmt boot-random-seed firstboot hwdb-update machine-id-commit
   pcrmachine pcrphase pcrphase-sysinit repart
+- disabled/masked proc-sys-fs-binfmt_misc.automount
 - disabled/masked nfs3 support:
   rpcbind.service, rpcbind.socket, rpcbind.target and nfs-server.service
 - switch to default graphical.target
@@ -46,7 +47,12 @@ setup:
 - cleaned up partition functions
 - fixed mountpoint checks on EFI directory
 - renamed Auto-Prepare to Quick Setup
-- fixed /efi /boot mounting order in quick setup mode
+- disable Set Source and Network Configuration in local mode
+- always run pacman -Sy on package installation
+- restart systemd-networkd and systemd-resolved on network setup
+- fixed /efi /boot mounting order in Quick Setup mode
+- disable broken systemd-boot and UKI bootloaders on aarch64
+- fixed empty UCODE in grub config
 ---
 2023.05 Highlights:
 - linux 6.3.x
