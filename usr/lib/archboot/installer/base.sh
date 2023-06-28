@@ -62,7 +62,7 @@ _abort_running_system() {
     _dialog --msgbox "This function is not available on System Setup Mode." 5 60
 }
 
-_abort_offline_mode() {
+_abort_local_mode() {
     _dialog --msgbox "This function is not available on Local Mode." 5 60
 }
 
@@ -300,7 +300,7 @@ _mainmenu() {
             _set_vconsole ;;
         "1")
             if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-                _abort_offline_mode
+                _abort_local_mode
             else
                 _donetwork
             fi ;;
@@ -308,7 +308,7 @@ _mainmenu() {
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
             elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-                _abort_offline_mode
+                _abort_local_mode
             else
                 _select_source || return 1
                 _update_environment
