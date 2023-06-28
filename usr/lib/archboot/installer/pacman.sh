@@ -142,7 +142,7 @@ _run_pacman(){
     echo "Installing Packages..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -S ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
+    ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
