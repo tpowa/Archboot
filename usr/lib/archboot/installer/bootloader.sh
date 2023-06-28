@@ -33,7 +33,7 @@ _getraidarrays() {
 _getcryptsetup() {
     _LUKSSETUP=""
     if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
-        if cryptsetup status "$(basename "${_ROOTDEV}")"; then
+        if cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
                 _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
