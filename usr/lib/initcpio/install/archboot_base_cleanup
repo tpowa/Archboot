@@ -14,7 +14,7 @@ build ()
           colrm column fallocate flock getopt ionice ipcmk ipcrm ipcs swapoff \
           look lsfd lscpu mcookie namei prlimit rename renice rev script scriptreplay uname26 \
           linux32 linux64 setarch setsid setterm taskset ul unshare uuidgen whereis write \
-          addpart delpart ldattach partx readprofile rtcwake uuidd sysctl pkill pmap \
+          addpart delpart ldattach partx readprofile rtcwake uuidd sysctl pidwait pkill pmap \
           pwdx slabtop tload vmstat watch eject keyctl request-key tac \
           sulogin resizepart lslocks wdctl zless zgrep fold hexdump shred blockdev blkdiscard \
           newgrp nsenter runuser vigr vipw diff lsmod lzcmp lzdiff lzegrep \
