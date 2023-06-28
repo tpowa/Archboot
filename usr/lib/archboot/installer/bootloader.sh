@@ -39,7 +39,7 @@ _getcryptsetup() {
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
                 _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')")"
             else
-                _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g'))"
+                _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g'))"
             fi
             _LUKSNAME="$(basename "${_ROOTDEV}")"
             _LUKSSETUP="cryptdevice=${_LUKSDEV}:${_LUKSNAME}"
