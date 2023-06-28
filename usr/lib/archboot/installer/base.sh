@@ -63,7 +63,7 @@ _abort_running_system() {
 }
 
 _abort_offline_mode() {
-    _dialog --msgbox "This function is not available on Offline Mode." 5 60
+    _dialog --msgbox "This function is not available on Local Mode." 5 60
 }
 
 _geteditor() {
