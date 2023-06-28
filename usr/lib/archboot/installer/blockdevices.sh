@@ -134,13 +134,13 @@ _partitionable_raid_devices_partitions() {
 _dmraid_devices() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>"${_NO_LOG}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$"; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "isw_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE 2>"${_NO_LOG}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$"; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "ddf_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
