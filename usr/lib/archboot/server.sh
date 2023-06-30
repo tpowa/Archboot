@@ -78,16 +78,16 @@ _create_archive() {
     [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
 }
 
-# sign files and create new sha256sum.txt
-_sign_sha256sum() {
+# sign files and create new b2sum.txt
+_sign_b2sum() {
     for i in $1; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
             sudo -u "${_USER}" gpg ${_GPG} "${i}"
-            cksum -a sha256 "${i}" >> sha256sum.txt
+            cksum -a blake2b "${i}" >> b2sum.txt
         fi
         if [[ -f "${i}.sig" ]]; then
-            cksum -a sha256 "${i}.sig" >> sha256sum.txt
+            cksum -a blake2b "${i}.sig" >> b2sum.txt
         fi
     done
 }
@@ -109,10 +109,10 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # removing sha256sum
-    rm sha256sum.txt
-    _sign_sha256sum "*"
-    _sign_sha256sum "boot/*"
+    # removing b2sum
+    rm b2sum.txt
+    _sign_b2sum "*"
+    _sign_b2sum "boot/*"
     chown -R "${_USER}:${_GROUP}" ./*
     cd ..
     _create_archive

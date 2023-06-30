@@ -153,16 +153,16 @@ _create_iso() {
     # removing container
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
-    # create sha256sums
-    echo "Generating sha256sum..."
+    # create b2sums
+    echo "Generating b2sum..."
     for i in *; do
         if [[ -f "${i}" ]]; then
-            cksum -a sha256 "${i}" >> sha256sum.txt
+            cksum -a blake2b "${i}" >> b2sum.txt
         fi
     done
     for i in boot/*; do
         if [[ -f "${i}" ]]; then
-            cksum -a sha256 "${i}" >> sha256sum.txt
+            cksum -a blake2b "${i}" >> b2sum.txt
         fi
     done
 }
