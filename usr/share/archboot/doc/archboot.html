@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 26.06.2023 10:43</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 30.06.2023 07:24</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -399,23 +399,23 @@ initrd (loop)/boot/initramfs-x86_64.img
 <tbody>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a></td>
-<td><code># update-installer -gnome</code></td>
+<td><code># update -gnome</code></td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
-<td><code># update-installer -gnome-wayland</code></td>
+<td><code># update -gnome-wayland</code></td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/KDE_Plasma" title="KDE Plasma"><strong>KDE Plasma</strong></a></td>
-<td><code># update-installer -plasma</code></td>
+<td><code># update -plasma</code></td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/KDE_Plasma" title="KDE Plasma"><strong>KDE Plasma</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
-<td><code># update-installer -plasma-wayland</code></td>
+<td><code># update -plasma-wayland</code></td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Xfce" title="Xfce"><strong>Xfce</strong></a></td>
-<td><code># update-installer -xfce</code></td>
+<td><code># update -xfce</code></td>
 </tr>
 </tbody>
 </table>
@@ -439,11 +439,11 @@ initrd (loop)/boot/initramfs-x86_64.img
 <tbody>
 <tr class="odd">
 <td><code>_CUSTOM_XORG</code></td>
-<td><code># update-installer -custom-xorg</code></td>
+<td><code># update -custom-xorg</code></td>
 </tr>
 <tr class="even">
 <td><code>_CUSTOM_WAYLAND</code></td>
-<td><code># update-installer -custom-wayland</code></td>
+<td><code># update -custom-wayland</code></td>
 </tr>
 </tbody>
 </table>
@@ -553,11 +553,11 @@ initrd (loop)/boot/initramfs-x86_64.img
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># update-installer -full-system</code></td>
+<td><code># update -full-system</code></td>
 </tr>
 </tbody>
 </table>
-<p>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update-installer</code></strong> tasks.</p>
+<p>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update</code></strong> tasks.</p>
 <h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
 <p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
 <h4 data-number="3.5.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.5.1</span> <strong>Configure Console</strong></h4>
@@ -641,7 +641,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># update-installer -help</code></td>
+<td><code># update -help</code></td>
 </tr>
 </tbody>
 </table>
@@ -704,7 +704,7 @@ initrd (loop)/boot/initramfs-x86_64.img
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># update-installer -update</code></td>
+<td><code># update -update</code></td>
 </tr>
 </tbody>
 </table>
