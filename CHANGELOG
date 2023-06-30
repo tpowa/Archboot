@@ -32,9 +32,10 @@ Environment Changes:
 - updated /etc/motd
 - updated /etc/issue
 - fixed /etc/os-release
-update-installer.sh:
+update-installer:
 - updated messages on -full-system call
 - updated elinks, chromium and firefox starting page to archboot.com
+- rename update-installer.sh to update
 setup:
 - replaced findmnt -vno SOURCE with _FINDMNT
 - replaced lsblk -rnpo with _LSBLK
@@ -108,7 +109,7 @@ Environment changes:
 - don't run kexec on local image, use systemd's switch_root instead
 - added archboot-locale script for system wide locale switching
 - readd kernel and /EFI to iso filesystem for virtualbox UEFI support
-update-installer.sh:
+update-installer:
 - implemented free RAM detection for kexec tasks
 km:
 - removed main menu
