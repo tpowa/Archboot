@@ -3,7 +3,7 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.locale"
 _RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot${_RUNNING_ARCH} | Arch Linux Setup | System Wide Locale Setting"
+_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | System Wide Locale Setting"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
