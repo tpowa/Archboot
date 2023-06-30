@@ -7,8 +7,8 @@ build ()
     map add_file "/etc/archboot/defaults" "/usr/lib/archboot/common.sh" \
     "/usr/lib/archboot/container.sh" "/usr/bin/archboot-$(uname -m)-create-container.sh" \
     "/usr/lib/archboot/login.sh" "/usr/lib/archboot/cpio.sh" "/usr/bin/archboot-cpio.sh"
-    add_full_dir "/usr/lib/archboot/update-installer"
-    add_file "/usr/bin/archboot-update-installer.sh" "/usr/bin/update-installer"
+    add_full_dir "/usr/lib/archboot/update"
+    add_file "/usr/bin/archboot-update.sh" "/usr/bin/update"
     add_file "/usr/share/archboot/gpg/tpowa.gpg"
     # use /etc/profile to launch login.sh
     echo ". /usr/lib/archboot/login.sh" >> ${BUILDROOT}/root/.bashrc

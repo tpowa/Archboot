@@ -102,8 +102,8 @@ _update_environment() {
                         echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
                         echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
                         echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
-                        echo -e "\e[1mRunning now: \e[92mupdate-installer -latest-install\e[m"
-                        update-installer -latest-install
+                        echo -e "\e[1mRunning now: \e[92mupdate -latest-install\e[m"
+                        update -latest-install
                     fi
                 fi
             fi

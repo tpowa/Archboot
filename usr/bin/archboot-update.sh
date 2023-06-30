@@ -5,12 +5,12 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 #shellcheck disable=SC1094
-. /usr/lib/archboot/update-installer/update-installer.sh
-. /usr/lib/archboot/update-installer/xfce.sh
-. /usr/lib/archboot/update-installer/gnome.sh
-. /usr/lib/archboot/update-installer/gnome-wayland.sh
-. /usr/lib/archboot/update-installer/plasma.sh
-. /usr/lib/archboot/update-installer/plasma-wayland.sh
+. /usr/lib/archboot/update/update.sh
+. /usr/lib/archboot/update/xfce.sh
+. /usr/lib/archboot/update/gnome.sh
+. /usr/lib/archboot/update/gnome-wayland.sh
+. /usr/lib/archboot/update/plasma.sh
+. /usr/lib/archboot/update/plasma-wayland.sh
 [[ -z "${1}" ]] && usage
 while [ $# -gt 0 ]; do
     case ${1} in

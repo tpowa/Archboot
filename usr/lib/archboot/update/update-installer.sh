@@ -16,7 +16,7 @@ _INITRD="initrd.img"
 _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
-_UPDATE="/${_LIB}/update-installer"
+_UPDATE="/${_LIB}/update"
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="Image"
 
@@ -100,7 +100,7 @@ _download_latest() {
         # helper binaries
         echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
         # main binaries
-        BINS="quickinst setup km tz update-installer copy-mountpoint rsync-backup restore-usbstick"
+        BINS="quickinst setup km tz update copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
@@ -119,8 +119,8 @@ _download_latest() {
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done
-        # update-installer libs
-        LIBS="update-installer.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh"
+        # update libs
+        LIBS="update.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
         done
@@ -151,10 +151,10 @@ _network_check() {
 }
 
 _update_installer_check() {
-    if [[ -f /.update-installer ]]; then
+    if [[ -f /.update ]]; then
         echo -e "\e[91mAborting:\e[m"
-        echo "update-installer is already running on other tty..."
-        echo "If you are absolutly sure it's not running, you need to remove /.update-installer"
+        echo "update is already running on other tty..."
+        echo "If you are absolutly sure it's not running, you need to remove /.update"
         exit 1
     fi
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -338,7 +338,7 @@ _prepare_graphic() {
 
 _new_environment() {
     _update_installer_check
-    touch /.update-installer
+    touch /.update
     _kill_w_dir
     _STEPS="10"
     _S_APPEND="0"

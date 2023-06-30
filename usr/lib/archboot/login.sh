@@ -94,14 +94,14 @@ _enter_shell() {
 
 _run_latest() {
     echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwithout\e[m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[m"
-    update-installer -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    echo -e "\e[1mRunning now: \e[92mupdate -latest\e[m"
+    update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
     echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate-installer -latest-install\e[m"
-    update-installer -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    echo -e "\e[1mRunning now: \e[92mupdate -latest-install\e[m"
+    update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_update_installer() {
@@ -133,9 +133,9 @@ _run_update_installer() {
         fi
     elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            echo -e "Running \e[1m\e[92mupdate-installer -latest-install\e[m on \e[1mtty1\e[m, please wait...\e[m"
+            echo -e "Running \e[1m\e[92mupdate -latest-install\e[m on \e[1mtty1\e[m, please wait...\e[m"
         else
-            echo -e "\e[1mRunning now: \e[92mupdate-installer -latest\e[m"
+            echo -e "\e[1mRunning now: \e[92mupdate -latest\e[m"
         fi
         echo -e "\e[1mProgress is shown here...\e[m"
     fi
