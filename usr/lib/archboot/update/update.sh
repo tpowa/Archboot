@@ -451,12 +451,16 @@ _full_system() {
         exit 0
     fi
     echo -e "\e[1mInitializing full Arch Linux system...\e[m"
-    echo -e "\e[1mStep 1/2:\e[m Reinstalling packages and adding info/man-pages..."
+    echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
     echo "          This will need some time..."
     pacman -Sy >/dev/tty7 2>&1 || exit 1
     pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
-    echo -e "\e[1mStep 2/2:\e[m Checking kernel version..."
+    echo -e "\e[1mStep 2/3:\e[m Checking kernel version..."
     _kernel_check
+    echo -e "\e[1mStep 3/3:\e[m Trigger kernel module loading..."
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    udevadm settle
     echo -e "\e[1mFull Arch Linux system is ready now.\e[m"
     touch /.full_system
 }
