@@ -533,7 +533,7 @@ _install_graphic () {
 
 _hint_graphic_installed () {
     echo -e "\e[1;91mError: Graphical environment already installed...\e[m"
-    echo -e "You are running in \e[1mLocal mode\e[m with less than \e[1m4500 MB RAM\e[m, which only can launch \e[1mone\e[m environment."
+    echo -e "You are running in \e[1mOffline Mode\e[m with less than \e[1m4500 MB RAM\e[m, which only can launch \e[1mone\e[m environment."
     echo -e "Please relaunch your already used graphical environment from commandline."
 }
 
