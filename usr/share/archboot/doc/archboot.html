@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 03.07.2023 10:35</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 03.07.2023 21:39</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -142,6 +142,7 @@
 </table>
 <p>The ISO for <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
 <h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span> UKIs - <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a></h3>
+<!--
 <table>
 <thead>
 <tr class="header">
@@ -156,6 +157,23 @@
 <a href="/iso/aarch64/latest/boot/archboot-latest-aarch64.efi"><strong>archboot-latest-aarch64.efi</strong></a>[<a href="/iso/aarch64/latest/boot/archboot-latest-aarch64.efi.sig"><strong>.sig</strong></a>]<br>
 <a href="/iso/aarch64/latest/boot/archboot-local-aarch64.efi"><strong>archboot-local-aarch64.efi</strong></a>[<a href="/iso/aarch64/latest/boot/archboot-local-aarch64.efi.sig"><strong>.sig</strong></a>]<br>
 </td>
+<td>
+<a href="/iso/x86_64/latest/boot/archboot-x86_64.efi"><strong>archboot-x86_64.efi</strong></a>[<a href="/iso/x86_64/latest/boot/archboot-x86_64.efi.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/x86_64/latest/boot/archboot-latest-x86_64.efi"><strong>archboot-latest-x86_64.efi</strong></a>[<a href="/iso/x86_64/latest/boot/archboot-latest-x86_64.efi.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/x86_64/latest/boot/archboot-local-x86_64.efi"><strong>archboot-local-x86_64.efi</strong></a>[<a href="/iso/x86_64/latest/boot/archboot-local-x86_64.efi.sig"><strong>.sig</strong></a>]<br>
+</td>
+</tr>
+</tbody>
+</table>
+-->
+<table>
+<thead>
+<tr class="header">
+<th>X86_64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="even">
 <td>
 <a href="/iso/x86_64/latest/boot/archboot-x86_64.efi"><strong>archboot-x86_64.efi</strong></a>[<a href="/iso/x86_64/latest/boot/archboot-x86_64.efi.sig"><strong>.sig</strong></a>]<br>
 <a href="/iso/x86_64/latest/boot/archboot-latest-x86_64.efi"><strong>archboot-latest-x86_64.efi</strong></a>[<a href="/iso/x86_64/latest/boot/archboot-latest-x86_64.efi.sig"><strong>.sig</strong></a>]<br>
@@ -727,7 +745,7 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 </ul>
 <ul>
 <li>How much <strong>RAM</strong> is needed to boot?<br>
-It’s an initrd which includes everything. The calculated size to boot the image follows the formula:<br>
+The calculated size to boot the image follows the formula:<br>
 <strong>Initrd + Kernel + Unpackedkernel + Unpackedinitrd = minimum RAM to boot</strong>
 </li>
 </ul>
