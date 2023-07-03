@@ -22,8 +22,8 @@
 <li><ul>
 <li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> ISOs - USB / CD / Virtual Machine</a></li>
 <li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> UKIs - Unified Kernel Images</a></li>
-<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initramfs / Microcode / Rescue System / PXE</a></li>
-<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> ISO / Initramfs / UKI Types</a></li>
+<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initrd / Microcode / Rescue System / PXE</a></li>
+<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> ISO / Initrd / UKI Types</a></li>
 <li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> ISO Boot Modes</a></li>
 <li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> ISO Writing To USB / CD</a></li>
 </ul></li>
@@ -81,7 +81,7 @@
 <ul>
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a>, <a href="/web/gallery.html"><strong>Screenshot Gallery</strong></a>, <a href="https://bit.ly/archboot-sources"><strong>Sources</strong></a>.</li>
 <li><strong>Release schedule</strong>: on 10th, 20th and 30th of a month new images are released.</li>
-<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramfs</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcodes</strong></a> are provided.</li>
+<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcodes</strong></a> are provided.</li>
 <li><strong>PGP KEY</strong>: <a href="https://keyserver.ubuntu.com/pks/lookup?op=vindex&amp;fingerprint=on&amp;exact=on&amp;search=0x5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"><strong>5B7E 3FB7 1B7F 1032 9A1C 03AB 771D F662 7EDF 681F</strong></a> for file verification is provided.</li>
 <li><strong>Supported Glibc Locales</strong>: be, bg, cs, da, de, en, el, es, fi, fr, hu, it, lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, uk</li>
 </ul>
@@ -165,7 +165,7 @@
 </tbody>
 </table>
 <p>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</p>
-<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span> Kernel / Initramfs / Microcode / Rescue System / <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a></h3>
+<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span> Kernel / Initrd / Microcode / Rescue System / <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a></h3>
 <table>
 <thead>
 <tr class="header">
@@ -186,14 +186,14 @@
 </td>
 </tr>
 <tr class="even">
-<td><strong>Initramfs</strong></td>
+<td><strong>Initrd</strong></td>
 <td>
-<a href="/iso/aarch64/latest/boot/initramfs-aarch64.img"><strong>initramfs-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initramfs-aarch64.img.sig"><strong>.sig</strong></a>]<br>
-<a href="/iso/aarch64/latest/boot/initramfs-latest-aarch64.img"><strong>initramfs-latest-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initramfs-latest-aarch64.img.sig"><strong>.sig</strong></a>]<br>
-<a href="/iso/aarch64/latest/boot/initramfs-local-aarch64.img"><strong>initramfs-local-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initramfs-local-aarch64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/aarch64/latest/boot/initrd-aarch64.img"><strong>initrd-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initrd-aarch64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/aarch64/latest/boot/initrd-latest-aarch64.img"><strong>initrd-latest-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initrd-latest-aarch64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/aarch64/latest/boot/initrd-local-aarch64.img"><strong>initrd-local-aarch64.img</strong></a>[<a href="/iso/aarch64/latest/boot/initrd-local-aarch64.img.sig"><strong>.sig</strong></a>]<br>
 </td>
 <td>
-<a href="/iso/riscv64/latest/boot/initramfs-riscv64.img"><strong>initramfs-riscv64.img</strong></a>[<a href="/iso/riscv64/latest/boot/initramfs-riscv64.img.sig"><strong>.sig</strong>]</a><br>
+<a href="/iso/riscv64/latest/boot/initrd-riscv64.img"><strong>initrd-riscv64.img</strong></a>[<a href="/iso/riscv64/latest/boot/initrd-riscv64.img.sig"><strong>.sig</strong>]</a><br>
 </td>
 </tr>
 <tr class="odd">
@@ -219,11 +219,11 @@
 </td>
 </tr>
 <tr class="even">
-<td><strong>Initramfs</strong></td>
+<td><strong>Initrd</strong></td>
 <td>
-<a href="/iso/x86_64/latest/boot/initramfs-x86_64.img"><strong>initramfs-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initramfs-x86_64.img.sig"><strong>.sig</strong></a>]<br>
-<a href="/iso/x86_64/latest/boot/initramfs-latest-x86_64.img"><strong>initramfs-latest-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initramfs-latest-x86_64.img.sig"><strong>.sig</strong></a>]<br>
-<a href="/iso/x86_64/latest/boot/initramfs-local-x86_64.img"><strong>initramfs-local-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initramfs-local-x86_64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/x86_64/latest/boot/initrd-x86_64.img"><strong>initrd-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initrd-x86_64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/x86_64/latest/boot/initrd-latest-x86_64.img"><strong>initrd-latest-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initrd-latest-x86_64.img.sig"><strong>.sig</strong></a>]<br>
+<a href="/iso/x86_64/latest/boot/initrd-local-x86_64.img"><strong>initrd-local-x86_64.img</strong></a>[<a href="/iso/x86_64/latest/boot/initrd-local-x86_64.img.sig"><strong>.sig</strong></a>]<br>
 </td>
 </tr>
 <tr class="odd">
@@ -235,10 +235,10 @@
 </tbody>
 </table>
 <ul>
-<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramfs</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initramfs</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
+<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
 </ul>
-<h3 data-number="2.4" id="image-types"><span class="header-section-number">2.4</span> <strong>ISO / Initramfs / UKI Types</strong></h3>
+<h3 data-number="2.4" id="image-types"><span class="header-section-number">2.4</span> <strong>ISO / Initrd / UKI Types</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -362,7 +362,7 @@ iso_loop_path=/dirname/basename_of_archboot.iso</code></td>
 <td><code>menuentry &quot;Archboot&quot; --class iso {
 loopback loop (hdX,Y)/archboot.iso
 linux (loop)/boot/vmlinuz-x86_64 iso_loop_dev=/dev/sdXY iso_loop_path=/archboot.iso
-initrd (loop)/boot/initramfs-x86_64.img
+initrd (loop)/boot/initrd-x86_64.img
 }</code></td>
 </tr>
 </tbody>
@@ -753,8 +753,8 @@ It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI">
 </ul>
 <ul>
 <li>How much <strong>RAM</strong> is needed to boot?<br>
-It’s an initramfs which includes everything. The calculated size to boot the image follows the formula:<br>
-<strong>Initramfs + Kernel + Unpackedkernel + Unpackedinitramfs = minimum RAM to boot</strong>
+It’s an initrd which includes everything. The calculated size to boot the image follows the formula:<br>
+<strong>Initrd + Kernel + Unpackedkernel + Unpackedinitrd = minimum RAM to boot</strong>
 </li>
 </ul>
 <h2 data-number="5." id="archiso"><span class="header-section-number">5. </span>Comparison To <a href="https://wiki.archlinux.org/title/Archiso" title="Archiso"><strong>Archiso</strong></a> Image</h2>
@@ -1009,16 +1009,16 @@ It’s an initramfs which includes everything. The calculated size to boot the i
 <table>
 <thead>
 <tr class="header">
-<th>Create the initramfs with your chosen profile:</th>
+<th>Create the initrd with your chosen profile:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-cpio.sh -c /etc/archboot/&lt;profile&gt;.conf -g initramfs.img</code></td>
+<td><code># archboot-cpio.sh -c /etc/archboot/&lt;profile&gt;.conf -g initrd.img</code></td>
 </tr>
 </tbody>
 </table>
-<p>Add your used <strong>kernel</strong> and <strong>initramfs</strong> to your bootloader.</p>
+<p>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</p>
 <h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> Create Image Files</h2>
 <h3 data-number="7.2.1" id="requirements"><span class="header-section-number">7.2.1</span> <strong>Requirement</strong></h3>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
@@ -1081,10 +1081,10 @@ There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
-<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initramfs.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initrd.</li>
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
-<p>The archboot initramfs toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
+<p>The archboot initrd toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
 <strong>HOOKS, COMPRESSION, COMPRESSION_OPTIONS, MODULES_DECOMPRESS</strong></li>
@@ -1211,12 +1211,12 @@ There are the following configuration files for ISO creation:
 <table>
 <thead>
 <tr class="header">
-<th>kernel and initramfs testing:</th>
+<th>kernel and initrd testing:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initramfs&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>--enable-kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
+<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initrd&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>--enable-kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
