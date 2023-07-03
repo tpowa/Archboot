@@ -5,15 +5,15 @@
 _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
-_INITRAMFS="boot/initramfs-${_ARCH}.img"
-_INITRAMFS_LATEST="boot/initramfs-latest-${_ARCH}.img"
-_INITRAMFS_LOCAL="boot/initramfs-local-${_ARCH}.img"
+_INITRD="boot/initrd-${_ARCH}.img"
+_INITRD_LATEST="boot/initrd-latest-${_ARCH}.img"
+_INITRD_LOCAL="boot/initrd-local-${_ARCH}.img"
 if [[ "${_ARCH}" == "aarch64" ]]; then
     _KERNEL="boot/Image-${_ARCH}.gz"
-    _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}.gz"
+    _KERNEL_ARCHBOOT="boot/Image-${_ARCH}.gz"
 else
     _KERNEL="boot/vmlinuz-${_ARCH}"
-    _KERNEL_ARCHBOOT="boot/vmlinuz-archboot-${_ARCH}"
+    _KERNEL_ARCHBOOT="boot/vmlinuz-${_ARCH}"
 fi
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
@@ -72,11 +72,11 @@ _create_iso() {
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
             elif echo "${i}" | grep -q latest; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
             elif echo "${i}" | grep -q local; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
         done
     else
@@ -85,14 +85,14 @@ _create_iso() {
                 isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
-                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS}"
+                mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
                 mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
                 isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
-                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LATEST}"
+                mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
             elif echo "${i}" | grep -q local; then
                 isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
-                mcopy -m -i efi.img ::/"${_INITRAMFS}" ./"${_INITRAMFS_LOCAL}"
+                mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
             rm efi.img
         done
@@ -123,13 +123,13 @@ _create_iso() {
         fi
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
-        for initramfs in ${_INITRAMFS} ${_INITRAMFS_LATEST} ${_INITRAMFS_LOCAL}; do
-            [[ "${initramfs}" == "${_INITRAMFS}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
-            [[ "${initramfs}" == "${_INITRAMFS_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
-            [[ "${initramfs}" == "${_INITRAMFS_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
+        for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
+            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
-                ${_UCODE} ${initramfs} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
+                ${_UCODE} ${initrd} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
                 --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>/dev/null || exit 1
         done
         # fix permission and timestamp
