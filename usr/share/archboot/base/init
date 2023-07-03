@@ -53,7 +53,7 @@ while true; do
     _COUNT=$((_COUNT+1))
     [[ "${_COUNT}" == 10 ]] && break
 done
-if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
+if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
     if ! mount /cdrom/efi.img /mnt &>/dev/null; then
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
         echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
@@ -63,10 +63,10 @@ if ! [[ -f "/mnt/boot/initramfs-$(uname -m).img" ]] ; then
     fi
 fi
 cd /
-# move in modules from main initramfs
-echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
+# move in modules from main initrd
+echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initrd-$(uname -m).img..."
 echo -e "          This may need some time..."
-bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shell
 # reinitialize available modules
 udevadm control -R
 # clear screen
@@ -85,7 +85,7 @@ setfont consolefont-${SIZE}.psf.gz -C /dev/console
 _title
 echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
 echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
-echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initramfs-$(uname -m).img..."
+echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initrd-$(uname -m).img..."
 echo -e "          This may need some time..."
 echo -e "\e[1mStep 3/7:\e[m Removing firmware and modules..."
 # keep ethernet NIC firmware
@@ -105,7 +105,7 @@ mkdir -p /sysroot/usr/lib
 mv /lib/modules /sysroot/usr/lib
 mv /lib/firmware /sysroot/usr/lib
 cd /sysroot || _emergency_shell
-bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initramfs-$(uname -m).img" &>/dev/null || _emergency_shell
+bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shell
 # unmount everything after copying
 echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs..."
 while true; do

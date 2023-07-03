@@ -53,7 +53,7 @@ _config() {
 # - unified EFI is not possible because of this:
 #   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
 # - only left option is extlinux support in u-boot loader
-_prepare_kernel_initramfs_files() {
+_prepare_kernel_initrd_files() {
     #shellcheck disable=SC1090
     source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
@@ -77,9 +77,9 @@ _prepare_kernel_initramfs_files() {
             cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
         fi
     fi
-    echo "Running archboot-cpio.sh for initramfs-${_ARCH}.img..."
+    echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
     #shellcheck disable=SC2154
-    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initramfs-${_ARCH}.img" || exit 1
+    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
