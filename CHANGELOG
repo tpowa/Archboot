@@ -57,7 +57,7 @@ setup:
 - cleaned up partition functions
 - fixed mountpoint checks on EFI directory
 - renamed Auto-Prepare to Quick Setup
-- disable Select Source and Network Configuration in Local Mode
+- disabled Select Source and Network Configuration in Local Mode
 - always run pacman -Sy on package installation
 - restart systemd-networkd and systemd-resolved on network setup
 - fixed /efi /boot mounting order in Quick Setup mode
