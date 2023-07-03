@@ -333,7 +333,7 @@ _mainmenu() {
             _install_bootloader ;;
         "8")
             #shellcheck disable=SC2086
-            dialog ${_DEFAULT} --default-item "1" --backtitle "${_TITLE}" --title " EXIT MENU " --menu "" 9 30 5 \
+            dialog --backtitle "${_TITLE}" --title " EXIT MENU " --menu "" 9 30 5 \
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
