@@ -13,7 +13,7 @@ _welcome () {
 
 _local_mode () {
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
-        echo -e "You are running in \e[92m\e[1mLocal Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
+        echo -e "You are running in \e[92m\e[1mOffline Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
         if [[ -e /usr/bin/setup ]] ; then
             # bring down network
             systemctl stop systemd-networkd 2>/dev/null
