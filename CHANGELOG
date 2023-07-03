@@ -1,6 +1,9 @@
 On the road to 2023.07:
 - kernel 6.4.x
 - use BLAKE2b/b2sum instead of sha256sum
+Environment Changes:
+- renamed initramfs to initrd
+- stripped off archboot from kernel name
 locale:
 - fixed abort dialog
 update:
