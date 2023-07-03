@@ -4,6 +4,7 @@ On the road to 2023.07:
 Environment Changes:
 - renamed initramfs to initrd
 - stripped off archboot from kernel name
+- renamed Locale Mode to Offline Mode
 locale:
 - fixed abort dialog
 update:
