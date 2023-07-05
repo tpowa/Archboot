@@ -18,4 +18,6 @@ for i in $(cat packages.txt); do
         pacman -S ${i} --noconfirm --overwrite '*'
     fi
 done
+# remove false positives
+grep -v "linux-firmware-marvell pambase pacman-mirrorlist licenses" uninstalled.txt >uninstalled.txt
 # vim: set ft=sh ts=4 sw=4 et:

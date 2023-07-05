@@ -214,9 +214,6 @@ build ()
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
     add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
-    ### add secure boot MOK
-    add_full_dir /usr/share/archboot/keys
-
     ### remove conflicting mkinitcpio files and grub
     rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
         ${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \

@@ -155,10 +155,11 @@ if ! [[ -e "/.vconsole-run" ]]; then
 fi
 if ! [[ -e "/.clean-pacman-db" ]]; then
     touch /.clean-pacman-db
-    _RM_PACMAN_DB="grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
+    _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
         libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
-        libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap mtools \
-        libsysprof-capture libnsl libksba gdbm binutils cdrtools systemd-ukify"
+        libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
+        memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
+        cdrtools systemd-ukify python python-pe"
     for i in ${_RM_PACMAN_DB}; do
         rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
     done
