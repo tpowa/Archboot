@@ -43,11 +43,11 @@ _create_iso() {
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         echo "Generating local ISO..."
         # generate local iso in container
-        if [[ "${_ARCH}" == "x86_64" ]]; then
-            echo "Adding custom grub..."
-            wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" -P "${_W_DIR}/var/cache/pacman/pkg"
-            wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" -P "${_W_DIR}/var/cache/pacman/pkg"
-        fi
+        #if [[ "${_ARCH}" == "x86_64" ]]; then
+        #    echo "Adding custom grub..."
+        #    wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" -P "${_W_DIR}/var/cache/pacman/pkg"
+        #    wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" -P "${_W_DIR}/var/cache/pacman/pkg"
+        #fi
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
             -p=${_PRESET_LOCAL}  -i=${_ISONAME}-local-${_ARCH}" || exit 1
         echo "Generating latest ISO..."
