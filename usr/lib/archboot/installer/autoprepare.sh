@@ -34,7 +34,7 @@ _autoprepare() {
     _BOOTDEV_SIZE=""
     _UEFISYSDEV_SIZE=""
     # get just the disk size in M/MiB 1024*1024
-    _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}")/1048576))"
+    _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}" 2>"${_NO_LOG}")/1048576))"
     if [[ -z "${_DISK_SIZE}" ]]; then
         _dialog --msgbox "ERROR: Setup cannot detect size of your device, please use normal installation routine for partitioning and mounting devices." 0 0
         return 1

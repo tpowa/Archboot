@@ -35,7 +35,7 @@ _ssd_optimization() {
     _SSD_MOUNT_OPTIONS=""
     if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|btrfs|xfs|nilfs2|f2fs'; then
         # check all underlying devices on ssd
-        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s | grep "disk$" | cut -d' ' -f 1); do
+        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d' ' -f 1); do
             # check for ssd
             if [[ "$(cat /sys/block/"$(basename "${i}")"/queue/rotational)" == 0 ]]; then
                 _SSD_MOUNT_OPTIONS="noatime"
@@ -109,7 +109,7 @@ _check_mkfs_values() {
     [[ -z "${_BTRFS_DEVS}" ]] && _BTRFS_DEVS="NONE"
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_BTRFS_SUBVOLUME}" ]] && _BTRFS_SUBVOLUME="NONE"
-    [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}")"
+    [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
 
@@ -124,7 +124,7 @@ _create_filesystem() {
         [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "vfat" ]] || _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --inputbox "Enter the LABEL name for the device, keep it short\n(not more than 12 characters) and use no spaces or special\ncharacters." 10 65 \
-            "$(${_LSBLK} LABEL "${_DEV}")" 2>"${_ANSWER}" || return 1
+            "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${_LABEL_NAME}$" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical LABEL names! Please enter another name." 8 65
@@ -185,7 +185,7 @@ _mountpoints() {
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
-                    [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}")"
+                    [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
                     if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi
@@ -272,7 +272,7 @@ _mountpoints() {
                     _check_mkfs_values
                     echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
                     # always remove swap paetition and root device
-                    [[ ! "${_FSTYPE}" == "btrfs" || -z "${_UEFISYSDEV_DONE}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+                    [[ ! "${_FSTYPE}" == "btrfs" || -z "${_UEFISYSDEV_DONE}" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
                 fi
             fi
         done

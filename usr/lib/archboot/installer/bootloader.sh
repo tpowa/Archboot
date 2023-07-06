@@ -130,14 +130,14 @@ _abort_uboot(){
 }
 
 _abort_nilfs_bootpart() {
-        if ${_LSBLK} FSTYPE "${_BOOTDEV}" | grep -q "nilfs2"; then
+        if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "nilfs2"; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_f2fs_bootpart() {
-        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" | grep -q "f2fs"; then
+        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "f2fs"; then
             _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
@@ -175,7 +175,7 @@ _do_uefi_efibootmgr() {
     for _bootnum in $(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
         efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
     done
-    _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}")
+    _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}" 2>"${_NO_LOG}")
     _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sed -e "s#${_BOOTMGRDEV}##g" | sed -e 's#p##g')
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
 }
