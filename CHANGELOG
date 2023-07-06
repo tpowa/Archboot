@@ -1,14 +1,21 @@
 On the road to 2023.07:
 - kernel 6.4.x
+- grub 2.06.r591.g6425c12cd-1
 - use BLAKE2b/b2sum instead of sha256sum
 Environment Changes:
 - renamed initramfs to initrd
 - stripped off archboot from kernel name
 - renamed Locale Mode to Offline Mode
+- removed custom grub package
+- removed uninstalled packages
+- added grub bli efi module
 locale:
 - fixed abort dialog
 update:
 - trigger kernel module loading on -full-system
+setup:
+- silence _LSBLK errors
+- added grub bli efi module to grub.cfg
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout
