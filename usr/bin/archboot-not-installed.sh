@@ -19,5 +19,5 @@ for i in $(cat packages.txt); do
     fi
 done
 # remove false positives
-grep -v "linux-firmware-marvell pambase pacman-mirrorlist licenses" uninstalled.orig.txt >uninstalled.txt
+grep -v -E "iana-etc|linux-firmware-marvell|pambase|pacman-mirrorlist|licenses" uninstalled.orig.txt >uninstalled.txt
 # vim: set ft=sh ts=4 sw=4 et:
