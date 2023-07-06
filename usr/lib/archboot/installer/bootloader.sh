@@ -634,6 +634,7 @@ else
     if [ "\${grub_platform}" == "efi" ]; then
         insmod efi_gop
         insmod efi_uga
+        insmod bli
     fi
     if [ "\${grub_platform}" == "pc" ]; then
         insmod vbe
