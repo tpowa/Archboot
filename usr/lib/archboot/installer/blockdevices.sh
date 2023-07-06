@@ -3,27 +3,27 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _getfstype()
 {
-    ${_LSBLK} FSTYPE "${1}"
+    ${_LSBLK} FSTYPE "${1}" 2>"${_NO_LOG}"
 }
 
 _getfsuuid()
 {
-    ${_LSBLK} UUID "${1}"
+    ${_LSBLK} UUID "${1}" 2>"${_NO_LOG}"
 }
 
 _getfslabel()
 {
-    ${_LSBLK} LABEL "${1}"
+    ${_LSBLK} LABEL "${1}" 2>"${_NO_LOG}"
 }
 
 _getpartuuid()
 {
-    ${_LSBLK} PARTUUID "${1}"
+    ${_LSBLK} PARTUUID "${1}" 2>"${_NO_LOG}"
 }
 
 _getpartlabel()
 {
-    ${_LSBLK} PARTLABEL "${1}"
+    ${_LSBLK} PARTLABEL "${1}" 2>"${_NO_LOG}"
 }
 
 # lists linux blockdevices
@@ -32,16 +32,16 @@ _blockdevices() {
      for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
         # exclude checks:
         #- iso9660 devices
-        #  (${_LSBLK} FSTYPE ${dev} | grep "iso9660"
+        #  (${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "iso9660"
         #- fakeraid isw devices
-        #  ${_LSBLK} FSTYPE ${dev} | grep "isw_raid_member"
+        #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "isw_raid_member"
         #- fakeraid ddf devices
-        #  ${_LSBLK} FSTYPE ${dev} | grep "ddf_raid_member"
+        #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "ddf_raid_member"
         # - zram devices
         #  echo "${dev}" | grep -q 'zram'
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "iso9660" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "isw_raid_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "ddf_raid_member" &&\
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "iso9660" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "ddf_raid_member" &&\
             ! echo "${dev}" | grep -q 'zram'; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
@@ -56,11 +56,11 @@ _blockdevices_partitions() {
     for dev in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d' ' -f1); do
         # exclude checks:
         #- part of raid device
-        #  ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member"
+        #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "linux_raid_member"
         #- part of lvm2 device
-        #  ${_LSBLK} FSTYPE /dev/${dev} | grep "LVM2_member"
+        #  ${_LSBLK} FSTYPE /dev/${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
         #- part of luks device
-        #  ${_LSBLK} FSTYPE /dev/${dev} | grep "crypto_LUKS"
+        #  ${_LSBLK} FSTYPE /dev/${dev} 2>"${_NO_LOG}" | grep "crypto_LUKS"
         #- extended partition
         #  sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep "Extended$"
         # - extended partition (LBA)
@@ -69,10 +69,10 @@ _blockdevices_partitions() {
         #  sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "BIOS boot$"
         #- iso9660 devices
         #  "${_LSBLK} FSTYPE -s ${dev} | grep "iso9660"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
-            ! ${_LSBLK} FSTYPE -s "${dev}" | grep -q "iso9660" &&\
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "linux_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "crypto_LUKS" &&\
+            ! ${_LSBLK} FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep -q "iso9660" &&\
             ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" &&\
             ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" &&\
             ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "BIOS boot$"; then
@@ -87,17 +87,17 @@ _raid_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" | cut -d' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
         # - part of luks device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "crypto_LUKS"
         # - part of isw fakeraid
-        #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
+        #   ${_LSBLK} FSTYPE ${dev} -s 2>"${_NO_LOG}" | grep "isw_raid_member"
         # - part of ddf fakeraid
-        #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member" &&\
+        #   ${_LSBLK} FSTYPE ${dev} -s 2>"${_NO_LOG}" | grep "ddf_raid_member"
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "crypto_LUKS" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | grep -q "ddf_raid_member" &&\
             ! find "$dev"*p* -type f -exec echo {} \; 2>"${_NO_LOG}"; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
@@ -109,23 +109,23 @@ _partitionable_raid_devices_partitions() {
     for dev in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md.*p" 2>"${_NO_LOG}" | cut -d' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
         # - part of luks device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "crypto_LUKS"
         # - extended partition
-        #   sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep "Extended$"
+        #   sfdisk -l 2>"${_NO_LOG}" 2>"${_NO_LOG}" | grep "${dev}" | grep "Extended$"
         # - extended partition (LBA)
-        #   sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep "(LBA)$"
+        #   sfdisk -l 2>"${_NO_LOG}" 2>"${_NO_LOG}" | grep "${dev}" | grep "(LBA)$"
         # - part of isw fakeraid
-        #   ${_LSBLK} FSTYPE ${dev} -s | grep "isw_raid_member"
+        #   ${_LSBLK} FSTYPE ${dev} -s 2>"${_NO_LOG}" | grep "isw_raid_member"
         # - part of ddf fakeraid
-        #   ${_LSBLK} FSTYPE ${dev} -s | grep "ddf_raid_member"
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS" &&\
+        #   ${_LSBLK} FSTYPE ${dev} -s 2>"${_NO_LOG}" | grep "ddf_raid_member"
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "LVM2_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "crypto_LUKS" &&\
             ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "Extended$" &&\
             ! sfdisk -l 2>"${_NO_LOG}" | grep "${dev}" | grep -q "(LBA)$" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "isw_raid_member" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" -s | grep -q "ddf_raid_member"; then
+            ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | grep -q "isw_raid_member" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | grep -q "ddf_raid_member"; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -134,13 +134,13 @@ _partitionable_raid_devices_partitions() {
 _dmraid_devices() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "isw_raid_member$"; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep -q "isw_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "ddf_raid_member$"; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep -q "ddf_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -149,13 +149,13 @@ _dmraid_devices() {
 _dmraid_partitions() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -168,17 +168,17 @@ _dm_devices() {
     for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "LVM2_member"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
         # - part of luks device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "crypto_LUKS"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "crypto_LUKS"
         # - part of raid device
-        #   ${_LSBLK} FSTYPE ${dev} | grep "linux_raid_member$"
+        #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "linux_raid_member$"
         # - part of running raid on encrypted device
-        #   ${_LSBLK} TYPE ${dev} | grep "raid.*$
-        if ! ${_LSBLK} FSTYPE "${dev}" | grep -q "crypto_LUKS$" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "LVM2_member$" &&\
-            ! ${_LSBLK} FSTYPE "${dev}" | grep -q "linux_raid_member$" &&\
-            ! ${_LSBLK} TYPE "${dev}" | grep -q "raid.*$"; then
+        #   ${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | grep "raid.*$
+        if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "crypto_LUKS$" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "LVM2_member$" &&\
+            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | grep -q "linux_raid_member$" &&\
+            ! ${_LSBLK} TYPE "${dev}" 2>"${_NO_LOG}" | grep -q "raid.*$"; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -239,7 +239,7 @@ _activate_luks()
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
             for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
-                if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
+                if ! ${_LSBLK} TYPE "${part}" 2>"${_NO_LOG}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
                     _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS=1
                     [[ -n "${_RUN_LUKS}" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
@@ -379,7 +379,7 @@ _stopluks()
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
         for dev in ${_LUKSDEV}; do
-            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
+            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
             cryptsetup remove "${dev}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
@@ -425,7 +425,7 @@ _createmd()
         _DEVS="$(_finddevices)"
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
-                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}")/}"
+                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")/}"
             done
         fi
         # break if all devices are in use
@@ -464,7 +464,7 @@ _createmd()
         while [[ "${_DEV}" != "DONE" ]]; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
             # add more devices
@@ -545,7 +545,7 @@ _createpv()
         _DEVS="$(_finddevices)"
         if [[ -n "${_LVM_BLACKLIST}" ]]; then
             for dev in ${_LVM_BLACKLIST}; do
-                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}")/}"
+                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")/}"
             done
         fi
         # break if all devices are in use
@@ -562,7 +562,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}")/}"
+            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}") 2>"${_NO_LOG}"/}"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -594,10 +594,10 @@ _findpv()
     for dev in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
         # exclude checks:
         #-  not part of running lvm2
-        # ! "$(${_LSBLK} TYPE ${dev} | grep "lvm")"
+        # ! "$(${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | grep "lvm")"
         #- not part of volume group
         # $(pvs -o vg_name --noheading ${dev} | grep " $")
-        if ! ${_LSBLK} TYPE "${dev}" | grep "lvm" && pvs -o vg_name --noheading "${dev}" | grep -q " $"; then
+        if ! ${_LSBLK} TYPE "${dev}" 2>"${_NO_LOG}" | grep "lvm" && pvs -o vg_name --noheading "${dev}" | grep -q " $"; then
             ${_LSBLK} NAME,SIZE "${dev}"
         fi
     done
@@ -647,7 +647,7 @@ _createvg()
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
             #shellcheck disable=SC2001,SC2086
-            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_PV}")/}"
+            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_PV}") 2>"${_NO_LOG}"/}"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -812,7 +812,7 @@ _createluks()
          _DEVS="$(_finddevices)"
         if [[ -n "${_LUKS_BLACKLIST}" ]]; then
             for dev in ${_LUKS_BLACKLIST}; do
-                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}")/}"
+                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")/}"
             done
         fi
         # break if all devices are in use

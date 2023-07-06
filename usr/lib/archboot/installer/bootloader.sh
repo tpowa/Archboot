@@ -35,9 +35,9 @@ _getcryptsetup() {
     if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
         if cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')" 2>"${_NO_LOG}")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" | grep device: | sed -e 's#device:##g')")"
+                _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')" 2>"${_NO_LOG}")"
             else
                 _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g'))"
             fi
