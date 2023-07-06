@@ -133,13 +133,13 @@ _partitionable_raid_devices_partitions() {
 
 _dmraid_devices() {
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE 2>"${_NO_LOG}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "isw_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE 2>"${_NO_LOG}" | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep -q "ddf_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
@@ -149,13 +149,13 @@ _dmraid_devices() {
 _dmraid_partitions() {
     # isw_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
     for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -237,7 +237,7 @@ _activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         _dialog --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
-            for part in $(${_LSBLK} NAME,FSTYPE 2>"${_NO_LOG}" | grep " crypto_LUKS$" | cut -d' ' -f 1); do
+            for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
