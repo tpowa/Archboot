@@ -3,11 +3,10 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 # simulate login from tty
-if ! [[ -e /tmp/.ttyd ]]; then
+if ! [[ -e /tmp/.setup-running ]]; then
     cat /etc/motd
     echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
     read -r
-    : >/tmp/.ttyd
 fi
 . /etc/profile
 screen -q -R
