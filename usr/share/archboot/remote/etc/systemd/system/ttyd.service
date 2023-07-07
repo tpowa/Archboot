@@ -7,7 +7,7 @@ After=syslog.target
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/ttyd bash
+ExecStart=/usr/bin/ttyd ttyd.sh
 Type=simple
 Restart=always
 User=root
