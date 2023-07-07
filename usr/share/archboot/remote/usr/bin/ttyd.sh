@@ -9,4 +9,5 @@ if ! [[ -e /tmp/.ttyd ]]; then
     read -r
     : >/tmp/.ttyd
 fi
+. /etc/profile
 screen -q -R
