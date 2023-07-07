@@ -9,6 +9,7 @@ Environment Changes:
 - removed custom grub package
 - removed uninstalled packages
 - added grub bli efi module
+- added ttyd remote http terminal support
 locale:
 - fixed abort dialog
 update:
