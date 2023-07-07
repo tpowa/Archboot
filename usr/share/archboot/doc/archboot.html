@@ -30,7 +30,7 @@
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
 <li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> Graphical Environments / VNC</a></li>
-<li><a href="#remote-access" id="toc-remote-access"><span class="toc-section-number">3.2</span> Remote Access</a></li>
+<li><a href="#remote-terminal-access" id="toc-remote-terminal-access"><span class="toc-section-number">3.2</span> Remote Terminal Access</a></li>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> Secure Boot - MOK / Machine Owner Key</a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch To Complete Arch Linux System</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
@@ -140,7 +140,7 @@
 <td><a href="https://bbs.archlinux.org/viewtopic.php?id=182439"><strong>Check</strong></a></td>
 </tbody>
 </table>
-<p>The ISO for <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
+<p>The ISO supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
 <h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span> UKIs - <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a></h3>
 <!--
 <table>
@@ -432,8 +432,8 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.2" id="remote-access"><span class="header-section-number">3.2</span> <strong>Remote Access</strong></h3>
-<h4 data-number="3.2.1" id="remote-access-openssh"><span class="header-section-number">3.2.1</span> <strong>OpenSSH</strong></h4>
+<h3 data-number="3.2" id="remote-terminal-access"><span class="header-section-number">3.2</span> <strong>Remote Terminal Access</strong></h3>
+<h4 data-number="3.2.1" id="remote-access-openssh"><span class="header-section-number">3.2.1</span> <strong>OpenSSH Terminal</strong></h4>
 <p>Access the terminal with <a href="https://wiki.archlinux.org/title/OpenSSH" title="Password"><strong>OpenSSH</strong></a>.<br><strong>Attention:</strong> root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not set/empty</strong> by default!</p>
 <table>
 <thead>
@@ -480,7 +480,7 @@
 </table>
 <p>Please read <a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim"><strong>Roderick Smith’s guide</strong></a> for initial shim setup first.</p>
 <p>The included tools for key management: <strong>KeyTool, HashTool, mokutil, sbsigntools, sbctl</strong> and <strong>mkkeys.sh</strong></p>
-<h4 data-number="3.3.1" id="secure-boot-iso"><span class="header-section-number">3.3.1</span> <strong>Boot ISO</strong></h4>
+<h4 data-number="3.3.1" id="secure-iso-boot"><span class="header-section-number">3.3.1</span> <strong>Secure Boot - ISO Booting</strong></h4>
 <p>On initial <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> setup MOK manager is launched:</p>
 <table>
 <thead>
@@ -494,7 +494,7 @@
 </tr>
 </tbody>
 </table>
-<h4 data-number="3.3.2" id="secure-boot-setup"><span class="header-section-number">3.3.2</span> <strong>Setup Routine</strong></h4>
+<h4 data-number="3.3.2" id="secure-boot-auto-setup"><span class="header-section-number">3.3.2</span> <strong>Secure Boot - Automatic Setup Routine</strong></h4>
 <p>The setup script supports the following <a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> layout:</p>
 <ul>
 <li>The <strong><a href="https://kojipkgs.fedoraproject.org/packages/shim/" title="Fedora Shim">fedora's signed shim</a></strong> is copied to the installed system</li>
@@ -505,7 +505,7 @@
 <li>On <strong>first</strong> boot you need to <strong>enroll</strong> the used personal key as <strong>MOK</strong>.</li>
 <li>Then your installed system is dual boot <strong>ready</strong>.</li>
 </ul>
-<h4 data-number="3.3.3" id="secure-boot-create-mok"><span class="header-section-number">3.3.3</span> <strong>Create MOK</strong></h4>
+<h4 data-number="3.3.3" id="secure-boot-manual-create-mok"><span class="header-section-number">3.3.3</span> <strong>Secure Boot - Manual Create MOK</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -518,7 +518,7 @@
 </tr>
 </tbody>
 </table>
-<h4 data-number="3.3.4" id="secure-boot-reset-mok"><span class="header-section-number">3.3.4</span> <strong>Reset MOK</strong></h4>
+<h4 data-number="3.3.4" id="secure-boot-reset-mok"><span class="header-section-number">3.3.4</span> <strong>Secure Boot - Reset MOK</strong></h4>
 <p>In order to <strong>reset</strong> the MOK setup:</p>
 <ul>
 <li>Turn <strong>off</strong> Secure Boot in firmware</li>
@@ -538,7 +538,7 @@
 </table>
 <ul>
 <li>Reboot and turn <strong>on</strong> Secure Boot again in firmware.</li>
-<li>Start again at <a href="#secure-boot-iso"><strong>3.3.1 Boot ISO</strong></a>.</li>
+<li>Start again at point <a href="#secure-iso-boot"><strong>3.3.1</strong></a>.</li>
 </ul>
 <h3 data-number="3.4" id="switch-to-complete-arch-linux-system"><span class="header-section-number">3.4</span> <strong>Switch To Complete Arch Linux System</strong></h3>
 <ul>
