@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _title() {
     echo -e "\e[1mInitializing\e[m \e[1;96mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
-    echo -e "\e[1;93mPlease keep the boot medium inserted, until the process has finished! \e[m"
+    echo -e "\e[1;93mPlease keep the boot medium inserted...\e[m"
 }
 _emergency_shell() {
     echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
