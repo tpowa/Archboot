@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 06.07.2023 08:21</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 07.07.2023 10:51</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -30,7 +30,7 @@
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
 <li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> Graphical Environments / VNC</a></li>
-<li><a href="#remote-installation-with-openssh" id="toc-remote-installation-with-openssh"><span class="toc-section-number">3.2</span> Remote Access With OpenSSH</a></li>
+<li><a href="#remote-access" id="toc-remote-access"><span class="toc-section-number">3.2</span> Remote Access</a></li>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> Secure Boot - MOK / Machine Owner Key</a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch To Complete Arch Linux System</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
@@ -432,7 +432,8 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.2" id="remote-installation-with-openssh"><span class="header-section-number">3.2</span> <strong>Remote Access With OpenSSH</strong></h3>
+<h3 data-number="3.2" id="remote-access"><span class="header-section-number">3.2</span> <strong>Remote Access</strong></h3>
+<h4 data-number="3.2.1" id="remote-access-openssh"><span class="header-section-number">3.2</span> <strong>OpenSSH</strong></h4>
 <p>root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a> is <strong>not</strong> set by default! If you need security during installation set a <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong></a>.</p>
 <table>
 <thead>
@@ -445,6 +446,9 @@
 <td><code>$ ssh root@&lt;ipadress&gt;</code></td>
 </tr>
 </tbody>
+</table>
+<h4 data-number="3.2.2" id="remote-access-ttyd"><span class="header-section-number">3.2.2</span> <strong>TTYD - HTTP Terminal</strong></h4>
+<p>Connect with your favourite browser to <strong><yourip>:7681</strong> and get a terminal in your browser window.</p>
 </table>
 <h3 data-number="3.3" id="secure-boot-support"><span class="header-section-number">3.3</span> <strong>Secure Boot - MOK / Machine Owner Key</strong></h3>
 <table>
@@ -789,6 +793,10 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyNo">&#10006;</td>
 </tr>
 <tr class="odd">
+<td>TTYD - HTTP Terminal</td>
+<td class="MyYes">&#10004;</td>
+<td class="MyNo">&#10006;</td>
+</tr>
 <td>Offline installation support<sup>1</sup></td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>

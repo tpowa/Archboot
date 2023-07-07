@@ -7,6 +7,6 @@ if ! [[ -e /tmp/.ttyd ]]; then
     cat /etc/motd
     echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
     read -r
-    : >/tmp.ttyd
+    : >/tmp/.ttyd
 fi
 screen -q -R
