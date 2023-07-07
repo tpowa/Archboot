@@ -4,7 +4,7 @@
 [[ -n "${BASH_VERSION:-}" ]] || return
 # Not an interactive shell?
 [[ $- == *i* ]] || return
-if  [[ "${UID}" == 0 ]]; then
+if [[ "${UID}" == 0 ]]; then
     # red for root user, host green, print full working dir
     PS1='[\[\e[1;31m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \w]\$ '
 else
@@ -18,4 +18,8 @@ if command -v nvim >/dev/null; then
     alias vi='nvim'
     alias vim='nvim'
     alias edit='nvim'
+fi
+# show MOTD on ttyd login
+if [[ -z "${TTY}" && -z "${SSH_TTY}" ]]; then
+    [[ "${SHLVL}" == "2" ]] && cat /etc/motd
 fi

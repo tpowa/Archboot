@@ -7,7 +7,7 @@ build ()
     map add_binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
       exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
 	  sm-notify start-statd rpcbind rpcinfo rpc.gssd \
-	  nfsdcltrack gssproxy screen tmux rsync
+	  nfsdcltrack gssproxy screen tmux rsync ttyd
     map add_file "/etc/screenrc" "/etc/ssh/ssh_config" "/etc/ssh/sshd_config" "/etc/ssh/moduli" \
         "/etc/rsyncd.conf" "/etc/exports"  "/usr/lib/ssh/sftp-server" "/usr/lib/ssh/ssh-keysign" \
         "/usr/lib/ssh/ssh-pkcs11-helper" "/etc/conf.d/rpcbind" \
@@ -31,9 +31,11 @@ build ()
     chown 439:439 "${BUILDROOT}/var/lib/openldap"
     # start sshd on startup
     add_symlink "/etc/systemd/system/multi-user.target.wants/sshd.service" "/usr/lib/systemd/system/sshd.service"
+    # start ttyd on startup
+    add_symlink "/etc/systemd/system/multi-user.target.wants/ttyd.service" "/etc/systemd/system/ttyd.service"
     # fix licenses
     map add_file "/usr/share/licenses/rpcbind/COPYING" "/usr/share/licenses/nfsidmap/LICENSE" \
-        "/usr/share/licenses/tmux/LICENSE"
+        "/usr/share/licenses/tmux/LICENSE /usr/share/licenses/ttyd/LICENSE"
 }
 
 help ()
