@@ -140,8 +140,8 @@ _create_iso() {
     touch boot/*
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
-    (echo "Welcome to ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM";\
-    echo "Creation Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
+    (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM";\
+    echo "Build Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
     echo "Homepage: https://archboot.com";\
     echo "Architecture: ${_ARCH}";\
     echo "RAM requirement to boot: 700M or greater";\
