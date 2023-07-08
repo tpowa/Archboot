@@ -141,10 +141,10 @@ _create_iso() {
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM";\
-    echo "Build Tool: 'archboot' Tobias Powalowski <tpowa@archlinux.org>";\
-    echo "Homepage: https://archboot.com";\
-    echo "Architecture: ${_ARCH}";\
-    echo "RAM requirement to boot: 700M or greater";\
+    echo "(c) 2006 - 2023 | https://archboot.com";\
+    echo "Tobias Powalowski <tpowa@archlinux.org>";\
+    echo "";\
+    echo "Requirement: ${_ARCH} with 700M RAM and higher";\
     echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
