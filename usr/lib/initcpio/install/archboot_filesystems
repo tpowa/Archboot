@@ -24,6 +24,10 @@ build ()
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
     add_file "/etc/nilfs_cleanerd.conf"
     map add_full_dir /etc/cifs-utils /etc/request-key.d /etc/nvme
+    # fix libinih for plasma wallpaper
+    for i in /usr/lib/libINI*; do
+		add_file ${i}
+	done
     # fix licenses
     add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
 }
