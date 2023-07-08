@@ -146,8 +146,8 @@ _create_iso() {
     echo "";\
     echo "Requirement: ${_ARCH} with 700M RAM and higher";\
     echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
-    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub:$(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
-    echo "Kernel:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
+    [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(${_NSPAWN} "${_W_DIR}" pacman -Qi grub | grep Version | cut -d ":" -f3 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
+    echo "Linux:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")") >>Release.txt
     # removing container
