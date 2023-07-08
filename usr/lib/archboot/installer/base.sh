@@ -350,11 +350,11 @@ _mainmenu() {
                 fi
                     exit 0
             elif [[ "${_EXIT}" == "2" ]]; then
-                _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 70
+                _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 reboot
             elif [[ "${_EXIT}" == "3" ]]; then
-                _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 70
+                _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 poweroff
             fi
