@@ -10,6 +10,7 @@ Environment Changes:
 - added grub bli efi module
 - added ttyd remote http terminal support
 - use BLAKE2b/b2sum instead of sha256sum
+- shortened MOTD and init message
 locale:
 - fixed abort dialog
 update:
@@ -17,6 +18,7 @@ update:
 setup:
 - silence _LSBLK errors
 - added grub bli efi module to grub.cfg
+- switch to infobox on reboot and poweroff
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout
