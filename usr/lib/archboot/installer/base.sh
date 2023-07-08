@@ -350,10 +350,12 @@ _mainmenu() {
                 fi
                     exit 0
             elif [[ "${_EXIT}" == "2" ]]; then
-                _dialog --msgbox "Reboot:\nHit 'Enter' for rebooting the system.\nDon't forget to remove the boot medium!" 7 50
+                _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 3 70
+                sleep 10
                 reboot
             elif [[ "${_EXIT}" == "3" ]]; then
-                _dialog --msgbox "Poweroff:\nHit 'Enter' for powering off the system." 6 50
+                _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 3 70
+                sleep 10
                 poweroff
             fi
             ;;
