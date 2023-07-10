@@ -51,9 +51,9 @@ usage () {
                 _graphic_options
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
+                echo -e " \e[1m-sway\e[m            Launch Sway desktop."
                 echo -e " \e[1m-xfce\e[m            Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
-                echo -e " \e[1m-sway\e[m            Launch Sway desktop."
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""
             fi
