@@ -676,27 +676,27 @@ background=000000
 foreground=ffffff
 
 ## Normal/regular colors (color palette 0-7)
-regular0=808080   # bright black
+regular0=000000   # bright black
 regular1=ff0000   # bright red
 regular2=00ff00   # bright green
 regular3=ffff00   # bright yellow
-regular4=0000ff   # bright blue
+regular4=005fff   # bright blue
 regular5=ff00ff   # bright magenta
 regular6=00ffff   # bright cyan
 regular7=ffffff   # bright white
 
 ## Bright colors (color palette 8-15)
-bright0=808080   # bright black
+bright0=000000   # bright black
 bright1=ff0000   # bright red
 bright2=00ff00   # bright green
 bright3=ffff00   # bright yellow
-bright4=0000ff   # bright blue
+bright4=005fff   # bright blue
 bright5=ff00ff   # bright magenta
 bright6=00ffff   # bright cyan
 bright7=ffffff   # bright white
 
 [main]
-font=monospace:size=12
+font=Terminus:size=12
 EOF
 
     fi
