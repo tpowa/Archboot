@@ -694,7 +694,10 @@ bright4=0000ff   # bright blue
 bright5=ff00ff   # bright magenta
 bright6=00ffff   # bright cyan
 bright7=ffffff   # bright white
+
+font=monospace:size=12
 EOF
+
     fi
     echo "Autostarting setup..."
     grep -q 'exec foot' /etc/sway/config ||\
