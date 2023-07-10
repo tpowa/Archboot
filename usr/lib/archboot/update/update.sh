@@ -675,12 +675,12 @@ _configure_sway() {
     echo "Autostarting setup..."
     grep -q 'exec foot' /etc/sway/config ||\
         echo "exec foot -- /usr/bin/setup" >> /etc/sway/config
-    #_HIDE_MENU="avahi-discover bssh bvnc org.gnome.Extensions org.gnome.FileRoller org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
-    #echo "Hiding ${_HIDE_MENU} menu entries..."
-    #for i in ${_HIDE_MENU}; do
-    #    echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
-    #    echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
-    #done
+    _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
+    echo "Hiding ${_HIDE_MENU} menu entries..."
+    for i in ${_HIDE_MENU}; do
+        echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
+        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+    done
 }
 
 _custom_wayland_xorg() {
