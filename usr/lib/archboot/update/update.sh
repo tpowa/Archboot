@@ -662,23 +662,19 @@ EOF
 }
 
 _configure_sway() {
-    echo "Configuring Gnome..."
-    #[[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
-    #[[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    echo "Configuring Sway..."
     echo "Enable bemenu..."
     sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot"|g'  /etc/sway/config
     echo "Setting wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
+    echo "Setting tango theme for foot..."
+    grep -q '\[main\]' /etc/xdg/foot/foot.ini ||\
+        echo "\[main\]" >>/etc/xdg/foot/foot.ini
+    grep -q 'include\=/usr/share/foot/themes/tango' /etc/xdg/foot/foot.ini||\
+        echo "include=/usr/share/foot/themes/tango" >>/etc/xdg/foot/foot.ini
     echo "Autostarting setup..."
-    cat << EOF > /etc/xdg/autostart/archboot.desktop
-[Desktop Entry]
-Type=Application
-Name=Archboot Setup
-GenericName=Installer
-Exec=foot -- /usr/bin/setup
-Icon=system-software-install
-EOF
-    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+    grep -q 'exec foot' /etc/sway/config ||\
+        echo "exec foot" >> /etc/sway/config
     #_HIDE_MENU="avahi-discover bssh bvnc org.gnome.Extensions org.gnome.FileRoller org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
     #echo "Hiding ${_HIDE_MENU} menu entries..."
     #for i in ${_HIDE_MENU}; do
