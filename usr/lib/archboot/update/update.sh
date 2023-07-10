@@ -747,6 +747,7 @@ border2_color = (BLACK,WHITE,ON)
 menubox_border_color = (BLACK,WHITE,ON)
 menubox_border2_color = (BLACK,WHITE,ON)
 EOF
+export XKB_DEFAULT_LAYOUT="$(grep 'KEYMAP' /etc/vconsole | cut -d '=' | sed -e 's#-.*#g')"
 }
 
 _custom_wayland_xorg() {
