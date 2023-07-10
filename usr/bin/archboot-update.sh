@@ -11,6 +11,8 @@
 . /usr/lib/archboot/update/gnome-wayland.sh
 . /usr/lib/archboot/update/plasma.sh
 . /usr/lib/archboot/update/plasma-wayland.sh
+. /usr/lib/archboot/update/sway.sh
+
 [[ -z "${1}" ]] && usage
 while [ $# -gt 0 ]; do
     case ${1} in
