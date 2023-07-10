@@ -669,8 +669,8 @@ _configure_sway() {
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Setting tango theme for foot..."
     grep -q '\[main\]' /etc/xdg/foot/foot.ini ||\
-        echo "\[main\]" >>/etc/xdg/foot/foot.ini
-    grep -q 'include\=/usr/share/foot/themes/tango' /etc/xdg/foot/foot.ini||\
+        echo "[main]" >>/etc/xdg/foot/foot.ini
+    grep -q 'include=/usr/share/foot/themes/tango' /etc/xdg/foot/foot.ini||\
         echo "include=/usr/share/foot/themes/tango" >>/etc/xdg/foot/foot.ini
     echo "Autostarting setup..."
     grep -q 'exec foot' /etc/sway/config ||\
