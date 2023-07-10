@@ -667,7 +667,7 @@ _configure_sway() {
     sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot"|g'  /etc/sway/config
     echo "Setting wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
-        if ! grep -q 'archboot colors'; then
+    if ! grep -q 'archboot colors'; then
 cat <<EOF >> /etc/xdg/foot/foot.ini
 # archboot colors
 [colors]
@@ -694,6 +694,7 @@ bright5=ff00ff   # bright magenta
 bright6=00ffff   # bright cyan
 bright7=ffffff   # bright white
 EOF
+    fi
     echo "Autostarting setup..."
     grep -q 'exec foot' /etc/sway/config ||\
         echo "exec foot -- /usr/bin/setup" >> /etc/sway/config
