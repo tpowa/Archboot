@@ -695,6 +695,7 @@ bright5=ff00ff   # bright magenta
 bright6=00ffff   # bright cyan
 bright7=ffffff   # bright white
 
+[main]
 font=monospace:size=12
 EOF
 
