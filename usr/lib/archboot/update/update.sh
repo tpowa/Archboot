@@ -568,14 +568,14 @@ _prepare_plasma() {
 
 _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing SWAY desktop now..."
+        echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop now..."
         echo "          This will need some time..."
         _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\e[1mStep 2/3:\e[m Configuring SWAY desktop..."
+        echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop..."
         _configure_sway >/dev/tty7 2>&1
     else
-        echo -e "\e[1mStep 1/3:\e[m Installing SWAY desktop already done..."
-        echo -e "\e[1mStep 2/3:\e[m Configuring SWAY desktop already done..."
+        echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."
+        echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop already done..."
     fi
 }
 
