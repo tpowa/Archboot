@@ -664,7 +664,7 @@ EOF
 _configure_sway() {
     echo "Configuring Sway..."
     echo "Enable bemenu..."
-    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot"|g'  /etc/sway/config
+    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12"\x27 --term="foot"|g'  /etc/sway/config
     echo "Setting wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Configuring foot..."
@@ -725,6 +725,15 @@ for_window [title = "Firefox - Sharing Indicator"] kill
 for_window [title = "Firefox — Sharing Indicator"] kill
 EOF
     fi
+    echo "Setup desktop file..."
+    cat << EOF > /usr/share/applications/archboot.desktop
+[Desktop Entry]
+Type=Application
+Name=Archboot Setup
+GenericName=Installer
+Exec=foot -- /usr/bin/setup
+Icon=system-software-install
+EOF
     _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
