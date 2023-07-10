@@ -696,7 +696,7 @@ bright6=00ffff   # bright cyan
 bright7=ffffff   # bright white
 
 [main]
-font=Terminus:size=12
+font=monospace:size=12
 EOF
 
     fi
@@ -740,6 +740,13 @@ EOF
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
+    echo "Setting dialog values..."
+        cat <<EOF > /etc/dialogrc
+border_color = (BLACK,WHITE,ON)
+border2_color = (BLACK,WHITE,ON)
+menubox_border_color = (BLACK,WHITE,ON)
+menubox_border2_color = (BLACK,WHITE,ON)
+EOF
 }
 
 _custom_wayland_xorg() {
