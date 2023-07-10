@@ -19,6 +19,7 @@ while [ $# -gt 0 ]; do
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
         -latest-image|--latest-image) _G_RELEASE="1" ;;
         -xfce|--xfce) _L_XFCE="1" ;;
+        -sway|--sway) _L_SWAY="1" ;;
         -gnome|--gnome) _L_GNOME="1";;
         -gnome-wayland|--gnome-wayland) _L_GNOME_WAYLAND="1";;
         -plasma|--plasma) _L_PLASMA="1" ;;
