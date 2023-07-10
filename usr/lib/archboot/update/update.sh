@@ -664,7 +664,7 @@ EOF
 _configure_sway() {
     echo "Configuring Sway..."
     echo "Enable bemenu..."
-    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot" --no-generic|g'  /etc/sway/config
+    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot"|g'  /etc/sway/config
     echo "Setting wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Setting tango theme for foot..."
