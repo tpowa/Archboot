@@ -121,7 +121,7 @@ _download_latest() {
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done
         # update libs
-        LIBS="update.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh"
+        LIBS="update.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh sway.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
         done
