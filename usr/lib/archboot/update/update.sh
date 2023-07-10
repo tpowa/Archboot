@@ -676,14 +676,14 @@ background=000000
 foreground=ffffff
 
 ## Normal/regular colors (color palette 0-7)
-regular0=000000  # black
-regular1=800000  # red
-regular2=008000  # green
-regular3=808000  # yellow
-regular4=000080  # blue
-regular5=800080  # magenta
-regular6=008080  # cyan
-regular7=0c0c0c  # white
+regular0=808080   # bright black
+regular1=ff0000   # bright red
+regular2=00ff00   # bright green
+regular3=ffff00   # bright yellow
+regular4=0000ff   # bright blue
+regular5=ff00ff   # bright magenta
+regular6=00ffff   # bright cyan
+regular7=ffffff   # bright white
 
 ## Bright colors (color palette 8-15)
 bright0=808080   # bright black
