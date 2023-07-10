@@ -670,13 +670,38 @@ _configure_sway() {
     echo "Setting tango theme for foot..."
     grep -q '\[main\]' /etc/xdg/foot/foot.ini ||\
         echo "[main]" >>/etc/xdg/foot/foot.ini
-    grep -q 'include=/usr/share/foot/themes/tango' /etc/xdg/foot/foot.ini||\
-        echo "include=/usr/share/foot/themes/tango" >>/etc/xdg/foot/foot.ini
+        if ! grep -q 'archboot colors'; then
+cat <<EOF >> /etc/xdg/foot/foot.ini
+# archboot colors
+[colors]
+background=000000
+foreground=ffffff
+
+## Normal/regular colors (color palette 0-7)
+regular0=000000  # black
+regular1=008000  # red
+regular2=008000  # green
+regular3=808000  # yellow
+regular4=000080  # blue
+regular5=800080  # magenta
+regular6=008080  # cyan
+regular7=0c0c0c  # white
+
+## Bright colors (color palette 8-15)
+bright0=000000   # bright black
+bright1=ff0000   # bright red
+bright2=00ff00   # bright green
+bright3=ffff00   # bright yellow
+bright4=0000ff   # bright blue
+bright5=ff00ff   # bright magenta
+bright6=00ffff   # bright cyan
+bright7=ffffff   # bright white
+EOF
     echo "Autostarting setup..."
     grep -q 'exec foot' /etc/sway/config ||\
         echo "exec foot -- /usr/bin/setup" >> /etc/sway/config
-if ! grep -q firefox /etc/sway/config; then
-    cat <<EOF >> /etc/sway/config
+    if ! grep -q firefox /etc/sway/config; then
+        cat <<EOF >> /etc/sway/config
 # from https://wiki.gentoo.org/wiki/Sway
 # automatic floating
 for_window [window_role = "pop-up"] floating enable
@@ -696,7 +721,7 @@ for_window [app_id="firefox" title="Library"] floating enable, border pixel 1, s
 for_window [title = "Firefox - Sharing Indicator"] kill
 for_window [title = "Firefox — Sharing Indicator"] kill
 EOF
-fi
+    fi
     _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
