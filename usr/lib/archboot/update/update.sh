@@ -53,6 +53,7 @@ usage () {
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
                 echo -e " \e[1m-xfce\e[m            Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
+                echo -e " \e[1m-sway\e[m            Launch SWAY desktop."
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""
             fi
@@ -519,6 +520,7 @@ _install_graphic () {
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
     [[ -n "${_L_PLASMA}" ]] && _install_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
+    [[ -n "${_L_SWAY}" ]] && _install_sway
     # only start vnc on xorg environment
     echo -e "\e[1mStep 3/3:\e[m Setting up VNC and browser...\e[m"
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
@@ -529,6 +531,7 @@ _install_graphic () {
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
     [[ -n "${_L_PLASMA}" ]] && _start_plasma
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _start_plasma_wayland
+    [[ -n "${_L_SWAY}" ]] && _start_sway
 }
 
 _hint_graphic_installed () {
@@ -560,6 +563,19 @@ _prepare_plasma() {
     else
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop already done..."
+    fi
+}
+
+_prepare_sway() {
+    if ! [[ -e /usr/bin/sway ]]; then
+        echo -e "\e[1mStep 1/3:\e[m Installing SWAY desktop now..."
+        echo "          This will need some time..."
+        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
+        echo -e "\e[1mStep 2/3:\e[m Configuring SWAY desktop..."
+        _configure_sway >/dev/tty7 2>&1
+    else
+        echo -e "\e[1mStep 1/3:\e[m Installing SWAY desktop already done..."
+        echo -e "\e[1mStep 2/3:\e[m Configuring SWAY desktop already done..."
     fi
 }
 
@@ -643,6 +659,32 @@ Exec=konsole -p colors=Linux -e /usr/bin/setup
 Icon=system-software-install
 EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+}
+
+_configure_sway() {
+    echo "Configuring Gnome..."
+    #[[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    #[[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
+    echo "Enable bemenu..."
+    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --nb "#3f3f3f" --nf "#dcdccc" --fn "pango:DejaVu Sans Mono 12"\x27 --term="foot"|g'  /etc/sway/config
+    echo "Setting wallpaper..."
+    sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
+    echo "Autostarting setup..."
+    cat << EOF > /etc/xdg/autostart/archboot.desktop
+[Desktop Entry]
+Type=Application
+Name=Archboot Setup
+GenericName=Installer
+Exec=foot -- /usr/bin/setup
+Icon=system-software-install
+EOF
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
+    #_HIDE_MENU="avahi-discover bssh bvnc org.gnome.Extensions org.gnome.FileRoller org.gnome.gThumb org.gnome.gedit fluid vncviewer qvidcap qv4l2"
+    #echo "Hiding ${_HIDE_MENU} menu entries..."
+    #for i in ${_HIDE_MENU}; do
+    #    echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
+    #    echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+    #done
 }
 
 _custom_wayland_xorg() {

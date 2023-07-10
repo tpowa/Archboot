@@ -22,6 +22,9 @@ _GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center
 ### KDE/Plasma defaults
 # KDE/Plasma packages
 _PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
+### SWAY defaults
+# Sway packages
+_SWAY_PACKAGES="sway foot bemenu-wayland j4-dmenu-desktop"
 ### Custom Graphical defaults
 # Custom packages
 _CUSTOM_XORG=""
