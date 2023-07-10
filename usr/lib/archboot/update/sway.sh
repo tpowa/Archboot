@@ -8,7 +8,9 @@ _install_sway() {
 
 _start_sway() {
     echo -e "Launching \e[1mSway\e[m now..."
-	echo -e "To relaunch \e[1mSway\e[m use: \e[92msway\e[m"
-    sway
+    echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/sway-wayland
+    chmod 755 /usr/bin/sway-wayland
+    sway-wayland
 }
 # vim: set ft=sh ts=4 sw=4 et:
