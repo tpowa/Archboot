@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 08.07.2023 12:08</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 11.07.2023 08:47</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -389,6 +389,10 @@
 <td><code># update -plasma-wayland</code></td>
 </tr>
 <tr class="odd">
+<td><a href="https://wiki.archlinux.org/title/Sway" title="Xfce"><strong>Sway Wayland</strong></a></td>
+<td><code># update -sway</code></td>
+</tr>
+<tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Xfce" title="Xfce"><strong>Xfce</strong></a></td>
 <td><code># update -xfce</code></td>
 </tr>
@@ -397,10 +401,14 @@
 <ul>
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is automatically launched with starting <a href="https://wiki.archlinux.org/title/Xorg" title="Xorg"><strong>Xorg</strong></a>.
 <ul>
-<li>Connect with your vnc client and use password:<strong>archboot</strong></li>
+<li>Connect with your VNC client and use password:<strong>archboot</strong></li>
 <li><a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong>/etc/archboot/defaults</strong> to change default vnc password.</li>
 </ul></li>
-<li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>not</strong> available.</li>
+<li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>only</strong> available in <strong>Sway</strong>.
+<ul>
+<li>Connect with your VNC client <strong>without</strong> user and password.</li>
+</ul></li>
+<li>On <strong>MacOS/Windows</strong> you can use <a href="https://www.realvnc.com/en/connect/download/viewer/" title="RealVNC"><strong>RealVNC</strong></a> for passwordless login.</li>
 </ul>
 <h4 data-number="3.1.2" id="custom-environment-without-vnc-support"><span class="header-section-number">3.1.2</span> <strong>Custom Environment Without VNC Support</strong></h4>
 <a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong><code>/etc/archboot/defaults</code></strong>
@@ -935,6 +943,11 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/KDE" title="KDE/Plasma"><strong>KDE/Plasma</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
+<td class="MyYes">&#10004;</td>
+<td class="MyNo">&#10006;</td>
+</tr>
+<tr class="odd">
+<td><a href="https://wiki.archlinux.org/title/Sway" title="Xfce"><strong>Sway Wayland</strong></a> desktop</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>
