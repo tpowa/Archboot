@@ -16,6 +16,8 @@ locale:
 - fixed abort dialog
 update:
 - trigger kernel module loading on -full-system
+- lower RAM requiremens for graphical environments
+- remove reinstalled packages too from package cache
 setup:
 - silence _LSBLK errors
 - added grub bli efi module to grub.cfg
