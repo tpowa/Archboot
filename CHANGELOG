@@ -2,6 +2,7 @@ On the road to 2023.07:
 - kernel 6.4.x
 - grub 2.06.r591.g6425c12cd-1
 Environment Changes:
+- added Sway to preconfigured desktop environments
 - renamed initramfs to initrd
 - stripped off archboot from kernel name
 - renamed Locale Mode to Offline Mode
