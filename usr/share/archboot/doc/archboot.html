@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 11.07.2023 08:47</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 11.07.2023 10:02</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -29,7 +29,7 @@
 </ul></li>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
-<li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> Graphical Environments / VNC</a></li>
+<li><a href="#graphical-environment-vnc" id="toc-graphical-environment-vnc"><span class="toc-section-number">3.1</span> Graphical Environments / Remote VNC Access</a></li>
 <li><a href="#remote-terminal-access" id="toc-remote-terminal-access"><span class="toc-section-number">3.2</span> Remote Terminal Access</a></li>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> Secure Boot - MOK / Machine Owner Key</a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch To Complete Arch Linux System</a></li>
@@ -66,7 +66,7 @@
 <h2 data-number="1" id="introduction"><span class="header-section-number">1.</span> Introduction</h2>
 <p><strong>Archboot</strong> is a most advanced, modular <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> boot/install image creation utility to generate<br><strong>reproducible</strong> bootable media for <strong>UKI/CD/USB/PXE</strong>, designed for <strong>installation</strong> or <strong>rescue</strong> operation.
 <br>The utility was used for the official <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> install medium from <strong>Release 0.7</strong> till <strong>2008.03</strong>.
-<br>The <strong><a href="#archiso">additional</a> ISOs</strong> and <strong>UKIs</strong> focuss on being <strong>small, fast</strong> and <strong>(power)user friendly</strong>.</p>
+<br>The <strong><a href="#archiso">additional</a> ISOs</strong> and <strong>UKIs</strong> focus on being <strong>small, fast</strong> and <strong>(power)user friendly</strong>.</p>
 <h2 data-number="2" id="releases"><span class="header-section-number">2.</span> Releases</h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a>, <a href="/web/gallery.html"><strong>Screenshot Gallery</strong></a>, <a href="https://bit.ly/archboot-sources"><strong>Sources</strong></a>.</li>
@@ -362,7 +362,7 @@
 </table>
 <p>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</p>
 <h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> Features In A Nutshell</h2>
-<h3 data-number="3.1" id="graphical-environment-vnc"><span class="header-section-number">3.1</span> <strong>Graphical Environments / VNC</strong></h3>
+<h3 data-number="3.1" id="graphical-environment-vnc"><span class="header-section-number">3.1</span> <strong>Graphical Environments / Remote VNC Access</strong></h3>
 <h4 data-number="3.1.1" id="preconfigured-environments"><span class="header-section-number">3.1.1</span> <strong>Preconfigured Environments</strong></h4>
 <table>
 <thead>
@@ -932,7 +932,7 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyNo">&#10006;</td>
 </tr>
 <tr class="even">
-<td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
+<td><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> desktop</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>
@@ -942,7 +942,7 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyNo">&#10006;</td>
 </tr>
 <tr class="even">
-<td><a href="https://wiki.archlinux.org/title/KDE" title="KDE/Plasma"><strong>KDE/Plasma</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></td>
+<td><a href="https://wiki.archlinux.org/title/KDE" title="KDE/Plasma"><strong>KDE/Plasma</strong></a> <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> desktop</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>

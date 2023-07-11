@@ -3,13 +3,13 @@ On the road to 2023.07:
 - grub 2.06.r591.g6425c12cd-1
 Environment Changes:
 - added Sway to preconfigured desktop environments
+- added ttyd remote http terminal support
 - renamed initramfs to initrd
 - stripped off archboot from kernel name
 - renamed Locale Mode to Offline Mode
 - removed custom grub package
 - removed uninstalled packages
 - added grub bli efi module
-- added ttyd remote http terminal support
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 locale:
@@ -19,7 +19,7 @@ update:
 setup:
 - silence _LSBLK errors
 - added grub bli efi module to grub.cfg
-- switch to infobox on reboot and poweroff
+- switched to infobox on reboot and poweroff
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout
