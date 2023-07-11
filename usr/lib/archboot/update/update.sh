@@ -37,7 +37,7 @@ usage () {
         echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, tz, km and helpers."
     fi
     # latest image
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     # local image
     elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 && ! -e "/.full_system" && -e "/var/cache/pacman/pkg/archboot.db" && -e "/usr/bin/setup" ]]; then
@@ -47,14 +47,14 @@ usage () {
     if [[ -e "/usr/bin/setup" ]]; then
         # works only on latest image
         if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] ; then
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2400000 ]] ; then
                 _graphic_options
             fi
-            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2500000 ]]; then
-                echo -e " \e[1m-sway\e[m            Launch Sway desktop."
+            if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1500000 ]]; then
+                echo -e " \e[1m-sway\e[m            Launch Sway desktop with VNC sharing enabled."
                 echo -e " \e[1m-xfce\e[m            Launch XFCE desktop with VNC sharing enabled."
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
-               [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
+               [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""
             fi
         fi
