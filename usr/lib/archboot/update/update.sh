@@ -269,7 +269,7 @@ _cleanup_install() {
 _cleanup_cache() {
     # remove packages from cache
     #shellcheck disable=SC2013
-    for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
+    for i in $(grep 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf /var/cache/pacman/pkg/"${i}"-[0-9]*
     done
 }
