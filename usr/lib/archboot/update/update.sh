@@ -663,9 +663,9 @@ EOF
 
 _configure_sway() {
     echo "Configuring Sway..."
-    echo "Enable bemenu..."
+    echo "Configuring bemenu..."
     sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12"\x27 --no-generic --term="foot"|g'  /etc/sway/config
-    echo "Setting wallpaper..."
+    echo "Configuring wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Configuring foot..."
     if ! grep -q 'archboot colors' /etc/xdg/foot/foot.ini; then
@@ -725,7 +725,7 @@ for_window [title = "Firefox - Sharing Indicator"] kill
 for_window [title = "Firefox — Sharing Indicator"] kill
 EOF
     fi
-    echo "Setup desktop file..."
+    echo "Configuring desktop files..."
     cat << EOF > /usr/share/applications/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -740,13 +740,18 @@ EOF
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
-    echo "Setting dialog values..."
+    echo "Configuring dialog..."
         cat <<EOF > /etc/dialogrc
 border_color = (BLACK,WHITE,ON)
 border2_color = (BLACK,WHITE,ON)
 menubox_border_color = (BLACK,WHITE,ON)
 menubox_border2_color = (BLACK,WHITE,ON)
 EOF
+    echo "Configuring wayvnc..."
+     if ! grep -q wayvnc /etc/sway/config; then
+        echo "address=0.0.0.0" > /etc/wayvnc
+        echo "exec wayvnc -C /etc/wayvnc &" >> /etc/sway/config
+    fi
 }
 
 _custom_wayland_xorg() {

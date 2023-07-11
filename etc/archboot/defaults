@@ -13,9 +13,6 @@ _GRAPHIC_IGNORE="linux linux-firmware linux-firmware-marvell"
 _VNC_PW="archboot"
 ### Standard Web Browser: chromium or firefox
 _STANDARD_BROWSER="firefox"
-### XFCE defaults
-# Xfce packages
-_XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
 ### GNOME defaults
 # GNOME packages
 _GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit"
@@ -24,7 +21,10 @@ _GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center
 _PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
 ### SWAY defaults
 # Sway packages
-_SWAY_PACKAGES="sway swaybg foot bemenu-wayland j4-dmenu-desktop"
+_SWAY_PACKAGES="sway swaybg foot bemenu-wayland j4-dmenu-desktop wayvnc"
+### XFCE defaults
+# Xfce packages
+_XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
 ### Custom Graphical defaults
 # Custom packages
 _CUSTOM_XORG=""
