@@ -12,7 +12,6 @@
 . /usr/lib/archboot/installer/btrfs.sh
 . /usr/lib/archboot/installer/configuration.sh
 . /usr/lib/archboot/installer/mountpoints.sh
-. /usr/lib/archboot/installer/network.sh
 . /usr/lib/archboot/installer/pacman.sh
 . /usr/lib/archboot/installer/partition.sh
 . /usr/lib/archboot/installer/storage.sh
