@@ -30,8 +30,9 @@ _dolauncher() {
             update | grep -q KDE && _LAUNCHER="${_LAUNCHER} PLASMA KDE/Plasma"
             update | grep -q Sway && _LAUNCHER="${_LAUNCHER} SWAY Sway"
             update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE Xfce"
-            _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER}
-            if [[ $? -eq 0 ]]; then
+            ABORT=""
+            _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER} || _ABORT=1
+            if [[ -n "${_ABORT}"  ]]; then
                 clear
                 exit 1
             fi
