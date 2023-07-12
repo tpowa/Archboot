@@ -280,15 +280,15 @@ _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_NEXTITEM}"
     else
-        _DEFAULT=""
+        _DEFAULT="3"
     fi
     #shellcheck disable=SC2086
     dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Configure Console" \
     "1" "Configure Network" \
-    "2" "Select Source" \
-    "3" "Configure Clock" \
+    "2" "Configure Clock" \
+    "3" "Select Source" \
     "4" "Prepare Storage Device" \
     "5" "Install Packages" \
     "6" "Configure System" \
@@ -305,6 +305,9 @@ _mainmenu() {
                 _donetwork
             fi ;;
         "2")
+            _set_clock ;;
+
+        "3")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
             elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
@@ -313,8 +316,6 @@ _mainmenu() {
                 _select_source || return 1
                 _update_environment
             fi ;;
-        "3")
-            _set_clock ;;
         "4")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
