@@ -5,6 +5,7 @@ _ANSWER="/tmp/.net"
 _RUNNING_ARCH="$(uname -m)"
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Network Configuration"
 _LOG="/dev/tty7"
+_NO_LOG="/dev/null"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
