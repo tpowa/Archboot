@@ -189,7 +189,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.keymap ]]; then
         km && : >/tmp/.keymap
     fi
-    if ! [[ -e /tmp/.network && -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ ! -e /tmp/.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
         net && : >/tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then

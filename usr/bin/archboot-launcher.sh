@@ -3,7 +3,7 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.launcher"
 _RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Launcher"
+_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Launcher"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
