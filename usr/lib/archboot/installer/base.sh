@@ -139,13 +139,33 @@ _set_guid() {
     fi
 }
 
-_set_vconsole() {
+_configure_vconsole() {
     if [[ -e /usr/bin/km ]]; then
         km && _NEXTITEM=1
     elif [[ -e /usr/bin/archboot-km.sh ]]; then
         archboot-km.sh && _NEXTITEM=1
     else
-        _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard setting." 0 0
+        _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard configuration." 0 0
+    fi
+}
+
+_configure_network() {
+    if [[ -e /usr/bin/net ]]; then
+        net && _NEXTITEM="2"
+    elif [[ -e /usr/bin/archboot-net.sh ]]; then
+        archboot-tz.sh && _NEXTITEM="2"
+    else
+        _dialog --msgbox "Error:\nnet script not found, aborting network configuration" 0 0
+    fi
+}
+
+_configure_clock() {
+    if [[ -e /usr/bin/tz ]]; then
+        tz && _NEXTITEM="3"
+    elif [[ -e /usr/bin/archboot-tz.sh ]]; then
+        archboot-tz.sh && _NEXTITEM="3"
+    else
+        _dialog --msgbox "Error:\ntz script not found, aborting clock configuration" 0 0
     fi
 }
 
@@ -165,16 +185,6 @@ _select_source() {
         fi
     fi
     _NEXTITEM="4"
-}
-
-_set_clock() {
-    if [[ -e /usr/bin/tz ]]; then
-        tz && _NEXTITEM="3"
-    elif [[ -e /usr/bin/archboot-tz.sh ]]; then
-        archboot-tz.sh && _NEXTITEM="3"
-    else
-        _dialog --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
-    fi
 }
 
 _prepare_storagedrive() {
@@ -297,16 +307,15 @@ _mainmenu() {
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
         "0")
-            _set_vconsole ;;
+            _configure_vconsole ;;
         "1")
             if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
                 _abort_local_mode
             else
-                _donetwork
+                _configure_network
             fi ;;
         "2")
-            _set_clock ;;
-
+            _configure_clock ;;
         "3")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
