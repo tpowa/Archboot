@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 11.07.2023 10:02</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 12.07.2023 22:10</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -557,7 +557,7 @@
 </table>
 <p>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update</code></strong> tasks.</p>
 <h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
-<p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.</p>
+<p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.<br>The first 3 points are also covered by first login.</p>
 <h4 data-number="3.5.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.5.1</span> <strong>Configure Console</strong></h4>
 <p>Your <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> and <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> will be set by <strong>km</strong> script.</p>
 <h4 data-number="3.5.2" id="setup-network"><span class="header-section-number">3.5.2</span> <strong>Configure Network</strong></h4>
@@ -568,11 +568,14 @@
 </ul></li>
 <li><strong>Online mode</strong>:
 <ul>
+<li>Your network will be set by <strong>network</strong> script.</li>
 <li>Your <a href="https://wiki.archlinux.org/title/Network" title="Network"><strong>network</strong></a> will be configured by <strong><a href="https://wiki.archlinux.org/title/systemd-networkd" title="Systemd-Networkd">systemd-networkd</a></strong>.</li>
 <li>Your <strong>wifi network</strong> will be authentificated by <strong><a href="https://wiki.archlinux.org/title/iwd" title="iwd">iwd</a></strong>.</li>
 </ul></li>
 </ul>
-<h4 data-number="3.5.3" id="select-source"><span class="header-section-number">3.5.3</span> <strong>Select Source</strong></h4>
+<h4 data-number="3.5.3" id="changing-timezone-and-date"><span class="header-section-number">3.5.3</span> <strong>Configure Clock</strong></h4>
+<p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</p>
+<h4 data-number="3.5.4" id="select-source"><span class="header-section-number">3.5.4</span> <strong>Select Source</strong></h4>
 <ul>
 <li><strong>Offline Mode</strong>:
 <ul>
@@ -585,8 +588,6 @@
 <li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
-<h4 data-number="3.5.4" id="changing-timezone-and-date"><span class="header-section-number">3.5.4</span> <strong>Configure Clock</strong></h4>
-<p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</p>
 <h4 data-number="3.5.5" id="prepare-storage-drive"><span class="header-section-number">3.5.5</span> <strong>Prepare Storage Drive</strong></h4>
 <ul>
 <li>You setup your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
