@@ -741,7 +741,7 @@ EOF
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
     echo "Configuring waybar..."
-    if ! grep -q waybar /etc/sway/config; then
+    if ! grep -q 'exec waybar' /etc/sway/config; then
         # hide sway-bar
         sed -i '/position top/a mode invisible' /etc/sway/config
         # diable not usable plugins
