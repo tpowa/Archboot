@@ -21,7 +21,7 @@ _GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center
 _PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
 ### SWAY defaults
 # Sway packages
-_SWAY_PACKAGES="sway swaybg foot bemenu-wayland j4-dmenu-desktop wayvnc"
+_SWAY_PACKAGES="sway swaybg foot bemenu-wayland j4-dmenu-desktop wayvnc waybar ttf-font-awesome"
 ### XFCE defaults
 # Xfce packages
 _XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"

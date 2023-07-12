@@ -740,6 +740,13 @@ EOF
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
+    echo "Configuring waybar..."
+    # hide sway-bar
+    grep -q waybar /etc/sway/config || sed -i -e 's#position top#a mode invisible' /etc/sway/config
+    # diable not usable plugins
+    echo exec waybar >> /etc/sway/config
+    sed -i -e 's#, "custom/media"##g' /etc/xdg/waybar/config
+    sed -i -e 's#"mpd", "idle_inhibitor", "pulseaudio",##g' /etc/xdg/waybar/config
     echo "Configuring dialog..."
         cat <<EOF > /etc/dialogrc
 border_color = (BLACK,WHITE,ON)
