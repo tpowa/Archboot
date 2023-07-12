@@ -39,7 +39,7 @@ _dolauncher() {
             fi
             _EXIT="$(cat ${_ANSWER})"
             if [[ "${_EXIT}" == "GNOME" ]]; then
-                _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 40
+                _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45
                 if [[ $? -eq 0 ]]; then
                     clear
                     update -gnome-wayland
@@ -48,7 +48,7 @@ _dolauncher() {
                     update -gnome
                 fi
             elif [[ "${_EXIT}" == "PLASMA" ]]; then
-                _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 40
+                _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 45
                 if [[ $? -eq 0 ]]; then
                     clear
                     update -plasma-wayland
