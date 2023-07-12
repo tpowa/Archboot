@@ -664,7 +664,7 @@ EOF
 _configure_sway() {
     echo "Configuring Sway..."
     echo "Configuring bemenu..."
-    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12"\x27 --no-generic --term="foot"|g'  /etc/sway/config
+    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12" -H 30\x27 --no-generic --term="foot"|g'  /etc/sway/config
     echo "Configuring wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Configuring foot..."
