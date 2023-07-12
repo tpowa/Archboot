@@ -280,7 +280,7 @@ _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_NEXTITEM}"
     else
-        _DEFAULT="3"
+        _DEFAULT="--default-item 3"
     fi
     #shellcheck disable=SC2086
     dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
