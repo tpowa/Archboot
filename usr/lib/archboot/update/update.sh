@@ -581,6 +581,16 @@ _prepare_sway() {
     fi
 }
 
+_configure_dialog() {
+    echo "Configuring dialog..."
+        cat <<EOF > /etc/dialogrc
+border_color = (BLACK,WHITE,ON)
+border2_color = (BLACK,WHITE,ON)
+menubox_border_color = (BLACK,WHITE,ON)
+menubox_border2_color = (BLACK,WHITE,ON)
+EOF
+}
+
 _configure_gnome() {
     echo "Configuring Gnome..."
     [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
@@ -603,6 +613,7 @@ EOF
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
+    _configure_dialog
 }
 
 _configure_plasma() {
@@ -751,13 +762,7 @@ EOF
         sed -i -e 's#, "custom/media"##g' /etc/xdg/waybar/config
         sed -i -e 's#"mpd", "idle_inhibitor", "pulseaudio",##g' /etc/xdg/waybar/config
     fi
-    echo "Configuring dialog..."
-        cat <<EOF > /etc/dialogrc
-border_color = (BLACK,WHITE,ON)
-border2_color = (BLACK,WHITE,ON)
-menubox_border_color = (BLACK,WHITE,ON)
-menubox_border2_color = (BLACK,WHITE,ON)
-EOF
+    _configure_dialog
     echo "Configuring wayvnc..."
      if ! grep -q wayvnc /etc/sway/config; then
         echo "address=0.0.0.0" > /etc/wayvnc
