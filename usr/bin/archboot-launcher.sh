@@ -26,12 +26,12 @@ _dolauncher() {
             exit 0 ;;
         "2")
             _LAUNCHER=""
-            update | grep -q Gnome && _LAUNCHER="${_LAUNCHER} "GNOME" "Gnome Desktop""
-            update | grep -q KDE && _LAUNCHER="${_LAUNCHER} "PLASMA" "KDE/Plasma Desktop""
-            update | grep -q Sway && _LAUNCHER="${_LAUNCHER} "SWAY" "Sway Desktop""
-            update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} "XFCE" "Xfce Desktop""
+            update | grep -q Gnome && _LAUNCHER="${_LAUNCHER} GNOME Gnome"
+            update | grep -q KDE && _LAUNCHER="${_LAUNCHER} PLASMA KDE/Plasma"
+            update | grep -q Sway && _LAUNCHER="${_LAUNCHER} SWAY Sway"
+            update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE Xfce"
             ABORT=""
-            _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER} || _ABORT=1
+            _dialog --title " Desktop Menu " --menu "" 10 30 6 ${_LAUNCHER} 2>${_ANSWER} || _ABORT=1
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ -n "${_ABORT}"  ]]; then
                 clear
