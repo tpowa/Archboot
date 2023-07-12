@@ -196,9 +196,11 @@ if [[ -e /usr/bin/setup ]]; then
         tz && : >/tmp/.timezone
     fi
     # switch for setup or launcher
-    if [[ ! -e /tmp/.setup && -e "${_CACHEDIR}/archboot.db" ]]; then
-        # run setup on local medium once!
-        setup
+    if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
+        if [[ ! -e /tmp/.setup ]]; then
+            # run setup on local medium once!
+            setup
+        fi
     else
         # run launcher on latest/normal medium once!
         if [[ ! -e /tmp/.launcher ]]; then
