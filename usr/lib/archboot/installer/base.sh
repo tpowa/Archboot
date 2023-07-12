@@ -150,7 +150,7 @@ _set_vconsole() {
 }
 
 _select_source() {
-    _NEXTITEM="2"
+    _NEXTITEM="3"
     _set_title
     _S_SRC=""
     if [[ -e "${_LOCAL_DB}" ]]; then
@@ -164,14 +164,14 @@ _select_source() {
             _getsource || return 1
         fi
     fi
-    _NEXTITEM="3"
+    _NEXTITEM="4"
 }
 
 _set_clock() {
     if [[ -e /usr/bin/tz ]]; then
-        tz && _NEXTITEM="4"
+        tz && _NEXTITEM="3"
     elif [[ -e /usr/bin/archboot-tz.sh ]]; then
-        archboot-tz.sh && _NEXTITEM="4"
+        archboot-tz.sh && _NEXTITEM="3"
     else
         _dialog --msgbox "Error:\ntz script not found, aborting clock setting" 0 0
     fi
