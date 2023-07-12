@@ -32,12 +32,12 @@ _dolauncher() {
             update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE Xfce"
             ABORT=""
             _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER} || _ABORT=1
+            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ -n "${_ABORT}"  ]]; then
                 clear
                 exit 1
             fi
             _EXIT="$(cat ${_ANSWER})"
-            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ "${_EXIT}" == "GNOME" ]]; then
                 _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 40
                 if [[ $? -eq 0 ]]; then
