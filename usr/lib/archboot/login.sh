@@ -187,7 +187,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.keymap ]]; then
         km && : > /tmp/.keymap
     fi
-    if ! [[ -e /tmp/.network ]]; then
+    if ! [[ -e /tmp/.network && -e /var/cache/pacman/pkg/archboot.db ]]; then
         net && : > /tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then
