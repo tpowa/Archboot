@@ -26,14 +26,14 @@ _dolauncher() {
             exit 0 ;;
         "2")
             _LAUNCHER=""
-            update | grep -q Gnome && _LAUNCHER="${_LAUNCHER} 1 Gnome"
-            update | grep -q KDE && _LAUNCHER="${_LAUNCHER} 2 KDE/Plasma"
-            update | grep -q Sway && _LAUNCHER="${_LAUNCHER} 3 Sway"
-            update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} 4 Xfce"
+            update | grep -q Gnome && _LAUNCHER="${_LAUNCHER} GNOME Gnome"
+            update | grep -q KDE && _LAUNCHER="${_LAUNCHER} PLASMA KDE/Plasma"
+            update | grep -q Sway && _LAUNCHER="${_LAUNCHER} SWAY Sway"
+            update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE Xfce"
             _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER}
             _EXIT="$(cat ${_ANSWER})"
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-            if [[ "${_EXIT}" == "1" ]]; then
+            if [[ "${_EXIT}" == "GNOME" ]]; then
                 _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 40
                 if [[ $? -eq 0 ]]; then
                     clear
@@ -42,7 +42,7 @@ _dolauncher() {
                     clear
                     update -gnome
                 fi
-            elif [[ "${_EXIT}" == "2" ]]; then
+            elif [[ "${_EXIT}" == "PLASMA" ]]; then
                 _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 40
                 if [[ $? -eq 0 ]]; then
                     clear
@@ -51,10 +51,10 @@ _dolauncher() {
                     clear
                     update -plasma
                 fi
-            elif [[ "${_EXIT}" == "3" ]]; then
+            elif [[ "${_EXIT}" == "SWAY" ]]; then
                 clear
                 update -sway
-            elif [[ "${_EXIT}" == "4" ]]; then
+            elif [[ "${_EXIT}" == "XFCE" ]]; then
                 clear
                 update -xfce
             fi
