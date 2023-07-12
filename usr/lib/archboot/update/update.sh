@@ -293,9 +293,7 @@ _prepare_graphic() {
     pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
     [[ ! -e "/.full_system" ]] && _cleanup_install
     # check for qxl module
-    if grep -q qxl /proc/modules; then
-        _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
-    fi
+    grep -q qxl /proc/modules && grep -q xorg ${_GRAPHIC} && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     echo "Running pacman to install packages: ${_GRAPHIC}..."
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
