@@ -187,7 +187,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.keymap ]]; then
         km && : > /tmp/.keymap
     fi
-    if! [[ -e /tmp/.network ]]; do
+    if ! [[ -e /tmp/.network ]]; then
         net && : > /tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then
