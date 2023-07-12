@@ -289,6 +289,8 @@ _configure_system() {
 _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_NEXTITEM}"
+    elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        _DEFAULT="--default-item 4"
     else
         _DEFAULT="--default-item 3"
     fi
