@@ -179,9 +179,19 @@ fi
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     _enter_shell
+    # basic setup
     if ! [[ -e /tmp/.locale ]]; then
         archboot-locale.sh
         source /etc/locale.conf
+    fi
+    if ! [[ -e /tmp/.keymap ]]; then
+        km && : > /tmp/.keymap
+    fi
+    if! [[ -e /tmp/.network ]]; do
+        net && : > /tmp/.network
+    fi
+    if ! [[ -e /tmp/.timezone ]]; then
+        tz && : >/tmp/.timezone
     fi
     if ! [[ -e /tmp/.setup ]]; then
         setup
