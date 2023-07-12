@@ -31,6 +31,10 @@ _dolauncher() {
             update | grep -q Sway && _LAUNCHER="${_LAUNCHER} SWAY Sway"
             update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE Xfce"
             _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER}
+            if [[ $? -eq 0 ]]; then
+                clear
+                exit 1
+            fi
             _EXIT="$(cat ${_ANSWER})"
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ "${_EXIT}" == "GNOME" ]]; then
