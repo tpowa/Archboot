@@ -52,7 +52,7 @@ usage () {
             fi
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1500000 ]]; then
                 echo -e " \e[1m-sway\e[m            Launch Sway desktop with VNC sharing enabled."
-                echo -e " \e[1m-xfce\e[m            Launch XFCE desktop with VNC sharing enabled."
+                echo -e " \e[1m-xfce\e[m            Launch Xfce desktop with VNC sharing enabled."
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
                [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""
@@ -101,7 +101,7 @@ _download_latest() {
         # helper binaries
         echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
         # main binaries
-        BINS="quickinst setup km tz update copy-mountpoint rsync-backup restore-usbstick"
+        BINS="quickinst setup km tz launcher update copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
@@ -292,6 +292,8 @@ _prepare_graphic() {
     #shellcheck disable=SC2086
     pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
     [[ ! -e "/.full_system" ]] && _cleanup_install
+    # check for qxl module
+    grep -q qxl /proc/modules && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     echo "Running pacman to install packages: ${_GRAPHIC}..."
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086

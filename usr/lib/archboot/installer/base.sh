@@ -205,7 +205,7 @@ _prepare_storagedrive() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        dialog ${_DEFAULT} --backtitle "${_TITLE}" --menu "Prepare Storage Device" 12 60 5 \
+        _dialog ${_DEFAULT} --menu "Prepare Storage Device" 12 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
@@ -300,7 +300,7 @@ _mainmenu() {
         _DEFAULT="--default-item 3"
     fi
     #shellcheck disable=SC2086
-    dialog ${_DEFAULT} --backtitle "${_TITLE}" --title " MAIN MENU " \
+    _dialog ${_DEFAULT} --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Configure Console" \
     "1" "Configure Network" \
@@ -350,7 +350,7 @@ _mainmenu() {
             _install_bootloader ;;
         "8")
             #shellcheck disable=SC2086
-            dialog --backtitle "${_TITLE}" --title " EXIT MENU " --menu "" 9 30 5 \
+            _dialog --title " EXIT MENU " --menu "" 9 30 5 \
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
@@ -365,7 +365,7 @@ _mainmenu() {
                     echo "to restart the system."
                     echo ""
                 fi
-                    exit 0
+                exit 0
             elif [[ "${_EXIT}" == "2" ]]; then
                 _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10

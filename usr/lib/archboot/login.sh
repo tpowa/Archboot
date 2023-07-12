@@ -85,7 +85,7 @@ _enter_shell() {
     [[ -z $TTY ]] && TTY=$(tty)
     # dbus sources profiles again
     if ! echo "${TTY}" | grep -q pts; then
-        echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
+        echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine."
         cd /
         read -r
         clear
@@ -149,8 +149,8 @@ if ! [[ -e /.vconsole-run ]]; then
     else
         SIZE="16"
     fi
-    echo KEYMAP=us > /etc/vconsole.conf
-    echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
+    echo KEYMAP=us >/etc/vconsole.conf
+    echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
 fi
 if ! [[ -e /.clean-pacman-db ]]; then
@@ -178,23 +178,32 @@ fi
 
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
+    # wait on user interaction!
     _enter_shell
-    # basic setup
+    # basic environment setup:
+    # glibc locale, vconsole, network, clock
     if ! [[ -e /tmp/.locale ]]; then
         archboot-locale.sh
         source /etc/locale.conf
     fi
     if ! [[ -e /tmp/.keymap ]]; then
-        km && : > /tmp/.keymap
+        km && : >/tmp/.keymap
     fi
-    if ! [[ -e /tmp/.network && -e /var/cache/pacman/pkg/archboot.db ]]; then
-        net && : > /tmp/.network
+    if ! [[ -e /tmp/.network && -e "${_CACHEDIR}/archboot.db" ]]; then
+        net && : >/tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then
         tz && : >/tmp/.timezone
     fi
-    if ! [[ -e /tmp/.setup ]]; then
+    # switch for setup or launcher
+    if [[ ! -e /tmp/.setup && -e "${_CACHEDIR}/archboot.db" ]]; then
+        # run setup on local medium once!
         setup
+    else
+        # run launcher on latest/normal medium once!
+        if [[ ! -e /tmp/.launcher ]]; then
+            launcher
+        fi
     fi
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
