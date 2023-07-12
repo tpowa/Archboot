@@ -150,10 +150,10 @@ _configure_vconsole() {
 }
 
 _configure_network() {
-    if [[ -e /usr/bin/net ]]; then
-        net && _NEXTITEM="2"
-    elif [[ -e /usr/bin/archboot-net.sh ]]; then
-        archboot-tz.sh && _NEXTITEM="2"
+    if [[ -e /usr/bin/network ]]; then
+        network && _NEXTITEM="2"
+    elif [[ -e /usr/bin/archboot-network.sh ]]; then
+        archboot-network.sh && _NEXTITEM="2"
     else
         _dialog --msgbox "Error:\nnet script not found, aborting network configuration" 0 0
     fi
