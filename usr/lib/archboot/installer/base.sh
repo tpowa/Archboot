@@ -177,7 +177,12 @@ _select_source() {
         _getsource || return 1
     else
         if [[ -z ${_S_NET} ]]; then
-            _check_network || return 1
+            if ! [[ -e /tmp/.network ]]; then
+                net || return 1
+                _S_NET=1
+            else
+                _S_NET=1
+            fi
         fi
         if [[ -z ${_S_SRC} ]]; then
             [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _enable_testing
@@ -289,7 +294,7 @@ _configure_system() {
 _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_NEXTITEM}"
-    elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    elif [[ -e "${_LOCAL_DB}" ]]; then
         _DEFAULT="--default-item 4"
     else
         _DEFAULT="--default-item 3"
@@ -311,7 +316,7 @@ _mainmenu() {
         "0")
             _configure_vconsole ;;
         "1")
-            if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+            if [[ -e "${_LOCAL_DB}" ]]; then
                 _abort_local_mode
             else
                 _configure_network
@@ -321,7 +326,7 @@ _mainmenu() {
         "3")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
-            elif [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+            elif [[ -e "${_LOCAL_DB}" ]]; then
                 _abort_local_mode
             else
                 _select_source || return 1
