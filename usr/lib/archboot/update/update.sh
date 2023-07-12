@@ -742,7 +742,7 @@ EOF
     done
     echo "Configuring waybar..."
     # hide sway-bar
-    grep -q waybar /etc/sway/config || sed -i -e 's#position top#a mode invisible' /etc/sway/config
+    grep -q waybar /etc/sway/config || sed -i 's/position top/a mode invisible' /etc/sway/config
     # diable not usable plugins
     echo exec waybar >> /etc/sway/config
     sed -i -e 's#, "custom/media"##g' /etc/xdg/waybar/config
