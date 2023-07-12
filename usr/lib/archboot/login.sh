@@ -141,7 +141,7 @@ _run_update_installer() {
     fi
 }
 
-if ! [[ -e "/.vconsole-run" ]]; then
+if ! [[ -e /.vconsole-run ]]; then
     touch /.vconsole-run
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
     if [[ "${FB_SIZE}" -gt '1900' ]]; then
@@ -153,7 +153,7 @@ if ! [[ -e "/.vconsole-run" ]]; then
     echo FONT=ter-v${SIZE}n >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
 fi
-if ! [[ -e "/.clean-pacman-db" ]]; then
+if ! [[ -e /.clean-pacman-db ]]; then
     touch /.clean-pacman-db
     _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
         libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
@@ -171,7 +171,7 @@ else
     systemctl start systemd-networkd
     systemctl start systemd-resolved
     # initialize pacman keyring
-    if [[ -e "/etc/systemd/system/pacman-init.service" ]]; then
+    if [[ -e /etc/systemd/system/pacman-init.service ]]; then
         systemctl start pacman-init
     fi
 fi
@@ -187,7 +187,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /tmp/.keymap ]]; then
         km && : > /tmp/.keymap
     fi
-    if ! [[ -e /tmp/.network && -e /var/cache/pacman/pkg/archboot.db ]]; then
+    if ! [[ -e /tmp/.network ]] && ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         net && : > /tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then
