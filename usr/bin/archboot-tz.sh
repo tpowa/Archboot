@@ -108,7 +108,7 @@ _dotimeset() {
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
                 # display and ask to set date/time
-                if _dialog --title ' Date Setting' --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
+                if _dialog --title ' Date Setting' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
                     _DATE="$(cat ${_ANSWER})"
                     _CONTINUE=1
                 else
