@@ -15,7 +15,7 @@ _dialog() {
 }
 
 _dolauncher() {
-    _dialog --title " Main Menu " --menu "" 9 40 5 \
+    _dialog --title " Main Menu " --menu "" 10 40 6 \
     "1" "Launch Archboot Setup" \
     "2" "Launch Desktop Environment" \
     "3" "Manage Archboot Environment" \
@@ -76,7 +76,7 @@ _dolauncher() {
             update | grep -q image && _LAUNCHER+=( "IMAGE" "Create New Images" )
             _ABORT=""
             if [[ -n "${_LAUNCHER[@]}" ]]; then
-                _dialog --title " Manage Archboot Menu " --menu "" 10 60 6 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
+                _dialog --title " Manage Archboot Menu " --menu "" 9 60 5 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
             else
                 _dialog --msgbox "Error:\nNo management options available." 0 0
                 _ABORT=1
