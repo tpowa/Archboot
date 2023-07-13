@@ -14,6 +14,18 @@ _dialog() {
     return $?
 }
 
+_abort()
+{
+    if _dialog --yesno "Abort Arch Linux Clock Configuration?" 5 60; then
+        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+        [[ -e /tmp/.tz ]] && rm /tmp/.tz
+        clear
+        exit 1
+    else
+        _CONTINUE=""
+    fi
+}
+
 _dohwclock() {
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
@@ -32,33 +44,43 @@ _dohwclock() {
 _dotimezone () {
     _SET_ZONE=""
     while [[ -z "${_SET_ZONE}" ]]; do
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
         _REGIONS="America - Europe - Africa - Asia - Australia -"
         #shellcheck disable=SC2086
-        _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}
-        _REGION=$(cat ${_ANSWER})
-        _ZONES=""
-        for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
-            _ZONES="${_ZONES} ${i} -"
-        done
-        #shellcheck disable=SC2086
-        _dialog --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER} && _SET_ZONE="1"
-        _ZONE=$(cat ${_ANSWER})
-        [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-        if [[ -n "${_SET_ZONE}" ]]; then
-            _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 60
-            timedatectl set-timezone "${_ZONE}"
-            sleep 2
+        if _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}; then
+            _REGION=$(cat ${_ANSWER})
+            _ZONES=""
+            _CONTINUE=1
         else
-            return 1
+            _abort
         fi
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
+                _ZONES="${_ZONES} ${i} -"
+            done
+            #shellcheck disable=SC2086
+            if _dialog --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER}; then
+                _SET_ZONE="1"
+                _ZONE=$(cat ${_ANSWER})
+                [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
+                if [[ -n "${_SET_ZONE}" ]]; then
+                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 60
+                    timedatectl set-timezone "${_ZONE}"
+                    sleep 2
+                else
+                    return 1
+                fi
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
     done
 }
 
 _dotimeset() {
-    if [[ -z "${_SET_ZONE}" ]]; then
-        _dialog --msgbox "Error:\nYou have to select timezone first." 0 0
-        dotimezone || return 1
-    fi
     _SET_TIME=""
     while [[ -z "${_SET_TIME}" ]]; do
         _HARDWARECLOCK=""
@@ -82,11 +104,25 @@ _dotimeset() {
         fi
         if [[ -z "${_SET_TIME}" ]]; then
             timedatectl set-ntp 0
-            # display and ask to set date/time
-            dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER} || return 1
-            _DATE="$(cat ${_ANSWER})"
-            dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER} || return 1
-            _TIME="$(cat ${_ANSWER})"
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                # display and ask to set date/time
+                if dialog --calendar "Set the date.\nUse <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
+                    _DATE="$(cat ${_ANSWER})"
+                    _CONTINUE=1
+                else
+                    _abort
+                fi
+            done
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                if dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
+                    _TIME="$(cat ${_ANSWER})"
+                _   CONTINUE=1
+                else
+                    _abort
+                fi
+            done
             # save the time
             # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
             _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
