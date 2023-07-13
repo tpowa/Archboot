@@ -31,7 +31,7 @@ _dolauncher() {
             update | grep -q Sway && _LAUNCHER+=( "SWAY" "Sway Desktop" )
             update | grep -q Xfce && _LAUNCHER+=( "XFCE" "Xfce Desktop" )
             _ABORT=""
-            if [[ -n "${_LAUNCHER}" ]]; then
+            if [[ -n "${_LAUNCHER[@]}" ]]; then
                 _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
             else
                 _dialog --msgbox "Error:\nNo Desktop Environments available." 0 0
