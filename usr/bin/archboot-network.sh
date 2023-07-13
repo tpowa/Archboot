@@ -188,7 +188,7 @@ _donetwork() {
             done
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}", then
+                if _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}"; then
                     _DNS=$(cat "${_ANSWER}")
                     _CONTINUE=1
                 else
