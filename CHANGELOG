@@ -13,17 +13,20 @@ Environment Changes:
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - ask basic environment settings on first login
-- added launcher management script
+- added interactive launcher script
+- added network script for network configuration
 locale:
 - fixed abort dialog
 update:
 - trigger kernel module loading on -full-system
 - lower RAM requiremens for graphical environments
 - remove reinstalled packages too from package cache
+- added qxl module detection
 setup:
 - silence _LSBLK errors
 - added grub bli efi module to grub.cfg
 - switched to infobox on reboot and poweroff
+- removed network code
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout

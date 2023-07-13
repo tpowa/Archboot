@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 12.07.2023 22:10</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 13.07.2023 08:21</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -33,12 +33,13 @@
 <li><a href="#remote-terminal-access" id="toc-remote-terminal-access"><span class="toc-section-number">3.2</span> Remote Terminal Access</a></li>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.3</span> Secure Boot - MOK / Machine Owner Key</a></li>
 <li><a href="#switch-to-complete-arch-linux-system" id="toc-switch-to-complete-arch-linux-system"><span class="toc-section-number">3.4</span> Switch To Complete Arch Linux System</a></li>
-<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
-<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For Experts: Quickinst Installation</a></li>
-<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> Manage Environment</a></li>
-<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools For Backup And Copying Of An Existing System</a></li>
-<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring An USB Device To FAT32 State</a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> System configuration on installed system</a></li>
+<li><a href="#interactive-launcher" id="toc-interactive-launcher"><span class="toc-section-number">3.5</span> Interactive Launcher</a></li>
+<li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.6</span> Interactive Setup</a></li>
+<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.7</span> For Experts: Quickinst Installation</a></li>
+<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.8</span> Manage Environment</a></li>
+<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.9</span> Tools For Backup And Copying Of An Existing System</a></li>
+<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.10</span> Restoring An USB Device To FAT32 State</a></li>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.11</span> System configuration on installed system</a></li>
 </ul></li>
 <li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
 <li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
@@ -555,12 +556,21 @@
 </tr>
 </tbody>
 </table>
-<p>This will also <strong>stop</strong> cleaning the system, while running other <strong><code>update</code></strong> tasks.</p>
-<h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
-<p>You can run each point for doing the mentioned task. If you do a fresh install, it is recommended to run each point in the order as presented.<br>The first 3 points are also covered by first login.</p>
-<h4 data-number="3.5.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.5.1</span> <strong>Configure Console</strong></h4>
+<p>This will also <strong>stop</strong> cleaning the system, while running other <strong>update</strong> tasks.</p>
+<h3 data-number="3.5" id="interactive-launcher"><span class="header-section-number">3.5</span> <strong>Interactive Launcher</strong></h3>
+<ul>
+<li>The interactive <strong>launcher</strong> script for quick navigation is launched on <strong>first</strong> login.</li>
+<li>You can go straight to <strong>setup</strong>, leave to <strong>shell</strong>, launch <strong>desktop environment</strong> or do <strong>environment management</strong>.</li>
+</ul>
+<h3 data-number="3.6" id="interactive-setup"><span class="header-section-number">3.6</span> <strong>Interactive Setup</strong></h3>
+<ul>
+<li>The first <strong>3</strong> menu points are covered by <strong>first</strong> login and setup will start at menu point <strong>3</strong> or <strong>4</strong> by default.</li>
+<li>You can run each menu point for doing the mentioned task.</li>
+<li>If you do a fresh install, it is recommended to run each point in the order as presented.</li>
+</ul>
+<h4 data-number="3.6.1" id="changing-keymap-and-console-fonts"><span class="header-section-number">3.6.1</span> <strong>Configure Console</strong></h4>
 <p>Your <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> and <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> will be set by <strong>km</strong> script.</p>
-<h4 data-number="3.5.2" id="setup-network"><span class="header-section-number">3.5.2</span> <strong>Configure Network</strong></h4>
+<h4 data-number="3.6.2" id="setup-network"><span class="header-section-number">3.6.2</span> <strong>Configure Network</strong></h4>
 <ul>
 <li><strong>Offline Mode</strong>:
 <ul>
@@ -573,9 +583,9 @@
 <li>Your <strong>wifi network</strong> will be authentificated by <strong><a href="https://wiki.archlinux.org/title/iwd" title="iwd">iwd</a></strong>.</li>
 </ul></li>
 </ul>
-<h4 data-number="3.5.3" id="changing-timezone-and-date"><span class="header-section-number">3.5.3</span> <strong>Configure Clock</strong></h4>
+<h4 data-number="3.6.3" id="changing-timezone-and-date"><span class="header-section-number">3.6.3</span> <strong>Configure Clock</strong></h4>
 <p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>tz</strong> script.</p>
-<h4 data-number="3.5.4" id="select-source"><span class="header-section-number">3.5.4</span> <strong>Select Source</strong></h4>
+<h4 data-number="3.6.4" id="select-source"><span class="header-section-number">3.6.4</span> <strong>Select Source</strong></h4>
 <ul>
 <li><strong>Offline Mode</strong>:
 <ul>
@@ -588,7 +598,7 @@
 <li>If a new kernel is online available, you can decide to load the latest archboot environment<br>and cache packages for installation <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
-<h4 data-number="3.5.5" id="prepare-storage-drive"><span class="header-section-number">3.5.5</span> <strong>Prepare Storage Drive</strong></h4>
+<h4 data-number="3.6.5" id="prepare-storage-drive"><span class="header-section-number">3.6.5</span> <strong>Prepare Storage Drive</strong></h4>
 <ul>
 <li>You setup your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
 <li>Quick Setup, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
@@ -597,13 +607,13 @@
 <li>Supports standard linux, <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>/<a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>_partitions, dmraid/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a>, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Filesystem support: <a href="https://wiki.archlinux.org/title/Btrfs" title="BTRFS"><strong>BTRFS</strong></a>, EXT2/<a href="https://wiki.archlinux.org/title/Ext3" title="EXT3"><strong>3</strong></a>/<a href="https://wiki.archlinux.org/title/Ext4" title="EXT4"><strong>4</strong></a>, <a href="https://wiki.archlinux.org/title/F2FS" title="F2FS"><strong>F2FS</strong></a>, NILFS2, <a href="https://wiki.archlinux.org/title/XFS" title="XFS"><strong>XFS</strong></a>, <a href="https://wiki.archlinux.org/title/JFS" title="JFS"><strong>JFS</strong></a>, <a href="https://wiki.archlinux.org/title/VFAT" title="VFAT"><strong>VFAT</strong></a></li>
 </ul>
-<h4 data-number="3.5.6" id="install-packages"><span class="header-section-number">3.5.6</span> <strong>Install Packages</strong></h4>
+<h4 data-number="3.6.6" id="install-packages"><span class="header-section-number">3.6.6</span> <strong>Install Packages</strong></h4>
 <ul>
 <li>You can modify the packages to install in <strong>/etc/archboot/defaults</strong>.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will install the packages for the first boot to your storage drive.</li>
 <li>Autoconfiguration of basic system:<br><a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Bash" title="Bash"><strong>Bash</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>Keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>Timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>Fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>Systemd</strong></a>,<br><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>Network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>Crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>Mdadm</strong></a></li>
 </ul>
-<h4 data-number="3.5.7" id="configure-system"><span class="header-section-number">3.5.7</span> <strong>Configure System</strong></h4>
+<h4 data-number="3.6.7" id="configure-system"><span class="header-section-number">3.6.7</span> <strong>Configure System</strong></h4>
 <ul>
 <li>You set the root <a href="https://wiki.archlinux.org/title/Password" title="Password"><strong>password</strong>.</a></li>
 <li>You set the system-wide <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a></li>
@@ -611,7 +621,7 @@
 <li>Choose your editor: <a href="https://wiki.archlinux.org/title/nano" title="nano"><strong>nano</strong></a> or <a href="https://wiki.archlinux.org/title/neovim" title="neovim"><strong>neovim</strong></a></li>
 <li>Configuration of basic system files:<br><a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>,<br><a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
 </ul>
-<h4 data-number="3.5.8" id="install-bootloader"><span class="header-section-number">3.5.8</span> <strong>Install Bootloader</strong></h4>
+<h4 data-number="3.6.8" id="install-bootloader"><span class="header-section-number">3.6.8</span> <strong>Install Bootloader</strong></h4>
 <ul>
 <li>You setup your preferred <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li><a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and other needed programs will be installed automatically.</li>
@@ -620,7 +630,7 @@
 <li><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a> supports only shim signed by fedora with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></li>
 <li>The selected <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> will be installed to your system and you can modify the configuration file(s) afterwards.</li>
 </ul>
-<h3 data-number="3.6" id="for-experts-quickinst-installation"><span class="header-section-number">3.6</span> <strong>For Experts: Quickinst Installation</strong></h3>
+<h3 data-number="3.7" id="for-experts-quickinst-installation"><span class="header-section-number">3.7</span> <strong>For Experts: Quickinst Installation</strong></h3>
 <ul>
 <li>This script is for <strong>experts</strong>, who assemble the filesystems first and mount them in a directory.</li>
 <li><strong>quickinst</strong> will autodetect the packages to install for a minimal system.</li>
@@ -637,7 +647,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.7" id="manage-archboot"><span class="header-section-number">3.7</span> <strong>Manage Environment</strong></h3>
+<h3 data-number="3.8" id="manage-archboot"><span class="header-section-number">3.8</span> <strong>Manage Environment</strong></h3>
 <p>You can always bump your image to <strong>latest</strong> available possibilities.</p>
 <table>
 <thead>
@@ -651,7 +661,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.8" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.8</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
+<h3 data-number="3.9" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.9</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
 </ul>
@@ -679,7 +689,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.9" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.9</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
+<h3 data-number="3.10" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.10</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
@@ -697,7 +707,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.10" id="system-configuration"><span class="header-section-number">3.10</span> System Configuration On Installed System</h3>
+<h3 data-number="3.11" id="system-configuration"><span class="header-section-number">3.11</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
 <p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
