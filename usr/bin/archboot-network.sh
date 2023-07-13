@@ -127,11 +127,11 @@ _donetwork() {
         _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            _dialog --ok-label "Select" --menu "Select a network interface:" 12 40 6 ${_INTERFACES} 2>"${_ANSWER}"
-            case $? in
-                1) _abort ;;
-                0) _INTERFACE=$(cat "${_ANSWER}") ;;
-            esac
+            if _dialog --ok-label "Select" --menu "Select a network interface:" 12 40 6 ${_INTERFACES} 2>"${_ANSWER}"; then
+                _INTERFACE=$(cat "${_ANSWER}")
+            else
+                _abort
+            fi
         done
         echo "${_INTERFACE}" >/tmp/.network-interface
         # iwd renames wireless devices to wlanX
@@ -159,6 +159,7 @@ _donetwork() {
             else
                 _abort
             fi
+        done
         # dhcp switch
         _IP=""
         if _dialog --yesno "Do you want to use DHCP?" 5 40; then
