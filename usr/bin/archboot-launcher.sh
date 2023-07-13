@@ -76,7 +76,7 @@ _dolauncher() {
             update | grep -q image && _LAUNCHER+=( "IMAGE" "Create New Images" )
             _ABORT=""
             if [[ -n "${_LAUNCHER[@]}" ]]; then
-                _dialog --title " Manage Archboot Menu " --menu "" 9 60 5 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
+                _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
             else
                 _dialog --msgbox "Error:\nNo management options available." 0 0
                 _ABORT=1
