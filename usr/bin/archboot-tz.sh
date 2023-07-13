@@ -46,15 +46,16 @@ _dotimezone () {
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
-        _REGIONS="America - Europe - Africa - Asia - Australia -"
-        #shellcheck disable=SC2086
-        if _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}; then
-            _REGION=$(cat ${_ANSWER})
-            _ZONES=""
-            _CONTINUE=1
-        else
-            _abort
-        fi
+            _REGIONS="America - Europe - Africa - Asia - Australia -"
+            #shellcheck disable=SC2086
+            if _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}; then
+                _REGION=$(cat ${_ANSWER})
+                _ZONES=""
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
             for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
