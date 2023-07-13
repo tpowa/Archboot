@@ -27,6 +27,14 @@ _abort() {
     fi
 }
 
+_printk()
+{
+    case ${1} in
+        "on")  echo 4 >/proc/sys/kernel/printk ;;
+        "off") echo 0 >/proc/sys/kernel/printk ;;
+    esac
+}
+
 _net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
