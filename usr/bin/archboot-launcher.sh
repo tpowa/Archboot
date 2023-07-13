@@ -18,7 +18,8 @@ _dolauncher() {
     _dialog --title " Main Menu " --menu "" 9 40 5 \
     "1" "Launch Archboot Setup" \
     "2" "Launch Desktop Environment" \
-    "3" "Exit Program" 2>${_ANSWER}
+    "3" "Manage Archboot Environment" \
+    "4" "Exit Program" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
@@ -69,6 +70,37 @@ _dolauncher() {
             exit 0
             ;;
         "3")
+            _LAUNCHER=()
+            update | grep -q full && _LAUNCHER+=( "FULL" "Switch To Full Arch Linux System" )
+            update | grep -q latest && _LAUNCHER+=( "UPDATE" "Update Archboot Environment" )
+            update | grep -q image && _LAUNCHER+=( "IMAGE" "Create New Images" )
+            _ABORT=""
+            if [[ -n "${_LAUNCHER[@]}" ]]; then
+                _dialog --title " Manage Archboot Menu " --menu "" 10 60 6 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
+            else
+                _dialog --msgbox "Error:\nNo management options available." 0 0
+                _ABORT=1
+            fi
+            clear
+            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+            if [[ -n "${_ABORT}"  ]]; then
+                exit 1
+            fi
+            _EXIT="$(cat ${_ANSWER})"
+            if [[ "${_EXIT}" == "FULL" ]]; then
+                update -full-system
+            elif [[ "${_EXIT}" == "UPDATE" ]]; then
+                if update | grep -q latest-install; then
+                    update -latest-install
+                else
+                    update -latest
+                fi
+            elif [[ "${_EXIT}" == "IMAGE" ]]; then
+                update -latest-image
+            fi
+            exit 0
+            ;;
+        "4")
             #shellcheck disable=SC2086
             _dialog --title " EXIT MENU " --menu "" 9 30 5 \
             "1" "Exit Program" \
