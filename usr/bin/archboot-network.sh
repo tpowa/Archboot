@@ -90,7 +90,7 @@ _do_wireless() {
             || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
                 _CONTINUE=""
                 while [[ -z "${_CONTINUE}" ]]; do
-                    _dialog --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}"; then
+                    if _dialog --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}"; then
                         _WLAN_KEY=$(cat "${_ANSWER}")
                         _CONTINUE=1
                     else
