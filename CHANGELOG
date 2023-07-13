@@ -1,6 +1,6 @@
 On the road to 2023.07:
 - kernel 6.4.x
-- grub 2.06.r591.g6425c12cd-1
+- grub 2.12rc1-1
 Environment Changes:
 - added Sway to preconfigured desktop environments
 - added ttyd remote http terminal support

@@ -143,6 +143,8 @@ if ! _dolauncher; then
 fi
 [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
 clear
+# show like normal login
+echo ""
 agetty --show-issue
 echo ""
 cat /etc/motd
