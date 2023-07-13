@@ -14,6 +14,25 @@ _dialog() {
     return $?
 }
 
+_abort() {
+    if _dialog --yesno "Abort Arch Linux Launcher?" 5 60; then
+        [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+        clear
+        exit 1
+    else
+        _CONTINUE=""
+    fi
+}
+
+_simulate_login() {
+    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    clear
+    echo ""
+    agetty --show-issue
+    echo ""
+    cat /etc/motd
+}
+
 _dolauncher() {
     _dialog --title " Main Menu " --menu "" 10 40 6 \
     "1" "Launch Archboot Setup" \
@@ -137,16 +156,9 @@ fi
 : >/tmp/.launcher
 : >/tmp/.launcher-running
 if ! _dolauncher; then
-    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-    clear
+    _simulate_login
     exit 1
 fi
-[[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-clear
-# show like normal login
-echo ""
-agetty --show-issue
-echo ""
-cat /etc/motd
+_simulate_login
 exit 0
 # vim: set ts=4 sw=4 et:
