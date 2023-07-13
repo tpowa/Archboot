@@ -26,13 +26,13 @@ _dolauncher() {
             exit 0 ;;
         "2")
             _LAUNCHER=""
-            update | grep -q Gnome && _LAUNCHER="${_LAUNCHER} GNOME Gnome\ Desktop"
-            update | grep -q KDE && _LAUNCHER="${_LAUNCHER} PLASMA 'KDE/Plasma Desktop'"
-            update | grep -q Sway && _LAUNCHER="${_LAUNCHER} SWAY 'Sway\ Desktop'"
-            update | grep -q Xfce && _LAUNCHER="${_LAUNCHER} XFCE 'Xfce\ Desktop'"
+            update | grep -q Gnome && _LAUNCHER=+("GNOME" "Gnome Desktop")
+            update | grep -q KDE && _LAUNCHER=+("PLASMA" "KDE/Plasma Desktop")
+            update | grep -q Sway && _LAUNCHER=+("SWAY" "Sway Desktop")
+            update | grep -q Xfce && _LAUNCHER=+("XFCE" "Xfce Desktop")
             _ABORT=""
             if [[ -n "${_LAUNCHER}" ]]; then
-                _dialog --title " Desktop Menu " --menu "" 10 40 6 ${_LAUNCHER} 2>${_ANSWER} || _ABORT=1
+                _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
             else
                 _dialog --msgbox "Error:\nNo Desktop Environments available." 0 0
                 _ABORT=1
