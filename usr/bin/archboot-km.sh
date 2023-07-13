@@ -15,15 +15,6 @@ _dialog() {
     return $?
 }
 
-_abort()
-{
-    _dialog --yesno "Abort Arch Linux Console Configuration?" 5 60 || return 0
-    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
-    [[ -e /tmp/.km ]] && rm /tmp/.km
-    clear
-    exit 1
-}
-
 _do_vconsole() {
     _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
@@ -42,7 +33,7 @@ _set_vconsole() {
         _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
     fi
     #shellcheck disable=SC2086
-    _dialog --menu "        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || _abort
+    _dialog --menu "        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER} || return 1
     #shellcheck disable=SC2086
     _FONT=$(cat ${_ANSWER})
     # get list of 2 sign locale
@@ -50,11 +41,11 @@ _set_vconsole() {
     _KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
     _OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Dansk et Estonian fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian"
     #shellcheck disable=SC2086
-    _dialog --menu "Select A Keymap Region:" 13 40 7 ${_KEYMAPS} 2>${_ANSWER} || _abort
+    _dialog --menu "Select A Keymap Region:" 13 40 7 ${_KEYMAPS} 2>${_ANSWER} || return 1
     _KEYMAP=$(cat ${_ANSWER})
     if [[ "${_KEYMAP}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        _dialog --menu "Select A Keymap Region:" 18 40 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || _abort
+        _dialog --menu "Select A Keymap Region:" 18 40 12 ${_OTHER_KEYMAPS} 2>${_ANSWER} || return 1
         _KEYMAP=$(cat ${_ANSWER})
     fi
     _KEYMAPS=""
@@ -62,7 +53,7 @@ _set_vconsole() {
         _KEYMAPS="${_KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
-    _dialog --menu "Select A Keymap Layout:" 14 40 8 ${_KEYMAPS} 2>${_ANSWER} || _abort
+    _dialog --menu "Select A Keymap Layout:" 14 40 8 ${_KEYMAPS} 2>${_ANSWER} || return 1
     #shellcheck disable=SC2086
     _KEYMAP=$(cat ${_ANSWER})
 }
