@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
-# created by Tobias Powalowski <tpowa@archlinux.org>
+# written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.net"
 _RUNNING_ARCH="$(uname -m)"
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Network Configuration"
@@ -14,6 +14,17 @@ _NO_LOG="/dev/null"
 _dialog() {
     dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
+}
+
+_abort() {
+    if _dialog --yesno "Abort Arch Linux Network Configuration?" 5 60; then
+        [[ -e /tmp/.net-running ]] && rm /tmp/.net-running
+        [[ -e /tmp/.net ]] && rm /tmp/.net
+        clear
+        exit 1
+    else
+        _CONTINUE=""
+    fi
 }
 
 _net_interfaces() {
@@ -42,18 +53,31 @@ _do_wireless() {
         iwctl station "${_INTERFACE}" disconnect &>"${_NO_LOG}"
         # clean old keys first!
         rm -f /var/lib/iwd/* &>"${_NO_LOG}"
-        #shellcheck disable=SC2086,SC2046
-        _dialog --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
-        $(_essid_scan _) \
-            "Hidden" "_" 2>"${_ANSWER}" || return 1
-        _WLAN_SSID=$(cat "${_ANSWER}")
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            #shellcheck disable=SC2086,SC2046
+            if _dialog --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
+            $(_essid_scan _) \
+            "Hidden" "_" 2>"${_ANSWER}"; then
+                _WLAN_SSID=$(cat "${_ANSWER}")
+                _CONTINUE=1
+            else
+                _abort
+            fi
         _WLAN_CONNECT="connect"
         if [[ "${_WLAN_SSID}" == "Hidden" ]]; then
-            _dialog --inputbox "Enter the hidden SSID:" 8 65 \
-                "secret" 2>"${_ANSWER}" || return 1
-            _WLAN_SSID=$(cat "${_ANSWER}")
-            _WLAN_CONNECT="connect-hidden"
-            _WLAN_HIDDEN=1
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                if _dialog --inputbox "Enter the hidden SSID:" 8 65 \
+                "secret" 2>"${_ANSWER}"; then
+                    _WLAN_SSID=$(cat "${_ANSWER}")
+                    _WLAN_CONNECT="connect-hidden"
+                    _WLAN_HIDDEN=1
+                    _CONTINUE=1
+                else
+                    _abort
+                fi
+            done
         fi
         # replace # with spaces again
         #shellcheck disable=SC2001,SC2086
@@ -62,9 +86,17 @@ _do_wireless() {
         while [[ -z "${_WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
-                _dialog --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}" || return 1
-                _WLAN_KEY=$(cat "${_ANSWER}")
+            if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] \
+            || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
+                _CONTINUE=""
+                while [[ -z "${_CONTINUE}" ]]; do
+                    _dialog --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}"; then
+                        _WLAN_KEY=$(cat "${_ANSWER}")
+                        _CONTINUE=1
+                    else
+                        _abort
+                    fi
+                done
             fi
             # time to connect
             _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
@@ -96,7 +128,7 @@ _donetwork() {
             #shellcheck disable=SC2086
             _dialog --ok-label "Select" --menu "Select a network interface:" 12 40 6 ${_INTERFACES} 2>"${_ANSWER}"
             case $? in
-                1) return 1 ;;
+                1) _abort ;;
                 0) _INTERFACE=$(cat "${_ANSWER}") ;;
             esac
         done
@@ -109,31 +141,70 @@ _donetwork() {
         fi
         # profile name
         _NETWORK_PROFILE=""
-        _dialog --inputbox "Enter your network profile name:" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}" || return 1
-        _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            if _dialog --inputbox "Enter your network profile name:" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"; then
+                _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
         # wifi setup first
-        _do_wireless || return 1
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            if _do_wireless; then
+                _CONTINUE=1
+            else
+                _abort
+            fi
         # dhcp switch
         _IP=""
-        _dialog --yesno "Do you want to use DHCP?" 5 40
-        #shellcheck disable=SC2181
-        if [[ $? -eq 0 ]]; then
+        if _dialog --yesno "Do you want to use DHCP?" 5 40; then
             _IP="dhcp"
             _IPADDR=""
             _GW=""
             _DNS=""
         else
             _IP="static"
-            _dialog --inputbox "Enter your IP address and netmask:" 8 40 "192.168.1.23/24" 2>"${_ANSWER}" || return 1
-            _IPADDR=$(cat "${_ANSWER}")
-            _dialog --inputbox "Enter your gateway:" 8 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
-            _GW=$(cat "${_ANSWER}")
-            _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}" || return 1
-            _DNS=$(cat "${_ANSWER}")
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                if _dialog --inputbox "Enter your IP address and netmask:" 8 40 "192.168.1.23/24" 2>"${_ANSWER}"; then
+                    _IPADDR=$(cat "${_ANSWER}")
+                    _CONTINUE=1
+                else
+                    _abort
+                fi
+            done
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                if _dialog --inputbox "Enter your gateway:" 8 40 "192.168.1.1" 2>"${_ANSWER}"; then
+                    _GW=$(cat "${_ANSWER}")
+                    _CONTINUE=1
+                else
+                    _abort
+                fi
+            done
+            _CONTINUE=""
+            while [[ -z "${_CONTINUE}" ]]; do
+                if _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}", then
+                    _DNS=$(cat "${_ANSWER}")
+                    _CONTINUE=1
+                else
+                    _abort
+                fi
+            done
         fi
-            # http/ftp proxy settings
-        _dialog --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}" || return 1
-        _PROXY=$(cat "${_ANSWER}")
+        # http/ftp proxy settings
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            if _dialog --inputbox "Enter your proxy server, for example:\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}"; then
+                _PROXY=$(cat "${_ANSWER}")
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
         _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
         _dialog --yesno "Are these settings correct?\n\nInterface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0
         case $? in

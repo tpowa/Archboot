@@ -15,8 +15,7 @@ _dialog() {
     return $?
 }
 
-_abort()
-{
+_abort() {
     if _dialog --yesno "Abort Arch Linux Console Configuration?" 5 60; then
         [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
         [[ -e /tmp/.km ]] && rm /tmp/.km
