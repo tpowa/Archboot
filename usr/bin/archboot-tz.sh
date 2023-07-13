@@ -117,7 +117,7 @@ _dotimeset() {
             done
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if dialog --timebox "Set the time.\nUse <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
+                if dialog --title ' Time Setting ' --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
                     _TIME="$(cat ${_ANSWER})"
                     _CONTINUE=1
                 else
