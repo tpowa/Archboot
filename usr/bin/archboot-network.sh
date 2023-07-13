@@ -64,6 +64,7 @@ _do_wireless() {
             else
                 _abort
             fi
+        done
         _WLAN_CONNECT="connect"
         if [[ "${_WLAN_SSID}" == "Hidden" ]]; then
             _CONTINUE=""
