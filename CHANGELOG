@@ -13,7 +13,7 @@ Environment Changes:
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - ask basic environment settings on first login
-- added launcher script
+- added launcher management script
 locale:
 - fixed abort dialog
 update:
