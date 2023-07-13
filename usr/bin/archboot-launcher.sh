@@ -25,7 +25,7 @@ _dolauncher() {
             setup
             exit 0 ;;
         "2")
-            _LAUNCHER=""
+            _LAUNCHER=()
             update | grep -q Gnome && _LAUNCHER+=( "GNOME" "Gnome Desktop" )
             update | grep -q KDE && _LAUNCHER+=( "PLASMA" "KDE/Plasma Desktop" )
             update | grep -q Sway && _LAUNCHER+=( "SWAY" "Sway Desktop" )
