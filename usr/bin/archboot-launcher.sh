@@ -112,6 +112,7 @@ fi
 [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
 clear
 agetty --show-issue
+echo ""
 cat /etc/motd
 exit 0
 # vim: set ts=4 sw=4 et:
