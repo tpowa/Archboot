@@ -66,7 +66,7 @@ _do_wireless() {
             iwctl station "${_INTERFACE}" scan
             sleep 5
             #shellcheck disable=SC2086,SC2046
-            if _dialog --title " SSID Scan " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
+            if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             $(_essid_list _) \
             "Hidden" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
@@ -129,7 +129,7 @@ _do_wireless() {
     fi
 }
 
-_donetwork() {
+_network() {
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface
@@ -137,7 +137,7 @@ _donetwork() {
         _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            if _dialog --title " Network Interface " --ok-label "Select" --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
+            if _dialog --title " Network Interface " --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
                 _INTERFACE=$(cat "${_ANSWER}")
             else
                 _abort
@@ -152,15 +152,8 @@ _donetwork() {
         fi
         # profile name
         _NETWORK_PROFILE=""
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            if _dialog --title " Network Profile Name " --inputbox "" 6 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"; then
-                _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
-                _CONTINUE=1
-            else
-                _abort
-            fi
-        done
+        _dialog --no-cancel --title " Network Profile Name " --inputbox "" 6 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"
+        _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
@@ -179,44 +172,16 @@ _donetwork() {
             _DNS=""
         else
             _IP="static"
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --title "IP Address And Netmask" --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"; then
-                    _IPADDR=$(cat "${_ANSWER}")
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"; then
-                    _GW=$(cat "${_ANSWER}")
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --title " Domain Name Server " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"; then
-                    _DNS=$(cat "${_ANSWER}")
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
+            _dialog --no-cancel --title "IP Address And Netmask" --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
+            _IPADDR=$(cat "${_ANSWER}")
+            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
+            _GW=$(cat "${_ANSWER}")
+            _dialog --no-cancel --title " Domain Name Server " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
+            _DNS=$(cat "${_ANSWER}")
         fi
         # http/ftp proxy settings
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            if _dialog --title " Proxy Server " --inputbox "\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 12 65 "" 2>"${_ANSWER}"; then
-                _PROXY=$(cat "${_ANSWER}")
-                _CONTINUE=1
-            else
-                _abort
-            fi
-        done
+        _dialog --no-cancel --title " Proxy Server " --inputbox "\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 12 65 "" 2>"${_ANSWER}"
+        _PROXY=$(cat "${_ANSWER}")
         _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
         _dialog --title " Confirmation Dialog " --yesno "Interface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0 && _NETPARAMETERS=1
     done
@@ -260,12 +225,13 @@ _donetwork() {
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
-        _donetwork
+        return 1
     fi
     _dialog --infobox "Link is up. Network is ready." 3 50
     sleep 3
     _dialog --infobox "Network configuration completed successfully." 3 50
     sleep 3
+    return 0
 }
 
 if [[ -e /tmp/.network-running ]]; then
@@ -275,12 +241,9 @@ if [[ -e /tmp/.network-running ]]; then
     exit 1
 fi
 : >/tmp/.network-running
-if ! _donetwork; then
-    clear
-    [[ -e /tmp/.network ]] && rm /tmp/.network
-    [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
-    exit 1
-fi
+while true; do
+    _network && break
+done
 [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
 clear
 exit 0
