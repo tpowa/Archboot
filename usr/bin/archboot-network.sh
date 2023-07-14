@@ -17,7 +17,7 @@ _dialog() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort Arch Linux Network Configuration?" 5 60; then
+    if _dialog --yesno "Abort Arch Linux Network Configuration?" 5 45; then
         [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
         [[ -e /tmp/.network ]] && rm /tmp/.network
         clear
