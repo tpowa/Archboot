@@ -46,7 +46,7 @@ _set_vconsole() {
             _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
-        if _dialog --menu "        Select Vconsole Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER}; then
+        if _dialog --title " Vconsole Font " --menu "     Font Name          Region" 10 40 12 ${_FONTS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _FONT=$(cat ${_ANSWER})
             _CONTINUE=1
