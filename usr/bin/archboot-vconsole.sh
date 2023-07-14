@@ -16,7 +16,7 @@ _dialog() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort Arch Linux Vconsole Configuration?" 5 50; then
+    if _dialog --yesno "Abort Arch Linux Vconsole Configuration?" 5 45; then
         [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
         [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
         clear
