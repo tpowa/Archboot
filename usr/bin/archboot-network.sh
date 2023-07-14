@@ -64,7 +64,7 @@ _do_wireless() {
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
             #shellcheck disable=SC2086,SC2046
-            if _dialog --menu "Choose your SSID:\n(Empty spaces in your SSID are replaced by '+' char)" 14 60 7 \
+            if _dialog --title " SSID " --menu "\n(Empty spaces in your SSID are replaced by '+' char)" 13 60 6 \
             $(_essid_scan _) \
             "Hidden" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
@@ -77,7 +77,7 @@ _do_wireless() {
         if [[ "${_WLAN_SSID}" == "Hidden" ]]; then
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --inputbox "Enter the hidden SSID:" 8 65 \
+                if _dialog --title " Hidden SSID " --inputbox "" 7 65 \
                 "secret" 2>"${_ANSWER}"; then
                     _WLAN_SSID=$(cat "${_ANSWER}")
                     _WLAN_CONNECT="connect-hidden"
@@ -99,7 +99,7 @@ _do_wireless() {
             || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
                 _CONTINUE=""
                 while [[ -z "${_CONTINUE}" ]]; do
-                    if _dialog --inputbox "Enter your KEY for SSID='${_WLAN_SSID}'" 8 50 "SecretWirelessKey" 2>"${_ANSWER}"; then
+                    if _dialog --title " Connection Key for ${_WLAN_SSID} " --inputbox "" 8 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
                         _WLAN_KEY=$(cat "${_ANSWER}")
                         _CONTINUE=1
                     else
@@ -108,7 +108,7 @@ _do_wireless() {
                 done
             fi
             # time to connect
-            _dialog --infobox "Connection to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
+            _dialog --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
             _printk off
             if [[ -z "${_WLAN_KEY}" ]]; then
                 iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
@@ -116,8 +116,8 @@ _do_wireless() {
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
             fi
             if [[ -n "${_WLAN_AUTH}" ]]; then
-                _dialog --infobox "Authentification was successful. Continuing in 5 seconds..." 3 70
-                sleep 5
+                _dialog --infobox "Authentification was successful." 3 70
+                sleep 3
             else
                 _dialog --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
             fi
@@ -178,7 +178,7 @@ _donetwork() {
             _IP="static"
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --inputbox "Enter your IP address and netmask:" 8 40 "192.168.1.23/24" 2>"${_ANSWER}"; then
+                if _dialog --title "IP Address And Netmask" --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"; then
                     _IPADDR=$(cat "${_ANSWER}")
                     _CONTINUE=1
                 else
@@ -187,7 +187,7 @@ _donetwork() {
             done
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --inputbox "Enter your gateway:" 8 40 "192.168.1.1" 2>"${_ANSWER}"; then
+                if _dialog --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"; then
                     _GW=$(cat "${_ANSWER}")
                     _CONTINUE=1
                 else
@@ -196,7 +196,7 @@ _donetwork() {
             done
             _CONTINUE=""
             while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --inputbox "Enter your DNS server IP:" 8 40 "192.168.1.1" 2>"${_ANSWER}"; then
+                if _dialog --title " Domain Name Server " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"; then
                     _DNS=$(cat "${_ANSWER}")
                     _CONTINUE=1
                 else
