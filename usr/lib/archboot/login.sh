@@ -186,13 +186,13 @@ if [[ -e /usr/bin/setup ]]; then
         localize
         source /etc/locale.conf
     fi
-    if ! [[ -e /tmp/.keymap ]]; then
+    if ! [[ -e /tmp/.vconsole ]]; then
         vconsole
     fi
     if [[ ! -e /tmp/.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
         network
     fi
-    if ! [[ -e /tmp/.timezone ]]; then
+    if ! [[ -e /tmp/.clock ]]; then
         clock
     fi
     # switch for setup or launcher

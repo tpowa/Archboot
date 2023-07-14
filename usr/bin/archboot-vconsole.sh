@@ -108,7 +108,6 @@ if ! _set_vconsole; then
     clear
     exit 1
 fi
-[[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
 [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
 _do_vconsole
 clear

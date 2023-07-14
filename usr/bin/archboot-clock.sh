@@ -157,7 +157,6 @@ if ! _dotimeset; then
     clear
     exit 1
 fi
-[[ -e /tmp/.clock ]] && rm /tmp/.clock
 [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
 clear
 exit 0
