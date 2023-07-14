@@ -109,7 +109,7 @@ _wireless() {
         sleep 3
         return 0
     else
-        _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 5 50
+        _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 4 60
         sleep 5
         return 1
     fi
