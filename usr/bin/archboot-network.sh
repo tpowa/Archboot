@@ -97,7 +97,6 @@ _do_wireless() {
         #shellcheck disable=SC2001,SC2086
         _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
         #shellcheck disable=SC2001,SC2086
-        while [[ -z "${_WLAN_AUTH}" ]]; do
             # expect hidden network has a WLAN_KEY
             #shellcheck disable=SC2143
             if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] \
@@ -121,16 +120,15 @@ _do_wireless() {
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
             fi
             sleep 3
+            _printk on
             if [[ -n "${_WLAN_AUTH}" ]]; then
                 _dialog --infobox "Authentification was successful." 3 70
                 sleep 3
             else
-                _WLAN_AUTH=""
                 _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 6 60
                 sleep 5
+                return 1
             fi
-            _printk on
-        done
     fi
 }
 
@@ -161,11 +159,11 @@ _network() {
         _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
         _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
+        while [[ -z "${_CONTINUE}" && "${_CONNECTION}" == "wireless" ]]; do
             if _do_wireless; then
                 _CONTINUE=1
             else
-                _abort
+                _CONTINUE=""
             fi
         done
         # dhcp switch
