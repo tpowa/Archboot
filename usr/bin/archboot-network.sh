@@ -39,11 +39,7 @@ _net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
 
-_essid_scan() {
-    # scan the area
-    _dialog --infobox "Scanning for SSID with interface ${_INTERFACE}..." 3 50
-    iwctl station "${_INTERFACE}" scan
-    sleep 5
+_essid_list() {
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
@@ -65,9 +61,13 @@ _do_wireless() {
         rm -f /var/lib/iwd/* &>"${_NO_LOG}"
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
+            # scan the area
+            _dialog --infobox "Scanning for SSID with interface ${_INTERFACE}..." 3 50
+            iwctl station "${_INTERFACE}" scan
+            sleep 5
             #shellcheck disable=SC2086,SC2046
             if _dialog --title " SSID Scan " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
-            $(_essid_scan _) \
+            $(_essid_list _) \
             "Hidden" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
                 _CONTINUE=1
