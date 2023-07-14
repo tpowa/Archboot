@@ -49,86 +49,69 @@ _essid_list() {
     done
 }
 
-_do_wireless() {
+_wireless() {
     _WLAN_HIDDEN=""
     _WLAN_SSID=""
     _WLAN_KEY=""
     _WLAN_AUTH=""
-    if [[ "${_CONNECTION}" == "wireless" ]]; then
-        # disconnect the interface first!
-        iwctl station "${_INTERFACE}" disconnect &>"${_NO_LOG}"
-        # clean old keys first!
-        rm -f /var/lib/iwd/* &>"${_NO_LOG}"
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            # scan the area
-            _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
-            iwctl station "${_INTERFACE}" scan
-            sleep 5
-            #shellcheck disable=SC2086,SC2046
-            if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
-            $(_essid_list _) \
-            "Hidden" "_" "RESCAN" "_" 2>"${_ANSWER}"; then
-                _WLAN_SSID=$(cat "${_ANSWER}")
-                _CONTINUE=1
-                if grep -q 'RESCAN' "${_ANSWER}"; then
-                    _CONTINUE=""
-                fi
-            else
-                _abort
-            fi
-        done
-        _WLAN_CONNECT="connect"
-        if [[ "${_WLAN_SSID}" == "Hidden" ]]; then
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --title " Hidden SSID " --inputbox "" 7 65 \
-                "secret" 2>"${_ANSWER}"; then
-                    _WLAN_SSID=$(cat "${_ANSWER}")
-                    _WLAN_CONNECT="connect-hidden"
-                    _WLAN_HIDDEN=1
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
-        fi
-        # replace # with spaces again
-        #shellcheck disable=SC2001,SC2086
-        _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
-        #shellcheck disable=SC2001,SC2086
-            # expect hidden network has a WLAN_KEY
-            #shellcheck disable=SC2143
-            if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] \
-            || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
+    # disconnect the interface first!
+    iwctl station "${_INTERFACE}" disconnect &>"${_NO_LOG}"
+    # clean old keys first!
+    rm -f /var/lib/iwd/* &>"${_NO_LOG}"
+    _CONTINUE=""
+    while [[ -z "${_CONTINUE}" ]]; do
+        # scan the area
+        _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
+        iwctl station "${_INTERFACE}" scan
+        sleep 5
+        #shellcheck disable=SC2086,SC2046
+        if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
+        $(_essid_list _) \
+        "HIDDEN" "SSID" "RESCAN" "SSIDs" 2>"${_ANSWER}"; then
+            _WLAN_SSID=$(cat "${_ANSWER}")
+            _CONTINUE=1
+            if grep -q 'RESCAN' "${_ANSWER}"; then
                 _CONTINUE=""
-                while [[ -z "${_CONTINUE}" ]]; do
-                    if _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
-                        _WLAN_KEY=$(cat "${_ANSWER}")
-                        _CONTINUE=1
-                    else
-                        _abort
-                    fi
-                done
             fi
-            # time to connect
-            _dialog --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
-            _printk off
-            if [[ -z "${_WLAN_KEY}" ]]; then
-                iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
-            else
-                iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
-            fi
-            sleep 3
-            _printk on
-            if [[ -n "${_WLAN_AUTH}" ]]; then
-                _dialog --infobox "Authentification was successful." 3 70
-                sleep 3
-            else
-                _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 6 60
-                sleep 5
-                return 1
-            fi
+        else
+            _abort
+        fi
+    done
+    _WLAN_CONNECT="connect"
+    if [[ "${_WLAN_SSID}" == "HIDDEN" ]]; then
+        _dialog --no-cancel --title " HIDDEN SSID " --inputbox "" 7 65 "secret" 2>"${_ANSWER}"
+        _WLAN_SSID=$(cat "${_ANSWER}")
+        _WLAN_CONNECT="connect-hidden"
+        _WLAN_HIDDEN=1
+    fi
+    # replace # with spaces again
+    #shellcheck disable=SC2001,SC2086
+    _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
+    # expect hidden network has a WLAN_KEY
+    #shellcheck disable=SC2143
+    if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] \
+    || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
+        _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"
+        _WLAN_KEY=$(cat "${_ANSWER}")
+    fi
+    # time to connect
+    _dialog --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
+    _printk off
+    if [[ -z "${_WLAN_KEY}" ]]; then
+        iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
+    else
+        iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
+    fi
+    sleep 3
+    _printk on
+    if [[ -n "${_WLAN_AUTH}" ]]; then
+        _dialog --infobox "Authentification was successful." 3 70
+        sleep 3
+        return 0
+    else
+        _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 6 60
+        sleep 5
+        return 1
     fi
 }
 
@@ -160,7 +143,7 @@ _network() {
         # wifi setup first
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" && "${_CONNECTION}" == "wireless" ]]; do
-            if _do_wireless; then
+            if _wireless; then
                 _CONTINUE=1
             else
                 _CONTINUE=""
