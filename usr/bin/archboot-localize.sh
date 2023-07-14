@@ -44,7 +44,7 @@ _localize() {
     echo LC_COLLATE=C >> /etc/localize.conf
     localectl set-localize "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
-    sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/localize.gen
+    sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
     locale-gen &>/dev/null
     sleep 2
 }
