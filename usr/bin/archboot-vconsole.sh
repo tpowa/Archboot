@@ -46,7 +46,7 @@ _set_vconsole() {
             _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
-        if _dialog --title " Vconsole Font " --menu "" 9 40 11 ${_FONTS} 2>${_ANSWER}; then
+        if _dialog --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _FONT=$(cat ${_ANSWER})
             _CONTINUE=1
@@ -61,7 +61,7 @@ _set_vconsole() {
         _KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
         _OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Dansk et Estonian fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian"
         #shellcheck disable=SC2086
-        if _dialog --title " Keymap Region " --menu "" 6 40 9 ${_KEYMAPS} 2>${_ANSWER}; then
+        if _dialog --title " Keymap Region " --menu "" 12 40 6 ${_KEYMAPS} 2>${_ANSWER}; then
             _KEYMAP=$(cat ${_ANSWER})
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
                 while [[ -z "${_CONTINUE}" ]]; do
