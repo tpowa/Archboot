@@ -125,7 +125,7 @@ _timeset() {
         _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_DATETIME}"
     fi
-    if _dialog --trim --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
+    if _dialog --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
         _dialog --infobox "Clock configuration completed successfully." 3 50
         sleep 3
         return 0
