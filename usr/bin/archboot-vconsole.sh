@@ -31,7 +31,7 @@ _do_vconsole() {
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
-    sleep 2
+    sleep 3
     _dialog --infobox "Vconsole configuration completed successfully." 3 50
     sleep 3
     return 0
