@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-_ANSWER="/tmp/.tz"
+_ANSWER="/tmp/.clock"
 _RUNNING_ARCH="$(uname -m)"
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Clock Configuration"
 # _dialog()
@@ -16,8 +16,8 @@ _dialog() {
 
 _abort() {
     if _dialog --yesno "Abort Arch Linux Clock Configuration?" 5 50; then
-        [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
-        [[ -e /tmp/.tz ]] && rm /tmp/.tz
+        [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
+        [[ -e /tmp/.clock ]] && rm /tmp/.clock
         clear
         exit 1
     else
@@ -132,33 +132,33 @@ _dotimeset() {
         if _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0; then
             _SET_TIME=""
         else
-            _dialog --infobox "Time and Date setting completed successfully.\nContinuing in 5 seconds..." 4 60
+            _dialog --infobox "Clock configuration completed successfully.\nContinuing in 5 seconds..." 4 60
             sleep 5
             return 0
         fi
     done
 }
 
-if [[ -e /tmp/.tz-running ]]; then
-    echo "tz already runs on a different console!"
-    echo "Please remove /tmp/.tz-running first to launch tz!"
+if [[ -e /tmp/.clock-running ]]; then
+    echo "clock already runs on a different console!"
+    echo "Please remove /tmp/.clock-running first to launch clock!"
     exit 1
 fi
-: >/tmp/.tz-running
+: >/tmp/.clock-running
 if ! _dotimezone; then
-    [[ -e /tmp/.tz ]] && rm /tmp/.tz
-    [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+    [[ -e /tmp/.clock ]] && rm /tmp/.clock
+    [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
     exit 1
 fi
 if ! _dotimeset; then
-    [[ -e /tmp/.tz ]] && rm /tmp/.tz
-    [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+    [[ -e /tmp/.clock ]] && rm /tmp/.clock
+    [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
     exit 1
 fi
-[[ -e /tmp/.tz ]] && rm /tmp/.tz
-[[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
+[[ -e /tmp/.clock ]] && rm /tmp/.clock
+[[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
 clear
 exit 0
 # vim: set ts=4 sw=4 et:

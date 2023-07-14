@@ -160,12 +160,12 @@ _configure_network() {
 }
 
 _configure_clock() {
-    if [[ -e /usr/bin/tz ]]; then
-        tz && _NEXTITEM="3"
-    elif [[ -e /usr/bin/archboot-tz.sh ]]; then
-        archboot-tz.sh && _NEXTITEM="3"
+    if [[ -e /usr/bin/clock ]]; then
+        clock && _NEXTITEM="3"
+    elif [[ -e /usr/bin/archboot-clock.sh ]]; then
+        archboot-clock.sh && _NEXTITEM="3"
     else
-        _dialog --msgbox "Error:\ntz script not found, aborting clock configuration" 0 0
+        _dialog --msgbox "Error:\nclock script not found, aborting clock configuration" 0 0
     fi
 }
 

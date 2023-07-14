@@ -34,7 +34,7 @@ usage () {
     echo -e "\e[1m-----------------------------------------\e[m"
     echo -e " \e[1m-help\e[m            This message."
     if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
-        echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, tz, km and helpers."
+        echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, clock, km and helpers."
     fi
     # latest image
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
@@ -93,7 +93,7 @@ _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ -n "${_D_SCRIPTS}" ]]; then
         _network_check
-        echo -e "\e[1mStart:\e[m Downloading latest km, tz, quickinst, setup and helpers..."
+        echo -e "\e[1mStart:\e[m Downloading latest km, clock, quickinst, setup and helpers..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         # config
         echo -e "\e[1mStep 1/4:\e[m Downloading latest config..."
@@ -101,7 +101,7 @@ _download_latest() {
         # helper binaries
         echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
         # main binaries
-        BINS="quickinst setup km tz launcher network update copy-mountpoint rsync-backup restore-usbstick"
+        BINS="quickinst setup km clock launcher network update copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done

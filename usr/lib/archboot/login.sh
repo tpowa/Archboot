@@ -193,7 +193,7 @@ if [[ -e /usr/bin/setup ]]; then
         network && : >/tmp/.network
     fi
     if ! [[ -e /tmp/.timezone ]]; then
-        tz && : >/tmp/.timezone
+        clock && : >/tmp/.clock
     fi
     # switch for setup or launcher
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then

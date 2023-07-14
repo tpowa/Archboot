@@ -20,9 +20,9 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net_common ; then
     echo -e "\e[1mNetwork Configuration:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'network'\e[m script to change your network settings." >> "${MOTD}"
 fi
-if  echo "${HOOKS[@]}" | grep -qw archboot_tz; then
+if  echo "${HOOKS[@]}" | grep -qw archboot_clock; then
     echo -e "\e[1mClock Configuration:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'tz'\e[m script to change your time and date." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'clock'\e[m script to change your time and date." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
