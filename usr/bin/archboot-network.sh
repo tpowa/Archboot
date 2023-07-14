@@ -109,7 +109,7 @@ _wireless() {
         sleep 3
         return 0
     else
-        _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 6 60
+        _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 5 50
         sleep 5
         return 1
     fi
@@ -210,7 +210,8 @@ _network() {
     # add sleep here for systemd-resolve get correct values
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
-        _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 5 60
+        _dialog --infobox "Error:\nYour network is not working correctly, please configure again!" 5 60
+        sleep 5
         return 1
     fi
     _dialog --infobox "Link is up. Network is ready." 3 50
