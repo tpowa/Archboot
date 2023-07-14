@@ -127,7 +127,6 @@ _do_wireless() {
 }
 
 _donetwork() {
-    _S_NET=""
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface
