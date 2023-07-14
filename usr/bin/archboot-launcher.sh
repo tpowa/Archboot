@@ -48,7 +48,81 @@ _check_manage() {
     update | grep -q image && _MANAGE+=( "IMAGE" "Create New Archboot Images" )
 }
 
-_dolauncher() {
+_desktop () {
+    _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || _launcher
+    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    _EXIT="$(cat ${_ANSWER})"
+    if [[ "${_EXIT}" == "GNOME" ]]; then
+        if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
+            clear
+            update -gnome-wayland
+        else
+            clear
+            update -gnome
+        fi
+    elif [[ "${_EXIT}" == "PLASMA" ]]; then
+        if _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
+            clear
+            update -plasma-wayland
+        else
+            clear
+            update -plasma
+        fi
+    elif [[ "${_EXIT}" == "SWAY" ]]; then
+        clear
+        update -sway
+    elif [[ "${_EXIT}" == "XFCE" ]]; then
+        clear
+        update -xfce
+    fi
+    exit 0
+}
+
+_manage() {
+    _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || _launcher
+    clear
+    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    if [[ -n "${_ABORT}"  ]]; then
+        exit 1
+    fi
+    _EXIT="$(cat ${_ANSWER})"
+    if [[ "${_EXIT}" == "FULL" ]]; then
+        update -full-system
+    elif [[ "${_EXIT}" == "UPDATE" ]]; then
+        if update | grep -q latest-install; then
+            update -latest-install
+        else
+            update -latest
+        fi
+    elif [[ "${_EXIT}" == "IMAGE" ]]; then
+        update -latest-image
+    fi
+    exit 0
+}
+
+_exit() {
+    #shellcheck disable=SC2086
+    _dialog --title " EXIT MENU " --menu "" 9 30 5 \
+    "1" "Exit Program" \
+    "2" "Reboot System" \
+    "3" "Poweroff System" 2>${_ANSWER} || _launcher
+    _EXIT="$(cat ${_ANSWER})"
+    if [[ "${_EXIT}" == "1" ]]; then
+        return 0
+    elif [[ "${_EXIT}" == "2" ]]; then
+        _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+        sleep 10
+        clear
+        reboot
+    elif [[ "${_EXIT}" == "3" ]]; then
+        _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+        sleep 10
+        clear
+        poweroff
+    fi
+}
+
+_launcher() {
     _MENU=()
     if [[ -n "${_DESKTOP[@]}" ]]; then
         _MENU+=( "2" "Launch Desktop Environment" )
@@ -66,81 +140,13 @@ _dolauncher() {
             setup
             exit 0 ;;
         "2")
-            _ABORT=""
-            _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || _ABORT=1
-            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-            if [[ -n "${_ABORT}"  ]]; then
-                clear
-                exit 1
-            fi
-            _EXIT="$(cat ${_ANSWER})"
-            if [[ "${_EXIT}" == "GNOME" ]]; then
-                if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
-                    clear
-                    update -gnome-wayland
-                else
-                    clear
-                    update -gnome
-                fi
-            elif [[ "${_EXIT}" == "PLASMA" ]]; then
-                if _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
-                    clear
-                    update -plasma-wayland
-                else
-                    clear
-                    update -plasma
-                fi
-            elif [[ "${_EXIT}" == "SWAY" ]]; then
-                clear
-                update -sway
-            elif [[ "${_EXIT}" == "XFCE" ]]; then
-                clear
-                update -xfce
-            fi
-            exit 0
+            _desktop
             ;;
         "3")
-            _ABORT=""
-            _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || _ABORT=1
-            clear
-            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-            if [[ -n "${_ABORT}"  ]]; then
-                exit 1
-            fi
-            _EXIT="$(cat ${_ANSWER})"
-            if [[ "${_EXIT}" == "FULL" ]]; then
-                update -full-system
-            elif [[ "${_EXIT}" == "UPDATE" ]]; then
-                if update | grep -q latest-install; then
-                    update -latest-install
-                else
-                    update -latest
-                fi
-            elif [[ "${_EXIT}" == "IMAGE" ]]; then
-                update -latest-image
-            fi
-            exit 0
+            _manage
             ;;
         "4")
-            #shellcheck disable=SC2086
-            _dialog --title " EXIT MENU " --menu "" 9 30 5 \
-            "1" "Exit Program" \
-            "2" "Reboot System" \
-            "3" "Poweroff System" 2>${_ANSWER}
-            _EXIT="$(cat ${_ANSWER})"
-            if [[ "${_EXIT}" == "1" ]]; then
-                return 0
-            elif [[ "${_EXIT}" == "2" ]]; then
-                _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
-                sleep 10
-                clear
-                reboot
-            elif [[ "${_EXIT}" == "3" ]]; then
-                _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
-                sleep 10
-                clear
-                poweroff
-            fi
+            _exit
             ;;
         *)
             if _dialog --yesno "Abort Program?" 6 40; then
@@ -159,7 +165,7 @@ fi
 : >/tmp/.launcher-running
 _check_desktop
 _check_manage
-if ! _dolauncher; then
+if ! _launcher; then
     _show_login
     exit 1
 fi
