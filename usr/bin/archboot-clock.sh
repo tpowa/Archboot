@@ -104,7 +104,6 @@ _timeset() {
     if _dialog --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
         _dialog --infobox "Clock configuration completed successfully." 3 50
         sleep 3
-        return 0
     else
         _timezone
     fi
