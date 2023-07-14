@@ -96,6 +96,7 @@ _exit() {
         _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "1" ]]; then
         _show_login
+        exit 0
     elif [[ "${_EXIT}" == "2" ]]; then
         _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
         sleep 10
