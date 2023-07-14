@@ -34,7 +34,6 @@ _vconsole() {
     sleep 3
     _dialog --infobox "Vconsole configuration completed successfully." 3 50
     sleep 3
-    return 0
 }
 
 _vconsole_font() {
