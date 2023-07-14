@@ -132,7 +132,7 @@ _dotimeset() {
         if _dialog --cr-wrap --defaultno --yesno "Your current time and date is:\n$(${_DATE_PROGRAM})\n\nDo you want to change it?" 0 0; then
             _SET_TIME=""
         else
-            _dialog --infobox "Clock configuration completed successfully." 3 60
+            _dialog --infobox "Clock configuration completed successfully." 3 50
             sleep 3
             return 0
         fi
