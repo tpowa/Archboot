@@ -14,16 +14,6 @@ _dialog() {
     return $?
 }
 
-_abort() {
-    if _dialog --yesno "Abort Arch Linux Launcher?" 5 60; then
-        [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-        clear
-        exit 1
-    else
-        _CONTINUE=""
-    fi
-}
-
 _show_login() {
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     clear
@@ -147,7 +137,8 @@ _launcher() {
             ;;
         *)
             if _dialog --yesno "Abort Program?" 6 40; then
-                return 1
+                _show_login
+                exit 1
             fi
             ;;
     esac
