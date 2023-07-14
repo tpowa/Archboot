@@ -256,15 +256,17 @@ _donetwork() {
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
     systemctl restart systemd-resolved
-    _dialog --infobox "Waiting for network link to come up..." 3 60
+    _dialog --infobox "Waiting for network link to come up..." 3 40
     # add sleep here for systemd-resolve get correct values
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
-        return 1
+        _donetwork
     fi
-    _dialog --infobox "Link is up. Continuing in 5 seconds..." 3 60
-    sleep 5
+    _dialog --infobox "Link is up." 3 40
+    sleep 3
+    _dialog --infobox "Network configuration completed successfully." 3 40
+    sleep 3
 }
 
 if [[ -e /tmp/.network-running ]]; then
