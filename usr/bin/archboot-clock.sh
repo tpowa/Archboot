@@ -113,18 +113,8 @@ fi
 : >/tmp/.clock-running
 _SET_TIME=""
 while [[ -z "${_SET_TIME}" ]]; do
-    if ! _timezone; then
-        [[ -e /tmp/.clock ]] && rm /tmp/.clock
-        [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-        clear
-        exit 1
-    fi
-    if ! _timeset; then
-        [[ -e /tmp/.clock ]] && rm /tmp/.clock
-        [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-        clear
-        exit 1
-    fi
+    _timezone
+    _timeset
 done
 [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
 clear
