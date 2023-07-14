@@ -41,6 +41,7 @@ _net_interfaces() {
 
 _essid_scan() {
     # scan the area
+    _dialog --infobox "Scanning for SSID with interface ${_INTERFACE}..." 3 50
     iwctl station "${_INTERFACE}" scan
     sleep 5
     # only show lines with signal '*'
