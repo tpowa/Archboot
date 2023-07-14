@@ -39,42 +39,38 @@ _dohwclock() {
 }
 
 _timezone () {
-    _SET_ZONE=""
-    while [[ -z "${_SET_ZONE}" ]]; do
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            _REGIONS="America - Europe - Africa - Asia - Australia -"
-            #shellcheck disable=SC2086
-            if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
-                _REGION=$(cat ${_ANSWER})
-                _ZONES=""
-                _CONTINUE=1
-            else
-                _abort
-            fi
+    _CONTINUE=""
+    while [[ -z "${_CONTINUE}" ]]; do
+        _REGIONS="America - Europe - Africa - Asia - Australia -"
+        #shellcheck disable=SC2086
+        if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
+            _REGION=$(cat ${_ANSWER})
+            _ZONES=""
+            _CONTINUE=1
+        else
+            _abort
+        fi
+    done
+    _CONTINUE=""
+    while [[ -z "${_CONTINUE}" ]]; do
+        for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
+            _ZONES="${_ZONES} ${i} -"
         done
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
-                _ZONES="${_ZONES} ${i} -"
-            done
-            #shellcheck disable=SC2086
-            if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
-                _SET_ZONE="1"
-                _ZONE=$(cat ${_ANSWER})
-                [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-                if [[ -n "${_SET_ZONE}" ]]; then
-                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
-                    timedatectl set-timezone "${_ZONE}"
-                    sleep 3
-                else
-                    return 1
-                fi
-                _CONTINUE=1
+        #shellcheck disable=SC2086
+        if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
+            _ZONE=$(cat ${_ANSWER})
+            [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
+            if [[ -n "${_SET_ZONE}" ]]; then
+                _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
+                timedatectl set-timezone "${_ZONE}"
+                sleep 3
             else
-                _abort
+                return 1
             fi
-        done
+            _CONTINUE=1
+        else
+            _timezone
+        fi
     done
 }
 
