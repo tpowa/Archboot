@@ -26,7 +26,7 @@ _abort() {
     fi
 }
 
-_do_vconsole() {
+_vconsole() {
     _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
@@ -99,14 +99,20 @@ if [[ -e /tmp/.vconsole-running ]]; then
     exit 1
 fi 
 : >/tmp/.vconsole-running
-if ! _set_vconsole; then
+if ! _vconsole_font; then
+    [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
+    [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
+    clear
+    exit 1
+fi
+if ! _vconsole_keymap; then
     [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
     [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
     clear
     exit 1
 fi
 [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
-_do_vconsole
+_vconsole
 clear
 exit 0
 # vim: set ts=4 sw=4 et:
