@@ -32,8 +32,11 @@ _localize_menu() {
     _LOCALE=$(cat ${_ANSWER})
     if [[ "${_LOCALE}" == "OTHER" ]]; then
         #shellcheck disable=SC2086
-        _dialog --title " Other Locale Menu " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER} || _abort
-        _LOCALE=$(cat ${_ANSWER})
+        if _dialog --title " Other Locale Menu " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER}; then
+            _LOCALE=$(cat ${_ANSWER})
+        else
+            _LOCALE=""
+        fi
     fi
 }
 
