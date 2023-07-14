@@ -74,7 +74,7 @@ _timezone () {
                 fi
                 _CONTINUE=1
             else
-                _abort
+                _SET_ZONE=""
             fi
         done
     done
