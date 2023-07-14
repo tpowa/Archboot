@@ -100,18 +100,8 @@ if [[ -e /tmp/.vconsole-running ]]; then
     exit 1
 fi 
 : >/tmp/.vconsole-running
-if ! _vconsole_font; then
-    [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
-    [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
-    clear
-    exit 1
-fi
-if ! _vconsole_keymap; then
-    [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
-    [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
-    clear
-    exit 1
-fi
+_vconsole_font
+_vconsole_keymap
 [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
 _vconsole
 clear
