@@ -64,9 +64,9 @@ _timezone () {
                 _ZONE=$(cat ${_ANSWER})
                 [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
                 if [[ -n "${_SET_ZONE}" ]]; then
-                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 60
+                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
                     timedatectl set-timezone "${_ZONE}"
-                    sleep 2
+                    sleep 3
                 else
                     return 1
                 fi
