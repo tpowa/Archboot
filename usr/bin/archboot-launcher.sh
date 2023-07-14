@@ -136,7 +136,7 @@ _launcher() {
             _exit
             ;;
         *)
-            if _dialog --yesno "Abort Program?" 6 40; then
+            if _dialog --yesno "Abort Arch Linux Setup Launcher?" 6 40; then
                 _show_login
                 exit 1
             fi

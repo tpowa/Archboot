@@ -15,7 +15,7 @@ _dialog() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort Arch Linux Clock Configuration?" 5 60; then
+    if _dialog --yesno "Abort Arch Linux Clock Configuration?" 5 50; then
         [[ -e /tmp/.tz-running ]] && rm /tmp/.tz-running
         [[ -e /tmp/.tz ]] && rm /tmp/.tz
         clear
