@@ -62,7 +62,7 @@ _wireless() {
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
         _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
-        iwctl station "${_INTERFACE}" scan 2>"${_NO_LOG}"
+        iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
         if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
