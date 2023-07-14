@@ -76,11 +76,12 @@ _timeset() {
             # sync immediatly with standard pool
             if ! systemctl restart systemd-timesyncd; then
                 _dialog --msgbox "An error has occured, time was not changed!" 0 0
-                return 1
+                _SET_TIME=""
+            else
+                # enable background syncing
+                timedatectl set-ntp 1
+            _   SET_TIME="1"
             fi
-            # enable background syncing
-            timedatectl set-ntp 1
-            _SET_TIME="1"
         fi
     fi
     if [[ -z "${_SET_TIME}" ]]; then
@@ -99,7 +100,6 @@ _timeset() {
         _dialog --infobox "Clock configuration completed successfully." 3 50
         _SET_TIME="1"
         sleep 3
-        return 0
     else
         _SET_TIME=""
     fi
