@@ -32,7 +32,7 @@ _do_vconsole() {
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
-    _dialog --infobox "Vconsole configuration completed successfully." 3 40
+    _dialog --infobox "Vconsole configuration completed successfully." 3 50
     sleep 3
     return 0
 }
