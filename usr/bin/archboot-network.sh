@@ -117,6 +117,7 @@ _do_wireless() {
             else
                 iwctl --passphrase="${_WLAN_KEY}" station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
             fi
+            sleep 3
             if [[ -n "${_WLAN_AUTH}" ]]; then
                 _dialog --infobox "Authentification was successful." 3 70
                 sleep 3
