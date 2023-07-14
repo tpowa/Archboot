@@ -66,13 +66,13 @@ _vconsole_keymap() {
         #shellcheck disable=SC2086
         if _dialog --title " Keymap Region " --menu "" 12 40 6 ${_KEYMAPS} 2>${_ANSWER}; then
             _KEYMAP=$(cat ${_ANSWER})
+            _CONTINUE="1"
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
+                _CONTINUE=""
                 #shellcheck disable=SC2086
                 if _dialog --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
                     _KEYMAP=$(cat ${_ANSWER})
                     _CONTINUE=1
-                else
-                    _CONTINUE=""
                 fi
             fi
         else
