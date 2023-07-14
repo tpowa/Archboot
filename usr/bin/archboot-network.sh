@@ -43,7 +43,7 @@ _essid_list() {
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
-    for dev in $(iwctl station "${_INTERFACE}" get-networks 2>${_NO_LOG} | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
+    for dev in $(iwctl station "${_INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -62,7 +62,7 @@ _wireless() {
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
         _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
-        iwctl station "${_INTERFACE}" scan
+        iwctl station "${_INTERFACE}" scan 2>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
         if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
