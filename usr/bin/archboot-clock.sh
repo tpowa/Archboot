@@ -51,23 +51,19 @@ _timezone () {
             _abort
         fi
     done
-    _CONTINUE=""
-    while [[ -z "${_CONTINUE}" ]]; do
-        for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
-            _ZONES="${_ZONES} ${i} -"
-        done
-        #shellcheck disable=SC2086
-        if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
-            _ZONE=$(cat ${_ANSWER})
-            [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-            _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
-            timedatectl set-timezone "${_ZONE}"
-            sleep 3
-            _CONTINUE=1
-        else
-            _timezone
-        fi
+    for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
+        _ZONES="${_ZONES} ${i} -"
     done
+    #shellcheck disable=SC2086
+    if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
+        _ZONE=$(cat ${_ANSWER})
+        [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
+        _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
+        timedatectl set-timezone "${_ZONE}"
+        sleep 3
+    else
+        _timezone
+    fi
 }
 
 _timeset() {
