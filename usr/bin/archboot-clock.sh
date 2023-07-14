@@ -89,25 +89,17 @@ _timeset() {
     fi
     if [[ -z "${_SET_TIME}" ]]; then
         timedatectl set-ntp 0
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            # display and ask to set date/time
-            if _dialog --title ' Date Setting' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
-                _DATE="$(cat ${_ANSWER})"
-                _CONTINUE=1
-            else
-                _abort
-            fi
-        done
-        _CONTINUE=""
-        while [[ -z "${_CONTINUE}" ]]; do
-            if _dialog --title ' Time Setting ' --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
-                _TIME="$(cat ${_ANSWER})"
-                _CONTINUE=1
-            else
-                _abort
-            fi
-        done
+        # display and ask to set date/time
+        if _dialog --title ' Date Setting' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
+            _DATE="$(cat ${_ANSWER})"
+        else
+            _timeset
+        fi
+        if _dialog --title ' Time Setting ' --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
+            _TIME="$(cat ${_ANSWER})"
+        else
+            _timeset
+        fi
         # save the time
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
