@@ -42,6 +42,7 @@ _net_interfaces() {
 _essid_scan() {
     # scan the area
     iwctl station "${_INTERFACE}" scan
+    sleep 5
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
@@ -64,7 +65,7 @@ _do_wireless() {
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
             #shellcheck disable=SC2086,SC2046
-            if _dialog --title " SSID " --menu "\n(Empty spaces in your SSID are replaced by '+' char)" 13 60 6 \
+            if _dialog --title " SSID Scan " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             $(_essid_scan _) \
             "Hidden" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
