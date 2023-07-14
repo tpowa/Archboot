@@ -66,7 +66,7 @@ _set_vconsole() {
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
                 while [[ -z "${_CONTINUE}" ]]; do
                     #shellcheck disable=SC2086
-                    if _dialog --title " Keymap Layout " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
+                    if _dialog --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
                         _KEYMAP=$(cat ${_ANSWER})
                         _CONTINUE=1
                     else
@@ -86,7 +86,7 @@ _set_vconsole() {
             _KEYMAPS="${_KEYMAPS} ${i} -"
         done
         #shellcheck disable=SC2086
-        if _dialog --menu "Select A Keymap Layout:" 14 40 8 ${_KEYMAPS} 2>${_ANSWER}; then
+        if _dialog --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _KEYMAP=$(cat ${_ANSWER})
             _CONTINUE=1
