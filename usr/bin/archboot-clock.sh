@@ -25,7 +25,7 @@ _abort() {
     fi
 }
 
-_dohwclock() {
+_hwclock() {
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
@@ -40,7 +40,7 @@ _dohwclock() {
     fi
 }
 
-_dotimezone () {
+_timezone () {
     _SET_ZONE=""
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
@@ -66,9 +66,9 @@ _dotimezone () {
                 _ZONE=$(cat ${_ANSWER})
                 [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
                 if [[ -n "${_SET_ZONE}" ]]; then
-                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 60
+                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
                     timedatectl set-timezone "${_ZONE}"
-                    sleep 2
+                    sleep 3
                 else
                     return 1
                 fi
@@ -80,13 +80,13 @@ _dotimezone () {
     done
 }
 
-_dotimeset() {
+_timeset() {
     _SET_TIME=""
     while [[ -z "${_SET_TIME}" ]]; do
         _HARDWARECLOCK=""
         _DATE_PROGRAM=""
         _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
-        _dohwclock
+        _hwclock
         # check internet connection
         if ping -c1 www.google.com &>/dev/null; then
             if _dialog --yesno \
@@ -145,13 +145,13 @@ if [[ -e /tmp/.clock-running ]]; then
     exit 1
 fi
 : >/tmp/.clock-running
-if ! _dotimezone; then
+if ! _timezone; then
     [[ -e /tmp/.clock ]] && rm /tmp/.clock
     [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
     exit 1
 fi
-if ! _dotimeset; then
+if ! _timeset; then
     [[ -e /tmp/.clock ]] && rm /tmp/.clock
     [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
