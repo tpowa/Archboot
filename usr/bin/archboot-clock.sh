@@ -80,7 +80,7 @@ _timeset() {
             else
                 # enable background syncing
                 timedatectl set-ntp 1
-            _   SET_TIME="1"
+                _SET_TIME="1"
             fi
         fi
     fi
