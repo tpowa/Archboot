@@ -79,6 +79,7 @@ _timezone () {
 }
 
 _timeset() {
+    _SET_TIME=""
     _HARDWARECLOCK=""
     _DATE_PROGRAM=""
     _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
@@ -95,6 +96,7 @@ _timeset() {
             fi
             # enable background syncing
             timedatectl set-ntp 1
+            _SET_TIME=1
         fi
     fi
     if [[ -z "${_SET_TIME}" ]]; then
