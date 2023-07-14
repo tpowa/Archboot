@@ -57,6 +57,7 @@ _timezone () {
         done
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
+            _ZONES=""
             for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
                 _ZONES="${_ZONES} ${i} -"
             done
@@ -65,13 +66,9 @@ _timezone () {
                 _SET_ZONE="1"
                 _ZONE=$(cat ${_ANSWER})
                 [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-                if [[ -n "${_SET_ZONE}" ]]; then
-                    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
-                    timedatectl set-timezone "${_ZONE}"
-                    sleep 3
-                else
-                    return 1
-                fi
+                _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
+                timedatectl set-timezone "${_ZONE}"
+                sleep 3
                 _CONTINUE=1
             else
                 _SET_ZONE=""
