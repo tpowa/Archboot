@@ -50,7 +50,7 @@ _localize() {
 }
 
 if [[ -e /tmp/.localize-running ]]; then
-    echo "Localization already runs on a different console!"
+    echo "localize already runs on a different console!"
     echo "Please remove /tmp/.localize-running first!"
     exit 1
 fi 
