@@ -280,7 +280,6 @@ if ! _donetwork; then
     [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
     exit 1
 fi
-[[ -e /tmp/.network ]] && rm /tmp/.network
 [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
 clear
 exit 0
