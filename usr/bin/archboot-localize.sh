@@ -46,7 +46,8 @@ _localize() {
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
     locale-gen &>/dev/null
-    sleep 2
+    _dialog --infobox "Localization completed successfully." 3 40
+    sleep 3
 }
 
 if [[ -e /tmp/.localize-running ]]; then
