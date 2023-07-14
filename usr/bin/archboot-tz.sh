@@ -47,7 +47,7 @@ _dotimezone () {
         while [[ -z "${_CONTINUE}" ]]; do
             _REGIONS="America - Europe - Africa - Asia - Australia -"
             #shellcheck disable=SC2086
-            if _dialog --menu "Please Select A Region:" 12 40 7 ${_REGIONS} 2>${_ANSWER}; then
+            if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
                 _REGION=$(cat ${_ANSWER})
                 _ZONES=""
                 _CONTINUE=1
@@ -61,7 +61,7 @@ _dotimezone () {
                 _ZONES="${_ZONES} ${i} -"
             done
             #shellcheck disable=SC2086
-            if _dialog --menu "Please Select A Timezone:" 22 40 16 ${_ZONES} 2>${_ANSWER}; then
+            if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
                 _SET_ZONE="1"
                 _ZONE=$(cat ${_ANSWER})
                 [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
