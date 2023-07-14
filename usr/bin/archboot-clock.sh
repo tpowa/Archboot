@@ -129,7 +129,7 @@ _dotimeset() {
             timedatectl set-time "${_DATETIME}"
             _SET_TIME="1"
         fi
-        if _dialog --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 60; then
+        if _dialog --trim --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
             _dialog --infobox "Clock configuration completed successfully." 3 50
             sleep 3
             return 0
