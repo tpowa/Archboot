@@ -71,8 +71,9 @@ _do_wireless() {
             "Hidden" "_" "RESCAN" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
                 _CONTINUE=1
-            elif grep -q 'RESCAN' "${_ANSWER}"; then
-                _CONTINUE=""
+                if grep -q 'RESCAN' "${_ANSWER}"; then
+                    _CONTINUE=""
+                fi
             else
                 _abort
             fi
