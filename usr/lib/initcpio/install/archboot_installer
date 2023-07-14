@@ -5,10 +5,11 @@
 build ()
 {
     map add_binary genfstab arch-chroot pacstrap \
-    archboot-binary-check.sh archboot-not-installed.sh archboot-locale.sh hwdetect
+    archboot-binary-check.sh archboot-not-installed.sh hwdetect
     add_file "/usr/bin/archboot-setup.sh" "/usr/bin/setup"
     add_file "/usr/bin/archboot-launcher.sh" "/usr/bin/launcher"
     add_file "/usr/bin/archboot-quickinst.sh" "/usr/bin/quickinst"
+    add_file "/usr/bin/archboot-localize.sh" "/usr/bin/localize"
     add_file "/usr/bin/archboot-copy-mountpoint.sh" "/usr/bin/copy-mountpoint.sh"
     add_file "/usr/bin/archboot-rsync-backup.sh" "/usr/bin/rsync-backup.sh"
     add_file "/usr/bin/archboot-restore-usbstick.sh" "/usr/bin/restore-usbstick.sh"

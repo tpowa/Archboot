@@ -140,12 +140,12 @@ _set_guid() {
 }
 
 _configure_vconsole() {
-    if [[ -e /usr/bin/km ]]; then
-        km && _NEXTITEM=1
-    elif [[ -e /usr/bin/archboot-km.sh ]]; then
-        archboot-km.sh && _NEXTITEM=1
+    if [[ -e /usr/bin/vconsole ]]; then
+        vconsole && _NEXTITEM=1
+    elif [[ -e /usr/bin/archboot-vconsole.sh ]]; then
+        archboot-vconsole.sh && _NEXTITEM=1
     else
-        _dialog --msgbox "Error:\nkm script not found, aborting console and keyboard configuration." 0 0
+        _dialog --msgbox "Error:\nvconsole script not found, aborting vconsole configuration." 0 0
     fi
 }
 

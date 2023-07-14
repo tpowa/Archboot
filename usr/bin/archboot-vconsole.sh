@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-_ANSWER="/tmp/.km"
+_ANSWER="/tmp/.vconsole"
 _RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Console Configuration"
+_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Vconsole Configuration"
 _LIST_MAPS="localectl list-keymaps --no-pager"
 # _dialog()
 # an el-cheapo dialog wrapper
@@ -16,9 +16,9 @@ _dialog() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort Arch Linux Console Configuration?" 5 50; then
-        [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
-        [[ -e /tmp/.km ]] && rm /tmp/.km
+    if _dialog --yesno "Abort Arch Linux Vconsole Configuration?" 5 50; then
+        [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
+        [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
         clear
         exit 1
     else
@@ -27,12 +27,12 @@ _abort() {
 }
 
 _do_vconsole() {
-    _dialog --infobox "Setting console font ${_FONT} and keymap ${_KEYMAP}..." 3 80
+    _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
-    _dialog --infobox "Console Font and Keymap setting completed successfully.\nContinuing in 5 seconds..." 4 60
+    _dialog --infobox "Vconsole configuration completed successfully.\nContinuing in 5 seconds..." 4 60
     sleep 5
     return 0
 }
@@ -46,7 +46,7 @@ _set_vconsole() {
             _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
-        if _dialog --menu "        Select Console Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER}; then
+        if _dialog --menu "        Select Vconsole Font:\n\n     Font Name          Region" 12 40 14 ${_FONTS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _FONT=$(cat ${_ANSWER})
             _CONTINUE=1
@@ -96,20 +96,20 @@ _set_vconsole() {
     done
 }
 
-if [[ -e /tmp/.km-running ]]; then
-    echo "km already runs on a different console!"
-    echo "Please remove /tmp/.km-running first to launch tz!"
+if [[ -e /tmp/.vconsole-running ]]; then
+    echo "vconsole already runs on a different vconsole!"
+    echo "Please remove /tmp/.vconsole-running first to launch vconsole!"
     exit 1
 fi 
-: >/tmp/.km-running
+: >/tmp/.vconsole-running
 if ! _set_vconsole; then
-    [[ -e /tmp/.km ]] && rm /tmp/.km
-    [[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+    [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
+    [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
     clear
     exit 1
 fi
-[[ -e /tmp/.km ]] && rm /tmp/.km
-[[ -e /tmp/.km-running ]] && rm /tmp/.km-running
+[[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
+[[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
 _do_vconsole
 clear
 exit 0

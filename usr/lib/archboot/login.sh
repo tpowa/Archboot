@@ -182,12 +182,12 @@ if [[ -e /usr/bin/setup ]]; then
     _enter_shell
     # basic environment setup:
     # glibc locale, vconsole, network, clock
-    if ! [[ -e /tmp/.locale ]]; then
-        archboot-locale.sh
+    if ! [[ -e /tmp/.localize ]]; then
+        localize
         source /etc/locale.conf
     fi
     if ! [[ -e /tmp/.keymap ]]; then
-        km && : >/tmp/.keymap
+        vconsole && : >/tmp/.vconsole
     fi
     if [[ ! -e /tmp/.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
         network && : >/tmp/.network

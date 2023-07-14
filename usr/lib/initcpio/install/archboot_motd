@@ -11,10 +11,10 @@ build ()
     [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
-    echo -e "\e[1mConsole Configuration:\e[m" >> "${MOTD}"
+    echo -e "\e[1mVconsole Configuration:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92mALT + F1 - F6\e[m keys to change the virtual console." >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_keymap ; then
-    echo -e "  - Use the \e[1;92m'km'\e[m script to change to a non-US keymap." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'vconsole'\e[m script to change to a non-US keymap." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_net_common ; then
     echo -e "\e[1mNetwork Configuration:\e[m" >> "${MOTD}"
