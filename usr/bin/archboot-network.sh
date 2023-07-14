@@ -134,7 +134,7 @@ _donetwork() {
         _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            if _dialog --ok-label "Select" --menu "Select a network interface:" 12 40 6 ${_INTERFACES} 2>"${_ANSWER}"; then
+            if _dialog --title " Network Interface " --ok-label "Select" --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
                 _INTERFACE=$(cat "${_ANSWER}")
             else
                 _abort
@@ -151,7 +151,7 @@ _donetwork() {
         _NETWORK_PROFILE=""
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
-            if _dialog --inputbox "Enter your network profile name:" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"; then
+            if _dialog --title " Network Profile Name " --inputbox "" 6 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"; then
                 _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
                 _CONTINUE=1
             else
