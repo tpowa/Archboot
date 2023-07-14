@@ -210,7 +210,7 @@ _network() {
     # add sleep here for systemd-resolve get correct values
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
-        _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 6 70
+        _dialog --msgbox "Error:\nYour network is not working correctly, please configure again!" 5 60
         return 1
     fi
     _dialog --infobox "Link is up. Network is ready." 3 50
