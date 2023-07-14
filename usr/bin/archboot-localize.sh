@@ -3,7 +3,7 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.localize"
 _RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Locale Configuration"
+_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Localization"
 # _dialog()
 # an el-cheapo dialog wrapper
 #
@@ -15,7 +15,7 @@ _dialog() {
 }
 
 _abort() {
-    _dialog --yesno "Abort Arch Linux System Wide Locale Setting?" 5 60 || return 0
+    _dialog --yesno "Abort Arch Linux Localization?" 5 60 || return 0
     [[ -e /tmp/.localize-running ]] && rm /tmp/.localize-running
     [[ -e /tmp/.localize ]] && rm /tmp/.localize
     clear
@@ -38,7 +38,7 @@ _localize_menu() {
 }
 
 _localize() {
-    _dialog --infobox "Locale configuration set to ${_LOCALE}.UTF-8..." 3 50
+    _dialog --infobox "Localization set to ${_LOCALE}.UTF-8..." 3 50
     echo "LANG=${_LOCALE}.UTF-8" > /etc/localize.conf
     echo "LANG=${_LOCALE}.UTF-8" > /tmp/.localize
     echo LC_COLLATE=C >> /etc/localize.conf
@@ -50,7 +50,7 @@ _localize() {
 }
 
 if [[ -e /tmp/.localize-running ]]; then
-    echo "Locale configuration already runs on a different console!"
+    echo "Localization already runs on a different console!"
     echo "Please remove /tmp/.localize-running first!"
     exit 1
 fi 
