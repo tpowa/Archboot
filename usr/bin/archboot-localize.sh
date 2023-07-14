@@ -15,7 +15,7 @@ _dialog() {
 }
 
 _abort() {
-    _dialog --yesno "Abort Arch Linux Localization?" 5 40 || return 0
+    _dialog --yesno "Abort Arch Linux Localization?" 5 35 || return 0
     [[ -e /tmp/.localize-running ]] && rm /tmp/.localize-running
     [[ -e /tmp/.localize ]] && rm /tmp/.localize
     clear
