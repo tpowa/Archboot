@@ -21,7 +21,7 @@ _abort() {
         clear
         exit 1
     else
-        _CONTINUE=""
+        _timezone
     fi
 }
 
@@ -39,18 +39,14 @@ _hwclock() {
 }
 
 _timezone () {
-    _CONTINUE=""
-    while [[ -z "${_CONTINUE}" ]]; do
-        _REGIONS="America - Europe - Africa - Asia - Australia -"
-        #shellcheck disable=SC2086
-        if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
-            _REGION=$(cat ${_ANSWER})
-            _ZONES=""
-            _CONTINUE=1
-        else
-            _abort
-        fi
-    done
+    _REGIONS="America - Europe - Africa - Asia - Australia -"
+    #shellcheck disable=SC2086
+    if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
+        _REGION=$(cat ${_ANSWER})
+        _ZONES=""
+    else
+        _abort
+    fi
     for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
         _ZONES="${_ZONES} ${i} -"
     done
@@ -80,7 +76,7 @@ _timeset() {
             # sync immediatly with standard pool
             if ! systemctl restart systemd-timesyncd; then
                 _dialog --msgbox "An error has occured, time was not changed!" 0 0
-                return 1
+                _timeset
             fi
             # enable background syncing
             timedatectl set-ntp 1
@@ -120,18 +116,8 @@ if [[ -e /tmp/.clock-running ]]; then
     exit 1
 fi
 : >/tmp/.clock-running
-if ! _timezone; then
-    [[ -e /tmp/.clock ]] && rm /tmp/.clock
-    [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-    clear
-    exit 1
-fi
-if ! _timeset; then
-    [[ -e /tmp/.clock ]] && rm /tmp/.clock
-    [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-    clear
-    exit 1
-fi
+_timezone
+_timeset
 [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
 clear
 exit 0
