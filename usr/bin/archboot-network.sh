@@ -68,9 +68,11 @@ _do_wireless() {
             #shellcheck disable=SC2086,SC2046
             if _dialog --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             $(_essid_list _) \
-            "Hidden" "_" 2>"${_ANSWER}"; then
+            "Hidden" "_" "RESCAN" "_" 2>"${_ANSWER}"; then
                 _WLAN_SSID=$(cat "${_ANSWER}")
                 _CONTINUE=1
+            elif grep -q 'RESCAN' "${_ANSWER}"; then
+                _CONTINUE=""
             else
                 _abort
             fi
@@ -101,7 +103,7 @@ _do_wireless() {
             || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
                 _CONTINUE=""
                 while [[ -z "${_CONTINUE}" ]]; do
-                    if _dialog --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
+                    if _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
                         _WLAN_KEY=$(cat "${_ANSWER}")
                         _CONTINUE=1
                     else
@@ -122,7 +124,9 @@ _do_wireless() {
                 _dialog --infobox "Authentification was successful." 3 70
                 sleep 3
             else
-                _dialog --msgbox "Error:\nAuthentification failed. Please configure again!" 6 60
+                _WLAN_AUTH=""
+                _dialog --infobox "Error:\nAuthentification failed. Please configure again!" 6 60
+                sleep 5
             fi
             _printk on
         done
@@ -172,7 +176,7 @@ _network() {
             _DNS=""
         else
             _IP="static"
-            _dialog --no-cancel --title "IP Address And Netmask" --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
+            _dialog --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
             _IPADDR=$(cat "${_ANSWER}")
             _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
             _GW=$(cat "${_ANSWER}")
