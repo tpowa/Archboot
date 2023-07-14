@@ -29,13 +29,8 @@ _hwclock() {
     _DATE_PROGRAM=timedatectl
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
-    [[ "${_HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
-    [[ "${_HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
-    if [[ "${_HARDWARECLOCK}" = "UTC" ]]; then
-        timedatectl set-local-rtc 0
-    else
-        timedatectl set-local-rtc 1
-    fi
+    echo UTC >> /etc/adjtime
+    timedatectl set-local-rtc 0
 }
 
 _timezone () {
@@ -72,9 +67,6 @@ _timezone () {
 }
 
 _timeset() {
-    _HARDWARECLOCK=""
-    _DATE_PROGRAM=""
-    _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
     _hwclock
     # check internet connection
     if ping -c1 www.google.com &>/dev/null; then
