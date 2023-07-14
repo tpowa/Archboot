@@ -37,7 +37,7 @@ _do_vconsole() {
     return 0
 }
 
-_set_vconsole() {
+_vconsole_font() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         if grep -q '^FONT=.*32' /etc/vconsole.conf; then
@@ -54,6 +54,9 @@ _set_vconsole() {
             _abort
         fi
     done
+}
+
+_vconsole_keymap() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         # get list of 2 sign locale
@@ -64,23 +67,17 @@ _set_vconsole() {
         if _dialog --title " Keymap Region " --menu "" 12 40 6 ${_KEYMAPS} 2>${_ANSWER}; then
             _KEYMAP=$(cat ${_ANSWER})
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
-                while [[ -z "${_CONTINUE}" ]]; do
-                    #shellcheck disable=SC2086
-                    if _dialog --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
-                        _KEYMAP=$(cat ${_ANSWER})
-                        _CONTINUE=1
-                    else
-                        _abort
-                    fi
-                done
+                #shellcheck disable=SC2086
+                if _dialog --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
+                    _KEYMAP=$(cat ${_ANSWER})
+                    _CONTINUE=1
+                else
+                    _CONTINUE=""
+                fi
             fi
-            _CONTINUE=1
         else
             _abort
         fi
-    done
-    _CONTINUE=""
-    while [[ -z "${_CONTINUE}" ]]; do
         _KEYMAPS=""
         for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
             _KEYMAPS="${_KEYMAPS} ${i} -"
@@ -91,7 +88,7 @@ _set_vconsole() {
             _KEYMAP=$(cat ${_ANSWER})
             _CONTINUE=1
         else
-            _abort
+            _CONTINUE=""
         fi
     done
 }
