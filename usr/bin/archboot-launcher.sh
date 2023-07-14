@@ -39,7 +39,7 @@ _check_manage() {
 }
 
 _desktop () {
-    _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || _launcher
+    _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "GNOME" ]]; then
@@ -69,7 +69,7 @@ _desktop () {
 }
 
 _manage() {
-    _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || _launcher
+    _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || return 1
     clear
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     _EXIT="$(cat ${_ANSWER})"
@@ -92,8 +92,8 @@ _exit() {
     _dialog --title " EXIT MENU " --menu "" 9 30 5 \
     "1" "Exit Program" \
     "2" "Reboot System" \
-    "3" "Poweroff System" 2>${_ANSWER} || _launcher
-    _EXIT="$(cat ${_ANSWER})"
+    "3" "Poweroff System" 2>${_ANSWER} || return 1
+        _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "1" ]]; then
         _show_login
     elif [[ "${_EXIT}" == "2" ]]; then
@@ -151,7 +151,9 @@ if [[ -e /tmp/.launcher-running ]]; then
 fi
 : >/tmp/.launcher
 : >/tmp/.launcher-running
-_check_desktop
-_check_manage
-_launcher
+while true; do
+    _check_desktop
+    _check_manage
+    _launcher
+done
 # vim: set ts=4 sw=4 et:
