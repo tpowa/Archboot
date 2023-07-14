@@ -15,6 +15,8 @@ Environment Changes:
 - ask basic environment settings on first login
 - added interactive launcher script
 - added network script for network configuration
+- renamed km to vconsole
+- renamed tz to clock
 locale:
 - fixed abort dialog
 update:

@@ -42,10 +42,10 @@ _localize() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/localize.conf
     echo "LANG=${_LOCALE}.UTF-8" > /tmp/.localize
     echo LC_COLLATE=C >> /etc/localize.conf
-    localizectl set-localize "${_LOCALE}.UTF-8" &>/dev/null
+    localectl set-localize "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/localize.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/localize.gen
-    localize-gen &>/dev/null
+    locale-gen &>/dev/null
     sleep 2
 }
 
