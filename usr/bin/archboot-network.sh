@@ -62,7 +62,7 @@ _do_wireless() {
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
             # scan the area
-            _dialog --infobox "Scanning for SSID with interface ${_INTERFACE}..." 3 50
+            _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
             iwctl station "${_INTERFACE}" scan
             sleep 5
             #shellcheck disable=SC2086,SC2046
@@ -101,7 +101,7 @@ _do_wireless() {
             || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
                 _CONTINUE=""
                 while [[ -z "${_CONTINUE}" ]]; do
-                    if _dialog --title " Connection Key for ${_WLAN_SSID} " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
+                    if _dialog --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"; then
                         _WLAN_KEY=$(cat "${_ANSWER}")
                         _CONTINUE=1
                     else
