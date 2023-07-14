@@ -26,21 +26,19 @@ _abort() {
 }
 
 _dohwclock() {
+    _DATE_PROGRAM=timedatectl
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
     if [[ "${_HARDWARECLOCK}" = "UTC" ]]; then
         timedatectl set-local-rtc 0
-        _DATE_PROGRAM=timedatectl
     else
         timedatectl set-local-rtc 1
-        #shellcheck disable=SC2209
-        _DATE_PROGRAM=date
     fi
 }
 
-_dotimezone () {
+_timezone () {
     _SET_ZONE=""
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
@@ -80,63 +78,58 @@ _dotimezone () {
     done
 }
 
-_dotimeset() {
-    _SET_TIME=""
-    while [[ -z "${_SET_TIME}" ]]; do
-        _HARDWARECLOCK=""
-        _DATE_PROGRAM=""
-        _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
-        _dohwclock
-        # check internet connection
-        if ping -c1 www.google.com &>/dev/null; then
-            if _dialog --yesno \
-            "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-                _dialog --infobox "Syncing clock with NTP pool..." 3 45
-                # sync immediatly with standard pool
-                if ! systemctl restart systemd-timesyncd; then
-                    _dialog --msgbox "An error has occured, time was not changed!" 0 0
-                    return 1
-                fi
-                # enable background syncing
-                timedatectl set-ntp 1
-                _SET_TIME="1"
+_timeset() {
+    _HARDWARECLOCK=""
+    _DATE_PROGRAM=""
+    _dialog --yesno "Do you want to use UTC for your clock?\n\nIf you choose 'YES' UTC (recommended default) is used,\nwhich ensures daylightsaving is set automatically.\n\nIf you choose 'NO' Localtime is used, which means\nthe system will not change the time automatically.\nLocaltime is also prefered on dualboot machines,\nwhich also run Windows, because UTC may confuse it." 14 60 && _HARDWARECLOCK="UTC"
+    _dohwclock
+    # check internet connection
+    if ping -c1 www.google.com &>/dev/null; then
+        if _dialog --yesno \
+        "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
+            _dialog --infobox "Syncing clock with NTP pool..." 3 45
+            # sync immediatly with standard pool
+            if ! systemctl restart systemd-timesyncd; then
+                _dialog --msgbox "An error has occured, time was not changed!" 0 0
+                return 1
             fi
+            # enable background syncing
+            timedatectl set-ntp 1
         fi
-        if [[ -z "${_SET_TIME}" ]]; then
-            timedatectl set-ntp 0
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                # display and ask to set date/time
-                if _dialog --title ' Date Setting' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
-                    _DATE="$(cat ${_ANSWER})"
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
-            _CONTINUE=""
-            while [[ -z "${_CONTINUE}" ]]; do
-                if _dialog --title ' Time Setting ' --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
-                    _TIME="$(cat ${_ANSWER})"
-                    _CONTINUE=1
-                else
-                    _abort
-                fi
-            done
-            # save the time
-            # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
-            _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
-            timedatectl set-time "${_DATETIME}"
-            _SET_TIME="1"
-        fi
-        if _dialog --trim --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
-            _dialog --infobox "Clock configuration completed successfully." 3 50
-            sleep 3
-            return 0
-        else
-            _SET_TIME=""
-        fi
-    done
+    fi
+    if [[ -z "${_SET_TIME}" ]]; then
+        timedatectl set-ntp 0
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            # display and ask to set date/time
+            if _dialog --title ' Date Setting' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}; then
+                _DATE="$(cat ${_ANSWER})"
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
+        _CONTINUE=""
+        while [[ -z "${_CONTINUE}" ]]; do
+            if _dialog --title ' Time Setting ' --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}; then
+                _TIME="$(cat ${_ANSWER})"
+                _CONTINUE=1
+            else
+                _abort
+            fi
+        done
+        # save the time
+        # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
+        _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
+        timedatectl set-time "${_DATETIME}"
+    fi
+    if _dialog --trim --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
+        _dialog --infobox "Clock configuration completed successfully." 3 50
+        sleep 3
+        return 0
+    else
+        _timezone
+    fi
 }
 
 if [[ -e /tmp/.clock-running ]]; then
@@ -145,13 +138,13 @@ if [[ -e /tmp/.clock-running ]]; then
     exit 1
 fi
 : >/tmp/.clock-running
-if ! _dotimezone; then
+if ! _timezone; then
     [[ -e /tmp/.clock ]] && rm /tmp/.clock
     [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
     exit 1
 fi
-if ! _dotimeset; then
+if ! _timeset; then
     [[ -e /tmp/.clock ]] && rm /tmp/.clock
     [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
     clear
