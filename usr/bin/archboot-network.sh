@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-_ANSWER="/tmp/.net"
+_ANSWER="/tmp/.network"
 _RUNNING_ARCH="$(uname -m)"
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Network Configuration"
 _LOG="/dev/tty7"
@@ -18,8 +18,8 @@ _dialog() {
 
 _abort() {
     if _dialog --yesno "Abort Arch Linux Network Configuration?" 5 60; then
-        [[ -e /tmp/.net-running ]] && rm /tmp/.net-running
-        [[ -e /tmp/.net ]] && rm /tmp/.net
+        [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
+        [[ -e /tmp/.network ]] && rm /tmp/.network
         clear
         exit 1
     else
@@ -268,21 +268,21 @@ _donetwork() {
     sleep 5
 }
 
-if [[ -e /tmp/.net-running ]]; then
+if [[ -e /tmp/.network-running ]]; then
     clear
-    echo "net already runs on a different console!"
-    echo "Please remove /tmp/.net-running first to launch net!"
+    echo "network already runs on a different console!"
+    echo "Please remove /tmp/.network-running first to launch network!"
     exit 1
 fi
-: >/tmp/.net-running
+: >/tmp/.network-running
 if ! _donetwork; then
     clear
-    [[ -e /tmp/.net ]] && rm /tmp/.net
-    [[ -e /tmp/.net-running ]] && rm /tmp/.net-running
+    [[ -e /tmp/.network ]] && rm /tmp/.network
+    [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
     exit 1
 fi
-[[ -e /tmp/.net ]] && rm /tmp/.net
-[[ -e /tmp/.net-running ]] && rm /tmp/.net-running
+[[ -e /tmp/.network ]] && rm /tmp/.network
+[[ -e /tmp/.network-running ]] && rm /tmp/.network-running
 clear
 exit 0
 # vim: set ft=sh ts=4 sw=4 et:
