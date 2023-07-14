@@ -82,9 +82,6 @@ _manage() {
     _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || _launcher
     clear
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
-    if [[ -n "${_ABORT}"  ]]; then
-        exit 1
-    fi
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "FULL" ]]; then
         update -full-system
@@ -108,7 +105,7 @@ _exit() {
     "3" "Poweroff System" 2>${_ANSWER} || _launcher
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "1" ]]; then
-        return 0
+        _show_login
     elif [[ "${_EXIT}" == "2" ]]; then
         _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
         sleep 10
@@ -165,10 +162,5 @@ fi
 : >/tmp/.launcher-running
 _check_desktop
 _check_manage
-if ! _launcher; then
-    _show_login
-    exit 1
-fi
-_show_login
-exit 0
+_launcher
 # vim: set ts=4 sw=4 et:
