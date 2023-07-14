@@ -24,7 +24,7 @@ _abort() {
     fi
 }
 
-_simulate_login() {
+_show_login() {
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     clear
     echo ""
@@ -33,11 +33,32 @@ _simulate_login() {
     cat /etc/motd
 }
 
+_check_desktop() {
+    _DESKTOP=()
+    update | grep -q Gnome && _DESKTOP+=( "GNOME" "Simple Beautiful Elegant" )
+    update | grep -q KDE && _DESKTOP+=( "PLASMA" "Simple By Default" )
+    update | grep -q Sway && _DESKTOP+=( "SWAY" "Tiling Wayland Compositor" )
+    update | grep -q Xfce && _DESKTOP+=( "XFCE" "Leightweight Desktop" )
+}
+
+_check_manage() {
+    _MANAGE=()
+    update | grep -q full && _MANAGE+=( "FULL" "Switch To Full Arch Linux System" )
+    update | grep -q latest && _MANAGE+=( "UPDATE" "Update Archboot Environment" )
+    update | grep -q image && _MANAGE+=( "IMAGE" "Create New Archboot Images" )
+}
+
 _dolauncher() {
+    _MENU=()
+    if [[ -n "${_DESKTOP[@]}" ]]; then
+        _MENU+=( "2" "Launch Desktop Environment" )
+    fi
+    if [[ -n "${_MANAGE[@]}" ]]; then
+        _MENU+=( "3" "Manage Archboot Environment" )
+    fi
     _dialog --title " Main Menu " --menu "" 10 40 6 \
     "1" "Launch Archboot Setup" \
-    "2" "Launch Desktop Environment" \
-    "3" "Manage Archboot Environment" \
+    "${_MENU[@]}" \
     "4" "Exit Program" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
@@ -45,18 +66,8 @@ _dolauncher() {
             setup
             exit 0 ;;
         "2")
-            _LAUNCHER=()
-            update | grep -q Gnome && _LAUNCHER+=( "GNOME" "Simple Beautiful Elegant" )
-            update | grep -q KDE && _LAUNCHER+=( "PLASMA" "Simple By Default" )
-            update | grep -q Sway && _LAUNCHER+=( "SWAY" "Tiling Wayland Compositor" )
-            update | grep -q Xfce && _LAUNCHER+=( "XFCE" "Leightweight Desktop" )
             _ABORT=""
-            if [[ -n "${_LAUNCHER[@]}" ]]; then
-                _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
-            else
-                _dialog --msgbox "Error:\nNo Desktop Environments available." 0 0
-                _ABORT=1
-            fi
+            _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || _ABORT=1
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ -n "${_ABORT}"  ]]; then
                 clear
@@ -89,17 +100,8 @@ _dolauncher() {
             exit 0
             ;;
         "3")
-            _LAUNCHER=()
-            update | grep -q full && _LAUNCHER+=( "FULL" "Switch To Full Arch Linux System" )
-            update | grep -q latest && _LAUNCHER+=( "UPDATE" "Update Archboot Environment" )
-            update | grep -q image && _LAUNCHER+=( "IMAGE" "Create New Images" )
             _ABORT=""
-            if [[ -n "${_LAUNCHER[@]}" ]]; then
-                _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_LAUNCHER[@]}" 2>${_ANSWER} || _ABORT=1
-            else
-                _dialog --msgbox "Error:\nNo management options available." 0 0
-                _ABORT=1
-            fi
+            _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || _ABORT=1
             clear
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
             if [[ -n "${_ABORT}"  ]]; then
@@ -155,10 +157,12 @@ if [[ -e /tmp/.launcher-running ]]; then
 fi
 : >/tmp/.launcher
 : >/tmp/.launcher-running
+_check_desktop
+_check_manage
 if ! _dolauncher; then
-    _simulate_login
+    _show_login
     exit 1
 fi
-_simulate_login
+_show_login
 exit 0
 # vim: set ts=4 sw=4 et:
