@@ -43,7 +43,7 @@ _essid_list() {
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
-    for dev in $(iwctl station "${_INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
+    for dev in $(iwctl station "${_INTERFACE}" get-networks 2>${_NO_LOG} | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
