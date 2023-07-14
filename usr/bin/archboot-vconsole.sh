@@ -32,7 +32,7 @@ _do_vconsole() {
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
     sleep 2
-    _dialog --infobox "Vconsole configuration completed successfully." 4 60
+    _dialog --infobox "Vconsole configuration completed successfully." 3 40
     sleep 3
     return 0
 }
@@ -66,7 +66,7 @@ _set_vconsole() {
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
                 while [[ -z "${_CONTINUE}" ]]; do
                     #shellcheck disable=SC2086
-                    if _dialog --menu "Select A Keymap Region:" 18 40 12 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
+                    if _dialog --title " Keymap Layout " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
                         _KEYMAP=$(cat ${_ANSWER})
                         _CONTINUE=1
                     else
