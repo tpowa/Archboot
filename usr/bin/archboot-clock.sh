@@ -26,17 +26,15 @@ _abort() {
 }
 
 _hwclock() {
+    _DATE_PROGRAM=timedatectl
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "UTC" ]] && echo UTC >> /etc/adjtime
     [[ "${_HARDWARECLOCK}" = "" ]] && echo LOCAL >> /etc/adjtime
     if [[ "${_HARDWARECLOCK}" = "UTC" ]]; then
         timedatectl set-local-rtc 0
-        _DATE_PROGRAM=timedatectl
     else
         timedatectl set-local-rtc 1
-        #shellcheck disable=SC2209
-        _DATE_PROGRAM=date
     fi
 }
 
