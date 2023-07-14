@@ -109,7 +109,7 @@ _wireless() {
         sleep 3
         return 0
     else
-        _dialog --title "ERROR" --infobox "Authentification failed. Please configure again!" 3 60
+        _dialog --title "ERROR" --infobox "Authentification failed. Please configure again!" 3 70
         sleep 5
         return 1
     fi
@@ -206,7 +206,7 @@ _network() {
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
     systemctl restart systemd-resolved
-    _dialog --infobox "Waiting for network link to come up..." 3 50
+    _dialog --infobox "Waiting for network link to come up..." 3 60
     # add sleep here for systemd-resolve get correct values
     sleep 5
     if ! getent hosts www.google.com &>"${_LOG}"; then
@@ -214,9 +214,9 @@ _network() {
         sleep 5
         return 1
     fi
-    _dialog --infobox "Link is up. Network is ready." 3 50
+    _dialog --infobox "Link is up. Network is ready." 3 60
     sleep 3
-    _dialog --infobox "Network configuration completed successfully." 3 50
+    _dialog --infobox "Network configuration completed successfully." 3 60
     sleep 3
     return 0
 }
