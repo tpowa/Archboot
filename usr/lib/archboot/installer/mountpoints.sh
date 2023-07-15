@@ -123,7 +123,7 @@ _create_filesystem() {
     if [[ -n "${_DOMKFS}" ]]; then
         [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "vfat" ]] || _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
-            _dialog --no-cancel --title " LABEL Name " --no-cancel --inputbox "" 10 65 4\
+            _dialog --no-cancel --title " LABEL Name " --inputbox "" 7 65 \
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${_LABEL_NAME}$" /tmp/.parts; then
