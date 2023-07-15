@@ -68,7 +68,7 @@ _abort_local_mode() {
 
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
-        _dialog --menu "Select A Text Editor" 9 35 3 \
+        _dialog --title " Text Editor " --no-cancel --menu "" 8 35 2 \
         "1" "nano (easier)" \
         "2" "neovim" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
