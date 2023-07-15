@@ -191,7 +191,7 @@ _check_btrfs_subvolume(){
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
-                _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUME! Please enter another name." 3 70
+                _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 70
                 sleep 3
                 _BTRFS_SUBVOLUME="NONE"
             fi
@@ -201,7 +201,7 @@ _check_btrfs_subvolume(){
         # existing subvolumes
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
-            _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUME! Please enter another name." 3 70
+            _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 70
             sleep 3
             _BTRFS_SUBVOLUME="NONE"
         fi
