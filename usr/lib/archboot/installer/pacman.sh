@@ -180,7 +180,7 @@ _install_packages() {
     _auto_packages
     # fix double spaces
     _PACKAGES="${_PACKAGES//  / }"
-    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console.?" 10 75 || return 1
+    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
     _run_pacman
     _NEXTITEM="6"
     _chroot_mount
