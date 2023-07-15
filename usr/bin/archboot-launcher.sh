@@ -89,7 +89,7 @@ _manage() {
 
 _exit() {
     #shellcheck disable=SC2086
-    _dialog --title " Exit Menu " --menu "" 9 30 5 \
+    _dialog --cancel-label "Back" --title " Exit Menu " --menu "" 9 30 5 \
     "1" "Exit Program" \
     "2" "Reboot System" \
     "3" "Poweroff System" 2>${_ANSWER} || return 1
