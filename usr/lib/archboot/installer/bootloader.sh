@@ -269,8 +269,8 @@ _do_mok_sign () {
     if [[ -n "${_SIGN_MOK}" ]]; then
         ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
         ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-        _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully.\nContinuing in 5 seconds..." 6 60
-        sleep 5
+        _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
+        sleep 3
     fi
 }
 
@@ -762,8 +762,8 @@ label linux
     initrd ${_SUBDIR}/${_INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
-    _dialog --infobox "UBOOT has been installed successfully.\nContinuing in 5 seconds..." 4 55
-    sleep 5
+    _dialog --infobox "UBOOT has been installed successfully." 3 55
+    sleep 3
 }
 
 _do_grub_bios() {
@@ -919,8 +919,8 @@ _do_grub_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully.\n\nContinuing in 5 seconds..." 5 60
-        sleep 5
+        _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
+        sleep 3
         _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _do_secureboot_keys || return 1

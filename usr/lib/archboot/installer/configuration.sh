@@ -75,6 +75,7 @@ _set_password() {
             _PASSWORD=/tmp/.password
         else
             _dialog --title " ERROR " --infobox "Password didn't match, please enter again." 5 50
+            sleep 3
             _PASSWORD=""
             _PASS=""
             _PASS2=""
