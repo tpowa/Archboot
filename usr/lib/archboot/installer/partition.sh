@@ -49,7 +49,7 @@ _partition() {
     while true; do
         # Prompt the user with a list of known disks
         #shellcheck disable=SC2086
-        _dialog --no-cancel --menu "Select the device you want to partition:" 14 45 7 ${_DISKS} 2>"${_ANSWER}" || return 1
+        _dialog --title " Partition Device " --no-cancel --menu "" 13 45 6 ${_DISKS} 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
         if [[ "${_DISK}" == "OTHER" ]]; then
             _dialog --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || _DISK=""
