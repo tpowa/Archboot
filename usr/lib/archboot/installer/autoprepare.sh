@@ -13,7 +13,7 @@ _autoprepare() {
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
-        _dialog --menu "Select the storage device to use:" 10 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
+        _dialog --title " Storage Device " --menu "" 11 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
     else
         _DISK="${_DISKS}"
@@ -62,21 +62,22 @@ _autoprepare() {
         fi
         # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
-            _dialog --no-cancel --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
+            _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP=$(cat "${_ANSWER}")
             if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
-                _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260M and only FAT32 FS is supported." 0 0
                 _UEFISYS_BOOTDEV=1
             fi
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --no-cancel --inputbox "Enter the size (in MiB/M) of your /boot partition:\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 11 65 "512" 2>"${_ANSWER}" || return 1
+                    _dialog --title " Partition Size /boot MiB" --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 11 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
-                        _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                        _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                        sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                            _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+                            _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                            sleep 5
                         else
                             _BOOTDEV_SET=1
                             _UEFISYSDEV_SET=1
