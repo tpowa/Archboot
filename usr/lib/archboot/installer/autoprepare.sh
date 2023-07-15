@@ -69,7 +69,7 @@ _autoprepare() {
             fi
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --title " Partition Size /boot In MiB" --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 10 65 "512" 2>"${_ANSWER}" || return 1
+                    _dialog --title " /boot In MiB" --no-cancel --inputbox "Minimum value is 260. Disk space left: ${_DISK_SIZE}M" 8 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
@@ -88,7 +88,7 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --title " Partition Size  EFI SYSTEM PARTITION (ESP) In MiB " --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 10 65 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --title " EFI SYSTEM PARTITION (ESP) In MiB " --no-cancel --inputbox "Minimum value is 260. Disk space left: ${_DISK_SIZE}M" 8 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
