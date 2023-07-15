@@ -89,7 +89,7 @@ _manage() {
 
 _exit() {
     #shellcheck disable=SC2086
-    _dialog --title " EXIT MENU " --menu "" 9 30 5 \
+    _dialog --title " Exit Menu " --menu "" 9 30 5 \
     "1" "Exit Program" \
     "2" "Reboot System" \
     "3" "Poweroff System" 2>${_ANSWER} || return 1
@@ -121,7 +121,7 @@ _launcher() {
     _dialog --title " Main Menu " --menu "" 10 40 6 \
     "1" "Launch Archboot Setup" \
     "${_MENU[@]}" \
-    "4" "Exit Program" 2>${_ANSWER}
+    "4" "Exit" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
