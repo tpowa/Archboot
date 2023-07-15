@@ -26,7 +26,7 @@ _select_mirror() {
     # FIXME: this regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
-    _dialog --cancel-label "Back" --menu "Select a mirror:" 14 55 7 \
+    _dialog --title " Package Mirror "--menu "" 13 55 7 \
         ${_MIRRORS} \
         "Custom" "_" 2>${_ANSWER} || return 1
     #shellcheck disable=SC2155
@@ -131,7 +131,8 @@ _prepare_pacman() {
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
     if ! pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
-        _dialog --msgbox "Keyring update failed! Check ${_LOG} for errors." 6 60
+        _dialog --title " ERROR " --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
+        sleep 5
         return 1
     fi
 }
@@ -156,8 +157,8 @@ _run_pacman(){
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        _dialog --infobox "Package installation complete.\nContinuing in 5 seconds..." 4 40
-        sleep 5
+        _dialog --infobox "Package installation complete." 3 40
+        sleep 3
     fi
     rm /tmp/.pacman-retcode
     # ensure the disk is synced
