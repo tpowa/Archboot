@@ -141,31 +141,33 @@ _set_guid() {
 
 _configure_vconsole() {
     if [[ -e /usr/bin/vconsole ]]; then
-        vconsole && _NEXTITEM=1
+        vconsole --setup && _NEXTITEM=1
     elif [[ -e /usr/bin/archboot-vconsole.sh ]]; then
-        archboot-vconsole.sh && _NEXTITEM=1
+        archboot-vconsole.sh --setup && _NEXTITEM=1
     else
-        _dialog --msgbox "Error:\nvconsole script not found, aborting vconsole configuration." 0 0
+        _dialog --title " ERROR " --infobox "vconsole script not found, aborting vconsole configuration." 3 60
+        sleep 5
     fi
 }
 
 _configure_network() {
     if [[ -e /usr/bin/network ]]; then
-        network && _NEXTITEM="2"
+        network --setup && _NEXTITEM="2"
     elif [[ -e /usr/bin/archboot-network.sh ]]; then
-        archboot-network.sh && _NEXTITEM="2"
+        archboot-network.sh --setup && _NEXTITEM="2"
     else
-        _dialog --msgbox "Error:\nnet script not found, aborting network configuration" 0 0
+        _dialog --title " ERROR " --infobox "network script not found, aborting network configuration" 3 60
+        sleep 5
     fi
 }
 
 _configure_clock() {
     if [[ -e /usr/bin/clock ]]; then
-        clock && _NEXTITEM="3"
+        clock --setup && _NEXTITEM="3"
     elif [[ -e /usr/bin/archboot-clock.sh ]]; then
-        archboot-clock.sh && _NEXTITEM="3"
+        archboot-clock.sh --setup && _NEXTITEM="3"
     else
-        _dialog --msgbox "Error:\nclock script not found, aborting clock configuration" 0 0
+        _dialog --title " ERROR " --infobox "clock script not found, aborting clock configuration" 3 60
     fi
 }
 
