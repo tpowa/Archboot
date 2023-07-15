@@ -45,7 +45,7 @@ _vconsole_font() {
             _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
-        if _dialog --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
+        if _dialog --cancel-label "Exit" --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _FONT=$(cat ${_ANSWER})
             _CONTINUE=1
@@ -69,7 +69,7 @@ _vconsole_keymap() {
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
                 _CONTINUE=""
                 #shellcheck disable=SC2086
-                if _dialog --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
+                if _dialog --cancel-label "Back" --title " Keymap Region " --menu "" 17 40 11 ${_OTHER_KEYMAPS} 2>${_ANSWER}; then
                     _KEYMAP=$(cat ${_ANSWER})
                     _CONTINUE=1
                 fi
@@ -83,7 +83,7 @@ _vconsole_keymap() {
                 _KEYMAPS="${_KEYMAPS} ${i} -"
             done
             #shellcheck disable=SC2086
-            if _dialog --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
+            if _dialog --cancel-label "Back" --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
                 #shellcheck disable=SC2086
                 _KEYMAP=$(cat ${_ANSWER})
                 _CONTINUE=1
