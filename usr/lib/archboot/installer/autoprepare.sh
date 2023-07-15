@@ -69,7 +69,7 @@ _autoprepare() {
             fi
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --title " Partition Size /boot MiB" --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 11 65 "512" 2>"${_ANSWER}" || return 1
+                    _dialog --title " Partition Size /boot In MiB" --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 10 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
@@ -88,13 +88,15 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --no-cancel --inputbox "Enter the size (MiB/M) of your EFI SYSTEM PARTITION (ESP):\nMinimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 11 65 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --title " Partition Size  EFI SYSTEM PARTITION (ESP) In MiB " --no-cancel --inputbox "Minimum value is 260.\n\nDisk space left: ${_DISK_SIZE}M" 10 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
-                        _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
+                        _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                        sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                            _dialog --msgbox "ERROR: You have entered an invalid size, please enter again." 0 0
+                            _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                            sleep 5
                         else
                             _UEFISYSDEV_SET=1
                             _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
