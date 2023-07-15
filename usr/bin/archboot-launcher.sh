@@ -40,7 +40,7 @@ _check_manage() {
 }
 
 _desktop () {
-    _dialog --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
+    _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "GNOME" ]]; then
@@ -70,7 +70,7 @@ _desktop () {
 }
 
 _manage() {
-    _dialog --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || return 1
+    _dialog --cancel-label "Back" --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || return 1
     clear
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
     _EXIT="$(cat ${_ANSWER})"
