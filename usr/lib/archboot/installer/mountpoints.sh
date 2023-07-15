@@ -282,9 +282,11 @@ _mountpoints() {
                         _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
                         if [[ -n "${_UEFISYSDEV_DONE}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS="${_DEVS} ${_ROOT_BTRFS}"
+                            _ROOT_BTRFS=""
                         fi
                     else
-                        if [[ "${_MP}" == "/" ]]; then
+                        if [[ "${_FSTYPE}" == "btrfs" && "${_MP}" == "/" ]]; then
+                            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
                             _ROOT_BTRFS="$(${_LSBLK} NAME,SIZE -d "${_DEV}")"
                         fi
                     fi
