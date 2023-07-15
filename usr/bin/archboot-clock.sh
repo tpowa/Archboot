@@ -40,7 +40,7 @@ _timezone () {
         while [[ -z "${_CONTINUE}" ]]; do
             _REGIONS="America - Europe - Africa - Asia - Australia -"
             #shellcheck disable=SC2086
-            if _dialog --title " Region Menu " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
+            if _dialog --title " Timezone Region " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
                 _REGION=$(cat ${_ANSWER})
                 _ZONES=""
                 _CONTINUE=1
@@ -53,7 +53,7 @@ _timezone () {
             _ZONES="${_ZONES} ${i} -"
         done
         #shellcheck disable=SC2086
-        if _dialog --title " Timezone Menu " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
+        if _dialog --title " Timezone " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
             _SET_ZONE="1"
             _ZONE=$(cat ${_ANSWER})
             [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
@@ -87,16 +87,16 @@ _timeset() {
     if [[ -z "${_SET_TIME}" ]]; then
         timedatectl set-ntp 0
         # display and ask to set date/time
-        _dialog --title ' Date Setting' --no-cancel --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}
+        _dialog --title " Date " --no-cancel --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2> ${_ANSWER}
         _DATE="$(cat ${_ANSWER})"
-        _dialog --title ' Time Setting ' --no-cancel --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}
+        _dialog --title " Time " --no-cancel --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2> ${_ANSWER}
         _TIME="$(cat ${_ANSWER})"
         # save the time
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_DATETIME}"
     fi
-    if _dialog --cr-wrap --title " Confirmation Dialog " --yesno "$(${_DATE_PROGRAM})" 0 0; then
+    if _dialog --cr-wrap --title " Summary " --yesno "$(${_DATE_PROGRAM})" 0 0; then
         _dialog --infobox "Clock configuration completed successfully." 3 50
         _SET_TIME="1"
         sleep 3
