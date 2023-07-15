@@ -294,8 +294,8 @@ _autoprepare() {
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
         fi
     done
-    _dialog --infobox "Quick Setup was successful.\nContinuing in 5 seconds..." 4 40
-    sleep 5
+    _dialog --infobox "Quick Setup was successful." 3 40
+    sleep 3
     _S_MKFSAUTO=1
 }
 # vim: set ft=sh ts=4 sw=4 et:
