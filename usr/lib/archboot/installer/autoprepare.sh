@@ -107,7 +107,7 @@ _autoprepare() {
             fi
             _DISK_SIZE="$((_DISK_SIZE-_UEFISYSDEV_SIZE))"
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --title " /boot In MiB " --no-cancel --inputbox "Minimum value is 100. Disk space left: ${_DISK_SIZE}M" 8 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --title " /boot In MiB " --no-cancel --inputbox "Minimum value is 100. Disk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
@@ -125,7 +125,7 @@ _autoprepare() {
             done
         else
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --title " /boot In MiB "--no-cancel --inputbox "Minimum value is 100.\n\nDisk space left: ${_DISK_SIZE}M" 8 65 "512" 2>"${_ANSWER}" || return 1
+                _dialog --title " /boot In MiB "--no-cancel --inputbox "Minimum value is 100.\n\nDisk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
@@ -146,7 +146,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --title " Swap In MiB " --no-cancel --inputbox "Minimum value is > 0. Disk space left: ${_DISK_SIZE}M" 8 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --title " Swap In MiB " --no-cancel --inputbox "Minimum value is > 0. Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" || "${_SWAPDEV_SIZE}" == 0 ]]; then
                 _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
@@ -174,7 +174,7 @@ _autoprepare() {
         # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 12 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 12 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
