@@ -299,8 +299,8 @@ _umountall()
         for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "${dev}"
         done
-        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}...\nContinuing in 5 seconds..." 5 60
-        sleep 5
+        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 60
+        sleep 3
     fi
 }
 
@@ -316,8 +316,8 @@ _stopmd()
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
-            _dialog --infobox "Removing software raid device(s) done.\nContinuing in 5 seconds..." 0 0
-            sleep 5
+            _dialog --infobox "Removing software raid device(s) done." 3 50
+            sleep 3
         fi
     fi
     _DISABLEMDSB=""
@@ -331,8 +331,8 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${dev}"
         done
-        _dialog --infobox "Removing superblock(s) on software raid devices done.\nContinuing in 5 seconds..." 4 60
-        sleep 5
+        _dialog --infobox "Removing superblock(s) on software raid devices done." 3 60
+        sleep 3
     fi
 }
 
@@ -360,8 +360,8 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done.\nContinuing in 5 seconds..." 5 50
-        sleep 5
+        _dialog --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
+        sleep 3
     fi
 }
 
@@ -384,8 +384,8 @@ _stopluks()
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing luks encrypted device(s) done.\nContinuing in 5 seconds..." 0 0
-        sleep 5
+        _dialog --infobox "Removing luks encrypted device(s) done." 3 50
+        sleep 3
     fi
     _DISABLELUKS=""
     _DETECTED_LUKS=""
@@ -399,8 +399,8 @@ _stopluks()
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing not running luks encrypted device(s) done.\nContinuing in 5 seconds..." 0 0
-        sleep 5
+        _dialog --infobox "Removing not running luks encrypted device(s) done." 3 60
+        sleep 3
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
 }
@@ -504,10 +504,11 @@ _createmd()
     [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
-        _dialog --infobox "${_RAIDDEV} created successfully.\nContinuing in 5 seconds..." 4 50
-        sleep 5
+        _dialog --infobox "${_RAIDDEV} created successfully." 3 50
+        sleep 3
     else
-        _dialog --msgbox "Error while creating ${_RAIDDEV} (see ${_LOG} for details)." 0 0
+        _dialog --title " ERROR " --infobox "Creating ${_RAIDDEV} failed." 3 60
+        sleep 5
         return 1
     fi
     if [[ -n "${_RAID_PARTITION}" ]]; then
@@ -578,10 +579,12 @@ _createpv()
     _umountall
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
-        _dialog --infobox "Creating physical volume on ${_DEV} was successful.\nContinuing in 5 seconds..." 4 75
-        sleep 5
+        _dialog --infobox "Creating physical volume on ${_DEV} was successful." 3 75
+        sleep 3
     else
-        _dialog --msgbox "Error while creating physical volume on ${_DEV} (see ${_LOG} for details)." 0 0; return 1
+        _dialog --title " ERROR " --infobox "Creating physical volume on ${_DEV} failed." 3 60
+        sleep 5
+        return 1
     fi
     # run udevadm to get values exported
     udevadm trigger
@@ -661,8 +664,8 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
-        _dialog --infobox "Creating Volume Group ${_VGDEV} was successful.\nContinuing in 5 seconds..." 4 60
-        sleep 5
+        _dialog --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
+        sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
         return 1
@@ -730,8 +733,8 @@ _createlv()
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful.\nContinuing in 5 seconds..." 4 60
-            sleep 5
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
@@ -739,8 +742,8 @@ _createlv()
     else
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful.\nContinuing in 5 seconds..." 4 60
-            sleep 5
+            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
