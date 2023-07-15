@@ -280,7 +280,7 @@ _mountpoints() {
                     # btrfs is a special case! not really elegant
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
                         _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -n ${_ROOT_BTRFS} ]];
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS="${_DEVS} ${_ROOT_BTRFS}"
                         fi
                     else
