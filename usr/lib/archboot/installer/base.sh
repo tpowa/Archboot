@@ -46,7 +46,7 @@ _set_title() {
 # parameters: see dialog(1)
 # returns: whatever dialog did
 _dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
+    dialog --cancel-label "Back" --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
