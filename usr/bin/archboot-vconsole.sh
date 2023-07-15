@@ -46,7 +46,7 @@ _vconsole_font() {
             _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
-        if _dialog --cancel-label "Exit" --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
+        if _dialog --cancel-label "${_LABEL}" --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
             #shellcheck disable=SC2086
             _FONT=$(cat ${_ANSWER})
             _CONTINUE=1
@@ -101,6 +101,11 @@ if [[ -e /tmp/.vconsole-running ]]; then
     exit 1
 fi 
 : >/tmp/.vconsole-running
+if [[ -n "${1}" ]]; then
+_LABEL="Back"
+else
+_LABEL="Exit"
+fi
 _vconsole_font
 _vconsole_keymap
 [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running

@@ -41,7 +41,7 @@ _timezone () {
         while [[ -z "${_CONTINUE}" ]]; do
             _REGIONS="America - Europe - Africa - Asia - Australia -"
             #shellcheck disable=SC2086
-            if _dialog --cancel-label "Exit" --title " Timezone Region " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
+            if _dialog --cancel-label "${_LABEL}" --title " Timezone Region " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
                 _REGION=$(cat ${_ANSWER})
                 _ZONES=""
                 _CONTINUE=1
@@ -113,6 +113,11 @@ if [[ -e /tmp/.clock-running ]]; then
 fi
 : >/tmp/.clock-running
 _SET_TIME=""
+if [[ -n "${1}" ]]; then
+_LABEL="Back"
+else
+_LABEL="Exit"
+fi
 while [[ -z "${_SET_TIME}" ]]; do
     _timezone
     _timeset
