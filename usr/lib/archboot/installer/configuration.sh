@@ -4,12 +4,13 @@
 _check_root_password() {
     # check if empty password is set
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
-        _dialog --msgbox "Setup detected no password set for root user,\nplease set new password now." 6 50
+        _dialog --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
+        sleep 3
         _set_password || return 1
     fi
     # check if account is locked
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
-        _dialog --msgbox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
+        _dialog --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
         _set_password || return 1
     fi
 }
@@ -22,7 +23,8 @@ _set_mkinitcpio() {
         [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || _HOOK_ERROR=1
     done
     if [[ -n "${_HOOK_ERROR}" ]]; then
-        _dialog --msgbox "ERROR: Detected error in 'HOOKS=' line, please correct HOOKS= in /etc/mkinitcpio.conf!" 18 70
+        _dialog --title " ERROR " --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
+        sleep 5
     else
         _run_mkinitcpio
     fi
@@ -37,11 +39,11 @@ _set_locale() {
             _OTHER_LOCALES="${_OTHER_LOCALES} ${i} -"
         done
         #shellcheck disable=SC2086
-        _dialog --menu "Select A System Wide Locale:" 13 40 7 ${_LOCALES} 2>${_ANSWER} || return 1
+        _dialog --no-cancel --title " Locale " --menu "" 12 40 7 ${_LOCALES} 2>${_ANSWER} || return 1
         _SET_LOCALE=$(cat "${_ANSWER}")
         if [[ "${_SET_LOCALE}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
-            _dialog --menu "Select A System Wide Locale:" 18 40 12 ${_OTHER_LOCALES} 2>${_ANSWER} || return 1
+            _dialog --no-cancel --title " Other Locale " --menu "" 18 40 12 ${_OTHER_LOCALES} 2>${_ANSWER} || return 1
             _SET_LOCALE=$(cat "${_ANSWER}")
         fi
         sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}.UTF-8#g" "${_DESTDIR}"/etc/locale.conf
@@ -59,11 +61,11 @@ _set_password() {
     _PASS2=""
     while [[ -z "${_PASSWORD}" ]]; do
         while [[ -z "${_PASS}" ]]; do
-            _dialog --insecure --passwordbox "Enter new root password:" 8 50 2>"${_ANSWER}" || return 1
+            _dialog --title " Root Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
             _PASS=$(cat "${_ANSWER}")
         done
         while [[ -z  "${_PASS2}" ]]; do
-            _dialog --insecure --passwordbox "Retype new root password:" 8 50 2>"${_ANSWER}" || return 1
+            _dialog --title " Retype Root Password " --insecure --passwordbox "" 8 50 2>"${_ANSWER}" || return 1
             _PASS2=$(cat "${_ANSWER}")
         done
         if [[ "${_PASS}" == "${_PASS2}" ]]; then
@@ -72,7 +74,7 @@ _set_password() {
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
         else
-            _dialog --msgbox "Error:\nPassword didn't match, please enter again." 6 50
+            _dialog --title " ERROR " --infobox "Password didn't match, please enter again." 5 50
             _PASSWORD=""
             _PASS=""
             _PASS2=""

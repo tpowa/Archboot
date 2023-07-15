@@ -258,7 +258,7 @@ _configure_system() {
             _DEFAULT=""
         fi
         #shellcheck disable=SC2086
-        _dialog ${_DEFAULT} --menu "System Configuration" 20 60 16 \
+        _dialog --no-cancel ${_DEFAULT} --menu "System Configuration" 20 60 16 \
             "/etc/hostname"                 "System Hostname" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
