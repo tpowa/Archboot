@@ -57,7 +57,7 @@ _select_filesystem() {
     command -v mkfs.ext3 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
     command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    _dialog --no-cancel --menu "Select a filesystem for ${_DEV}:" 16 50 13 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 16 50 13 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
