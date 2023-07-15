@@ -310,7 +310,7 @@ _mainmenu() {
     "5" "Install Packages" \
     "6" "Configure System" \
     "7" "Install Bootloader" \
-    "8" "Exit Program" 2>${_ANSWER}
+    "8" "Exit" 2>${_ANSWER}
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
         "0")
@@ -350,7 +350,7 @@ _mainmenu() {
             _install_bootloader ;;
         "8")
             #shellcheck disable=SC2086
-            _dialog --title " EXIT MENU " --menu "" 9 30 5 \
+            _dialog --title " Exit Menu " --menu "" 9 30 5 \
             "1" "Exit Program" \
             "2" "Reboot System" \
             "3" "Poweroff System" 2>${_ANSWER}
