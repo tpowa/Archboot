@@ -288,7 +288,7 @@ _mountpoints() {
             _MOUNT_TEXT="mount"
         fi
         #shellcheck disable=SC2028
-        _dialog --yesno "Would you like to ${_MOUNT_TEXT} the filesytems like this?\n\nSyntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
+        _dialog --title " Summary " --yesno "Syntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
     done
     # disable swap and all mounted devices
     _umountall
