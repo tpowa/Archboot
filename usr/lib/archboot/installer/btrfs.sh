@@ -260,7 +260,7 @@ _btrfs_subvolume() {
 _btrfs_compress() {
     _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
     #shellcheck disable=SC2086
-    _dialog --title " Compression on ${_DEV} subvolume=${_BTRFS_SUBVOLUME} " --menu "" 10 50 4 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --no-cancel --title " Compression on ${_DEV} subvolume=${_BTRFS_SUBVOLUME} " --menu "" 10 50 4 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
     if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
         _BTRFS_COMPRESS="NONE"
     else
