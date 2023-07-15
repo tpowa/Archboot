@@ -74,7 +74,7 @@ _enter_mountpoint() {
         _MP="/"
         _ROOT_DONE=1
     elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
-        _dialog --title " EFI SYSTEM PARTITION (ESP) " --menu "" 8 50 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " EFI SYSTEM PARTITION (ESP) " --menu "" 8 50 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         _UEFISYSDEV_DONE=1
     else
@@ -84,7 +84,7 @@ _enter_mountpoint() {
             grep -qw "/boot" /tmp/.parts && _MP=/home
             grep -qw "/home" /tmp/.parts && _MP=/srv
             grep -qw "/srv" /tmp/.parts && _MP=/var
-            _dialog --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
             if grep ":${_MP}:" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
