@@ -953,7 +953,7 @@ _install_bootloader_uefi() {
     if [[ -n "${_UEFI_SECURE_BOOT}" || "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _do_grub_uefi
     else
-        _dialog --title " ${_UEFI_ARCH} UEFI bootloader " --menu "" 8 55 2 \
+        _dialog --title " ${_UEFI_ARCH} UEFI Bootloader " --menu "" 8 40 2 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
             "GRUB_UEFI" "GRUB(2) for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
         case $(cat "${_ANSWER}") in
