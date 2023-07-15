@@ -135,7 +135,7 @@ _create_filesystem() {
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _prepare_btrfs || return 1
         fi
-        _dialog --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 7 70  2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 7 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     else
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
