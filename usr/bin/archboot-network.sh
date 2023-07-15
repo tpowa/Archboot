@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
+LANG=C
 _ANSWER="/tmp/.network"
 _RUNNING_ARCH="$(uname -m)"
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Network Configuration"
