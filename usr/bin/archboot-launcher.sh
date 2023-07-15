@@ -118,10 +118,8 @@ _launcher() {
     if [[ -n "${_MANAGE[@]}" ]]; then
         _MENU+=( "3" "Manage Archboot Environment" )
     fi
-    _dialog --title " Main Menu " --menu "" 10 40 6 \
-    "1" "Launch Archboot Setup" \
-    "${_MENU[@]}" \
-    "4" "Exit" 2>${_ANSWER}
+    _dialog --cancel-label "Exit" --title " Main Menu " --menu "" 10 40 6 \
+    "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
             [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
@@ -133,14 +131,8 @@ _launcher() {
         "3")
             _manage
             ;;
-        "4")
-            _exit
-            ;;
         *)
-            if _dialog --yesno "Abort Arch Linux Setup Launcher?" 6 40; then
-                _show_login
-                exit 1
-            fi
+            _exit
             ;;
     esac
 }
