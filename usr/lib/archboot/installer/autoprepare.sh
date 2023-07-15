@@ -62,7 +62,7 @@ _autoprepare() {
         fi
         # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
-            _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
+            _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 8 40 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP=$(cat "${_ANSWER}")
             if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
                 _UEFISYS_BOOTDEV=1
