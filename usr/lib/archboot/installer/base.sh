@@ -205,7 +205,7 @@ _prepare_storagedrive() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        _dialog ${_DEFAULT} --menu "Prepare Storage Device" 12 60 5 \
+        _dialog --no-cancel --cancel-label "Back" ${_DEFAULT} --menu "Prepare Storage Device" 12 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
