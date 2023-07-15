@@ -33,7 +33,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'update'\e[m or \e[1;92m'launcher'\e[m script." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92m'launcher'\e[m or \e[1;92m'update'\e[m script." >> "${MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1mInstallation Or Installation For Experts:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'setup'\e[m or \e[1;92m'quickinst'\e[m script." >> "${MOTD}"
