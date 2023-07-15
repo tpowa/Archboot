@@ -178,7 +178,7 @@ _select_source() {
     else
         if [[ -z ${_S_NET} ]]; then
             if ! [[ -e /tmp/.network ]]; then
-                net || return 1
+                network || return 1
                 _S_NET=1
             else
                 _S_NET=1
