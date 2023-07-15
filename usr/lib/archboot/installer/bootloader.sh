@@ -124,21 +124,21 @@ _check_bootpart() {
 _abort_uboot(){
         _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
         if ! [[ "${_FSTYPE}" == "ext2" || "${_FSTYPE}" == "ext3" || "${_FSTYPE}" == "ext4" || "${_FSTYPE}" == "vfat" ]]; then
-            _dialog --msgbox "Error:\nYour selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
+            _dialog --title " ERROR " --infobox "Your selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_nilfs_bootpart() {
         if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "nilfs2"; then
-            _dialog --msgbox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
+            _dialog --title " ERROR " --infobox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_f2fs_bootpart() {
         if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "f2fs"; then
-            _dialog --msgbox "Error:\nYour selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
+            _dialog --title " ERROR " --infobox "Your selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
 }
@@ -219,22 +219,22 @@ _do_secureboot_keys() {
     _MOK_PW=""
     _KEYDIR=""
     while [[ -z "${_KEYDIR}" ]]; do
-        _dialog --inputbox "Setup keys:\nEnter the directory to store the keys on ${_DESTDIR}." 9 65 "/etc/secureboot/keys" 2>"${_ANSWER}" || return 1
+        _dialog --title " Setup Keys " --no-cancel --inputbox "Enter the directory to store the keys on ${_DESTDIR}." 8 65 "/etc/secureboot/keys" 2>"${_ANSWER}" || return 1
         _KEYDIR=$(cat "${_ANSWER}")
         #shellcheck disable=SC2086,SC2001
         _KEYDIR="$(echo ${_KEYDIR} | sed -e 's#^/##g')"
     done
     if [[ ! -d "${_DESTDIR}/${_KEYDIR}" ]]; then
         while [[ -z "${_CN}" ]]; do
-            _dialog --inputbox "Setup keys:\nEnter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
+            _dialog --title " Setup Keys " --no-cancel --inputbox "Enter a common name(CN) for your keys, eg. Your Name" 7 65 "" 2>"${_ANSWER}" || return 1
             _CN=$(cat "${_ANSWER}")
         done
         secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
-         _dialog --infobox "Setup keys created:\n\nCommon name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}\n\nContinuing in 10 seconds..." 8 60
-         sleep 10
+         _dialog --title " Setup Keys " --infobox "Common name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}" 5 60
+         sleep 5
     else
-         _dialog --infobox "Setup keys:\n-Directory ${_DESTDIR}/${_KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now\n\nContinuing in 10 seconds..." 8 50
-         sleep 10
+         _dialog --title " Setup Keys " --infobox "-Directory ${_DESTDIR}/${_KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 5 50
+         sleep 5
     fi
 }
 
@@ -245,9 +245,9 @@ _do_mok_sign () {
     _dialog --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && _INSTALL_MOK=1
     if [[ -n "${_INSTALL_MOK}" ]]; then
         while [[ -z "${_MOK_PW}" ]]; do
-            _dialog --insecure --passwordbox "Enter a one time MOK password for SHIM on reboot:" 8 65 2>"${_ANSWER}" || return 1
+            _dialog --title " MOK Password " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
             _PASS=$(cat "${_ANSWER}")
-            _dialog --insecure --passwordbox "Retype one time MOK password:" 8 65 2>"${_ANSWER}" || return 1
+            _dialog --title " Retype MOK Passwork " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
             _PASS2=$(cat "${_ANSWER}")
             if [[ "${_PASS}" == "${_PASS2}" && -n "${_PASS}" ]]; then
                 _MOK_PW=${_PASS}
@@ -255,13 +255,14 @@ _do_mok_sign () {
                 echo "${_MOK_PW}" >> /tmp/.password
                 _MOK_PW=/tmp/.password
             else
-                _dialog --msgbox "Password didn't match or was empty, please enter again." 6 65
+                _dialog --title " ERROR " --infobox "Password didn't match or was empty, please enter again." 6 65
+                sleep 3
             fi
         done
         mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
         rm /tmp/.password
-        _dialog --infobox "MOK keys have been installed successfully.\nContinuing in 5 seconds..." 4 50
-        sleep 5
+        _dialog --infobox "MOK keys have been installed successfully." 3 50
+        sleep 3
     fi
     _SIGN_MOK=""
     _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK=1
@@ -294,8 +295,8 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        _dialog --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}\nContinuing in 5 seconds..." 6 70
-        sleep 5
+        _dialog --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
+        sleep 3
     fi
 }
 
@@ -378,7 +379,7 @@ _do_efistub_uefi() {
         _ADDITIONAL_BOOTLOADER="rEFInd"
         _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --menu "Select FIRMWARE boot or an UEFI Boot Manager\nto provide a menu for the EFISTUB kernels?" 11 60 3 \
+    _dialog --title " Firmware Or UEFI Boot Manager " --menu "" 9 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
@@ -422,8 +423,8 @@ GUMEOF
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _do_efistub_copy_to_efisys
-        _dialog --infobox "SYSTEMD-BOOT has been setup successfully.\nContinuing in 5 seconds..." 4 50
-        sleep 5
+        _dialog --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0
@@ -471,8 +472,8 @@ CONFEOF
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _do_efistub_copy_to_efisys
-        _dialog --infobox "rEFInd has been setup successfully.\nContinuing in 5 seconds..." 4 50
-        sleep 5
+        _dialog --infobox "rEFInd has been setup successfully." 3 50
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error setting up rEFInd." 3 40
@@ -533,11 +534,12 @@ CONFEOF
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "Unified Kernel Image has been setup successfully.\nContinuing in 5 seconds..." 4 60
-        sleep 5
+        _dialog --infobox "Unified Kernel Image has been setup successfully." 3 60
+        sleep 3
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error: Setting up Unified Kernel Image failed!" 5 60
+        _dialog --title " ERROR " --infobox "Setting up Unified Kernel Image failed!" 3 60
+        sleep 5
     fi
 }
 
@@ -809,7 +811,7 @@ _do_grub_bios() {
         return 1
     fi
     #shellcheck disable=SC2086
-    _dialog --menu "Select the boot device where the GRUB(2) bootloader will be installed." 14 55 7 ${_DEVS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Grub Boot Device " --no-cancel --menu "" 14 55 7 ${_DEVS} 2>"${_ANSWER}" || return 1
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
@@ -842,8 +844,8 @@ _do_grub_bios() {
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
         _do_grub_config || return 1
-        _dialog --infobox "GRUB(2) BIOS has been installed successfully.\nContinuing in 5 seconds..." 4 55
-        sleep 5
+        _dialog --infobox "GRUB(2) BIOS has been installed successfully." 3 55
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${_DESTDIR} before chrooting." 0 0
@@ -928,8 +930,8 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
-        _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully.\nContinuing in 5 seconds..." 5 50
-        sleep 5
+        _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully." 4 50
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${_DESTDIR} before chrooting." 0 0
