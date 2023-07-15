@@ -300,7 +300,7 @@ _mainmenu() {
         _DEFAULT="--default-item 3"
     fi
     #shellcheck disable=SC2086
-    _dialog ${_DEFAULT} --title " MAIN MENU " \
+    _dialog --no-cancel ${_DEFAULT} --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
     "0" "Configure Console" \
     "1" "Configure Network" \
