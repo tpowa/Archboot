@@ -112,14 +112,15 @@ _btrfsraid_level() {
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --menu "Select the raid data level you want to use:" 14 50 10 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level  " --menu "" 13 50 7 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "NONE" ]]; then
             echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
             break
         else
             if [[ "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
-                _dialog --msgbox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
+                _dialog --infobox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
+                sleep 5
             fi
             # take selected device as 1st device, add additional devices in part below.
             _select_btrfsraid_devices
@@ -136,7 +137,7 @@ _select_btrfsraid_devices () {
     _BTRFS_DEVS=${_DEVS//${_BTRFS_DEV}\ _/}
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
-    _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
     _BTRFS_DEV=$(cat "${_ANSWER}")
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     while [[ "${_BTRFS_DEV}" != "DONE" ]]; do
@@ -151,14 +152,14 @@ _select_btrfsraid_devices () {
         _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
         # add more devices
         #shellcheck disable=SC2086
-        _dialog --menu "Select device ${_RAIDNUMBER}:" 13 50 10 ${_BTRFS_DEVS} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1
+        _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BTRFS_DEVS} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1
         _BTRFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BTRFS_DEV}" == "DONE" ]] && break
         echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
      done
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
-     _dialog --yesno "Would you like to create btrfs raid data like this?\n\nLEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && _BTRFS_RAID_FINISH="DONE"
+     _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && _BTRFS_RAID_FINISH="DONE"
 }
 
 # prepare new btrfs device
@@ -171,7 +172,7 @@ _prepare_btrfs() {
 _prepare_btrfs_subvolume() {
     _BTRFS_SUBVOLUME="NONE"
     while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
-        _dialog --inputbox "Enter the SUBVOLUME name on ${_DEV}, keep it short\nand use no spaces or special ncharacters." 9 60 2>"${_ANSWER}" || return 1
+        _dialog --title " Subvolume Name on ${_DEV} " --no-cancel --inputbox "Keep it short and use no spaces or special characters." 8 60 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _check_btrfs_subvolume
     done
@@ -182,14 +183,16 @@ _prepare_btrfs_subvolume() {
 _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
     if [[ -z "$(cat "${_ANSWER}")" ]]; then
-        _dialog --msgbox "ERROR: You have defined an empty name!\nPlease enter another name." 6 50
+        _dialog --title " ERROR " --infobox "You have defined an empty name! Please enter another name." 3 60
+        sleep 5
         _BTRFS_SUBVOLUME="NONE"
     fi
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
-                _dialog --msgbox "ERROR: You have defined 2 identical SUBVOLUME names!\nPlease enter another name." 6 60
+                _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUME names! Please enter another name." 3 60
+                sleep 5
                 _BTRFS_SUBVOLUME="NONE"
             fi
         done
@@ -198,7 +201,8 @@ _check_btrfs_subvolume(){
         # existing subvolumes
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
-            _dialog --msgbox "ERROR: You have defined 2 identical SUBVOLUME names!\nPlease enter another name." 6 60
+            _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUME names! Please enter another name." 3 60
+            sleep 5
             _BTRFS_SUBVOLUME="NONE"
         fi
     fi
@@ -227,12 +231,13 @@ _choose_btrfs_subvolume () {
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086
-        _dialog --menu "Select the subvolume to mount:" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
+        _dialog --title " Subvolume " --no-cancel --menu "" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _btrfs_compress || return 1
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
-            _dialog --msgbox "ERROR: All subvolumes of the device are already in use. Switching to create a new one now." 8 65
+            _dialog --title " ERROR " --infobox "All subvolumes of the device are already in use. Switching to create a new one now." 3 65
+            sleep 5
             _prepare_btrfs_subvolume || return 1
         fi
     fi
@@ -255,7 +260,7 @@ _btrfs_subvolume() {
 _btrfs_compress() {
     _BTRFS_COMPRESSLEVELS="zstd - lzo - zlib - NONE -"
     #shellcheck disable=SC2086
-    _dialog --menu "Select the compression method you want to use:\nDevice -> ${_DEV} subvolume=${_BTRFS_SUBVOLUME}" 12 50 10 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Compression on ${_DEV} subvolume=${_BTRFS_SUBVOLUME} " --menu "" 10 50 4 ${_BTRFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
     if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
         _BTRFS_COMPRESS="NONE"
     else
