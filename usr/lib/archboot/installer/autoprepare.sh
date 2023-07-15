@@ -13,7 +13,7 @@ _autoprepare() {
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
-        _dialog --cancel-label "Back" --menu "Select the storage device to use:" 10 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
+        _dialog --menu "Select the storage device to use:" 10 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
     else
         _DISK="${_DISKS}"
@@ -62,7 +62,7 @@ _autoprepare() {
         fi
         # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
-            _dialog --cancel-label "Back" --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
+            _dialog --menu "Select the mountpoint of your\nEFI SYSTEM PARTITION (ESP):" 10 40 7 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
             _UEFISYS_MP=$(cat "${_ANSWER}")
             if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
                 _dialog --msgbox "You have chosen to use /boot as the ESP Mountpoint. The minimum partition size is 260M and only FAT32 FS is supported." 0 0
