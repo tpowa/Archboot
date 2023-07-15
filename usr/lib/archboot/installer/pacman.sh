@@ -16,7 +16,7 @@ _select_mirror() {
     _NEXTITEM="3"
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        dialog --cancel-label "Back" --infobox "Downloading latest mirrorlist..." 3 40
+        dialog --infobox "Downloading latest mirrorlist..." 3 40
         ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
@@ -26,7 +26,7 @@ _select_mirror() {
     # FIXME: this regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
-    _dialog --menu "Select a mirror:" 14 55 7 \
+    _dialog --cancel-label "Back" --menu "Select a mirror:" 14 55 7 \
         ${_MIRRORS} \
         "Custom" "_" 2>${_ANSWER} || return 1
     #shellcheck disable=SC2155
