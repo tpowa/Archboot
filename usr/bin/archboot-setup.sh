@@ -7,7 +7,7 @@ LANG=C
 . /usr/lib/archboot/installer/base.sh
 # source all other functions
 . /usr/lib/archboot/installer/autoconfiguration.sh
-. /usr/lib/archboot/installer/autoprepare.sh
+. /usr/lib/archboot/installer/quicksetup.sh
 . /usr/lib/archboot/installer/blockdevices.sh
 . /usr/lib/archboot/installer/bootloader.sh
 . /usr/lib/archboot/installer/btrfs.sh

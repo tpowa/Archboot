@@ -132,7 +132,7 @@ _download_latest() {
         done
         # setup libs
         echo -e "\e[1mStep 4/4:\e[m Downloading latest setup libs..."
-        LIBS="autoconfiguration.sh autoprepare.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
+        LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
                 configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
