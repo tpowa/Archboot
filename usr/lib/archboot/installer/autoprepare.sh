@@ -164,7 +164,7 @@ _autoprepare() {
         done
         while [[ -z "${_CHOSENFS}" ]]; do
             #shellcheck disable=SC2086
-            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 15 45 9 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 14 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
             _dialog --yesno "${_FSTYPE} will be used for\n/ and /home. Is this OK?" 0 0 && _CHOSENFS=1
         done
@@ -174,7 +174,7 @@ _autoprepare() {
         # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 9 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
