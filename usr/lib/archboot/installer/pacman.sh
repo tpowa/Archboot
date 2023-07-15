@@ -13,7 +13,7 @@ _getsource() {
 }
 
 _select_mirror() {
-    _NEXTITEM="2"
+    _NEXTITEM="3"
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         dialog --infobox "Downloading latest mirrorlist..." 3 40
