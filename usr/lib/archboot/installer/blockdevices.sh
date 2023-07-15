@@ -445,7 +445,7 @@ _createmd()
         done
         _RAIDLEVELS="linear - raid0 - raid1 - raid4 - raid5 - raid6 - raid10 -"
         #shellcheck disable=SC2086
-        _dialog --menu "Select the raid level you want to use:" 14 50 7 ${_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --menu "Select the raid level you want to use:" 14 50 7 ${_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _LEVEL=$(cat "${_ANSWER}")
         # raid5 and raid10 support parity parameter
         _PARITY=""
@@ -469,7 +469,7 @@ _createmd()
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
             _DEV=$(cat "${_ANSWER}")
             _SPARE=""
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
@@ -565,7 +565,7 @@ _createpv()
             _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}") 2>"${_NO_LOG}"/}"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
             _DEV=$(cat "${_ANSWER}")
             [[ "${_DEV}" == "DONE" ]] && break
             echo "${_DEV}" >>/tmp/.pvs-create
@@ -640,7 +640,7 @@ _createvg()
         # select the first device to use, no missing option available!
         _PVNUMBER=1
         #shellcheck disable=SC2086
-        _dialog --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
         _PV=$(cat "${_ANSWER}")
         echo "${_PV}" >>/tmp/.pvs
         while [[ "${_PVS}" != "DONE" ]]; do
@@ -650,7 +650,7 @@ _createvg()
             _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_PV}") 2>"${_NO_LOG}"/}"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
             _PV=$(cat "${_ANSWER}")
             [[ "${_PV}" == "DONE" ]] && break
             echo "${_PV}" >>/tmp/.pvs
@@ -689,7 +689,7 @@ _createlv()
         # enter logical volume name
         _LVDEV=""
         while [[ -z "${_LVDEV}" ]]; do
-            _dialog --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --inputbox "Enter the Logical Volume name:\nfooname\n<yourvolumename>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
             _LVDEV=$(cat "${_ANSWER}")
             if lvs -o lv_name,vg_name --noheading | grep -q " ${_LVDEV} ${_LV}$"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical Logical Volume names! Please enter another name." 8 65
@@ -698,7 +698,7 @@ _createlv()
         done
         while [[ -z "${_LV_SIZE_SET}" ]]; do
             _LV_ALL=""
-            _dialog --inputbox "Enter the size (M/MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units M "${_LV}")\n\nIf you enter no value, all free space left will be used." 12 65 "" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --inputbox "Enter the size (M/MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units M "${_LV}")\n\nIf you enter no value, all free space left will be used." 12 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
                     _LV_ALL=1
@@ -764,16 +764,17 @@ _enter_luks_name() {
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
     while [[ -z "${_LUKSPASSPHRASE}" ]]; do
-        _dialog --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
         _LUKSPASS=$(cat "${_ANSWER}")
-        _dialog --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
         _LUKSPASS2=$(cat "${_ANSWER}")
         if [[ -n "${_LUKSPASS}" && -n "${_LUKSPASS2}" && "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
         else
-             _dialog --msgbox "Passphrases didn't match or was empty, please enter again." 0 0
+             _dialog --infobox "Passphrases didn't match or was empty, please enter again." 0 0
+             sleep 5
         fi
     done
 }
@@ -784,7 +785,8 @@ _opening_luks() {
     while [[ -z "${_LUKSOPEN_SUCCESS}" ]]; do
         cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
         if [[ -z "${_LUKSOPEN_SUCCESS}" ]]; then
-            _dialog --msgbox "Error: Passphrase didn't match, please enter again." 0 0
+            _dialog --infobox "Error: Passphrase didn't match, please enter again." 0 0
+            sleep 5
             _enter_luks_passphrase || return 1
         fi
     done
