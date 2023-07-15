@@ -93,7 +93,7 @@ _download_latest() {
     # Download latest setup and quickinst script from git repository
     if [[ -n "${_D_SCRIPTS}" ]]; then
         _network_check
-        echo -e "\e[1mStart:\e[m Downloading latest vconsole, clock, quickinst, setup and helpers..."
+        echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         # config
         echo -e "\e[1mStep 1/4:\e[m Downloading latest config..."
