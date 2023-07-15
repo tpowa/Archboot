@@ -562,7 +562,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d -p "${_DEV}") 2>"${_NO_LOG}"/}"
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
@@ -647,7 +647,7 @@ _createvg()
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
             #shellcheck disable=SC2001,SC2086
-            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -p -d "${_PV}") 2>"${_NO_LOG}"/}"
+            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_PV}") 2>"${_NO_LOG}"/}"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
