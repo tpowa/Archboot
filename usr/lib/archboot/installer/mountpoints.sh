@@ -163,6 +163,7 @@ _mountpoints() {
         _DEVS=$(_finddevices)
         _SWAP_DONE=""
         _ROOT_DONE=""
+        _ROOT_BTRFS=""
         if [[ -n ${_UEFI_BOOT} ]];then
             _UEFISYSDEV_DONE=""
         else
@@ -276,8 +277,17 @@ _mountpoints() {
                     _btrfs_parts
                     _check_mkfs_values
                     echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
-                    # always remove swap partition and root device
-                    [[ ! "${_FSTYPE}" == "btrfs" || "${_FSTYPE}" == "swap" ]] && _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
+                    # btrfs is a special case! not really elegant
+                    if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
+                        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -n ${_ROOT_BTRFS} ]];
+                            _DEVS="${_DEVS} ${_ROOT_BTRFS}"
+                        fi
+                    else
+                        if [[ "${_MP}" == "/" ]]; then
+                            _ROOT_BTRFS="$(${_LSBLK} NAME,SIZE -d "${_DEV}")"
+                        fi
+                    fi
                 fi
             fi
         done
