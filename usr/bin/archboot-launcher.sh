@@ -118,7 +118,7 @@ _launcher() {
     if [[ -n "${_MANAGE[@]}" ]]; then
         _MENU+=( "3" "Manage Archboot Environment" )
     fi
-    _dialog --cancel-label "Exit" --title " Main Menu " --menu "" 10 40 6 \
+    _dialog --cancel-label "Exit" --title " Main Menu " --menu "" 9 40 5 \
     "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
