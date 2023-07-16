@@ -139,7 +139,7 @@ _prepare_pacman() {
 
 _run_pacman(){
     _chroot_mount
-    _dialog --title " Pacman is runnning " --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
+    _dialog --title " Pacman " --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
     echo "Installing Packages..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
