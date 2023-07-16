@@ -31,28 +31,13 @@ _set_mkinitcpio() {
 }
 
 _set_locale() {
-    if [[ -z ${_S_LOCALE} ]]; then
-        _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER More"
-        _CHECK_LOCALES="$(grep 'UTF' "${_DESTDIR}"/etc/locale.gen | sed -e 's:#::g' -e 's: UTF-8.*$::g')"
-        _OTHER_LOCALES=""
-        for i in ${_CHECK_LOCALES}; do
-            _OTHER_LOCALES="${_OTHER_LOCALES} ${i} -"
-        done
-        #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Locale " --menu "" 12 40 7 ${_LOCALES} 2>${_ANSWER} || return 1
-        _SET_LOCALE=$(cat "${_ANSWER}")
-        if [[ "${_SET_LOCALE}" == "OTHER" ]]; then
-            #shellcheck disable=SC2086
-            _dialog --no-cancel --title " Other Locale " --menu "" 18 40 12 ${_OTHER_LOCALES} 2>${_ANSWER} || return 1
-            _SET_LOCALE=$(cat "${_ANSWER}")
-        fi
-        sed -i -e "s#LANG=.*#LANG=${_SET_LOCALE}.UTF-8#g" "${_DESTDIR}"/etc/locale.conf
-        _dialog --infobox "Setting locale LANG=${_SET_LOCALE}.UTF-8 on installed system..." 3 70
-        _S_LOCALE=1
-        sleep 2
+    if [[ -z ${_S_LOCALE} && ! -e /tmp/.localize && $(grep -qw '^archboot' /etc/hostname) ]]; then
+        localize
+        _auto_locale
         _auto_set_locale
         _run_locale_gen
     fi
+    _S_LOCALE=1
 }
 
 _set_password() {

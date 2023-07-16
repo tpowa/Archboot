@@ -206,11 +206,15 @@ _auto_hostname() {
 }
 
 _auto_locale() {
+    _dialog --infobox "Set default locale on installed system..." 3 70
     if [[ ! -f ${_DESTDIR}/etc/locale.conf ]]; then
-        _dialog --infobox "Set default locale on installed system..." 3 70
-        echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
-        echo "LC_COLLATE=C" >> "${_DESTDIR}"/etc/locale.conf
-        sleep 2
+        if [[ -n ${_DESTDIR} && -e /tmp/.localize ]]; then
+            cp /etc/locale.conf "${_DESTDIR}"/etc/locale.conf
+        else
+            echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
+            echo "LC_COLLATE=C" >> "${_DESTDIR}"/etc/locale.conf
+            sleep 2
+        fi
     fi
 }
 
