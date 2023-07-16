@@ -201,9 +201,9 @@ _install_packages() {
     _auto_hostname
     _auto_locale
     _auto_set_locale
-    _run_locale_gen
     _auto_bash
     # tear down the chroot environment
     _chroot_umount
+    _run_locale_gen
 }
 # vim: set ft=sh ts=4 sw=4 et:
