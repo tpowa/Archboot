@@ -17,7 +17,8 @@ Environment Changes:
 - added network script for network configuration
 - renamed km to vconsole
 - renamed tz to clock
-locale:
+- renamed archboot-locale script to localize
+localize:
 - fixed abort dialog
 update:
 - trigger kernel module loading on -full-system
@@ -29,6 +30,10 @@ setup:
 - added grub bli efi module to grub.cfg
 - switched to infobox on reboot and poweroff
 - removed network code
+- removed localization code
+- added titles  to all menus
+- removed and renamed cancel buttons
+- switched most msgboxes to infoboxes
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout
