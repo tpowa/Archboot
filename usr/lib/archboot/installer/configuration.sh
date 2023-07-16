@@ -31,7 +31,7 @@ _set_mkinitcpio() {
 }
 
 _set_locale() {
-    if [[ -z "${_S_LOCALE}" && ! -e "/tmp/.localize" && "$(grep -qw '^archboot' /etc/hostname)" ]]; then
+    if [[ -z "${_S_LOCALE}" && $(grep -qw '^archboot' /etc/hostname) && ! -e "/tmp/.localize" ]]; then
         localize
         _auto_locale
         _auto_set_locale
