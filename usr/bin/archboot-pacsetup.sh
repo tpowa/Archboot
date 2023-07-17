@@ -51,9 +51,6 @@ _enable_testing() {
 }
 
 _prepare_pacman() {
-    # Set up the necessary directories for pacman use
-    [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
-    [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     _dialog --infobox "Waiting for Arch Linux keyring initialization..." 3 40
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
