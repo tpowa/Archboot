@@ -238,7 +238,7 @@ _mainmenu() {
     fi
     #shellcheck disable=SC2086
     _dialog --no-cancel ${_DEFAULT} --title " MAIN MENU " \
-    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 14 58 8 \
+    --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 13 58 7 \
     "1" "Prepare Storage Device" \
     "2" "Install Packages" \
     "3" "Configure System" \
