@@ -22,7 +22,7 @@ _dialog() {
 _abort() {
     if _dialog --yesno "Abort$(echo ${_TITLE} | cut -d '|' -f3) ?" 5 45; then
         [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
-        [[ -e "${_ANSWER}" ]] && ${_ANSWER}
+        [[ -e "${_ANSWER}" ]] && rm ${_ANSWER}
         clear
         exit 1
     else
