@@ -3,9 +3,6 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
-_DLPROG="wget -q"
-_MIRRORLIST="/etc/pacman.d/mirrorlist"
-_KERNELPKG="linux"
 
 _select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
@@ -130,9 +127,16 @@ _update_environment() {
 _check
 while true; do
     _enable_testing
-    _select_mirror && break
+    _select_mirror
+    if _prepare_pacman; then
+        break
+    else
+        _dialog --title " ERROR " --infobox "Please reconfigure pacman." 3 50
+        sleep 5
+    fi
 done
-_prepare_pacman || exit 1
 _update_environment
+_dialog --infobox "Pacman configuration completed successfully." 3 40
+sleep 3
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
