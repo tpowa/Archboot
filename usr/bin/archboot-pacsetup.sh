@@ -131,12 +131,12 @@ while true; do
     if _prepare_pacman; then
         break
     else
-        _dialog --title " ERROR " --infobox "Please reconfigure pacman." 3 50
+        _dialog --title " ERROR " --infobox "Please reconfigure pacman." 3 40
         sleep 5
     fi
 done
 _update_environment
-_dialog --infobox "Pacman configuration completed successfully." 3 40
+_dialog --infobox "Pacman configuration completed successfully." 3 60
 sleep 3
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
