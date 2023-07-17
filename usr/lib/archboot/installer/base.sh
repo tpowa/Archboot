@@ -173,9 +173,9 @@ _prepare_storagedrive() {
         esac
     done
     if [[ "${_CANCEL}" = "1" ]]; then
-        _NEXTITEM="4"
+        _NEXTITEM="1"
     else
-        _NEXTITEM="5"
+        _NEXTITEM="2"
     fi
 }
 
