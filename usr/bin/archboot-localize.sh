@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/basic-common.sh
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Localization"
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Localization"
 
 _localize_menu() {
     _LOCALE=""
