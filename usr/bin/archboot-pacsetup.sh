@@ -110,7 +110,7 @@ _update_environment() {
                     _dialog --infobox "No new kernel online available. Skipping update environment." 3 70
                     sleep 3
                 else
-                    _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 11 60 && _UPDATE_ENVIRONMENT=1
+                    _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                         clear
                         echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
