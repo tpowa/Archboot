@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Launcher"
 . /usr/lib/archboot/basic-common.sh
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Launcher"
 
 _show_login() {
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running

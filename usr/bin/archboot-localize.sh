@@ -1,27 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
-_ANSWER="/tmp/.localize"
-_RUNNING_ARCH="$(uname -m)"
+. /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Localization"
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
-
-_abort() {
-    _dialog --yesno "Abort Arch Linux Localization?" 5 35 || return 0
-    [[ -e /tmp/.localize-running ]] && rm /tmp/.localize-running
-    [[ -e /tmp/.localize ]] && rm /tmp/.localize
-    clear
-    exit 1
-}
 
 _localize_menu() {
     _LOCALE=""
