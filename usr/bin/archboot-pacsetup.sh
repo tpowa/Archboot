@@ -85,7 +85,7 @@ _update_environment() {
     if update | grep -q '\-latest'; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-                _dialog --infobox "Refreshing package database..." 3 70
+                _dialog --infobox "Refreshing package database..." 3 50
                 pacman -Sy &>"${_LOG}"
                 sleep 1
                 _dialog --infobox "Checking on new online kernel version..." 3 50
@@ -107,7 +107,7 @@ _update_environment() {
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
                 sleep 2
                 if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
-                    _dialog --infobox "No new kernel online available. Skipping update environment." 3 50
+                    _dialog --infobox "No new kernel online available. Skipping update environment." 3 70
                     sleep 3
                 else
                     _dialog --defaultno --yesno "New online kernel version ${_ONLINE_KERNEL} available.\n\nDo you want to update the archboot environment to latest packages with caching packages for installation?\n\nATTENTION:\nThis will reboot the system using kexec!" 11 60 && _UPDATE_ENVIRONMENT=1
