@@ -10,6 +10,7 @@ build ()
     add_file "/usr/bin/archboot-launcher.sh" "/usr/bin/launcher"
     add_file "/usr/bin/archboot-quickinst.sh" "/usr/bin/quickinst"
     add_file "/usr/bin/archboot-localize.sh" "/usr/bin/localize"
+    add_file "/usr/bin/archboot-pacsetup.sh" "/usr/bin/pacsetup"
     add_file "/usr/bin/archboot-copy-mountpoint.sh" "/usr/bin/copy-mountpoint.sh"
     add_file "/usr/bin/archboot-rsync-backup.sh" "/usr/bin/rsync-backup.sh"
     add_file "/usr/bin/archboot-restore-usbstick.sh" "/usr/bin/restore-usbstick.sh"

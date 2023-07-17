@@ -180,8 +180,8 @@ if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!
     _enter_shell
-    # basic environment setup:
-    # glibc locale, vconsole, network, clock
+    # Basic Setup:
+    # glibc locale, vconsole, network, clock, pacman
     if ! [[ -e /tmp/.localize ]]; then
         localize
         source /etc/locale.conf
@@ -194,6 +194,9 @@ if [[ -e /usr/bin/setup ]]; then
     fi
     if ! [[ -e /tmp/.clock ]]; then
         clock
+    fi
+    if [[ ! -e /tmp/.pacsetup && ! -e "${_CACHEDIR}/archboot.db" ]]; then
+        pacsetup
     fi
     # switch for setup or launcher
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
