@@ -43,9 +43,6 @@ _run_pacman(){
 _install_packages() {
     _destdir_mounts || return 1
     _setsource
-    if [[ -z "${_S_SRC}" ]]; then
-        _select_source || return 1
-    fi
     _prepare_pacman || return 1
     _PACKAGES=""
     # add packages from archboot defaults
