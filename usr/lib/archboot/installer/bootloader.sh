@@ -974,7 +974,7 @@ _install_bootloader() {
         _set_device_name_scheme || return 1
     fi
     if [[ -z "${_S_SRC}" ]]; then
-        if ! _getsource; then
+        if ! _setsource; then
             _NEXTITEM="4"
             return 1
         fi
