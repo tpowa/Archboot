@@ -36,6 +36,7 @@ setup:
 - added titles  to all menus
 - removed and renamed cancel buttons
 - switched most msgboxes to infoboxes
+- removed menu points covered by Basic Setup routine
 ---
 2023.06 Highlights:
 - New domain https://archboot.com with new w3c conform html layout
