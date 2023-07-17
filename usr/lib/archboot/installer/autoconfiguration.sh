@@ -188,8 +188,9 @@ _auto_timesetting() {
 _auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if [[ "${_SYNC_URL}" != "" ]]; then
+    if grep -q '^Server' /etc/pacman.d/mirrorlist; then
         _dialog --infobox "Enable pacman mirror on installed system..." 3 70
+        _SYNC_URL=$(grep '^Server' /etc/pacman.d/mirrorlist | sed -e 's#.*\ ##g')
         #shellcheck disable=SC2027,SC2086
         awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
