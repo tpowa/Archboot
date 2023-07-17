@@ -42,7 +42,7 @@ _wireless() {
         iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
-        if _dialog --cancel-label "Exit" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
+        if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
         $(_essid_list _) \
         "HIDDEN" "SSID" "RESCAN" "SSIDs" 2>"${_ANSWER}"; then
             _WLAN_SSID=$(cat "${_ANSWER}")
@@ -100,7 +100,7 @@ _network() {
         _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
             #shellcheck disable=SC2086
-            if _dialog --cancel-label "Exit" --title " Network Interface " --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
+            if _dialog --cancel-label "${_LABEL}" --title " Network Interface " --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
                 _INTERFACE=$(cat "${_ANSWER}")
             else
                 _abort

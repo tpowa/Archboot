@@ -8,6 +8,7 @@ _LOG="/dev/tty7"
 _NO_LOG="/dev/null"
 _DLPROG="wget -q"
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
+_LABEL="Exit"
 
 # _dialog()
 # an el-cheapo dialog wrapper
