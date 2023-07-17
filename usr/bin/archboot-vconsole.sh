@@ -75,7 +75,7 @@ _vconsole_keymap() {
 }
 
 _check
-while true; dp
+while true; do
     _vconsole_font
     _vconsole_keymap
     _vconsole && break
