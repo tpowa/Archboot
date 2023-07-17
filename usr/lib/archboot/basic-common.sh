@@ -7,6 +7,9 @@ _RUNNING_ARCH="$(uname -m)"
 _LOG="/dev/tty7"
 _NO_LOG="/dev/null"
 _LABEL="Exit"
+_DLPROG="wget -q"
+_MIRRORLIST="/etc/pacman.d/mirrorlist"
+_KERNELPKG="linux"
 
 # _dialog()
 # an el-cheapo dialog wrapper
