@@ -10,7 +10,7 @@ fi
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
-_S_SRC=""         # choose mirror
+_S_SRC=""         # source set
 _S_QUICK_SETUP="" # guided fs/format
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
