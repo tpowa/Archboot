@@ -974,8 +974,8 @@ _install_bootloader() {
         _set_device_name_scheme || return 1
     fi
     if [[ -z "${_S_SRC}" ]]; then
-        if ! _select_source; then
-            _NEXTITEM="7"
+        if ! _getsource; then
+            _NEXTITEM="4"
             return 1
         fi
     fi
@@ -996,9 +996,9 @@ _install_bootloader() {
         fi
     fi
     if [[ -z "${_S_BOOTLOADER}" ]]; then
-        _NEXTITEM="7"
+        _NEXTITEM="4"
     else
-        _NEXTITEM="8"
+        _NEXTITEM="5"
     fi
 }
 # vim: set ft=sh ts=4 sw=4 et:

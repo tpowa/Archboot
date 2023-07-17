@@ -228,45 +228,41 @@ _configure_system() {
         fi
     done
     if [[ ${_S_CONFIG} -eq 1 ]]; then
-        _NEXTITEM="7"
+        _NEXTITEM="4"
     fi
 }
 
 _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
         _DEFAULT="--default-item ${_NEXTITEM}"
-    elif [[ -e "${_LOCAL_DB}" ]]; then
-        _DEFAULT="--default-item 4"
-    else
-        _DEFAULT="--default-item 3"
     fi
     #shellcheck disable=SC2086
     _dialog --no-cancel ${_DEFAULT} --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
-    "4" "Prepare Storage Device" \
-    "5" "Install Packages" \
-    "6" "Configure System" \
-    "7" "Install Bootloader" \
-    "8" "Exit" 2>${_ANSWER}
+    "1" "Prepare Storage Device" \
+    "2" "Install Packages" \
+    "3" "Configure System" \
+    "4" "Install Bootloader" \
+    "5" "Exit" 2>${_ANSWER}
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
-        "4")
+        "1")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
             else
                 _prepare_storagedrive
             fi ;;
-        "5")
+        "2")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
             else
                 _install_packages
             fi ;;
-        "6")
+        "3")
             _configure_system ;;
-        "7")
+        "4")
             _install_bootloader ;;
-        "8")
+        "5")
             #shellcheck disable=SC2086
             _dialog --title " Exit Menu " --menu "" 9 30 5 \
             "1" "Exit Program" \
