@@ -53,8 +53,8 @@ _auto_mdadm()
 # configures network on host system according to installer
 _auto_network()
 {
-    # exit if network wasn't configured in installer
-    if [[ -z ${_S_NET} ]]; then
+    # exit if network wasn't configured in basic setup
+    if [[ ! -e  /tmp/.network ]]; then
         return 1
     fi
     _dialog --infobox "Enable network and proxy settings on installed system..." 3 70

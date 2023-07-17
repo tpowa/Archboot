@@ -10,7 +10,6 @@ fi
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
-_S_NET=""         # network setting
 _S_SRC=""         # choose mirror
 _S_MKFS=""        # formatting
 _S_MKFSAUTO=""    # auto fs part/formatting
@@ -24,7 +23,6 @@ _BLKID="blkid -c ${_NO_LOG}"
 _FINDMNT="findmnt -vno SOURCE"
 _DLPROG="wget -q"
 if [[ ${_DESTDIR} == "/" ]]; then
-    _S_NET=1
     _S_SRC=1
 fi
 
