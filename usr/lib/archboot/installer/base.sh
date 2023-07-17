@@ -62,11 +62,11 @@ _abort_running_system() {
 
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
-        _dialog --title " Text Editor " --no-cancel --menu "" 8 35 2 \
-        "1" "nano (easier)" \
-        "2" "neovim" 2>${_ANSWER} || return 1
+        _dialog --title " Text Editor " --no-cancel --menu "" 8 55 2 \
+        "NANO" "Easier for newbies" \
+        "NEOVIM" "VIM variant for experts" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
-            "1") _EDITOR="nano"
+            "NANO") _EDITOR="nano"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES="nano"
                     _run_pacman
@@ -76,7 +76,7 @@ _geteditor() {
                     sleep 2
                 fi
                 ;;
-            "2") _EDITOR="nvim"
+            "NEOVIM") _EDITOR="nvim"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nvim" ]]; then
                     _PACKAGES="nvim"
                     _run_pacman
