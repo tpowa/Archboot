@@ -5,6 +5,7 @@
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 _DLPROG="wget -q"
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
+_KERNELPKG="linux"
 
 _select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
@@ -19,7 +20,7 @@ _select_mirror() {
     # FIXME: this regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
-    _dialog --no-cancel --title " Pacman Package Mirror " --menu "" 13 55 7 \
+    _dialog --no-cancel --title " Package Mirror " --menu "" 13 55 7 \
     "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || return 1
     #shellcheck disable=SC2155
     local _SERVER=$(cat "${_ANSWER}")
