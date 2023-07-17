@@ -62,7 +62,7 @@ _abort_running_system() {
 
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
-        _dialog --title " Text Editor " --no-cancel --menu "" 8 55 2 \
+        _dialog --title " Text Editor " --no-cancel --menu "" 8 45 2 \
         "NANO" "Easier for newbies" \
         "NEOVIM" "VIM variant for experts" 2>${_ANSWER} || return 1
         case $(cat ${_ANSWER}) in
