@@ -182,20 +182,20 @@ if [[ -e /usr/bin/setup ]]; then
     _enter_shell
     # Basic Setup:
     # glibc locale, vconsole, network, clock, pacman
-    if ! [[ -e /tmp/.localize ]]; then
+    if ! [[ -e /.localize ]]; then
         localize
         source /etc/locale.conf
     fi
-    if ! [[ -e /tmp/.vconsole ]]; then
+    if ! [[ -e /.vconsole ]]; then
         vconsole
     fi
-    if [[ ! -e /tmp/.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ ! -e /.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
         network
     fi
-    if ! [[ -e /tmp/.clock ]]; then
+    if ! [[ -e /.clock ]]; then
         clock
     fi
-    if [[ ! -e /tmp/.pacsetup && ! -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ ! -e /.pacsetup && ! -e "${_CACHEDIR}/archboot.db" ]]; then
         pacsetup
     fi
     # switch for setup or launcher
