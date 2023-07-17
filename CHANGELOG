@@ -13,12 +13,12 @@ Environment Changes:
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - run Basic Setup scripts on first login
-- added Basic Setup interactive launcher script
-- added Basic Setup network script
-- added Basic Setup pacsetup script
-- renamed km to Basic Setup vconsole script
-- renamed tz to Basic Setup clock script
-- renamed archboot-locale script to Basic Setup localize script
+- added interactive launcher script
+- added network script
+- added pacsetup script
+- renamed km to vconsole script
+- renamed tz to clock script
+- renamed archboot-locale script to localize script
 - load archboot.com and wiki.archlinux.org on firefox startup
 localize:
 - fixed abort dialog
