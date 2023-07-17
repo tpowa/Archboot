@@ -332,7 +332,6 @@ _mountpoints() {
     _dialog --infobox "Devices were mounted successfully." 3 50
     sleep 3
     _NEXTITEM="5"
-    _S_MKFS=1
 }
 
 # _mkfs()

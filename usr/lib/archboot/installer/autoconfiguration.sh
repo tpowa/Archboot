@@ -6,18 +6,16 @@
 # according to partitioning/formatting stage
 _auto_fstab(){
     # Modify fstab
-    if [[ -n "${_S_MKFS}" || -n "${_S_MKFSAUTO}" ]]; then
-        _dialog --infobox "Create new fstab on installed system..." 3 70
-        if [[ -f /tmp/.device-names ]]; then
-            sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
-        fi
-        if [[ -f /tmp/.fstab ]]; then
-            # clean fstab first from entries
-            sed -i -e '/^\#/!d' "${_DESTDIR}"/etc/fstab
-            sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
-        fi
-        sleep 2
+    _dialog --infobox "Create new fstab on installed system..." 3 70
+    if [[ -f /tmp/.device-names ]]; then
+        sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
     fi
+    if [[ -f /tmp/.fstab ]]; then
+        # clean fstab first from entries
+        sed -i -e '/^\#/!d' "${_DESTDIR}"/etc/fstab
+        sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
+    fi
+    sleep 2
 }
 
 # add udev rule for schedulers by default

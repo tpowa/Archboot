@@ -11,8 +11,7 @@ _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
 _S_SRC=""         # choose mirror
-_S_MKFS=""        # formatting
-_S_MKFSAUTO=""    # auto fs part/formatting
+_S_QUICK_SETUP="" # guided fs/format
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
 # To allow choice in script set EDITOR=""
@@ -134,8 +133,7 @@ _set_guid() {
 }
 
 _prepare_storagedrive() {
-    _S_MKFSAUTO=""
-    _S_MKFS=""
+    _S_QUICK_SETUP=""
     _DONE=""
     _NEXTITEM=""
     while [[ -z "${_DONE}" ]]; do
@@ -153,12 +151,12 @@ _prepare_storagedrive() {
             "4" "Set Filesystem Mountpoints" \
             "5" "Return To Main Menu" 2>${_ANSWER} || _CANCEL=1
         _NEXTITEM="$(cat ${_ANSWER})"
-        [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
+        [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
         case $(cat ${_ANSWER}) in
             "1")
                 _CREATE_MOUNTPOINTS=1
                 _autoprepare
-                [[ "${_S_MKFSAUTO}" = "1" ]] && _DONE=1
+                [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
                 ;;
             "2")
                 _partition ;;

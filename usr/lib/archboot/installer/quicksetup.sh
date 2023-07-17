@@ -296,6 +296,6 @@ _autoprepare() {
     done
     _dialog --infobox "Quick Setup was successful." 3 40
     sleep 3
-    _S_MKFSAUTO=1
+    _S_QUICK_SETUP=1
 }
 # vim: set ft=sh ts=4 sw=4 et:
