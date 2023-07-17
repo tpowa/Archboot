@@ -406,7 +406,7 @@ _new_environment() {
         cp /etc/locale.gen "${_W_DIR}"/tmp/etc
         cp /etc/locale.conf "${_W_DIR}"/tmp/etc
         cp /.localize "${_W_DIR}"/tmp/
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "locale-gen"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "locale-gen"
     fi
     if [[ -e '/.vconsole' ]]; then
         cp /etc/vconsole "${_W_DIR}"/tmp/etc
@@ -414,15 +414,15 @@ _new_environment() {
     fi
     if [[ -e '/.clock' ]]; then
         cp -a /etc/{adjtime,localtime} "${_W_DIR}"/tmp/etc
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-timesyncd.service;timedatectl set-ntp 1"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-timesyncd.service;timedatectl set-ntp 1"
         cp /.vconsole "${_W_DIR}"/tmp/
     fi
     if [[ -e '/.network' ]]; then
         cp -r /var/lib/iwd "${_W_DIR}"/tmp/var/lib
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable iwd"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable iwd"
         cp /etc/systemd/network/* "${_W_DIR}"/tmp//etc/systemd/network/
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-networkd"
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-resolved"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-networkd"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-resolved"
         rm "${_W_DIR}"/tmp/etc/systemd/network/10-wired-auto-dhcp.network
         [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_W_DIR}"/tmp/etc/profile.d/proxy.sh
         cp /.network "${_W_DIR}"/tmp/
