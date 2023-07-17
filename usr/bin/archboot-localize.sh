@@ -36,17 +36,10 @@ _localize() {
     sleep 3
 }
 
-if [[ -e /tmp/.localize-running ]]; then
-    echo "localize already runs on a different console!"
-    echo "Please remove /tmp/.localize-running first!"
-    exit 1
-fi 
-: >/tmp/.localize-running
+_check
 while [[ -z ${_LOCALE} ]]; do
     _localize_menu
 done
 _localize
-[[ -e /tmp/.localize-running ]] && rm /tmp/.localize-running
-clear
-exit 0
+_cleanup
 # vim: set ts=4 sw=4 et:

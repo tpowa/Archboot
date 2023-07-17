@@ -139,61 +139,6 @@ _set_guid() {
     fi
 }
 
-_configure_vconsole() {
-    if [[ -e /usr/bin/vconsole ]]; then
-        vconsole --setup && _NEXTITEM=1
-    elif [[ -e /usr/bin/archboot-vconsole.sh ]]; then
-        archboot-vconsole.sh --setup && _NEXTITEM=1
-    else
-        _dialog --title " ERROR " --infobox "vconsole script not found, aborting vconsole configuration." 3 60
-        sleep 5
-    fi
-}
-
-_configure_network() {
-    if [[ -e /usr/bin/network ]]; then
-        network --setup && _NEXTITEM="2"
-    elif [[ -e /usr/bin/archboot-network.sh ]]; then
-        archboot-network.sh --setup && _NEXTITEM="2"
-    else
-        _dialog --title " ERROR " --infobox "network script not found, aborting network configuration" 3 60
-        sleep 5
-    fi
-}
-
-_configure_clock() {
-    if [[ -e /usr/bin/clock ]]; then
-        clock --setup && _NEXTITEM="3"
-    elif [[ -e /usr/bin/archboot-clock.sh ]]; then
-        archboot-clock.sh --setup && _NEXTITEM="3"
-    else
-        _dialog --title " ERROR " --infobox "clock script not found, aborting clock configuration" 3 60
-    fi
-}
-
-_select_source() {
-    _NEXTITEM="3"
-    _set_title
-    _S_SRC=""
-    if [[ -e "${_LOCAL_DB}" ]]; then
-        _getsource || return 1
-    else
-        if [[ -z ${_S_NET} ]]; then
-            if ! [[ -e /tmp/.network ]]; then
-                network || return 1
-                _S_NET=1
-            else
-                _S_NET=1
-            fi
-        fi
-        if [[ -z ${_S_SRC} ]]; then
-            [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _enable_testing
-            _getsource || return 1
-        fi
-    fi
-    _NEXTITEM="4"
-}
-
 _prepare_storagedrive() {
     _S_MKFSAUTO=""
     _S_MKFS=""
@@ -304,10 +249,6 @@ _mainmenu() {
     #shellcheck disable=SC2086
     _dialog --no-cancel ${_DEFAULT} --title " MAIN MENU " \
     --menu "Use the UP and DOWN arrows to navigate menus.\nUse TAB to switch between buttons and ENTER to select." 17 58 14 \
-    "0" "Configure Console" \
-    "1" "Configure Network" \
-    "2" "Configure Clock" \
-    "3" "Select Source" \
     "4" "Prepare Storage Device" \
     "5" "Install Packages" \
     "6" "Configure System" \
@@ -315,25 +256,6 @@ _mainmenu() {
     "8" "Exit" 2>${_ANSWER}
     _NEXTITEM="$(cat ${_ANSWER})"
     case $(cat ${_ANSWER}) in
-        "0")
-            _configure_vconsole ;;
-        "1")
-            if [[ -e "${_LOCAL_DB}" ]]; then
-                _abort_local_mode
-            else
-                _configure_network
-            fi ;;
-        "2")
-            _configure_clock ;;
-        "3")
-            if [[ "${_DESTDIR}" == "/" ]]; then
-                _abort_running_system
-            elif [[ -e "${_LOCAL_DB}" ]]; then
-                _abort_local_mode
-            else
-                _select_source || return 1
-                _update_environment
-            fi ;;
         "4")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system

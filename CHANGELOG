@@ -12,12 +12,13 @@ Environment Changes:
 - added grub bli efi module
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
-- ask basic environment settings on first login
-- added interactive launcher script
-- added network script for network configuration
-- renamed km to vconsole
-- renamed tz to clock
-- renamed archboot-locale script to localize
+- run Basic Setup scripts on first login
+- added Basic Setup interactive launcher script
+- added Basic Setup network script
+- added Basic Setup pacsetup script
+- renamed km to Basic Setup vconsole script
+- renamed tz to Basic Setup clock script
+- renamed archboot-locale script to Basic Setup localize script
 - load archboot.com and wiki.archlinux.org on firefox startup
 localize:
 - fixed abort dialog
