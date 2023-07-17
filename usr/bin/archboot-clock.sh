@@ -1,30 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
-_ANSWER="/tmp/.clock"
-_RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Clock Configuration"
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
-
-_abort() {
-    if _dialog --yesno "Abort Arch Linux Clock Configuration?" 5 45; then
-        [[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-        [[ -e /tmp/.clock ]] && rm /tmp/.clock
-        clear
-        exit 1
-    else
-        _CONTINUE=""
-    fi
-}
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Clock Configuration"
+. /usr/lib/archboot/basic-common.sh
 
 _hwclock() {
     _DATE_PROGRAM=timedatectl
@@ -106,23 +84,11 @@ _timeset() {
     fi
 }
 
-if [[ -e /tmp/.clock-running ]]; then
-    echo "clock already runs on a different console!"
-    echo "Please remove /tmp/.clock-running first to launch clock!"
-    exit 1
-fi
-: >/tmp/.clock-running
+_check
 _SET_TIME=""
-if [[ -n "${1}" ]]; then
-_LABEL="Back"
-else
-_LABEL="Exit"
-fi
 while [[ -z "${_SET_TIME}" ]]; do
     _timezone
     _timeset
 done
-[[ -e /tmp/.clock-running ]] && rm /tmp/.clock-running
-clear
-exit 0
+_cleanup
 # vim: set ts=4 sw=4 et:

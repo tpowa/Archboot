@@ -116,7 +116,7 @@ _download_latest() {
         done
         # main libs
         echo -e "\e[1mStep 3/4:\e[m Downloading latest script libs..."
-        LIBS="common.sh container.sh release.sh iso.sh login.sh cpio.sh"
+        LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
         for i in ${LIBS}; do
             wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
         done

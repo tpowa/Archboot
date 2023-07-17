@@ -1,19 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
-_ANSWER="/tmp/.launcher"
-_RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Launcher"
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Launcher"
+. /usr/lib/archboot/basic-common.sh
 
 _show_login() {
     [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
@@ -96,6 +85,7 @@ _exit() {
     "3" "Poweroff System" 2>${_ANSWER} || return 1
         _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "1" ]]; then
+        [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
         _show_login
         exit 0
     elif [[ "${_EXIT}" == "2" ]]; then
@@ -138,13 +128,7 @@ _launcher() {
     esac
 }
 
-if [[ -e /tmp/.launcher-running ]]; then
-    echo "launcher already runs on a different console!"
-    echo "Please remove /tmp/.launcher-running first to launch launcher!"
-    exit 1
-fi
-: >/tmp/.launcher
-: >/tmp/.launcher-running
+_check
 while true; do
     _check_desktop
     _check_manage

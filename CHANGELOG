@@ -18,6 +18,7 @@ Environment Changes:
 - renamed km to vconsole
 - renamed tz to clock
 - renamed archboot-locale script to localize
+- load archboot.com and wiki.archlinux.org on firefox startup
 localize:
 - fixed abort dialog
 update:

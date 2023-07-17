@@ -4,48 +4,9 @@
 _getsource() {
     _PACMAN_CONF=""
     if [[ -e "${_LOCAL_DB}" ]]; then
-        _NEXTITEM="4"
         _local_pacman_conf
-    else
-        _select_mirror || return 1
     fi
     _S_SRC=1
-}
-
-_select_mirror() {
-    _NEXTITEM="3"
-    ## Download updated mirrorlist, if possible (only on x86_64)
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _dialog --infobox "Downloading latest mirrorlist..." 3 40
-        ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
-        if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
-            mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
-            cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
-        fi
-    fi
-    # FIXME: this regex doesn't honor commenting
-    _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
-    #shellcheck disable=SC2086
-    _dialog --title " Pacman Package Mirror " --menu "" 13 55 7 \
-        ${_MIRRORS} \
-        "Custom" "_" 2>${_ANSWER} || return 1
-    #shellcheck disable=SC2155
-    local _SERVER=$(cat "${_ANSWER}")
-    if [[ "${_SERVER}" == "Custom" ]]; then
-        _dialog --inputbox "Enter the full URL to repositories." 8 65 \
-            "" 2>"${_ANSWER}" || return 1
-            _SYNC_URL=$(cat "${_ANSWER}")
-    else
-        # Form the full URL for our mirror by grepping for the server name in
-        # our mirrorlist and pulling the full URL out. Substitute 'core' in
-        # for the repository name, and ensure that if it was listed twice we
-        # only return one line for the mirror.
-        _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_MIRRORLIST}" | head -n1)
-    fi
-    _NEXTITEM="4"
-    echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
-    #shellcheck disable=SC2027,SC2086
-    echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
 }
 
 _enable_testing() {

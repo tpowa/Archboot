@@ -1,32 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
-_ANSWER="/tmp/.network"
-_RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Network Configuration"
-_LOG="/dev/tty7"
-_NO_LOG="/dev/null"
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
-
-_abort() {
-    if _dialog --yesno "Abort Arch Linux Network Configuration?" 5 45; then
-        [[ -e /tmp/.network-running ]] && rm /tmp/.network-running
-        [[ -e /tmp/.network ]] && rm /tmp/.network
-        clear
-        exit 1
-    else
-        _CONTINUE=""
-    fi
-}
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Network Configuration"
+. /usr/lib/archboot/basic-common.sh
 
 _printk()
 {
@@ -222,22 +198,9 @@ _network() {
     return 0
 }
 
-if [[ -e /tmp/.network-running ]]; then
-    clear
-    echo "network already runs on a different console!"
-    echo "Please remove /tmp/.network-running first to launch network!"
-    exit 1
-fi
-: >/tmp/.network-running
-if [[ -n "${1}" ]]; then
-_LABEL="Back"
-else
-_LABEL="Exit"
-fi
+_check
 while true; do
     _network && break
 done
-[[ -e /tmp/.network-running ]] && rm /tmp/.network-running
-clear
-exit 0
+_cleanup
 # vim: set ft=sh ts=4 sw=4 et:

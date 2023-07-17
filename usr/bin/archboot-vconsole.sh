@@ -1,31 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # written by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
-_ANSWER="/tmp/.vconsole"
-_RUNNING_ARCH="$(uname -m)"
-_TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup | Vconsole Configuration"
+. /usr/lib/archboot/basic-common.sh
+_TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Vconsole Configuration"
 _LIST_MAPS="localectl list-keymaps --no-pager"
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
-
-_abort() {
-    if _dialog --yesno "Abort Arch Linux Vconsole Configuration?" 5 45; then
-        [[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
-        [[ -e /tmp/.vconsole ]] && rm /tmp/.vconsole
-        clear
-        exit 1
-    else
-        _CONTINUE=""
-    fi
-}
 
 _vconsole() {
     _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
@@ -35,6 +13,7 @@ _vconsole() {
     sleep 3
     _dialog --infobox "Vconsole configuration completed successfully." 3 50
     sleep 3
+    return 0
 }
 
 _vconsole_font() {
@@ -95,21 +74,11 @@ _vconsole_keymap() {
     done
 }
 
-if [[ -e /tmp/.vconsole-running ]]; then
-    echo "vconsole already runs on a different vconsole!"
-    echo "Please remove /tmp/.vconsole-running first to launch vconsole!"
-    exit 1
-fi 
-: >/tmp/.vconsole-running
-if [[ -n "${1}" ]]; then
-_LABEL="Back"
-else
-_LABEL="Exit"
-fi
-_vconsole_font
-_vconsole_keymap
-[[ -e /tmp/.vconsole-running ]] && rm /tmp/.vconsole-running
-_vconsole
-clear
-exit 0
+_check
+while true; dp
+    _vconsole_font
+    _vconsole_keymap
+    _vconsole && break
+done
+_cleanup
 # vim: set ts=4 sw=4 et:
