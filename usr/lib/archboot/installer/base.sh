@@ -60,10 +60,6 @@ _abort_running_system() {
     _dialog --msgbox "This function is not available on System Setup Mode." 5 60
 }
 
-_abort_local_mode() {
-    _dialog --msgbox "This function is not available on Offline Mode." 5 60
-}
-
 _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
         _dialog --title " Text Editor " --no-cancel --menu "" 8 35 2 \

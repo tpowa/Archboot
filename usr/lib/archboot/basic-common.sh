@@ -6,8 +6,6 @@ _ANSWER="/tmp/.$(basename ${0})"
 _RUNNING_ARCH="$(uname -m)"
 _LOG="/dev/tty7"
 _NO_LOG="/dev/null"
-_DLPROG="wget -q"
-_MIRRORLIST="/etc/pacman.d/mirrorlist"
 _LABEL="Exit"
 
 # _dialog()

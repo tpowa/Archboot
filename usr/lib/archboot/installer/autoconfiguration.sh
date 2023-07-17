@@ -50,10 +50,10 @@ _auto_mdadm()
     fi
 }
 
-# configures network on host system according to installer
+# configures network on host system according to Basic Setup
 _auto_network()
 {
-    # exit if network wasn't configured in basic setup
+    # exit if network wasn't configured in Basic Setup
     if [[ ! -e  /tmp/.network ]]; then
         return 1
     fi
@@ -91,7 +91,7 @@ _auto_pacman_keyring()
 
 _auto_testing()
 {
-    if [[ -n "${_DOTESTING}" ]]; then
+    if grep -q "^\[.*testing\]" /etc/pacman.conf; then
         _dialog --infobox "Enable [testing] repository on installed system..." 3 70
         sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
         sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf

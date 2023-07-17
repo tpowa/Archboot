@@ -101,7 +101,7 @@ _download_latest() {
         # helper binaries
         echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
         # main binaries
-        BINS="quickinst setup vconsole clock launcher localize network update copy-mountpoint rsync-backup restore-usbstick"
+        BINS="quickinst setup vconsole clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done

@@ -3,6 +3,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
+_DLPROG="wget -q"
+_MIRRORLIST="/etc/pacman.d/mirrorlist"
 
 _select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
@@ -51,14 +53,10 @@ _enable_testing() {
 }
 
 _update_environment() {
-    if [[ -d "/var/cache/pacman/pkg" ]] && [[ -n "$(ls -A "/var/cache/pacman/pkg")" ]]; then
-        echo "Packages are already in pacman cache..."  >"${_LOG}"
-        _dialog --infobox "Packages are already in pacman cache.\nSkipping update environment.\nContinuing in 5 seconds..." 5 50
-        sleep 5
-    else
-        _UPDATE_ENVIRONMENT=""
-        _LOCAL_KERNEL=""
-        _ONLINE_KERNEL=""
+    _UPDATE_ENVIRONMENT=""
+    _LOCAL_KERNEL=""
+    _ONLINE_KERNEL=""
+    if update | grep -q '\-latest'; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 _dialog --infobox "Refreshing package database..." 3 70
@@ -69,7 +67,7 @@ _update_environment() {
                 _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                     #shellcheck disable=SC2086
-                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                _   ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     if [[ -n "${_DOTESTING}" ]]; then
                         #shellcheck disable=SC2086
@@ -91,9 +89,11 @@ _update_environment() {
                         clear
                         echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
                         echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
-                        echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
-                        echo -e "\e[1mRunning now: \e[92mupdate -latest-install\e[m"
-                        update -latest-install
+                        if update | grep -q latest-install; then
+                            update -latest-install
+                        else
+                            update -latest
+                        fi
                     fi
                 fi
             fi
@@ -128,7 +128,9 @@ _prepare_pacman() {
 
 _check
 while true; do
+    _enable_testing
     _select_mirror && break
 done
+_update_environment
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
