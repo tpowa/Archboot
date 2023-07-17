@@ -43,7 +43,6 @@ _run_pacman(){
 _install_packages() {
     _destdir_mounts || return 1
     _setsource
-    _prepare_pacman || return 1
     _PACKAGES=""
     # add packages from archboot defaults
     _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')
