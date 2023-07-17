@@ -52,6 +52,31 @@ _enable_testing() {
     fi
 }
 
+_prepare_pacman() {
+    # Set up the necessary directories for pacman use
+    [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
+    _dialog --infobox "Waiting for Arch Linux keyring initialization..." 3 40
+    # pacman-key process itself
+    while pgrep -x pacman-key &>"${_NO_LOG}"; do
+        sleep 1
+    done
+    # gpg finished in background
+    while pgrep -x gpg &>"${_NO_LOG}"; do
+        sleep 1
+    done
+    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
+    _dialog --infobox "Update Arch Linux keyring..." 3 40
+    _KEYRING="archlinux-keyring"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
+    #shellcheck disable=SC2086
+    if ! pacman -Sy --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
+        _dialog --title " ERROR " --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
+        sleep 5
+        return 1
+    fi
+}
+
 _update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
@@ -101,36 +126,12 @@ _update_environment() {
     fi
 }
 
-_prepare_pacman() {
-    # Set up the necessary directories for pacman use
-    [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
-    [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
-    _dialog --infobox "Waiting for Arch Linux keyring initialization..." 3 40
-    # pacman-key process itself
-    while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    # gpg finished in background
-    while pgrep -x gpg &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    _dialog --infobox "Update Arch Linux keyring..." 3 40
-    _KEYRING="archlinux-keyring"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
-    #shellcheck disable=SC2086
-    if ! pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
-        _dialog --title " ERROR " --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
-        sleep 5
-        return 1
-    fi
-}
-
 _check
 while true; do
     _enable_testing
     _select_mirror && break
 done
+_prepare_pacman || exit 1
 _update_environment
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
