@@ -401,6 +401,39 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
+    # copy configs to new container
+    if [[ -e '/.localize' ]]; then
+        cp /etc/locale.gen "${_W_DIR}"/tmp/etc
+        cp /etc/locale.conf "${_W_DIR}"/tmp/etc
+        cp /.localize "${_W_DIR}"/tmp/
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "locale-gen"
+    fi
+    if [[ -e '/.vconsole' ]]; then
+        cp /etc/vconsole "${_W_DIR}"/tmp/etc
+        cp /.vconsole "${_W_DIR}"/tmp/
+    fi
+    if [[ -e '/.clock' ]]; then
+        cp -a /etc/{adjtime,localtime} "${_W_DIR}"/tmp/etc
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-timesyncd.service;timedatectl set-ntp 1"
+        cp /.vconsole "${_W_DIR}"/tmp/
+    fi
+    if [[ -e '/.network' ]]; then
+        cp -r /var/lib/iwd "${_W_DIR}"/tmp/var/lib
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable iwd"
+        cp /etc/systemd/network/* "${_W_DIR}"/tmp//etc/systemd/network/
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-networkd"
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "systemctl enable systemd-resolved"
+        rm "${_W_DIR}"/tmp/etc/systemd/network/10-wired-auto-dhcp.network
+        [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_W_DIR}"/tmp/etc/profile.d/proxy.sh
+        cp /.network "${_W_DIR}"/tmp/
+    fi
+    if [[ -e '/.pacsetup' ]]; then
+        cp /etc/pacman.conf "${_W_DIR}"/tmp/etc
+        cp /etc/pacman.d/mirrorlist "${_W_DIR}"/tmp/etc/pacman.d/
+        cp -ar /etc/pacman.d/gnupg "${_W_DIR}"/tmp/etc/pacman.d
+        rm "${_W_DIR}"/tmp/etc/systemd/system/pacman-init.service
+        cp /.pacsetup "${_W_DIR}"/tmp/
+    fi
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
     _create_initramfs

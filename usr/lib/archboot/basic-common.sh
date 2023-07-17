@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 LANG=C
-_ANSWER="/tmp/.$(basename ${0})"
+_ANSWER="/.$(basename ${0})"
 _RUNNING_ARCH="$(uname -m)"
 _LOG="/dev/tty7"
 _NO_LOG="/dev/null"

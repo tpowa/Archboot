@@ -174,6 +174,8 @@ _network() {
     else
         for i in ${_PROXIES}; do
             export "${i}"="${_PROXY}"
+            echo "export ${i}=${_PROXY}" >> /etc/profile.d/proxy.sh
+            chmod a+x "${_DESTDIR}"/etc/profile.d/proxy.sh
         done
     fi
     if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then

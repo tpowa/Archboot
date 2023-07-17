@@ -69,11 +69,8 @@ _auto_network()
         chroot "${_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}"
     fi
     # copy proxy settings
-    if [[ -n "${_PROXY}" ]]; then
-        for i in ${_PROXIES}; do
-            echo "export ${i}=${_PROXY}" >> "${_DESTDIR}"/etc/profile.d/proxy.sh
-            chmod a+x "${_DESTDIR}"/etc/profile.d/proxy.sh
-        done
+    if [[ -e "/etc/profile.d/proxy.sh" ]]; then
+        cp /etc/profile.d/proxy.sh "${_DESTDIR}"/etc/profile.d/proxy.sh
     fi
     sleep 2
 }

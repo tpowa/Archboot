@@ -25,7 +25,7 @@ _localize_menu() {
 _localize() {
     _dialog --infobox "Localization set to ${_LOCALE}.UTF-8..." 3 50
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
-    echo "LANG=${_LOCALE}.UTF-8" > /tmp/.localize
+    echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
