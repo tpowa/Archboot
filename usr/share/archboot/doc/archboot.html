@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 17.07.2023 17:57</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 17.07.2023 18:49</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -35,7 +35,7 @@
 <li><a href="#interactive-launcher" id="toc-interactive-launcher"><span class="toc-section-number">3.4</span> Interactive Launcher</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For Experts: Quickinst Installation</a></li>
-<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> Manage Environment</a></li>
+<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> CLI Manage Environment</a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools For Backup And Copying Of An Existing System</a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring An USB Device To FAT32 State</a></li>
 <li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> System configuration on installed system</a></li>
@@ -470,7 +470,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.3" id="interactive-launcher"><span class="header-section-number">3.3</span> <strong>Interactive Basic Setup</strong></h3>
+<h3 data-number="3.3" id="interactive-basic-setup"><span class="header-section-number">3.3</span> <strong>Interactive Basic Setup</strong></h3>
 <p>The interactive <strong>scripts</strong> are launched on <strong>first</strong> login.</p>
 <h4 data-number="3.3.1" id="localization"><span class="header-section-number">3.3.1</span> <strong>Localization</strong></h4>
 <p>Your <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>locale</strong></a> will be set by <strong>localize</strong> script.</p>
@@ -510,7 +510,8 @@
 <li>The interactive <strong>launcher</strong> script for quick navigation is launched on <strong>first</strong> login.</li>
 <li>You can go straight to <strong>setup</strong>, leave to <strong>shell</strong>, launch <strong>desktop environment</strong> or do <strong>environment management</strong>.</li>
 </ul>
-<h4 data-number="3.4.1" id="desktop-environments"><span class="header-section-number">3.4.1</span> <strong>Desktop Environments / VNC Remote Access</strong></h4>
+<h4 data-number="3.4.1" id="desktop-environments"><span class="header-section-number">3.4.1</span> <strong>Launch Desktop Environment / Remote VNC Access</strong></h4>
+<p><a href="https://wiki.archlinux.org/title/Gnome" title="GNOME"><strong>Gnome</strong></a>, <a href="https://wiki.archlinux.org/title/Plasma" title="PLASMA"><strong>Plasma</strong></a>, <a href="https://wiki.archlinux.org/title/Sway" title="SWAY"><strong>Sway</strong></a> and <a href="https://wiki.archlinux.org/title/Xfce" title="XFCE"><strong>Xfce</strong></a> are supported.</p>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is automatically launched with starting <a href="https://wiki.archlinux.org/title/Xorg" title="Xorg"><strong>Xorg</strong></a>.
 <ul>
@@ -523,12 +524,15 @@
 </ul></li>
 <li>On <strong>MacOS/Windows</strong> you can use <a href="https://www.realvnc.com/en/connect/download/viewer/" title="RealVNC"><strong>RealVNC</strong></a> for passwordless login.</li>
 </ul>
-<h4 data-number="3.4.2" id="desktop-environments"><span class="header-section-number">3.4.2</span> <strong>Manage Archboot Environment</strong></h4>
+<h4 data-number="3.4.2" id="manage-archboot-environment"><span class="header-section-number">3.4.2</span> <strong>Manage Archboot Environment</strong></h4>
+<h5 data-number="3.4.2.1" id="full-arch-linux-system"><span class="header-section-number">3.4.2.1</span> <strong>Full Arch Linux System</strong></h5>
 <ul>
 <li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
 <li>Though <strong>perl, python, man/info pages, includes, additional kernel modules (eg. sound)</strong><br>and other things are <strong>not</strong> provided by default.</li>
 <li>This will also <strong>stop</strong> cleaning the system, while running other <strong>update</strong> tasks.</li>
 </ul>
+<h5 data-number="3.4.2.2" id="update-archboot-environment"><span class="header-section-number">3.4.2.2</span> <strong>Update Archboot Environment</strong></h5>
+<h5 data-number="3.4.2.3" id="create-new-images"><span class="header-section-number">3.4.2.3</span> <strong>Create New Images</strong></h5>
 <h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
 <ul>
 <li>You can run each menu point for doing the mentioned task.</li>
@@ -583,7 +587,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.7" id="manage-archboot"><span class="header-section-number">3.7</span> <strong>Manage Environment</strong></h3>
+<h3 data-number="3.7" id="cli-manage-archboot"><span class="header-section-number">3.7</span> <strong>CLI Manage Environment</strong></h3>
 <p>You can always bump your image to <strong>latest</strong> available possibilities.</p>
 <table>
 <thead>
