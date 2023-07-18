@@ -32,7 +32,7 @@ setup:
 - switched to infobox on reboot and poweroff
 - removed network code
 - removed localization code
-- added titles  to all menus
+- added titles to all menus
 - removed and renamed cancel buttons
 - switched most msgboxes to infoboxes
 - removed menu points covered by Basic Setup routine
