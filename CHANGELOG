@@ -9,6 +9,7 @@ Environment Changes:
 - renamed Locale Mode to Offline Mode
 - removed custom grub package
 - removed uninstalled packages
+- added grub bli efi module
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - run Basic Setup scripts on first login
