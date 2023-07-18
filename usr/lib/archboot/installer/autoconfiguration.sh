@@ -52,7 +52,7 @@ _auto_mdadm()
 _auto_network()
 {
     # exit if network wasn't configured in Basic Setup
-    if [[ ! -e  /tmp/.network ]]; then
+    if [[ ! -e  /.network ]]; then
         return 1
     fi
     _dialog --infobox "Enable network and proxy settings on installed system..." 3 70
@@ -204,7 +204,7 @@ _auto_hostname() {
 _auto_locale() {
     _dialog --infobox "Set default locale on installed system..." 3 70
     if [[ ! -f ${_DESTDIR}/etc/locale.conf ]]; then
-        if [[ -n ${_DESTDIR} && -e /tmp/.localize ]]; then
+        if [[ -n ${_DESTDIR} && -e /.localize ]]; then
             cp /etc/locale.conf "${_DESTDIR}"/etc/locale.conf
         else
             echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
