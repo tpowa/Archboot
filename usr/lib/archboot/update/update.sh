@@ -17,6 +17,8 @@ _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
 _UPDATE="/${_LIB}/update"
+_LOG="/dev/tty7"
+_NO_LOG="/dev/null"
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="Image"
 
@@ -143,7 +145,7 @@ _download_latest() {
 }
 
 _network_check() {
-    if ! getent hosts www.google.com &>/dev/null; then
+    if ! getent hosts www.google.com &>"${_NO_LOG}"; then
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
@@ -183,11 +185,11 @@ _clean_archboot() {
 
 _gpg_check() {
     # pacman-key process itself
-    while pgrep -x pacman-key &>/dev/null; do
+    while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
     done
     # gpg finished in background
-    while pgrep -x gpg &>/dev/null; do
+    while pgrep -x gpg &>"${_NO_LOG}"; do
         sleep 1
     done
     if [[ -e /etc/systemd/system/pacman-init.service ]]; then
@@ -198,7 +200,7 @@ _gpg_check() {
 _create_container() {
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
-        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >/dev/tty7 2>&1 || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"$_LOG}" 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -206,14 +208,14 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db "${_W_DIR}"/var/cache/pacman/pkg/archboot.db
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >/dev/tty7 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >"$_LOG}" 2>&1 || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
     else
         #online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >/dev/tty7 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"$_LOG}" 2>&1 || exit 1
         fi
     fi
 }
@@ -222,7 +224,7 @@ _kver_x86() {
     # get kernel version from installed kernel
     if [[ -f "${_RAM}/${_VMLINUZ}" ]]; then
         offset="$(od -An -j0x20E -dN2 "${_RAM}/${_VMLINUZ}")"
-        read -r _HWKVER _ < <(dd if="${_RAM}/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>/dev/null)
+        read -r _HWKVER _ < <(dd if="${_RAM}/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_NO_LOG}")
     fi
 }
 
@@ -247,7 +249,7 @@ _create_initramfs() {
             LANG=C bsdtar --null -cf - --format=newc @- |
             zstd --rm -T0> ${_RAM}/${_INITRD} &
     sleep 2
-    while pgrep -x zstd &>/dev/null; do
+    while pgrep -x zstd &>"${_NO_LOG}"; do
         _clean_kernel_cache
         sleep 1
     done
@@ -290,14 +292,14 @@ _prepare_graphic() {
         done
     fi
     #shellcheck disable=SC2086
-    pacman -Syu ${_IGNORE} --noconfirm &>/dev/null || exit 1
+    pacman -Syu ${_IGNORE} --noconfirm &>"${_NO_LOG}" || exit 1
     [[ ! -e "/.full_system" ]] && _cleanup_install
     # check for qxl module
     grep -q qxl /proc/modules && grep -q xorg "${_GRAPHIC}" && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     echo "Running pacman to install packages: ${_GRAPHIC}..."
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>/dev/null || exit 1
+        pacman -S ${i} --noconfirm &>"${_NO_LOG}" || exit 1
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
         rm -f /var/log/pacman.log
@@ -307,17 +309,17 @@ _prepare_graphic() {
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
-                pacman -S firefox-i18n-"${i}" --noconfirm &>/dev/null || exit 1
+                pacman -S firefox-i18n-"${i}" --noconfirm &>"${_NO_LOG}" || exit 1
             fi
         done
         if grep -q en_US /etc/locale.conf; then
-            pacman -S firefox-i18n-en-us --noconfirm &>/dev/null || exit 1
+            pacman -S firefox-i18n-en-us --noconfirm &>"${_NO_LOG}" || exit 1
         elif grep -q es_ES /etc/locale.conf; then
-            pacman -S firefox-i18n-es-es --noconfirm &>/dev/null || exit 1
+            pacman -S firefox-i18n-es-es --noconfirm &>"${_NO_LOG}" || exit 1
         elif grep -q pt_PT /etc/locale.conf; then
-            pacman -S firefox-i18n-pt-pt --noconfirm &>/dev/null || exit 1
+            pacman -S firefox-i18n-pt-pt --noconfirm &>"${_NO_LOG}" || exit 1
         elif grep -q sv_SE /etc/locale.conf; then
-            pacman -S firefox-i18n-sv-se --noconfirm &>/dev/null || exit 1
+            pacman -S firefox-i18n-sv-se --noconfirm &>"${_NO_LOG}" || exit 1
         fi
     fi
     if [[ ! -e "/.full_system" ]]; then
@@ -329,11 +331,11 @@ _prepare_graphic() {
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
         ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
         ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
-        ! -path '*/sv/*' ! -path '*/uk/*' -delete &>/dev/null
-        find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
+        ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+        find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
-    systemd-sysusers >/dev/tty7 2>&1
-    systemd-tmpfiles --create >/dev/tty7 2>&1
+    systemd-sysusers >"$_LOG}" 2>&1
+    systemd-tmpfiles --create >"$_LOG}" 2>&1
     # fixing dbus requirements
     systemctl reload dbus
     systemctl reload dbus-org.freedesktop.login1.service
@@ -377,7 +379,7 @@ _new_environment() {
     echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
     echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >/dev/tty7 2>&1 || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >"$_LOG}" 2>&1 || exit 1
     echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
@@ -387,8 +389,8 @@ _new_environment() {
         echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Switch root to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
-        rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>/dev/null
-        rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+        rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
+        rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
         touch /etc/initrd-release
@@ -401,37 +403,38 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
+    _C_DIR="${_W_DIR}/tmp"
     echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
-        cp /etc/{locale.gen,locale.conf} "${_W_DIR}"/tmp/etc
-        cp /.localize "${_W_DIR}"/tmp/
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "locale-gen" &>/dev/null
+        cp /etc/{locale.gen,locale.conf} "${_C_DIR}"/etc
+        cp /.localize "${_C_DIR}"/
+        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "locale-gen" &>"${_NO_LOG}"
     fi
     if [[ -e '/.vconsole' ]]; then
-        cp /etc/vconsole.conf "${_W_DIR}"/tmp/etc
-        cp /.vconsole "${_W_DIR}"/tmp/
-        : >"${_W_DIR}"/tmp/.vconsole-run
+        cp /etc/vconsole.conf "${_C_DIR}"/etc
+        cp /.vconsole "${_C_DIR}"/
+        : >"${_C_DIR}"/.vconsole-run
     fi
     if [[ -e '/.clock' ]]; then
-        cp -a /etc/{adjtime,localtime} "${_W_DIR}"/tmp/etc
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-timesyncd.service" &>/dev/null
-        cp /.clock "${_W_DIR}"/tmp/
+        cp -a /etc/{adjtime,localtime} "${_C_DIR}"/etc
+        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-timesyncd.service" &>"${_NO_LOG}"
+        cp /.clock "${_C_DIR}"/
     fi
     if [[ -e '/.network' ]]; then
-        cp -r /var/lib/iwd "${_W_DIR}"/tmp/var/lib
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable iwd" &>/dev/null
-        cp /etc/systemd/network/* "${_W_DIR}"/tmp/etc/systemd/network/
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-networkd" &>/dev/null
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-resolved" &>/dev/null
-        rm "${_W_DIR}"/tmp/etc/systemd/network/10-wired-auto-dhcp.network
-        [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_W_DIR}"/tmp/etc/profile.d/proxy.sh
-        cp /.network "${_W_DIR}"/tmp/
+        cp -r /var/lib/iwd "${_C_DIR}"/var/lib
+        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable iwd" &>"${_NO_LOG}"
+        cp /etc/systemd/network/* "${_C_DIR}"/etc/systemd/network/
+        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-networkd" &>"${_NO_LOG}"
+        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-resolved" &>"${_NO_LOG}"
+        rm "${_C_DIR}"/etc/systemd/network/10-wired-auto-dhcp.network
+        [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_C_DIR}"/etc/profile.d/proxy.sh
+        cp /.network "${_C_DIR}"/
     fi
     if [[ -e '/.pacsetup' ]]; then
-        cp /etc/pacman.conf "${_W_DIR}"/tmp/etc
-        cp /etc/pacman.d/mirrorlist "${_W_DIR}"/tmp/etc/pacman.d/
-        cp -ar /etc/pacman.d/gnupg "${_W_DIR}"/tmp/etc/pacman.d
-        cp /.pacsetup "${_W_DIR}"/tmp/
+        cp /etc/pacman.conf "${_C_DIR}"/etc
+        cp /etc/pacman.d/mirrorlist "${_C_DIR}"/etc/pacman.d/
+        cp -ar /etc/pacman.d/gnupg "${_C_DIR}"/etc/pacman.d
+        cp /.pacsetup "${_C_DIR}"/
     fi
     echo -e "\e[1mStep ${_S_APPEND}8/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
@@ -458,10 +461,10 @@ _new_environment() {
     sleep 0.1
     _clean_kernel_cache
     rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
-    umount ${_RAM} &>/dev/null
-    rm -r ${_RAM} &>/dev/null
+    umount ${_RAM} &>"${_NO_LOG}"
+    rm -r ${_RAM} &>"${_NO_LOG}"
     #shellcheck disable=SC2115
-    rm -rf /usr/* &>/dev/null
+    rm -rf /usr/* &>"${_NO_LOG}"
     while true; do
         _clean_kernel_cache
         read -r -t 1
@@ -488,8 +491,8 @@ _full_system() {
     echo -e "\e[1mInitializing full Arch Linux system...\e[m"
     echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
     echo "          This will need some time..."
-    pacman -Sy >/dev/tty7 2>&1 || exit 1
-    pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >/dev/tty7 2>&1 || exit 1
+    pacman -Sy >"$_LOG}" 2>&1 || exit 1
+    pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >"$_LOG}" 2>&1 || exit 1
     echo -e "\e[1mStep 2/3:\e[m Checking kernel version..."
     _kernel_check
     echo -e "\e[1mStep 3/3:\e[m Trigger kernel module loading..."
@@ -513,35 +516,35 @@ _new_image() {
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > /dev/tty7 || exit 1
-    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > /dev/tty7
+    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "$_LOG}" || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "$_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # removing not working lvm2 from latest image
-        echo "Removing lvm2 from container ${_W_DIR}..." > /dev/tty7
-        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
+        echo "Removing lvm2 from container ${_W_DIR}..." > "$_LOG}"
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         # generate latest tarball in container
-        echo "Generating local ISO..." > /dev/tty7
+        echo "Generating local ISO..." > "$_LOG}"
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         _ram_check
-        echo "Generating latest ISO..." > /dev/tty7
+        echo "Generating latest ISO..." > "$_LOG}"
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
-        echo "Installing lvm2 to container ${_W_DIR}..." > /dev/tty7
-        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
+        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
+        echo "Installing lvm2 to container ${_W_DIR}..." > "$_LOG}"
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    echo "Generating normal ISO..." > /dev/tty7
+    echo "Generating normal ISO..." > "$_LOG}"
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
-    -i=${_ISONAME}-${_RUNNING_ARCH}" > /dev/tty7 || exit 1
+    -i=${_ISONAME}-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
     # move iso out of container
-    mv "${_W_DIR}"/*.iso ./ &>/dev/null
-    mv "${_W_DIR}"/*.img ./ &>/dev/null
+    mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
+    mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     rm -r "${_W_DIR}"
     echo -e "\e[1mFinished:\e[m New isofiles are located in /archboot"
 }
@@ -558,8 +561,8 @@ _install_graphic () {
     # only start vnc on xorg environment
     echo -e "\e[1mStep 3/3:\e[m Setting up VNC and browser...\e[m"
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
-    command -v firefox &>/dev/null  && _firefox_flags
-    command -v chromium &>/dev/null && _chromium_flags
+    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
+    command -v chromium &>"${_NO_LOG}" && _chromium_flags
     [[ -n "${_L_XFCE}" ]] && _start_xfce
     [[ -n "${_L_GNOME}" ]] && _start_gnome
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
@@ -578,9 +581,9 @@ _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop..."
-        _configure_gnome >/dev/tty7 2>&1
+        _configure_gnome >"$_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop already done..."
@@ -591,9 +594,9 @@ _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop..."
-        _configure_plasma >/dev/tty7 2>&1
+        _configure_plasma >"$_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop already done..."
@@ -604,9 +607,9 @@ _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >/dev/tty7 2>&1
+        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop..."
-        _configure_sway >/dev/tty7 2>&1
+        _configure_sway >"$_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop already done..."
@@ -806,22 +809,22 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > /dev/tty7 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > "$_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > /dev/tty7 2>&1
+        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "$_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/3:\e[m Starting avahi-daemon..."
     systemctl start avahi-daemon.service
     echo -e "\e[1mStep 3/3:\e[m Setting up browser...\e[m"
-    which firefox &>/dev/null  && _firefox_flags
-    which chromium &>/dev/null && _chromium_flags
+    which firefox &>"${_NO_LOG}"  && _firefox_flags
+    which chromium &>"${_NO_LOG}" && _chromium_flags
 }
 
 _chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf..." >/dev/tty7
+    echo "Adding chromium flags to /etc/chromium-flags.conf..." >"$_LOG}"
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
@@ -833,7 +836,7 @@ EOF
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
         if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js..." >/dev/tty7
+            echo "Adding firefox flags vendor.js..." >"$_LOG}"
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
@@ -847,10 +850,10 @@ EOF
 }
 
 _autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >/dev/tty7
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >"$_LOG}"
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc..." >/dev/tty7
+    echo "Autostarting tigervnc..." >"$_LOG}"
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
