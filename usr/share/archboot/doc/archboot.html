@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 17.07.2023 18:49</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 18.07.2023 08:36</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -478,7 +478,7 @@
 <p>Your <a href="https://wiki.archlinux.org/title/Console_fonts" title="Console fonts"><strong>console fonts</strong></a> and <a href="https://wiki.archlinux.org/title/Keymap" title="Keymap"><strong>keymap</strong></a> will be set by <strong>vconsole</strong> script.</p>
 <h4 data-number="3.3.3" id="network"><span class="header-section-number">3.3.3</span> <strong>Network Configuration</strong></h4>
 <ul>
-<li><strong>Offline Mode</strong>:
+<li><strong>Offline Mode (local medium)</strong>:
 <ul>
 <li>Skipped in this mode.</li>
 </ul></li>
@@ -494,7 +494,7 @@
 <h4 data-number="3.3.5" id="pacman"><span class="header-section-number">3.3.5</span> <strong>Pacman Setup</strong></h4>
 <p>Your <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> will be configured by <strong>pacsetup</strong> script.</p>
 <ul>
-<li><strong>Offline Mode</strong>:
+<li><strong>Offline Mode (local medium)</strong>:
 <ul>
 <li>Skipped in this mode.</li>
 </ul></li>
@@ -532,7 +532,15 @@
 <li>This will also <strong>stop</strong> cleaning the system, while running other <strong>update</strong> tasks.</li>
 </ul>
 <h5 data-number="3.4.2.2" id="update-archboot-environment"><span class="header-section-number">3.4.2.2</span> <strong>Update Archboot Environment</strong></h5>
+<ul>
+<li>The Archboot Environment will be updated to latest packages.</li>
+<li>Depending on the available RAM you will get the new system with or without package cache.</li>
+<li>The new system will be booted through kexec.</li>
+</ul>
 <h5 data-number="3.4.2.3" id="create-new-images"><span class="header-section-number">3.4.2.3</span> <strong>Create New Images</strong></h5>
+<ul>
+<li>You get will new images with latest packages.</li>
+</ul>
 <h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
 <ul>
 <li>You can run each menu point for doing the mentioned task.</li>
